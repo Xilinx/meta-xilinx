@@ -1,0 +1,6 @@
+#!/bin/sh
+
+PATH=/bin:/sbin:/usr/bin:/usr/sbin
+
+echo "Starting inetd: "
+/usr/sbin/inetd &
