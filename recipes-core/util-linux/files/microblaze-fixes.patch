@@ -1,0 +1,17 @@
+Fixed microblaze/el support.
+
+Index: util-linux-2.21/fdisk/fdiskbsdlabel.h
+===================================================================
+--- util-linux-2.21.orig/fdisk/fdiskbsdlabel.h	2012-10-08 12:48:44.749417892 +1000
++++ util-linux-2.21/fdisk/fdiskbsdlabel.h	2012-10-08 12:49:58.356743930 +1000
+@@ -54,7 +54,8 @@
+ #elif defined (__alpha__) || defined (__powerpc__) || defined (__ia64__) || defined (__hppa__)
+ #define BSD_LABELSECTOR   0
+ #define BSD_LABELOFFSET   64
+-#elif defined (__s390__) || defined (__s390x__)
++#elif defined (__s390__) || defined (__s390x__) || \
++    defined(__microblaze__) || defined(__microblazeel__)
+ #define BSD_LABELSECTOR   1
+ #define BSD_LABELOFFSET   0
+ #else
+
