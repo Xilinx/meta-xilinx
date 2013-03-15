@@ -9,13 +9,12 @@ A layer must exist above `libffi' that handles type conversions for values passe
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e54c573c49435ccbbd3f6dc9e49a065e"
 
-S = "${WORKDIR}/git"
 PR = "r0"
 
-BRANCH = "microblaze-support-rebase"
-SRC_URI = "git://developer.petalogix.com/petalogix/internal/git/private/dev/nrossi/libffi;protocol=ssh;branch=${BRANCH}"
+SRC_URI = "ftp://sourceware.org/pub/libffi/${BPN}-${PV}.tar.gz"
 
-SRCREV="${AUTOREV}"
+SRC_URI[md5sum] = "da984c6756170d50f47925bb333cda71"
+SRC_URI[sha256sum] = "2ea0db90c2bbcc907c3aefc3f76e9dfc3b35c7a0fb75a4319f5248e0172c1e9e"
 
 EXTRA_OECONF += "--disable-builddir"
 
@@ -24,11 +23,3 @@ inherit autotools
 FILES_${PN}-dev += "${libdir}/libffi-${PV}"
 
 BBCLASSEXTEND = "native nativesdk"
-
-autotools_do_configure() {
-	if [ -e ${S}/configure ]; then
-		oe_runconf
-	else
-		bbnote "nothing to configure"
-	fi
-}
