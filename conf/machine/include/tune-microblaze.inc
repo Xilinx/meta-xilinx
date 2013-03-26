@@ -1,18 +1,17 @@
-# Tune options for microblaze big endian
+# Tune options for microblaze
+# The only tune 'feature' defined here is the microblaze tune.
+# See the machine file (microblaze[el].conf) for details.
 
 DEFAULTTUNE ?= "microblaze"
-TUNE_ARCH = "microblaze"
-TUNE_PKGARCH = "${TUNE_ARCH}"
+
+TUNE_ARCH = "microblazeel"
+
+require conf/machine/include/tune-microblaze-features.inc
 
 AVAILTUNES += "microblaze"
-TUNE_FEATURES_tune-microblaze ?= "fpu-soft"
-PACKAGE_EXTRA_ARCHS_tune-microblaze = ""
+TUNEVALID[microblaze] = "Microblaze"
+TUNE_FEATURES_tune-microblaze += "microblaze"
 
-# FPU Configuration
-TUNEVALID[fpu-soft] = "Use software FPU."
-TARGET_FPU = "${@bb.utils.contains("TUNE_FEATURES", "fpu-soft", "soft", "", d)}"
-TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "fpu-soft", "-msoft-float", "", d)}"
-
-# CPU Version Configuration
-TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "microblaze", "-mcpu=v8.30.a", "", d)}"
-
+TUNE_CCARGS += "${MBCCARGSENDIAN} ${MBCCARGSVERSION} ${MBCCARGSBARRELSHIFT} ${MBCCARGSMUL} ${MBCCARGSDIV} ${MBCCARGSFPU} ${MBCCARGSPATTERNCOMPARE} ${MBCCARGSREORDER}"
+TUNE_PKGARCH = "microblaze${MBPKGENDIAN}${MBPKGVERSION}${MBPKGBARRELSHIFT}${MBPKGMUL}${MBPKGDIV}${MBPKGFPU}${MBPKGSPATTERNCOMPARE}${MBPKGREORDER}"
+PACKAGE_EXTRA_ARCHS_tune-microblaze = "${TUNE_PKGARCH}"
