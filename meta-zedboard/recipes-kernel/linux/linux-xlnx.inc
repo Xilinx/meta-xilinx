@@ -5,6 +5,6 @@
 #SRC_URI_append_zedboard += "file://zedboard.dts"
 #KERNEL_DEVICETREE_zedboard = "${WORKDIR}/zedboard.dts"
 
-KERNEL_DEVICETREE_zedboard = "${S}/arch/arm/boot/dts/zedboard.dts"
+KERNEL_DEVICETREE_zedboard = "${S}/arch/arm/boot/dts/zynq-zed.dts"
 
 COMPATIBLE_MACHINE_zedboard = "zedboard"
