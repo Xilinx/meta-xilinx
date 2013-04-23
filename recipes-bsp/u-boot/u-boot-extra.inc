@@ -1,5 +1,4 @@
 
-# Move into include?
 # Also deploy u-boot elf file with same file format as bin file
 SRC_ELF ?= "u-boot"
 DEST_ELF ?= "u-boot-${MACHINE}-${PV}-${PR}.elf"

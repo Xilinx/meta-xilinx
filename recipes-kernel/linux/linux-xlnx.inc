@@ -32,14 +32,14 @@ LINUX_VERSION_EXTENSION ?= "-xlnx"
 
 require recipes-kernel/linux/linux-yocto.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
+#FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 
 # Override SRC_URI in a bbappend file to point at a different source
 # tree if you do not want to build from Linus' tree.
 SRC_URI = "git://github.com/Xilinx/linux-xlnx;protocol=git;nocheckout=1"
 
-# Consolidate defconfig and use fragments
-SRC_URI += "file://defconfig"
+# Consolidate defconfig and use fragments?
+#SRC_URI += "file://defconfig"
 
 KERNEL_IMAGETYPE = "uImage"
 

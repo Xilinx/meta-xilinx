@@ -1,0 +1,128 @@
+/dts-v1/;
+
+/ {
+	model = "Xilinx Zynq ZedBoard";
+	compatible = "xlnx,zynq-zc702";
+	#address-cells = <0x1>;
+	#size-cells = <0x1>;
+	interrupt-parent = <0x1>;
+
+	memory {
+		device_type = "memory";
+		reg = <0x0 0x20000000>;
+	};
+
+	chosen {
+		bootargs = "console=ttyPS0,115200 root=/dev/ram rw initrd=0x800000,8M earlyprintk maxcpus=2 debug ip=192.168.1.10";
+		linux,stdout-path = "/amba@0/uart@E0001000";
+	};
+
+	amba@0 {
+		compatible = "simple-bus";
+		#address-cells = <0x1>;
+		#size-cells = <0x1>;
+		ranges;
+
+		intc@f8f01000 {
+			interrupt-controller;
+			compatible = "arm,cortex-a9-gic";
+			#interrupt-cells = <0x3>;
+			reg = <0xf8f01000 0x1000 0xf8f00100 0x100>;
+			linux,phandle = <0x1>;
+			phandle = <0x1>;
+		};
+
+		pl310@f8f02000 {
+			compatible = "arm,pl310-cache";
+			cache-unified;
+			cache-level = <0x2>;
+			reg = <0xf8f02000 0x1000>;
+			arm,data-latency = <0x3 0x2 0x2>;
+			arm,tag-latency = <0x2 0x2 0x2>;
+			interrupts = <0x0 0x22 0x4>;
+		};
+
+		uart@e0001000 {
+			compatible = "xlnx,ps7-uart-1.00.a";
+			reg = <0xe0001000 0x1000>;
+			interrupts = <0x0 0x32 0x0>;
+			interrupt-parent = <0x1>;
+			clock = <0x2faf080>;
+		};
+
+		timer@0xf8001000 {
+			compatible = "xlnx,ps7-ttc-1.00.a";
+			reg = <0xf8001000 0x1000>;
+			interrupts = <0x0 0xa 0x0 0x0 0xb 0x0 0x0 0xc 0x0>;
+			interrupt-parent = <0x1>;
+			clock-frequency-timer0 = <0x69f6bc7>;
+			clock-frequency-timer1 = <0x69f6bc7>;
+			clock-frequency-timer2 = <0x69f6bc7>;
+		};
+
+		swdt@f8005000 {
+			device_type = "watchdog";
+			compatible = "xlnx,ps7-wdt-1.00.a";
+			reg = <0xf8005000 0x100>;
+			clock-frequency = <0x69f6bc7>;
+		};
+
+		eth@e000b000 {
+			compatible = "xlnx,ps7-ethernet-1.00.a";
+			reg = <0xe000b000 0x1000>;
+			interrupts = <0x0 0x16 0x0>;
+			interrupt-parent = <0x1>;
+			phy-handle = <0x2>;
+			xlnx,ptp-enet-clock = <0x69f6bc7>;
+			xlnx,slcr-div0-1000Mbps = <0x8>;
+			xlnx,slcr-div0-100Mbps = <0x8>;
+			xlnx,slcr-div0-10Mbps = <0x8>;
+			xlnx,slcr-div1-1000Mbps = <0x1>;
+			xlnx,slcr-div1-100Mbps = <0x5>;
+			xlnx,slcr-div1-10Mbps = <0x32>;
+			#address-cells = <0x1>;
+			#size-cells = <0x0>;
+
+			phy@0 {
+				compatible = "marvell,88e1510";
+				device_type = "ethernet-phy";
+				reg = <0x0>;
+				marvell,reg-init = <0x3 0x10 0xff00 0x1e 0x3 0x11 0xfff0 0xa>;
+				linux,phandle = <0x2>;
+				phandle = <0x2>;
+			};
+		};
+
+		sdhci@e0100000 {
+			compatible = "xlnx,ps7-sdhci-1.00.a";
+			reg = <0xe0100000 0x1000>;
+			xlnx,has-cd = <0x1>;
+			interrupts = <0x0 0x18 0x0>;
+			interrupt-parent = <0x1>;
+			clock-frequency = <0x1fc9f08>;
+		};
+
+		usb@e0002000 {
+			compatible = "xlnx,ps7-usb-1.00.a";
+			reg = <0xe0002000 0x1000>;
+			interrupts = <0x0 0x15 0x0>;
+			interrupt-parent = <0x1>;
+			dr_mode = "host";
+			phy_type = "ulpi";
+		};
+
+		gpio@e000a000 {
+			compatible = "xlnx,ps7-gpio-1.00.a";
+			reg = <0xe000a000 0x1000>;
+			interrupts = <0x0 0x14 0x0>;
+			interrupt-parent = <0x1>;
+		};
+
+		devcfg@f8007000 {
+			compatible = "xlnx,ps7-dev-cfg-1.00.a";
+			reg = <0xf8007000 0x100>;
+			interrupts = <0x0 0x8 0x0>;
+			interrupt-parent = <0x1>;
+		};
+	};
+};
