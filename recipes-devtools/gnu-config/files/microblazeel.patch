@@ -1,0 +1,68 @@
+From fb456b34ef4aa02b95dc6be69aaa66fa94a844fb Mon Sep 17 00:00:00 2001
+From: David Holsgrove <david.holsgrove@xilinx.com>
+Date: Wed, 10 Oct 2012 04:33:17 +0000
+Subject: 	* config.sub (microblazeel): New.
+
+	* testsuite/config-sub.data: Add a test case.
+
+Signed-off-by: Ben Elliston <bje@gnu.org>
+Upstream-Status: Backport [Not part of 2012-08-14]
+---
+diff --git a/config.sub b/config.sub
+index bdda9e4..826e4c6 100755
+--- a/config.sub
++++ b/config.sub
+@@ -156,7 +156,7 @@ case $os in
+ 	-convergent* | -ncr* | -news | -32* | -3600* | -3100* | -hitachi* |\
+ 	-c[123]* | -convex* | -sun | -crds | -omron* | -dg | -ultra | -tti* | \
+ 	-harris | -dolphin | -highlevel | -gould | -cbm | -ns | -masscomp | \
+-	-apple | -axis | -knuth | -cray | -microblaze)
++	-apple | -axis | -knuth | -cray | -microblaze*)
+ 		os=
+ 		basic_machine=$1
+ 		;;
+@@ -273,7 +273,7 @@ case $basic_machine in
+ 	| le32 | le64 \
+ 	| lm32 \
+ 	| m32c | m32r | m32rle | m68000 | m68k | m88k \
+-	| maxq | mb | microblaze | mcore | mep | metag \
++	| maxq | mb | microblaze | microblazeel | mcore | mep | metag \
+ 	| mips | mipsbe | mipseb | mipsel | mipsle \
+ 	| mips16 \
+ 	| mips64 | mips64el \
+@@ -389,7 +389,8 @@ case $basic_machine in
+ 	| lm32-* \
+ 	| m32c-* | m32r-* | m32rle-* \
+ 	| m68000-* | m680[012346]0-* | m68360-* | m683?2-* | m68k-* \
+-	| m88110-* | m88k-* | maxq-* | mcore-* | metag-* | microblaze-* \
++	| m88110-* | m88k-* | maxq-* | mcore-* | metag-* \
++	| microblaze-* | microblazeel-* \
+ 	| mips-* | mipsbe-* | mipseb-* | mipsel-* | mipsle-* \
+ 	| mips16-* \
+ 	| mips64-* | mips64el-* \
+@@ -788,7 +789,7 @@ case $basic_machine in
+ 		basic_machine=ns32k-utek
+ 		os=-sysv
+ 		;;
+-	microblaze)
++	microblaze*)
+ 		basic_machine=microblaze-xilinx
+ 		;;
+ 	mingw64)
+diff --git a/testsuite/config-sub.data b/testsuite/config-sub.data
+index fafbca1..9bd2cd5 100644
+--- a/testsuite/config-sub.data
++++ b/testsuite/config-sub.data
+@@ -99,8 +99,11 @@ mep				mep-unknown-elf
+ metag-linux			metag-unknown-linux-gnu
+ metag				metag-unknown-none
+ microblaze-elf			microblaze-unknown-elf
++microblazeel-elf		microblazeel-unknown-elf
+ microblaze-linux		microblaze-unknown-linux-gnu
++microblazeel-linux		microblazeel-unknown-linux-gnu
+ microblaze			microblaze-unknown-none
++microblazeel			microblazeel-unknown-none
+ mingw32ce			arm-unknown-mingw32ce
+ mingw64				x86_64-pc-mingw64
+ mips64octeonel-elf		mips64octeonel-unknown-elf
+---
