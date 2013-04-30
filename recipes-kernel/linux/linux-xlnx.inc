@@ -41,8 +41,6 @@ SRC_URI = "git://github.com/Xilinx/linux-xlnx;protocol=git;nocheckout=1"
 # Consolidate defconfig and use fragments?
 #SRC_URI += "file://defconfig"
 
-KERNEL_IMAGETYPE = "uImage"
-
 PR = "r1"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 
