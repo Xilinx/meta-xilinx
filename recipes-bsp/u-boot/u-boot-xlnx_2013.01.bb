@@ -7,3 +7,5 @@ PV = "v2013.01${XILINX_EXTENSION}+git${SRCPV}"
 PR = "r1"
 
 include u-boot-xlnx.inc
+
+# This revision is just a merge in of v2013.01  - SRCREV = 01ebbdc82fef0f8c2122a69cd3c4900a23b28af4

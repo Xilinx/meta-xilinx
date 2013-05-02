@@ -28,18 +28,19 @@
 
 inherit kernel
 
-LINUX_VERSION_EXTENSION ?= "-xlnx"
+# This version extension should match CONFIG_LOCALVERSION in defconfig
+LINUX_VERSION_EXTENSION ?= "-xilinx"
 
 require recipes-kernel/linux/linux-yocto.inc
 
-#FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 
 # Override SRC_URI in a bbappend file to point at a different source
 # tree if you do not want to build from Linus' tree.
 SRC_URI = "git://github.com/Xilinx/linux-xlnx;protocol=git;nocheckout=1"
 
 # Consolidate defconfig and use fragments?
-#SRC_URI += "file://defconfig"
+SRC_URI += "file://xilinx_zynq_defconfig.cfg"
 
 PR = "r1"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
