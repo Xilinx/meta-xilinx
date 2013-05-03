@@ -39,9 +39,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 # tree if you do not want to build from Linus' tree.
 SRC_URI = "git://github.com/Xilinx/linux-xlnx;protocol=git;nocheckout=1"
 
-# Consolidate defconfig and use fragments?
-SRC_URI += "file://xilinx_zynq_defconfig.cfg"
-
 PR = "r1"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 
