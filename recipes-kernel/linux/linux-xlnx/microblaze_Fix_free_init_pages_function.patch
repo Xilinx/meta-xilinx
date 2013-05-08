@@ -1,0 +1,68 @@
+From: Michal Simek <michal.simek@xilinx.com>
+Subject: [LINUX PATCH 2/3] microblaze: Fix free_init_pages function
+
+- fce() is used only in init.c file - let's use static
+- start and end addresses should be page align
+- remove additional addr variable
+- use pr_info instead of printk(KERN_INFO...)
+- use __free_page(page) instead of free_page(start)
+  it is faster because of no checking,
+  if ramdisk is out of the kernel you will get kernel panic anyway
+
+Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+---
+ arch/microblaze/include/asm/setup.h |  1 -
+ arch/microblaze/mm/init.c           | 20 +++++++++++++-------
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/arch/microblaze/include/asm/setup.h b/arch/microblaze/include/asm/setup.h
+index 0e0b0a5..f05df56 100644
+--- a/arch/microblaze/include/asm/setup.h
++++ b/arch/microblaze/include/asm/setup.h
+@@ -46,7 +46,6 @@ void machine_shutdown(void);
+ void machine_halt(void);
+ void machine_power_off(void);
+ 
+-void free_init_pages(char *what, unsigned long begin, unsigned long end);
+ extern void *alloc_maybe_bootmem(size_t size, gfp_t mask);
+ extern void *zalloc_maybe_bootmem(size_t size, gfp_t mask);
+ 
+diff --git a/arch/microblaze/mm/init.c b/arch/microblaze/mm/init.c
+index ce80823..09affec 100644
+--- a/arch/microblaze/mm/init.c
++++ b/arch/microblaze/mm/init.c
+@@ -236,17 +236,23 @@ void __init setup_memory(void)
+ 	paging_init();
+ }
+ 
+-void free_init_pages(char *what, unsigned long begin, unsigned long end)
++static void free_init_pages(char *what, unsigned long start, unsigned long end)
+ {
+-	unsigned long addr;
++	if (start >= end)
++		return;
+ 
+-	for (addr = begin; addr < end; addr += PAGE_SIZE) {
+-		ClearPageReserved(virt_to_page(addr));
+-		init_page_count(virt_to_page(addr));
+-		free_page(addr);
++	start = PAGE_DOWN(start);
++	end = PAGE_UP(end);
++
++	pr_info("Freeing %s: %ldk freed\n", what, (end - start) >> 10);
++
++	for (; start < end; start += PAGE_SIZE) {
++		struct page *page = virt_to_page(start);
++		ClearPageReserved(page);
++		init_page_count(page);
++		__free_page(page);
+ 		totalram_pages++;
+ 	}
+-	printk(KERN_INFO "Freeing %s: %ldk freed\n", what, (end - begin) >> 10);
+ }
+ 
+ #ifdef CONFIG_BLK_DEV_INITRD
+-- 
+1.8.2.1
+
+
