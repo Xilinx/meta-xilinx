@@ -14,6 +14,9 @@ PACKAGE_EXTRA_ARCHS_tune-zynq = "${PACKAGE_EXTRA_ARCHS_tune-armv7a-neon} zynq"
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-xlnx"
 PREFERRED_VERSION_linux-xlnx ?= "3.8%"
 KERNEL_IMAGETYPE ?= "uImage"
+# Set default load address. 
+# Override with KERNEL_EXTRA_ARGS_<board> += "..." in machine file if required
+KERNEL_EXTRA_ARGS_zynq += "UIMAGE_LOADADDR=0x8000"
 
 # File System Configuration
 IMAGE_FSTYPES = "cpio ext2 ext2.gz.u-boot ext2.gz"
