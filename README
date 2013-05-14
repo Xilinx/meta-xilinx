@@ -1,9 +1,10 @@
 This layer provides support for Xilinx microblaze and zynq platforms. 
 
-Specific boards supported by this layer:
+Specific boards supported in this layer:
 
  * kc705 microblaze TRD
  * zc702 Zynq evaluation board
+ * zedboard Avnet Digilent evaluation board
 
 End users should create a layer and use bbappends to extend
 the recipes in this layer to support their boards.
