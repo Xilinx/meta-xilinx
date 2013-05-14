@@ -1,0 +1,18 @@
+This layer provides support for Xilinx microblaze and zynq platforms. 
+
+Specific boards supported by this layer:
+
+ * kc705 microblaze TRD
+ * zc702 Zynq evaluation board
+
+End users should create a layer and use bbappends to extend
+the recipes in this layer to support their boards.
+
+Patches for this layer should be sent to meta-xilinx@lists.yoctoproject.org.
+
+You can submit single patches with this command:
+
+'git send-email -M -1 --to meta-xilinx@lists.yoctoproject.org --subject-prefix=PATCH'
+
+For longer sets fork the meta-xilinx repo on github and push to a branch.
+
