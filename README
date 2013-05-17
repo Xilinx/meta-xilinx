@@ -17,3 +17,5 @@ You can submit single patches with this command:
 
 For longer sets fork the meta-xilinx repo on github and push to a branch.
 
+Refer to the README in each meta-<bsp> layer for building and booting 
+information.

@@ -1,0 +1,65 @@
+This README file contains information on building the meta-zedboard
+BSP layer.
+
+The zedboard is an evaluation board by Avnet-Digilent for Xilinx Zynq
+architecture:
+  http://www.zedboard.org/
+
+Dependencies
+============
+
+This layer depends on:
+
+  URI: git://git.yoctoproject.org/poky
+  branch: master
+
+  URI: git://github.com/Xilinx/meta-xilinx
+  branch: master
+
+
+Patches
+=======
+
+Refer meta-xilinx/README for patch submission details
+
+Build Instructions 
+==================
+
+Setup a Yocto Poky installation 
+ - http://www.yoctoproject.org/docs/current/yocto-project-qs/yocto-project-qs.html
+Clone the meta-xilinx layer into your installation
+Add meta-xilinx and meta-xilinx/meta-zedboard to your bblayers.conf file
+Add MACHINE="zedboard" to your local.conf file
+Build
+ > bitbake core-image-minimal
+ > bitbake u-boot-xlnx
+Images can be found in 'tmp/deploy/images' of your build directory
+   kernel - uImage*.bin
+   rootfs - core-image-minimal-zedboard-*.rootfs.ext2.gz.u-boot
+   uboot  - u-boot-zedboard-v*.elf 
+   device tree - uImage--*-xilinx*-zynq-zed-*.dtb
+
+SD Card boot
+============
+
+Copy and rename files as follows. Multiple builds will result in multiple 
+images, so choose the correct files (see above for image file name formats)
+   kernel - uImage
+   rootfs - uramdisk.image.gz
+   uboot  - u-boot.elf
+   device tree - devicetree.dtb
+
+Use Xilinx tools to pack zynq_fsbl_0.elf and u-boot.elf into BOOT.BIN.
+ - You can use Webpack or licensed Xilinx tools
+Copy BOOT.BIN, devicetree.dtb, uImage and uramdisk.image.gz to the SD Card.
+Insert SD Card, connect UART to Terminal program and boot board
+
+
+Reference files and documents 
+=============================
+http://www.zedboard.org/reference-designs-categories/zynq-concepts-tools-and-techniques-zedboard
+ - "Zynq Concepts, Tools, and Techniques on ZedBoard"
+  - contains both PDF file and design files including zynq_fsbl_0.elf
+
+Additional information on Zynq architecture can be found at:
+  http://www.xilinx.com/support/index.htm
