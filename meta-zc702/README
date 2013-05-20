@@ -1,9 +1,8 @@
-This README file contains information on building the meta-zedboard
+This README file contains information on building the meta-zc702
 BSP layer.
 
-The zedboard is an evaluation board by Avnet-Digilent for Xilinx Zynq
-architecture:
-  http://www.zedboard.org/
+The zc702 is an evaluation board by Xilinx for Zynq architecture:
+  http://www.xilinx.com/
 
 Dependencies
 ============
@@ -22,27 +21,27 @@ Patches
 
 Refer meta-xilinx/README for patch submission details
 
-Build Instructions 
+Build Instructions
 ==================
 
-Setup a Yocto Poky installation 
+Setup a Yocto Poky installation
  - http://www.yoctoproject.org/docs/current/yocto-project-qs/yocto-project-qs.html
 Clone the meta-xilinx layer into your installation
-Add meta-xilinx and meta-xilinx/meta-zedboard to your bblayers.conf file
-Add MACHINE="zedboard" to your local.conf file
+Add meta-xilinx and meta-xilinx/meta-zc702 to your bblayers.conf file
+Add MACHINE="zc702" to your local.conf file
 Build
  > bitbake core-image-minimal
  > bitbake u-boot-xlnx
 Images can be found in 'tmp/deploy/images' of your build directory
    kernel - uImage*.bin
-   rootfs - core-image-minimal-zedboard-*.rootfs.ext2.gz.u-boot
-   uboot  - u-boot-zedboard-v*.elf 
-   device tree - uImage-*-zynq-zed-*.dtb
+   rootfs - core-image-minimal-zc702-*.rootfs.ext2.gz.u-boot
+   uboot  - u-boot-zc702-v*.elf
+   device tree - uImage-*-zynq-zc702-*.dtb
 
 SD Card boot
 ============
 
-Copy and rename files as follows. Multiple builds will result in multiple 
+Copy and rename files as follows. Multiple builds will result in multiple
 images, so choose the correct files (see above for image file name formats)
    kernel - uImage
    rootfs - uramdisk.image.gz
@@ -52,14 +51,15 @@ images, so choose the correct files (see above for image file name formats)
 Use Xilinx tools to pack zynq_fsbl_0.elf and u-boot.elf into BOOT.BIN.
  - You can use Webpack or licensed Xilinx tools
 Copy BOOT.BIN, devicetree.dtb, uImage and uramdisk.image.gz to the SD Card.
-Insert SD Card, connect UART to Terminal program and boot board
+Insert SD Card, connect UART to Terminal program and boot board.
 
 
-Reference files and documents 
+Reference files and documents
 =============================
-http://www.zedboard.org/reference-designs-categories/zynq-concepts-tools-and-techniques-zedboard
- - "Zynq Concepts, Tools, and Techniques on ZedBoard"
-  - contains both PDF file and design files including zynq_fsbl_0.elf
+http://www.xilinx.com/support/download/index.htm
+ - Search for ug873
+ - "Zynq-7000 All Programmable SoC: Concepts, Tools, and Techniques (CTT)"
+ - Design files ug873-design-files.zip for zynq_fsbl_0.elf
 
 Additional information on Zynq architecture can be found at:
   http://www.xilinx.com/support/index.htm
