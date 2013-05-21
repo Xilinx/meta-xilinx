@@ -1,2 +1,0 @@
-
-include rootfs-extra.inc
