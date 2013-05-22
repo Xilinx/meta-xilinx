@@ -8,10 +8,10 @@ require conf/machine/include/microblaze/feature-microblaze-v7.inc
 
 # Setup a 'feature set' conflict list which ensures only one version is selected
 # when defining the TUNE_FEATURES_tune-<>  in local.conf file.
-TUNECONFLICTS[v850] += "v730 v800 v810 v820 v830 v840"
-TUNECONFLICTS[v840] += "v730 v800 v810 v820 v830 v850"
-TUNECONFLICTS[v830] += "v730 v800 v810 v820 v840 v850"
-TUNECONFLICTS[v820] += "v730 v800 v810 v830 v840 v850"
-TUNECONFLICTS[v810] += "v730 v800 v820 v830 v840 v850"
-TUNECONFLICTS[v800] += "v730 v810 v820 v830 v840 v850"
-TUNECONFLICTS[v730] += "v800 v810 v820 v830 v840 v850"
+TUNECONFLICTS[v8.50] += "v7.30 v8.00 v8.10 v8.20 v8.30 v8.40"
+TUNECONFLICTS[v8.40] += "v7.30 v8.00 v8.10 v8.20 v8.30 v8.50"
+TUNECONFLICTS[v8.30] += "v7.30 v8.00 v8.10 v8.20 v8.40 v8.50"
+TUNECONFLICTS[v8.20] += "v7.30 v8.00 v8.10 v8.30 v8.40 v8.50"
+TUNECONFLICTS[v8.10] += "v7.30 v8.00 v8.20 v8.30 v8.40 v8.50"
+TUNECONFLICTS[v8.00] += "v7.30 v8.10 v8.20 v8.30 v8.40 v8.50"
+TUNECONFLICTS[v7.30] += "v8.00 v8.10 v8.20 v8.30 v8.40 v8.50"
