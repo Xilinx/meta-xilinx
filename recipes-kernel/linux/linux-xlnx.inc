@@ -7,7 +7,7 @@ require recipes-kernel/linux/linux-yocto.inc
 require conf/machine/include/soc-family.inc
 
 # MicroBlaze is a uImage target, but its not called 'uImage'
-DEPENDS_microblaze += "u-boot-mkimage-native"
+DEPENDS_append_microblaze += "u-boot-mkimage-native"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 SRC_URI = "git://github.com/Xilinx/linux-xlnx;protocol=git;nocheckout=1"
