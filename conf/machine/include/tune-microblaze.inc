@@ -6,7 +6,7 @@ require conf/machine/include/tune-microblaze-features.inc
 TUNEVALID[microblaze] = "Microblaze"
 AVAILTUNES += "microblaze"
 
-TUNE_FEATURES_tune-microblaze += "microblaze"
+TUNE_FEATURES_tune-microblaze = "microblaze"
 PACKAGE_EXTRA_ARCHS_tune-microblaze = "${TUNE_PKGARCH}"
 
 # Linux Configuration
