@@ -10,4 +10,5 @@ SRC_URI_append = " \
 		file://microblaze_Do_not_use_r6_in_head.S.patch \
 		file://microblaze_Fix_free_init_pages_function.patch \
 		file://microblaze_Fix_initrd_support.patch \
+		file://arch_microblaze_Add_linux.bin.ub_target.patch \
 		"
