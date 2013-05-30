@@ -12,7 +12,7 @@ PACKAGE_EXTRA_ARCHS_tune-microblaze = "${TUNE_PKGARCH}"
 # Linux Configuration
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-xlnx"
 PREFERRED_VERSION_linux-xlnx ?= "3.8%"
-KERNEL_IMAGETYPE ?= "linux.bin"
+KERNEL_IMAGETYPE ?= "linux.bin.ub"
 
 # File System Configuration
 IMAGE_FSTYPES ?= "cpio ext2 ext2.gz.u-boot ext2.gz"
