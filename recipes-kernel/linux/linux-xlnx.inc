@@ -15,4 +15,4 @@ PR = "r1"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 
 # Override COMPATIBLE_MACHINE to include your machine in a bbappend file.
-COMPATIBLE_MACHINE = "zynq|microblazeel"
+COMPATIBLE_MACHINE = ""
