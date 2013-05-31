@@ -1,1 +1,0 @@
-include linux-xlnx.inc
