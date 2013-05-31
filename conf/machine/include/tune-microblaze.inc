@@ -2,6 +2,7 @@ DEFAULTTUNE ?= "microblaze"
 SOC_FAMILY ?= "microblaze"
 
 require conf/machine/include/tune-microblaze-features.inc
+require conf/machine/include/soc-family.inc
 
 TUNEVALID[microblaze] = "Microblaze"
 AVAILTUNES += "microblaze"

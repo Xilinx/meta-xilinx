@@ -4,7 +4,6 @@ inherit kernel
 LINUX_VERSION_EXTENSION ?= "-xilinx"
 
 require recipes-kernel/linux/linux-yocto.inc
-require conf/machine/include/soc-family.inc
 
 # MicroBlaze is a uImage target, but its not called 'uImage'
 DEPENDS_append_microblaze += "u-boot-mkimage-native"
