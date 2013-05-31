@@ -1,21 +1,137 @@
-This layer provides support for Xilinx microblaze and zynq platforms. 
+meta-xilinx
+===========
 
-Specific boards supported in this layer:
+This layer provides Official support for Xilinx MicroBlaze and Zynq architectures
+as well as evaluation boards.
 
- * kc705 microblaze TRD
- * zc702 Zynq evaluation board
- * zedboard Avnet Digilent evaluation board
+Supported Boards/Machines
+=========================
 
-End users should create a layer and use bbappends to extend
-the recipes in this layer to support their boards.
+Boards Supported by this layer and sub-layers:
+	* Xilinx KC705 Embedded TRD (MicroBlaze)
+	* Xilinx ZC702 (Zynq)
+	* Avnet/Digilent ZedBoard (Zynq)
 
-Patches for this layer should be sent to meta-xilinx@lists.yoctoproject.org.
+Patches
+=======
 
-You can submit single patches with this command:
+Please submit any patches for this layer to: meta-xilinx@lists.yoctoproject.org.
 
-'git send-email -M -1 --to meta-xilinx@lists.yoctoproject.org --subject-prefix=PATCH'
+Please see the MAINTAINERS file for more details.
 
-For longer sets fork the meta-xilinx repo on github and push to a branch.
+Dependencies
+============
 
-Refer to the README in each meta-<bsp> layer for building and booting 
-information.
+This layer depends on:
+
+	URI: git://git.openembedded.org/bitbake
+
+	URI: git://git.openembedded.org/openembedded-core
+	layers: meta
+
+	(for external toolchains only)
+	URI: git://github.com/MentorEmbedded/meta-sourcery.git
+	layers: meta-sourcery
+
+This repository also contains sub-layers which depend on this layer.
+
+Sub-Layers
+==========
+
+This repository contains the meta-xilinx layer as well as additional board
+specific layers. Each of these board specific layers provide additional
+configuration for the associated board. Please refer to the associated README
+in each sub-layer for more details.
+
+Note: sub-layers have no dependency between each other, all sub-layers can be
+used at the same time without conflicts.
+
+Build Instructions
+==================
+
+The following instructions require a Poky installation (or equivalent).
+
+Initialize a build using the 'oe-init-build-env' script in Poky. Once
+initialized configure bblayers.conf by adding the 'meta-xilinx' layer as
+well as any or all of the sub-layers of this repository, e.g.:
+
+	meta-xilinx \
+	meta-xilinx/meta-kc705 \
+	meta-xilinx/meta-zc702 \
+	meta-xilinx/meta-zedboard \
+
+To build a specific target BSP configure the associated machine in local.conf:
+(See associated sub-layers for available machines and additional details)
+
+	MACHINE ?= "zc702"
+
+Note: Currently MicroBlaze targets only support being built with an External
+toolchain, please see the section below 'Configuring External Toolchain'.
+
+Build the target file system image using bitbake:
+
+	$ bitbake core-image-minimal
+
+Build additional targets include Linux and U-Boot:
+
+	$ bitbake linux-xlnx u-boot-xlnx
+
+Once complete the images for the target machine will be available in the output
+directory 'tmp/deploy/images'.
+
+Images generated:
+	* core-image-minimal-<machine name>.cpio (rootfs in CPIO format)
+	* core-image-minimal-<machine name>.ext2.gz.u-boot (rootfs in EXT2+GZIP, u-boot wrapped format)
+	* u-boot.elf (U-Boot ELF)
+	* For Zynq:
+		* uImage (Linux Kernel binary, in u-boot wrapped format)
+		* uImage-<machine name>.dtb (DTB for target machine)
+	* For MicroBlaze:
+		* linux.bin.ub (Linux Kernel binary, in u-boot wrapped format)
+		* linux.bin.ub-<machine name>.dtb (DTB for target machine)
+
+Booting
+=======
+
+Please see the associated README for the target machine, located in the
+associated sub-layer.
+
+Configuring External Toolchain
+==============================
+
+In order to build with an external toolchain some additional configuration must
+be set in the build environments local.conf. The 'meta-sourcery' layer must also
+be setup in your bblayers.conf
+
+First configure the use of an external toolchain, including the location to the
+toolchain (this example is for a microblazeel toolchain, ensure that you insert
+the relevant information for your target machine and target toolchain):
+
+	TCMODE = "external-csl"
+	CSL_TARGET_SYS_<machine name> = "microblazeel-xilinx-linux-gnu"
+	EXTERNAL_TOOLCHAIN = "<path to toolchain>/microblazeel-xilinx-linux-gnu"
+	EXTERNAL_TOOLCHAIN_SYSROOT = "<path to toolchain>/microblazeel-xilinx-linux-gnu/microblazeel-xilinx-linux-gnu/libc"
+	INSANE_SKIP_external-sourcery-toolchain-dev += "ldflags"
+
+Additionally the preferred provider for various packages must be configured to
+use the external toolchain:
+
+	PREFERRED_PROVIDER_linux-libc-headers = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_linux-libc-headers-dev = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}gcc = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}gcc-initial = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}gcc-intermediate = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}g++ = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}binutils = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}libc-initial = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}libc-for-gcc = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}compilerlibs = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_libgcc = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_eglibc = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/libc = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/libintl = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/libiconv = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_glibc-thread-db = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/linux-libc-headers = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_virtual/linux-libc-headers-dev = "external-sourcery-toolchain"
+	PREFERRED_PROVIDER_gdbserver = "external-sourcery-toolchain"
