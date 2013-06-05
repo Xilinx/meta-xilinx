@@ -20,7 +20,7 @@ KERNEL_IMAGETYPE ?= "uImage"
 KERNEL_EXTRA_ARGS_zynq += "UIMAGE_LOADADDR=0x8000"
 
 # File System Configuration
-IMAGE_FSTYPES = "cpio ext2 ext2.gz.u-boot ext2.gz"
+IMAGE_FSTYPES ?= "cpio ext2 ext2.gz.u-boot ext2.gz"
 IMAGE_CLASSES += "image_types_uboot"
 
 # U-Boot Configuration
