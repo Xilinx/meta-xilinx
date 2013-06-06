@@ -7,7 +7,9 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 # meta-xilinx/meta-<boardlayer>/kernel-recipes for board specific fragments
 SRC_URI_append_zedboard += "file://xilinx_zynq_defconfig_${LINUX_VERSION}.cfg"
 SRC_URI_append_zedboard += "file://nortc.cfg"
+SRC_URI_append_zedboard += "file://zynq-zed-mmcblk0p2.dts"
+SRC_URI_append_zedboard += "file://zynq-zed-ram.dts"
 
-KERNEL_DEVICETREE_zedboard = "${S}/arch/arm/boot/dts/zynq-zed.dts"
+KERNEL_DEVICETREE_zedboard = "${WORKDIR}/zynq-zed-mmcblk0p2.dts ${WORKDIR}/zynq-zed-ram.dts"
 
 COMPATIBLE_MACHINE_zedboard = "zedboard"
