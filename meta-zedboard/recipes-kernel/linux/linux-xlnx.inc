@@ -9,6 +9,7 @@ SRC_URI_append_zedboard += "file://xilinx_zynq_defconfig_${LINUX_VERSION}.cfg"
 SRC_URI_append_zedboard += "file://nortc.cfg"
 SRC_URI_append_zedboard += "file://zynq-zed-mmcblk0p2.dts"
 SRC_URI_append_zedboard += "file://zynq-zed-ram.dts"
+SRC_URI_append_zedboard += "file://zynq-zed.dtsi"
 
 KERNEL_DEVICETREE_zedboard = "${WORKDIR}/zynq-zed-mmcblk0p2.dts ${WORKDIR}/zynq-zed-ram.dts"
 
