@@ -1,0 +1,29 @@
+From: Nathan Rossi <nathan.rossi@xilinx.com>
+Date: Fri, 7 Jun 2013 14:03:41 +1000
+Subject: [PATCH] fdisk: add support for the MicroBlaze architecture
+
+Add support to fdisk for the MicroBlaze architecture.
+
+Signed-off-by: Nathan Rossi <nathan.rossi@xilinx.com>
+Upstream-Status: Submitted
+---
+ fdisks/fdiskbsdlabel.h |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/fdisks/fdiskbsdlabel.h b/fdisks/fdiskbsdlabel.h
+index 8c4e4e7..69f1065 100644
+--- a/fdisks/fdiskbsdlabel.h
++++ b/fdisks/fdiskbsdlabel.h
+@@ -49,7 +49,8 @@
+ #if defined (__i386__) || defined (__sparc__) || defined (__arm__) || \
+     defined (__mips__) || defined (__s390__) || defined (__sh__) || \
+     defined (__aarch64__) || defined(__xtensa__) || \
+-    defined(__x86_64__) || defined (__avr32__) || defined(__cris__)
++    defined (__x86_64__) || defined (__avr32__) || defined(__cris__) || \
++    defined (__microblaze__)
+ #define BSD_LABELSECTOR   1
+ #define BSD_LABELOFFSET   0
+ #elif defined (__alpha__) || defined (__powerpc__) || defined (__ia64__) || defined (__hppa__)
+-- 
+1.7.5.4
+
