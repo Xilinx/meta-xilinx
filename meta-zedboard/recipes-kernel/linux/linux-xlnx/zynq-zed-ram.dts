@@ -3,19 +3,9 @@
  */
 
 /dts-v1/;
-/ {
-	#address-cells = <1>;
-	#size-cells = <1>;
-	compatible = "xlnx,zynq-zc770";
-	model = "Xilinx Zynq";
-	aliases {
-		ethernet0 = &ps7_ethernet_0;
-		serial0 = &ps7_uart_1;
-	} ;
-	chosen {
-		bootargs = "console=ttyPS0,115200 root=/dev/ram rw ip=:::::eth0:dhcp earlyprintk";
-		linux,stdout-path = "/axi@0/serial@e0001000";
-	} ;
-
 /include/ "zynq-zed.dtsi"
+/ {
+	chosen {
+		bootargs = "console=ttyPS0,115200 root=/dev/ram rw earlyprintk";
+	} ;
 } ;
