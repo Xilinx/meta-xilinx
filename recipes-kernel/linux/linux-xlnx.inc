@@ -23,7 +23,7 @@ FILESEXTRAPATHS_append := "${XILINX_LAYERDIR}/conf/machine/boards/common:"
 SRC_URI_append += "file://zynq-7-base.dtsi"
 
 # Override COMPATIBLE_MACHINE to include your machine in a bbappend file.
-COMPATIBLE_MACHINE = "qemumicroblaze|qemuzynq|zynq7-zedboard"
+COMPATIBLE_MACHINE = "qemumicroblaze|qemuzynq|zynq7-zedboard|kc705-trd-microblazeel"
 
 # Scan all files in MACHINE_DEVICETREE and MACHINE_KCONFIG and populate SRC_URI,
 # FILESEXTRAPATHS and KERNEL_DEVICETREE.
