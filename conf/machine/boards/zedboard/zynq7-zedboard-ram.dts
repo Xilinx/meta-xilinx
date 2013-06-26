@@ -1,0 +1,11 @@
+/*
+ * Zedboard DTS file header for ramdisk boot.
+ */
+
+/dts-v1/;
+/include/ "zynq7-zedboard.dtsi"
+/ {
+	chosen {
+		bootargs = "console=ttyPS0,115200 root=/dev/ram rw earlyprintk";
+	} ;
+} ;
