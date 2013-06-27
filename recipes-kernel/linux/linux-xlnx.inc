@@ -15,15 +15,15 @@ SRC_URI = "git://github.com/Xilinx/linux-xlnx;protocol=git;nocheckout=1"
 PR = "r1"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCREV}"
 
+# Override COMPATIBLE_MACHINE to include your machine in a bbappend file.
+COMPATIBLE_MACHINE = "qemumicroblaze|qemuzynq|microblaze|zynq"
+
 # Device Tree and Kernel Configuration
 
 # Common Device Tree Includes
 # (put them in ${WORKDIR} to avoid using dtc with include paths)
 FILESEXTRAPATHS_append := "${XILINX_LAYERDIR}/conf/machine/boards/common:"
 SRC_URI_append += "file://zynq-7-base.dtsi"
-
-# Override COMPATIBLE_MACHINE to include your machine in a bbappend file.
-COMPATIBLE_MACHINE = "qemumicroblaze|qemuzynq|zynq7-zedboard|kc705-trd-microblazeel"
 
 # Scan all files in MACHINE_DEVICETREE and MACHINE_KCONFIG and populate SRC_URI,
 # FILESEXTRAPATHS and KERNEL_DEVICETREE.
