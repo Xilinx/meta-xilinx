@@ -1,0 +1,380 @@
+From 4ad1cef09548a23fd46a519404dab436d4f6fa56 Mon Sep 17 00:00:00 2001
+From: Sipke Vriend <sipke.vriend@xilinx.com>
+Date: Wed, 15 May 2013 15:31:25 +1000
+Subject: [PATCH 23/24] Xilinx specific documentation update
+
+Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
+---
+ .../devicetree/bindings/arm/zynq/xlnx,zynq-smc.txt |   30 +++++
+ .../devicetree/bindings/clock/zynq-7000.txt        |    7 +-
+ .../devicetree/bindings/dma/xilinx/axi-cdma.txt    |   18 +++
+ .../devicetree/bindings/dma/xilinx/axi-dma.txt     |   28 ++++
+ .../devicetree/bindings/dma/xilinx/axi-vdma.txt    |   28 ++++
+ .../devicetree/bindings/pci/xilinx-axipcie.txt     |   31 +++++
+ Documentation/devicetree/bindings/xilinx.txt       |    1 +
+ Documentation/pmods/00-INDEX                       |    8 +
+ Documentation/pmods/pmodoled.txt                   |  137 ++++++++++++++++++++
+ 9 files changed, 286 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/arm/zynq/xlnx,zynq-smc.txt
+ create mode 100644 Documentation/devicetree/bindings/dma/xilinx/axi-cdma.txt
+ create mode 100644 Documentation/devicetree/bindings/dma/xilinx/axi-dma.txt
+ create mode 100644 Documentation/devicetree/bindings/dma/xilinx/axi-vdma.txt
+ create mode 100644 Documentation/devicetree/bindings/pci/xilinx-axipcie.txt
+ create mode 100644 Documentation/pmods/00-INDEX
+ create mode 100644 Documentation/pmods/pmodoled.txt
+
+diff --git a/Documentation/devicetree/bindings/arm/zynq/xlnx,zynq-smc.txt b/Documentation/devicetree/bindings/arm/zynq/xlnx,zynq-smc.txt
+new file mode 100644
+index 0000000..1ae80ed
+--- /dev/null
++++ b/Documentation/devicetree/bindings/arm/zynq/xlnx,zynq-smc.txt
+@@ -0,0 +1,30 @@
++Device tree bindings for Zynq's SMC (PL353)
++
++The SMC supports NAND, NOR and SRAM memory. The SMC driver handles generic
++tasks, while children drivers handle memory type specifics.
++
++Required properties:
++ compatible: Compatibility string. Must be "xlnx,ps7-smc".
++ reg: Specify the base and size of the SMC registers in the memory map.
++      E.g.: reg = <0xe000e000 0x1000>;
++ #address-cells: Address cells, must be 1.
++ #size-cells: Size cells. Must be 1.
++ ranges
++
++Child nodes:
++ For NAND the "xlnx,ps7-nand" and for NOR the "cfi-flash" drivers are supported
++ as child nodes.
++
++Example:
++	ps7_smc_0: ps7-smc@e000e000 {
++		compatible = "xlnx,ps7-smc";
++		reg = <0xe000e000 0x1000>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		ps7_nand_0: ps7-nand@e1000000 {
++			compatible = "xlnx,ps7-nand-1.00.a";
++			(...)
++		};
++	};
+diff --git a/Documentation/devicetree/bindings/clock/zynq-7000.txt b/Documentation/devicetree/bindings/clock/zynq-7000.txt
+index 23ae1db..c282375 100644
+--- a/Documentation/devicetree/bindings/clock/zynq-7000.txt
++++ b/Documentation/devicetree/bindings/clock/zynq-7000.txt
+@@ -13,8 +13,11 @@ Used to describe the ARM_PLL, DDR_PLL, and IO_PLL.
+ Required properties:
+ - #clock-cells : shall be 0 (only one clock is output from this node)
+ - compatible : "xlnx,zynq-pll"
+-- reg : pair of u32 values, which are the address offsets within the SLCR
+-        of the relevant PLL_CTRL register and PLL_CFG register respectively
++- reg : set of u32 values, which are the address offsets within the SLCR
++        of the relevant PLL_CTRL register, PLL_CFG and PLL_STATUS register
++	respectively
++- lockbit : the index of the PLL_LOCKED bit in the PLL_STATUS register for this
++  PLL
+ - clocks : phandle for parent clock.  should be the phandle for ps_clk
+ 
+ Optional properties:
+diff --git a/Documentation/devicetree/bindings/dma/xilinx/axi-cdma.txt b/Documentation/devicetree/bindings/dma/xilinx/axi-cdma.txt
+new file mode 100644
+index 0000000..9035626
+--- /dev/null
++++ b/Documentation/devicetree/bindings/dma/xilinx/axi-cdma.txt
+@@ -0,0 +1,18 @@
++Xilinx AXI CDMA engine, it does transfers between memory and memory
++
++Required properties:
++- compatible: Should be "xlnx,axi-cdma"
++- reg: Should contain CDMA registers location and length.
++- interrupts: Should contain channel CDMA interrupts.
++
++Example:
++++++++++
++
++axi_cdma_0: axicdma@40030000 {
++	compatible = "xlnx,axi-cdma";
++	reg = < 0x40030000 0x10000 >;
++	dma-channel@40030000 {
++		interrupts = < 0 59 4 >;
++	} ;
++} ;
++
+diff --git a/Documentation/devicetree/bindings/dma/xilinx/axi-dma.txt b/Documentation/devicetree/bindings/dma/xilinx/axi-dma.txt
+new file mode 100644
+index 0000000..4b474a2
+--- /dev/null
++++ b/Documentation/devicetree/bindings/dma/xilinx/axi-dma.txt
+@@ -0,0 +1,28 @@
++Xilinx AXI DMA engine, it does transfers between memory and device. It can be
++configured to have one channel or two channels. If configured as two
++channels, one is to transmit to device and another is to receive from
++device.
++
++Required properties:
++- compatible: Should be "xlnx,axi-dma"
++- reg: Should contain DMA registers location and length.
++- interrupts: Should contain per channel DMA interrupts.
++- compatible (child node): It should be either "xlnx,axi-dma-mm2s-channel" or
++	"xlnx,axi-dma-s2mm-channel". It depends on the hardware design and it
++	can also have both channels.
++
++Example:
++++++++++
++
++axi_dma_0: axidma@40400000 {
++	compatible = "xlnx,axi-dma";
++	reg = < 0x40400000 0x10000 >;
++	dma-channel@40400000 {
++		compatible = "xlnx,axi-dma-mm2s-channel";
++		interrupts = < 0 59 4 >;
++	} ;
++	dma-channel@40030030 {
++		compatible = "xlnx,axi-dma-s2mm-channel";
++		interrupts = < 0 58 4 >;
++	} ;
++} ;
+diff --git a/Documentation/devicetree/bindings/dma/xilinx/axi-vdma.txt b/Documentation/devicetree/bindings/dma/xilinx/axi-vdma.txt
+new file mode 100644
+index 0000000..a9cccf1
+--- /dev/null
++++ b/Documentation/devicetree/bindings/dma/xilinx/axi-vdma.txt
+@@ -0,0 +1,28 @@
++Xilinx AXI VDMA engine, it does transfers between memory and video devices.
++It can be configured to have one channel or two channels. If configured
++as two channels, one is to transmit to the video device and another is
++to receive from the video device.
++
++Required properties:
++- compatible: Should be "xlnx,axi-vdma"
++- reg: Should contain VDMA registers location and length.
++- interrupts: Should contain per channel VDMA interrupts.
++- compatible (child node): It should be either "xlnx,axi-vdma-mm2s-channel" or
++	"xlnx,axi-vdma-s2mm-channel". It depends on the hardware design and it
++	can also have both channels.
++
++Example:
++++++++++
++
++axi_vdma_0: axivdma@40030000 {
++	compatible = "xlnx,axi-vdma";
++	reg = < 0x40030000 0x10000 >;
++	dma-channel@40030000 {
++		compatible = "xlnx,axi-vdma-mm2s-channel";
++		interrupts = < 0 54 4 >;
++	} ;
++	dma-channel@40030030 {
++		compatible = "xlnx,axi-vdma-s2mm-channel";
++		interrupts = < 0 53 4 >;
++	} ;
++} ;
+diff --git a/Documentation/devicetree/bindings/pci/xilinx-axipcie.txt b/Documentation/devicetree/bindings/pci/xilinx-axipcie.txt
+new file mode 100644
+index 0000000..edefc0c
+--- /dev/null
++++ b/Documentation/devicetree/bindings/pci/xilinx-axipcie.txt
+@@ -0,0 +1,31 @@
++* Xilinx AXI PCIe Root Port Bridge
++
++Required properties:
++	compatible: Should be "xlnx,axi-pcie-1.05.a"
++	reg: Should contain AXI PCIe registers location and length.
++	interrupts: Should contain AXI PCIe interrupts.
++	ranges: These are the parameters for each PCIe bar implemented within the IP
++	The ranges property is <<child address> <parent address> <size>>.
++	The parent address #address-cells is taken from the parent node.
++	xlnx, include-rc: Root Port (=1) or End Point(=0)
++	xlnx,axibar2pciebar-0: Translates address from AXI to PCIe
++	xlnx,pciebar2axibar-0: Translates address from PCIe to AXI
++
++Example:
++++++++++
++
++	ps7_axi_interconnect_0: axi@0 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		pci_express: axi-pcie@50000000 {
++			#address-cells = <3>;
++			#size-cells = <2>;
++			compatible = "xlnx,axi-pcie-1.05.a";
++			interrupts = < 0 52 4 >;
++			ranges = < 0x02000000 0 0x60000000 0x60000000 0 0x10000000 >;
++			reg = < 0x50000000 0x10000000 >;
++			xlnx,include-rc = <0x1>;
++			xlnx,axibar2pciebar-0 = <0x60000000>;
++			xlnx,pciebar2axibar-0 = <0x0>;
++		};
++ 	};
+diff --git a/Documentation/devicetree/bindings/xilinx.txt b/Documentation/devicetree/bindings/xilinx.txt
+index 299d0923..7fe7e9d6 100644
+--- a/Documentation/devicetree/bindings/xilinx.txt
++++ b/Documentation/devicetree/bindings/xilinx.txt
+@@ -253,6 +253,7 @@
+ 
+       Optional properties:
+        - 8-bit (empty) : Set this property for SystemACE in 8 bit mode
++       - port-number = <port_number> : Set port number for particular device
+ 
+       iii) Xilinx EMAC and Xilinx TEMAC
+ 
+diff --git a/Documentation/pmods/00-INDEX b/Documentation/pmods/00-INDEX
+new file mode 100644
+index 0000000..813f5b4
+--- /dev/null
++++ b/Documentation/pmods/00-INDEX
+@@ -0,0 +1,8 @@
++Documentation for pmods, a set of peripheral modules provided by Digilent Inc.,
++which can be plugged to various development boards to add additional functionalities.
++These drivers are maintained by Digilent Inc.
++
++00-INDEX
++	- this file
++pmodoled.txt
++	- PmodOLED: 128 by 32 pixel 0.9" Organic LED Graphic Display
+diff --git a/Documentation/pmods/pmodoled.txt b/Documentation/pmods/pmodoled.txt
+new file mode 100644
+index 0000000..85feb43
+--- /dev/null
++++ b/Documentation/pmods/pmodoled.txt
+@@ -0,0 +1,137 @@
++PmodOLED
++========
++
++Copyright 2012, Digilent Inc.
++
++
++Description
++-----------
++
++The PmodOLED features an SPI-controlled monochrome OLED display,
++perfect for embedded applications requiring small, complex visual output.
++
++The PmodOLED uses a standard 12-pin connector to display output on
++a 128x32 pixel organic LED (OLED) panel. The graphic display panel uses
++the Solomon Systech SSD1306 display controller.
++
++An SPI interface is used to configure the display,
++as well as to send the bitmap data to the device.
++
++The PmodOLED displays the last image drawn on the screen until it is
++powered down or a new image is drawn to the display. Refreshing and
++updating is handled internally.
++
++The Reference Manual for PmodOLED display is available online at
++Digilent Inc. Website (www.digilentinc.com)
++
++For more information on the OLED display interface, see the
++UG-2832HSWEG04 datasheet available online or from Univisio.
++
++The OLED display uses a compatible command set from the SSD1306 device.
++For more information, see the SSD1306 datasheet available at
++www.solomon-systech.com.
++
++
++Interface
++---------
++
++Signal     Description
++
++CS         SPI Chip Select (Slave Select)
++SDIN       SPI Data In (MOSI)
++SCLK       SPI Clock
++D/C        Data/Command Control
++RES        Power Reset
++VBATC      VBAT Battery Voltage Control
++VDDC       VDD Logic Voltage Control
++
++
++Devicetree
++----------
++
++Required Properties:
++- compatible : Should be "dlgnt,pmodoled-gpio"
++- vbat-gpio :  Should specify the GPIO for VBATC, see "gpios property" in
++  Documentation/devicetree/gpio.txt.
++- vdd-gpio :  Should specify the GPIO for VDDC, see "gpios property" in
++  Documentation/devicetree/gpio.txt.
++- res-gpio :  Should specify the GPIO for RES, see "gpios property" in
++  Documentation/devicetree/gpio.txt.
++- dc-gpio :  Should specify the GPIO for D/C, see "gpios property" in
++  Documentation/devicetree/gpio.txt.
++- spi-bus-num :  Should specify the bus number for PmodOLED SPI controller.
++  This value cannot be shared by any other SPI controller present in the
++  device tree.
++- spi-sclk-gpio :  Should specify the GPIO for SCLK, see "gpios property" in
++  Documentation/devicetree/gpio.txt.
++- spi-sdin-gpio :  Should specify the GPIO for SDIN, see "gpios property" in
++  Documentation/devicetree/gpio.txt.
++
++Optional Properties:
++- spi-cs-gpio :  Should specify the GPIO for CS, see "gpios property" in
++  Documentation/devicetree/gpio.txt. If unspecified, CS is assumed to be
++  tied to ground.
++
++Examples:
++
++zed_oled {
++	compatible = "dglnt,pmodoled-gpio";
++	/* GPIO Pins */
++	vbat-gpio = <&gpiops 55 0>;
++	vdd-gpio = <&gpiops 56 0>;
++	res-gpio = <&gpiops 57 0>;
++	dc-gpio = <&gpiops 58 0>;
++	/* SPI-GPIOs */
++	spi-bus-num = <2>;
++	spi-sclk-gpio = <&gpiops 59 0>;
++	spi-sdin-gpio = <&gpiops 60 0>;
++};
++
++pmodoled_A {
++	compatible = "dglnt,pmodoled-gpio";
++	vbat-gpio = <&gpiops 88 0>;
++	vdd-gpio = <&gpiops 89 0>;
++	res-gpio = <&gpiops 87 0>;
++	dc-gpio = <&gpiops 86 0>;
++	spi-bus-num = <3>;
++	spi-sclk-gpio = <&gpiops 85 0>;
++	spi-sdin-gpio = <&gpiops 83 0>;
++	spi-cs-gpio = <&gpiops 82 0>;
++};
++
++
++Configuration
++-------------
++
++The PmodOLED is located in the kernel configuration menu at
++Device Drivers -> Pmods -> PmodOLED. The driver can be built into the kernel
++by selecting (*) for it, or loadable module by selecting (M) for it.
++
++
++Device Nodes
++------------
++
++A char device node will be created for each PmodOLED device automatically.
++The name of the node is default to the one declared in the device tree.
++
++
++Read/Writes
++-----------
++
++The driver provides a 512 Byte display buffer for the display of PmodOLED.
++The Whole screen is divided into four lines, each of them is 128 bits wide
++and 8 bits high, as shown in the figure below.
++
++    +--------------------------...----------------------------+
++    +                         Line 4                          +
++    +--------------------------...----------------------------+
++    +                         Line 3                          +
++    +--------------------------...----------------------------+
++    +                         Line 2                          +
++    +--------------------------...----------------------------+ MSB (bit 7)
++    +                         Line 1                          +
++    +--------------------------...----------------------------+ LSB (bit 0)
++byte 127                                                     byte 0
++
++Users can perform read and write functions to the device node to access the data
++inside the display buffer.
+-- 
+1.7.5.4
+

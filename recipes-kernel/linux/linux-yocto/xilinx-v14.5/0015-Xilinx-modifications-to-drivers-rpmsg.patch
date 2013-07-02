@@ -1,0 +1,3170 @@
+From 7bb6f9d25b321de369059098bbc9a09812f77bad Mon Sep 17 00:00:00 2001
+From: Sipke Vriend <sipke.vriend@xilinx.com>
+Date: Wed, 15 May 2013 15:28:01 +1000
+Subject: [PATCH 15/24] Xilinx modifications to drivers/rpmsg
+
+Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
+---
+ drivers/rpmsg/Kconfig                    |   26 ++
+ drivers/rpmsg/Makefile                   |    4 +
+ drivers/rpmsg/host/Kconfig               |   11 +
+ drivers/rpmsg/host/Makefile              |    1 +
+ drivers/rpmsg/host/omap_rpmsg.c          |  540 +++++++++++++++++++++++++++
+ drivers/rpmsg/host/omap_rpmsg.h          |   69 ++++
+ drivers/rpmsg/rpmsg_freertos_statistic.c |  344 +++++++++++++++++
+ drivers/rpmsg/rpmsg_omx.c                |  532 ++++++++++++++++++++++++++
+ drivers/rpmsg/rpmsg_server_sample.c      |  180 +++++++++
+ drivers/rpmsg/virtio_rpmsg_bus.c         |   82 ++++-
+ include/linux/rpmsg.h                    |    4 +
+ include/linux/rpmsg_omx.h                |  130 +++++++
+ include/linux/socket.h                   |    3 +
+ include/net/rpmsg.h                      |   58 +++
+ net/Makefile                             |    1 +
+ net/rpmsg/Makefile                       |    1 +
+ net/rpmsg/rpmsg_proto.c                  |  602 ++++++++++++++++++++++++++++++
+ tools/rpmsg_proto.c                      |  120 ++++++
+ tools/test_rpmsg_omx.c                   |  180 +++++++++
+ 19 files changed, 2880 insertions(+), 8 deletions(-)
+ create mode 100644 drivers/rpmsg/host/Kconfig
+ create mode 100644 drivers/rpmsg/host/Makefile
+ create mode 100644 drivers/rpmsg/host/omap_rpmsg.c
+ create mode 100644 drivers/rpmsg/host/omap_rpmsg.h
+ create mode 100644 drivers/rpmsg/rpmsg_freertos_statistic.c
+ create mode 100644 drivers/rpmsg/rpmsg_omx.c
+ create mode 100644 drivers/rpmsg/rpmsg_server_sample.c
+ create mode 100644 include/linux/rpmsg_omx.h
+ create mode 100644 include/net/rpmsg.h
+ create mode 100644 net/rpmsg/Makefile
+ create mode 100644 net/rpmsg/rpmsg_proto.c
+ create mode 100644 tools/rpmsg_proto.c
+ create mode 100644 tools/test_rpmsg_omx.c
+
+diff --git a/drivers/rpmsg/Kconfig b/drivers/rpmsg/Kconfig
+index 2bd911f..9b9354b 100644
+--- a/drivers/rpmsg/Kconfig
++++ b/drivers/rpmsg/Kconfig
+@@ -6,4 +6,30 @@ config RPMSG
+ 	select VIRTIO
+ 	depends on EXPERIMENTAL
+ 
++config RPMSG_SERVER_SAMPLE
++	tristate "An rpmsg server sample"
++	depends on RPMSG
++	---help---
++	  This is just a sample server driver for the rpmsg bus.
++	  Say either Y or M. You know you want to.
++
++config RPMSG_OMX
++	tristate "rpmsg OMX driver"
++	depends on RPMSG
++	---help---
++	  An rpmsg driver that exposes OMX API to user space, in order to
++	  allow multimedia applications to offload OMX processing to
++	  remote processors.
++
++	  If unsure, say N.
++
++config RPMSG_FREERTOS_STAT
++	tristate "An FreeRTOS statistic"
++	depends on RPMSG
++	---help---
++	  This is just a sample to get statistic from FreeRTOS.
++	  Say either Y or M. You know you want to.
++
++source "drivers/rpmsg/host/Kconfig"
++
+ endmenu
+diff --git a/drivers/rpmsg/Makefile b/drivers/rpmsg/Makefile
+index 7617fcb..a9d9f67 100644
+--- a/drivers/rpmsg/Makefile
++++ b/drivers/rpmsg/Makefile
+@@ -1 +1,5 @@
+ obj-$(CONFIG_RPMSG)	+= virtio_rpmsg_bus.o
++obj-$(CONFIG_RPMSG_SERVER_SAMPLE) += rpmsg_server_sample.o
++obj-$(CONFIG_RPMSG_FREERTOS_STAT) += rpmsg_freertos_statistic.o
++obj-$(CONFIG_RPMSG_OMX) += rpmsg_omx.o
++obj-$(CONFIG_RPMSG)            += host/
+diff --git a/drivers/rpmsg/host/Kconfig b/drivers/rpmsg/host/Kconfig
+new file mode 100644
+index 0000000..fd2140c
+--- /dev/null
++++ b/drivers/rpmsg/host/Kconfig
+@@ -0,0 +1,11 @@
++config OMAP_RPMSG
++	tristate "OMAP virtio-based remote processor messaging support"
++	depends on ARCH_OMAP4 && OMAP_REMOTE_PROC
++	select CONFIG_OMAP_MBOX_FWK
++	select RPMSG
++	help
++	  Say Y if you want to enable OMAP's virtio-based remote-processor
++	  messaging, currently only available on OMAP4. This is required
++	  for offloading cpu-intensive and/or latency-sensitive tasks to
++	  the remote on-chip M3s or C64x+ dsp, usually used by multimedia
++	  frameworks.
+diff --git a/drivers/rpmsg/host/Makefile b/drivers/rpmsg/host/Makefile
+new file mode 100644
+index 0000000..9823745
+--- /dev/null
++++ b/drivers/rpmsg/host/Makefile
+@@ -0,0 +1 @@
++obj-$(CONFIG_OMAP_RPMSG) += omap_rpmsg.o
+diff --git a/drivers/rpmsg/host/omap_rpmsg.c b/drivers/rpmsg/host/omap_rpmsg.c
+new file mode 100644
+index 0000000..b8c2305
+--- /dev/null
++++ b/drivers/rpmsg/host/omap_rpmsg.c
+@@ -0,0 +1,540 @@
++/*
++ * Remote processor messaging transport (OMAP platform-specific bits)
++ *
++ * Copyright (C) 2011 Texas Instruments, Inc.
++ * Copyright (C) 2011 Google, Inc.
++ *
++ * Ohad Ben-Cohen <ohad@wizery.com>
++ * Brian Swetland <swetland@google.com>
++ *
++ * This software is licensed under the terms of the GNU General Public
++ * License version 2, as published by the Free Software Foundation, and
++ * may be copied, distributed, and modified under those terms.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#define pr_fmt(fmt) "%s: " fmt, __func__
++
++#include <linux/init.h>
++#include <linux/virtio.h>
++#include <linux/virtio_config.h>
++#include <linux/virtio_ids.h>
++#include <linux/virtio_ring.h>
++#include <linux/rpmsg.h>
++#include <linux/err.h>
++#include <linux/slab.h>
++#include <linux/notifier.h>
++#include <linux/remoteproc.h>
++
++#include <plat/mailbox.h>
++#include <plat/dsp.h>
++
++#include "omap_rpmsg.h"
++
++/**
++ * struct omap_rpmsg_vproc - omap's virtio remote processor state
++ * @vdev: virtio device
++ * @vring: phys address of two vrings; first one used for rx, 2nd one for tx
++ * @buf_paddr: physical address of the IPC buffer region
++ * @buf_size: size of IPC buffer region
++ * @buf_mapped: kernel (ioremap'ed) address of IPC buffer region
++ * @mbox_name: name of omap mailbox device to use with this vproc
++ * @rproc_name: name of remote proc device to use with this vproc
++ * @mbox: omap mailbox handle
++ * @rproc: remoteproc handle
++ * @nb: notifier block that will be invoked on inbound mailbox messages
++ * @vq: virtio's virtqueues
++ * @base_vq_id: index of first virtqueue that belongs to this vproc
++ * @num_of_vqs: number of virtqueues this vproc owns
++ * @static_chnls: table of static channels for this vproc
++ */
++struct omap_rpmsg_vproc {
++	struct virtio_device vdev;
++	unsigned int vring[2]; /* mpu owns first vring, ipu owns the 2nd */
++	unsigned int buf_paddr;
++	unsigned int buf_size; /* size must be page-aligned */
++	void *buf_mapped;
++	char *mbox_name;
++	char *rproc_name;
++	struct omap_mbox *mbox;
++	struct rproc *rproc;
++	struct notifier_block nb;
++	struct virtqueue *vq[2];
++	int base_vq_id;
++	int num_of_vqs;
++	struct rpmsg_channel_info *static_chnls;
++};
++
++#define to_omap_vproc(vd) container_of(vd, struct omap_rpmsg_vproc, vdev)
++
++/**
++ * struct omap_rpmsg_vq_info - virtqueue state
++ * @num: number of buffers supported by the vring
++ * @vq_id: a unique index of this virtqueue
++ * @addr: address where the vring is mapped onto
++ * @vproc: the virtual remote processor state
++ *
++ * Such a struct will be maintained for every virtqueue we're
++ * using to communicate with the remote processor
++ */
++struct omap_rpmsg_vq_info {
++	__u16 num;
++	__u16 vq_id;
++	void *addr;
++	struct omap_rpmsg_vproc *vproc;
++};
++
++/*
++ * For now, allocate 256 buffers of 512 bytes for each side. each buffer
++ * will then have 16B for the msg header and 496B for the payload.
++ * This will require a total space of 256KB for the buffers themselves, and
++ * 3 pages for every vring (the size of the vring depends on the number of
++ * buffers it supports).
++ */
++#define RPMSG_NUM_BUFS		(512)
++#define RPMSG_BUF_SIZE		(512)
++#define RPMSG_BUFS_SPACE	(RPMSG_NUM_BUFS * RPMSG_BUF_SIZE)
++
++/*
++ * The alignment between the consumer and producer parts of the vring.
++ * Note: this is part of the "wire" protocol. If you change this, you need
++ * to update your BIOS image as well
++ */
++#define RPMSG_VRING_ALIGN	(4096)
++
++/* With 256 buffers, our vring will occupy 3 pages */
++#define RPMSG_RING_SIZE	((DIV_ROUND_UP(vring_size(RPMSG_NUM_BUFS / 2, \
++				RPMSG_VRING_ALIGN), PAGE_SIZE)) * PAGE_SIZE)
++
++/* The total IPC space needed to communicate with a remote processor */
++#define RPMSG_IPC_MEM	(RPMSG_BUFS_SPACE + 2 * RPMSG_RING_SIZE)
++
++/*
++ * Provide rpmsg core with platform-specific configuration.
++ * Since user data is at stake here, bugs can't be tolerated. hence
++ * the BUG_ON approach on invalid lengths.
++ *
++ * For more info on these configuration requests, see enum
++ * rpmsg_platform_requests.
++ */
++static void omap_rpmsg_get(struct virtio_device *vdev, unsigned int request,
++		   void *buf, unsigned len)
++{
++	struct omap_rpmsg_vproc *vproc = to_omap_vproc(vdev);
++	int tmp;
++
++	switch (request) {
++	case VPROC_BUF_ADDR:
++		BUG_ON(len != sizeof(vproc->buf_mapped));
++		memcpy(buf, &vproc->buf_mapped, len);
++		break;
++	case VPROC_BUF_PADDR:
++		BUG_ON(len != sizeof(vproc->buf_paddr));
++		memcpy(buf, &vproc->buf_paddr, len);
++		break;
++	case VPROC_BUF_NUM:
++		BUG_ON(len != sizeof(tmp));
++		tmp = RPMSG_NUM_BUFS;
++		memcpy(buf, &tmp, len);
++		break;
++	case VPROC_BUF_SZ:
++		BUG_ON(len != sizeof(tmp));
++		tmp = RPMSG_BUF_SIZE;
++		memcpy(buf, &tmp, len);
++		break;
++	case VPROC_STATIC_CHANNELS:
++		BUG_ON(len != sizeof(vproc->static_chnls));
++		memcpy(buf, &vproc->static_chnls, len);
++		break;
++	default:
++		dev_err(&vdev->dev, "invalid request: %d\n", request);
++	}
++}
++
++/* kick the remote processor, and let it know which virtqueue to poke at */
++static void omap_rpmsg_notify(struct virtqueue *vq)
++{
++	struct omap_rpmsg_vq_info *rpvq = vq->priv;
++	int ret;
++
++	pr_debug("sending mailbox msg: %d\n", rpvq->vq_id);
++	/* send the index of the triggered virtqueue in the mailbox payload */
++	ret = omap_mbox_msg_send(rpvq->vproc->mbox, rpvq->vq_id);
++	if (ret)
++		pr_err("ugh, omap_mbox_msg_send() failed: %d\n", ret);
++}
++
++/**
++ * omap_rpmsg_mbox_callback() - inbound mailbox message handler
++ * @this: notifier block
++ * @index: unused
++ * @data: mailbox payload
++ *
++ * This handler is invoked by omap's mailbox driver whenever a mailbox
++ * message is received. Usually, the mailbox payload simply contains
++ * the index of the virtqueue that is kicked by the remote processor,
++ * and we let virtio handle it.
++ *
++ * In addition to virtqueue indices, we also have some out-of-band values
++ * that indicates different events. Those values are deliberately very
++ * big so they don't coincide with virtqueue indices. Moreover,
++ * they are rarely used, if used at all, and their necessity should
++ * be revisited.
++ */
++static int omap_rpmsg_mbox_callback(struct notifier_block *this,
++					unsigned long index, void *data)
++{
++	mbox_msg_t msg = (mbox_msg_t) data;
++	struct omap_rpmsg_vproc *vproc;
++
++	vproc = container_of(this, struct omap_rpmsg_vproc, nb);
++
++	pr_debug("mbox msg: 0x%x\n", msg);
++
++	switch (msg) {
++	case RP_MBOX_CRASH:
++		pr_err("%s has just crashed !\n", vproc->rproc_name);
++		/* todo: smarter error handling here */
++		break;
++	case RP_MBOX_ECHO_REPLY:
++		pr_info("received echo reply from %s !\n", vproc->rproc_name);
++		break;
++	case RP_MBOX_PENDING_MSG:
++		/*
++		 * a new inbound message is waiting in our rx vring (1st vring).
++		 * Let's pretend the message explicitly contained the rx vring
++		 * index number and handle it generically.
++		 */
++		msg = vproc->base_vq_id;
++		/* intentional fall-through */
++	default:
++		/* ignore vq indices which are clearly not for us */
++		if (msg < vproc->base_vq_id)
++			break;
++
++		msg -= vproc->base_vq_id;
++
++		/*
++		 * Currently both PENDING_MSG and explicit-virtqueue-index
++		 * messaging are supported.
++		 * Whatever approach is taken, at this point 'msg' contains
++		 * the index of the vring which was just triggered.
++		 */
++		if (msg < vproc->num_of_vqs)
++			vring_interrupt(msg, vproc->vq[msg]);
++	}
++
++	return NOTIFY_DONE;
++}
++
++/* prepare a virtqueue */
++static struct virtqueue *rp_find_vq(struct virtio_device *vdev,
++				    unsigned index,
++				    void (*callback)(struct virtqueue *vq),
++				    const char *name)
++{
++	struct omap_rpmsg_vproc *vproc = to_omap_vproc(vdev);
++	struct omap_rpmsg_vq_info *rpvq;
++	struct virtqueue *vq;
++	int err;
++
++	rpvq = kmalloc(sizeof(*rpvq), GFP_KERNEL);
++	if (!rpvq)
++		return ERR_PTR(-ENOMEM);
++
++	/* ioremap'ing normal memory, so we cast away sparse's complaints */
++	rpvq->addr = (__force void *) ioremap_nocache(vproc->vring[index],
++							RPMSG_RING_SIZE);
++	if (!rpvq->addr) {
++		err = -ENOMEM;
++		goto free_rpvq;
++	}
++
++	memset(rpvq->addr, 0, RPMSG_RING_SIZE);
++
++	pr_debug("vring%d: phys 0x%x, virt 0x%x\n", index, vproc->vring[index],
++					(unsigned int) rpvq->addr);
++
++	vq = vring_new_virtqueue(RPMSG_NUM_BUFS / 2, RPMSG_VRING_ALIGN, vdev,
++				rpvq->addr, omap_rpmsg_notify, callback, name);
++	if (!vq) {
++		pr_err("vring_new_virtqueue failed\n");
++		err = -ENOMEM;
++		goto unmap_vring;
++	}
++
++	vproc->vq[index] = vq;
++	vq->priv = rpvq;
++	/* unique id for this virtqueue */
++	rpvq->vq_id = vproc->base_vq_id + index;
++	rpvq->vproc = vproc;
++
++	return vq;
++
++unmap_vring:
++	/* iounmap normal memory, so make sparse happy */
++	iounmap((__force void __iomem *) rpvq->addr);
++free_rpvq:
++	kfree(rpvq);
++	return ERR_PTR(err);
++}
++
++static void omap_rpmsg_del_vqs(struct virtio_device *vdev)
++{
++	struct virtqueue *vq, *n;
++	struct omap_rpmsg_vproc *vproc = to_omap_vproc(vdev);
++
++	if (vproc->rproc)
++		rproc_put(vproc->rproc);
++
++	if (vproc->mbox)
++		omap_mbox_put(vproc->mbox, &vproc->nb);
++
++	if (vproc->buf_mapped)
++		/* iounmap normal memory, so make sparse happy */
++		iounmap((__force void __iomem *)vproc->buf_mapped);
++
++	list_for_each_entry_safe(vq, n, &vdev->vqs, list) {
++		struct omap_rpmsg_vq_info *rpvq = vq->priv;
++		vring_del_virtqueue(vq);
++		/* iounmap normal memory, so make sparse happy */
++		iounmap((__force void __iomem *) rpvq->addr);
++		kfree(rpvq);
++	}
++}
++
++static int omap_rpmsg_find_vqs(struct virtio_device *vdev, unsigned nvqs,
++		       struct virtqueue *vqs[],
++		       vq_callback_t *callbacks[],
++		       const char *names[])
++{
++	struct omap_rpmsg_vproc *vproc = to_omap_vproc(vdev);
++	int i, err;
++
++	/* we maintain two virtqueues per remote processor (for RX and TX) */
++	if (nvqs != 2)
++		return -EINVAL;
++
++	for (i = 0; i < nvqs; ++i) {
++		vqs[i] = rp_find_vq(vdev, i, callbacks[i], names[i]);
++		if (IS_ERR(vqs[i])) {
++			err = PTR_ERR(vqs[i]);
++			goto error;
++		}
++	}
++
++	vproc->num_of_vqs = nvqs;
++
++	/* ioremap'ing normal memory, so we cast away sparse's complaints */
++	vproc->buf_mapped = (__force void *) ioremap_nocache(vproc->buf_paddr,
++							vproc->buf_size);
++	if (!vproc->buf_mapped) {
++		pr_err("ioremap failed\n");
++		err = -ENOMEM;
++		goto error;
++	}
++
++	/* for now, use mailbox's notifiers. later that can be optimized */
++	vproc->nb.notifier_call = omap_rpmsg_mbox_callback;
++	vproc->mbox = omap_mbox_get(vproc->mbox_name, &vproc->nb);
++	if (IS_ERR(vproc->mbox)) {
++		pr_err("failed to get mailbox %s\n", vproc->mbox_name);
++		err = -EINVAL;
++		goto error;
++	}
++
++	pr_debug("buf: phys 0x%x, virt 0x%x\n", vproc->buf_paddr,
++					(unsigned int) vproc->buf_mapped);
++
++	/* tell the M3 we're ready (so M3 will know we're sane) */
++	err = omap_mbox_msg_send(vproc->mbox, RP_MBOX_READY);
++	if (err) {
++		pr_err("ugh, omap_mbox_msg_send() failed: %d\n", err);
++		goto error;
++	}
++
++	/* send it the physical address of the vrings + IPC buffer */
++	err = omap_mbox_msg_send(vproc->mbox, (mbox_msg_t) vproc->buf_paddr);
++	if (err) {
++		pr_err("ugh, omap_mbox_msg_send() failed: %d\n", err);
++		goto error;
++	}
++
++	/* ping the remote processor. this is only for sanity-sake;
++	 * there is no functional effect whatsoever */
++	err = omap_mbox_msg_send(vproc->mbox, RP_MBOX_ECHO_REQUEST);
++	if (err) {
++		pr_err("ugh, omap_mbox_msg_send() failed: %d\n", err);
++		goto error;
++	}
++
++	/* now load the firmware, and boot the M3 */
++	vproc->rproc = rproc_get(vproc->rproc_name);
++	if (!vproc->rproc) {
++		pr_err("failed to get rproc %s\n", vproc->rproc_name);
++		err = -EINVAL;
++		goto error;
++	}
++
++	return 0;
++
++error:
++	omap_rpmsg_del_vqs(vdev);
++	return err;
++}
++
++/*
++ * should be nice to add firmware support for these handlers.
++ * for now provide them so virtio doesn't crash
++ */
++static u8 omap_rpmsg_get_status(struct virtio_device *vdev)
++{
++	return 0;
++}
++
++static void omap_rpmsg_set_status(struct virtio_device *vdev, u8 status)
++{
++	dev_dbg(&vdev->dev, "new status: %d\n", status);
++}
++
++static void omap_rpmsg_reset(struct virtio_device *vdev)
++{
++	dev_dbg(&vdev->dev, "reset !\n");
++}
++
++static u32 omap_rpmsg_get_features(struct virtio_device *vdev)
++{
++	/* for now, use hardcoded bitmap. later this should be provided
++	 * by the firmware itself */
++	return 1 << VIRTIO_RPMSG_F_NS;
++}
++
++static void omap_rpmsg_finalize_features(struct virtio_device *vdev)
++{
++	/* Give virtio_ring a chance to accept features */
++	vring_transport_features(vdev);
++}
++
++static void omap_rpmsg_vproc_release(struct device *dev)
++{
++	/* this handler is provided so driver core doesn't yell at us */
++}
++
++static struct virtio_config_ops omap_rpmsg_config_ops = {
++	.get_features	= omap_rpmsg_get_features,
++	.finalize_features = omap_rpmsg_finalize_features,
++	.get		= omap_rpmsg_get,
++	.find_vqs	= omap_rpmsg_find_vqs,
++	.del_vqs	= omap_rpmsg_del_vqs,
++	.reset		= omap_rpmsg_reset,
++	.set_status	= omap_rpmsg_set_status,
++	.get_status	= omap_rpmsg_get_status,
++};
++
++/*
++ * Populating the static channels table.
++ *
++ * This is not always required, and the example below just demonstrates
++ * how to populate it with a static server channel.
++ *
++ * This example should be moved to Documentation/rpmsh.h before merging.
++ *
++ * For more info, see 'struct rpmsg_channel_info'.
++ */
++static struct rpmsg_channel_info omap_ipuc0_static_chnls[] = {
++	RMSG_SERVER_CHNL("rpmsg-server-sample", 137),
++	{ },
++};
++
++static struct rpmsg_channel_info omap_ipuc1_static_chnls[] = {
++	{ },
++};
++
++static struct omap_rpmsg_vproc omap_rpmsg_vprocs[] = {
++	/* ipu_c0's rpmsg backend */
++	{
++		.vdev.id.device	= VIRTIO_ID_RPMSG,
++		.vdev.config	= &omap_rpmsg_config_ops,
++		.mbox_name	= "mailbox-1",
++		.rproc_name	= "ipu",
++		/* core 0 is using indices 0 + 1 for its vqs */
++		.base_vq_id	= 0,
++		.static_chnls = omap_ipuc0_static_chnls,
++	},
++	/* ipu_c1's rpmsg backend */
++	{
++		.vdev.id.device	= VIRTIO_ID_RPMSG,
++		.vdev.config	= &omap_rpmsg_config_ops,
++		.mbox_name	= "mailbox-1",
++		.rproc_name	= "ipu",
++		/* core 1 is using indices 2 + 3 for its vqs */
++		.base_vq_id	= 2,
++		.static_chnls = omap_ipuc1_static_chnls,
++	},
++};
++
++static int __init omap_rpmsg_ini(void)
++{
++	int i, ret = 0;
++	/*
++	 * This whole area generally needs some rework.
++	 * E.g, consider using dma_alloc_coherent for the IPC buffers and
++	 * vrings, use CMA, etc...
++	 */
++	phys_addr_t paddr = omap_dsp_get_mempool_base();
++	phys_addr_t psize = omap_dsp_get_mempool_size();
++
++	/*
++	 * allocate carverout memory for the buffers and vring, and
++	 * then register the vproc virtio device
++	 */
++	for (i = 0; i < ARRAY_SIZE(omap_rpmsg_vprocs); i++) {
++		struct omap_rpmsg_vproc *vproc = &omap_rpmsg_vprocs[i];
++
++		if (psize < RPMSG_IPC_MEM) {
++			pr_err("out of carveout memory: %d (%d)\n", psize, i);
++			return -ENOMEM;
++		}
++
++		vproc->buf_paddr = paddr;
++		vproc->buf_size = RPMSG_BUFS_SPACE;
++		vproc->vring[0] = paddr + RPMSG_BUFS_SPACE;
++		vproc->vring[1] = paddr + RPMSG_BUFS_SPACE + RPMSG_RING_SIZE;
++
++		paddr += RPMSG_IPC_MEM;
++		psize -= RPMSG_IPC_MEM;
++
++		pr_debug("vproc%d: buf 0x%x, vring0 0x%x, vring1 0x%x\n", i,
++			vproc->buf_paddr, vproc->vring[0], vproc->vring[1]);
++
++		vproc->vdev.dev.release = omap_rpmsg_vproc_release;
++
++		ret = register_virtio_device(&vproc->vdev);
++		if (ret) {
++			pr_err("failed to register vproc: %d\n", ret);
++			break;
++		}
++	}
++
++	return ret;
++}
++module_init(omap_rpmsg_ini);
++
++static void __exit omap_rpmsg_fini(void)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(omap_rpmsg_vprocs); i++) {
++		struct omap_rpmsg_vproc *vproc = &omap_rpmsg_vprocs[i];
++
++		unregister_virtio_device(&vproc->vdev);
++	}
++}
++module_exit(omap_rpmsg_fini);
++
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("OMAP Remote processor messaging virtio device");
+diff --git a/drivers/rpmsg/host/omap_rpmsg.h b/drivers/rpmsg/host/omap_rpmsg.h
+new file mode 100644
+index 0000000..f6d2036
+--- /dev/null
++++ b/drivers/rpmsg/host/omap_rpmsg.h
+@@ -0,0 +1,69 @@
++/*
++ * Remote processor messaging
++ *
++ * Copyright (C) 2011 Texas Instruments, Inc.
++ * Copyright (C) 2011 Google, Inc.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * * Redistributions of source code must retain the above copyright
++ *   notice, this list of conditions and the following disclaimer.
++ * * Redistributions in binary form must reproduce the above copyright
++ *   notice, this list of conditions and the following disclaimer in
++ *   the documentation and/or other materials provided with the
++ *   distribution.
++ * * Neither the name Texas Instruments nor the names of its
++ *   contributors may be used to endorse or promote products derived
++ *   from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#ifndef _OMAP_RPMSG_H
++#define _OMAP_RPMSG_H
++
++/*
++ * enum - Predefined Mailbox Messages
++ *
++ * @RP_MBOX_READY: informs the M3's that we're up and running. this is
++ * part of the init sequence sent that the M3 expects to see immediately
++ * after it is booted.
++ *
++ * @RP_MBOX_PENDING_MSG: informs the receiver that there is an inbound
++ * message waiting in its own receive-side vring. please note that currently
++ * this message is optional: alternatively, one can explicitly send the index
++ * of the triggered virtqueue itself. the preferred approach will be decided
++ * as we progress and experiment with those two different approaches.
++ *
++ * @RP_MBOX_CRASH: this message is sent if BIOS crashes
++ *
++ * @RP_MBOX_ECHO_REQUEST: a mailbox-level "ping" message.
++ *
++ * @RP_MBOX_ECHO_REPLY: a mailbox-level reply to a "ping"
++ *
++ * @RP_MBOX_ABORT_REQUEST: a "please crash" request, used for testing the
++ * recovery mechanism (to some extent).
++ */
++enum omap_rp_mbox_messages {
++	RP_MBOX_READY		= 0xFFFFFF00,
++	RP_MBOX_PENDING_MSG	= 0xFFFFFF01,
++	RP_MBOX_CRASH		= 0xFFFFFF02,
++	RP_MBOX_ECHO_REQUEST	= 0xFFFFFF03,
++	RP_MBOX_ECHO_REPLY	= 0xFFFFFF04,
++	RP_MBOX_ABORT_REQUEST	= 0xFFFFFF05,
++};
++
++#endif /* _OMAP_RPMSG_H */
+diff --git a/drivers/rpmsg/rpmsg_freertos_statistic.c b/drivers/rpmsg/rpmsg_freertos_statistic.c
+new file mode 100644
+index 0000000..021dd7e
+--- /dev/null
++++ b/drivers/rpmsg/rpmsg_freertos_statistic.c
+@@ -0,0 +1,344 @@
++/*
++ * Remote processor messaging transport - sample server driver
++ *
++ * Copyright (C) 2012 Michal Simek <monstr@monstr.eu>
++ * Copyright (C) 2012 PetaLogix
++ *
++ * Based on original OMX driver made by:
++ * Copyright (C) 2011 Texas Instruments, Inc.
++ * Copyright (C) 2011 Google, Inc.
++ *
++ * Ohad Ben-Cohen <ohad@wizery.com>
++ * Brian Swetland <swetland@google.com>
++ *
++ * This software is licensed under the terms of the GNU General Public
++ * License version 2, as published by the Free Software Foundation, and
++ * may be copied, distributed, and modified under those terms.
++ */
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/rpmsg.h>
++#include <linux/slab.h>
++#include <linux/cdev.h>
++#include <linux/fs.h>
++#include <linux/sched.h>
++#include <linux/scatterlist.h>
++#include <linux/slab.h>
++#include <linux/idr.h>
++#include <linux/poll.h>
++#include <linux/jiffies.h>
++#include <linux/mutex.h>
++#include <linux/wait.h>
++#include <linux/skbuff.h>
++
++struct rpmsg_service {
++	struct cdev cdev;
++	struct rpmsg_channel *rpdev;
++	struct device *dev;
++	int major;
++	int minor;
++};
++
++struct rpmsg_instance {
++	struct rpmsg_endpoint *ept;
++	struct rpmsg_service *service;
++	struct sk_buff_head queue;
++	struct mutex lock;
++	wait_queue_head_t readq;
++};
++
++static void rpmsg_cb(struct rpmsg_channel *rpdev, void *data, int len,
++						void *priv, u32 src)
++{
++	static int rx_count;
++	struct sk_buff *skb;
++	char *skbdata;
++	/* priv is setup only for new endpoints */
++	struct rpmsg_instance *instance = priv;
++
++	dev_dbg(&rpdev->dev, "incoming msg %d (src: 0x%x) len %d\n",
++						++rx_count, src, len);
++
++	print_hex_dump(KERN_DEBUG, __func__, DUMP_PREFIX_NONE, 32, 1,
++		       data, len,  true);
++
++	skb = alloc_skb(len, GFP_KERNEL);
++	if (!skb) {
++		dev_err(&rpdev->dev, "alloc_skb err: %u\n", len);
++		return;
++	}
++
++	skbdata = skb_put(skb, len);
++	memcpy(skbdata, data, len);
++	mutex_lock(&instance->lock);
++	skb_queue_tail(&instance->queue, skb);
++	mutex_unlock(&instance->lock);
++	/* wake up any blocking processes, waiting for new data */
++	wake_up_interruptible(&instance->readq);
++}
++
++static ssize_t rpmsg_read(struct file *filp, char __user *buf,
++						size_t len, loff_t *offp)
++{
++	struct rpmsg_instance *instance = filp->private_data;
++	struct sk_buff *skb;
++	int use;
++
++	if (mutex_lock_interruptible(&instance->lock))
++		return -ERESTARTSYS;
++
++	/* nothing to read ? */
++	if (skb_queue_empty(&instance->queue)) {
++		mutex_unlock(&instance->lock);
++		/* non-blocking requested ? return now */
++		if (filp->f_flags & O_NONBLOCK)
++			return -EAGAIN;
++		/* otherwise block, and wait for data */
++		if (wait_event_interruptible(instance->readq,
++				!skb_queue_empty(&instance->queue)))
++			return -ERESTARTSYS;
++		if (mutex_lock_interruptible(&instance->lock))
++			return -ERESTARTSYS;
++	}
++
++	skb = skb_dequeue(&instance->queue);
++	if (!skb) {
++		printk("err is rmpsg_omx racy ?\n");
++		return -EFAULT;
++	}
++
++	mutex_unlock(&instance->lock);
++
++	use = min(len, skb->len);
++	if (copy_to_user(buf, skb->data, use))
++		use = -EFAULT;
++
++	kfree_skb(skb);
++	return use;
++}
++
++/* MAX number of bytes in one packet - depend on resource table */
++#define CHANNEL_SIZE	512
++
++static ssize_t rpmsg_write(struct file *filp, const char __user *ubuf,
++						size_t len, loff_t *offp)
++{
++	struct rpmsg_instance *instance = filp->private_data;
++	struct rpmsg_service *service = instance->service;
++	int err;
++	char kbuf[CHANNEL_SIZE];
++
++	len = len < CHANNEL_SIZE ? len : CHANNEL_SIZE;
++	if (copy_from_user(kbuf, ubuf, len))
++		return -EMSGSIZE;
++
++	err = rpmsg_send_offchannel(service->rpdev, instance->ept->addr,
++					service->rpdev->dst, kbuf, len);
++	if (err) {
++		dev_err(service->dev, "rpmsg_send failed: %d\n", err);
++		return err;
++	}
++
++	return len;
++}
++
++static int rpmsg_open(struct inode *inode, struct file *filp)
++{
++	struct rpmsg_instance *instance;
++	struct rpmsg_service *service;
++
++	service = container_of(inode->i_cdev, struct rpmsg_service, cdev);
++
++	instance = kzalloc(sizeof(*instance), GFP_KERNEL);
++	if (!instance)
++		return -ENOMEM;
++
++	instance->service = service;
++
++	mutex_init(&instance->lock);
++	skb_queue_head_init(&instance->queue);
++	init_waitqueue_head(&instance->readq);
++
++	filp->private_data = instance;
++
++	/* assign a new, unique, local address and associate omx with it */
++	instance->ept = rpmsg_create_ept(service->rpdev, rpmsg_cb, instance,
++							RPMSG_ADDR_ANY);
++	if (!instance->ept) {
++		dev_err(service->dev, "create ept failed\n");
++		kfree(instance);
++		return -ENOMEM;
++	}
++
++	dev_dbg(service->dev, "New endpoint at %d\n", instance->ept->addr);
++	return 0;
++}
++
++typedef enum {
++	CLEAR = 0,
++	START,
++	STOP,
++	CLONE,
++	GET,
++	QUIT,
++	STATE_MASK = 0xF,
++} message_state;
++
++static int rpmsg_release(struct inode *inode, struct file *filp)
++{
++	int err, temp;
++	struct rpmsg_instance *instance = filp->private_data;
++	struct rpmsg_service *service = instance->service;
++
++	/* Place for sending any STOP message or announce driver
++	 * that connection from user-space is lost */
++	temp = QUIT;
++	err = rpmsg_send_offchannel(service->rpdev, instance->ept->addr,
++				service->rpdev->dst, &temp, sizeof(temp));
++	if (err) {
++		dev_err(service->dev, "rpmsg_send failed: %d\n", err);
++		/* No return here because driver wants to quit */
++	}
++
++	/* Discard all SKBs */
++	while (!skb_queue_empty(&instance->queue)) {
++		struct sk_buff *skb;
++		skb = skb_dequeue(&instance->queue);
++		kfree_skb(skb);
++	}
++
++	rpmsg_destroy_ept(instance->ept); /* Also endpoint */
++	kfree(instance);
++	return 0;
++}
++
++
++static const struct file_operations rpmsg_fops = {
++	.open		= rpmsg_open,
++	.release	= rpmsg_release,
++	.read		= rpmsg_read,
++	.write		= rpmsg_write,
++	.owner		= THIS_MODULE,
++};
++
++static struct class *rpmsg_class;
++static dev_t rpmsg_dev;
++
++static int rpmsg_sample_probe(struct rpmsg_channel *rpdev)
++{
++	int ret;
++	struct rpmsg_service *service;
++
++	service = kzalloc(sizeof(*service), GFP_KERNEL);
++	if (!service) {
++		dev_err(&rpdev->dev, "kzalloc failed\n");
++		return -ENOMEM;
++	}
++
++	service->rpdev = rpdev;
++	service->major = MAJOR(rpmsg_dev);
++	service->minor = 0;
++
++	cdev_init(&service->cdev, &rpmsg_fops);
++	service->cdev.owner = THIS_MODULE;
++	ret = cdev_add(&service->cdev,
++				MKDEV(service->major, service->minor), 1);
++	if (ret) {
++		dev_err(&rpdev->dev, "cdev_add failed: %d\n", ret);
++		goto free;
++	}
++
++	service->dev = device_create(rpmsg_class, &rpdev->dev,
++			MKDEV(service->major, service->minor), NULL,
++			"rpmsg%d", service->minor);
++	if (IS_ERR(service->dev)) {
++		dev_err(&rpdev->dev, "device_create failed: %d\n", ret);
++		goto clean_cdev;
++	}
++	dev_set_drvdata(&rpdev->dev, service);
++
++	dev_info(&rpdev->dev, "new channel: 0x%x -> 0x%x!\n",
++					rpdev->src, rpdev->dst);
++	return 0;
++
++clean_cdev:
++	cdev_del(&service->cdev);
++free:
++	kfree(service);
++	return ret;
++}
++
++static void rpmsg_sample_remove(struct rpmsg_channel *rpdev)
++{
++	struct rpmsg_service *service = dev_get_drvdata(&rpdev->dev);
++	int major = MAJOR(rpmsg_dev);
++
++	device_destroy(rpmsg_class, MKDEV(major, service->minor));
++	cdev_del(&service->cdev);
++	kfree(service);
++}
++
++static void rpmsg_sample_cb(struct rpmsg_channel *rpdev, void *data,
++					int len, void *priv, u32 src)
++{
++	dev_info(&rpdev->dev, "ORIGIN callback function without priv\n");
++}
++
++static struct rpmsg_device_id rpmsg_driver_sample_id_table[] = {
++	{ .name	= "rpmsg-timer-statistic" },
++	{ },
++};
++MODULE_DEVICE_TABLE(rpmsg, rpmsg_driver_sample_id_table);
++
++static struct rpmsg_driver rpmsg_sample_server = {
++	.drv.name	= KBUILD_MODNAME,
++	.drv.owner	= THIS_MODULE,
++	.id_table	= rpmsg_driver_sample_id_table,
++	.probe		= rpmsg_sample_probe,
++	.callback	= rpmsg_sample_cb,
++	.remove		= rpmsg_sample_remove,
++};
++
++#define MAX_DEVICES	8
++
++static int __init init(void)
++{
++	int ret;
++
++	/* Allocate 0-8 char devices */
++	ret = alloc_chrdev_region(&rpmsg_dev, 0, MAX_DEVICES,
++						KBUILD_MODNAME);
++	if (ret) {
++		pr_err("alloc_chrdev_region failed: %d\n", ret);
++		goto out;
++	}
++
++	/* Create class for this device */
++	rpmsg_class = class_create(THIS_MODULE, KBUILD_MODNAME);
++	if (IS_ERR(rpmsg_class)) {
++		ret = PTR_ERR(rpmsg_class);
++		pr_err("class_create failed: %d\n", ret);
++		goto unreg_region;
++	}
++
++	return register_rpmsg_driver(&rpmsg_sample_server);
++
++unreg_region:
++	unregister_chrdev_region(rpmsg_dev, MAX_DEVICES);
++out:
++	return ret;
++}
++
++static void __exit fini(void)
++{
++	unregister_rpmsg_driver(&rpmsg_sample_server);
++	class_destroy(rpmsg_class);
++	unregister_chrdev_region(rpmsg_dev, MAX_DEVICES);
++}
++module_init(init);
++module_exit(fini);
++
++MODULE_DESCRIPTION("Virtio remote processor messaging sample driver");
++MODULE_AUTHOR("Michal Simek <monstr@monstr.eu");
++MODULE_LICENSE("GPL v2");
+diff --git a/drivers/rpmsg/rpmsg_omx.c b/drivers/rpmsg/rpmsg_omx.c
+new file mode 100644
+index 0000000..49d8433
+--- /dev/null
++++ b/drivers/rpmsg/rpmsg_omx.c
+@@ -0,0 +1,532 @@
++/*
++ * OMX offloading remote processor driver
++ *
++ * Copyright (C) 2011 Texas Instruments, Inc.
++ * Copyright (C) 2011 Google, Inc.
++ *
++ * Ohad Ben-Cohen <ohad@wizery.com>
++ * Brian Swetland <swetland@google.com>
++ *
++ * This software is licensed under the terms of the GNU General Public
++ * License version 2, as published by the Free Software Foundation, and
++ * may be copied, distributed, and modified under those terms.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#define pr_fmt(fmt) "%s: " fmt, __func__
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/scatterlist.h>
++#include <linux/slab.h>
++#include <linux/idr.h>
++#include <linux/fs.h>
++#include <linux/poll.h>
++#include <linux/cdev.h>
++#include <linux/jiffies.h>
++#include <linux/mutex.h>
++#include <linux/wait.h>
++#include <linux/skbuff.h>
++#include <linux/sched.h>
++#include <linux/rpmsg.h>
++#include <linux/rpmsg_omx.h>
++
++/* maximum OMX devices this driver can handle */
++#define MAX_OMX_DEVICES		8
++
++struct rpmsg_omx_service {
++	struct cdev cdev;
++	struct device *dev;
++	struct rpmsg_channel *rpdev;
++	int minor;
++};
++
++struct rpmsg_omx_instance {
++	struct rpmsg_omx_service *omxserv;
++	struct sk_buff_head queue;
++	struct mutex lock;
++	wait_queue_head_t readq;
++	struct completion reply_arrived;
++	struct rpmsg_endpoint *ept;
++	u32 dst;
++	int state;
++};
++
++static struct class *rpmsg_omx_class;
++static dev_t rpmsg_omx_dev;
++
++/* store all remote omx connection services (usually one per remoteproc) */
++static DEFINE_IDR(rpmsg_omx_services);
++static DEFINE_SPINLOCK(rpmsg_omx_services_lock);
++
++static void rpmsg_omx_cb(struct rpmsg_channel *rpdev, void *data, int len,
++							void *priv, u32 src)
++{
++	struct omx_msg_hdr *hdr = data;
++	struct rpmsg_omx_instance *omx = priv;
++	struct omx_conn_rsp *rsp;
++	struct sk_buff *skb;
++	char *skbdata;
++
++	if (len < sizeof(*hdr) || hdr->len < len - sizeof(*hdr)) {
++		dev_warn(&rpdev->dev, "%s: truncated message\n", __func__);
++		return;
++	}
++
++	dev_dbg(&rpdev->dev, "%s: incoming msg src 0x%x type %d len %d\n",
++					__func__, src, hdr->type, hdr->len);
++	print_hex_dump(KERN_DEBUG, "rpmsg_omx RX: ", DUMP_PREFIX_NONE, 16, 1,
++		       data, len,  true);
++
++	switch (hdr->type) {
++	case OMX_CONN_RSP:
++		if (hdr->len < sizeof(*rsp)) {
++			dev_warn(&rpdev->dev, "incoming empty response msg\n");
++			break;
++		}
++		rsp = (struct omx_conn_rsp *) hdr->data;
++		dev_info(&rpdev->dev, "conn rsp: status %d addr %d\n",
++			       rsp->status, rsp->addr);
++		omx->dst = rsp->addr;
++		if (rsp->status)
++			omx->state = OMX_FAIL;
++		else
++			omx->state = OMX_CONNECTED;
++		complete(&omx->reply_arrived);
++		break;
++	case OMX_RAW_MSG:
++		skb = alloc_skb(hdr->len, GFP_KERNEL);
++		if (!skb) {
++			dev_err(&rpdev->dev, "alloc_skb err: %u\n", hdr->len);
++			break;
++		}
++		skbdata = skb_put(skb, hdr->len);
++		memcpy(skbdata, hdr->data, hdr->len);
++
++		mutex_lock(&omx->lock);
++		skb_queue_tail(&omx->queue, skb);
++		mutex_unlock(&omx->lock);
++		/* wake up any blocking processes, waiting for new data */
++		wake_up_interruptible(&omx->readq);
++		break;
++	default:
++		dev_warn(&rpdev->dev, "unexpected msg type: %d\n", hdr->type);
++		break;
++	}
++}
++
++static int rpmsg_omx_connect(struct rpmsg_omx_instance *omx, char *omxname)
++{
++	struct omx_msg_hdr *hdr;
++	struct omx_conn_req *payload;
++	struct rpmsg_omx_service *omxserv = omx->omxserv;
++	char connect_msg[sizeof(*hdr) + sizeof(*payload)] = { 0 };
++	int ret;
++
++	if (omx->state == OMX_CONNECTED) {
++		dev_dbg(omxserv->dev, "endpoint already connected\n");
++		return -EISCONN;
++	}
++
++	hdr = (struct omx_msg_hdr *)connect_msg;
++	hdr->type = OMX_CONN_REQ;
++	hdr->flags = 0;
++	hdr->len = strlen(omxname) + 1;
++	payload = (struct omx_conn_req *)hdr->data;
++	strcpy(payload->name, omxname);
++
++	init_completion(&omx->reply_arrived);
++
++	/* send a conn req to the remote OMX connection service. use
++	 * the new local address that was just allocated by ->open */
++	ret = rpmsg_send_offchannel(omxserv->rpdev, omx->ept->addr,
++			omxserv->rpdev->dst, connect_msg, sizeof(connect_msg));
++	if (ret) {
++		dev_err(omxserv->dev, "rpmsg_send failed: %d\n", ret);
++		return ret;
++	}
++
++	/* wait until a connection reply arrives or 5 seconds elapse */
++	ret = wait_for_completion_interruptible_timeout(&omx->reply_arrived,
++						msecs_to_jiffies(5000));
++	if (omx->state == OMX_CONNECTED)
++		return 0;
++
++	if (omx->state == OMX_FAIL)
++		return -ENXIO;
++
++	if (ret) {
++		dev_err(omxserv->dev, "premature wakeup: %d\n", ret);
++		return -EIO;
++	}
++
++	return -ETIMEDOUT;
++}
++
++static
++long rpmsg_omx_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
++{
++	struct rpmsg_omx_instance *omx = filp->private_data;
++	struct rpmsg_omx_service *omxserv = omx->omxserv;
++	char buf[48];
++	int ret = 0;
++
++	dev_dbg(omxserv->dev, "%s: cmd %d, arg 0x%lx\n", __func__, cmd, arg);
++
++	if (_IOC_TYPE(cmd) != OMX_IOC_MAGIC)
++		return -ENOTTY;
++	if (_IOC_NR(cmd) > OMX_IOC_MAXNR)
++		return -ENOTTY;
++
++	switch (cmd) {
++	case OMX_IOCCONNECT:
++		ret = copy_from_user(buf, (char __user *) arg, sizeof(buf));
++		if (ret) {
++			dev_err(omxserv->dev, "copy_from_user fail: %d\n", ret);
++			ret = -EFAULT;
++			break;
++		}
++		/* make sure user input is null terminated */
++		buf[sizeof(buf) - 1] = '\0';
++		ret = rpmsg_omx_connect(omx, buf);
++		break;
++	default:
++		dev_warn(omxserv->dev, "unhandled ioctl cmd: %d\n", cmd);
++		break;
++	}
++
++	return ret;
++}
++
++static int rpmsg_omx_open(struct inode *inode, struct file *filp)
++{
++	struct rpmsg_omx_service *omxserv;
++	struct rpmsg_omx_instance *omx;
++
++	omxserv = container_of(inode->i_cdev, struct rpmsg_omx_service, cdev);
++
++	omx = kzalloc(sizeof(*omx), GFP_KERNEL);
++	if (!omx)
++		return -ENOMEM;
++
++	mutex_init(&omx->lock);
++	skb_queue_head_init(&omx->queue);
++	init_waitqueue_head(&omx->readq);
++	omx->omxserv = omxserv;
++	omx->state = OMX_UNCONNECTED;
++
++	/* assign a new, unique, local address and associate omx with it */
++	omx->ept = rpmsg_create_ept(omxserv->rpdev, rpmsg_omx_cb, omx,
++							RPMSG_ADDR_ANY);
++	if (!omx->ept) {
++		dev_err(omxserv->dev, "create ept failed\n");
++		kfree(omx);
++		return -ENOMEM;
++	}
++
++	/* associate filp with the new omx instance */
++	filp->private_data = omx;
++
++	dev_info(omxserv->dev, "local addr assigned: 0x%x\n", omx->ept->addr);
++
++	return 0;
++}
++
++static int rpmsg_omx_release(struct inode *inode, struct file *filp)
++{
++	struct rpmsg_omx_instance *omx = filp->private_data;
++	struct rpmsg_omx_service *omxserv = omx->omxserv;
++	char kbuf[512];
++	struct omx_msg_hdr *hdr = (struct omx_msg_hdr *) kbuf;
++	struct omx_disc_req *disc_req = (struct omx_disc_req *)hdr->data;
++	int use, ret;
++
++	/* todo: release resources here */
++
++	/* send a disconnect msg with the OMX instance addr */
++	hdr->type = OMX_DISCONNECT;
++	hdr->flags = 0;
++	hdr->len = sizeof(struct omx_disc_req);
++	disc_req->addr = omx->dst;
++	use = sizeof(*hdr) + hdr->len;
++
++	dev_info(omxserv->dev, "Disconnecting from OMX service at %d\n",
++		omx->dst);
++
++	/* send the msg to the remote OMX connection service */
++	ret = rpmsg_send_offchannel(omxserv->rpdev, omx->ept->addr,
++					omxserv->rpdev->dst, kbuf, use);
++	if (ret) {
++		dev_err(omxserv->dev, "rpmsg_send failed: %d\n", ret);
++		return ret;
++	}
++
++	rpmsg_destroy_ept(omx->ept);
++	kfree(omx);
++
++	return 0;
++}
++
++static ssize_t rpmsg_omx_read(struct file *filp, char __user *buf,
++						size_t len, loff_t *offp)
++{
++	struct rpmsg_omx_instance *omx = filp->private_data;
++	struct sk_buff *skb;
++	int use;
++
++	if (omx->state != OMX_CONNECTED)
++		return -ENOTCONN;
++
++	if (mutex_lock_interruptible(&omx->lock))
++		return -ERESTARTSYS;
++
++	/* nothing to read ? */
++	if (skb_queue_empty(&omx->queue)) {
++		mutex_unlock(&omx->lock);
++		/* non-blocking requested ? return now */
++		if (filp->f_flags & O_NONBLOCK)
++			return -EAGAIN;
++		/* otherwise block, and wait for data */
++		if (wait_event_interruptible(omx->readq,
++				!skb_queue_empty(&omx->queue)))
++			return -ERESTARTSYS;
++		if (mutex_lock_interruptible(&omx->lock))
++			return -ERESTARTSYS;
++	}
++
++	skb = skb_dequeue(&omx->queue);
++	if (!skb) {
++		dev_err(omx->omxserv->dev, "err is rmpsg_omx racy ?\n");
++		return -EFAULT;
++	}
++
++	mutex_unlock(&omx->lock);
++
++	use = min(len, skb->len);
++
++	if (copy_to_user(buf, skb->data, use))
++		use = -EFAULT;
++
++	kfree_skb(skb);
++	return use;
++}
++
++static ssize_t rpmsg_omx_write(struct file *filp, const char __user *ubuf,
++						size_t len, loff_t *offp)
++{
++	struct rpmsg_omx_instance *omx = filp->private_data;
++	struct rpmsg_omx_service *omxserv = omx->omxserv;
++	char kbuf[512];
++	struct omx_msg_hdr *hdr = (struct omx_msg_hdr *) kbuf;
++	int use, ret;
++
++	if (omx->state != OMX_CONNECTED)
++		return -ENOTCONN;
++
++	/*
++	 * for now, limit msg size to 512 bytes (incl. header).
++	 * (note: rpmsg's limit is even tighter. this whole thing needs fixing)
++	 */
++	use = min(sizeof(kbuf) - sizeof(*hdr), len);
++
++	/*
++	 * copy the data. Later, number of copies can be optimized if found to
++	 * be significant in real use cases
++	 */
++	if (copy_from_user(hdr->data, ubuf, use))
++		return -EMSGSIZE;
++
++	hdr->type = OMX_RAW_MSG;
++	hdr->flags = 0;
++	hdr->len = use;
++
++	use += sizeof(*hdr);
++
++	ret = rpmsg_send_offchannel(omxserv->rpdev, omx->ept->addr,
++						omx->dst, kbuf, use);
++	if (ret) {
++		dev_err(omxserv->dev, "rpmsg_send failed: %d\n", ret);
++		return ret;
++	}
++
++	return use;
++}
++
++static
++unsigned int rpmsg_poll(struct file *filp, struct poll_table_struct *wait)
++{
++	struct rpmsg_omx_instance *omx = filp->private_data;
++	unsigned int mask = 0;
++
++	if (mutex_lock_interruptible(&omx->lock))
++		return -ERESTARTSYS;
++
++	poll_wait(filp, &omx->readq, wait);
++
++	if (!skb_queue_empty(&omx->queue))
++		mask |= POLLIN | POLLRDNORM;
++
++	/* implement missing rpmsg virtio functionality here */
++	if (true)
++		mask |= POLLOUT | POLLWRNORM;
++
++	mutex_unlock(&omx->lock);
++
++	return mask;
++}
++
++static const struct file_operations rpmsg_omx_fops = {
++	.open		= rpmsg_omx_open,
++	.release	= rpmsg_omx_release,
++	.unlocked_ioctl	= rpmsg_omx_ioctl,
++	.read		= rpmsg_omx_read,
++	.write		= rpmsg_omx_write,
++	.poll		= rpmsg_poll,
++	.owner		= THIS_MODULE,
++};
++
++static int rpmsg_omx_probe(struct rpmsg_channel *rpdev)
++{
++	int ret, major, minor;
++	struct rpmsg_omx_service *omxserv;
++
++	if (!idr_pre_get(&rpmsg_omx_services, GFP_KERNEL)) {
++		dev_err(&rpdev->dev, "idr_pre_get failes\n");
++		return -ENOMEM;
++	}
++
++	omxserv = kzalloc(sizeof(*omxserv), GFP_KERNEL);
++	if (!omxserv) {
++		dev_err(&rpdev->dev, "kzalloc failed\n");
++		return -ENOMEM;
++	}
++
++	/* dynamically assign a new minor number */
++	spin_lock(&rpmsg_omx_services_lock);
++	ret = idr_get_new(&rpmsg_omx_services, omxserv, &minor);
++	spin_unlock(&rpmsg_omx_services_lock);
++
++	if (ret) {
++		dev_err(&rpdev->dev, "failed to idr_get_new: %d\n", ret);
++		goto free_omx;
++	}
++
++	major = MAJOR(rpmsg_omx_dev);
++
++	omxserv->rpdev = rpdev;
++	omxserv->minor = minor;
++
++	cdev_init(&omxserv->cdev, &rpmsg_omx_fops);
++	omxserv->cdev.owner = THIS_MODULE;
++	ret = cdev_add(&omxserv->cdev, MKDEV(major, minor), 1);
++	if (ret) {
++		dev_err(&rpdev->dev, "cdev_add failed: %d\n", ret);
++		goto rem_idr;
++	}
++
++	omxserv->dev = device_create(rpmsg_omx_class, &rpdev->dev,
++			MKDEV(major, minor), NULL,
++			"rpmsg-omx%d", minor);
++	if (IS_ERR(omxserv->dev)) {
++		ret = PTR_ERR(omxserv->dev);
++		dev_err(&rpdev->dev, "device_create failed: %d\n", ret);
++		goto clean_cdev;
++	}
++
++	dev_set_drvdata(&rpdev->dev, omxserv);
++
++	dev_info(omxserv->dev, "new OMX connection srv channel: %u -> %u!\n",
++						rpdev->src, rpdev->dst);
++	return 0;
++
++clean_cdev:
++	cdev_del(&omxserv->cdev);
++rem_idr:
++	spin_lock(&rpmsg_omx_services_lock);
++	idr_remove(&rpmsg_omx_services, minor);
++	spin_unlock(&rpmsg_omx_services_lock);
++free_omx:
++	kfree(omxserv);
++	return ret;
++}
++
++static void rpmsg_omx_remove(struct rpmsg_channel *rpdev)
++{
++	struct rpmsg_omx_service *omxserv = dev_get_drvdata(&rpdev->dev);
++	int major = MAJOR(rpmsg_omx_dev);
++
++	dev_info(omxserv->dev, "rpmsg omx driver is removed\n");
++
++	device_destroy(rpmsg_omx_class, MKDEV(major, omxserv->minor));
++	cdev_del(&omxserv->cdev);
++	spin_lock(&rpmsg_omx_services_lock);
++	idr_remove(&rpmsg_omx_services, omxserv->minor);
++	spin_unlock(&rpmsg_omx_services_lock);
++	kfree(omxserv);
++}
++
++static void rpmsg_omx_driver_cb(struct rpmsg_channel *rpdev, void *data,
++						int len, void *priv, u32 src)
++{
++	dev_warn(&rpdev->dev, "uhm, unexpected message\n");
++
++	print_hex_dump(KERN_DEBUG, __func__, DUMP_PREFIX_NONE, 16, 1,
++		       data, len,  true);
++}
++
++static struct rpmsg_device_id rpmsg_omx_id_table[] = {
++	{ .name	= "rpmsg-omx" },
++	{ },
++};
++MODULE_DEVICE_TABLE(rpmsg, rpmsg_omx_id_table);
++
++static struct rpmsg_driver rpmsg_omx_driver = {
++	.drv.name	= KBUILD_MODNAME,
++	.drv.owner	= THIS_MODULE,
++	.id_table	= rpmsg_omx_id_table,
++	.probe		= rpmsg_omx_probe,
++	.callback	= rpmsg_omx_driver_cb,
++	.remove		= rpmsg_omx_remove,
++};
++
++static int __init init(void)
++{
++	int ret;
++
++	ret = alloc_chrdev_region(&rpmsg_omx_dev, 0, MAX_OMX_DEVICES,
++							KBUILD_MODNAME);
++	if (ret) {
++		pr_err("alloc_chrdev_region failed: %d\n", ret);
++		goto out;
++	}
++
++	rpmsg_omx_class = class_create(THIS_MODULE, KBUILD_MODNAME);
++	if (IS_ERR(rpmsg_omx_class)) {
++		ret = PTR_ERR(rpmsg_omx_class);
++		pr_err("class_create failed: %d\n", ret);
++		goto unreg_region;
++	}
++
++	return register_rpmsg_driver(&rpmsg_omx_driver);
++
++unreg_region:
++	unregister_chrdev_region(rpmsg_omx_dev, MAX_OMX_DEVICES);
++out:
++	return ret;
++}
++module_init(init);
++
++static void __exit fini(void)
++{
++	unregister_rpmsg_driver(&rpmsg_omx_driver);
++	class_destroy(rpmsg_omx_class);
++	unregister_chrdev_region(rpmsg_omx_dev, MAX_OMX_DEVICES);
++}
++module_exit(fini);
++
++MODULE_DESCRIPTION("OMX offloading rpmsg driver");
++MODULE_LICENSE("GPL v2");
+diff --git a/drivers/rpmsg/rpmsg_server_sample.c b/drivers/rpmsg/rpmsg_server_sample.c
+new file mode 100644
+index 0000000..55fad28
+--- /dev/null
++++ b/drivers/rpmsg/rpmsg_server_sample.c
+@@ -0,0 +1,180 @@
++/*
++ * Remote processor messaging transport - sample server driver
++ *
++ * Copyright (C) 2011 Texas Instruments, Inc.
++ * Copyright (C) 2011 Google, Inc.
++ *
++ * Ohad Ben-Cohen <ohad@wizery.com>
++ * Brian Swetland <swetland@google.com>
++ *
++ * This software is licensed under the terms of the GNU General Public
++ * License version 2, as published by the Free Software Foundation, and
++ * may be copied, distributed, and modified under those terms.
++ */
++
++#define pr_fmt(fmt) "%s: " fmt, __func__
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/rpmsg.h>
++#include <linux/io.h>
++
++#define MSG		("hello world!")
++#define MSG_LIMIT	100
++
++#define MSG_LAT		("12345678901234567890123456789012345678901234567890"\
++			"12345678901234567890123456789012345678901234567890"\
++			"12345678901234567890123456789012345678901234567890"\
++			"12345678901234567890123456789012345678901234567890"\
++			"12345678901234567890123456789012345678901234567890"\
++			"12345678901234567890123456789012345678901234567890"\
++			"12345678901234567890123456789012345678901234567890"\
++			"12345678901234567890123456789012345678901234567890"\
++			"12345678901234567890123456789012345678901234567890"\
++			"123456789012345678901234567890123456789012345")
++#define MSG_LAT_LIMIT	100000
++
++u64 start; /* variable for storing jiffies */
++
++/* TTC runs on 133 MHz - (1 / 133000000 = 8 ns) */
++#define TTC_HZ	8
++
++/* ttc ioremap pointer */
++u8 *ttc_base;
++
++/* Enable/disable latency measuring */
++static int latency;
++
++static void rpmsg_sample_cb(struct rpmsg_channel *rpdev, void *data, int len,
++						void *priv, u32 src)
++{
++	int err;
++	static int rx_count;
++
++	if (latency) {
++		static u32 min = 0x10000000;
++		static u32 max;
++		static u32 average;
++
++		u32 value = __raw_readl(ttc_base + 0x1c); /* Read value */
++		__raw_writel(0x11, ttc_base + 0x10); /* Stop TTC */
++
++		if (value < min)
++			min = value;
++		if (value > max)
++			max = value;
++
++		average += value;
++		/* count messages */
++		++rx_count;
++
++		if (rx_count >= MSG_LAT_LIMIT) {
++			u64 end = get_jiffies_64();
++			u32 time = end - start;
++			u32 timeps = ((1000000 / MSG_LAT_LIMIT) * time) / HZ;
++
++			printk(KERN_INFO "actual value %d ns, min %d ns, max %d"
++				" ns, average %d ns\n", value * TTC_HZ,
++						min * TTC_HZ, max * TTC_HZ,
++						(average/rx_count) * TTC_HZ);
++			printk(KERN_INFO "Start/end jiffies %llx/%llx, "
++				"messages %d. Time: %d s, "
++				"Messages per second %d\n", end, start,
++				rx_count, time/HZ,
++				1000000 / timeps);
++
++			dev_info(&rpdev->dev, "goodbye!\n");
++			return;
++		}
++
++		__raw_writel(0x10, ttc_base + 0x10); /* Start TTC */
++		/* reply */
++		err = rpmsg_sendto(rpdev, MSG_LAT, strlen(MSG_LAT), src);
++	} else {
++		dev_info(&rpdev->dev, "incoming msg %d (src: 0x%x)\n",
++							++rx_count, src);
++		print_hex_dump(KERN_DEBUG, __func__, DUMP_PREFIX_NONE, 16, 1,
++			data, len,  true);
++
++		/* samples should not live forever */
++		if (rx_count >= MSG_LIMIT) {
++			dev_info(&rpdev->dev, "goodbye!\n");
++			return;
++		}
++
++		err = rpmsg_sendto(rpdev, MSG, strlen(MSG), src); /* reply */
++	}
++
++	if (err)
++		pr_err("rpmsg_send failed: %d\n", err);
++}
++
++static int rpmsg_sample_probe(struct rpmsg_channel *rpdev)
++{
++	int err;
++
++	if (latency) {
++		dev_info(&rpdev->dev, "new channel: 0x%x -> 0x%x!, len %d\n",
++				rpdev->src, rpdev->dst, strlen(MSG_LAT));
++
++		ttc_base = ioremap(0xf8002000, PAGE_SIZE); /* TTC base addr */
++		if (!ttc_base) {
++			pr_err("TTC Ioremap failed\n");
++			return -1;
++		}
++		start = get_jiffies_64();
++		__raw_writel(0x10, ttc_base + 0x10); /* Start TTC */
++
++		err = rpmsg_sendto(rpdev, MSG_LAT, strlen(MSG_LAT), 50);
++	} else {
++		dev_info(&rpdev->dev, "new channel: 0x%x -> 0x%x!, len %d\n",
++				rpdev->src, rpdev->dst, strlen(MSG));
++
++		err = rpmsg_sendto(rpdev, MSG, strlen(MSG), 50);
++	}
++
++	if (err) {
++		pr_err("rpmsg_send failed: %d\n", err);
++		return err;
++	}
++
++	return 0;
++}
++
++static void rpmsg_sample_remove(struct rpmsg_channel *rpdev)
++{
++	dev_info(&rpdev->dev, "rpmsg sample driver is removed\n");
++}
++
++static struct rpmsg_device_id rpmsg_driver_sample_id_table[] = {
++	{ .name	= "rpmsg-server-sample" },
++	{ },
++};
++MODULE_DEVICE_TABLE(rpmsg, rpmsg_driver_sample_id_table);
++
++static struct rpmsg_driver rpmsg_sample_server = {
++	.drv.name	= KBUILD_MODNAME,
++	.drv.owner	= THIS_MODULE,
++	.id_table	= rpmsg_driver_sample_id_table,
++	.probe		= rpmsg_sample_probe,
++	.callback	= rpmsg_sample_cb,
++	.remove		= rpmsg_sample_remove,
++};
++
++static int __init init(void)
++{
++	return register_rpmsg_driver(&rpmsg_sample_server);
++}
++
++static void __exit fini(void)
++{
++	unregister_rpmsg_driver(&rpmsg_sample_server);
++}
++module_init(init);
++module_exit(fini);
++
++module_param(latency, int, 0);
++MODULE_PARM_DESC(latency, "Enable latency measuring code.");
++
++MODULE_DESCRIPTION("Virtio remote processor messaging sample driver");
++MODULE_LICENSE("GPL v2");
+diff --git a/drivers/rpmsg/virtio_rpmsg_bus.c b/drivers/rpmsg/virtio_rpmsg_bus.c
+index f1e3239..3edbc31 100644
+--- a/drivers/rpmsg/virtio_rpmsg_bus.c
++++ b/drivers/rpmsg/virtio_rpmsg_bus.c
+@@ -51,6 +51,7 @@
+  * @sendq:	wait queue of sending contexts waiting for a tx buffers
+  * @sleepers:	number of senders that are waiting for a tx buffer
+  * @ns_ept:	the bus's name service endpoint
++ * @id:		unique system-wide index id for this vproc
+  *
+  * This structure stores the rpmsg state of a given virtio remote processor
+  * device (there might be several virtio proc devices for each physical
+@@ -68,8 +69,15 @@ struct virtproc_info {
+ 	wait_queue_head_t sendq;
+ 	atomic_t sleepers;
+ 	struct rpmsg_endpoint *ns_ept;
++	int id;
+ };
+ 
++int get_virtproc_id(struct virtproc_info *vrp)
++{
++	return vrp->id;
++}
++EXPORT_SYMBOL(get_virtproc_id);
++
+ /**
+  * struct rpmsg_channel_info - internal channel info representation
+  * @name: name of service
+@@ -134,6 +142,16 @@ rpmsg_show_attr(dst, dst, "0x%x\n");
+ rpmsg_show_attr(announce, announce ? "true" : "false", "%s\n");
+ 
+ /*
++ * The virtio devices we are probed with represent remote processors
++ * on the system. We call them _virtual_ processors, because every physical
++ * remote processor might actually have several virtio devices.
++ *
++ * The idr below is used to assign each vproc a unique, system-wide, index id.
++ */
++static struct idr vprocs;
++static DEFINE_MUTEX(vprocs_mutex);
++
++/*
+  * Unique (and free running) index for rpmsg devices.
+  *
+  * Yeah, we're not recycling those numbers (yet?). will be easy
+@@ -499,7 +517,7 @@ static int rpmsg_channel_match(struct device *dev, void *data)
+  * this function will be used to create both static and dynamic
+  * channels.
+  */
+-static struct rpmsg_channel *rpmsg_create_channel(struct virtproc_info *vrp,
++static struct rpmsg_channel *__rpmsg_create_channel(struct virtproc_info *vrp,
+ 				struct rpmsg_channel_info *chinfo)
+ {
+ 	struct rpmsg_channel *rpdev;
+@@ -555,7 +573,7 @@ static struct rpmsg_channel *rpmsg_create_channel(struct virtproc_info *vrp,
+  * find an existing channel using its name + address properties,
+  * and destroy it
+  */
+-static int rpmsg_destroy_channel(struct virtproc_info *vrp,
++static int __rpmsg_destroy_channel(struct virtproc_info *vrp,
+ 					struct rpmsg_channel_info *chinfo)
+ {
+ 	struct virtio_device *vdev = vrp->vdev;
+@@ -872,6 +890,25 @@ static void rpmsg_xmit_done(struct virtqueue *svq)
+ 	wake_up_interruptible(&vrp->sendq);
+ }
+ 
++struct rpmsg_channel *rpmsg_create_channel(int vrp_id, const char *name,
++							int src, int dst)
++{
++	struct rpmsg_channel_info chinfo;
++	struct virtproc_info *vrp;
++
++	strncpy(chinfo.name, name, sizeof(chinfo.name));
++	chinfo.src = src;
++	chinfo.dst = dst;
++
++	/* TODO we probably want radix tree and fw-induced id numbers ? */
++	vrp = idr_find(&vprocs, vrp_id);
++	if (!vrp)
++		return NULL;
++
++	return __rpmsg_create_channel(vrp, &chinfo);
++}
++EXPORT_SYMBOL(rpmsg_create_channel);
++
+ /* invoked when a name service announcement arrives */
+ static void rpmsg_ns_cb(struct rpmsg_channel *rpdev, void *data, int len,
+ 							void *priv, u32 src)
+@@ -915,13 +952,13 @@ static void rpmsg_ns_cb(struct rpmsg_channel *rpdev, void *data, int len,
+ 	chinfo.dst = msg->addr;
+ 
+ 	if (msg->flags & RPMSG_NS_DESTROY) {
+-		ret = rpmsg_destroy_channel(vrp, &chinfo);
++		ret = __rpmsg_destroy_channel(vrp, &chinfo);
+ 		if (ret)
+-			dev_err(dev, "rpmsg_destroy_channel failed: %d\n", ret);
++			dev_err(dev, "__rpmsg_destroy_channel err: %d\n", ret);
+ 	} else {
+-		newch = rpmsg_create_channel(vrp, &chinfo);
++		newch = __rpmsg_create_channel(vrp, &chinfo);
+ 		if (!newch)
+-			dev_err(dev, "rpmsg_create_channel failed\n");
++			dev_err(dev, "__rpmsg_create_channel failed\n");
+ 	}
+ }
+ 
+@@ -932,7 +969,7 @@ static int rpmsg_probe(struct virtio_device *vdev)
+ 	struct virtqueue *vqs[2];
+ 	struct virtproc_info *vrp;
+ 	void *bufs_va;
+-	int err = 0, i;
++	int err = 0, i, vproc_id;
+ 
+ 	vrp = kzalloc(sizeof(*vrp), GFP_KERNEL);
+ 	if (!vrp)
+@@ -945,10 +982,26 @@ static int rpmsg_probe(struct virtio_device *vdev)
+ 	mutex_init(&vrp->tx_lock);
+ 	init_waitqueue_head(&vrp->sendq);
+ 
++	if (!idr_pre_get(&vprocs, GFP_KERNEL))
++		goto free_vrp;
++
++	mutex_lock(&vprocs_mutex);
++
++	err = idr_get_new(&vprocs, vrp, &vproc_id);
++
++	mutex_unlock(&vprocs_mutex);
++
++	if (err) {
++		dev_err(&vdev->dev, "idr_get_new failed: %d\n", err);
++		goto free_vrp;
++	}
++
++	vrp->id = vproc_id;
++
+ 	/* We expect two virtqueues, rx and tx (and in this order) */
+ 	err = vdev->config->find_vqs(vdev, 2, vqs, vq_cbs, names);
+ 	if (err)
+-		goto free_vrp;
++		goto rem_idr;
+ 
+ 	vrp->rvq = vqs[0];
+ 	vrp->svq = vqs[1];
+@@ -1010,6 +1063,10 @@ free_coherent:
+ 					bufs_va, vrp->bufs_dma);
+ vqs_del:
+ 	vdev->config->del_vqs(vrp->vdev);
++rem_idr:
++	mutex_lock(&vprocs_mutex);
++	idr_remove(&vprocs, vproc_id);
++	mutex_unlock(&vprocs_mutex);
+ free_vrp:
+ 	kfree(vrp);
+ 	return err;
+@@ -1044,6 +1101,10 @@ static void rpmsg_remove(struct virtio_device *vdev)
+ 	dma_free_coherent(vdev->dev.parent->parent, RPMSG_TOTAL_BUF_SPACE,
+ 					vrp->rbufs, vrp->bufs_dma);
+ 
++	mutex_lock(&vprocs_mutex);
++	idr_remove(&vprocs, vrp->id);
++	mutex_unlock(&vprocs_mutex);
++
+ 	kfree(vrp);
+ }
+ 
+@@ -1070,6 +1131,8 @@ static int __init rpmsg_init(void)
+ {
+ 	int ret;
+ 
++	idr_init(&vprocs);
++
+ 	ret = bus_register(&rpmsg_bus);
+ 	if (ret) {
+ 		pr_err("failed to register rpmsg bus: %d\n", ret);
+@@ -1090,6 +1153,9 @@ static void __exit rpmsg_fini(void)
+ {
+ 	unregister_virtio_driver(&virtio_ipc_driver);
+ 	bus_unregister(&rpmsg_bus);
++
++	idr_remove_all(&vprocs);
++	idr_destroy(&vprocs);
+ }
+ module_exit(rpmsg_fini);
+ 
+diff --git a/include/linux/rpmsg.h b/include/linux/rpmsg.h
+index 82a6739..05d0bc8 100644
+--- a/include/linux/rpmsg.h
++++ b/include/linux/rpmsg.h
+@@ -329,4 +329,8 @@ int rpmsg_trysend_offchannel(struct rpmsg_channel *rpdev, u32 src, u32 dst,
+ 	return rpmsg_send_offchannel_raw(rpdev, src, dst, data, len, false);
+ }
+ 
++int get_virtproc_id(struct virtproc_info *vrp);
++struct rpmsg_channel *rpmsg_create_channel(int vrp_id, const char *name,
++							int src, int dst);
++
+ #endif /* _LINUX_RPMSG_H */
+diff --git a/include/linux/rpmsg_omx.h b/include/linux/rpmsg_omx.h
+new file mode 100644
+index 0000000..705ef89
+--- /dev/null
++++ b/include/linux/rpmsg_omx.h
+@@ -0,0 +1,130 @@
++/*
++ * OMX offloading remote processor driver
++ *
++ * Copyright(c) 2011 Texas Instruments. All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * * Redistributions of source code must retain the above copyright
++ *   notice, this list of conditions and the following disclaimer.
++ * * Redistributions in binary form must reproduce the above copyright
++ *   notice, this list of conditions and the following disclaimer in
++ *   the documentation and/or other materials provided with the
++ *   distribution.
++ * * Neither the name Texas Instruments nor the names of its
++ *   contributors may be used to endorse or promote products derived
++ *   from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#ifndef RPMSG_OMX_H
++#define RPMSG_OMX_H
++
++#include <linux/ioctl.h>
++
++#define OMX_IOC_MAGIC	'X'
++
++#define OMX_IOCCONNECT	_IOW(OMX_IOC_MAGIC, 1, char *)
++
++#define OMX_IOC_MAXNR	(1)
++
++#ifdef __KERNEL__
++
++/**
++ * enum omx_msg_types - various message types currently supported
++ *
++ * @OMX_CONN_REQ: a connection request message type. the message should carry
++ * the name of the OMX service which we try to connect to. An instance of
++ * that service will be created remotely, and its address will be sent as
++ * a reply.
++ *
++ * @OMX_CONN_RSP: a response to a connection request. the message will carry
++ * an error code (success/failure), and if connection established successfully,
++ * the addr field will carry the address of the newly created OMX instance.
++ *
++ * @OMX_DISCONNECT: disconnect remote OMX instance. this message tells
++ * remote processor to release the resources coupled with this connection
++ *
++ * @OMX_RAW_MSG: a message that should be propagated as-is to the user.
++ * this would immediately enable user space development to start.
++ * as we progress, most likely this message won't be needed anymore.
++ */
++enum omx_msg_types {
++	OMX_CONN_REQ = 0,
++	OMX_CONN_RSP = 1,
++	OMX_DISCONNECT = 4,
++	OMX_RAW_MSG = 5,
++	/* todo: do we need a disconnect response ? ION refcounts should allow
++	 * asynchronous release of relevant buffers */
++};
++
++/**
++ * enum omx_error_codes - various error codes that will be used
++ *
++ * @OMX_SUCCESS: success
++ *
++ * @OMX_NOTSUPP: not supported
++ *
++ * @OMX_NOMEM: remote processor is out of memory
++ */
++enum omx_error_codes {
++	OMX_SUCCESS = 0,
++	OMX_NOTSUPP = 1,
++	OMX_NOMEM = 2,
++};
++
++/* keep documenting... */
++enum omx_state {
++	OMX_UNCONNECTED,
++	OMX_CONNECTED,
++	OMX_FAIL,
++};
++
++/**
++ * struct omx_msg_hdr - common header for all OMX messages
++ * @type:	type of message, see enum omx_msg_types
++ * @flags:	currently unused, should be zero
++ * @len:	length of msg payload (in bytes)
++ * @data:	the msg payload (depends on the message type)
++ *
++ * All OMX messages will start with this common header (which will begin
++ * right after the standard rpmsg header ends).
++ */
++struct omx_msg_hdr {
++	u32 type;
++	u32 flags;
++	u32 len;
++	char data[0];
++} __packed;
++
++struct omx_conn_rsp {
++	u32 status;
++	u32 addr;
++} __packed;
++
++struct omx_disc_req {
++	u32 addr;
++} __packed;
++
++
++#endif /* __KERNEL__ */
++
++/* temporarily exposed to user space too */
++struct omx_conn_req {
++	char name[48];
++} __packed;
++
++#endif /* RPMSG_OMX_H */
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index 9a546ff..8602fe8 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -179,6 +179,7 @@ struct ucred {
+ #define AF_ALG		38	/* Algorithm sockets		*/
+ #define AF_NFC		39	/* NFC sockets			*/
+ #define AF_MAX		40	/* For now.. */
++#define AF_RPMSG	41	/* Remote-processor messaging   */
+ 
+ /* Protocol families, same as address families. */
+ #define PF_UNSPEC	AF_UNSPEC
+@@ -222,6 +223,7 @@ struct ucred {
+ #define PF_ALG		AF_ALG
+ #define PF_NFC		AF_NFC
+ #define PF_MAX		AF_MAX
++#define PF_RPMSG	AF_RPMSG
+ 
+ /* Maximum queue length specifiable by listen.  */
+ #define SOMAXCONN	128
+@@ -296,6 +298,7 @@ struct ucred {
+ #define SOL_IUCV	277
+ #define SOL_CAIF	278
+ #define SOL_ALG		279
++#define SOL_RPMSG	280
+ 
+ /* IPX options */
+ #define IPX_TYPE	1
+diff --git a/include/net/rpmsg.h b/include/net/rpmsg.h
+new file mode 100644
+index 0000000..6b15036
+--- /dev/null
++++ b/include/net/rpmsg.h
+@@ -0,0 +1,58 @@
++/*
++ * Remote processor messaging sockets
++ *
++ * Copyright (C) 2011 Texas Instruments, Inc
++ *
++ * Ohad Ben-Cohen <ohad@wizery.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#ifndef __NET_RPMSG_H
++#define __NET_RPMSG_H
++
++#include <linux/types.h>
++#include <linux/socket.h>
++
++/* user space needs this */
++#ifndef AF_RPMSG
++#define AF_RPMSG	41
++#define PF_RPMSG	AF_RPMSG
++#endif
++
++/* Connection and socket states */
++enum {
++	RPMSG_CONNECTED = 1, /* wait_for_packet() wants this... */
++	RPMSG_OPEN,
++	RPMSG_LISTENING,
++	RPMSG_CLOSED,
++};
++
++struct sockaddr_rpmsg {
++	sa_family_t family;
++	__u32 vproc_id;
++	__u32 addr;
++};
++
++#define RPMSG_LOCALHOST ((__u32) ~0UL)
++
++#ifdef __KERNEL__
++
++#include <net/sock.h>
++#include <linux/rpmsg.h>
++
++struct rpmsg_socket {
++	struct sock sk;
++	struct rpmsg_channel *rpdev;
++	bool unregister_rpdev;
++};
++
++#endif /* __KERNEL__ */
++#endif /* __NET_RPMSG_H */
+diff --git a/net/Makefile b/net/Makefile
+index 4f4ee08..764e6de 100644
+--- a/net/Makefile
++++ b/net/Makefile
+@@ -70,3 +70,4 @@ obj-$(CONFIG_CEPH_LIB)		+= ceph/
+ obj-$(CONFIG_BATMAN_ADV)	+= batman-adv/
+ obj-$(CONFIG_NFC)		+= nfc/
+ obj-$(CONFIG_OPENVSWITCH)	+= openvswitch/
++obj-$(CONFIG_RPMSG)		+= rpmsg/
+diff --git a/net/rpmsg/Makefile b/net/rpmsg/Makefile
+new file mode 100644
+index 0000000..4db19df
+--- /dev/null
++++ b/net/rpmsg/Makefile
+@@ -0,0 +1 @@
++obj-$(CONFIG_RPMSG)	+= rpmsg_proto.o
+diff --git a/net/rpmsg/rpmsg_proto.c b/net/rpmsg/rpmsg_proto.c
+new file mode 100644
+index 0000000..407622c
+--- /dev/null
++++ b/net/rpmsg/rpmsg_proto.c
+@@ -0,0 +1,602 @@
++/*
++ * AF_RPMSG: Remote processor messaging sockets
++ *
++ * Copyright (C) 2011 Texas Instruments, Inc.
++ *
++ * Ohad Ben-Cohen <ohad@wizery.com>
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#define pr_fmt(fmt)    "%s: " fmt, __func__
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/device.h>
++#include <linux/types.h>
++#include <linux/list.h>
++#include <linux/errno.h>
++#include <linux/skbuff.h>
++#include <linux/rwlock.h>
++#include <linux/err.h>
++#include <linux/mutex.h>
++#include <linux/rpmsg.h>
++#include <net/sock.h>
++#include <net/rpmsg.h>
++#include <linux/radix-tree.h>
++
++#define RPMSG_CB(skb)	(*(struct sockaddr_rpmsg *)&((skb)->cb))
++
++/*
++ * A two-level radix-tree-based scheme is used to maintain the rpmsg channels
++ * we're exposing to userland. The first radix tree maps vproc index id
++ * to its channels, and the second radix tree associates each channel
++ * with its destination addresses (so sockaddr_rpmsg lookups are quick).
++ *
++ * Currently only channels with a valid dst address are supported (aka 'client'
++ * channels as opposed to 'server' channels which usually only have a valid
++ * src address).
++ */
++static RADIX_TREE(rpmsg_channels, GFP_KERNEL);
++
++/*
++ * Synchronization of access to the tree is achieved using a mutex,
++ * because we're using non-atomic radix tree allocations.
++ */
++static DEFINE_MUTEX(rpmsg_channels_lock);
++
++static struct proto rpmsg_proto = {
++	.name		= "RPMSG",
++	.owner		= THIS_MODULE,
++	.obj_size = sizeof(struct rpmsg_socket),
++};
++
++static int rpmsg_sock_connect(struct socket *sock, struct sockaddr *addr,
++							int alen, int flags)
++{
++	struct sock *sk = sock->sk;
++	struct rpmsg_socket *rpsk;
++	struct sockaddr_rpmsg *sa;
++	int err = 0;
++	struct radix_tree_root *vrp_channels;
++	struct rpmsg_channel *rpdev;
++
++	pr_debug("sk %p\n", sk);
++
++	if (sk->sk_state != RPMSG_OPEN)
++		return -EBADFD;
++
++	if (sk->sk_type != SOCK_SEQPACKET)
++		return -EINVAL;
++
++	if (!addr || addr->sa_family != AF_RPMSG)
++		return -EINVAL;
++
++	if (alen < sizeof(*sa))
++		return -EINVAL;
++
++	sa = (struct sockaddr_rpmsg *) addr;
++
++	lock_sock(sk);
++
++	rpsk = container_of(sk, struct rpmsg_socket, sk);
++
++	mutex_lock(&rpmsg_channels_lock);
++
++	/* find the set of channels exposed by this remote processor */
++	vrp_channels = radix_tree_lookup(&rpmsg_channels, sa->vproc_id);
++	if (!vrp_channels) {
++		err = -EINVAL;
++		goto out;
++	}
++
++	/* find the specific channel we need to connect with */
++	rpdev = radix_tree_lookup(vrp_channels, sa->addr);
++	if (!rpdev) {
++		err = -EINVAL;
++		goto out;
++	}
++
++	rpsk->rpdev = rpdev;
++
++	/* bind this socket with its rpmsg endpoint */
++	rpdev->ept->priv = sk;
++
++	/* XXX take care of disconnection state too */
++	sk->sk_state = RPMSG_CONNECTED;
++
++out:
++	mutex_unlock(&rpmsg_channels_lock);
++	release_sock(sk);
++	return err;
++}
++
++static int rpmsg_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
++					struct msghdr *msg, size_t len)
++{
++	struct sock *sk = sock->sk;
++	struct rpmsg_socket *rpsk;
++	char payload[512];/* todo: sane payload length methodology */
++	int err;
++
++	pr_debug("sk %p len %d\n", sk, len);
++
++	/* XXX check for sock_error as well ? */
++	/* XXX handle noblock ? */
++	if (msg->msg_flags & MSG_OOB)
++		return -EOPNOTSUPP;
++
++	/* no payload ? */
++	if (msg->msg_iov->iov_base == NULL)
++		return -EINVAL;
++
++	lock_sock(sk);
++
++	/* we don't support loopback at this point */
++	if (sk->sk_state != RPMSG_CONNECTED) {
++		release_sock(sk);
++		return -ENOTCONN;
++	}
++
++	rpsk = container_of(sk, struct rpmsg_socket, sk);
++
++	/* XXX for now, ignore the peer address. later use it
++	 * with rpmsg_sendto, but only if user is root */
++
++	err = memcpy_fromiovec(payload, msg->msg_iov, len);
++	if (err)
++		goto out;
++
++	/* XXX add length validation */
++	err = rpmsg_send(rpsk->rpdev, payload, len);
++	if (err)
++		pr_err("rpmsg_send failed: %d\n", err);
++
++out:
++	release_sock(sk);
++	return err;
++}
++
++static int rpmsg_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
++				struct msghdr *msg, size_t len, int flags)
++{
++	struct sock *sk = sock->sk;
++	struct sockaddr_rpmsg *sa;
++	struct sk_buff *skb;
++	int noblock = flags & MSG_DONTWAIT;
++	int ret;
++
++	pr_debug("sk %p len %d\n", sk, len);
++
++	if (msg->msg_flags & MSG_OOB)
++		return -EOPNOTSUPP;
++
++	msg->msg_namelen = 0;
++
++	skb = skb_recv_datagram(sk, flags, noblock, &ret);
++	if (!skb)
++		/* check for shutdown ? */
++		return ret;
++
++	if (msg->msg_name) {
++		msg->msg_namelen = sizeof(*sa);
++		sa = (struct sockaddr_rpmsg *) msg->msg_name;
++		sa->vproc_id = RPMSG_CB(skb).vproc_id;
++		sa->addr = RPMSG_CB(skb).addr;
++		sa->family = AF_RPMSG;
++	}
++
++	if (len > skb->len) {
++		len = skb->len;
++	} else if (len < skb->len) {
++		pr_warn("user buffer is too small\n");
++		/* XXX truncate or error ? */
++		msg->msg_flags |= MSG_TRUNC;
++	}
++
++	ret = skb_copy_datagram_iovec(skb, 0, msg->msg_iov, len);
++	if (ret) {
++		pr_warn("error copying skb data: %d\n", ret);
++		goto out_free;
++	}
++
++	ret = len;
++
++out_free:
++	skb_free_datagram(sk, skb);
++	return ret;
++}
++
++static unsigned int rpmsg_sock_poll(struct file *file, struct socket *sock,
++							poll_table *wait)
++{
++	struct sock *sk = sock->sk;
++	unsigned int mask = 0;
++
++	pr_debug("sk %p\n", sk);
++
++	poll_wait(file, sk_sleep(sk), wait);
++
++	/* exceptional events? */
++	if (sk->sk_err || !skb_queue_empty(&sk->sk_error_queue))
++		mask |= POLLERR;
++	if (sk->sk_shutdown & RCV_SHUTDOWN)
++		mask |= POLLRDHUP;
++	if (sk->sk_shutdown == SHUTDOWN_MASK)
++		mask |= POLLHUP;
++
++	/* readable? */
++	if (!skb_queue_empty(&sk->sk_receive_queue) ||
++	    (sk->sk_shutdown & RCV_SHUTDOWN))
++		mask |= POLLIN | POLLRDNORM;
++
++	if (sk->sk_state == RPMSG_CLOSED)
++		mask |= POLLHUP;
++
++	/*
++	 * XXX is writable ?
++	 * this depends on the destination processor.
++	 * if loopback: we're writable unless no memory
++	 * if to remote: we need enabled rpmsg buffer or user supplied bufs
++	 * for now, let's always be writable.
++	 */
++	mask |= POLLOUT | POLLWRNORM | POLLWRBAND;
++
++	return mask;
++}
++EXPORT_SYMBOL(rpmsg_sock_poll);
++
++/*
++ * return bound socket address information, either local or remote
++ * note: len is just an output parameter, doesn't carry any input value
++ */
++static int rpmsg_sock_getname(struct socket *sock, struct sockaddr *addr,
++							int *len, int peer)
++{
++	struct sock *sk = sock->sk;
++	struct rpmsg_socket *rpsk;
++	struct rpmsg_channel *rpdev;
++	struct sockaddr_rpmsg *sa;
++
++	pr_debug("sk %p\n", sk);
++
++	rpsk = container_of(sk, struct rpmsg_socket, sk);
++	rpdev = rpsk->rpdev;
++
++	if (!rpdev)
++		return -ENOTCONN;
++
++	addr->sa_family = AF_RPMSG;
++
++	sa = (struct sockaddr_rpmsg *) addr;
++
++	*len = sizeof(*sa);
++
++	if (peer) {
++		sa->vproc_id = get_virtproc_id(rpdev->vrp);
++		sa->addr = rpdev->dst;
++	} else {
++		sa->vproc_id = RPMSG_LOCALHOST;
++		sa->addr = rpsk->rpdev->src;
++	}
++
++	return 0;
++}
++
++static int rpmsg_sock_release(struct socket *sock)
++{
++	struct sock *sk = sock->sk;
++	struct rpmsg_socket *rpsk = container_of(sk, struct rpmsg_socket, sk);
++
++	pr_debug("sk %p\n", sk);
++
++	if (!sk)
++		return 0;
++
++	if (rpsk->unregister_rpdev)
++		device_unregister(&rpsk->rpdev->dev);
++
++	sock_put(sock->sk);
++
++	return 0;
++}
++
++/*
++ * Notes:
++ * - calling connect after bind isn't currently supported (is it even needed ?).
++ * - userspace arguments to bind aren't intuitive: one needs to provide
++ *   the vproc id of the remote processor he wants the channel to be shared
++ *   with, and the -local- address he wants the channel to be bind with
++ */
++static int
++rpmsg_sock_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
++{
++	struct sock *sk = sock->sk;
++	struct rpmsg_socket *rpsk = container_of(sk, struct rpmsg_socket, sk);
++	struct rpmsg_channel *rpdev;
++	struct sockaddr_rpmsg *sa = (struct sockaddr_rpmsg *)uaddr;
++
++	pr_debug("sk %p\n", sk);
++
++	if (sock->state == SS_CONNECTED)
++		return -EINVAL;
++
++	if (addr_len != sizeof(*sa))
++		return -EINVAL;
++
++	if (sa->family != AF_RPMSG)
++		return -EINVAL;
++
++	if (rpsk->rpdev)
++		return -EBUSY;
++
++	if (sk->sk_state != RPMSG_OPEN)
++		return -EINVAL;
++
++	rpdev = rpmsg_create_channel(sa->vproc_id, "rpmsg-proto", sa->addr,
++							RPMSG_ADDR_ANY);
++	if (!rpdev)
++		return -EINVAL;
++
++	rpsk->rpdev = rpdev;
++	rpsk->unregister_rpdev = true;
++
++	/* bind this socket with its rpmsg endpoint */
++	rpdev->ept->priv = sk;
++
++	sk->sk_state = RPMSG_LISTENING;
++
++	return 0;
++}
++
++static const struct proto_ops rpmsg_sock_ops = {
++	.family		= PF_RPMSG,
++	.owner		= THIS_MODULE,
++
++	.release	= rpmsg_sock_release,
++	.connect	= rpmsg_sock_connect,
++	.getname	= rpmsg_sock_getname,
++	.sendmsg	= rpmsg_sock_sendmsg,
++	.recvmsg	= rpmsg_sock_recvmsg,
++	.poll		= rpmsg_sock_poll,
++	.bind		= rpmsg_sock_bind,
++
++	.listen		= sock_no_listen,
++	.accept		= sock_no_accept,
++	.ioctl		= sock_no_ioctl,
++	.mmap		= sock_no_mmap,
++	.socketpair	= sock_no_socketpair,
++	.shutdown	= sock_no_shutdown,
++	.setsockopt	= sock_no_setsockopt,
++	.getsockopt	= sock_no_getsockopt
++};
++
++static void rpmsg_sock_destruct(struct sock *sk)
++{
++}
++
++static int rpmsg_sock_create(struct net *net, struct socket *sock, int proto,
++				int kern)
++{
++	struct sock *sk;
++
++	if (sock->type != SOCK_SEQPACKET)
++		return -ESOCKTNOSUPPORT;
++	if (proto != 0)
++		return -EPROTONOSUPPORT;
++
++	sk = sk_alloc(net, PF_RPMSG, GFP_KERNEL, &rpmsg_proto);
++	if (!sk)
++		return -ENOMEM;
++
++	pr_debug("sk %p\n", sk);
++
++	sock->state = SS_UNCONNECTED;
++	sock->ops = &rpmsg_sock_ops;
++	sock_init_data(sock, sk);
++
++	sk->sk_destruct = rpmsg_sock_destruct;
++	sk->sk_protocol = proto;
++
++	sk->sk_state = RPMSG_OPEN;
++
++	return 0;
++}
++
++static const struct net_proto_family rpmsg_proto_family = {
++	.family = PF_RPMSG,
++	.create	= rpmsg_sock_create,
++	.owner = THIS_MODULE,
++};
++
++static void __rpmsg_proto_cb(struct device *dev, int from_vproc_id, void *data,
++					int len, struct sock *sk, u32 src)
++{
++	struct rpmsg_socket *rpsk = container_of(sk, struct rpmsg_socket, sk);
++	struct sk_buff *skb;
++	int ret;
++
++	print_hex_dump(KERN_DEBUG, __func__, DUMP_PREFIX_NONE, 16, 1,
++		       data, len,  true);
++
++	lock_sock(sk);
++
++	switch (sk->sk_state) {
++	case RPMSG_CONNECTED:
++		if (rpsk->rpdev->dst != src)
++			dev_warn(dev, "unexpected source address: %d\n", src);
++		break;
++	case RPMSG_LISTENING:
++		/* When an inbound message is received while we're listening,
++		 * we implicitly become connected */
++		sk->sk_state = RPMSG_CONNECTED;
++		rpsk->rpdev->dst = src;
++		break;
++	default:
++		dev_warn(dev, "unexpected inbound message (from %d)\n", src);
++		break;
++	}
++
++	skb = sock_alloc_send_skb(sk, len, 1, &ret);
++	if (!skb) {
++		dev_err(dev, "sock_alloc_send_skb failed: %d\n", ret);
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	RPMSG_CB(skb).vproc_id = from_vproc_id;
++	RPMSG_CB(skb).addr = src;
++	RPMSG_CB(skb).family = AF_RPMSG;
++
++	memcpy(skb_put(skb, len), data, len);
++
++	ret = sock_queue_rcv_skb(sk, skb);
++	if (ret) {
++		dev_err(dev, "sock_queue_rcv_skb failed: %d\n", ret);
++		kfree_skb(skb);
++	}
++
++out:
++	release_sock(sk);
++}
++
++static void rpmsg_proto_cb(struct rpmsg_channel *rpdev, void *data, int len,
++						void *priv, u32 src)
++{
++	int id = get_virtproc_id(rpdev->vrp);
++
++	__rpmsg_proto_cb(&rpdev->dev, id, data, len, priv, src);
++}
++
++/* every channel we're probed with is exposed to userland via the Socket API */
++static int rpmsg_proto_probe(struct rpmsg_channel *rpdev)
++{
++	struct device *dev = &rpdev->dev;
++	int ret, dst = rpdev->dst, id;
++	struct radix_tree_root *vrp_channels;
++
++	if (dst == RPMSG_ADDR_ANY)
++		return 0;
++
++	id = get_virtproc_id(rpdev->vrp);
++
++	mutex_lock(&rpmsg_channels_lock);
++
++	/* are we exposing channels for this remote processor yet ? */
++	vrp_channels = radix_tree_lookup(&rpmsg_channels, id);
++	/* not yet ? let's prepare the 2nd radix tree level then */
++	if (!vrp_channels) {
++		vrp_channels = kzalloc(sizeof(*vrp_channels), GFP_KERNEL);
++		INIT_RADIX_TREE(vrp_channels, GFP_KERNEL);
++		/* now let's associate the new channel with its vrp */
++		ret = radix_tree_insert(&rpmsg_channels, id, vrp_channels);
++		if (ret) {
++			dev_err(dev, "radix_tree_insert failed: %d\n", ret);
++			kfree(vrp_channels);
++			return ret;
++		}
++	}
++
++	/* let's associate the new channel with its dst */
++	ret = radix_tree_insert(vrp_channels, dst, rpdev);
++	if (ret)
++		dev_err(dev, "failed to add rpmsg addr %d: %d\n", dst, ret);
++
++	mutex_unlock(&rpmsg_channels_lock);
++
++	return ret;
++}
++
++static void rpmsg_proto_remove(struct rpmsg_channel *rpdev)
++{
++	struct device *dev = &rpdev->dev;
++	int id, dst = rpdev->dst;
++	struct radix_tree_root *vrp_channels;
++
++	if (dst == RPMSG_ADDR_ANY)
++		return;
++
++	id = get_virtproc_id(rpdev->vrp);
++
++	mutex_lock(&rpmsg_channels_lock);
++
++	vrp_channels = radix_tree_lookup(&rpmsg_channels, id);
++	if (!vrp_channels) {
++		dev_err(dev, "can't find channels for this vrp: %d\n", id);
++		goto out;
++	}
++
++	if (!radix_tree_delete(vrp_channels, dst))
++		dev_err(dev, "failed to delete rpmsg %d\n", dst);
++
++out:
++	mutex_unlock(&rpmsg_channels_lock);
++}
++
++static struct rpmsg_device_id rpmsg_proto_id_table[] = {
++	{ .name	= "rpmsg-proto" },
++	{ },
++};
++MODULE_DEVICE_TABLE(rpmsg, rpmsg_proto_id_table);
++
++static struct rpmsg_driver rpmsg_proto_drv = {
++	.drv.name	= KBUILD_MODNAME,
++	.drv.owner	= THIS_MODULE,
++	.id_table	= rpmsg_proto_id_table,
++	.probe		= rpmsg_proto_probe,
++	.callback	= rpmsg_proto_cb,
++	.remove		= rpmsg_proto_remove,
++};
++
++int __init rpmsg_proto_init(void)
++{
++	int ret;
++
++	ret = proto_register(&rpmsg_proto, 0);
++	if (ret) {
++		pr_err("proto_register failed: %d\n", ret);
++		return ret;
++	}
++
++	ret = sock_register(&rpmsg_proto_family);
++	if (ret) {
++		pr_err("sock_register failed: %d\n", ret);
++		goto proto_unreg;
++	}
++
++	/* gimme rpmsg channels to expose ! */
++	ret = register_rpmsg_driver(&rpmsg_proto_drv);
++	if (ret) {
++		pr_err("register_rpmsg_driver failed: %d\n", ret);
++		goto sock_unreg;
++	}
++
++	return 0;
++
++sock_unreg:
++	sock_unregister(PF_RPMSG);
++proto_unreg:
++	proto_unregister(&rpmsg_proto);
++	return ret;
++}
++
++void __exit rpmsg_proto_exit(void)
++{
++	unregister_rpmsg_driver(&rpmsg_proto_drv);
++	sock_unregister(PF_RPMSG);
++	proto_unregister(&rpmsg_proto);
++}
++
++module_init(rpmsg_proto_init);
++module_exit(rpmsg_proto_exit);
++
++MODULE_DESCRIPTION("Remote processor messaging protocol");
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS_NETPROTO(AF_RPMSG);
+diff --git a/tools/rpmsg_proto.c b/tools/rpmsg_proto.c
+new file mode 100644
+index 0000000..f5a26b5
+--- /dev/null
++++ b/tools/rpmsg_proto.c
+@@ -0,0 +1,120 @@
++#include <sys/select.h>
++#include <sys/time.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <errno.h>
++#include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++#include <unistd.h>
++
++#include "../include/net/rpmsg.h"
++
++#define M3_CORE0	(0)
++
++int main(void)
++{
++	int sock, sock2, err;
++	struct sockaddr_rpmsg src_addr, dst_addr;
++	socklen_t len;
++	const char *msg = "Hello there!";
++	char buf[512];
++
++	/* create an RPMSG socket */
++	sock = socket(AF_RPMSG, SOCK_SEQPACKET, 0);
++	if (sock < 0) {
++		printf("socket failed: %s (%d)\n", strerror(errno), errno);
++		return -1;
++	}
++
++	/* connect to remote service */
++	memset(&dst_addr, 0, sizeof(dst_addr));
++	dst_addr.family = AF_RPMSG;
++	dst_addr.vproc_id = M3_CORE0;
++	dst_addr.addr = 51;
++
++	printf("Connecting to address 0x%x on processor %d\n",
++					dst_addr.addr, dst_addr.vproc_id);
++
++	len = sizeof(struct sockaddr_rpmsg);
++	err = connect(sock, (struct sockaddr *)&dst_addr, len);
++	if (err < 0) {
++		printf("connect failed: %s (%d)\n", strerror(errno), errno);
++		return -1;
++	}
++
++	/* let's see what local address did we get */
++	err = getsockname(sock, (struct sockaddr *)&src_addr, &len);
++	if (err < 0) {
++		printf("getpeername failed: %s (%d)\n", strerror(errno), errno);
++		return -1;
++	}
++
++	printf("Our address: socket family: %d, proc id = %d, addr = %d\n",
++			src_addr.family, src_addr.vproc_id, src_addr.addr);
++
++	printf("Sending \"%s\"\n", msg);
++	err = send(sock, msg, strlen(msg) + 1, 0);
++	if (err < 0) {
++		printf("sendto failed: %s (%d)\n", strerror(errno), errno);
++		return -1;
++	}
++
++	memset(&src_addr, 0, sizeof(src_addr));
++
++	len = sizeof(src_addr);
++
++	err = recvfrom(sock, buf, sizeof(buf), 0,
++					(struct sockaddr *)&src_addr, &len);
++	if (err < 0) {
++		printf("recvfrom failed: %s (%d)\n", strerror(errno), errno);
++		return -1;
++	}
++	if (len != sizeof(src_addr)) {
++		printf("recvfrom: got bad addr len (%d)\n", len);
++		return -1;
++	}
++
++	printf("Received a msg from address 0x%x on processor %d\n",
++					src_addr.addr, src_addr.vproc_id);
++	printf("Message content: \"%s\".\n", buf);
++
++
++	close(sock);
++
++	/* create another RPMSG socket */
++	sock2 = socket(AF_RPMSG, SOCK_SEQPACKET, 0);
++	if (sock2 < 0) {
++		printf("socket failed: %s (%d)\n", strerror(errno), errno);
++		return -1;
++	}
++
++	/* bind a local addr */
++	memset(&src_addr, 0, sizeof(src_addr));
++	src_addr.family = AF_RPMSG;
++	src_addr.vproc_id = M3_CORE0;
++	src_addr.addr = 99;
++
++
++	printf("Exposing address %d to processor %d\n",
++					src_addr.addr, src_addr.vproc_id);
++
++	len = sizeof(struct sockaddr_rpmsg);
++	err = bind(sock2, (struct sockaddr *)&src_addr, len);
++	if (err < 0) {
++		printf("bind failed: %s (%d)\n", strerror(errno), errno);
++		return -1;
++	}
++
++	/* let's see what local address did we bind */
++	err = getsockname(sock2, (struct sockaddr *)&src_addr, &len);
++	if (err < 0) {
++		printf("getpeername failed: %s (%d)\n", strerror(errno), errno);
++		return -1;
++	}
++
++	printf("Our address: socket family: %d, proc id = %d, addr = %d\n",
++			src_addr.family, src_addr.vproc_id, src_addr.addr);
++
++	return 0;
++}
+diff --git a/tools/test_rpmsg_omx.c b/tools/test_rpmsg_omx.c
+new file mode 100644
+index 0000000..6dda931
+--- /dev/null
++++ b/tools/test_rpmsg_omx.c
+@@ -0,0 +1,180 @@
++/*
++ * test_rpmsg_omx
++ *
++ * user space testing tool for the rpmsg_omx driver
++ *
++ * Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/
++ *
++ * Ohad Ben-Cohen <ohad@wizery.com>
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ *   Redistributions of source code must retain the above copyright
++ *   notice, this list of conditions and the following disclaimer.
++ *
++ *   Redistributions in binary form must reproduce the above copyright
++ *   notice, this list of conditions and the following disclaimer in the
++ *   documentation and/or other materials provided with the
++ *   distribution.
++ *
++ *   Neither the name of Texas Instruments Incorporated nor the names of
++ *   its contributors may be used to endorse or promote products derived
++ *   from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include <sys/select.h>
++#include <sys/time.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <errno.h>
++#include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <pthread.h>
++#include <sys/eventfd.h>
++
++#include "../include/linux/rpmsg_omx.h"
++
++static pthread_t listener;
++static int omxfd;
++static int die_now_fd;
++
++static void *listener_cb(void *arg)
++{
++	fd_set rfds;
++	struct timeval tv;
++	int ret = 0, maxfd;
++	char buf[512];
++
++	do {
++		/* Wait for OMX messages or self die_now notification */
++		FD_ZERO(&rfds);
++		FD_SET(omxfd, &rfds);
++		FD_SET(die_now_fd, &rfds);
++
++		maxfd = (die_now_fd > omxfd ? die_now_fd : omxfd) + 1;
++		ret = select(maxfd, &rfds, NULL, NULL, NULL);
++		if (ret == -1) {
++			perror("select()");
++			break;
++		}
++
++		if (FD_ISSET(omxfd, &rfds)) {
++			ret = read(omxfd, buf, sizeof(buf));
++			if (ret < 0) {
++				perror("Can't connect to OMX instance");
++				break;
++			}
++
++			printf("RX: %s\n", buf);
++		}
++
++		if (FD_ISSET(die_now_fd, &rfds)) {
++			printf("Need to die!\n");
++			break;
++		}
++
++	} while (1);
++
++	return (void *)ret;
++}
++
++int send_messages(void)
++{
++	const char *msg = "Hello there!";
++	int ret, i;
++
++	/* blather */
++	for (i = 0; i < 10; i++) {
++		ret = write(omxfd, msg, strlen(msg) + 1);
++		if (ret < 0) {
++			perror("Can't connect to OMX instance");
++			return -1;
++		}
++
++		printf("TX: %s\n", msg);
++		sleep(5);
++	}
++
++	return i;
++}
++
++int main(void)
++{
++	int ret;
++	uint64_t die_event = 1;
++	ssize_t s;
++	struct omx_conn_req connreq = { .name = "OMX" };
++
++	/* open the first OMX device */
++	omxfd = open("/dev/rpmsg-omx0", O_RDWR);
++	if (omxfd < 0) {
++		perror("Can't open OMX device");
++		return 1;
++	}
++
++	printf("Connecting to %s\n", connreq.name);
++	/* connect to an h264_decode instance */
++	ret = ioctl(omxfd, OMX_IOCCONNECT, &connreq);
++	if (ret < 0) {
++		perror("Can't connect to OMX instance");
++		return 1;
++	}
++
++	printf("Connected!\n", connreq.name);
++
++	die_now_fd = eventfd(0, 0);
++	if (die_now_fd < 0) {
++		perror("eventfd failed");
++		return 1;
++	}
++
++	ret = pthread_create(&listener, NULL, listener_cb, NULL);
++	if (ret) {
++		printf("can't spawn thread: %s\n", strerror(ret));
++		return 1;
++	}
++
++	ret = send_messages();
++	if (ret < 0)
++		return 1;
++
++	/* terminate connection and destroy OMX instance */
++	ret = close(omxfd);
++	if (ret < 0) {
++		perror("Can't close OMX fd ??");
++		return 1;
++	}
++
++	s = write(die_now_fd, &die_event, sizeof(uint64_t));
++	if (s != sizeof(uint64_t)) {
++		printf("failed to write die_now event\n");
++		return 1;
++	}
++
++	ret = pthread_join(listener, NULL);
++	if (ret) {
++		printf("can't join thread: %s\n", strerror(ret));
++		return 1;
++	}
++
++	printf("Bye!\n");
++
++	return 0;
++}
+-- 
+1.7.5.4
+

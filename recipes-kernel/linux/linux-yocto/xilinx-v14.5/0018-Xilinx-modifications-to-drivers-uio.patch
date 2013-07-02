@@ -1,0 +1,114 @@
+From 5860095b877c6dcf692c39b53dd87284c1e5bf6f Mon Sep 17 00:00:00 2001
+From: Sipke Vriend <sipke.vriend@xilinx.com>
+Date: Wed, 15 May 2013 15:29:12 +1000
+Subject: [PATCH 18/24] Xilinx modifications to drivers/uio
+
+Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
+---
+ drivers/uio/Kconfig           |    7 -------
+ drivers/uio/Makefile          |    1 -
+ drivers/uio/uio_pdrv_genirq.c |   31 ++++++++++---------------------
+ 3 files changed, 10 insertions(+), 29 deletions(-)
+
+diff --git a/drivers/uio/Kconfig b/drivers/uio/Kconfig
+index f56d185..65b3037 100644
+--- a/drivers/uio/Kconfig
++++ b/drivers/uio/Kconfig
+@@ -24,13 +24,6 @@ config UIO_CIF
+ 	  To compile this driver as a module, choose M here: the module
+ 	  will be called uio_cif.
+ 
+-config UIO_PDRV
+-	tristate "Userspace I/O platform driver"
+-	help
+-	  Generic platform driver for Userspace I/O devices.
+-
+-	  If you don't know what to do here, say N.
+-
+ config UIO_PDRV_GENIRQ
+ 	tristate "Userspace I/O platform driver with generic IRQ handling"
+ 	help
+diff --git a/drivers/uio/Makefile b/drivers/uio/Makefile
+index b354c53..ea015a2 100644
+--- a/drivers/uio/Makefile
++++ b/drivers/uio/Makefile
+@@ -1,6 +1,5 @@
+ obj-$(CONFIG_UIO)	+= uio.o
+ obj-$(CONFIG_UIO_CIF)	+= uio_cif.o
+-obj-$(CONFIG_UIO_PDRV)	+= uio_pdrv.o
+ obj-$(CONFIG_UIO_PDRV_GENIRQ)	+= uio_pdrv_genirq.o
+ obj-$(CONFIG_UIO_DMEM_GENIRQ)	+= uio_dmem_genirq.o
+ obj-$(CONFIG_UIO_AEC)	+= uio_aec.o
+diff --git a/drivers/uio/uio_pdrv_genirq.c b/drivers/uio/uio_pdrv_genirq.c
+index c122bca..0d8ad58 100644
+--- a/drivers/uio/uio_pdrv_genirq.c
++++ b/drivers/uio/uio_pdrv_genirq.c
+@@ -103,8 +103,6 @@ static int uio_pdrv_genirq_probe(struct platform_device *pdev)
+ 	int i;
+ 
+ 	if (pdev->dev.of_node) {
+-		int irq;
+-
+ 		/* alloc uioinfo for one device */
+ 		uioinfo = kzalloc(sizeof(*uioinfo), GFP_KERNEL);
+ 		if (!uioinfo) {
+@@ -114,13 +112,6 @@ static int uio_pdrv_genirq_probe(struct platform_device *pdev)
+ 		}
+ 		uioinfo->name = pdev->dev.of_node->name;
+ 		uioinfo->version = "devicetree";
+-
+-		/* Multiple IRQs are not supported */
+-		irq = platform_get_irq(pdev, 0);
+-		if (irq == -ENXIO)
+-			uioinfo->irq = UIO_IRQ_NONE;
+-		else
+-			uioinfo->irq = irq;
+ 	}
+ 
+ 	if (!uioinfo || !uioinfo->name || !uioinfo->version) {
+@@ -146,14 +137,6 @@ static int uio_pdrv_genirq_probe(struct platform_device *pdev)
+ 	priv->flags = 0; /* interrupt is enabled to begin with */
+ 	priv->pdev = pdev;
+ 
+-	if (!uioinfo->irq) {
+-		ret = platform_get_irq(pdev, 0);
+-		if (ret < 0) {
+-			dev_err(&pdev->dev, "failed to get IRQ\n");
+-			goto bad0;
+-		}
+-		uioinfo->irq = ret;
+-	}
+ 	uiomem = &uioinfo->mem[0];
+ 
+ 	for (i = 0; i < pdev->num_resources; ++i) {
+@@ -190,10 +173,15 @@ static int uio_pdrv_genirq_probe(struct platform_device *pdev)
+ 	 * Interrupt sharing is not supported.
+ 	 */
+ 
+-	uioinfo->handler = uio_pdrv_genirq_handler;
+-	uioinfo->irqcontrol = uio_pdrv_genirq_irqcontrol;
+-	uioinfo->open = uio_pdrv_genirq_open;
+-	uioinfo->release = uio_pdrv_genirq_release;
++	ret = platform_get_irq(pdev, 0);
++	if (ret >= 0) {
++		uioinfo->irq = ret;
++		uioinfo->handler = uio_pdrv_genirq_handler;
++		uioinfo->irqcontrol = uio_pdrv_genirq_irqcontrol;
++		uioinfo->open = uio_pdrv_genirq_open;
++		uioinfo->release = uio_pdrv_genirq_release;
++	}
++
+ 	uioinfo->priv = priv;
+ 
+ 	/* Enable Runtime PM for this device:
+@@ -264,6 +252,7 @@ static const struct dev_pm_ops uio_pdrv_genirq_dev_pm_ops = {
+ 
+ #ifdef CONFIG_OF
+ static const struct of_device_id uio_of_genirq_match[] = {
++	{ .compatible = "generic-uio", },
+ 	{ /* empty for now */ },
+ };
+ MODULE_DEVICE_TABLE(of, uio_of_genirq_match);
+-- 
+1.7.5.4
+
