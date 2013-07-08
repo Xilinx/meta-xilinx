@@ -1,0 +1,63 @@
+From 58deb49b33812b048a1061553c1ca6f010af59f4 Mon Sep 17 00:00:00 2001
+From: Michael Eager <eager@eagercon.com>
+Date: Fri, 9 Nov 2012 22:43:28 +0000
+Subject: Files missing from previous commit.
+
+Upstream-Status: Backport
+
+diff --git a/ld/emulparams/elf32mbel_linux.sh b/ld/emulparams/elf32mbel_linux.sh
+new file mode 100644
+index 0000000..2980e82
+--- /dev/null
++++ b/ld/emulparams/elf32mbel_linux.sh
+@@ -0,0 +1,18 @@
++SCRIPT_NAME=elf
++OUTPUT_FORMAT="elf32-microblazeel"
++BIG_OUTPUT_FORMAT="elf32-microblaze"
++LITTLE_OUTPUT_FORMAT="elf32-microblazeel"
++TEXT_START_ADDR=0x10000000
++NONPAGED_TEXT_START_ADDR=0x28
++ALIGNMENT=4
++MAXPAGESIZE=0x1000
++COMMONPAGESIZE=0x1000
++ARCH=microblaze
++
++NOP=0x80000000
++
++TEMPLATE_NAME=elf32
++GENERATE_SHLIB_SCRIPT=yes
++GENERATE_PIE_SCRIPT=yes
++NO_SMALL_DATA=yes
++SEPARATE_GOTPLT=12
+diff --git a/ld/emulparams/elf32microblazeel.sh b/ld/emulparams/elf32microblazeel.sh
+new file mode 100644
+index 0000000..86268b0
+--- /dev/null
++++ b/ld/emulparams/elf32microblazeel.sh
+@@ -0,0 +1,23 @@
++SCRIPT_NAME=elfmicroblaze
++OUTPUT_FORMAT="elf32-microblazeel"
++BIG_OUTPUT_FORMAT="elf32-microblaze"
++LITTLE_OUTPUT_FORMAT="elf32-microblazeel"
++#TEXT_START_ADDR=0
++NONPAGED_TEXT_START_ADDR=0x28
++ALIGNMENT=4
++MAXPAGESIZE=4
++ARCH=microblaze
++EMBEDDED=yes
++
++NOP=0x80000000
++
++# Hmmm, there's got to be a better way.  This sets the stack to the
++# top of the simulator memory (2^19 bytes).
++#PAGE_SIZE=0x1000
++#DATA_ADDR=0x10000
++#OTHER_RELOCATING_SECTIONS='.stack 0x7000 : { _stack = .; *(.stack) }'
++#$@{RELOCATING+ PROVIDE (__stack = 0x7000);@}
++#OTHER_RELOCATING_SECTIONS='PROVIDE (_stack = _end + 0x1000);'
++
++TEMPLATE_NAME=elf32
++#GENERATE_SHLIB_SCRIPT=yes
+-- 
+1.7.5.4
+
