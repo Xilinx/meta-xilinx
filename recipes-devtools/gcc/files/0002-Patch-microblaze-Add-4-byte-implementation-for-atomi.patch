@@ -1,0 +1,157 @@
+From: David Holsgrove <david.holsgrove@xilinx.com>
+Subject: [PATCH 2/8] [Patch, microblaze]: Add 4 byte implementation for
+ atomic builtin
+
+By providing this initial atomic implementation, gcc is able to generate the other atomic
+builtins by using a __sync_compare_and_swap loop
+
+Add __sync_lock_test_and_set 4 byte atomic builtin
+
+Changelog
+
+2013-03-18  David Holsgrove <david.holsgrove@xilinx.com>
+
+ * gcc/config/microblaze/sync.md: New file.
+ * gcc/config/microblaze/microblaze.md: Add UNSPEC_SYNC_CAS,
+   UNSPEC_SYNC_XCHG and include sync.md.
+ * gcc/config/microblaze/microblaze.c: Add print_operand 'y'.
+ * gcc/config/microblaze/constraints.md: Add memory_contraint
+   'Q' which is a single register.
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+Upstream-Status: Pending
+
+diff --git a/gcc/config/microblaze/constraints.md b/gcc/config/microblaze/constraints.md
+index c6fbc98..c9c1649 100644
+--- a/gcc/config/microblaze/constraints.md
++++ b/gcc/config/microblaze/constraints.md
+@@ -70,3 +70,8 @@
+   "Double word operand."
+   (and (match_code "mem")
+        (match_test "double_memory_operand (op, GET_MODE (op))")))
++
++(define_memory_constraint "Q"
++  "Memory operand which is a single register."
++  (and (match_code "mem")
++       (match_test "GET_CODE ( XEXP (op, 0)) == REG")))
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 5f4bc60..1562e60 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -2130,6 +2130,7 @@ microblaze_initial_elimination_offset (int from, int to)
+    't'  print 't' for EQ, 'f' for NE
+    'm'  Print 1<<operand.
+    'i'  Print 'i' if MEM operand has immediate value
++   'y'  Print 'y' if MEM operand is single register
+    'o'	Print operand address+4
+    '?'	Print 'd' if we use a branch with delay slot instead of normal branch.
+    'h'  Print high word of const_double (int or float) value as hex
+@@ -2300,6 +2301,15 @@ print_operand (FILE * file, rtx op, int letter)
+ 	rtx op4 = adjust_address (op, GET_MODE (op), 4);
+ 	output_address (XEXP (op4, 0));
+       }
++    else if (letter == 'y')
++      {
++        rtx mem_reg = XEXP (op, 0);
++        if (GET_CODE (mem_reg) == REG)
++        {
++            register int regnum = REGNO (mem_reg);
++            fprintf (file, "%s", reg_names[regnum]);
++        }
++      }
+     else
+       output_address (XEXP (op, 0));
+ 
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 4e7fe3b..55cc730 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -41,6 +41,8 @@
+   (UNSPEC_CMP		104)    ;; signed compare
+   (UNSPEC_CMPU		105)    ;; unsigned compare
+   (UNSPEC_TLS           106)    ;; jump table
++  (UNSPEC_SYNC_CAS  	107)    ;; Represent atomic compare swap.
++  (UNSPEC_SYNC_XCHG 	108)    ;; Represent atomic exchange.
+ ])
+ 
+ 
+@@ -2231,3 +2233,5 @@
+   microblaze_eh_return(operands[0]);
+   DONE;
+ }")
++
++(include "sync.md")
+diff --git a/gcc/config/microblaze/sync.md b/gcc/config/microblaze/sync.md
+new file mode 100644
+index 0000000..0923825
+--- /dev/null
++++ b/gcc/config/microblaze/sync.md
+@@ -0,0 +1,65 @@
++;; Machine description for Xilinx MicroBlaze synchronization instructions.
++;; Copyright (C) 2011, 2012
++;; Free Software Foundation, Inc.
++;;
++;; This file is part of GCC.
++;;
++;; GCC is free software; you can redistribute it and/or modify
++;; it under the terms of the GNU General Public License as published by
++;; the Free Software Foundation; either version 3, or (at your option)
++;; any later version.
++;;
++;; GCC is distributed in the hope that it will be useful,
++;; but WITHOUT ANY WARRANTY; without even the implied warranty of
++;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++;; GNU General Public License for more details.
++;;
++;; You should have received a copy of the GNU General Public License
++;; along with GCC; see the file COPYING3.  If not see
++;; <http://www.gnu.org/licenses/>.
++
++
++(define_insn "sync_compare_and_swapsi"
++  [(set (match_operand:SI 0 "register_operand" "=&d")          	;; retval
++        (match_operand:SI 1 "nonimmediate_operand" "+Q"))      	;; mem
++    (set (match_dup 1)
++	(unspec
++	    [(match_operand:SI 2 "register_operand" "d")	;; oldval
++	     (match_operand:SI 3 "register_operand" "d")]	;; newval
++			     UNSPEC_SYNC_CAS))
++   (clobber (match_scratch:SI 4 "=&d"))]			;; scratch
++  ""
++  {
++    output_asm_insn ("addc \tr0,r0,r0", operands);
++    output_asm_insn ("lwx  \t%0,%y1,r0", operands);
++    output_asm_insn ("addic\t%4,r0,0", operands);
++    output_asm_insn ("bnei \t%4,.-8", operands);
++    output_asm_insn ("cmp  \t%4,%0,%2", operands);
++    output_asm_insn ("bnei \t%4,.+16", operands);
++    output_asm_insn ("swx  \t%3,%y1,r0", operands);
++    output_asm_insn ("addic\t%4,r0,0", operands);
++    output_asm_insn ("bnei \t%4,.-28", operands);
++    return "";
++  }
++)
++
++(define_insn "sync_test_and_setsi"
++  [(set (match_operand:SI 0 "register_operand" "=&d")        	;; retval
++	(match_operand:SI 1 "nonimmediate_operand" "+Q"))	;; mem
++   (set (match_dup 1)
++	(unspec
++	  [(match_operand:SI 2 "register_operand" "d")]		;; value
++	  UNSPEC_SYNC_XCHG))
++   (clobber (match_scratch:SI 3 "=&d"))]			;; scratch
++  ""
++  {
++    output_asm_insn ("addc \tr0,r0,r0", operands);
++    output_asm_insn ("lwx  \t%0,%y1,r0", operands);
++    output_asm_insn ("addic\t%3,r0,0", operands);
++    output_asm_insn ("bnei \t%3,.-8", operands);
++    output_asm_insn ("swx  \t%2,%y1,r0", operands);
++    output_asm_insn ("addic\t%3,r0,0", operands);
++    output_asm_insn ("bnei \t%3,.-20", operands);
++    return "";
++  }
++)
+-- 
+1.7.5.4
+

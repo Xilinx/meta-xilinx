@@ -1,0 +1,35 @@
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Subject: [PATCH 6/8] [Patch, microblaze]: Remove SECONDARY_MEMORY_NEEDED
+
+MicroBlaze doesn't have restrictions that would force us to
+reload regs via memory. Don't define SECONDARY_MEMORY_NEEDED.
+Fixes an ICE when compiling OpenSSL for linux.
+
+Changelog
+
+2013-03-18  Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+ * gcc/config/microblaze/microblaze.h: Remove SECONDARY_MEMORY_NEEDED
+   definition.
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Peter A. G. Crosthwaite <peter.crosthwaite@xilinx.com>
+Upstream-Status: Pending
+
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 074b78e..add69e8 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -422,9 +422,6 @@ extern enum reg_class microblaze_regno_to_class[];
+ 	  || GET_MODE (X) == VOIDmode)					\
+ 	 ? (GR_REGS) : (CLASS))))
+ 
+-#define SECONDARY_MEMORY_NEEDED(CLASS1, CLASS2, MODE)			\
+-  (GET_MODE_CLASS (MODE) == MODE_INT)
+-
+ /* Stack layout; function entry, exit and calling.  */
+ 
+ #define STACK_GROWS_DOWNWARD
+-- 
+1.7.5.4
+

@@ -1,0 +1,30 @@
+From: David Holsgrove <david.holsgrove@xilinx.com>
+Subject: [PATCH 5/8] [Patch, microblaze]: Add -fstack-usage support
+
+Changelog
+
+2013-03-18  David Holsgrove <david.holsgrove@xilinx.com>
+
+ * gcc/config/microblaze/microblaze.c (microblaze_expand_prologue):
+   Add check for flag_stack_usage to enable -fstack-usage support
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+Upstream-Status: Pending
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index 7418e49..4417289 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -2790,6 +2790,9 @@ microblaze_expand_prologue (void)
+ 
+   fsiz = compute_frame_size (get_frame_size ());
+ 
++  if (flag_stack_usage)
++    current_function_static_stack_size = fsiz;
++
+   /* If this function is a varargs function, store any registers that
+      would normally hold arguments ($5 - $10) on the stack.  */
+   if (((TYPE_ARG_TYPES (fntype) != 0
+-- 
+1.7.5.4
+
