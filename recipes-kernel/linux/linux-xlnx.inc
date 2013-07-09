@@ -33,3 +33,6 @@ KERNEL_DEVICETREE_qemuzynq = "${WORKDIR}/qemuzynq.dts"
 
 # Override COMPATIBLE_MACHINE to include your machine in a bbappend file.
 COMPATIBLE_MACHINE = "qemumicroblaze|qemuzynq"
+
+# Add the modules directory to the 'kernel-base' files list
+FILES_kernel-base_append = " /lib/modules/${KERNEL_VERSION}/kernel"
