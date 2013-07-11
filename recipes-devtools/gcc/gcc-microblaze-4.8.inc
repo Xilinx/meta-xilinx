@@ -11,4 +11,5 @@ SRC_URI_append += " \
 		file://0007-Patch-microblaze-Add-SIZE_TYPE-and-PTRDIFF_TYPE-to-m.patch \
 		file://0008-Patch-microblaze-Add-branch_compare-instruction.patch \
 		file://Patch-microblaze-Fix-bswaphi2-implementation.patch \
+		file://Patch-microblaze-cstoresf4-add-mode-and-ordered_comp.patch \
 		"
