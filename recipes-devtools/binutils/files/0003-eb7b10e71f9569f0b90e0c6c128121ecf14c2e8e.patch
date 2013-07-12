@@ -1,0 +1,632 @@
+From eb7b10e71f9569f0b90e0c6c128121ecf14c2e8e Mon Sep 17 00:00:00 2001
+From: Michael Eager <eager@eagercon.com>
+Date: Fri, 9 Nov 2012 16:24:57 +0000
+Subject: Add microblazeel target support to bfd, gas and ld.
+
+binutils/bfd/Changelog
+
+ 2012-11-09  Edgar E. Iglesias <edgar.iglesias@gmail.com>
+
+          * config.bfd: Add microblazeel-*-*
+          * configure.in: Likewise.
+          * configure: Regenerate.
+          * elf32-microblaze.c (microblaze_elf_relocate_section):
+            Add endian awareness.
+            (microblaze_elf_merge_private_bfd_data): New.
+            (microblaze_bfd_write_imm_value_32): New.
+            (microblaze_bfd_write_imm_value_64): New.
+            (microblaze_elf_relax_section): Add endian awareness.
+            (microblaze_elf_add_symbol_hook): Define TARGET_LITTLE_NAME,
+            TARGET_LITTLE_SYM and bfd_elf32_bfd_merge_private_bfd_data.
+          * targets.c: Add bfd target bfd_elf32_microblazeel_vec.
+
+binutils/gas/Changelog
+
+ 2012-11-09  Edgar E. Iglesias <edgar.iglesias@gmail.com>
+
+          * tc-microblaze.c (md_longopts): Define OPTION_EB and
+            OPTION_EL for target.
+            (md_parse_option): Likewise.
+          * tc-microblaze.h: Set elf32-microblazeel if not
+            target_big_endian for TARGET_FORMAT.
+          * configure.tgt: Add microblazeel and set endian per target.
+
+binutils/gas/testsuite/Changelog
+
+ 2012-11-09  David Holsgrove  <david.holsgrove@xilinx.com>
+
+          * gas/microblaze/endian.exp: New file - endian
+            testcase for microblaze / microblazeel.
+          * gas/microblaze/endian.s: Likewise.
+          * gas/microblaze/endian_be.d: Likewise.
+          * gas/microblaze/endian_le.d: Likewise.
+          * gas/microblaze/endian_le_elf.d: Likewise.
+          * gas/microblaze/reloc_sym.d: Update to accept targets
+            other than elf32-microblaze.
+          * gas/microblaze/special_reg.d: Likewise.
+
+binutils/ld/Changelog
+
+ 2012-11-09  Edgar E. Iglesias <edgar.iglesias@gmail.com>
+
+          * Makefile.am: Add eelf32microblazeel.c and eelf32mbel_linux.c.
+          * Makefile.in: Regenerated.
+          * configure.tgt: Add microblazeel and set endian per target.
+          * emulparams/elf32mb_linux.sh: Add OUTPUT_FORMAT.
+          * emulparams/elf32microblaze.sh: Likewise.
+          * emulparams/elf32mbel_linux.sh: New file.
+          * emulparams/elf32microblazeel.sh: Likewise.
+
+Upstream-Status: Backport
+
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index 7def642..e59ab25 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -916,8 +916,14 @@ case "${targ}" in
+     targ_selvecs=bfd_elf32_mep_little_vec
+     ;;
+ 
++  microblazeel*-*)
++    targ_defvec=bfd_elf32_microblazeel_vec
++    targ_selvecs=bfd_elf32_microblaze_vec
++    ;;
++
+   microblaze*-*)
+     targ_defvec=bfd_elf32_microblaze_vec
++    targ_selvecs=bfd_elf32_microblazeel_vec
+     ;;
+ 
+   mips*-big-*)
+diff --git a/bfd/configure b/bfd/configure
+index 43bff03..7b073cc 100755
+--- a/bfd/configure
++++ b/bfd/configure
+@@ -15283,6 +15283,7 @@ do
+     bfd_elf32_mcore_little_vec)	tb="$tb elf32-mcore.lo elf32.lo $elf" ;;
+     bfd_elf32_mep_vec)		tb="$tb elf32-mep.lo elf32.lo $elf" ;;
+     bfd_elf32_mep_little_vec)	tb="$tb elf32-mep.lo elf32.lo $elf" ;;
++    bfd_elf32_microblazeel_vec)	tb="$tb elf32-microblaze.lo elf32.lo $elf" ;;
+     bfd_elf32_microblaze_vec)	tb="$tb elf32-microblaze.lo elf32.lo $elf" ;;
+     bfd_elf32_mn10200_vec)	tb="$tb elf-m10200.lo elf32.lo $elf" ;;
+     bfd_elf32_mn10300_vec)	tb="$tb elf-m10300.lo elf32.lo $elf" ;;
+diff --git a/bfd/configure.in b/bfd/configure.in
+index f7e3929..78f2744 100644
+--- a/bfd/configure.in
++++ b/bfd/configure.in
+@@ -764,6 +764,7 @@ do
+     bfd_elf32_mcore_little_vec)	tb="$tb elf32-mcore.lo elf32.lo $elf" ;;
+     bfd_elf32_mep_vec)		tb="$tb elf32-mep.lo elf32.lo $elf" ;;
+     bfd_elf32_mep_little_vec)	tb="$tb elf32-mep.lo elf32.lo $elf" ;;
++    bfd_elf32_microblazeel_vec)	tb="$tb elf32-microblaze.lo elf32.lo $elf" ;;
+     bfd_elf32_microblaze_vec)	tb="$tb elf32-microblaze.lo elf32.lo $elf" ;;
+     bfd_elf32_mn10200_vec)	tb="$tb elf-m10200.lo elf32.lo $elf" ;;
+     bfd_elf32_mn10300_vec)	tb="$tb elf-m10300.lo elf32.lo $elf" ;;
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index c000424..be2de13 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -702,6 +702,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+   Elf_Internal_Shdr *symtab_hdr = &elf_tdata (input_bfd)->symtab_hdr;
+   struct elf_link_hash_entry **sym_hashes = elf_sym_hashes (input_bfd);
+   Elf_Internal_Rela *rel, *relend;
++  int endian = (bfd_little_endian (output_bfd)) ? 0 : 2;
+   /* Assume success.  */
+   bfd_boolean ret = TRUE;
+   asection *sreloc;
+@@ -933,9 +934,9 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 			     + offset + INST_WORD_SIZE);
+ 	      relocation += addend;
+ 	      bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
+-			  contents + offset + 2);
++	                  contents + offset + endian);
+ 	      bfd_put_16 (input_bfd, relocation & 0xffff,
+-			  contents + offset + 2 + INST_WORD_SIZE);
++	                  contents + offset + endian + INST_WORD_SIZE);
+ 	      break;
+ 
+ 	    case (int) R_MICROBLAZE_PLT_64:
+@@ -952,9 +953,9 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 					      + input_section->output_offset
+ 					      + offset + INST_WORD_SIZE);
+ 		    bfd_put_16 (input_bfd, (immediate >> 16) & 0xffff,
+-				contents + offset + 2);
++		                contents + offset + endian);
+ 		    bfd_put_16 (input_bfd, immediate & 0xffff,
+-				contents + offset + 2 + INST_WORD_SIZE);
++		                contents + offset + endian + INST_WORD_SIZE);
+ 		  }
+ 		else
+ 		  {
+@@ -963,9 +964,9 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 				   + offset + INST_WORD_SIZE);
+ 		    immediate = relocation;
+ 		    bfd_put_16 (input_bfd, (immediate >> 16) & 0xffff,
+-				contents + offset + 2);
++		                contents + offset + endian);
+ 		    bfd_put_16 (input_bfd, immediate & 0xffff,
+-				contents + offset + 2 + INST_WORD_SIZE);
++		                contents + offset + endian + INST_WORD_SIZE);
+ 		  }
+ 		break;
+ 	      }
+@@ -1031,9 +1032,9 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 		      abort (); /* ??? */
+ 		  }
+ 		bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
+-			    contents + offset + 2);
++		            contents + offset + endian);
+ 		bfd_put_16 (input_bfd, relocation & 0xffff,
+-			    contents + offset + 2 + INST_WORD_SIZE);
++		            contents + offset + endian + INST_WORD_SIZE);
+ 		break;
+ 	      }
+ 
+@@ -1048,8 +1049,8 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 		immediate = relocation;
+ 		lo = immediate & 0x0000ffff;
+ 		high = (immediate >> 16) & 0x0000ffff;
+-		bfd_put_16 (input_bfd, high, contents + offset + 2);
+-		bfd_put_16 (input_bfd, lo, contents + offset + INST_WORD_SIZE + 2);
++		bfd_put_16 (input_bfd, high, contents + offset + endian);
++		bfd_put_16 (input_bfd, lo, contents + offset + INST_WORD_SIZE + endian);
+ 		break;
+ 	      }
+ 
+@@ -1082,9 +1083,9 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 					 + input_section->output_offset
+ 					 + offset + INST_WORD_SIZE);
+ 			bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
+-				    contents + offset + 2);
++			            contents + offset + endian);
+ 			bfd_put_16 (input_bfd, relocation & 0xffff,
+-				    contents + offset + 2 + INST_WORD_SIZE);
++			            contents + offset + endian + INST_WORD_SIZE);
+ 		      }
+ 		    break;
+ 		  }
+@@ -1176,9 +1177,9 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 					 + input_section->output_offset
+ 					 + offset + INST_WORD_SIZE);
+ 			bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
+-				    contents + offset + 2);
++			            contents + offset + endian);
+ 			bfd_put_16 (input_bfd, relocation & 0xffff,
+-				    contents + offset + 2 + INST_WORD_SIZE);
++			            contents + offset + endian + INST_WORD_SIZE);
+ 		      }
+ 		    break;
+ 		  }
+@@ -1253,6 +1254,21 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 
+   return ret;
+ }
++
++/* Merge backend specific data from an object file to the output
++   object file when linking.
++
++   Note: We only use this hook to catch endian mismatches.  */
++static bfd_boolean
++microblaze_elf_merge_private_bfd_data (bfd * ibfd, bfd * obfd)
++{
++  /* Check if we have the same endianess.  */
++  if (! _bfd_generic_verify_endian_match (ibfd, obfd))
++    return FALSE;
++
++  return TRUE;
++}
++
+ 
+ /* Calculate fixup value for reference.  */
+ 
+@@ -1275,6 +1291,36 @@ calc_fixup (bfd_vma addr, asection *sec)
+   return fixup;
+ }
+ 
++/* Read-modify-write into the bfd, an immediate value into appropriate fields of
++   a 32-bit instruction.  */
++static void
++microblaze_bfd_write_imm_value_32 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
++{
++    unsigned long instr = bfd_get_32 (abfd, bfd_addr);
++    instr &= ~0x0000ffff;
++    instr |= (val & 0x0000ffff);
++    bfd_put_32 (abfd, instr, bfd_addr);
++}
++
++/* Read-modify-write into the bfd, an immediate value into appropriate fields of
++   two consecutive 32-bit instructions.  */
++static void
++microblaze_bfd_write_imm_value_64 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
++{
++    unsigned long instr_hi;
++    unsigned long instr_lo;
++
++    instr_hi = bfd_get_32 (abfd, bfd_addr);
++    instr_hi &= ~0x0000ffff;
++    instr_hi |= ((val >> 16) & 0x0000ffff);
++    bfd_put_32 (abfd, instr_hi, bfd_addr);
++
++    instr_lo = bfd_get_32 (abfd, bfd_addr + INST_WORD_SIZE);
++    instr_lo &= ~0x0000ffff;
++    instr_lo |= (val & 0x0000ffff);
++    bfd_put_32 (abfd, instr_lo, bfd_addr + INST_WORD_SIZE);
++}
++
+ static bfd_boolean
+ microblaze_elf_relax_section (bfd *abfd,
+ 			      asection *sec,
+@@ -1305,7 +1351,8 @@ microblaze_elf_relax_section (bfd *abfd,
+   /* Only do this for a text section.  */
+   if (link_info->relocatable
+       || (sec->flags & SEC_RELOC) == 0
+-      || (sec->reloc_count == 0))
++      || (sec->reloc_count == 0)
++      || (sec->flags & SEC_CODE) == 0)
+     return TRUE;
+ 
+   BFD_ASSERT ((sec->size > 0) || (sec->rawsize > 0));
+@@ -1485,7 +1532,8 @@ microblaze_elf_relax_section (bfd *abfd,
+ 	        efix = calc_fixup (target_address, sec);
+ 	        irel->r_addend -= (efix - sfix);
+ 	        /* Should use HOWTO.  */
+-	        bfd_put_16 (abfd, irel->r_addend, contents + irel->r_offset + 2);
++	        microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset,
++	                                           irel->r_addend);
+ 	      }
+ 	      break;
+ 	    case R_MICROBLAZE_64_NONE:
+@@ -1498,8 +1546,8 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		sfix = calc_fixup (irel->r_offset + INST_WORD_SIZE, sec);
+ 		efix = calc_fixup (target_address, sec);
+ 		irel->r_addend -= (efix - sfix);
+-		bfd_put_16 (abfd, irel->r_addend, contents + irel->r_offset
+-			    + INST_WORD_SIZE + 2);
++    microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset
++                                       + INST_WORD_SIZE, irel->r_addend);
+ 	      }
+ 	      break;
+ 	    }
+@@ -1627,13 +1675,14 @@ microblaze_elf_relax_section (bfd *abfd,
+ 			    }
+ 			}
+ 
+-		      immediate = (unsigned short) bfd_get_16 (abfd, ocontents +
+-							       irelscan->r_offset + 2);
++		      unsigned long instr = bfd_get_32 (abfd, ocontents + irelscan->r_offset);
++		      immediate = instr & 0x0000ffff;
+ 		      target_address = immediate;
+ 		      offset = calc_fixup (target_address, sec);
+ 		      immediate -= offset;
+ 		      irelscan->r_addend -= offset;
+-		      bfd_put_16 (abfd, immediate, ocontents + irelscan->r_offset + 2);
++          microblaze_bfd_write_imm_value_32 (abfd, ocontents + irelscan->r_offset,
++                                             irelscan->r_addend);
+ 		    }
+ 		}
+ 
+@@ -1669,15 +1718,13 @@ microblaze_elf_relax_section (bfd *abfd,
+ 			      elf_section_data (o)->this_hdr.contents = ocontents;
+ 			    }
+ 			}
+-		      immediate = (unsigned short) (bfd_get_16 (abfd, ocontents
+-								+ irelscan->r_offset
+-								+ 2) << 16)
+-			& 0xffff0000;
+-		      immediate += (unsigned short) (bfd_get_16 (abfd, ocontents
+-								 + irelscan->r_offset
+-								 + INST_WORD_SIZE + 2))
+-			& 0x0000ffff;
+-
++          unsigned long instr_hi =  bfd_get_32 (abfd, ocontents
++                                                + irelscan->r_offset);
++          unsigned long instr_lo =  bfd_get_32 (abfd, ocontents
++                                                + irelscan->r_offset
++                                                + INST_WORD_SIZE);
++          immediate = (instr_hi & 0x0000ffff) << 16;
++          immediate |= (instr_lo & 0x0000ffff);
+ 		      offset = calc_fixup (irelscan->r_addend, sec);
+ 		      immediate -= offset;
+ 		      irelscan->r_addend -= offset;
+@@ -1715,22 +1762,19 @@ microblaze_elf_relax_section (bfd *abfd,
+ 			      elf_section_data (o)->this_hdr.contents = ocontents;
+ 			    }
+ 			}
+-
+-		      immediate = (unsigned short)
+-			(bfd_get_16 (abfd, ocontents + irelscan->r_offset + 2) << 16)
+-			& 0xffff0000;
+-		      immediate += (unsigned short)
+-			(bfd_get_16 (abfd, ocontents + irelscan->r_offset
+-				     + INST_WORD_SIZE + 2))
+-			& 0x0000ffff;
++          unsigned long instr_hi =  bfd_get_32 (abfd, ocontents
++                                                + irelscan->r_offset);
++          unsigned long instr_lo =  bfd_get_32 (abfd, ocontents
++                                                + irelscan->r_offset
++                                                + INST_WORD_SIZE);
++          immediate = (instr_hi & 0x0000ffff) << 16;
++          immediate |= (instr_lo & 0x0000ffff);
+ 		      target_address = immediate;
+ 		      offset = calc_fixup (target_address, sec);
+ 		      immediate -= offset;
+ 		      irelscan->r_addend -= offset;
+-		      bfd_put_16 (abfd, ((immediate >> 16) & 0x0000ffff),
+-				  ocontents + irelscan->r_offset + 2);
+-		      bfd_put_16 (abfd, (immediate & 0x0000ffff),
+-				  ocontents + irelscan->r_offset + INST_WORD_SIZE + 2);
++          microblaze_bfd_write_imm_value_64 (abfd, ocontents
++                                             + irelscan->r_offset, immediate);
+ 		    }
+ 		}
+             }
+@@ -1800,9 +1844,12 @@ microblaze_elf_relax_section (bfd *abfd,
+ 
+   if (sec->relax_count == 0)
+     {
++      *again = FALSE;
+       free (sec->relax);
+       sec->relax = NULL;
+     }
++  else
++    *again = TRUE;
+   return TRUE;
+ 
+  error_return:
+@@ -3016,6 +3063,8 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
+   return TRUE;
+ }
+ 
++#define TARGET_LITTLE_SYM      bfd_elf32_microblazeel_vec
++#define TARGET_LITTLE_NAME     "elf32-microblazeel"
+ 
+ #define TARGET_BIG_SYM          bfd_elf32_microblaze_vec
+ #define TARGET_BIG_NAME		"elf32-microblaze"
+@@ -3032,6 +3081,7 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
+ #define bfd_elf32_bfd_is_local_label_name       microblaze_elf_is_local_label_name
+ #define elf_backend_relocate_section		microblaze_elf_relocate_section
+ #define bfd_elf32_bfd_relax_section             microblaze_elf_relax_section
++#define bfd_elf32_bfd_merge_private_bfd_data    microblaze_elf_merge_private_bfd_data
+ #define bfd_elf32_bfd_reloc_name_lookup		microblaze_elf_reloc_name_lookup
+ 
+ #define elf_backend_gc_mark_hook		microblaze_elf_gc_mark_hook
+diff --git a/bfd/targets.c b/bfd/targets.c
+index 621bf8d..442cb8f 100644
+--- a/bfd/targets.c
++++ b/bfd/targets.c
+@@ -659,6 +659,7 @@ extern const bfd_target bfd_elf32_mcore_big_vec;
+ extern const bfd_target bfd_elf32_mcore_little_vec;
+ extern const bfd_target bfd_elf32_mep_vec;
+ extern const bfd_target bfd_elf32_mep_little_vec;
++extern const bfd_target bfd_elf32_microblazeel_vec;
+ extern const bfd_target bfd_elf32_microblaze_vec;
+ extern const bfd_target bfd_elf32_mn10200_vec;
+ extern const bfd_target bfd_elf32_mn10300_vec;
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index de0efda..04dfa1e 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -35,6 +35,9 @@
+ #define streq(a,b) (strcmp (a, b) == 0)
+ #endif
+ 
++#define OPTION_EB (OPTION_MD_BASE + 0)
++#define OPTION_EL (OPTION_MD_BASE + 1)
++
+ void microblaze_generate_symbol (char *sym);
+ static bfd_boolean check_spl_reg (unsigned *);
+ 
+@@ -1707,6 +1710,8 @@ const char * md_shortopts = "";
+ 
+ struct option md_longopts[] =
+ {
++  {"EB", no_argument, NULL, OPTION_EB},
++  {"EL", no_argument, NULL, OPTION_EL},
+   { NULL,          no_argument, NULL, 0}
+ };
+ 
+@@ -2304,6 +2309,12 @@ md_parse_option (int c, char * arg ATTRIBUTE_UNUSED)
+ {
+   switch (c)
+     {
++    case OPTION_EB:
++      target_big_endian = 1;
++      break;
++    case OPTION_EL:
++      target_big_endian = 0;
++      break;
+     default:
+       return 0;
+     }
+diff --git a/gas/config/tc-microblaze.h b/gas/config/tc-microblaze.h
+index db8d227..0651040 100644
+--- a/gas/config/tc-microblaze.h
++++ b/gas/config/tc-microblaze.h
+@@ -23,8 +23,10 @@
+ #define TC_MICROBLAZE 1
+ 
+ #define TARGET_ARCH	bfd_arch_microblaze
++#ifndef TARGET_BYTES_BIG_ENDIAN
+ /* Used to initialise target_big_endian.  */
+ #define TARGET_BYTES_BIG_ENDIAN 1
++#endif
+ 
+ #define IGNORE_NONSTANDARD_ESCAPES
+ 
+@@ -75,7 +77,7 @@ extern const struct relax_type md_relax_table[];
+ 
+ #ifdef OBJ_ELF
+ 
+-#define TARGET_FORMAT (target_big_endian ? "elf32-microblaze" : "elf32-microblaze-little")
++#define TARGET_FORMAT (target_big_endian ? "elf32-microblaze" : "elf32-microblazeel")
+ 
+ #define ELF_TC_SPECIAL_SECTIONS \
+   { ".sdata",		SHT_PROGBITS,	SHF_ALLOC + SHF_WRITE }, \
+diff --git a/gas/configure.tgt b/gas/configure.tgt
+index ff4cb3f..774031e 100644
+--- a/gas/configure.tgt
++++ b/gas/configure.tgt
+@@ -57,7 +57,8 @@ case ${cpu} in
+   m6811|m6812|m68hc12)	cpu_type=m68hc11 ;;
+   m683??)		cpu_type=m68k ;;
+   mep)			cpu_type=mep endian=little ;;
+-  microblaze*)		cpu_type=microblaze ;;
++  microblazeel*)	cpu_type=microblaze endian=little;;
++  microblaze*)		cpu_type=microblaze endian=big;;
+   mips*el)		cpu_type=mips endian=little ;;
+   mips*)		cpu_type=mips endian=big ;;
+   mt)			cpu_type=mt endian=big ;;
+diff --git a/gas/testsuite/gas/microblaze/reloc_sym.d b/gas/testsuite/gas/microblaze/reloc_sym.d
+index 212d0bb..571ffe1 100644
+--- a/gas/testsuite/gas/microblaze/reloc_sym.d
++++ b/gas/testsuite/gas/microblaze/reloc_sym.d
+@@ -1,6 +1,5 @@
+ 
+-reloc_sym.x:     file format elf32-microblaze
+-
++.*: +file format .*
+ 
+ Disassembly of section .text:
+ 
+diff --git a/gas/testsuite/gas/microblaze/special_reg.d b/gas/testsuite/gas/microblaze/special_reg.d
+index aad0131..c2041fd 100644
+--- a/gas/testsuite/gas/microblaze/special_reg.d
++++ b/gas/testsuite/gas/microblaze/special_reg.d
+@@ -1,10 +1,7 @@
+ #as:
+-#objdump: -ds
++#objdump: -d
+ 
+-.*:     file format .*
+-
+-Contents of section .text:
+- 0000 9409d000 6c00d000 001ff800           ....l.......    
++.*: +file format .*
+ 
+ Disassembly of section .text:
+ 
+diff --git a/ld/Makefile.am b/ld/Makefile.am
+index 4c692ea..f6f814f 100644
+--- a/ld/Makefile.am
++++ b/ld/Makefile.am
+@@ -237,6 +237,7 @@ ALL_EMULATION_SOURCES = \
+ 	eelf32mb_linux.c \
+ 	eelf32mcore.c \
+ 	eelf32mep.c \
++	eelf32microblazeel.c \
+ 	eelf32microblaze.c \
+ 	eelf32mipswindiss.c \
+ 	eelf32moxie.c \
+@@ -1107,6 +1108,9 @@ eelf32m32c.c: $(srcdir)/emulparams/elf32m32c.sh \
+   $(ELF_DEPS) $(srcdir)/emultempl/needrelax.em \
+   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} elf32m32c "$(tdir_m32c)"
++eelf32mbel_linux.c: $(srcdir)/emulparams/elf32mbel_linux.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} elf32mbel_linux "$(tdir_microblazeel)"
+ eelf32mb_linux.c: $(srcdir)/emulparams/elf32mb_linux.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} elf32mb_linux "$(tdir_microblaze)"
+@@ -1116,6 +1120,9 @@ eelf32mcore.c: $(srcdir)/emulparams/elf32mcore.sh \
+ eelf32mep.c: $(srcdir)/emulparams/elf32mep.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/mep.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} elf32mep "$(tdir_mep)"
++eelf32microblazeel.c: $(srcdir)/emulparams/elf32microblazeel.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elfmicroblaze.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} elf32microblazeel "$(tdir_microblazeel)"
+ eelf32microblaze.c: $(srcdir)/emulparams/elf32microblaze.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elfmicroblaze.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} elf32microblaze "$(tdir_microblaze)"
+diff --git a/ld/Makefile.in b/ld/Makefile.in
+index a675d01..fb0c21e 100644
+--- a/ld/Makefile.in
++++ b/ld/Makefile.in
+@@ -544,6 +544,7 @@ ALL_EMULATION_SOURCES = \
+ 	eelf32mb_linux.c \
+ 	eelf32mcore.c \
+ 	eelf32mep.c \
++	eelf32microblazeel.c \
+ 	eelf32microblaze.c \
+ 	eelf32mipswindiss.c \
+ 	eelf32moxie.c \
+@@ -1166,6 +1167,7 @@ distclean-compile:
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32mcore.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32mep.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32microblaze.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32microblazeel.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32mipswindiss.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32moxie.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32mt.Po@am__quote@
+@@ -2577,6 +2579,9 @@ eelf32m32c.c: $(srcdir)/emulparams/elf32m32c.sh \
+   $(ELF_DEPS) $(srcdir)/emultempl/needrelax.em \
+   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} elf32m32c "$(tdir_m32c)"
++eelf32mbel_linux.c: $(srcdir)/emulparams/elf32mbel_linux.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} elf32mbel_linux "$(tdir_microblazeel)"
+ eelf32mb_linux.c: $(srcdir)/emulparams/elf32mb_linux.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} elf32mb_linux "$(tdir_microblaze)"
+@@ -2586,6 +2591,9 @@ eelf32mcore.c: $(srcdir)/emulparams/elf32mcore.sh \
+ eelf32mep.c: $(srcdir)/emulparams/elf32mep.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/mep.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} elf32mep "$(tdir_mep)"
++eelf32microblazeel.c: $(srcdir)/emulparams/elf32microblazeel.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elfmicroblaze.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} elf32microblazeel "$(tdir_microblazeel)"
+ eelf32microblaze.c: $(srcdir)/emulparams/elf32microblaze.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elfmicroblaze.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} elf32microblaze "$(tdir_microblaze)"
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index 0e62b52..9f0025a 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -395,9 +395,18 @@ mcore-*-pe)		targ_emul=mcorepe ;
+ mcore-*-elf)		targ_emul=elf32mcore
+ 			;;
+ mep-*-elf)		targ_emul=elf32mep ;;
+-microblaze*-linux*)
+-			targ_emul="elf32mb_linux" ;;
+-microblaze*)		targ_emul=elf32microblaze ;;
++microblazeel*-linux*)	targ_emul="elf32mbel_linux"
++			targ_extra_emuls="elf32mb_linux"
++			;;
++microblaze*-linux*)	targ_emul="elf32mb_linux"
++			targ_extra_emuls="elf32mbel_linux"
++			;;
++microblazeel*)		targ_emul=elf32microblazeel
++			targ_extra_emuls=elf32microblaze
++			;;
++microblaze*)		targ_emul=elf32microblaze
++			targ_extra_emuls=elf32microblazeel
++			;;
+ mips*-*-pe)		targ_emul=mipspe ;
+ 			targ_extra_ofiles="deffilep.o pe-dll.o" ;;
+ mips*-dec-ultrix*)	targ_emul=mipslit ;;
+diff --git a/ld/emulparams/elf32mb_linux.sh b/ld/emulparams/elf32mb_linux.sh
+index f26f1a0..bb60d1f 100644
+--- a/ld/emulparams/elf32mb_linux.sh
++++ b/ld/emulparams/elf32mb_linux.sh
+@@ -1,5 +1,7 @@
+ SCRIPT_NAME=elf
+ OUTPUT_FORMAT="elf32-microblaze"
++BIG_OUTPUT_FORMAT="elf32-microblaze"
++LITTLE_OUTPUT_FORMAT="elf32-microblazeel"
+ TEXT_START_ADDR=0x10000000
+ NONPAGED_TEXT_START_ADDR=0x28
+ ALIGNMENT=4
+diff --git a/ld/emulparams/elf32microblaze.sh b/ld/emulparams/elf32microblaze.sh
+index ccc20d1..1f80447 100644
+--- a/ld/emulparams/elf32microblaze.sh
++++ b/ld/emulparams/elf32microblaze.sh
+@@ -1,5 +1,7 @@
+ SCRIPT_NAME=elfmicroblaze
+ OUTPUT_FORMAT="elf32-microblaze"
++BIG_OUTPUT_FORMAT="elf32-microblaze"
++LITTLE_OUTPUT_FORMAT="elf32-microblazeel"
+ #TEXT_START_ADDR=0
+ NONPAGED_TEXT_START_ADDR=0x28
+ ALIGNMENT=4
+-- 
+1.7.5.4
+

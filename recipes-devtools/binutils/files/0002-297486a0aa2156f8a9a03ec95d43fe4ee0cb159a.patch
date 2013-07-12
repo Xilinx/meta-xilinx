@@ -1,0 +1,30 @@
+From 297486a0aa2156f8a9a03ec95d43fe4ee0cb159a Mon Sep 17 00:00:00 2001
+From: Michael Eager <eager@eagercon.com>
+Date: Wed, 7 Nov 2012 15:36:08 +0000
+Subject: 2012-11-07  David Holsgrove  <david.holsgrove@xilinx.com>
+
+	* config/tc-microblaze.c: Remove special register condition check
+	for INST_TYPE_RFSL related instructions.
+
+2012-11-07  David Holsgrove  <david.holsgrove@xilinx.com>
+
+	* testsuite/gas/microblaze/special_reg.exp: Add test case.
+	* testsuite/gas/microblaze/special_reg.s: Likewise.
+	* testsuite/gas/microblaze/special_reg.d: Likewise.
+
+Upstream-Status: Backport
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 86ac90b..de0efda 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -1198,9 +1198,6 @@ md_assemble (char * str)
+           as_fatal (_("Error in statement syntax"));
+           immed = 0;
+         }
+-      /* Check for spl registers.  */
+-      if (check_spl_reg (&reg1))
+-        as_fatal (_("Cannot use special register with this instruction"));
+       inst |= (immed << IMM_LOW) & RFSL_MASK;
+       output = frag_more (isize);
+       break;

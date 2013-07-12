@@ -1,0 +1,89 @@
+From de1b485c223f0799e7f2f88d2fa6c010191bd1ed Mon Sep 17 00:00:00 2001
+From: Michael Eager <eager@eagercon.com>
+Date: Mon, 12 Nov 2012 00:23:25 +0000
+Subject: Add missing test cases. 	* gas/microblaze/endian.exp: New
+ file - endian testcase for microblaze / microblazeel. 	*
+ gas/microblaze/endian.s: Likewise. 	*
+ gas/microblaze/endian_be.d: Likewise. 	*
+ gas/microblaze/endian_le.d: Likewise. 	*
+ gas/microblaze/endian_le_elf.d: Likewise.
+
+Upstream-Status: Backport
+
+diff --git a/gas/testsuite/gas/microblaze/endian.exp b/gas/testsuite/gas/microblaze/endian.exp
+new file mode 100644
+index 0000000..2ec2112
+--- /dev/null
++++ b/gas/testsuite/gas/microblaze/endian.exp
+@@ -0,0 +1,12 @@
++# MicroBlaze test for special register.
++
++if [istarget microblaze-*-*] {
++    run_dump_test "endian_be"
++    if [istarget microblaze-*-elf] {
++        run_dump_test "endian_le_elf"
++    }
++}
++
++if [istarget microblazeel-*-*] {
++    run_dump_test "endian_le"
++}
+diff --git a/gas/testsuite/gas/microblaze/endian.s b/gas/testsuite/gas/microblaze/endian.s
+new file mode 100644
+index 0000000..1274d89
+--- /dev/null
++++ b/gas/testsuite/gas/microblaze/endian.s
+@@ -0,0 +1,5 @@
++	.text
++start:
++	addi    r1,r0,1234
++	.long	0x12345678
++	.word	0x1234, 0
+diff --git a/gas/testsuite/gas/microblaze/endian_be.d b/gas/testsuite/gas/microblaze/endian_be.d
+new file mode 100644
+index 0000000..266d3f3
+--- /dev/null
++++ b/gas/testsuite/gas/microblaze/endian_be.d
+@@ -0,0 +1,9 @@
++#as:
++#objdump: -s
++#name: MicroBlaze Big Endian
++#source: endian.s
++
++.*:     file format elf32-microblaze
++
++Contents of section .text:
++ 0000 202004d2 12345678 00001234 00000000    ...4Vx...4....
+diff --git a/gas/testsuite/gas/microblaze/endian_le.d b/gas/testsuite/gas/microblaze/endian_le.d
+new file mode 100644
+index 0000000..9aa5931
+--- /dev/null
++++ b/gas/testsuite/gas/microblaze/endian_le.d
+@@ -0,0 +1,9 @@
++#as:
++#objdump: -s
++#name: MicroBlaze Little Endian
++#source: endian.s
++
++.*:     file format elf32-microblazeel
++
++Contents of section .text:
++ 0000 d2042020 78563412 34120000 00000000  ..  xV4.4.......
+diff --git a/gas/testsuite/gas/microblaze/endian_le_elf.d b/gas/testsuite/gas/microblaze/endian_le_elf.d
+new file mode 100644
+index 0000000..e3647b6
+--- /dev/null
++++ b/gas/testsuite/gas/microblaze/endian_le_elf.d
+@@ -0,0 +1,9 @@
++#as: -EL
++#objdump: -s
++#name: MicroBlaze Little Endian
++#source: endian.s
++
++.*:     file format elf32-microblazeel
++
++Contents of section .text:
++ 0000 d2042020 78563412 34120000 00000000  ..  xV4.4.......
+-- 
+1.7.5.4
+

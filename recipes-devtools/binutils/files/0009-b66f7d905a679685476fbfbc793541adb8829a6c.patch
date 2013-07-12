@@ -1,0 +1,149 @@
+From b66f7d905a679685476fbfbc793541adb8829a6c Mon Sep 17 00:00:00 2001
+From: Michael Eager <eager@eagercon.com>
+Date: Wed, 21 Nov 2012 17:34:11 +0000
+Subject: Add stack high register and stack low register for MicroBlaze
+ hardware assisted stack protection, stores stack low / stack high
+ limits for detecting stack overflow / underflow
+
+binutils/opcodes
+          * microblaze-opcm.h: Add REG_SLR_MASK, REG_SHR_MASK, REG_SHR and REG_SLR
+          * microblaze-dis.c (get_field_special): Handle REG_SLR_MASK and REG_SHR_MASK
+binutils/gas
+          * config/tc-microblaze.c (parse_reg): Parse REG_SLR, REG_SHR
+binutils/gas
+          * gas/microblaze/allinsn.s: Test use of SHR, SLR
+          * gas/microblaze/allinsn.d: Likewise
+
+Upstream-Status: Backport
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index b71383b..5a427a0 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -531,6 +531,17 @@ parse_reg (char * s, unsigned * reg)
+ 	}
+       return s;
+     }
++  /* Stack protection registers.  */
++  else if (strncasecmp (s, "rshr", 4) == 0)
++    {
++      *reg = REG_SHR;
++      return s + 4;
++    }
++  else if (strncasecmp (s, "rslr", 4) == 0)
++    {
++      *reg = REG_SLR;
++      return s + 4;
++    }
+   else
+     {
+       if (TOLOWER (s[0]) == 'r')
+@@ -760,6 +771,7 @@ check_spl_reg (unsigned * reg)
+       || (*reg == REG_PID)   || (*reg == REG_ZPR)
+       || (*reg == REG_TLBX)  || (*reg == REG_TLBLO)
+       || (*reg == REG_TLBHI) || (*reg == REG_TLBSX)
++      || (*reg == REG_SHR)   || (*reg == REG_SLR)
+       || (*reg >= REG_PVR+MIN_PVR_REGNUM && *reg <= REG_PVR+MAX_PVR_REGNUM))
+     return TRUE;
+ 
+@@ -1280,6 +1292,10 @@ md_assemble (char * str)
+         immed = opcode->immval_mask | REG_TLBLO_MASK;
+       else if (reg2 == REG_TLBHI)
+         immed = opcode->immval_mask | REG_TLBHI_MASK;
++      else if (reg2 == REG_SHR)
++        immed = opcode->immval_mask | REG_SHR_MASK;
++      else if (reg2 == REG_SLR)
++        immed = opcode->immval_mask | REG_SLR_MASK;
+       else if (reg2 >= (REG_PVR+MIN_PVR_REGNUM) && reg2 <= (REG_PVR+MAX_PVR_REGNUM))
+ 	immed = opcode->immval_mask | REG_PVR_MASK | reg2;
+       else
+@@ -1331,6 +1347,10 @@ md_assemble (char * str)
+         immed = opcode->immval_mask | REG_TLBHI_MASK;
+       else if (reg1 == REG_TLBSX)
+         immed = opcode->immval_mask | REG_TLBSX_MASK;
++      else if (reg1 == REG_SHR)
++        immed = opcode->immval_mask | REG_SHR_MASK;
++      else if (reg1 == REG_SLR)
++        immed = opcode->immval_mask | REG_SLR_MASK;
+       else
+         as_fatal (_("invalid value for special purpose register"));
+       inst |= (reg2 << RA_LOW) & RA_MASK;
+diff --git a/gas/testsuite/gas/microblaze/allinsn.d b/gas/testsuite/gas/microblaze/allinsn.d
+index ec14020..4a03340 100644
+--- a/gas/testsuite/gas/microblaze/allinsn.d
++++ b/gas/testsuite/gas/microblaze/allinsn.d
+@@ -31,3 +31,13 @@ Disassembly of section .text:
+ 
+ 00000020 <sleep>:
+   20:	ba020004 	sleep
++
++00000024 <regslr>:
++  24:	b0000000 	imm	0
++  28:	31600000 	addik	r11, r0, 0
++  2c:	940bc800 	mts	rslr, r11
++
++00000030 <regshr>:
++  30:	b0000000 	imm	0
++  34:	31600000 	addik	r11, r0, 0
++  38:	940bc802 	mts	rshr, r11
+diff --git a/gas/testsuite/gas/microblaze/allinsn.s b/gas/testsuite/gas/microblaze/allinsn.s
+index 582da17..437444f 100644
+--- a/gas/testsuite/gas/microblaze/allinsn.s
++++ b/gas/testsuite/gas/microblaze/allinsn.s
+@@ -36,4 +36,14 @@ mbar:
+     .global sleep
+ sleep:
+     sleep
++    .text
++    .global regslr
++regslr:
++    la r11,r0,r0
++    mts rslr,r11
++    .text
++    .global regshr
++regshr:
++    la r11,r0,r0
++    mts rshr,r11
+ 
+diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
+index e204e36..7e3a546 100644
+--- a/opcodes/microblaze-dis.c
++++ b/opcodes/microblaze-dis.c
+@@ -139,6 +139,12 @@ get_field_special (long instr, struct op_code_struct * op)
+     case REG_TLBSX_MASK :
+       strcpy (spr, "tlbsx");
+       break;
++    case REG_SHR_MASK :
++      strcpy (spr, "shr");
++      break;
++    case REG_SLR_MASK :
++      strcpy (spr, "slr");
++      break;
+     default :
+       if (((((instr & IMM_MASK) >> IMM_LOW) ^ op->immval_mask) & 0xE000)
+           == REG_PVR_MASK)
+diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
+index 867263e..a2a42d0 100644
+--- a/opcodes/microblaze-opcm.h
++++ b/opcodes/microblaze-opcm.h
+@@ -79,6 +79,8 @@ enum microblaze_instr_type
+ #define REG_BTR_MASK 0x800b
+ #define REG_EDR_MASK 0x800d
+ #define REG_PVR_MASK 0xa000
++#define REG_SLR_MASK 0x8800
++#define REG_SHR_MASK 0x8802
+ 
+ #define REG_PID_MASK   0x9000
+ #define REG_ZPR_MASK   0x9001
+@@ -100,6 +102,8 @@ enum microblaze_instr_type
+ #define REG_FSR 39 /* FPU Status reg.  */
+ #define REG_BTR 43 /* Branch Target reg.  */
+ #define REG_EDR 45 /* Exception reg.  */
++#define REG_SHR 50 /* Stack High reg.  */
++#define REG_SLR 51 /* Stack Low reg.  */
+ #define REG_PVR 40960 /* Program Verification reg.  */
+ 
+ #define REG_PID   36864 /* MMU: Process ID reg.  */
+-- 
+1.7.5.4
+
