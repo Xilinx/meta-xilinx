@@ -1,0 +1,30 @@
+
+Loading U-Boot via JTAG
+=======================
+
+Note: This boot flow requires access to Xilinx tools (for JTAG programming).
+
+Download the bitstream for the target machine using JTAG (The pre-built
+bitstream provided in the reference design files should be used).
+
+(MicroBlaze) Download the 'u-boot.elf' to the target CPU via the use of XMD.
+	$ xmd
+	XMD% connect mb mdm
+	XMD% rst
+	XMD% dow u-boot.elf
+	XMD% con
+
+(Zynq) Download the 'u-boot.elf' to the target CPU via the use of XMD.
+(Note: Ensure to have the boot mode pins/switches configured in JTAG mode)
+	$ xmd
+	XMD% connect arm hw
+	XMD% rst
+	XMD% dow zynq_fsbl_0.elf
+	XMD% con; sleep 1; stop
+	XMD% dow u-boot.elf
+	XMD% con
+
+U-Boot will load and the console will be avaliable on the UART interface.
+	...
+	Hit any key to stop autoboot: 0
+	U-Boot> 

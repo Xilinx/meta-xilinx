@@ -1,0 +1,17 @@
+
+SD Card Boot (Zynq Only)
+========================
+
+Note: This boot flow requires access to Xilinx tools (for BOOT.BIN generation).
+
+Copy the following to the SD card (ensure to rename the files where appropriate):
+	Kernel: uImage
+	RootFS: uramdisk.image.gz (core-image-minimal-<machine name>.ext2.gz.u-boot)
+	DTB:    devicetree.dtb (uImage-<machine name>.dtb)
+
+Using the Xilinx tools, package 'zynq_fsbl_0.elf' and 'u-boot.elf' into a 
+'BOOT.BIN' (See http://www.wiki.xilinx.com/Prepare+Boot+Image for details). Once
+created copy 'BOOT.BIN' onto the SD Card.
+
+Insert SD Card, connect UART to Terminal program and boot board (Ensure the
+board is configured for SD Boot).
