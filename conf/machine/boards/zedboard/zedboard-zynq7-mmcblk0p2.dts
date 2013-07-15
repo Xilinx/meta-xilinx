@@ -3,7 +3,7 @@
  */
 
 /dts-v1/;
-/include/ "zynq7-zedboard.dtsi"
+/include/ "zedboard-zynq7.dtsi"
 / {
 	chosen {
 		bootargs = "console=ttyPS0,115200 root=/dev/mmcblk0p2 ro earlyprintk";
