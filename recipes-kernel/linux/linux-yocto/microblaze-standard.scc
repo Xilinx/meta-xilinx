@@ -1,0 +1,39 @@
+
+# Microblaze common configurations
+include cfg/8250.scc
+include cfg/efi-ext.scc
+include cfg/fs/devtmpfs.scc
+include cfg/fs/ext2.scc
+include cfg/fs/ext3.scc
+include cfg/fs/flash_fs.scc
+include cfg/net/ipsec6.scc
+include cfg/net/ipsec.scc
+include cfg/timer/hz_1000.scc
+include cfg/timer/hz_100.scc
+include cfg/timer/hz_250.scc
+include cfg/timer/no_hz.scc
+
+# Don't include features, as user can do this?
+features/edf/edf.cfg
+features/eg20t/eg20t.cfg
+features/hrt/hrt.cfg
+features/mac80211/mac80211.cfg
+features/systemtap/systemtap.cfg
+features/uio/uio.cfg
+
+# These are in xilinx kernel cache...
+include cfg/eeprom.scc
+include cfg/mtd.scc
+include cfg/xilinx/devicetree.scc
+include cfg/xilinx/ethernet.scc
+include cfg/xilinx/firewire.scc
+include cfg/xilinx/gpio.scc
+include cfg/xilinx/hid.scc
+include cfg/xilinx/scsi.scc
+include cfg/xilinx/spi.scc
+include cfg/uio-irq.scc
+include cfg/fs/flash_fs.scc
+
+include cfg/microblaze/debug.scc
+
+include cfg/microblaze/microblaze-arch.scc
