@@ -1,13 +1,6 @@
-define KMACHINE zedboard
-define KTYPE standard
-define KARCH arm
 
-include ktypes/standard
-branch meta
 kconf hardware cfg/zynq/zynq-arch.cfg
 kconf hardware cfg/zynq/zynq-boot.cfg
-
-
 
 # non hardware kconfig configs
 include cfg/commonclk.scc
@@ -42,6 +35,7 @@ include cfg/windowsfs.scc
 include cfg/procevents.scc
 include cfg/eeprom.scc
 include cfg/zynq/clk.scc
+include cfg/zynq/cma.scc
 include cfg/arm/amba.scc
 
 # Scrutinize all below and see if these are tiny or standard or both...
@@ -50,6 +44,7 @@ include cfg/arm/amba.scc
 include cfg/smp.scc
 include features/mac80211/mac80211.cfg
 include arch/arm/arm.cfg
+include cfg/uio-irq.scc
 
 # Non-hardware kconf configs
 # IPsec: Configuration for IPv4 and IPv6
@@ -58,10 +53,9 @@ include cfg/net/ipv6.scc
 include cfg/dmaengine.scc
 include cfg/usb-mass-storage.scc
 include cfg/fs/ext2.scc
+include cfg/fs/flash_fs.scc
 
 include features/power/zynq.scc
 
 # Optional kconfig configs
 include cfg/tracing.scc
-
-######

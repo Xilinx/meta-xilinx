@@ -1,0 +1,7 @@
+define KMACHINE zc702
+define KTYPE standard
+define KARCH arm
+
+include ktypes/standard
+branch meta
+include zynq-standard.scc

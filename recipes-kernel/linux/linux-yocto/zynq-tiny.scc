@@ -1,9 +1,3 @@
-define KMACHINE zedboard
-define KTYPE tiny
-define KARCH arm
-
-include ktypes/tiny
-branch meta
 
 include arch/arm/arm.cfg
 
@@ -44,7 +38,6 @@ include cfg/windowsfs.scc
 
 include cfg/procevents.scc
 include cfg/eeprom.scc
-#####include cfg/zynq/clk.scc
 include cfg/arm/amba.scc
 
 # Scrutinize all below and see if these are tiny or standard or both...
