@@ -15,6 +15,7 @@ include cfg/xilinx/userinput.scc
 include cfg/xilinx/serial.scc
 include cfg/xilinx/i2c.scc
 include cfg/xilinx/spi.scc
+include cfg/xilinx/mmc.scc
 include cfg/gps.scc
 include cfg/ptpclock.scc
 include cfg/xilinx/gpio.scc
@@ -44,6 +45,9 @@ include cfg/arm/amba.scc
 include cfg/smp.scc
 include features/mac80211/mac80211.cfg
 include arch/arm/arm.cfg
+include cfg/mtd.scc
+
+include features/uio/uio.cfg
 include cfg/uio-irq.scc
 
 # Non-hardware kconf configs
@@ -59,3 +63,5 @@ include features/power/zynq.scc
 
 # Optional kconfig configs
 include cfg/tracing.scc
+
+include cfg/timer/no_hz.scc

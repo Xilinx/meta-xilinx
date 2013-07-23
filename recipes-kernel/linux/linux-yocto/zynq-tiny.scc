@@ -1,10 +1,6 @@
 
-include arch/arm/arm.cfg
-
 kconf hardware cfg/zynq/zynq-arch.cfg
 kconf hardware cfg/zynq/zynq-boot.cfg
-## remove eventually
-kconf hardware cfg/zynq/all-others.cfg
 
 # non hardware kconfig configs
 include cfg/commonclk.scc
@@ -19,6 +15,7 @@ include cfg/xilinx/userinput.scc
 include cfg/xilinx/serial.scc
 include cfg/xilinx/i2c.scc
 include cfg/xilinx/spi.scc
+include cfg/xilinx/mmc.scc
 include cfg/gps.scc
 include cfg/ptpclock.scc
 include cfg/xilinx/gpio.scc
@@ -45,6 +42,7 @@ include cfg/arm/amba.scc
 # Hardware kconf configs
 include cfg/smp.scc
 include features/mac80211/mac80211.cfg
+include arch/arm/arm.cfg
 include cfg/efi-ext.scc
 
 # Non-hardware kconf configs
