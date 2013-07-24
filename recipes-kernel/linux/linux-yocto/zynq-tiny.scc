@@ -38,10 +38,8 @@ include cfg/gps.scc
 include cfg/ptpclock.scc
 include cfg/procevents.scc
 include cfg/eeprom.scc
-include cfg/commonclk.scc
 include cfg/windowsfs.scc
 include cfg/uio-irq.scc
-include cfg/arm/watchdogtimer.scc
 include cfg/arm/multicore-scheduler.scc
 include cfg/arm/neon.scc
 include cfg/arm/amba.scc
@@ -58,25 +56,12 @@ include cfg/timer/no_hz.scc
 #
 # Non Xilinx specific non-hardware configs - from yocto-kernel-cache
 #
-include cfg/net/ipsec.scc
-include cfg/net/ipv6.scc
 include cfg/dmaengine.scc
 include cfg/usb-mass-storage.scc
 include cfg/fs/ext2.scc
 include cfg/fs/flash_fs.scc
 
 #
-# Feature configs - from yocto-kernel-cache
-#
-include features/mac80211/mac80211.cfg
-include features/uio/uio.cfg
-
-#
 # Feature configs - not in yocto-kernel-cache
 #
 include features/power/zynq.scc
-
-#
-# Optional kconfig configs - from yocto-kernel-cache
-#
-include cfg/tracing.scc
