@@ -52,6 +52,7 @@ include cfg/arm/amba.scc
 include arch/arm/arm.cfg
 include cfg/mtd.scc
 include cfg/smp.scc
+include cfg/efi-ext.scc
 include cfg/timer/no_hz.scc
 
 #
