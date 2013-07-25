@@ -11,4 +11,4 @@ SRC_URI_append += " \
 SRC_URI_append += "git://github.com/Xilinx/xilinx-kernel-cache;protocol=git;branch=master;type=kmeta;name=externalcache;destsuffix=external-cache/"
 SRCREV_externalcache = "${AUTOREV}"
 
-COMPATIBLE_MACHINE = "zedboard|zc702"
+COMPATIBLE_MACHINE = "zedboard|zc702|kc705-trd"
