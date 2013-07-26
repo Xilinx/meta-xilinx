@@ -5,3 +5,4 @@ define KARCH arm
 include ktypes/tiny
 branch meta
 include zynq-tiny.scc
+include cfg/zynq/rtc.scc
