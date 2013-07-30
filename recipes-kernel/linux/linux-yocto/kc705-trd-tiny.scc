@@ -1,0 +1,10 @@
+define KMACHINE kc705-trd
+define KTYPE tiny
+define KARCH microblaze
+
+include ktypes/tiny
+branch meta
+
+# Same configs used for standard as tiny for microblaze
+include microblaze-standard.scc
+kconf hardware kc705-trd.cfg

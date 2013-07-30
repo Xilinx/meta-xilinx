@@ -1,0 +1,76 @@
+#
+# Xilinx Zynq architecture hardware configs
+#
+kconf hardware cfg/zynq/zynq-arch.cfg
+kconf hardware cfg/zynq/zynq-boot.cfg
+include cfg/zynq/smc.scc
+include cfg/zynq/clk.scc
+include cfg/zynq/cma.scc
+
+#
+# Xilinx specific hardware configs
+#
+include cfg/xilinx/nand.scc
+include cfg/xilinx/devicetree.scc
+include cfg/xilinx/scsi.scc
+include cfg/xilinx/firewire.scc
+include cfg/xilinx/ethernet.scc
+include cfg/xilinx/userinput.scc
+include cfg/xilinx/serial.scc
+include cfg/xilinx/i2c.scc
+include cfg/xilinx/spi.scc
+include cfg/xilinx/mmc.scc
+include cfg/xilinx/gpio.scc
+include cfg/xilinx/xadc.scc
+include cfg/xilinx/watchdog.scc
+include cfg/xilinx/graphics.scc
+include cfg/xilinx/hid.scc
+include cfg/xilinx/usb-extra.scc
+include cfg/xilinx/dma.scc
+include cfg/xilinx/remoteproc.scc
+
+#
+# Non Xilinx specific hardware configs - not in yocto-kernel-cache, 
+# but might be one day
+#
+include cfg/pci.scc
+include cfg/gps.scc
+include cfg/ptpclock.scc
+include cfg/procevents.scc
+include cfg/eeprom.scc
+include cfg/commonclk.scc
+include cfg/windowsfs.scc
+include cfg/uio-irq.scc
+include cfg/arm/watchdogtimer.scc
+include cfg/arm/multicore-scheduler.scc
+include cfg/arm/neon.scc
+include cfg/arm/amba.scc
+
+#
+# Non Xilinx specific hardware configs - from yocto-kernel-cache
+#
+include arch/arm/arm.cfg
+include cfg/mtd.scc
+include cfg/smp.scc
+include cfg/efi-ext.scc
+include cfg/timer/no_hz.scc
+
+#
+# Non Xilinx specific non-hardware configs - from yocto-kernel-cache
+#
+include cfg/net/ipsec.scc
+include cfg/net/ipv6.scc
+include cfg/dmaengine.scc
+include cfg/usb-mass-storage.scc
+include cfg/fs/ext2.scc
+include cfg/fs/flash_fs.scc
+
+#
+# Feature configs - not in yocto-kernel-cache
+#
+include features/power/zynq.scc
+
+#
+# Optional kconfig configs - from yocto-kernel-cache
+#
+include cfg/tracing.scc

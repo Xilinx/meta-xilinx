@@ -1,0 +1,22 @@
+From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Date: Fri, 15 Feb 2013 07:08:24 +0000
+Subject: HACK: target-arm: Harcode the SCU offset
+
+Becuase the QOM framework to drive this from a property isnt there yet.
+
+Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+---
+diff --git a/target-arm/cpu.c b/target-arm/cpu.c
+index 496a59f..705688b 100644
+--- a/target-arm/cpu.c
++++ b/target-arm/cpu.c
+@@ -531,7 +531,7 @@ static void cortex_a9_initfn(Object *obj)
+     {
+         ARMCPRegInfo cbar = {
+             .name = "CBAR", .cp = 15, .crn = 15,  .crm = 0, .opc1 = 4,
+-            .opc2 = 0, .access = PL1_R|PL3_W, .resetvalue = cpu->reset_cbar,
++            .opc2 = 0, .access = PL1_R|PL3_W, .resetvalue = 0xf8f00000,
+             .fieldoffset = offsetof(CPUARMState, cp15.c15_config_base_address)
+         };
+         define_one_arm_cp_reg(cpu, &cbar);
+--

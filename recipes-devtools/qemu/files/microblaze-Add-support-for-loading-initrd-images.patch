@@ -1,0 +1,176 @@
+From: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Subject: [PATCH] microblaze: Add support for loading initrd images
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ hw/microblaze/boot.c                     |   61 ++++++++++++++++++++++++++---
+ hw/microblaze/boot.h                     |    7 ++-
+ hw/microblaze/petalogix_ml605_mmu.c      |    6 ++-
+ hw/microblaze/petalogix_s3adsp1800_mmu.c |    4 +-
+ 4 files changed, 66 insertions(+), 12 deletions(-)
+
+diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
+index e543d88..8f52a5c 100644
+--- a/hw/microblaze/boot.c
++++ b/hw/microblaze/boot.c
+@@ -38,6 +38,8 @@ static struct
+     void (*machine_cpu_reset)(MicroBlazeCPU *);
+     uint32_t bootstrap_pc;
+     uint32_t cmdline;
++    uint32_t initrd_start;
++    uint32_t initrd_end;
+     uint32_t fdt;
+ } boot_info;
+ 
+@@ -48,6 +50,7 @@ static void main_cpu_reset(void *opaque)
+ 
+     cpu_reset(CPU(cpu));
+     env->regs[5] = boot_info.cmdline;
++    env->regs[6] = boot_info.initrd_start;
+     env->regs[7] = boot_info.fdt;
+     env->sregs[SR_PC] = boot_info.bootstrap_pc;
+     if (boot_info.machine_cpu_reset) {
+@@ -56,9 +59,11 @@ static void main_cpu_reset(void *opaque)
+ }
+ 
+ static int microblaze_load_dtb(hwaddr addr,
+-                                      uint32_t ramsize,
+-                                      const char *kernel_cmdline,
+-                                      const char *dtb_filename)
++                               uint32_t ramsize,
++                               uint32_t initrd_start,
++                               uint32_t initrd_end,
++                               const char *kernel_cmdline,
++                               const char *dtb_filename)
+ {
+     int fdt_size;
+ #ifdef CONFIG_FDT
+@@ -80,6 +85,20 @@ static int microblaze_load_dtb(hwaddr addr,
+         }
+     }
+ 
++    if (initrd_start) {
++        r = qemu_devtree_setprop_cell(fdt, "/chosen", "linux,initrd-start",
++                initrd_start);
++        if (r < 0) {
++            fprintf(stderr, "couldn't set /chosen/linux,initrd-start\n");
++        }
++
++        r = qemu_devtree_setprop_cell(fdt, "/chosen", "linux,initrd-end",
++                    initrd_end);
++        if (r < 0) {
++            fprintf(stderr, "couldn't set /chosen/linux,initrd-end\n");
++        }
++    }
++
+     cpu_physical_memory_write(addr, fdt, fdt_size);
+ #else
+     /* We lack libfdt so we cannot manipulate the fdt. Just pass on the blob
+@@ -101,8 +120,11 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
+ }
+ 
+ void microblaze_load_kernel(MicroBlazeCPU *cpu, hwaddr ddr_base,
+-                            uint32_t ramsize, const char *dtb_filename,
+-                            void (*machine_cpu_reset)(MicroBlazeCPU *))
++                            uint32_t ramsize,
++                            const char *initrd_filename,
++                            const char *dtb_filename,
++                            void (*machine_cpu_reset)(MicroBlazeCPU *),
++                            void *machine_cpu_reset_opaque)
+ {
+     QemuOpts *machine_opts;
+     const char *kernel_filename = NULL;
+@@ -164,14 +186,39 @@ void microblaze_load_kernel(MicroBlazeCPU *cpu, hwaddr ddr_base,
+             high = (ddr_base + kernel_size + 3) & ~3;
+         }
+ 
++        if (initrd_filename) {
++            int initrd_size;
++            uint32_t initrd_offset;
++
++            high += kernel_size + 3;
++            high &= ~3;
++            boot_info.initrd_start = high;
++            initrd_offset = boot_info.initrd_start - ddr_base;
++
++            initrd_size = load_image_targphys(initrd_filename,
++                                              boot_info.initrd_start,
++                                              ram_size - initrd_offset);
++            if (initrd_size < 0) {
++                fprintf(stderr, "qemu: could not load initrd '%s'\n",
++                        initrd_filename);
++                exit(1);
++            }
++            boot_info.initrd_end = boot_info.initrd_start + initrd_size;
++            high += initrd_size + 3;
++            high &= ~3;
++        }
++
+         boot_info.cmdline = high + 4096;
+         if (kernel_cmdline && strlen(kernel_cmdline)) {
+             pstrcpy_targphys("cmdline", boot_info.cmdline, 256, kernel_cmdline);
+         }
+         /* Provide a device-tree.  */
+         boot_info.fdt = boot_info.cmdline + 4096;
+-        microblaze_load_dtb(boot_info.fdt, ram_size, kernel_cmdline,
+-                                                     dtb_filename);
++        microblaze_load_dtb(boot_info.fdt, ram_size,
++                            boot_info.initrd_start,
++                            boot_info.initrd_end,
++                            kernel_cmdline,
++                            dtb_filename);
+     }
+ 
+ }
+diff --git a/hw/microblaze/boot.h b/hw/microblaze/boot.h
+index b14ef2b..bae7cae 100644
+--- a/hw/microblaze/boot.h
++++ b/hw/microblaze/boot.h
+@@ -4,7 +4,10 @@
+ #include "hw/hw.h"
+ 
+ void microblaze_load_kernel(MicroBlazeCPU *cpu, hwaddr ddr_base,
+-                            uint32_t ramsize, const char *dtb_filename,
+-                            void (*machine_cpu_reset)(MicroBlazeCPU *));
++                            uint32_t ramsize,
++                            const char *initrd_filename,
++                            const char *dtb_filename,
++                            void (*machine_cpu_reset)(MicroBlazeCPU *),
++                            void *machine_cpu_reset_opaque);
+ 
+ #endif /* __MICROBLAZE_BOOT __ */
+diff --git a/hw/microblaze/petalogix_ml605_mmu.c b/hw/microblaze/petalogix_ml605_mmu.c
+index 3340468..3d1861f 100644
+--- a/hw/microblaze/petalogix_ml605_mmu.c
++++ b/hw/microblaze/petalogix_ml605_mmu.c
+@@ -176,8 +176,10 @@ petalogix_ml605_init(QEMUMachineInitArgs *args)
+         }
+     }
+ 
+-    microblaze_load_kernel(cpu, ddr_base, ram_size, BINARY_DEVICE_TREE_FILE,
+-                                                            machine_cpu_reset);
++    microblaze_load_kernel(cpu, ddr_base, ram_size,
++                           args->initrd_filename,
++                           BINARY_DEVICE_TREE_FILE,
++                           machine_cpu_reset, NULL);
+ 
+ }
+ 
+diff --git a/hw/microblaze/petalogix_s3adsp1800_mmu.c b/hw/microblaze/petalogix_s3adsp1800_mmu.c
+index 7c258f0..21c0ffb 100644
+--- a/hw/microblaze/petalogix_s3adsp1800_mmu.c
++++ b/hw/microblaze/petalogix_s3adsp1800_mmu.c
+@@ -108,7 +108,9 @@ petalogix_s3adsp1800_init(QEMUMachineInitArgs *args)
+     xilinx_ethlite_create(&nd_table[0], ETHLITE_BASEADDR, irq[1], 0, 0);
+ 
+     microblaze_load_kernel(cpu, ddr_base, ram_size,
+-                    BINARY_DEVICE_TREE_FILE, machine_cpu_reset);
++                           args->initrd_filename,
++                           BINARY_DEVICE_TREE_FILE,
++                           machine_cpu_reset, NULL);
+ }
+ 
+ static QEMUMachine petalogix_s3adsp1800_machine = {
+-- 
+1.7.5.4
+

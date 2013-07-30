@@ -23,3 +23,6 @@ COMPATIBLE_MACHINE = "qemumicroblaze|qemuzynq|microblaze|zynq"
 # (put them in ${WORKDIR} to avoid using dtc with include paths)
 FILESEXTRAPATHS_append := "${XILINX_LAYERDIR}/conf/machine/boards/common:"
 SRC_URI_append += "file://zynq-7-base.dtsi"
+
+# Add the modules directory to the 'kernel-base' files list
+FILES_kernel-base_append = " /lib/modules/${KERNEL_VERSION}/kernel"
