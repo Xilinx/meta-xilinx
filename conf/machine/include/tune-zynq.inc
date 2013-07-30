@@ -26,3 +26,6 @@ IMAGE_CLASSES += "image_types_uboot"
 # U-Boot Configuration
 PREFERRED_PROVIDER_u-boot ?= "u-boot-xlnx"
 PREFERRED_VERSION_u-boot-xlnx ?= "v2013.01%"
+
+# linux-yocto KMACHINE
+KMACHINE ?= "zynq-default"

@@ -1,0 +1,9 @@
+define KMACHINE microblaze-default
+define KTYPE tiny
+define KARCH microblaze
+
+include ktypes/tiny
+branch meta
+
+# Same configs used for standard as tiny for microblaze
+include microblaze-standard.scc

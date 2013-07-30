@@ -1,0 +1,8 @@
+define KMACHINE microblaze-default
+define KTYPE standard
+define KARCH microblaze
+
+include ktypes/standard
+branch meta
+
+include microblaze-standard.scc

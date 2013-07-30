@@ -23,3 +23,6 @@ IMAGE_CLASSES += "image_types_uboot"
 PREFERRED_PROVIDER_u-boot ?= "u-boot-xlnx"
 PREFERRED_VERSION_u-boot-xlnx ?= "v2013.01%"
 UBOOT_MACHINE ?= "microblaze-generic"
+
+# linux-yocto KMACHINE
+KMACHINE ?= "microblaze-default"
