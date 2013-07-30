@@ -3,11 +3,8 @@ inherit kernel
 # This version extension should match CONFIG_LOCALVERSION in defconfig
 LINUX_VERSION_EXTENSION ?= "-xilinx"
 
-require linux-machine-config.inc
 require recipes-kernel/linux/linux-yocto.inc
-
-# MicroBlaze is a uImage target, but its not called 'uImage'
-DEPENDS_append_microblaze += "u-boot-mkimage-native"
+require linux-machine-common.inc
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
@@ -19,10 +16,6 @@ PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCREV}"
 # Override COMPATIBLE_MACHINE to include your machine in a bbappend file.
 COMPATIBLE_MACHINE = "qemumicroblaze|qemuzynq|microblaze|zynq"
 
-# Common Device Tree Includes
-# (put them in ${WORKDIR} to avoid using dtc with include paths)
-FILESEXTRAPATHS_append := "${XILINX_LAYERDIR}/conf/machine/boards/common:"
-SRC_URI_append += "file://zynq-7-base.dtsi"
 
 # Add the modules directory to the 'kernel-base' files list
 FILES_kernel-base_append = " /lib/modules/${KERNEL_VERSION}/kernel"
