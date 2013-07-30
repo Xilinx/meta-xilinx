@@ -8,6 +8,12 @@ python __anonymous () {
     extrapaths = set()
     sources = set()
     if machine_devicetree:
+        # linux-dtb.inc gets processed before this '__anonymous'
+        depends = d.getVar("DEPENDS", True)
+        d.setVar("DEPENDS", "%s dtc-native" % depends)
+        packages = d.getVar("PACKAGES", True)
+        d.setVar("PACKAGES", "%s kernel-devicetree" % packages)
+        
         files=set()
         for path in machine_devicetree.split():
             sources.add("file://" + os.path.basename(path))
