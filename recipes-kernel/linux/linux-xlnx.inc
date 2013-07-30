@@ -18,6 +18,7 @@ COMPATIBLE_MACHINE = "qemumicroblaze|qemuzynq|microblaze|zynq"
 
 # Common kernel configuration parts
 # Arch specific kernel configuration parts
+SRC_URI_append_zynq += "file://zynq_defconfig_${LINUX_VERSION}.cfg"
 SRC_URI_append_microblaze += "file://microblaze_defconfig_${LINUX_VERSION}.cfg"
 
 # Add the modules directory to the 'kernel-base' files list
