@@ -1,0 +1,12 @@
+/*
+ * ZC706 DTS file header for ramdisk boot.
+ */
+
+/dts-v1/;
+/include/ "zc706-zynq7.dtsi"
+/ {
+	chosen {
+		bootargs = "console=ttyPS0,115200 root=/dev/ram rw earlyprintk";
+		linux,stdout-path = "/amba@0/serial@e0001000";
+	} ;
+} ;
