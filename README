@@ -33,10 +33,6 @@ This layer depends on:
 	URI: git://git.openembedded.org/openembedded-core
 	layers: meta
 
-	(for external toolchains only)
-	URI: git://github.com/MentorEmbedded/meta-sourcery.git
-	layers: meta-sourcery
-
 Build Instructions
 ==================
 
@@ -90,38 +86,9 @@ Configuring External Toolchain
 ==============================
 
 In order to build with an external toolchain some additional configuration must
-be set in the build environments local.conf. The 'meta-sourcery' layer must also
-be setup in your bblayers.conf
+be set in the build environments local.conf. First configure the use of an
+external toolchain, including the location to the toolchain:
 
-First configure the use of an external toolchain, including the location to the
-toolchain (this example is for a microblazeel toolchain, ensure that you insert
-the relevant information for your target machine and target toolchain):
+	TCMODE = "external-xilinx"
+	EXTERNAL_TOOLCHAIN = "<path to toolchain>"
 
-	TCMODE = "external-csl"
-	CSL_TARGET_SYS_<machine name> = "microblazeel-xilinx-linux-gnu"
-	EXTERNAL_TOOLCHAIN = "<path to toolchain>/microblazeel-xilinx-linux-gnu"
-	EXTERNAL_TOOLCHAIN_SYSROOT = "<path to toolchain>/microblazeel-xilinx-linux-gnu/microblazeel-xilinx-linux-gnu/libc"
-	INSANE_SKIP_external-sourcery-toolchain-dev += "ldflags"
-
-Additionally the preferred provider for various packages must be configured to
-use the external toolchain:
-
-	PREFERRED_PROVIDER_linux-libc-headers = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_linux-libc-headers-dev = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}gcc = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}gcc-initial = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}gcc-intermediate = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}g++ = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}binutils = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}libc-initial = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}libc-for-gcc = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/${TARGET_PREFIX}compilerlibs = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_libgcc = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_eglibc = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/libc = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/libintl = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/libiconv = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_glibc-thread-db = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/linux-libc-headers = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_virtual/linux-libc-headers-dev = "external-sourcery-toolchain"
-	PREFERRED_PROVIDER_gdbserver = "external-sourcery-toolchain"
