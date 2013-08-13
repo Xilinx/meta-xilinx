@@ -10,7 +10,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 SRC_URI = "git://github.com/Xilinx/linux-xlnx;protocol=git;nocheckout=1"
 
-PR = "r1"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCREV}"
 
 # Override COMPATIBLE_MACHINE to include your machine in a bbappend file.
