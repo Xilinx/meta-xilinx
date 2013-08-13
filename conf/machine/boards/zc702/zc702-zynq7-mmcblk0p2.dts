@@ -1,9 +1,9 @@
 /*
- * ZC706 DTS file header for sdcard/mmc partition 2 boot.
+ * ZC702 DTS file header for sdcard/mmc partition 2 boot.
  */
 
 /dts-v1/;
-/include/ "zc706-zynq7.dtsi"
+/include/ "zc702-zynq7.dtsi"
 / {
 	chosen {
 		bootargs = "console=ttyPS0,115200 root=/dev/mmcblk0p2 ro earlyprintk";
