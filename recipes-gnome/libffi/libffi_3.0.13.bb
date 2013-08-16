@@ -13,8 +13,8 @@ PR = "r0"
 
 SRC_URI = "ftp://sourceware.org/pub/libffi/${BPN}-${PV}.tar.gz"
 
-SRC_URI[md5sum] = "da984c6756170d50f47925bb333cda71"
-SRC_URI[sha256sum] = "2ea0db90c2bbcc907c3aefc3f76e9dfc3b35c7a0fb75a4319f5248e0172c1e9e"
+SRC_URI[md5sum] = "45f3b6dbc9ee7c7dfbbbc5feba571529"
+SRC_URI[sha256sum] = "1dddde1400c3bcb7749d398071af88c3e4754058d2d4c0b3696c2f82dc5cf11c"
 
 EXTRA_OECONF += "--disable-builddir"
 
@@ -23,3 +23,11 @@ inherit autotools
 FILES_${PN}-dev += "${libdir}/libffi-${PV}"
 
 BBCLASSEXTEND = "native nativesdk"
+
+do_install_append() {
+	# Move the lib64/* into lib/ (this is to fix issues where the host system is 64-bit and uses lib64)
+	if [ -e "${D}${libdir}64" ]; then
+		mkdir -p ${D}${libdir}
+		mv ${D}${libdir}64/* ${D}${libdir}
+	fi
+}
