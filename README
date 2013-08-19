@@ -52,7 +52,7 @@ initialized configure bblayers.conf by adding the 'meta-xilinx' layer. e.g.:
 
 To build a specific target BSP configure the associated machine in local.conf:
 
-	MACHINE ?= "zc702"
+	MACHINE ?= "zc702-zynq7"
 
 Note: Currently MicroBlaze targets only support being built with an External
 toolchain, please see the section below 'Configuring External Toolchain'.
@@ -69,6 +69,7 @@ Once complete the images for the target machine will be available in the output
 directory 'tmp/deploy/images'.
 
 Images generated:
+	* core-image-minimal-<machine name>.tar.gz (rootfs tar+GZIP)
 	* core-image-minimal-<machine name>.cpio (rootfs in CPIO format)
 	* core-image-minimal-<machine name>.ext2.gz.u-boot (rootfs in EXT2+GZIP, u-boot wrapped format)
 	* u-boot.elf (U-Boot ELF)

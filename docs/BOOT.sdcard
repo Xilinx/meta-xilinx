@@ -4,14 +4,38 @@ SD Card Boot (Zynq Only)
 
 Note: This boot flow requires access to Xilinx tools (for BOOT.BIN generation).
 
-Copy the following to the SD card (ensure to rename the files where appropriate):
+Creating boot file
+------------------
+Using the Xilinx tools, package 'zynq_fsbl_0.elf' and 'u-boot.elf' into a 
+'BOOT.BIN' (See http://www.wiki.xilinx.com/Prepare+Boot+Image for details). 
+
+Boot using a ramdisk
+--------------------
+Use an SD card with partition one in FAT16 format.
+Copy the following to the SD card partition one (ensure to rename the files 
+where appropriate):
+        Boot file: BOOT.BIN
 	Kernel: uImage
 	RootFS: uramdisk.image.gz (core-image-minimal-<machine name>.ext2.gz.u-boot)
-	DTB:    devicetree.dtb (uImage-<machine name>.dtb)
-
-Using the Xilinx tools, package 'zynq_fsbl_0.elf' and 'u-boot.elf' into a 
-'BOOT.BIN' (See http://www.wiki.xilinx.com/Prepare+Boot+Image for details). Once
-created copy 'BOOT.BIN' onto the SD Card.
+	DTB:    devicetree.dtb (uImage-<machine name>-ram.dtb)
 
 Insert SD Card, connect UART to Terminal program and boot board (Ensure the
 board is configured for SD Boot).
+
+Boot using SD card partition
+----------------------------
+Use an SD card with partition one in FAT16 format and partition two in EXT2 format.
+Copy the following to the SD card partition one (ensure to rename the files where 
+appropriate):
+        Boot file: BOOT.BIN
+	Kernel: uImage
+	DTB:    devicetree.dtb (uImage-<machine name>-mmcblk0p2.dtb)
+Extract the following to the SD card partion two
+	RootFS: core-image-minimal-<machine name>.tar.gz
+
+Insert SD Card, connect UART to Terminal program and boot board.
+The loading of 'ramdisk' will fail as it is not present. Perform a manual 
+boot by typing
+bootm 0x3000000 - 0x2A00000
+Refer to u-boot documention to see how to modify and save these settings,
+so the following boot will correctly locate the rootfs in partition two.
