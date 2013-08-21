@@ -8,7 +8,7 @@
 #
 # This will expand out to:
 # SRC_URI_append += "file://zc702/zc702-zynq7.dts file://common/rtc.cfg"
-# KERNEL_DEVICETREE ?= "${WORKDIR}/devicetree/zc702-zynq7.dts"
+# OOT_KERNEL_DEVICETREE ?= "${WORKDIR}/devicetree/zc702-zynq7.dts"
 #
 # This include also adds all the 'conf/machine/boards' for all layers (that are
 # available) to the FILESEXTRAPATHS.
@@ -37,9 +37,9 @@ def get_additional_bbpath_filespath(path, d):
         return ":".join(board_extrapaths) + ":"
     return ""
 
-# If KERNEL_DEVICETREE is not set, default to the device tree's provided by
+# If OOT_KERNEL_DEVICETREE is not set, default to the device tree's provided by
 # MACHINE_DEVICETREE
-KERNEL_DEVICETREE ?= "${@get_all_devicetrees(d)}"
+OOT_KERNEL_DEVICETREE ?= "${@get_all_devicetrees(d)}"
 
 # Appends the '<layer>/conf/machine/boards' path to FILESEXTRAPATHS for all
 # layers (using the ${BBPATH})
