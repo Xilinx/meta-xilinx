@@ -7,3 +7,10 @@ PV = "v2013.01${XILINX_EXTENSION}+git${SRCPV}"
 PR = "r1"
 
 include u-boot-xlnx.inc
+
+SRC_URI += " \
+                file://microblaze_bootm_Add_support_for_loading_initrd.patch \
+                file://microblaze_bootm_Fix_coding_style_issues.patch \
+                file://microblaze_Fix_coding_style_for_bootb.patch \
+                "
+
