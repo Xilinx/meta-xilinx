@@ -5,3 +5,8 @@ PV = "v2013.07${XILINX_EXTENSION}+git${SRCPV}"
 PR = "r1"
 
 include u-boot-xlnx.inc
+
+SRC_URI_append += " \
+		file://zynq_common-Add-uEnv.txt-boot-environment-load-suppo.patch \
+		file://zynq-Increase-number-of-arguments.patch \
+		"
