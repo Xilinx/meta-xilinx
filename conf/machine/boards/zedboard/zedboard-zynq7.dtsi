@@ -11,6 +11,8 @@
 	} ;
 	ps7_axi_interconnect_0: amba@0 {
 		ps7_ethernet_0: ps7-ethernet@e000b000 {
+			phy-handle = <&phy0>;
+			phy-mode = "rgmii-id";
 			mdio {
 				phy0: phy@7 {
 					compatible = "marvell,88e1510";
