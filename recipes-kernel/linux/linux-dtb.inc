@@ -1,4 +1,5 @@
 # Support for device tree generation
+FILES_kernel-devicetree = "/boot/devicetree*"
 OOT_KERNEL_DEVICETREE_FLAGS ?= "-R 8 -p 0x3000"
 
 python __anonymous () {
@@ -6,6 +7,8 @@ python __anonymous () {
     if oot_devicetree:
         depends = d.getVar("DEPENDS", True)
         d.setVar("DEPENDS", "%s dtc-native" % depends)
+        packages = d.getVar("PACKAGES", True)
+        d.setVar("PACKAGES", "%s kernel-devicetree" % packages)
 }
 
 do_install_append() {
