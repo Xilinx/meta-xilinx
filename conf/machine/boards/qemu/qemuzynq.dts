@@ -61,5 +61,7 @@
 		ps7_wdt_0: ps7-wdt@f8005000 { compatible = "invalid"; };
 		ps7_can_0: ps7-can@e0008000 { compatible = "invalid"; };
 		ps7_can_1: ps7-can@e0009000 { compatible = "invalid"; };
+		/* Not Implemented in QEMU */
+		ps7_xadc: ps7-xadc@f8007100 { compatible = "invalid"; } ;
 	} ;
 } ;
