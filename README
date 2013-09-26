@@ -82,6 +82,41 @@ Booting
 Please see the associated README file for each avaliable boot method in the
 'docs/BOOT.*' files of this layer.
 
+Known Issues
+============
+
+MicroBlaze Yocto Built Toolchain fails to compile shadow
+--------------------------------------------------------
+There is an issue with the GCC 4.8 toolchain built by Yocto which fails to
+correctly built the 'shadow' package due to an assembler error.
+
+{standard input}: Assembler messages:
+{standard input}:754: Error: operation combines symbols in different segments
+
+The current workaround for this issue is to build the entire repository
+without debug symbols, or to disable debug symbols only for shadow.
+
+e.g. Add the following to local.conf:
+	DEBUG_FLAGS_pn-shadow = ""
+
+MicroBlaze Linux Kernel 3.8+ and GCC 4.8+ fails to boot
+-------------------------------------------------------
+There is a regression in GCC 4.8 that causes a race condition in the kernel. It
+occurs due to changes in the optimization and improper handling of certain
+branch optimization where delay slots are used.
+
+The error during kernel boot looks similar to:
+	------------[ cut here ]------------
+	WARNING: at mm/mmap.c:2657 exit_mmap+0x158/0x178()
+
+There are two work arounds for this issue, the first which is recommended is to
+use the MicroBlaze external toolchain that is provided by Xilinx SDK or
+PetaLinux.
+
+The the second workaround applies to the linux-xlnx only, disable the kernel
+configuration "CONFIG_OPTIMIZE_FOR_SIZE". This prevents the compiler from trying
+to optimize the delay slots incorrectly.
+
 Configuring External Toolchain
 ==============================
 
