@@ -8,7 +8,8 @@ python __anonymous () {
         depends = d.getVar("DEPENDS", True)
         d.setVar("DEPENDS", "%s dtc-native" % depends)
         packages = d.getVar("PACKAGES", True)
-        d.setVar("PACKAGES", "%s kernel-devicetree" % packages)
+        if "kernel-devicetree" not in packages:
+            d.setVar("PACKAGES", "%s kernel-devicetree" % packages)
 }
 
 do_install_append() {
