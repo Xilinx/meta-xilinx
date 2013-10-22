@@ -9,7 +9,8 @@ LINUX_VERSION_EXTENSION ?= "-xilinx"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCREV}"
 
 # Sources
-SRC_URI = "git://github.com/Xilinx/linux-xlnx;protocol=git"
+KBRANCH ?= "master"
+SRC_URI = "git://github.com/Xilinx/linux-xlnx;protocol=git;branch=${KBRANCH}"
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 

@@ -1,16 +1,11 @@
+KBRANCH = "xlnx_3.8"
 # See include file for common information
 include linux-xlnx.inc
 
 PR = "r1"
 
-# Kernel version and SRCREV correspond to: github.com/Xilinx v14.5 tag
+# Kernel version and SRCREV correspond to: github.com/Xilinx xlnx_3.8 branch
 LINUX_VERSION = "3.8"
-SRCREV = "6a0bedad60e2bca8d9b50bf81b9895e29e31a6d7"
+#SRCREV = "7a65c6dd165a8fc052ba0321eb706536e6cbef71"
+SRCREV ?= "${AUTOREV}"
 
-# MicroBlaze patches
-SRC_URI_append_microblaze = " \
-		file://microblaze_Do_not_use_r6_in_head.S.patch \
-		file://microblaze_Fix_free_init_pages_function.patch \
-		file://microblaze_Fix_initrd_support.patch \
-		file://arch_microblaze_Add_linux.bin.ub_target.patch \
-		"
