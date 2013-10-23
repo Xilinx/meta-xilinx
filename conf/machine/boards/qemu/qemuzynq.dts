@@ -8,7 +8,7 @@
 	} ;
 	ps7_ddr_0: memory@0 {
 		device_type = "memory";
-		reg = < 0x0 0x40000000 >;
+		reg = <0x0 0x40000000>;
 	} ;
 	ps7_axi_interconnect_0: amba@0 {
 		ps7_ethernet_0: ps7-ethernet@e000b000 {
@@ -27,7 +27,7 @@
 				#address-cells = <1>;
 				#size-cells = <1>;
 				compatible = "st,m25p80";
-				reg = < 0x0 >;
+				reg = <0x0>;
 				spi-max-frequency = <50000000>;
 				partition@0x00000000 {
 					label = "boot";
