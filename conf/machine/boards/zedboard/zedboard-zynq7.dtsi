@@ -7,7 +7,7 @@
 	} ;
 	ps7_ddr_0: memory@0 {
 		device_type = "memory";
-		reg = < 0x0 0x20000000 >;
+		reg = <0x0 0x20000000>;
 	} ;
 	ps7_axi_interconnect_0: amba@0 {
 		ps7_ethernet_0: ps7-ethernet@e000b000 {
@@ -49,6 +49,10 @@
 					reg = <0xC00000 0x400000>;
 				};
 			};
+		} ;
+		ps7_gpio_0: ps7-gpio@e000a000 {
+			gpio-mask-high = <0xc0000>;
+			gpio-mask-low = <0xfe81>;
 		} ;
 
 		/* Disabled Devices */
