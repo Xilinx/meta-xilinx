@@ -1,9 +1,0 @@
-define KMACHINE kc705-trd
-define KTYPE standard
-define KARCH microblaze
-
-include ktypes/standard
-branch meta
-
-include microblaze-standard.scc
-kconf hardware kc705-trd.cfg
