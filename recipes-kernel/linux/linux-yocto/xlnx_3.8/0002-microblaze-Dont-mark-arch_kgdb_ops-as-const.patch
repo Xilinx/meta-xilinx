@@ -1,0 +1,35 @@
+From fd2c402c79a9a73e5b2384f0897f3f95f599afdd Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@threespeedlogic.com>
+Date: Sat, 8 Jun 2013 09:52:08 -0700
+Subject: [PATCH] microblaze: Don't mark arch_kgdb_ops as const.
+
+Other architectures don't do it, and it conflicts with the extern'd definition
+in include/linux/kgdb.h.
+
+The patch fails checkpatch but it reflects current
+functions declaration and solved compilation error.
+
+Signed-off-by: Graeme Smecher <gsmecher@threespeedlogic.com>
+CC: Michal Simek <monstr@monstr.eu>
+CC: linux-kernel@vger.kernel.org
+Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+---
+ arch/microblaze/kernel/kgdb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/microblaze/kernel/kgdb.c b/arch/microblaze/kernel/kgdb.c
+index 8adc9244..09a5e82 100644
+--- a/arch/microblaze/kernel/kgdb.c
++++ b/arch/microblaze/kernel/kgdb.c
+@@ -141,7 +141,7 @@ void kgdb_arch_exit(void)
+ /*
+  * Global data
+  */
+-const struct kgdb_arch arch_kgdb_ops = {
++struct kgdb_arch arch_kgdb_ops = {
+ #ifdef __MICROBLAZEEL__
+ 	.gdb_bpt_instr = {0x18, 0x00, 0x0c, 0xba}, /* brki r16, 0x18 */
+ #else
+-- 
+1.8.4
+
