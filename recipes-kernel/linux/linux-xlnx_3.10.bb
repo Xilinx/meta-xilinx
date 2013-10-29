@@ -4,7 +4,7 @@ include linux-xlnx.inc
 PR = "r1"
 
 # Kernel version and SRCREV correspond to: 
-# github.com/Xilinx/linux-xlnx.git  
+# github.com/Xilinx/linux-xlnx.git xilinx-v14.7 tag 
 LINUX_VERSION = "3.10"
-SRCREV = "7f5d01bf5fbac64ac42781d061582fa51dd14a37"
+SRCREV = "efc27505715e64526653f35274717c0fc56491e3"
 
