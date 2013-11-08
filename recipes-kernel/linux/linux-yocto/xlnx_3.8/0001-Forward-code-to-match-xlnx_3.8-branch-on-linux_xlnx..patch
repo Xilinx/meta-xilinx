@@ -1,6 +1,6 @@
-From d4b1e64e45771480df527ff7890be14fce90a61d Mon Sep 17 00:00:00 2001
+From bcc57cd6e8484be41c996fd98702d360191c3b98 Mon Sep 17 00:00:00 2001
 From: Sipke Vriend <sipke.vriend@xilinx.com>
-Date: Fri, 25 Oct 2013 10:26:31 +1000
+Date: Fri, 8 Nov 2013 14:47:49 +1000
 Subject: [PATCH] Forward code to match xlnx_3.8 branch on linux_xlnx.git
 
 Forward to commit id 7a65c6dd165a8fc052ba0321eb706536e6cbef71
@@ -11,6 +11,9 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  Documentation/ABI/testing/debugfs-aufs             |   37 -
  Documentation/ABI/testing/sysfs-aufs               |   24 -
  .../devicetree/bindings/clock/zynq-7000.txt        |  122 +-
+ .../devicetree/bindings/gpio/gpio-xilinx.txt       |   50 +
+ .../bindings/remoteproc/mb_remoteproc.txt          |   46 +
+ Documentation/driver-model/devres.txt              |    3 +-
  Documentation/filesystems/aufs/README              |  333 --
  Documentation/filesystems/aufs/design/01intro.txt  |  162 -
  Documentation/filesystems/aufs/design/02struct.txt |  226 -
@@ -45,13 +48,15 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  arch/arm/boot/dts/zynq-zc770-xm012.dts             |  472 +-
  arch/arm/boot/dts/zynq-zc770-xm013.dts             |  509 +-
  arch/arm/boot/dts/zynq-zed.dts                     |  234 +-
+ arch/arm/common/gic.c                              |    1 +
  arch/arm/configs/at91sam9g45_defconfig             |    1 +
  arch/arm/configs/xilinx_zynq_apf_defconfig         | 2954 ++++++++++++
  arch/arm/configs/xilinx_zynq_base_trd_defconfig    | 2843 +++++++++++
  arch/arm/configs/xilinx_zynq_defconfig             |   15 +-
+ arch/arm/include/asm/mach/irq.h                    |   31 -
  arch/arm/include/asm/pgtable.h                     |    9 -
  arch/arm/kernel/entry-common.S                     |    3 +-
- arch/arm/lib/memset.S                              |   33 +-
+ arch/arm/mach-at91/gpio.c                          |    3 +-
  arch/arm/mach-at91/setup.c                         |    2 +-
  arch/arm/mach-imx/headsmp.S                        |   47 -
  arch/arm/mach-omap2/cpuidle34xx.c                  |    5 +-
@@ -70,6 +75,8 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  arch/arm/mach-zynq/xaxipcie.c                      |    2 -
  arch/arm/mm/cache-v7.S                             |   46 +
  arch/arm/mm/fault.c                                |   13 +-
+ arch/arm/plat-samsung/irq-vic-timer.c              |    3 +-
+ arch/arm/plat-samsung/s5p-irq-gpioint.c            |    3 +-
  arch/arm/xen/enlighten.c                           |    2 +-
  arch/arm64/mm/fault.c                              |    3 +-
  arch/avr32/configs/favr-32_defconfig               |    1 +
@@ -79,6 +86,7 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  arch/ia64/kernel/irq.c                             |    8 -
  arch/ia64/kernel/mca.c                             |   37 +-
  arch/ia64/kvm/vtlb.c                               |    2 +-
+ arch/microblaze/Kconfig                            |    4 -
  arch/microblaze/configs/mmu_defconfig              |    1 -
  arch/microblaze/include/asm/io.h                   |    2 +-
  arch/microblaze/include/asm/pci.h                  |    2 -
@@ -90,10 +98,9 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  arch/microblaze/kernel/early_printk.c              |   17 +-
  arch/microblaze/kernel/exceptions.c                |   27 +-
  arch/microblaze/kernel/ftrace.c                    |   44 +-
- arch/microblaze/kernel/head.S                      |    4 +-
+ arch/microblaze/kernel/head.S                      |    6 +-
  arch/microblaze/kernel/heartbeat.c                 |    2 +-
  arch/microblaze/kernel/intc.c                      |    4 +-
- arch/microblaze/kernel/kgdb.c                      |    2 +-
  arch/microblaze/kernel/microblaze_ksyms.c          |    2 +-
  arch/microblaze/kernel/module.c                    |    5 +-
  arch/microblaze/kernel/process.c                   |   24 +-
@@ -167,8 +174,16 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  drivers/clk/zynq/pll.c                             |  243 +
  drivers/cpufreq/zynq-cpufreq.c                     |   45 +-
  drivers/edac/edac_mc_sysfs.c                       |   12 +-
+ drivers/gpio/Kconfig                               |    1 +
+ drivers/gpio/gpio-msm-v2.c                         |    3 +-
+ drivers/gpio/gpio-mxc.c                            |    2 +-
+ drivers/gpio/gpio-omap.c                           |    3 +-
+ drivers/gpio/gpio-pl061.c                          |    2 +-
+ drivers/gpio/gpio-pxa.c                            |    3 +-
  drivers/gpio/gpio-sch.c                            |   37 +-
- drivers/gpio/gpio-xilinxps.c                       |    7 +-
+ drivers/gpio/gpio-tegra.c                          |    3 +-
+ drivers/gpio/gpio-xilinx.c                         |  412 +-
+ drivers/gpio/gpio-xilinxps.c                       |    9 +-
  drivers/gpu/drm/ast/ast_drv.h                      |    2 -
  drivers/gpu/drm/ast/ast_fb.c                       |   43 +-
  drivers/gpu/drm/ast/ast_ttm.c                      |    2 +-
@@ -241,8 +256,13 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  drivers/net/wireless/rt2x00/rt2800lib.c            |    8 +-
  drivers/pci/pci-driver.c                           |    4 -
  drivers/pci/pci.c                                  |   12 +-
+ drivers/pinctrl/pinctrl-at91.c                     |    3 +-
+ drivers/pinctrl/pinctrl-exynos.c                   |    3 +-
+ drivers/pinctrl/pinctrl-sirf.c                     |    2 +-
+ drivers/pinctrl/spear/pinctrl-plgpio.c             |    2 +-
  drivers/pwm/pwm-spear.c                            |    6 +-
- drivers/remoteproc/Kconfig                         |    5 +-
+ drivers/remoteproc/Kconfig                         |    5 +
+ drivers/remoteproc/mb_remoteproc.c                 |  291 +-
  drivers/rpmsg/rpmsg_freertos_statistic.c           |    1 -
  drivers/rtc/rtc-cmos.c                             |    4 +-
  drivers/s390/char/sclp_cmd.c                       |    4 +-
@@ -260,6 +280,7 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  drivers/staging/apf/xlnk-ioctl.h                   |   39 +
  drivers/staging/apf/xlnk.c                         | 1261 +++++
  drivers/staging/apf/xlnk.h                         |  116 +
+ drivers/staging/imx-drm/ipu-v3/ipu-common.c        |    2 +-
  drivers/staging/video/axivdma/Kconfig              |   16 +
  drivers/staging/video/axivdma/Makefile             |    1 +
  drivers/staging/video/axivdma/xvdma.c              |  440 ++
@@ -461,9 +482,11 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  include/linux/clk-provider.h                       |    8 +-
  include/linux/clk.h                                |   22 +-
  include/linux/clk/zynq.h                           |   28 +-
+ include/linux/device.h                             |    1 +
  include/linux/fs.h                                 |    1 -
  include/linux/hugetlb.h                            |   19 +-
  include/linux/ipc_namespace.h                      |    2 +-
+ include/linux/irqchip/chained_irq.h                |   52 +
  include/linux/jbd2.h                               |    2 -
  include/linux/mm_types.h                           |    2 -
  include/linux/nfs_fs_sb.h                          |    3 -
@@ -494,6 +517,7 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  kernel/trace/trace_stack.c                         |   76 +-
  kernel/trace/trace_stat.c                          |    2 -
  kernel/uptime_limit.c                              |  166 -
+ lib/devres.c                                       |   58 +-
  lib/oid_registry.c                                 |    5 -
  mm/memory.c                                        |    2 -
  mm/mmap.c                                          |   21 +-
@@ -512,6 +536,7 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  net/netfilter/nf_conntrack_sip.c                   |    2 +-
  net/netfilter/nf_nat_core.c                        |   40 +-
  net/wireless/reg.c                                 |    2 +-
+ scripts/coccinelle/api/devm_ioremap_resource.cocci |   90 +
  scripts/kconfig/streamline_config.pl               |   17 +-
  scripts/mod/modpost.c                              |    6 +-
  security/commoncap.c                               |    2 -
@@ -541,9 +566,11 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  tools/perf/util/include/linux/compiler.h           |    1 -
  .../util/scripting-engines/trace-event-python.c    |    4 -
  usr/Makefile                                       |    2 +-
- 533 files changed, 15818 insertions(+), 53168 deletions(-)
+ 558 files changed, 16640 insertions(+), 53392 deletions(-)
  delete mode 100644 Documentation/ABI/testing/debugfs-aufs
  delete mode 100644 Documentation/ABI/testing/sysfs-aufs
+ create mode 100644 Documentation/devicetree/bindings/gpio/gpio-xilinx.txt
+ create mode 100644 Documentation/devicetree/bindings/remoteproc/mb_remoteproc.txt
  delete mode 100644 Documentation/filesystems/aufs/README
  delete mode 100644 Documentation/filesystems/aufs/design/01intro.txt
  delete mode 100644 Documentation/filesystems/aufs/design/02struct.txt
@@ -693,8 +720,10 @@ Signed-off-by: Sipke Vriend <sipke.vriend@xilinx.com>
  delete mode 100644 fs/yaffs2/yaffs_yaffs2.h
  delete mode 100644 fs/yaffs2/yportenv.h
  delete mode 100644 include/linux/aufs_type.h
+ create mode 100644 include/linux/irqchip/chained_irq.h
  delete mode 100644 include/uapi/linux/aufs_type.h
  delete mode 100644 kernel/uptime_limit.c
+ create mode 100644 scripts/coccinelle/api/devm_ioremap_resource.cocci
 
 diff --git a/Documentation/ABI/testing/debugfs-aufs b/Documentation/ABI/testing/debugfs-aufs
 deleted file mode 100644
@@ -907,6 +936,128 @@ index c282375..7f686c8 100644
 +		clocks = <&clkc 16>, <&clk_foo>;
 +		clock-names = "gem1_emio_clk", "can_mio_clk_23";
 +        };
+diff --git a/Documentation/devicetree/bindings/gpio/gpio-xilinx.txt b/Documentation/devicetree/bindings/gpio/gpio-xilinx.txt
+new file mode 100644
+index 0000000..7efb339
+--- /dev/null
++++ b/Documentation/devicetree/bindings/gpio/gpio-xilinx.txt
+@@ -0,0 +1,50 @@
++Xilinx plb/axi GPIO controller
++
++Dual channel GPIO controller with configurable number of pins
++(from 1 to 32 per channel). Every pin can be configured as
++input/output/tristate. Both channels share the same global IRQ but
++local interrupts can be enabled on channel basis.
++
++Required properties:
++- compatible : Should be "xlnx,xps-gpio-1.00.a"
++- reg : Address and length of the register set for the device
++- #gpio-cells : Should be two. The first cell is the pin number and the
++  second cell is used to specify channel offset:
++		0 - first channel
++		8 - second channel
++- gpio-controller : Marks the device node as a GPIO controller.
++
++Optional properties:
++- interrupts : Interrupt mapping for GPIO IRQ.
++- interrupt-parent : Phandle for the interrupt controller that
++  services interrupts for this device.
++- xlnx,all-inputs : if n-th bit is setup, GPIO-n is input
++- xlnx,dout-default : if n-th bit is 1, GPIO-n default value is 1
++- xlnx,gpio-width : gpio width
++- xlnx,tri-default : if n-th bit is 1, GPIO-n is in tristate mode
++- xlnx,is-dual : if 1, controller also uses the second channel
++- xlnx,all-inputs-2 : as above but for the second channel
++- xlnx,dout-default-2 : as above but the second channel
++- xlnx,gpio2-width : as above but for the second channel
++- xlnx,tri-default-2 : as above but for the second channel
++
++
++Example:
++gpio: gpio@40000000 {
++	#gpio-cells = <2>;
++	compatible = "xlnx,xps-gpio-1.00.a";
++	gpio-controller ;
++	interrupt-parent = <&microblaze_0_intc>;
++	interrupts = < 6 2 >;
++	reg = < 0x40000000 0x10000 >;
++	xlnx,all-inputs = <0x0>;
++	xlnx,all-inputs-2 = <0x0>;
++	xlnx,dout-default = <0x0>;
++	xlnx,dout-default-2 = <0x0>;
++	xlnx,gpio-width = <0x2>;
++	xlnx,gpio2-width = <0x2>;
++	xlnx,interrupt-present = <0x1>;
++	xlnx,is-dual = <0x1>;
++	xlnx,tri-default = <0xffffffff>;
++	xlnx,tri-default-2 = <0xffffffff>;
++} ;
+diff --git a/Documentation/devicetree/bindings/remoteproc/mb_remoteproc.txt b/Documentation/devicetree/bindings/remoteproc/mb_remoteproc.txt
+new file mode 100644
+index 0000000..ebc2b35
+--- /dev/null
++++ b/Documentation/devicetree/bindings/remoteproc/mb_remoteproc.txt
+@@ -0,0 +1,46 @@
++Xilinx ARM-Microblaze remoteproc driver
++
++This driver requires specific Zynq hardware design where Microblaze is added
++to the programmable logic.
++Microblaze is connected with PS block via axi bus connected to PS HP port
++to ensure access to PS DDR.
++Communication channels are done via soft GPIO IP connected to PS block
++and to Microblaze. There are also 2 gpio control signals reset and debug
++which are used for reseting Microblaze.
++
++Required properties:
++- compatible : Should be "xlnx,mb_remoteproc"
++- reg : Address and length of the ddr address space
++- bram: Phandle to bram controller which can access Microblaze BRAM
++- bram-firmware : Microblaze BRAM bootloader name
++- firmware : Default firmware name which can be override by
++	     "firmware" module parameter
++- reset : Gpio phandle which reset Microblaze remoteproc
++- debug : Gpio phandle which setup Microblaze to debug state
++- ipino : Gpio phandle for Microblaze to ARM communication
++- vring0 : Gpio phandle for ARM to Microblaze communication vring 0
++- vring1 : Gpio phandle for ARM to Microblaze communication vring 1
++
++Microblaze SoC can be also connected to the PS block via a axi bus.
++That's why there is the option to allocate interrupts for Microblaze use only.
++The driver will allocate interrupts to itself and Microblaze sw has to ensure
++that interrupts are properly enabled and handled by Microblaze interrupt
++controller.
++
++Optional properties:
++ - interrupts : Interrupt mapping for remoteproc
++ - interrupt-parent : Phandle for the interrupt controller
++
++Example:
++test_mb: mb_remoteproc-test@800000 {
++	compatible = "xlnx,mb_remoteproc";
++	reg = < 0x8000000 0x8000000 >;
++	bram = <&axi_bram_ctrl_0>;
++	bram-firmware = "mb.bin";
++	firmware = "image.elf";
++	reset = <&zynq_gpio_reset 1 0>;
++	debug = <&zynq_gpio_reset 0 0>;
++	ipino = <&zynq_gpio_vring 0 0>;
++	vring0 = <&zynq_gpio_vring 1 0>;
++	vring1 = <&zynq_gpio_vring 2 0>;
++} ;
+diff --git a/Documentation/driver-model/devres.txt b/Documentation/driver-model/devres.txt
+index 43cff70..25240fc 100644
+--- a/Documentation/driver-model/devres.txt
++++ b/Documentation/driver-model/devres.txt
+@@ -266,7 +266,8 @@ IOMAP
+   devm_ioremap()
+   devm_ioremap_nocache()
+   devm_iounmap()
+-  devm_request_and_ioremap() : checks resource, requests region, ioremaps
++  devm_ioremap_resource() : checks resource, requests memory region, ioremaps
++  devm_request_and_ioremap() : obsoleted by devm_ioremap_resource()
+   pcim_iomap()
+   pcim_iounmap()
+   pcim_iomap_table()	: array of mapped addresses indexed by BAR
 diff --git a/Documentation/filesystems/aufs/README b/Documentation/filesystems/aufs/README
 deleted file mode 100644
 index 41bf3a7..0000000
@@ -7897,6 +8048,18 @@ index cd0bc86..911b88a 100644
  		} ;
  	} ;
  } ;
+diff --git a/arch/arm/common/gic.c b/arch/arm/common/gic.c
+index d4a9a45..9ec4eb3 100644
+--- a/arch/arm/common/gic.c
++++ b/arch/arm/common/gic.c
+@@ -39,6 +39,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/percpu.h>
+ #include <linux/slab.h>
++#include <linux/irqchip/chained_irq.h>
+ 
+ #include <asm/irq.h>
+ #include <asm/exception.h>
 diff --git a/arch/arm/configs/at91sam9g45_defconfig b/arch/arm/configs/at91sam9g45_defconfig
 index 8aab786..606d48f 100644
 --- a/arch/arm/configs/at91sam9g45_defconfig
@@ -13760,6 +13923,46 @@ index 58c226e..95d4d3e 100644
  # CONFIG_AUXDISPLAY is not set
  CONFIG_UIO=y
  # CONFIG_UIO_CIF is not set
+diff --git a/arch/arm/include/asm/mach/irq.h b/arch/arm/include/asm/mach/irq.h
+index 15cb035..33e625c 100644
+--- a/arch/arm/include/asm/mach/irq.h
++++ b/arch/arm/include/asm/mach/irq.h
+@@ -34,35 +34,4 @@ do {							\
+ 	raw_spin_unlock(&desc->lock);			\
+ } while(0)
+ 
+-#ifndef __ASSEMBLY__
+-/*
+- * Entry/exit functions for chained handlers where the primary IRQ chip
+- * may implement either fasteoi or level-trigger flow control.
+- */
+-static inline void chained_irq_enter(struct irq_chip *chip,
+-				     struct irq_desc *desc)
+-{
+-	/* FastEOI controllers require no action on entry. */
+-	if (chip->irq_eoi)
+-		return;
+-
+-	if (chip->irq_mask_ack) {
+-		chip->irq_mask_ack(&desc->irq_data);
+-	} else {
+-		chip->irq_mask(&desc->irq_data);
+-		if (chip->irq_ack)
+-			chip->irq_ack(&desc->irq_data);
+-	}
+-}
+-
+-static inline void chained_irq_exit(struct irq_chip *chip,
+-				    struct irq_desc *desc)
+-{
+-	if (chip->irq_eoi)
+-		chip->irq_eoi(&desc->irq_data);
+-	else
+-		chip->irq_unmask(&desc->irq_data);
+-}
+-#endif
+-
+ #endif
 diff --git a/arch/arm/include/asm/pgtable.h b/arch/arm/include/asm/pgtable.h
 index 26e9ce4..c094749 100644
 --- a/arch/arm/include/asm/pgtable.h
@@ -13794,60 +13997,22 @@ index a58dd49..a6c301e 100644
  #define OBSOLETE(syscall) sys_ni_syscall
  #else
  #define OBSOLETE(syscall) syscall
-diff --git a/arch/arm/lib/memset.S b/arch/arm/lib/memset.S
-index 94b0650..d912e73 100644
---- a/arch/arm/lib/memset.S
-+++ b/arch/arm/lib/memset.S
-@@ -14,15 +14,31 @@
+diff --git a/arch/arm/mach-at91/gpio.c b/arch/arm/mach-at91/gpio.c
+index c5d7e1e..a5afcf7 100644
+--- a/arch/arm/mach-at91/gpio.c
++++ b/arch/arm/mach-at91/gpio.c
+@@ -22,10 +22,9 @@
+ #include <linux/module.h>
+ #include <linux/io.h>
+ #include <linux/irqdomain.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/of_address.h>
  
- 	.text
- 	.align	5
-+	.word	0
-+
-+1:	subs	r2, r2, #4		@ 1 do we have enough
-+	blt	5f			@ 1 bytes to align with?
-+	cmp	r3, #2			@ 1
-+	strltb	r1, [ip], #1		@ 1
-+	strleb	r1, [ip], #1		@ 1
-+	strb	r1, [ip], #1		@ 1
-+	add	r2, r2, r3		@ 1 (r2 = r2 - (4 - r3))
-+/*
-+ * The pointer is now aligned and the length is adjusted.  Try doing the
-+ * memset again.
-+ */
- 
- ENTRY(memset)
--	ands	r3, r0, #3		@ 1 unaligned?
--	mov	ip, r0			@ preserve r0 as return value
--	bne	6f			@ 1
-+/*
-+ * Preserve the contents of r0 for the return value.
-+ */
-+	mov	ip, r0
-+	ands	r3, ip, #3		@ 1 unaligned?
-+	bne	1b			@ 1
- /*
-  * we know that the pointer in ip is aligned to a word boundary.
-  */
--1:	orr	r1, r1, r1, lsl #8
-+	orr	r1, r1, r1, lsl #8
- 	orr	r1, r1, r1, lsl #16
- 	mov	r3, r1
- 	cmp	r2, #16
-@@ -111,13 +127,4 @@ ENTRY(memset)
- 	tst	r2, #1
- 	strneb	r1, [ip], #1
- 	mov	pc, lr
+-#include <asm/mach/irq.h>
 -
--6:	subs	r2, r2, #4		@ 1 do we have enough
--	blt	5b			@ 1 bytes to align with?
--	cmp	r3, #2			@ 1
--	strltb	r1, [ip], #1		@ 1
--	strleb	r1, [ip], #1		@ 1
--	strb	r1, [ip], #1		@ 1
--	add	r2, r2, r3		@ 1 (r2 = r2 - (4 - r3))
--	b	1b
- ENDPROC(memset)
+ #include <mach/hardware.h>
+ #include <mach/at91_pio.h>
+ 
 diff --git a/arch/arm/mach-at91/setup.c b/arch/arm/mach-at91/setup.c
 index 6b4608d..4b67847 100644
 --- a/arch/arm/mach-at91/setup.c
@@ -16164,6 +16329,48 @@ index e207aa5..5dbf13f 100644
  	return 0;
  
  bad_area:
+diff --git a/arch/arm/plat-samsung/irq-vic-timer.c b/arch/arm/plat-samsung/irq-vic-timer.c
+index f980cf3..5d205e7 100644
+--- a/arch/arm/plat-samsung/irq-vic-timer.c
++++ b/arch/arm/plat-samsung/irq-vic-timer.c
+@@ -16,6 +16,7 @@
+ #include <linux/kernel.h>
+ #include <linux/interrupt.h>
+ #include <linux/irq.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/io.h>
+ 
+ #include <mach/map.h>
+@@ -23,8 +24,6 @@
+ #include <plat/irq-vic-timer.h>
+ #include <plat/regs-timer.h>
+ 
+-#include <asm/mach/irq.h>
+-
+ static void s3c_irq_demux_vic_timer(unsigned int irq, struct irq_desc *desc)
+ {
+ 	struct irq_chip *chip = irq_get_chip(irq);
+diff --git a/arch/arm/plat-samsung/s5p-irq-gpioint.c b/arch/arm/plat-samsung/s5p-irq-gpioint.c
+index bae5613..fafdb05 100644
+--- a/arch/arm/plat-samsung/s5p-irq-gpioint.c
++++ b/arch/arm/plat-samsung/s5p-irq-gpioint.c
+@@ -14,6 +14,7 @@
+ #include <linux/kernel.h>
+ #include <linux/interrupt.h>
+ #include <linux/irq.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/io.h>
+ #include <linux/gpio.h>
+ #include <linux/slab.h>
+@@ -22,8 +23,6 @@
+ #include <plat/gpio-core.h>
+ #include <plat/gpio-cfg.h>
+ 
+-#include <asm/mach/irq.h>
+-
+ #define GPIO_BASE(chip)		((void __iomem *)((unsigned long)((chip)->base) & 0xFFFFF000u))
+ 
+ #define CON_OFFSET		0x700
 diff --git a/arch/arm/xen/enlighten.c b/arch/arm/xen/enlighten.c
 index 01b20a2..7a32976 100644
 --- a/arch/arm/xen/enlighten.c
@@ -16354,6 +16561,21 @@ index a7869f8..4332f7e 100644
  
  	return ret;
  }
+diff --git a/arch/microblaze/Kconfig b/arch/microblaze/Kconfig
+index aa8976e..3a1e6a2 100644
+--- a/arch/microblaze/Kconfig
++++ b/arch/microblaze/Kconfig
+@@ -254,10 +254,6 @@ config MICROBLAZE_64K_PAGES
+ 
+ endchoice
+ 
+-config KERNEL_PAD
+-	hex "Kernel PAD for unpacking" if ADVANCED_OPTIONS
+-	default "0x80000" if MMU
+-
+ endmenu
+ 
+ source "mm/Kconfig"
 diff --git a/arch/microblaze/configs/mmu_defconfig b/arch/microblaze/configs/mmu_defconfig
 index d2b097a..3649a8b 100644
 --- a/arch/microblaze/configs/mmu_defconfig
@@ -17010,7 +17232,7 @@ index 357d56a..e8a5e9c 100644
  				: "r" (addr), "r" (value)
  	);
 diff --git a/arch/microblaze/kernel/head.S b/arch/microblaze/kernel/head.S
-index a8ce682..fcc797f 100644
+index a8ce682..817b7ee 100644
 --- a/arch/microblaze/kernel/head.S
 +++ b/arch/microblaze/kernel/head.S
 @@ -120,7 +120,7 @@ _copy_command_line:
@@ -17031,6 +17253,15 @@ index a8ce682..fcc797f 100644
  	addik	r11, r11, 4		/* increment counting */
  	bgtid	r3, _copy_bram		/* loop for all entries */
  	addik	r3, r3, -4		/* descrement loop */
+@@ -176,7 +176,7 @@ _invalidate:
+ 	/* start to do TLB calculation */
+ 	addik	r12, r0, _end
+ 	rsub	r12, r3, r12
+-	addik	r12, r12, CONFIG_KERNEL_PAD /* that's the pad */
++	addik	r12, r12, CONFIG_LOWMEM_SIZE >> PTE_SHIFT /* that's the pad */
+ 
+ 	or r9, r0, r0 /* TLB0 = 0 */
+ 	or r10, r0, r0 /* TLB1 = 0 */
 diff --git a/arch/microblaze/kernel/heartbeat.c b/arch/microblaze/kernel/heartbeat.c
 index 154756f..1879a05 100644
 --- a/arch/microblaze/kernel/heartbeat.c
@@ -17063,19 +17294,6 @@ index 9422699..d85fa3a 100644
  		intc->name, intc_baseaddr, nr_irq, intr_mask);
  
  	/*
-diff --git a/arch/microblaze/kernel/kgdb.c b/arch/microblaze/kernel/kgdb.c
-index 09a5e82..8adc9244 100644
---- a/arch/microblaze/kernel/kgdb.c
-+++ b/arch/microblaze/kernel/kgdb.c
-@@ -141,7 +141,7 @@ void kgdb_arch_exit(void)
- /*
-  * Global data
-  */
--struct kgdb_arch arch_kgdb_ops = {
-+const struct kgdb_arch arch_kgdb_ops = {
- #ifdef __MICROBLAZEEL__
- 	.gdb_bpt_instr = {0x18, 0x00, 0x0c, 0xba}, /* brki r16, 0x18 */
- #else
 diff --git a/arch/microblaze/kernel/microblaze_ksyms.c b/arch/microblaze/kernel/microblaze_ksyms.c
 index 2b25bcf..9f1d02c4 100644
 --- a/arch/microblaze/kernel/microblaze_ksyms.c
@@ -21619,6 +21837,115 @@ index c9303ed..0ca1ca7 100644
  		   channel_ce_count_show, NULL, 5);
  
  /* Total possible dynamic ce_count attribute file table */
+diff --git a/drivers/gpio/Kconfig b/drivers/gpio/Kconfig
+index 5b6ccf1..4510330 100644
+--- a/drivers/gpio/Kconfig
++++ b/drivers/gpio/Kconfig
+@@ -233,6 +233,7 @@ config GPIO_VT8500
+ config GPIO_XILINX
+ 	bool "Xilinx GPIO support"
+ 	depends on PPC_OF || MICROBLAZE || ARCH_ZYNQ
++	select GENERIC_IRQ_CHIP
+ 	help
+ 	  Say yes here to support the Xilinx AXI/XPS GPIO device
+ 
+diff --git a/drivers/gpio/gpio-msm-v2.c b/drivers/gpio/gpio-msm-v2.c
+index 55a7e77..dd2edde 100644
+--- a/drivers/gpio/gpio-msm-v2.c
++++ b/drivers/gpio/gpio-msm-v2.c
+@@ -23,13 +23,12 @@
+ #include <linux/init.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/irq.h>
+ #include <linux/module.h>
+ #include <linux/platform_device.h>
+ #include <linux/spinlock.h>
+ 
+-#include <asm/mach/irq.h>
+-
+ #include <mach/msm_gpiomux.h>
+ #include <mach/msm_iomap.h>
+ 
+diff --git a/drivers/gpio/gpio-mxc.c b/drivers/gpio/gpio-mxc.c
+index 7877335..7176743 100644
+--- a/drivers/gpio/gpio-mxc.c
++++ b/drivers/gpio/gpio-mxc.c
+@@ -24,6 +24,7 @@
+ #include <linux/io.h>
+ #include <linux/irq.h>
+ #include <linux/irqdomain.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/gpio.h>
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+@@ -32,7 +33,6 @@
+ #include <linux/of_device.h>
+ #include <linux/module.h>
+ #include <asm-generic/bug.h>
+-#include <asm/mach/irq.h>
+ 
+ enum mxc_gpio_hwtype {
+ 	IMX1_GPIO,	/* runs on i.mx1 */
+diff --git a/drivers/gpio/gpio-omap.c b/drivers/gpio/gpio-omap.c
+index f1fbedb2..6996da9 100644
+--- a/drivers/gpio/gpio-omap.c
++++ b/drivers/gpio/gpio-omap.c
+@@ -25,11 +25,10 @@
+ #include <linux/of.h>
+ #include <linux/of_device.h>
+ #include <linux/irqdomain.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/gpio.h>
+ #include <linux/platform_data/gpio-omap.h>
+ 
+-#include <asm/mach/irq.h>
+-
+ #define OFF_MODE	1
+ 
+ static LIST_HEAD(omap_gpio_list);
+diff --git a/drivers/gpio/gpio-pl061.c b/drivers/gpio/gpio-pl061.c
+index c1720de..175c33b 100644
+--- a/drivers/gpio/gpio-pl061.c
++++ b/drivers/gpio/gpio-pl061.c
+@@ -15,6 +15,7 @@
+ #include <linux/io.h>
+ #include <linux/ioport.h>
+ #include <linux/irq.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/bitops.h>
+ #include <linux/workqueue.h>
+ #include <linux/gpio.h>
+@@ -23,7 +24,6 @@
+ #include <linux/amba/pl061.h>
+ #include <linux/slab.h>
+ #include <linux/pm.h>
+-#include <asm/mach/irq.h>
+ 
+ #define GPIODIR 0x400
+ #define GPIOIS  0x404
+diff --git a/drivers/gpio/gpio-pxa.c b/drivers/gpio/gpio-pxa.c
+index 8325f58..2d3af98 100644
+--- a/drivers/gpio/gpio-pxa.c
++++ b/drivers/gpio/gpio-pxa.c
+@@ -19,6 +19,7 @@
+ #include <linux/init.h>
+ #include <linux/irq.h>
+ #include <linux/irqdomain.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/io.h>
+ #include <linux/of.h>
+ #include <linux/of_device.h>
+@@ -26,8 +27,6 @@
+ #include <linux/syscore_ops.h>
+ #include <linux/slab.h>
+ 
+-#include <asm/mach/irq.h>
+-
+ #include <mach/irqs.h>
+ 
+ /*
 diff --git a/drivers/gpio/gpio-sch.c b/drivers/gpio/gpio-sch.c
 index 529c488..edae963 100644
 --- a/drivers/gpio/gpio-sch.c
@@ -21702,10 +22029,621 @@ index 529c488..edae963 100644
  
  	spin_unlock(&gpio_lock);
  	return 0;
+diff --git a/drivers/gpio/gpio-tegra.c b/drivers/gpio/gpio-tegra.c
+index 63cb643..48117e6 100644
+--- a/drivers/gpio/gpio-tegra.c
++++ b/drivers/gpio/gpio-tegra.c
+@@ -26,11 +26,10 @@
+ #include <linux/platform_device.h>
+ #include <linux/module.h>
+ #include <linux/irqdomain.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/pinctrl/consumer.h>
+ #include <linux/pm.h>
+ 
+-#include <asm/mach/irq.h>
+-
+ #define GPIO_BANK(x)		((x) >> 5)
+ #define GPIO_PORT(x)		(((x) >> 3) & 0x3)
+ #define GPIO_BIT(x)		((x) & 0x7)
+diff --git a/drivers/gpio/gpio-xilinx.c b/drivers/gpio/gpio-xilinx.c
+index 1fa1519..566a306 100644
+--- a/drivers/gpio/gpio-xilinx.c
++++ b/drivers/gpio/gpio-xilinx.c
+@@ -1,7 +1,7 @@
+ /*
+  * Xilinx gpio driver for xps/axi_gpio IP.
+  *
+- * Copyright 2008, 2011 Xilinx, Inc.
++ * Copyright 2008 - 2013 Xilinx, Inc.
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License version 2
+@@ -12,32 +12,62 @@
+  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <linux/bitops.h>
+ #include <linux/init.h>
+ #include <linux/errno.h>
+ #include <linux/module.h>
+ #include <linux/of_device.h>
++#include <linux/of_irq.h>
+ #include <linux/of_platform.h>
+ #include <linux/of_gpio.h>
++#include <linux/interrupt.h>
+ #include <linux/io.h>
++#include <linux/irq.h>
++#include <linux/irqchip/chained_irq.h>
++#include <linux/irqdomain.h>
+ #include <linux/gpio.h>
+ #include <linux/slab.h>
+ 
+ /* Register Offset Definitions */
+-#define XGPIO_DATA_OFFSET   (0x0)	/* Data register  */
+-#define XGPIO_TRI_OFFSET    (0x4)	/* I/O direction register  */
++#define XGPIO_DATA_OFFSET	0x0 /* Data register */
++#define XGPIO_TRI_OFFSET	0x4 /* I/O direction register */
++#define XGPIO_GIER_OFFSET	0x11c /* Global Interrupt Enable */
++#define XGPIO_GIER_IE		BIT(31)
++
++#define XGPIO_IPISR_OFFSET	0x120 /* IP Interrupt Status */
++#define XGPIO_IPIER_OFFSET	0x128 /* IP Interrupt Enable */
+ 
+ #define XGPIO_CHANNEL_OFFSET	0x8
+ 
+ /* Read/Write access to the GPIO registers */
+-#define xgpio_readreg(offset)		__raw_readl(offset)
+-#define xgpio_writereg(offset, val)	__raw_writel(val, offset)
++#ifdef CONFIG_ARCH_ZYNQ
++# define xgpio_readreg(offset)		readl(offset)
++# define xgpio_writereg(offset, val)	writel(val, offset)
++#else
++# define xgpio_readreg(offset)		__raw_readl(offset)
++# define xgpio_writereg(offset, val)	__raw_writel(val, offset)
++#endif
+ 
++/**
++ * struct xgpio_instance - Stores information about GPIO device
++ * @mmchip: OF GPIO chip for memory mapped banks
++ * @gpio_state: GPIO state shadow register
++ * @gpio_dir: GPIO direction shadow register
++ * @offset: GPIO channel offset
++ * @irq_base: GPIO channel irq base address
++ * @irq_enable: GPIO irq enable/disable bitfield
++ * @gpio_lock: Lock used for synchronization
++ * @irq_domain: irq_domain of the controller
++ */
+ struct xgpio_instance {
+ 	struct of_mm_gpio_chip mmchip;
+-	u32 gpio_state;		/* GPIO state shadow register */
+-	u32 gpio_dir;		/* GPIO direction shadow register */
++	u32 gpio_state;
++	u32 gpio_dir;
+ 	u32 offset;
+-	spinlock_t gpio_lock;	/* Lock used for synchronization */
++	int irq_base;
++	u32 irq_enable;
++	spinlock_t gpio_lock;
++	struct irq_domain *irq_domain;
+ };
+ 
+ /**
+@@ -45,8 +75,11 @@ struct xgpio_instance {
+  * @gc:     Pointer to gpio_chip device structure.
+  * @gpio:   GPIO signal number.
+  *
+- * This function reads the specified signal of the GPIO device. It returns 0 if
+- * the signal clear, 1 if signal is set or negative value on error.
++ * This function reads the specified signal of the GPIO device.
++ *
++ * Return:
++ * 0 if direction of GPIO signals is set as input otherwise it
++ * returns negative error value.
+  */
+ static int xgpio_get(struct gpio_chip *gc, unsigned int gpio)
+ {
+@@ -56,7 +89,7 @@ static int xgpio_get(struct gpio_chip *gc, unsigned int gpio)
+ 
+ 	void __iomem *regs = mm_gc->regs + chip->offset;
+ 
+-	return (xgpio_readreg(regs + XGPIO_DATA_OFFSET) >> gpio) & 1;
++	return !!(xgpio_readreg(regs + XGPIO_DATA_OFFSET) & BIT(gpio));
+ }
+ 
+ /**
+@@ -80,9 +113,9 @@ static void xgpio_set(struct gpio_chip *gc, unsigned int gpio, int val)
+ 
+ 	/* Write to GPIO signal and set its direction to output */
+ 	if (val)
+-		chip->gpio_state |= 1 << gpio;
++		chip->gpio_state |= BIT(gpio);
+ 	else
+-		chip->gpio_state &= ~(1 << gpio);
++		chip->gpio_state &= ~BIT(gpio);
+ 
+ 	xgpio_writereg(regs + chip->offset + XGPIO_DATA_OFFSET,
+ 							 chip->gpio_state);
+@@ -96,8 +129,10 @@ static void xgpio_set(struct gpio_chip *gc, unsigned int gpio, int val)
+  * @gpio:   GPIO signal number.
+  *
+  * This function sets the direction of specified GPIO signal as input.
+- * It returns 0 if direction of GPIO signals is set as input otherwise it
+- * returns negative error value.
++ *
++ * Return:
++ * 0 - if direction of GPIO signals is set as input
++ * otherwise it returns negative error value.
+  */
+ static int xgpio_dir_in(struct gpio_chip *gc, unsigned int gpio)
+ {
+@@ -110,7 +145,7 @@ static int xgpio_dir_in(struct gpio_chip *gc, unsigned int gpio)
+ 	spin_lock_irqsave(&chip->gpio_lock, flags);
+ 
+ 	/* Set the GPIO bit in shadow register and set direction as input */
+-	chip->gpio_dir |= (1 << gpio);
++	chip->gpio_dir |= BIT(gpio);
+ 	xgpio_writereg(regs + chip->offset + XGPIO_TRI_OFFSET, chip->gpio_dir);
+ 
+ 	spin_unlock_irqrestore(&chip->gpio_lock, flags);
+@@ -124,8 +159,10 @@ static int xgpio_dir_in(struct gpio_chip *gc, unsigned int gpio)
+  * @gpio:   GPIO signal number.
+  * @val:    Value to be written to specified signal.
+  *
+- * This function sets the direction of specified GPIO signal as output. If all
+- * GPIO signals of GPIO chip is configured as input then it returns
++ * This function sets the direction of specified GPIO signal as output.
++ *
++ * Return:
++ * If all GPIO signals of GPIO chip is configured as input then it returns
+  * error otherwise it returns 0.
+  */
+ static int xgpio_dir_out(struct gpio_chip *gc, unsigned int gpio, int val)
+@@ -140,13 +177,14 @@ static int xgpio_dir_out(struct gpio_chip *gc, unsigned int gpio, int val)
+ 
+ 	/* Write state of GPIO signal */
+ 	if (val)
+-		chip->gpio_state |= 1 << gpio;
++		chip->gpio_state |= BIT(gpio);
+ 	else
+-		chip->gpio_state &= ~(1 << gpio);
+-	xgpio_writereg(regs + chip->offset + XGPIO_DATA_OFFSET, chip->gpio_state);
++		chip->gpio_state &= ~BIT(gpio);
++	xgpio_writereg(regs + chip->offset + XGPIO_DATA_OFFSET,
++		       chip->gpio_state);
+ 
+ 	/* Clear the GPIO bit in shadow register and set direction as output */
+-	chip->gpio_dir &= (~(1 << gpio));
++	chip->gpio_dir &= ~BIT(gpio);
+ 	xgpio_writereg(regs + chip->offset + XGPIO_TRI_OFFSET, chip->gpio_dir);
+ 
+ 	spin_unlock_irqrestore(&chip->gpio_lock, flags);
+@@ -156,7 +194,7 @@ static int xgpio_dir_out(struct gpio_chip *gc, unsigned int gpio, int val)
+ 
+ /**
+  * xgpio_save_regs - Set initial values of GPIO pins
+- * @mm_gc: pointer to memory mapped GPIO chip structure
++ * @mm_gc: Pointer to memory mapped GPIO chip structure
+  */
+ static void xgpio_save_regs(struct of_mm_gpio_chip *mm_gc)
+ {
+@@ -170,42 +208,263 @@ static void xgpio_save_regs(struct of_mm_gpio_chip *mm_gc)
+ }
+ 
+ /**
++ * xgpio_xlate - Set initial values of GPIO pins
++ * @gc: Pointer to gpio_chip device structure.
++ * @gpiospec:  gpio specifier as found in the device tree
++ * @flags: A flags pointer based on binding
++ *
++ * Return:
++ * irq number otherwise -EINVAL
++ */
++static int xgpio_xlate(struct gpio_chip *gc,
++		       const struct of_phandle_args *gpiospec, u32 *flags)
++{
++	struct of_mm_gpio_chip *mm_gc = to_of_mm_gpio_chip(gc);
++	struct xgpio_instance *chip = container_of(mm_gc, struct xgpio_instance,
++						   mmchip);
++
++	if (gpiospec->args[1] == chip->offset)
++		return gpiospec->args[0];
++
++	return -EINVAL;
++}
++
++/**
++ * xgpio_irq_mask - Write the specified signal of the GPIO device.
++ * @irq_data: per irq and chip data passed down to chip functions
++ */
++static void xgpio_irq_mask(struct irq_data *irq_data)
++{
++	unsigned long flags;
++	struct xgpio_instance *chip = irq_data_get_irq_chip_data(irq_data);
++	struct of_mm_gpio_chip *mm_gc = &chip->mmchip;
++	u32 offset = irq_data->irq - chip->irq_base;
++	u32 temp;
++
++	pr_debug("%s: Disable %d irq, irq_enable_mask 0x%x\n",
++		__func__, offset, chip->irq_enable);
++
++	spin_lock_irqsave(&chip->gpio_lock, flags);
++
++	chip->irq_enable &= ~BIT(offset);
++
++	if (!chip->irq_enable) {
++		/* Enable per channel interrupt */
++		temp = xgpio_readreg(mm_gc->regs + XGPIO_IPIER_OFFSET);
++		temp &= chip->offset / XGPIO_CHANNEL_OFFSET + 1;
++		xgpio_writereg(mm_gc->regs + XGPIO_IPIER_OFFSET, temp);
++
++		/* Disable global interrupt if channel interrupts are unused */
++		temp = xgpio_readreg(mm_gc->regs + XGPIO_IPIER_OFFSET);
++		if (!temp)
++			xgpio_writereg(mm_gc->regs + XGPIO_GIER_OFFSET,
++				       ~XGPIO_GIER_IE);
++
++	}
++	spin_unlock_irqrestore(&chip->gpio_lock, flags);
++}
++
++/**
++ * xgpio_irq_unmask - Write the specified signal of the GPIO device.
++ * @irq_data: per irq and chip data passed down to chip functions
++ */
++static void xgpio_irq_unmask(struct irq_data *irq_data)
++{
++	unsigned long flags;
++	struct xgpio_instance *chip = irq_data_get_irq_chip_data(irq_data);
++	struct of_mm_gpio_chip *mm_gc = &chip->mmchip;
++	u32 offset = irq_data->irq - chip->irq_base;
++	u32 temp;
++
++	pr_debug("%s: Enable %d irq, irq_enable_mask 0x%x\n",
++		__func__, offset, chip->irq_enable);
++
++	/* Setup pin as input */
++	xgpio_dir_in(&mm_gc->gc, offset);
++
++	spin_lock_irqsave(&chip->gpio_lock, flags);
++
++	chip->irq_enable |= BIT(offset);
++
++	if (chip->irq_enable) {
++
++		/* Enable per channel interrupt */
++		temp = xgpio_readreg(mm_gc->regs + XGPIO_IPIER_OFFSET);
++		temp |= chip->offset / XGPIO_CHANNEL_OFFSET + 1;
++		xgpio_writereg(mm_gc->regs + XGPIO_IPIER_OFFSET, temp);
++
++		/* Enable global interrupts */
++		xgpio_writereg(mm_gc->regs + XGPIO_GIER_OFFSET, XGPIO_GIER_IE);
++	}
++
++	spin_unlock_irqrestore(&chip->gpio_lock, flags);
++}
++
++/**
++ * xgpio_set_irq_type - Write the specified signal of the GPIO device.
++ * @irq_data: Per irq and chip data passed down to chip functions
++ * @type: Interrupt type that is to be set for the gpio pin
++ *
++ * Return:
++ * 0 if interrupt type is supported otherwise otherwise -EINVAL
++ */
++static int xgpio_set_irq_type(struct irq_data *irq_data, unsigned int type)
++{
++	/* Only rising edge case is supported now */
++	if (type == IRQ_TYPE_EDGE_RISING)
++		return 0;
++
++	return -EINVAL;
++}
++
++/* irq chip descriptor */
++static struct irq_chip xgpio_irqchip = {
++	.name		= "xgpio",
++	.irq_mask	= xgpio_irq_mask,
++	.irq_unmask	= xgpio_irq_unmask,
++	.irq_set_type	= xgpio_set_irq_type,
++};
++
++/**
++ * xgpio_to_irq - Find out gpio to Linux irq mapping
++ * @gc: Pointer to gpio_chip device structure.
++ * @offset: Gpio pin offset
++ *
++ * Return:
++ * irq number otherwise -EINVAL
++ */
++static int xgpio_to_irq(struct gpio_chip *gc, unsigned offset)
++{
++	struct of_mm_gpio_chip *mm_gc = to_of_mm_gpio_chip(gc);
++	struct xgpio_instance *chip = container_of(mm_gc, struct xgpio_instance,
++						   mmchip);
++
++	return irq_find_mapping(chip->irq_domain, offset);
++}
++
++/**
++ * xgpio_irqhandler - Gpio interrupt service routine
++ * @irq: gpio irq number
++ * @desc: Pointer to interrupt description
++ */
++static void xgpio_irqhandler(unsigned int irq, struct irq_desc *desc)
++{
++	struct xgpio_instance *chip = (struct xgpio_instance *)
++						irq_get_handler_data(irq);
++	struct of_mm_gpio_chip *mm_gc = &chip->mmchip;
++	struct irq_chip *irqchip = irq_desc_get_chip(desc);
++	int offset;
++	unsigned long val;
++
++	chained_irq_enter(irqchip, desc);
++
++	val = xgpio_readreg(mm_gc->regs + chip->offset);
++	/* Only rising edge is supported */
++	val &= chip->irq_enable;
++
++	for_each_set_bit(offset, &val, chip->mmchip.gc.ngpio) {
++		generic_handle_irq(chip->irq_base + offset);
++	}
++
++	xgpio_writereg(mm_gc->regs + XGPIO_IPISR_OFFSET,
++		       chip->offset / XGPIO_CHANNEL_OFFSET + 1);
++
++	chained_irq_exit(irqchip, desc);
++}
++
++static struct lock_class_key gpio_lock_class;
++
++/**
++ * xgpio_irq_setup - Allocate irq for gpio and setup appropriate functions
++ * @np: Device node of the GPIO chip
++ * @chip: Pointer to private gpio channel structure
++ *
++ * Return:
++ * 0 if success, otherwise -1
++ */
++static int xgpio_irq_setup(struct device_node *np, struct xgpio_instance *chip)
++{
++	u32 pin_num;
++	struct resource res;
++
++	int ret = of_irq_to_resource(np, 0, &res);
++	if (!ret) {
++		pr_info("GPIO IRQ not connected\n");
++		return 0;
++	}
++
++	chip->mmchip.gc.of_xlate = xgpio_xlate;
++	chip->mmchip.gc.of_gpio_n_cells = 2;
++	chip->mmchip.gc.to_irq = xgpio_to_irq;
++
++	chip->irq_base = irq_alloc_descs(-1, 0, chip->mmchip.gc.ngpio, 0);
++	if (chip->irq_base < 0) {
++		pr_err("Couldn't allocate IRQ numbers\n");
++		return -1;
++	}
++	chip->irq_domain = irq_domain_add_legacy(np, chip->mmchip.gc.ngpio,
++						 chip->irq_base, 0,
++						 &irq_domain_simple_ops, NULL);
++
++	/*
++	 * set the irq chip, handler and irq chip data for callbacks for
++	 * each pin
++	 */
++	for (pin_num = 0; pin_num < chip->mmchip.gc.ngpio; pin_num++) {
++		u32 gpio_irq = irq_find_mapping(chip->irq_domain, pin_num);
++		irq_set_lockdep_class(gpio_irq, &gpio_lock_class);
++		pr_debug("IRQ Base: %d, Pin %d = IRQ %d\n",
++			chip->irq_base,	pin_num, gpio_irq);
++		irq_set_chip_and_handler(gpio_irq, &xgpio_irqchip,
++					 handle_simple_irq);
++		irq_set_chip_data(gpio_irq, (void *)chip);
++#ifdef CONFIG_ARCH_ZYNQ
++		set_irq_flags(gpio_irq, IRQF_VALID);
++#endif
++	}
++	irq_set_handler_data(res.start, (void *)chip);
++	irq_set_chained_handler(res.start, xgpio_irqhandler);
++
++	return 0;
++}
++
++/**
+  * xgpio_of_probe - Probe method for the GPIO device.
+  * @np: pointer to device tree node
+  *
+  * This function probes the GPIO device in the device tree. It initializes the
+- * driver data structure. It returns 0, if the driver is bound to the GPIO
+- * device, or a negative value if there is an error.
++ * driver data structure.
++ *
++ * Return:
++ * It returns 0, if the driver is bound to the GPIO device, or
++ * a negative value if there is an error.
+  */
+-static int xgpio_of_probe(struct device_node *np)
++static int xgpio_of_probe(struct platform_device *pdev)
+ {
++	struct device_node *np = pdev->dev.of_node;
+ 	struct xgpio_instance *chip;
+ 	int status = 0;
+ 	const u32 *tree_info;
+ 
+-	chip = kzalloc(sizeof(*chip), GFP_KERNEL);
++	chip = devm_kzalloc(&pdev->dev, sizeof(*chip), GFP_KERNEL);
+ 	if (!chip)
+ 		return -ENOMEM;
+ 
+ 	/* Update GPIO state shadow register with default value */
+-	tree_info = of_get_property(np, "xlnx,dout-default", NULL);
+-	if (tree_info)
+-		chip->gpio_state = be32_to_cpup(tree_info);
++	of_property_read_u32(np, "xlnx,dout-default", &chip->gpio_state);
++
++	/* By default, all pins are inputs */
++	chip->gpio_dir = 0xFFFFFFFF;
+ 
+ 	/* Update GPIO direction shadow register with default value */
+-	chip->gpio_dir = 0xFFFFFFFF; /* By default, all pins are inputs */
+-	tree_info = of_get_property(np, "xlnx,tri-default", NULL);
+-	if (tree_info)
+-		chip->gpio_dir = be32_to_cpup(tree_info);
++	of_property_read_u32(np, "xlnx,tri-default", &chip->gpio_dir);
++
++	/* By default assume full GPIO controller */
++	chip->mmchip.gc.ngpio = 32;
+ 
+ 	/* Check device node and parent device node for device width */
+-	chip->mmchip.gc.ngpio = 32; /* By default assume full GPIO controller */
+-	tree_info = of_get_property(np, "xlnx,gpio-width", NULL);
+-	if (!tree_info)
+-		tree_info = of_get_property(np->parent,
+-					    "xlnx,gpio-width", NULL);
+-	if (tree_info)
+-		chip->mmchip.gc.ngpio = be32_to_cpup(tree_info);
++	of_property_read_u32(np, "xlnx,gpio-width",
++			      (u32 *)&chip->mmchip.gc.ngpio);
+ 
+ 	spin_lock_init(&chip->gpio_lock);
+ 
+@@ -219,29 +478,24 @@ static int xgpio_of_probe(struct device_node *np)
+ 	/* Call the OF gpio helper to setup and register the GPIO device */
+ 	status = of_mm_gpiochip_add(np, &chip->mmchip);
+ 	if (status) {
+-		kfree(chip);
+ 		pr_err("%s: error in probe function with status %d\n",
+ 		       np->full_name, status);
+ 		return status;
+ 	}
+ 
++	status = xgpio_irq_setup(np, chip);
++	if (status) {
++		pr_err("%s: GPIO IRQ initialization failed %d\n",
++		       np->full_name, status);
++		return status;
++	}
++
+ 	pr_info("XGpio: %s: registered, base is %d\n", np->full_name,
+ 							chip->mmchip.gc.base);
+ 
+ 	tree_info = of_get_property(np, "xlnx,is-dual", NULL);
+ 	if (tree_info && be32_to_cpup(tree_info)) {
+-		/* Distinguish dual gpio chip */
+-		/* NOTE baseaddr ends with zero address XGPIO_CHANNEL_OFFSET */
+-		/*
+-		 * FIXME
+-		 * drivers/gpio/gpio-xilinx.c: In function 'xgpio_of_probe':
+-		 * drivers/gpio/gpio-xilinx.c:235:3: error: assignment of
+-		 * read-only location '*(np->full_name + ((unsigned int)strlen
+-		 * (np->full_name) + 0xffffffffffffffffffffffffffffffffu))'
+-		 */
+-		/* np->full_name[strlen(np->full_name) - 1] = '8'; */
+-
+-		chip = kzalloc(sizeof(*chip), GFP_KERNEL);
++		chip = devm_kzalloc(&pdev->dev, sizeof(*chip), GFP_KERNEL);
+ 		if (!chip)
+ 			return -ENOMEM;
+ 
+@@ -249,26 +503,21 @@ static int xgpio_of_probe(struct device_node *np)
+ 		chip->offset = XGPIO_CHANNEL_OFFSET;
+ 
+ 		/* Update GPIO state shadow register with default value */
+-		tree_info = of_get_property(np, "xlnx,dout-default-2", NULL);
+-		if (tree_info)
+-			chip->gpio_state = be32_to_cpup(tree_info);
++		of_property_read_u32(np, "xlnx,dout-default-2",
++				     &chip->gpio_state);
+ 
+-		/* Update GPIO direction shadow register with default value */
+ 		/* By default, all pins are inputs */
+ 		chip->gpio_dir = 0xFFFFFFFF;
+-		tree_info = of_get_property(np, "xlnx,tri-default-2", NULL);
+-		if (tree_info)
+-			chip->gpio_dir = be32_to_cpup(tree_info);
+ 
+-		/* Check device node and parent device node for device width */
++		/* Update GPIO direction shadow register with default value */
++		of_property_read_u32(np, "xlnx,tri-default-2", &chip->gpio_dir);
++
+ 		/* By default assume full GPIO controller */
+ 		chip->mmchip.gc.ngpio = 32;
+-		tree_info = of_get_property(np, "xlnx,gpio2-width", NULL);
+-		if (!tree_info)
+-			tree_info = of_get_property(np->parent,
+-						"xlnx,gpio2-width", NULL);
+-		if (tree_info)
+-			chip->mmchip.gc.ngpio = be32_to_cpup(tree_info);
++
++		/* Check device node and parent device node for device width */
++		of_property_read_u32(np, "xlnx,gpio2-width",
++				     (u32 *)&chip->mmchip.gc.ngpio);
+ 
+ 		spin_lock_init(&chip->gpio_lock);
+ 
+@@ -279,12 +528,18 @@ static int xgpio_of_probe(struct device_node *np)
+ 
+ 		chip->mmchip.save_regs = xgpio_save_regs;
+ 
++		status = xgpio_irq_setup(np, chip);
++		if (status) {
++			pr_err("%s: GPIO IRQ initialization failed %d\n",
++			      np->full_name, status);
++			return status;
++		}
++
+ 		/* Call the OF gpio helper to setup and register the GPIO dev */
+ 		status = of_mm_gpiochip_add(np, &chip->mmchip);
+ 		if (status) {
+-			kfree(chip);
+ 			pr_err("%s: error in probe function with status %d\n",
+-			np->full_name, status);
++			       np->full_name, status);
+ 			return status;
+ 		}
+ 		pr_info("XGpio: %s: dual channel registered, base is %d\n",
+@@ -298,15 +553,20 @@ static struct of_device_id xgpio_of_match[] = {
+ 	{ .compatible = "xlnx,xps-gpio-1.00.a", },
+ 	{ /* end of list */ },
+ };
++MODULE_DEVICE_TABLE(of, xgpio_of_match);
++
++static struct platform_driver xilinx_gpio_driver = {
++	.probe = xgpio_of_probe,
++	.driver = {
++		.owner = THIS_MODULE,
++		.name = "xilinx-gpio",
++		.of_match_table = xgpio_of_match,
++	},
++};
+ 
+ static int __init xgpio_init(void)
+ {
+-	struct device_node *np;
+-
+-	for_each_matching_node(np, xgpio_of_match)
+-		xgpio_of_probe(np);
+-
+-	return 0;
++	return platform_driver_register(&xilinx_gpio_driver);
+ }
+ 
+ /* Make sure we get initialized before anyone else tries to use us */
 diff --git a/drivers/gpio/gpio-xilinxps.c b/drivers/gpio/gpio-xilinxps.c
-index 8c51700..dbe0a9f 100644
+index 8c51700..d953580 100644
 --- a/drivers/gpio/gpio-xilinxps.c
 +++ b/drivers/gpio/gpio-xilinxps.c
+@@ -26,7 +26,7 @@
+ #include <linux/pm_runtime.h>
+ #include <linux/pm_wakeup.h>
+ #include <linux/slab.h>
+-#include <asm/mach/irq.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/irqdomain.h>
+ 
+ #define DRIVER_NAME "xgpiops"
 @@ -426,8 +426,7 @@ static void xgpiops_irqhandler(unsigned int irq, struct irq_desc *desc)
  			generic_handle_irq(gpio_irq);
  		}
@@ -25390,6 +26328,84 @@ index d1b4e00..5cb5820 100644
  
  	return error;
  }
+diff --git a/drivers/pinctrl/pinctrl-at91.c b/drivers/pinctrl/pinctrl-at91.c
+index 471c71f..0b3d463 100644
+--- a/drivers/pinctrl/pinctrl-at91.c
++++ b/drivers/pinctrl/pinctrl-at91.c
+@@ -18,6 +18,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/irq.h>
+ #include <linux/irqdomain.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/io.h>
+ #include <linux/gpio.h>
+ #include <linux/pinctrl/machine.h>
+@@ -27,8 +28,6 @@
+ /* Since we request GPIOs from ourself */
+ #include <linux/pinctrl/consumer.h>
+ 
+-#include <asm/mach/irq.h>
+-
+ #include <mach/hardware.h>
+ #include <mach/at91_pio.h>
+ 
+diff --git a/drivers/pinctrl/pinctrl-exynos.c b/drivers/pinctrl/pinctrl-exynos.c
+index 538b9dd..7265e55 100644
+--- a/drivers/pinctrl/pinctrl-exynos.c
++++ b/drivers/pinctrl/pinctrl-exynos.c
+@@ -23,13 +23,12 @@
+ #include <linux/interrupt.h>
+ #include <linux/irqdomain.h>
+ #include <linux/irq.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/of_irq.h>
+ #include <linux/io.h>
+ #include <linux/slab.h>
+ #include <linux/err.h>
+ 
+-#include <asm/mach/irq.h>
+-
+ #include "pinctrl-samsung.h"
+ #include "pinctrl-exynos.h"
+ 
+diff --git a/drivers/pinctrl/pinctrl-sirf.c b/drivers/pinctrl/pinctrl-sirf.c
+index d02498b..ab26b4b 100644
+--- a/drivers/pinctrl/pinctrl-sirf.c
++++ b/drivers/pinctrl/pinctrl-sirf.c
+@@ -14,6 +14,7 @@
+ #include <linux/slab.h>
+ #include <linux/err.h>
+ #include <linux/irqdomain.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/pinctrl/pinctrl.h>
+ #include <linux/pinctrl/pinmux.h>
+ #include <linux/pinctrl/consumer.h>
+@@ -25,7 +26,6 @@
+ #include <linux/bitops.h>
+ #include <linux/gpio.h>
+ #include <linux/of_gpio.h>
+-#include <asm/mach/irq.h>
+ 
+ #define DRIVER_NAME "pinmux-sirf"
+ 
+diff --git a/drivers/pinctrl/spear/pinctrl-plgpio.c b/drivers/pinctrl/spear/pinctrl-plgpio.c
+index 3cf4ecd..5c2d86e 100644
+--- a/drivers/pinctrl/spear/pinctrl-plgpio.c
++++ b/drivers/pinctrl/spear/pinctrl-plgpio.c
+@@ -15,12 +15,12 @@
+ #include <linux/io.h>
+ #include <linux/irq.h>
+ #include <linux/irqdomain.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/module.h>
+ #include <linux/pinctrl/consumer.h>
+ #include <linux/platform_device.h>
+ #include <linux/pm.h>
+ #include <linux/spinlock.h>
+-#include <asm/mach/irq.h>
+ 
+ #define MAX_GPIO_PER_REG		32
+ #define PIN_OFFSET(pin)			(pin % MAX_GPIO_PER_REG)
 diff --git a/drivers/pwm/pwm-spear.c b/drivers/pwm/pwm-spear.c
 index 0c644e7..83b21d9 100644
 --- a/drivers/pwm/pwm-spear.c
@@ -25419,7 +26435,7 @@ index 0c644e7..83b21d9 100644
  			return ret;
  		}
 diff --git a/drivers/remoteproc/Kconfig b/drivers/remoteproc/Kconfig
-index 36d7805..c88b8c2 100644
+index 36d7805..823df2c 100644
 --- a/drivers/remoteproc/Kconfig
 +++ b/drivers/remoteproc/Kconfig
 @@ -44,6 +44,8 @@ config STE_MODEM_RPROC
@@ -25431,16 +26447,436 @@ index 36d7805..c88b8c2 100644
  	select REMOTEPROC
  	select RPMSG
  	select HOTPLUG_CPU
-@@ -55,7 +57,8 @@ config ZYNQ_REMOTEPROC
+@@ -55,6 +57,9 @@ config ZYNQ_REMOTEPROC
  config MB_REMOTEPROC
  	tristate "Support Microblaze remoteproc"
  	depends on ARCH_ZYNQ
--	select REMOTEPROC
 +	depends on EXPERIMENTAL
 +	depends on HAS_DMA
++	select GPIO_XILINX
+ 	select REMOTEPROC
  	select RPMSG
  	default m
- 	help
+diff --git a/drivers/remoteproc/mb_remoteproc.c b/drivers/remoteproc/mb_remoteproc.c
+index 470ff9d..860847d 100644
+--- a/drivers/remoteproc/mb_remoteproc.c
++++ b/drivers/remoteproc/mb_remoteproc.c
+@@ -1,7 +1,8 @@
+ /*
+  * Microblaze Remote Processor driver
+  *
+- * Copyright (C) 2012 Michal Simek <monstr@monstr.eu>
++ * Copyright (C) 2012 - 2013 Michal Simek <monstr@monstr.eu>
++ * Copyright (C) 2013 Xilinx, Inc.
+  * Copyright (C) 2012 PetaLogix
+  *
+  * Based on origin OMAP Remote Processor driver
+@@ -21,55 +22,97 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+-#include <linux/moduleloader.h>
+ #include <linux/err.h>
+ #include <linux/platform_device.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/remoteproc.h>
+ #include <linux/interrupt.h>
+ #include <linux/of_irq.h>
++#include <linux/of_gpio.h>
++#include <linux/of_platform.h>
+ #include <linux/smp.h>
+ #include <asm/hardware/gic.h>
+ #include <asm/outercache.h>
+ #include <asm/cacheflush.h>
+ #include <linux/slab.h>
+ #include <linux/cpu.h>
++#include <linux/gpio.h>
++#include <linux/io.h>
++#include <linux/delay.h>
+ 
+ #include "remoteproc_internal.h"
+ 
+-extern int __cpuinit zynq_cpun_start(u32 address, int cpu);
+-
+ /* Module parameter */
+ static char *firmware;
+ 
+-/* Structure for storing IRQs */
+-struct irq_list {
+-	int irq;
+-	struct list_head list;
+-};
+-
+ /* Private data */
+ struct mb_rproc_pdata {
+-	struct irq_list mylist;
+ 	struct rproc *rproc;
+ 	u32 mem_start;
+ 	u32 mem_end;
+-	u32 *gpio_reset_addr;
+-	u32 reset_gpio_pin;
++	int reset_gpio;
++	int mb_debug_gpio;
++	int ipi;
++	int vring0;
++	int vring1;
++	void __iomem *vbase;
++	const unsigned char *bootloader;
+ };
+ 
++/* Store rproc for IPI handler */
++static struct platform_device *remoteprocdev;
++static struct work_struct workqueue;
++
++static void handle_event(struct work_struct *work)
++{
++	struct mb_rproc_pdata *local = platform_get_drvdata(remoteprocdev);
++
++	flush_cache_all();
++	outer_flush_range(local->mem_start, local->mem_end);
++
++	if (rproc_vq_interrupt(local->rproc, 0) == IRQ_NONE)
++		dev_info(&remoteprocdev->dev, "no message found in vqid 0\n");
++}
++
++static irqreturn_t ipi_kick(int irq, void *dev_id)
++{
++	dev_dbg(&remoteprocdev->dev, "KICK Linux because of pending message\n");
++	schedule_work(&workqueue);
++	dev_dbg(&remoteprocdev->dev, "KICK Linux handled\n");
++
++	return IRQ_HANDLED;
++}
++
+ static int mb_rproc_start(struct rproc *rproc)
+ {
+ 	struct device *dev = rproc->dev.parent;
+ 	struct platform_device *pdev = to_platform_device(dev);
+ 	struct mb_rproc_pdata *local = platform_get_drvdata(pdev);
++	const struct firmware *fw;
++	int ret;
+ 
+ 	dev_info(dev, "%s\n", __func__);
++	INIT_WORK(&workqueue, handle_event);
+ 
+ 	flush_cache_all();
+ 	outer_flush_range(local->mem_start, local->mem_end);
+ 
+-	*local->gpio_reset_addr &= ~(1 << local->reset_gpio_pin);
++	remoteprocdev = pdev;
++
++	ret = request_firmware(&fw, local->bootloader, &pdev->dev);
++	if (ret < 0) {
++		dev_err(&pdev->dev, "request_firmware failed\n");
++		return ret;
++	}
++	/* Copy bootloader to memory */
++	memcpy(local->vbase, fw->data, fw->size);
++	release_firmware(fw);
++
++	/* Just for sure synchronize memories */
++	dsb();
++
++	/* Release Microblaze from reset */
++	gpio_set_value(local->reset_gpio, 0);
+ 
+ 	return 0;
+ }
+@@ -78,9 +121,28 @@ static int mb_rproc_start(struct rproc *rproc)
+ static void mb_rproc_kick(struct rproc *rproc, int vqid)
+ {
+ 	struct device *dev = rproc->dev.parent;
++	struct platform_device *pdev = to_platform_device(dev);
++	struct mb_rproc_pdata *local = platform_get_drvdata(pdev);
++
++	dev_dbg(dev, "KICK Firmware to start send messages vqid %d\n", vqid);
+ 
+-	dev_info(dev, "KICK Firmware to start send messages vqid %d\n",
+-									vqid);
++	flush_cache_all();
++	outer_flush_all();
++
++	/* Send swirq to firmware */
++	gpio_set_value(local->vring0, 0);
++	gpio_set_value(local->vring1, 0);
++	dsb();
++
++	if (!vqid) {
++		udelay(500);
++		gpio_set_value(local->vring0, 1);
++		dsb();
++	} else {
++		udelay(100);
++		gpio_set_value(local->vring1, 1);
++		dsb();
++	}
+ }
+ 
+ /* power off the remote processor */
+@@ -90,10 +152,21 @@ static int mb_rproc_stop(struct rproc *rproc)
+ 	struct platform_device *pdev = to_platform_device(dev);
+ 	struct mb_rproc_pdata *local = platform_get_drvdata(pdev);
+ 
+-	dev_info(dev, "%s\n", __func__);
++	/* Setup MB to the state where all memory transactions are done */
++	gpio_set_value(local->mb_debug_gpio, 1);
++	dsb(); /* Be sure that this write has been done */
++	/*
++	 * This should be enough to ensure one CLK as
++	 * it is written in MB ref guide
++	 */
++	gpio_set_value(local->mb_debug_gpio, 0);
++
++	udelay(1000); /* Wait some time to finish all mem transactions */
+ 
+-	*local->gpio_reset_addr |= 1 << local->reset_gpio_pin;
++	/* Add Microblaze to reset state */
++	gpio_set_value(local->reset_gpio, 1);
+ 
++	/* No reason to wait that operations where done */
+ 	return 0;
+ }
+ 
+@@ -113,33 +186,17 @@ static irqreturn_t mb_remoteproc_interrupt(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
+ }
+ 
+-static void clear_irq(struct platform_device *pdev)
+-{
+-	struct list_head *pos, *q;
+-	struct irq_list *tmp;
+-	struct mb_rproc_pdata *local = platform_get_drvdata(pdev);
+-
+-	dev_info(&pdev->dev, "Deleting the irq_list\n");
+-	list_for_each_safe(pos, q, &local->mylist.list) {
+-		tmp = list_entry(pos, struct irq_list, list);
+-		free_irq(tmp->irq, &pdev->dev);
+-		list_del(pos);
+-		kfree(tmp);
+-	}
+-}
+-
+ static int mb_remoteproc_probe(struct platform_device *pdev)
+ {
+ 	const unsigned char *prop;
+-	const void *of_prop;
++	struct platform_device *bram_pdev;
++	struct device_node *bram_dev;
+ 	struct resource *res; /* IO mem resources */
+ 	int ret = 0;
+-	struct irq_list *tmp;
+-	int count;
++	int count = 0;
+ 	struct mb_rproc_pdata *local;
+ 
+-
+-	local = kzalloc(sizeof(struct mb_rproc_pdata), GFP_KERNEL);
++	local = devm_kzalloc(&pdev->dev, sizeof(*local), GFP_KERNEL);
+ 	if (!local) {
+ 		dev_err(&pdev->dev, "Unable to alloc private data\n");
+ 		return -ENOMEM;
+@@ -172,58 +229,123 @@ static int mb_remoteproc_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
+-	/* Init list for IRQs - it can be long list */
+-	INIT_LIST_HEAD(&local->mylist.list);
+-
+-	count = of_irq_count(pdev->dev.of_node);
+ 	/* Alloc IRQ based on DTS to be sure that no other driver will use it */
+-	while (count--) {
+-		tmp = kzalloc(sizeof(struct irq_list), GFP_KERNEL);
+-		if (!tmp) {
+-			dev_err(&pdev->dev, "Unable to alloc irq list\n");
+-			ret = -ENOMEM;
+-			goto irq_fault;
+-		}
+-
+-		tmp->irq = irq_of_parse_and_map(pdev->dev.of_node, count);
+-
+-		dev_info(&pdev->dev, "%d: Alloc irq: %d\n", count, tmp->irq);
+-
++	while (1) {
++		int irq;
+ 		/* Allocating shared IRQs will ensure that any module will
+ 		 * use these IRQs */
+-		ret = request_irq(tmp->irq, mb_remoteproc_interrupt, 0,
+-					dev_name(&pdev->dev), &pdev->dev);
++		irq = platform_get_irq(pdev, count++);
++		if (irq == -ENXIO)
++			break;
++		ret = devm_request_irq(&pdev->dev, irq, mb_remoteproc_interrupt,
++				       0, dev_name(&pdev->dev), &pdev->dev);
+ 		if (ret) {
+-			dev_err(&pdev->dev, "IRQ %d already allocated\n",
+-								tmp->irq);
+-			goto irq_fault;
++			dev_err(&pdev->dev, "IRQ %d already allocated\n", irq);
++			return ret;
+ 		}
+ 
+-		list_add(&(tmp->list), &(local->mylist.list));
++		dev_info(&pdev->dev, "%d: Alloc irq: %d\n", count, irq);
+ 	}
+ 
++	/* Find out reset gpio and keep microblaze in reset */
++	local->reset_gpio = of_get_named_gpio(pdev->dev.of_node, "reset", 0);
++	if (local->reset_gpio < 0) {
++		dev_err(&pdev->dev, "reset-gpio property not found\n");
++		return local->reset_gpio;
++	}
++	ret = devm_gpio_request_one(&pdev->dev, local->reset_gpio,
++				    GPIOF_OUT_INIT_HIGH, "mb_reset");
++	if (ret) {
++		dev_err(&pdev->dev, "Please specify gpio reset addr\n");
++		return ret;
++	}
++
++	/* Find out reset gpio and keep microblaze in reset */
++	local->mb_debug_gpio = of_get_named_gpio(pdev->dev.of_node, "debug", 0);
++	if (local->mb_debug_gpio < 0) {
++		dev_err(&pdev->dev, "mb-debug-gpio property not found\n");
++		return local->mb_debug_gpio;
++	}
++	ret = devm_gpio_request_one(&pdev->dev, local->mb_debug_gpio,
++				    GPIOF_OUT_INIT_LOW, "mb_debug");
++	if (ret) {
++		dev_err(&pdev->dev, "Please specify gpio debug pin\n");
++		return ret;
++	}
++
++	/* IPI number for getting irq from firmware */
++	local->ipi = of_get_named_gpio(pdev->dev.of_node, "ipino", 0);
++	if (local->ipi < 0) {
++		dev_err(&pdev->dev, "ipi-gpio property not found\n");
++		return local->ipi;
++	}
++	ret = devm_gpio_request_one(&pdev->dev, local->ipi, GPIOF_IN, "mb_ipi");
++	if (ret) {
++		dev_err(&pdev->dev, "Please specify gpio reset addr\n");
++		return ret;
++	}
++	ret = devm_request_irq(&pdev->dev, gpio_to_irq(local->ipi),
++			       ipi_kick, IRQF_SHARED|IRQF_TRIGGER_RISING,
++			       dev_name(&pdev->dev), local);
++	if (ret) {
++		dev_err(&pdev->dev, "IRQ %d already allocated\n", local->ipi);
++		return ret;
++	}
++
++	/* Find out vring0 pin */
++	local->vring0 = of_get_named_gpio(pdev->dev.of_node, "vring0", 0);
++	if (local->vring0 < 0) {
++		dev_err(&pdev->dev, "reset-gpio property not found\n");
++		return local->vring0;
++	}
++	ret = devm_gpio_request_one(&pdev->dev, local->vring0,
++				    GPIOF_DIR_OUT, "mb_vring0");
++	if (ret) {
++		dev_err(&pdev->dev, "Please specify gpio reset addr\n");
++		return ret;
++	}
+ 
+-	of_prop = of_get_property(pdev->dev.of_node, "reset-gpio", NULL);
+-	if (!of_prop) {
++	/* Find out vring1 pin */
++	local->vring1 = of_get_named_gpio(pdev->dev.of_node, "vring1", 0);
++	if (local->vring1 < 0) {
++		dev_err(&pdev->dev, "reset-gpio property not found\n");
++		return local->vring1;
++	}
++	ret = devm_gpio_request_one(&pdev->dev, local->vring1,
++				    GPIOF_DIR_OUT, "mb_vring1");
++	if (ret) {
+ 		dev_err(&pdev->dev, "Please specify gpio reset addr\n");
+-		goto irq_fault;
++		return ret;
+ 	}
+ 
+-	local->gpio_reset_addr = ioremap(be32_to_cpup(of_prop), 0x1000);
+-	if (!local->gpio_reset_addr) {
+-		dev_err(&pdev->dev, "Reset GPIO ioremap failed\n");
+-		goto irq_fault;
++	/* Allocate bram device */
++	bram_dev = of_parse_phandle(pdev->dev.of_node, "bram", 0);
++	if (!bram_dev) {
++		dev_err(&pdev->dev, "Please specify bram connection\n");
++		return -ENODEV;
++	}
++	bram_pdev = of_find_device_by_node(bram_dev);
++	if (!bram_pdev) {
++		dev_err(&pdev->dev, "BRAM device hasn't found\n");
++		return -ENODEV;
++	}
++	res = platform_get_resource(bram_pdev, IORESOURCE_MEM, 0);
++	local->vbase = devm_ioremap_resource(&pdev->dev, res);
++	if (!local->vbase) {
++		dev_err(&pdev->dev, "BRAM devm ioremap failed\n");
++		return -ENODEV;
+ 	}
+ 
+-	of_prop = of_get_property(pdev->dev.of_node, "reset-gpio-pin", NULL);
+-	if (!of_prop) {
+-		dev_err(&pdev->dev, "Please specify cpu number\n");
+-		goto irq_fault;
++	/* Load simple bootloader to bram */
++	local->bootloader = of_get_property(pdev->dev.of_node,
++					    "bram-firmware", NULL);
++	if (!local->bootloader) {
++		dev_err(&pdev->dev, "Please specify BRAM firmware\n");
++		return -ENODEV;
+ 	}
+-	local->reset_gpio_pin = be32_to_cpup(of_prop);
+ 
+-	/* Keep mb in reset */
+-	*local->gpio_reset_addr |= 1 << local->reset_gpio_pin;
++	dev_info(&pdev->dev, "Using microblaze BRAM bootloader: %s\n",
++		 local->bootloader);
+ 
+ 	/* Module param firmware first */
+ 	if (firmware)
+@@ -237,26 +359,19 @@ static int mb_remoteproc_probe(struct platform_device *pdev)
+ 				&mb_rproc_ops, prop, sizeof(struct rproc));
+ 		if (!local->rproc) {
+ 			dev_err(&pdev->dev, "rproc allocation failed\n");
+-			goto rproc_fault;
++			return -ENOMEM;
+ 		}
+ 
+ 		ret = rproc_add(local->rproc);
+ 		if (ret) {
+ 			dev_err(&pdev->dev, "rproc registration failed\n");
+-			goto rproc_fault;
++			rproc_put(local->rproc);
++			return ret;
+ 		}
++		return 0;
++	}
+ 
+-		return ret;
+-	} else
+-		ret = -ENODEV;
+-
+-rproc_fault:
+-	rproc_put(local->rproc);
+-
+-irq_fault:
+-	clear_irq(pdev);
+-
+-	return ret;
++	return -ENODEV;
+ }
+ 
+ static int mb_remoteproc_remove(struct platform_device *pdev)
+@@ -267,8 +382,6 @@ static int mb_remoteproc_remove(struct platform_device *pdev)
+ 
+ 	dma_release_declared_memory(&pdev->dev);
+ 
+-	clear_irq(pdev);
+-
+ 	rproc_del(local->rproc);
+ 	rproc_put(local->rproc);
+ 
 diff --git a/drivers/rpmsg/rpmsg_freertos_statistic.c b/drivers/rpmsg/rpmsg_freertos_statistic.c
 index 021dd7e..c09301a 100644
 --- a/drivers/rpmsg/rpmsg_freertos_statistic.c
@@ -28737,6 +30173,20 @@ index 0000000..e44fad7
 +
 +
 +#endif
+diff --git a/drivers/staging/imx-drm/ipu-v3/ipu-common.c b/drivers/staging/imx-drm/ipu-v3/ipu-common.c
+index f7059cd..fabd3ed 100644
+--- a/drivers/staging/imx-drm/ipu-v3/ipu-common.c
++++ b/drivers/staging/imx-drm/ipu-v3/ipu-common.c
+@@ -25,8 +25,8 @@
+ #include <linux/clk.h>
+ #include <linux/list.h>
+ #include <linux/irq.h>
++#include <linux/irqchip/chained_irq.h>
+ #include <linux/of_device.h>
+-#include <asm/mach/irq.h>
+ 
+ #include "imx-ipu-v3.h"
+ #include "ipu-prv.h"
 diff --git a/drivers/staging/video/axivdma/Kconfig b/drivers/staging/video/axivdma/Kconfig
 new file mode 100644
 index 0000000..f3b401b
@@ -77566,6 +79016,18 @@ index a501169..d9718ee 100644
 +		spinlock_t *lock);
  
  #endif
+diff --git a/include/linux/device.h b/include/linux/device.h
+index 43dcda9..251f33b 100644
+--- a/include/linux/device.h
++++ b/include/linux/device.h
+@@ -573,6 +573,7 @@ extern int devres_release_group(struct device *dev, void *id);
+ extern void *devm_kzalloc(struct device *dev, size_t size, gfp_t gfp);
+ extern void devm_kfree(struct device *dev, void *p);
+ 
++void __iomem *devm_ioremap_resource(struct device *dev, struct resource *res);
+ void __iomem *devm_request_and_ioremap(struct device *dev,
+ 			struct resource *res);
+ 
 diff --git a/include/linux/fs.h b/include/linux/fs.h
 index 1a39c33..7617ee0 100644
 --- a/include/linux/fs.h
@@ -77653,6 +79115,64 @@ index c4d870b..ae221a7 100644
  	/*
  	 * Defines whether IPC_RMID is forced for _all_ shm segments regardless
  	 * of shmctl()
+diff --git a/include/linux/irqchip/chained_irq.h b/include/linux/irqchip/chained_irq.h
+new file mode 100644
+index 0000000..adf4c30
+--- /dev/null
++++ b/include/linux/irqchip/chained_irq.h
+@@ -0,0 +1,52 @@
++/*
++ * Chained IRQ handlers support.
++ *
++ * Copyright (C) 2011 ARM Ltd.
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++#ifndef __IRQCHIP_CHAINED_IRQ_H
++#define __IRQCHIP_CHAINED_IRQ_H
++
++#include <linux/irq.h>
++
++/*
++ * Entry/exit functions for chained handlers where the primary IRQ chip
++ * may implement either fasteoi or level-trigger flow control.
++ */
++static inline void chained_irq_enter(struct irq_chip *chip,
++				     struct irq_desc *desc)
++{
++	/* FastEOI controllers require no action on entry. */
++	if (chip->irq_eoi)
++		return;
++
++	if (chip->irq_mask_ack) {
++		chip->irq_mask_ack(&desc->irq_data);
++	} else {
++		chip->irq_mask(&desc->irq_data);
++		if (chip->irq_ack)
++			chip->irq_ack(&desc->irq_data);
++	}
++}
++
++static inline void chained_irq_exit(struct irq_chip *chip,
++				    struct irq_desc *desc)
++{
++	if (chip->irq_eoi)
++		chip->irq_eoi(&desc->irq_data);
++	else
++		chip->irq_unmask(&desc->irq_data);
++}
++
++#endif /* __IRQCHIP_CHAINED_IRQ_H */
 diff --git a/include/linux/jbd2.h b/include/linux/jbd2.h
 index 383bef0..e30b663 100644
 --- a/include/linux/jbd2.h
@@ -78921,6 +80441,109 @@ index b6a1a5e..0000000
 -	return err;
 -}
 -device_initcall(timelimit_init);
+diff --git a/lib/devres.c b/lib/devres.c
+index 80b9c76..88ad759 100644
+--- a/lib/devres.c
++++ b/lib/devres.c
+@@ -1,3 +1,4 @@
++#include <linux/err.h>
+ #include <linux/pci.h>
+ #include <linux/io.h>
+ #include <linux/gfp.h>
+@@ -86,22 +87,24 @@ void devm_iounmap(struct device *dev, void __iomem *addr)
+ EXPORT_SYMBOL(devm_iounmap);
+ 
+ /**
+- * devm_request_and_ioremap() - Check, request region, and ioremap resource
+- * @dev: Generic device to handle the resource for
++ * devm_ioremap_resource() - check, request region, and ioremap resource
++ * @dev: generic device to handle the resource for
+  * @res: resource to be handled
+  *
+- * Takes all necessary steps to ioremap a mem resource. Uses managed device, so
+- * everything is undone on driver detach. Checks arguments, so you can feed
+- * it the result from e.g. platform_get_resource() directly. Returns the
+- * remapped pointer or NULL on error. Usage example:
++ * Checks that a resource is a valid memory region, requests the memory region
++ * and ioremaps it either as cacheable or as non-cacheable memory depending on
++ * the resource's flags. All operations are managed and will be undone on
++ * driver detach.
++ *
++ * Returns a pointer to the remapped memory or an ERR_PTR() encoded error code
++ * on failure. Usage example:
+  *
+  *	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+- *	base = devm_request_and_ioremap(&pdev->dev, res);
+- *	if (!base)
+- *		return -EADDRNOTAVAIL;
++ *	base = devm_ioremap_resource(&pdev->dev, res);
++ *	if (IS_ERR(base))
++ *		return PTR_ERR(base);
+  */
+-void __iomem *devm_request_and_ioremap(struct device *dev,
+-			struct resource *res)
++void __iomem *devm_ioremap_resource(struct device *dev, struct resource *res)
+ {
+ 	resource_size_t size;
+ 	const char *name;
+@@ -111,7 +114,7 @@ void __iomem *devm_request_and_ioremap(struct device *dev,
+ 
+ 	if (!res || resource_type(res) != IORESOURCE_MEM) {
+ 		dev_err(dev, "invalid resource\n");
+-		return NULL;
++		return ERR_PTR(-EINVAL);
+ 	}
+ 
+ 	size = resource_size(res);
+@@ -119,7 +122,7 @@ void __iomem *devm_request_and_ioremap(struct device *dev,
+ 
+ 	if (!devm_request_mem_region(dev, res->start, size, name)) {
+ 		dev_err(dev, "can't request region for resource %pR\n", res);
+-		return NULL;
++		return ERR_PTR(-EBUSY);
+ 	}
+ 
+ 	if (res->flags & IORESOURCE_CACHEABLE)
+@@ -130,10 +133,39 @@ void __iomem *devm_request_and_ioremap(struct device *dev,
+ 	if (!dest_ptr) {
+ 		dev_err(dev, "ioremap failed for resource %pR\n", res);
+ 		devm_release_mem_region(dev, res->start, size);
++		dest_ptr = ERR_PTR(-ENOMEM);
+ 	}
+ 
+ 	return dest_ptr;
+ }
++EXPORT_SYMBOL(devm_ioremap_resource);
++
++/**
++ * devm_request_and_ioremap() - Check, request region, and ioremap resource
++ * @dev: Generic device to handle the resource for
++ * @res: resource to be handled
++ *
++ * Takes all necessary steps to ioremap a mem resource. Uses managed device, so
++ * everything is undone on driver detach. Checks arguments, so you can feed
++ * it the result from e.g. platform_get_resource() directly. Returns the
++ * remapped pointer or NULL on error. Usage example:
++ *
++ *	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++ *	base = devm_request_and_ioremap(&pdev->dev, res);
++ *	if (!base)
++ *		return -EADDRNOTAVAIL;
++ */
++void __iomem *devm_request_and_ioremap(struct device *device,
++				       struct resource *res)
++{
++	void __iomem *dest_ptr;
++
++	dest_ptr = devm_ioremap_resource(device, res);
++	if (IS_ERR(dest_ptr))
++		return NULL;
++
++	return dest_ptr;
++}
+ EXPORT_SYMBOL(devm_request_and_ioremap);
+ 
+ #ifdef CONFIG_HAS_IOPORT
 diff --git a/lib/oid_registry.c b/lib/oid_registry.c
 index 318f382..d8de11f 100644
 --- a/lib/oid_registry.c
@@ -79424,6 +81047,102 @@ index 91ef82b..82c4fc7 100644
  		return;
  	}
  
+diff --git a/scripts/coccinelle/api/devm_ioremap_resource.cocci b/scripts/coccinelle/api/devm_ioremap_resource.cocci
+new file mode 100644
+index 0000000..495daa3
+--- /dev/null
++++ b/scripts/coccinelle/api/devm_ioremap_resource.cocci
+@@ -0,0 +1,90 @@
++virtual patch
++virtual report
++
++@depends on patch@
++expression base, dev, res;
++@@
++
++-base = devm_request_and_ioremap(dev, res);
+++base = devm_ioremap_resource(dev, res);
++ ...
++ if (
++-base == NULL
+++IS_ERR(base)
++ || ...) {
++<...
++-	return ...;
+++	return PTR_ERR(base);
++...>
++ }
++
++@depends on patch@
++expression e, E, ret;
++identifier l;
++@@
++
++ e = devm_ioremap_resource(...);
++ ...
++ if (IS_ERR(e) || ...) {
++ 	... when any
++-	ret = E;
+++	ret = PTR_ERR(e);
++ 	...
++(
++ 	return ret;
++|
++ 	goto l;
++)
++ }
++
++@depends on patch@
++expression e;
++@@
++
++ e = devm_ioremap_resource(...);
++ ...
++ if (IS_ERR(e) || ...) {
++ 	...
++-	\(dev_dbg\|dev_err\|pr_debug\|pr_err\|DRM_ERROR\)(...);
++ 	...
++ }
++
++@depends on patch@
++expression e;
++identifier l;
++@@
++
++ e = devm_ioremap_resource(...);
++ ...
++ if (IS_ERR(e) || ...)
++-{
++(
++ 	return ...;
++|
++ 	goto l;
++)
++-}
++
++@r depends on report@
++expression e;
++identifier l;
++position p1;
++@@
++
++*e = devm_request_and_ioremap@p1(...);
++ ...
++ if (e == NULL || ...) {
++ 	...
++(
++ 	return ...;
++|
++ 	goto l;
++)
++ }
++
++@script:python depends on r@
++p1 << r.p1;
++@@
++
++msg = "ERROR: deprecated devm_request_and_ioremap() API used on line %s" % (p1[0].line)
++coccilib.report.print_report(p1[0], msg)
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
 index 68b85e1..3368939 100644
 --- a/scripts/kconfig/streamline_config.pl
