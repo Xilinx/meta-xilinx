@@ -14,10 +14,10 @@
 			phy-handle = <&phy0>;
 			phy-mode = "rgmii-id";
 			mdio {
-				phy0: phy@7 {
-					compatible = "marvell,88e1510";
+				phy0: phy@0 {
+					compatible = "marvell,88e1518";
 					device_type = "ethernet-phy";
-					reg = <7>;
+					reg = <0>;
 				} ;
 			} ;
 		} ;
