@@ -13,7 +13,7 @@
 		serial0 = &rs232_uart_1;
 	} ;
 	chosen {
-		bootargs = "console=ttyS0,115200 ";
+		bootargs = "console=ttyS0,115200 root=/dev/ram rw";
 		linux,stdout-path = "/axi@1/serial@83e00000";
 	} ;
 	cpus {
