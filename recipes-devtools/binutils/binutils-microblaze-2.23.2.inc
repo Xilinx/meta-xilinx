@@ -15,4 +15,10 @@ SRC_URI_append += " \
 		file://0011-77625f8c77d14a67bc542bb790e6f826c725de4c.patch \
 		file://0012-b0ea811a61103f378351c9aa2cb16bd3010b0a31.patch \
 		file://0013-19e05575d97b6dc83dae1b8309624da3102d7a74.patch \
+		file://0014-Patch-microblaze-Add-wdc.ext.clear-and-wdc.ext.flush.patch \
+		file://0015-Patch-microblaze-Add-mlittle-endian-and-mbig-endian-.patch \
+		file://0016-Disable-the-warning-message-for-eh_frame_hdr.patch \
+		file://0017-Fix-relaxation-of-assembler-resolved-reference.patch \
+		file://0018-Fixup-debug_loc-sections-after-linker-relaxati.patch \
+		file://0019-upstream-change-to-garbage-collection-s.patch \
 		"
