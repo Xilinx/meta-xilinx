@@ -1,0 +1,160 @@
+From: David Holsgrove <david.holsgrove@xilinx.com>
+Date: Mon, 22 Jul 2013 11:16:05 +1000
+Subject: revert master-rebase changes to gdbserver
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+Upstream-Status: Pending
+---
+ gdb/gdbserver/Makefile.in            |    4 +++
+ gdb/gdbserver/configure.srv          |    7 +++++
+ gdb/gdbserver/linux-microblaze-low.c |   53 +++++-----------------------------
+ 3 files changed, 18 insertions(+), 46 deletions(-)
+
+diff --git a/gdb/gdbserver/Makefile.in b/gdb/gdbserver/Makefile.in
+index 08db2cc..aa76959 100644
+--- a/gdb/gdbserver/Makefile.in
++++ b/gdb/gdbserver/Makefile.in
+@@ -143,6 +143,7 @@ SFILES=	$(srcdir)/gdbreplay.c $(srcdir)/inferiors.c $(srcdir)/dll.c \
+ 	$(srcdir)/linux-ia64-low.c $(srcdir)/linux-low.c \
+ 	$(srcdir)/linux-m32r-low.c \
+ 	$(srcdir)/linux-m68k-low.c $(srcdir)/linux-mips-low.c \
++	$(srcdir)/linux-microblaze-low.c \
+ 	$(srcdir)/linux-ppc-low.c \
+ 	$(srcdir)/linux-s390-low.c \
+ 	$(srcdir)/linux-sh-low.c $(srcdir)/linux-sparc-low.c \
+@@ -336,6 +337,7 @@ clean:
+ 	rm -f i386-avx.c i386-avx-linux.c
+ 	rm -f amd64-avx.c amd64-avx-linux.c
+ 	rm -f i386-mmx.c i386-mmx-linux.c
++	rm -f microblaze-linux.c
+ 	rm -f x32.c x32-linux.c
+ 	rm -f x32-avx.c x32-avx-linux.c
+ 	@$(MAKE) $(FLAGS_TO_PASS) DO=$@ "DODIRS=$(SUBDIRS)" subdir_do
+@@ -616,6 +618,8 @@ mips64-linux.c : $(srcdir)/../regformats/mips64-linux.dat $(regdat_sh)
+ 	$(SHELL) $(regdat_sh) $(srcdir)/../regformats/mips64-linux.dat mips64-linux.c
+ mips64-dsp-linux.c : $(srcdir)/../regformats/mips64-dsp-linux.dat $(regdat_sh)
+ 	$(SHELL) $(regdat_sh) $(srcdir)/../regformats/mips64-dsp-linux.dat mips64-dsp-linux.c
++microblaze-linux.c : $(srcdir)/../regformats/reg-microblaze.dat $(regdat_sh)
++	$(SHELL) $(regdat_sh) $(srcdir)/../regformats/reg-microblaze.dat microblaze-linux.c
+ powerpc-32.c : $(srcdir)/../regformats/rs6000/powerpc-32.dat $(regdat_sh)
+ 	$(SHELL) $(regdat_sh) $(srcdir)/../regformats/rs6000/powerpc-32.dat powerpc-32.c
+ powerpc-32l.c : $(srcdir)/../regformats/rs6000/powerpc-32l.dat $(regdat_sh)
+diff --git a/gdb/gdbserver/configure.srv b/gdb/gdbserver/configure.srv
+index 271a0fe..57bd3a4c 100644
+--- a/gdb/gdbserver/configure.srv
++++ b/gdb/gdbserver/configure.srv
+@@ -201,6 +201,13 @@ case "${target}" in
+ 			srv_linux_usrregs=yes
+ 			srv_linux_thread_db=yes
+ 			;;
++  microblaze*-*-linux*)	srv_regobj=microblaze-linux.o
++			srv_tgtobj="linux-low.o linux-osdata.o linux-microblaze-low.o "
++			srv_tgtobj="${srv_tgtobj} linux-procfs.o linux-ptrace.o"
++			srv_linux_regsets=yes
++			srv_linux_usrregs=yes
++			srv_linux_thread_db=yes
++			;;
+   powerpc*-*-linux*)	srv_regobj="powerpc-32l.o"
+ 			srv_regobj="${srv_regobj} powerpc-altivec32l.o"
+ 			srv_regobj="${srv_regobj} powerpc-cell32l.o"
+diff --git a/gdb/gdbserver/linux-microblaze-low.c b/gdb/gdbserver/linux-microblaze-low.c
+index 279df9f..cba5d6f 100644
+--- a/gdb/gdbserver/linux-microblaze-low.c
++++ b/gdb/gdbserver/linux-microblaze-low.c
+@@ -43,7 +43,6 @@ static int microblaze_regmap[] =
+ 
+ /* Defined in auto-generated file microblaze-linux.c.  */
+ void init_registers_microblaze (void);
+-extern const struct target_desc *tdesc_microblaze;
+ 
+ static int
+ microblaze_cannot_store_register (int regno)
+@@ -108,7 +107,7 @@ microblaze_reinsert_addr (struct regcache *regcache)
+ static void
+ microblaze_collect_ptrace_register (struct regcache *regcache, int regno, char *buf)
+ {
+-  int size = register_size (regcache->tdesc, regno);
++  int size = register_size (regno);
+ 
+   memset (buf, 0, sizeof (long));
+ 
+@@ -122,7 +121,7 @@ static void
+ microblaze_supply_ptrace_register (struct regcache *regcache,
+ 			    int regno, const char *buf)
+ {
+-  int size = register_size (regcache->tdesc, regno);
++  int size = register_size (regno);
+ 
+   if (regno == 0) {
+     unsigned long regbuf_0 = 0;
+@@ -158,7 +157,7 @@ microblaze_store_gregset (struct regcache *regcache, const void *buf)
+ 
+ #endif /* HAVE_PTRACE_GETREGS */
+ 
+-static struct regset_info microblaze_regsets[] = {
++struct regset_info target_regsets[] = {
+ #ifdef HAVE_PTRACE_GETREGS
+   { PTRACE_GETREGS, PTRACE_SETREGS, 0, sizeof (elf_gregset_t), GENERAL_REGS, microblaze_fill_gregset, microblaze_store_gregset },
+   { 0, 0, 0, -1, -1, NULL, NULL },
+@@ -166,41 +165,11 @@ static struct regset_info microblaze_regsets[] = {
+   { 0, 0, 0, -1, -1, NULL, NULL }
+ };
+ 
+-static struct regsets_info microblaze_regsets_info =
+-  {
+-    microblaze_regsets, /* regsets */
+-    0, /* num_regsets */
+-    NULL, /* disabled_regsets */
+-  };
+-
+-static struct usrregs_info microblaze_usrregs_info =
+-  {
+-    microblaze_num_regs,
+-    microblaze_regmap,
+-  };
+-
+-static struct regs_info regs_info =
+-  {
+-    NULL, /* regset_bitmap */
+-    &microblaze_usrregs_info,
+-    &microblaze_regsets_info
+-  };
+-
+-static const struct regs_info *
+-microblaze_regs_info (void)
+-{
+-  return &regs_info;
+-}
+-
+-static void
+-microblaze_arch_setup (void)
+-{
+-  current_process ()->tdesc = tdesc_microblaze;
+-}
+-
+ struct linux_target_ops the_low_target = {
+-  microblaze_arch_setup,
+-  microblaze_regs_info,
++  init_registers_microblaze,
++  microblaze_num_regs,
++  microblaze_regmap,
++  NULL,
+   microblaze_cannot_fetch_register,
+   microblaze_cannot_store_register,
+   NULL, /* fetch_register */
+@@ -218,11 +187,3 @@ struct linux_target_ops the_low_target = {
+   microblaze_collect_ptrace_register,
+   microblaze_supply_ptrace_register,
+ };
+-
+-void
+-initialize_low_arch (void)
+-{
+-  init_registers_microblaze ();
+-
+-  initialize_regsets_info (&microblaze_regsets_info);
+-}
+\ No newline at end of file
+-- 
+1.7.9.5
+
