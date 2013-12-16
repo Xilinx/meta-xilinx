@@ -1,0 +1,33 @@
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Fri, 22 Jun 2012 01:20:20 +0200
+Subject: Disable the warning message for eh_frame_hdr
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+Upstream-Status: Pending
+---
+ bfd/elf-eh-frame.c |    9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/bfd/elf-eh-frame.c b/bfd/elf-eh-frame.c
+index a75d806..de69cef 100644
+--- a/bfd/elf-eh-frame.c
++++ b/bfd/elf-eh-frame.c
+@@ -913,9 +913,12 @@ _bfd_elf_parse_eh_frame (bfd *abfd, struct bfd_link_info *info,
+   goto success;
+ 
+  free_no_table:
+-  (*info->callbacks->einfo)
+-    (_("%P: error in %B(%A); no .eh_frame_hdr table will be created.\n"),
+-     abfd, sec);
++  /* FIXME: Remove the microblaze specifics when relaxing gets fixed.  */
++  if (bfd_get_arch(abfd) != bfd_arch_microblaze) {
++    (*info->callbacks->einfo)
++      (_("%P: error in %B(%A); no .eh_frame_hdr table will be created.\n"),
++       abfd, sec);
++  }
+   hdr_info->table = FALSE;
+   if (sec_info)
+     free (sec_info);
+-- 
+1.7.9.5
+
