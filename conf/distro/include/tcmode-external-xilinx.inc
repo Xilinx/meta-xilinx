@@ -62,7 +62,7 @@ python toolchain_setup () {
     if len(files) > 0:
         ext_bindir = d.expand('${EXTERNAL_TOOLCHAIN}/bin')
         loc_bindir = d.getVar('STAGING_BINDIR_TOOLCHAIN', True)
-        bb.mkdirhier(loc_bindir)
+        bb.utils.mkdirhier(loc_bindir)
         for f in files:
             source = os.path.join(ext_bindir, f[0])
             dest = os.path.join(loc_bindir, f[1])
