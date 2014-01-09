@@ -85,20 +85,6 @@ Please see the associated README file for each avaliable boot method in the
 Known Issues
 ============
 
-MicroBlaze Yocto Built Toolchain fails to compile shadow
---------------------------------------------------------
-There is an issue with the GCC 4.8 toolchain built by Yocto which fails to
-correctly built the 'shadow' package due to an assembler error.
-
-{standard input}: Assembler messages:
-{standard input}:754: Error: operation combines symbols in different segments
-
-The current workaround for this issue is to build the entire repository
-without debug symbols, or to disable debug symbols only for shadow.
-
-e.g. Add the following to local.conf:
-	DEBUG_FLAGS_pn-shadow = ""
-
 MicroBlaze Linux Kernel 3.8+ and GCC 4.8+ fails to boot
 -------------------------------------------------------
 There is a regression in GCC 4.8 that causes a race condition in the kernel. It
