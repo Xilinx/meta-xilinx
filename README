@@ -127,3 +127,6 @@ external toolchain, including the location to the toolchain:
 	TCMODE = "external-xilinx"
 	EXTERNAL_TOOLCHAIN = "<path to toolchain>"
 
+WARNING: There is a known issue with the MicroBlaze Linux toolchain provided by
+XSDK 2013.3 where certain shift instructions are not generated correctly, avoid
+using this toolchain. Use the newer XSDK 2013.4 or PetaLinux 2013.10 toolchains.
