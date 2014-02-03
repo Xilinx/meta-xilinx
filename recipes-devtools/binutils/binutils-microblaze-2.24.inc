@@ -1,6 +1,6 @@
 
 # Add MicroBlaze Patches
-FILESEXTRAPATHS_append := "${THISDIR}/files2:"
+FILESEXTRAPATHS_append := "${THISDIR}/files:"
 SRC_URI_append += " \
 		file://Add-wdc.ext.clear-and-wdc.ext.flush.patch \
 		file://Add-mlittle-endian-and-mbig-endian.patch \
