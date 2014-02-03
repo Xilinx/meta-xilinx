@@ -18,14 +18,14 @@ relocations for a shared lib with garbage collection this occurs
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 Upstream-Status: Pending
 ---
- bfd/elflink.c |    1 -
+ bfd/elflink.c | 1 -
  1 file changed, 1 deletion(-)
 
 diff --git a/bfd/elflink.c b/bfd/elflink.c
-index bcd3add..e6d7bfb 100644
+index 99b7ca1..415d714 100644
 --- a/bfd/elflink.c
 +++ b/bfd/elflink.c
-@@ -11870,7 +11870,6 @@ elf_gc_sweep_symbol (struct elf_link_hash_entry *h, void *data)
+@@ -11909,7 +11909,6 @@ elf_gc_sweep_symbol (struct elf_link_hash_entry *h, void *data)
  
        inf = (struct elf_gc_sweep_symbol_info *) data;
        (*inf->hide_symbol) (inf->info, h, TRUE);
@@ -34,5 +34,5 @@ index bcd3add..e6d7bfb 100644
        h->ref_regular_nonweak = 0;
      }
 -- 
-1.7.9.5
+1.8.5.1
 

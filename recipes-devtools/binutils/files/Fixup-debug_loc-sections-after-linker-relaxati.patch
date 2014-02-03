@@ -13,37 +13,33 @@ Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 Upstream-Status: Pending
 ---
- bfd/bfd-in2.h              |    7 ++++++-
- bfd/elf32-microblaze.c     |   45 ++++++++++++++++++++++++++++++++++++--------
- bfd/libbfd.h               |    1 +
- bfd/reloc.c                |    6 ++++++
- binutils/readelf.c         |    4 ++++
- gas/config/tc-microblaze.c |    3 +++
- include/elf/microblaze.h   |    1 +
- 7 files changed, 58 insertions(+), 9 deletions(-)
+ bfd/bfd-in2.h              |  5 +++++
+ bfd/elf32-microblaze.c     | 45 +++++++++++++++++++++++++++++++++++++--------
+ bfd/libbfd.h               |  1 +
+ bfd/reloc.c                |  6 ++++++
+ binutils/readelf.c         |  4 ++++
+ gas/config/tc-microblaze.c |  3 +++
+ include/elf/microblaze.h   |  1 +
+ 7 files changed, 57 insertions(+), 8 deletions(-)
 
 diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
-index 1e47573..d50375e 100644
+index 41f7a68..b8c73b0 100644
 --- a/bfd/bfd-in2.h
 +++ b/bfd/bfd-in2.h
-@@ -5035,9 +5035,14 @@ value relative to the read-write small data area anchor  */
+@@ -5190,6 +5190,11 @@ value relative to the read-write small data area anchor  */
  expressions of the form "Symbol Op Symbol"  */
    BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM,
  
--/* This is a 64 bit reloc that stores the 32 bit pc relative 
 +/* This is a 32 bit reloc that stores the 32 bit pc relative
- value in two words (with an imm instruction).  No relocation is 
- done here - only used for relaxing  */
++value in two words (with an imm instruction).  No relocation is 
++done here - only used for relaxing  */
 +  BFD_RELOC_MICROBLAZE_32_NONE,
 +
-+/* This is a 64 bit reloc that stores the 32 bit pc relative
-+value in two words (with an imm instruction).  No relocation is
-+done here - only used for relaxing  */
-   BFD_RELOC_MICROBLAZE_64_NONE,
- 
- /* This is a 64 bit reloc that stores the 32 bit pc relative 
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imm instruction).  No relocation is
+ done here - only used for relaxing  */
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 9de2479..1f20e23 100644
+index d94ac32..7cd0195 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
 @@ -177,6 +177,20 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
@@ -151,10 +147,10 @@ index 9de2479..1f20e23 100644
  							0,
  							sec);
 diff --git a/bfd/libbfd.h b/bfd/libbfd.h
-index e20013a..7a943eb 100644
+index 1381803..034efb8 100644
 --- a/bfd/libbfd.h
 +++ b/bfd/libbfd.h
-@@ -2411,6 +2411,7 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
+@@ -2513,6 +2513,7 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
    "BFD_RELOC_MICROBLAZE_32_ROSDA",
    "BFD_RELOC_MICROBLAZE_32_RWSDA",
    "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
@@ -163,11 +159,11 @@ index e20013a..7a943eb 100644
    "BFD_RELOC_MICROBLAZE_64_GOTPC",
    "BFD_RELOC_MICROBLAZE_64_GOT",
 diff --git a/bfd/reloc.c b/bfd/reloc.c
-index 76669fa..99496d8 100644
+index 25c089c..3d2a8a8 100644
 --- a/bfd/reloc.c
 +++ b/bfd/reloc.c
-@@ -5842,6 +5842,12 @@ ENUMDOC
-   This is a 32 bit reloc for the microblaze to handle 
+@@ -6048,6 +6048,12 @@ ENUMDOC
+   This is a 32 bit reloc for the microblaze to handle
    expressions of the form "Symbol Op Symbol"
  ENUM
 +  BFD_RELOC_MICROBLAZE_32_NONE
@@ -178,12 +174,12 @@ index 76669fa..99496d8 100644
 +ENUM
    BFD_RELOC_MICROBLAZE_64_NONE
  ENUMDOC
-   This is a 64 bit reloc that stores the 32 bit pc relative 
+   This is a 64 bit reloc that stores the 32 bit pc relative
 diff --git a/binutils/readelf.c b/binutils/readelf.c
-index d9ec436..df892de 100644
+index 19b46c9..81a027c 100644
 --- a/binutils/readelf.c
 +++ b/binutils/readelf.c
-@@ -10207,6 +10207,10 @@ is_none_reloc (unsigned int reloc_type)
+@@ -10547,6 +10547,10 @@ is_none_reloc (unsigned int reloc_type)
        return reloc_type == 0;
      case EM_AARCH64:
        return reloc_type == 0 || reloc_type == 256;
@@ -228,5 +224,5 @@ index c4d9821..72771e8 100644
  END_RELOC_NUMBERS (R_MICROBLAZE_max)
  
 -- 
-1.7.9.5
+1.8.5.1
 
