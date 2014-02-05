@@ -50,16 +50,13 @@ To build a specific target BSP configure the associated machine in local.conf:
 
 	MACHINE ?= "zc702-zynq7"
 
-Note: Currently MicroBlaze targets only support being built with an External
-toolchain, please see the section below 'Configuring External Toolchain'.
-
 Build the target file system image using bitbake:
 
 	$ bitbake core-image-minimal
 
-Build additional targets include Linux and U-Boot:
+Build additional targets, including U-Boot:
 
-	$ bitbake linux-xlnx u-boot-xlnx
+	$ bitbake u-boot-xlnx
 
 Once complete the images for the target machine will be available in the output
 directory 'tmp/deploy/images'.
