@@ -267,7 +267,7 @@
 			clocks = <&clkc 14>, <&clkc 31>;
 			compatible = "xlnx,ps7-ethernet-1.00.a";
 			interrupt-parent = <&ps7_scugic_0>;
-			interrupts = <0 45 1>;
+			interrupts = <0 45 4>;
 			local-mac-address = [ 00 0a 35 00 00 01 ];
 			reg = <0xe000c000 0x1000>;
 			xlnx,enet-reset = <0xffffffff>;
