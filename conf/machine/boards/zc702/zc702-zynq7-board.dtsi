@@ -1,8 +1,12 @@
+/*
+ * ZC702 DTS file header for generic boot.
+ */
+
 /include/ "zynq-7-base.dtsi"
 / {
 	model = "Xilinx ZC702";
 	chosen {
-		bootargs = "console=ttyPS0,115200 earlyprintk";
+		bootargs = "console=ttyPS0,115200 earlyprintk root=/dev/ram rw";
 		linux,stdout-path = "/amba@0/serial@e0001000";
 	} ;
 	ps7_ddr_0: memory@0 {
