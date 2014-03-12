@@ -9,33 +9,69 @@ Creating boot file
 Using the Xilinx tools, package 'zynq_fsbl_0.elf' and 'u-boot.elf' into a 
 'BOOT.BIN' (See http://www.wiki.xilinx.com/Prepare+Boot+Image for details). 
 
-Boot using a ramdisk
---------------------
+Additionally if you require a bitstream at boot ensure that the bitstream is
+included in the BOOT.BIN.
+
+Booting to U-Boot via SD
+------------------------
 Use an SD card with partition one in FAT16 format.
-Copy the following to the SD card partition one (ensure to rename the files 
-where appropriate):
-        Boot file: BOOT.BIN
-	Kernel: uImage
-	RootFS: uramdisk.image.gz (core-image-minimal-<machine name>.ext2.gz.u-boot)
-	DTB:    devicetree.dtb (uImage-<machine name>-ram.dtb)
 
-Insert SD Card, connect UART to Terminal program and boot board (Ensure the
-board is configured for SD Boot).
+Copy the following to the SD card partition one:
+	* Boot file: BOOT.BIN
 
-Boot using SD card partition
-----------------------------
-Use an SD card with partition one in FAT16 format and partition two in EXT2 format.
-Copy the following to the SD card partition one (ensure to rename the files where 
-appropriate):
-        Boot file: BOOT.BIN
-	Kernel: uImage
-	DTB:    devicetree.dtb (uImage-<machine name>-mmcblk0p2.dtb)
-Extract the following to the SD card partion two
-	RootFS: core-image-minimal-<machine name>.tar.gz
+Insert the SD Card, connect UART to terminal program and boot the board the
+board. (Ensure the board is configured via the MIO's for SD Boot).
 
-Insert SD Card, connect UART to Terminal program and boot board.
-The loading of 'ramdisk' will fail as it is not present. Perform a manual 
-boot by typing
-bootm 0x3000000 - 0x2A00000
-Refer to u-boot documention to see how to modify and save these settings,
-so the following boot will correctly locate the rootfs in partition two.
+Booting the Kernel (with ramdisk rootfs)
+----------------------------------------
+Use an SD card with partition one in FAT16 format.
+
+Copy the following to the SD card partition one:
+	* Kernel:     uImage
+	* Root FS:    core-image-minimal-<machine name>.ext2.gz.u-boot
+	* Devicetree: uImage-<machine name>.dtb
+
+Also create the file "uEnv.txt" on the SD card parition one, with the following
+contents. Replacing the names of files where appropriate (this file will be
+loaded into the U-Boot environment). Ensure to replace the file names with the
+correct name for you machine/system.
+
+	kernel_image=uImage
+	devicetree_image=uImage-<machine name>.dtb
+	ramdisk_image=core-image-minimal-<machine name>.ext2.gz.u-boot
+
+Alternatively you can use the default names for the images, rename them
+according to below and copy them onto partition one. Doing this removes the need
+to create the uEnv.txt file.
+
+	* Kernel:     uImage
+	* Root FS:    uramdisk.image.gz
+	* Devicetree: devicetree.dtb
+
+Insert the SD Card, connect UART to terminal program and boot the board the
+board. (Ensure the board is configured via the MIO's for SD Boot).
+
+Booting the Kernel (with mmcblk/SD card rootfs)
+-----------------------------------------------
+Use an SD card with partition one in FAT16 format, and an additional partition
+for the root filesystem (formatted as EXT2).
+
+Copy the following to the SD card partition one:
+	* Kernel:     uImage
+	* Devicetree: uImage-<machine name>.dtb
+
+Extract the following to the SD card partion two:
+	* Root FS:    core-image-minimal-<machine name>.tar.gz
+
+Also create the file "uEnv.txt" on the SD card parition one, with the following
+contents. Replacing the names of files where appropriate (this file will be
+loaded into the U-Boot environment). Ensure to replace the file names with the
+correct name for you machine/system.
+
+	kernel_image=uImage
+	devicetree_image=uImage-<machine name>.dtb
+	bootargs=console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootwait earlyprintk
+	uenvcmd=echo Copying Linux from SD to RAM... && fatload mmc 0 0x3000000 ${kernel_image} && fatload mmc 0 0x2A00000 ${devicetree_image} && bootm 0x3000000 - 0x2A00000
+
+Insert the SD Card, connect UART to terminal program and boot the board the
+board. (Ensure the board is configured via the MIO's for SD Boot).
