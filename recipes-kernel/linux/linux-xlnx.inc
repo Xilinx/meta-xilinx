@@ -11,7 +11,6 @@ PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCREV}"
 # Sources
 KBRANCH ?= "master"
 SRC_URI = "git://github.com/Xilinx/linux-xlnx;protocol=git;branch=${KBRANCH}"
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 
 # Source Directory
@@ -26,8 +25,8 @@ COMPATIBLE_MACHINE = "qemumicroblaze|qemuzynq|microblaze|zynq"
 
 # Common kernel configuration parts
 # Arch specific kernel configuration parts
-MACHINE_KCONFIG_append_zynq += "common/zynq_defconfig_${LINUX_VERSION}.cfg"
-MACHINE_KCONFIG_append_microblaze += "common/microblaze_defconfig_${LINUX_VERSION}.cfg"
+MACHINE_KCONFIG_append_zynq += "common/linux/zynq/defconfig_${LINUX_VERSION}.cfg"
+MACHINE_KCONFIG_append_microblaze += "common/linux/microblaze/defconfig_${LINUX_VERSION}.cfg"
 
 # returns all the elements from the src uri that are .cfg files
 def find_config_fragments(d):
