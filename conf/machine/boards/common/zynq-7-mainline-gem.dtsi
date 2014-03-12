@@ -1,0 +1,29 @@
+/*
+ * Zynq 7 Device Tree - Linux Mainline GEM
+ * 
+ * This dtsi file will configure the ps7_ethernet_* nodes to be compatible with
+ * the upstream Cadence GEM driver (macb).
+ *
+ * To use this dtsi, include it after the base include. e.g.
+ *     ...
+ *     /include/ "zynq-7-base.dtsi"
+ *     /include/ "zynq-7-mainline-gem.dtsi"
+ *     / {
+ *     ...
+ */
+/ {
+	ps7_axi_interconnect_0: amba@0 {
+		ps7_ethernet_0: ps7-ethernet@e000b000 {
+			clock-names = "pclk", "hclk", "tx_clk";
+			clocks = <&clkc 30>, <&clkc 30>, <&clkc 13>;
+			compatible = "cdns,gem";
+			reg = <0xe000b000 0x4000>;
+		} ;
+		ps7_ethernet_1: ps7-ethernet@e000c000 {
+			clock-names = "pclk", "hclk", "tx_clk";
+			clocks = <&clkc 31>, <&clkc 31>, <&clkc 14>;
+			compatible = "cdns,gem";
+			reg = <0xe000c000 0x4000>;
+		} ;
+	} ;
+} ;
