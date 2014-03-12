@@ -1,0 +1,5 @@
+/dts-v1/;
+/include/ "zc702-zynq7-board.dtsi"
+/include/ "zynq-7-mainline-gem.dtsi"
+/ {
+} ;
