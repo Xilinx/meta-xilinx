@@ -1,0 +1,70 @@
+From ec2eba55f0c0e74dd39aca14dcc597583cf1eb67 Mon Sep 17 00:00:00 2001
+From: Jason Wu <huanyu@xilinx.com>
+Date: Wed, 21 Aug 2013 07:10:32 +0200
+Subject: [PATCH] microblaze: Add linux.bin.ub target
+
+Currently the linux.bin target creates both linux.bin and linux.bin.ub.
+Add linux.bin.ub as separate target to generate linux.bin.ub.
+
+Signed-off-by: Jason Wu <huanyu@xilinx.com>
+Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+Upstream-Status: Backport
+---
+ arch/microblaze/Makefile      | 3 ++-
+ arch/microblaze/boot/Makefile | 7 ++++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/arch/microblaze/Makefile b/arch/microblaze/Makefile
+index 0a603d3..40350a3 100644
+--- a/arch/microblaze/Makefile
++++ b/arch/microblaze/Makefile
+@@ -72,7 +72,7 @@ all: linux.bin
+ archclean:
+ 	$(Q)$(MAKE) $(clean)=$(boot)
+ 
+-linux.bin linux.bin.gz: vmlinux
++linux.bin linux.bin.gz linux.bin.ub: vmlinux
+ 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
+ 
+ simpleImage.%: vmlinux
+@@ -81,6 +81,7 @@ simpleImage.%: vmlinux
+ define archhelp
+   echo '* linux.bin    - Create raw binary'
+   echo '  linux.bin.gz - Create compressed raw binary'
++  echo '  linux.bin.ub - Create U-Boot wrapped raw binary'
+   echo '  simpleImage.<dt> - ELF image with $(arch)/boot/dts/<dt>.dts linked in'
+   echo '                   - stripped elf with fdt blob'
+   echo '  simpleImage.<dt>.unstrip - full ELF image with fdt blob'
+diff --git a/arch/microblaze/boot/Makefile b/arch/microblaze/boot/Makefile
+index 80fe54f..8e211cc 100644
+--- a/arch/microblaze/boot/Makefile
++++ b/arch/microblaze/boot/Makefile
+@@ -2,12 +2,15 @@
+ # arch/microblaze/boot/Makefile
+ #
+ 
+-targets := linux.bin linux.bin.gz simpleImage.%
++targets := linux.bin linux.bin.gz linux.bin.ub simpleImage.%
+ 
+ OBJCOPYFLAGS := -R .note -R .comment -R .note.gnu.build-id -O binary
+ 
+ $(obj)/linux.bin: vmlinux FORCE
+ 	$(call if_changed,objcopy)
++	@echo 'Kernel: $@ is ready' ' (#'`cat .version`')'
++
++$(obj)/linux.bin.ub: $(obj)/linux.bin FORCE
+ 	$(call if_changed,uimage)
+ 	@echo 'Kernel: $@ is ready' ' (#'`cat .version`')'
+ 
+@@ -22,8 +25,6 @@ quiet_cmd_strip = STRIP   $@
+ 	cmd_strip = $(STRIP) -K microblaze_start -K _end -K __log_buf \
+ 				-K _fdt_start vmlinux -o $@
+ 
+-UIMAGE_IN = $@
+-UIMAGE_OUT = $@.ub
+ UIMAGE_LOADADDR = $(CONFIG_KERNEL_BASE_ADDR)
+ 
+ $(obj)/simpleImage.%: vmlinux FORCE
+-- 
+1.8.5.5
+
