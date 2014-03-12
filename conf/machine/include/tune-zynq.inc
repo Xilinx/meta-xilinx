@@ -19,4 +19,4 @@ KERNEL_IMAGETYPE ?= "uImage"
 KERNEL_EXTRA_ARGS_zynq += "UIMAGE_LOADADDR=0x8000"
 
 # linux-yocto KMACHINE
-KMACHINE ?= "zynq-default"
+KMACHINE ?= "zynq"

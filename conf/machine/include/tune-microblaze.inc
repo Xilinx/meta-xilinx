@@ -17,4 +17,4 @@ KERNEL_IMAGETYPE ?= "linux.bin.ub"
 UBOOT_MACHINE ?= "microblaze-generic"
 
 # linux-yocto KMACHINE
-KMACHINE ?= "microblaze-default"
+KMACHINE ?= "microblaze"
