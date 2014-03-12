@@ -1,7 +1,0 @@
-define KMACHINE zynq-default
-define KTYPE tiny
-define KARCH arm
-
-include ktypes/tiny
-branch meta
-include zynq-tiny.scc
