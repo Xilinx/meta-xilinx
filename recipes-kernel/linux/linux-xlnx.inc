@@ -10,7 +10,7 @@ PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCREV}"
 
 # Sources
 KBRANCH ?= "master"
-SRC_URI = "git://github.com/Xilinx/linux-xlnx;protocol=git;branch=${KBRANCH}"
+SRC_URI = "git://github.com/Xilinx/linux-xlnx.git;protocol=https;branch=${KBRANCH}"
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 
 # Source Directory

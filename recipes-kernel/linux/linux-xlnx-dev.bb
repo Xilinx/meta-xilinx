@@ -25,8 +25,6 @@ KBRANCH_DEFAULT = "master"
 
 include linux-xlnx.inc
 
-SRC_URI = "git://github.com/Xilinx/linux-xlnx.git;protocol=git;branch=${KBRANCH}"
-
 # Set default SRCREVs. SRCREVs statically set to prevent network access during 
 # parsing. If linux-xlnx-dev is the preferred provider, they will be overridden 
 # to AUTOREV in the anonymous python routine and resolved when the variables 
