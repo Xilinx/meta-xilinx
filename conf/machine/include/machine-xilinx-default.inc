@@ -10,5 +10,6 @@ PREFERRED_VERSION_linux-xlnx ?= "3.8%"
 PREFERRED_VERSION_linux-yocto ?= "3.10%"
 
 # U-Boot Configuration
+PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-xlnx"
 PREFERRED_PROVIDER_u-boot ?= "u-boot-xlnx"
 PREFERRED_VERSION_u-boot-xlnx ?= "v2013.01%"
