@@ -15,9 +15,9 @@
 			phy-handle = <&phy0>;
 			phy-mode = "gmii";
 			mdio {
-				phy0: phy@7 {
+				phy0: phy@23 {
 					device_type = "ethernet-phy";
-					reg = <7>;
+					reg = <23>;
 				} ;
 			} ;
 		} ;
