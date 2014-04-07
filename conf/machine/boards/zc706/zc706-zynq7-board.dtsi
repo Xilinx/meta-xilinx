@@ -2,7 +2,6 @@
  * ZC706 DTS file header for generic boot.
  */
 
-/include/ "zynq-7-base.dtsi"
 / {
 	model = "Xilinx ZC706";
 	chosen {

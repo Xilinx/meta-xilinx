@@ -2,7 +2,6 @@
  * ZedBoard DTS file header for generic boot.
  */
 
-/include/ "zynq-7-base.dtsi"
 / {
 	model = "ZedBoard";
 	chosen {

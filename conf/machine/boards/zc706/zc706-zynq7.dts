@@ -1,4 +1,5 @@
 /dts-v1/;
+/include/ "zynq-7-base.dtsi"
 /include/ "zc706-zynq7-board.dtsi"
 / {
 } ;
