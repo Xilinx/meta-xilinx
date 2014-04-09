@@ -21,7 +21,9 @@
 		#cpus = <0x1>;
 		#size-cells = <0>;
 		microblaze_0: cpu@0 {
+			bus-handle = <&axi4_0>, <&axi4lite_0>;
 			clock-frequency = <100000000>;
+			clocks = <&clk_cpu>;
 			compatible = "xlnx,microblaze-8.40.a";
 			d-cache-baseaddr = <0x50000000>;
 			d-cache-highaddr = <0x53ffffff>;
@@ -121,6 +123,24 @@
 			xlnx,use-stack-protection = <0x0>;
 		} ;
 	} ;
+	clocks {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		clk_bus: bus {
+			#clock-cells = <0>;
+			clock-frequency = <100000000>;
+			clock-output-names = "bus";
+			compatible = "fixed-clock";
+			reg = <1>;
+		} ;
+		clk_cpu: cpu {
+			#clock-cells = <0>;
+			clock-frequency = <100000000>;
+			clock-output-names = "cpu";
+			compatible = "fixed-clock";
+			reg = <0>;
+		} ;
+	} ;
 	axi4_0: axi@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
@@ -136,11 +156,12 @@
 			axistream-connected = <&ethernet_dma>;
 			axistream-control-connected = <&ethernet_dma>;
 			clock-frequency = <100000000>;
+			clocks = <&clk_bus>;
 			compatible = "xlnx,axi-ethernet-3.01.a", "xlnx,axi-ethernet-1.00.a";
 			device_type = "network";
 			interrupt-parent = <&microblaze_0_intc>;
 			interrupts = < 3 2 >;
-			local-mac-address = [ 00 0a 35 00 81 91 ];
+			local-mac-address = [ 00 0a 35 00 00 00 ];
 			phy-handle = <&phy0>;
 			reg = < 0x82780000 0x40000 >;
 			xlnx,avb = <0x0>;
@@ -148,7 +169,7 @@
 			xlnx,include-io = <0x1>;
 			xlnx,mcast-extend = <0x0>;
 			xlnx,phy-type = <0x1>;
-			xlnx,phyaddr = "0B00001";
+			xlnx,phyaddr = <0x1>;
 			xlnx,rxcsum = <0x0>;
 			xlnx,rxmem = <0x1000>;
 			xlnx,rxvlan-strp = <0x0>;
@@ -165,7 +186,6 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 				phy0: phy@7 {
-					compatible = "marvell,88e1111";
 					device_type = "ethernet-phy";
 					reg = <7>;
 				} ;
@@ -195,6 +215,7 @@
 		} ;
 		rs232_uart_1: serial@83e00000 {
 			clock-frequency = <100000000>;
+			clocks = <&clk_bus>;
 			compatible = "xlnx,axi-uart16550-1.01.a", "xlnx,xps-uart16550-2.00.a", "ns16550a";
 			current-speed = <115200>;
 			device_type = "serial";
@@ -366,6 +387,7 @@
 		} ;
 		system_timer: system-timer@83c00000 {
 			clock-frequency = <100000000>;
+			clocks = <&clk_bus>;
 			compatible = "xlnx,axi-timer-1.03.a", "xlnx,xps-timer-1.00.a";
 			interrupt-parent = <&microblaze_0_intc>;
 			interrupts = < 2 2 >;
@@ -379,78 +401,5 @@
 			xlnx,trig0-assert = <0x1>;
 			xlnx,trig1-assert = <0x1>;
 		} ;
-       axi_pcie_0: axi-pcie@80000000 {
-           #address-cells = <2>;
-           #size-cells = <2>;
-           compatible = "xlnx,axi-pcie-1.05.a";
-           interrupt-parent = <&microblaze_0_intc>;
-           interrupts = < 6 2 >;
-           ranges = < 0x00000002 0x00000000 0x40000000 0x70000000 0x00000000 0x00000000 0x10000000 >;
-           reg = < 0x80000000 0x1000000 >;
-           xlnx,axi-aclk-freq-hz = <0x7735940>;
-           xlnx,axibar-0 = <0x70000000>;
-           xlnx,axibar-1 = <0xffffffff>;
-           xlnx,axibar-2 = <0xffffffff>;
-           xlnx,axibar-3 = <0xffffffff>;
-           xlnx,axibar-4 = <0xffffffff>;
-           xlnx,axibar-5 = <0xffffffff>;
-           xlnx,axibar-as-0 = <0x0>;
-           xlnx,axibar-as-1 = <0x0>;
-           xlnx,axibar-as-2 = <0x0>;
-           xlnx,axibar-as-3 = <0x0>;
-           xlnx,axibar-as-4 = <0x0>;
-           xlnx,axibar-as-5 = <0x0>;
-           xlnx,axibar-highaddr-0 = <0x7fffffff>;
-           xlnx,axibar-highaddr-1 = <0x0>;
-           xlnx,axibar-highaddr-2 = <0x0>;
-           xlnx,axibar-highaddr-3 = <0x0>;
-           xlnx,axibar-highaddr-4 = <0x0>;
-           xlnx,axibar-highaddr-5 = <0x0>;
-           xlnx,axibar-num = <0x1>;
-           xlnx,axibar2pciebar-0 = <0x40000000>;
-           xlnx,axibar2pciebar-1 = <0x0>;
-           xlnx,axibar2pciebar-2 = <0x0>;
-           xlnx,axibar2pciebar-3 = <0x0>;
-           xlnx,axibar2pciebar-4 = <0x0>;
-           xlnx,axibar2pciebar-5 = <0x0>;
-           xlnx,class-code = <0x60400>;
-           xlnx,comp-timeout = <0x1>;
-           xlnx,device-id = <0x705>;
-           xlnx,family = "virtex6";
-           xlnx,include-baroffset-reg = <0x0>;
-           xlnx,include-rc = <0x1>;
-           xlnx,instance = "axi_pcie_0";
-           xlnx,interrupt-pin = <0x0>;
-           xlnx,max-link-speed = <0x0>;
-           xlnx,no-of-lanes = <0x1>;
-           xlnx,num-msi-req = <0x0>;
-           xlnx,pcie-cap-slot-implemented = <0x0>;
-           xlnx,pcie-use-mode = "1.0";
-           xlnx,pciebar-as = <0x0>;
-           xlnx,pciebar-len-0 = <0x1c>;
-           xlnx,pciebar-len-1 = <0xd>;
-           xlnx,pciebar-len-2 = <0xd>;
-           xlnx,pciebar-num = <0x1>;
-           xlnx,pciebar2axibar-0 = <0xc0000000>;
-           xlnx,pciebar2axibar-0-sec = <0x0>;
-           xlnx,pciebar2axibar-1 = <0xffffffff>;
-           xlnx,pciebar2axibar-1-sec = <0x0>;
-           xlnx,pciebar2axibar-2 = <0xffffffff>;
-           xlnx,pciebar2axibar-2-sec = <0x0>;
-           xlnx,ref-clk-freq = <0x0>;
-           xlnx,ref-clk-freq-hz = <0x5f5e100>;
-           xlnx,rev-id = <0x0>;
-           xlnx,s-axi-ctl-aclk-freq-hz = <0x7735940>;
-           xlnx,s-axi-ctl-protocol = "AXI4LITE";
-           xlnx,s-axi-id-width = <0x1>;
-           xlnx,s-axi-support-threads = <0x1>;
-           xlnx,s-axi-supports-narrow-burst = <0x0>;
-           xlnx,s-axi-supports-read = <0x1>;
-           xlnx,s-axi-supports-write = <0x1>;
-           xlnx,subsystem-id = <0x0>;
-           xlnx,subsystem-vendor-id = <0x0>;
-           xlnx,vendor-id = <0x10ee>;
-       } ;
-		
 	} ;
 } ;
