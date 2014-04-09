@@ -4,6 +4,10 @@
 	#size-cells = <1>;
 	compatible = "xlnx,microblaze";
 	model = "Xilinx-KC705-TRD";
+	ddr3_sdram: memory@80000000 {
+		device_type = "memory";
+		reg = < 0x80000000 0x40000000 >;
+	} ;
 	aliases {
 		ethernet0 = &soft_ethernet_mac;
 		serial0 = &rs232_uart_1;
@@ -17,7 +21,9 @@
 		#cpus = <0x1>;
 		#size-cells = <0>;
 		microblaze_0: cpu@0 {
+			bus-handle = <&axi_mm_mb>, <&axi4_0>, <&axi4lite_0>;
 			clock-frequency = <150000000>;
+			clocks = <&clk_cpu>;
 			compatible = "xlnx,microblaze-8.50.a";
 			d-cache-baseaddr = <0x80000000>;
 			d-cache-highaddr = <0xffffffff>;
@@ -118,9 +124,23 @@
 			xlnx,use-stack-protection = <0x0>;
 		} ;
 	} ;
-	ddr3_sdram: memory@80000000 {
-		device_type = "memory";
-		reg = < 0x80000000 0x40000000 >;
+	clocks {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		clk_bus: bus {
+			#clock-cells = <0>;
+			clock-frequency = <100000000>;
+			clock-output-names = "bus";
+			compatible = "fixed-clock";
+			reg = <1>;
+		} ;
+		clk_cpu: cpu {
+			#clock-cells = <0>;
+			clock-frequency = <150000000>;
+			clock-output-names = "cpu";
+			compatible = "fixed-clock";
+			reg = <0>;
+		} ;
 	} ;
 	axi4lite_0: axi@2 {
 		#address-cells = <1>;
@@ -197,6 +217,7 @@
 		} ;
 		dual_timer_counter: system-timer@40300000 {
 			clock-frequency = <100000000>;
+			clocks = <&clk_bus>;
 			compatible = "xlnx,axi-timer-1.03.a", "xlnx,xps-timer-1.00.a";
 			interrupt-parent = <&interrupt_cntlr>;
 			interrupts = < 3 2 >;
@@ -430,6 +451,7 @@
 		} ;
 		rs232_uart_1: serial@40400000 {
 			clock-frequency = <100000000>;
+			clocks = <&clk_bus>;
 			compatible = "xlnx,axi-uart16550-1.01.a", "xlnx,xps-uart16550-2.00.a", "ns16550a";
 			current-speed = <115200>;
 			device_type = "serial";
@@ -451,6 +473,7 @@
 			axistream-connected = <&axi_dma_ethernet>;
 			axistream-control-connected = <&axi_dma_ethernet>;
 			clock-frequency = <100000000>;
+			clocks = <&clk_bus>;
 			compatible = "xlnx,axi-ethernet-3.01.a", "xlnx,axi-ethernet-1.00.a";
 			device_type = "network";
 			interrupt-parent = <&interrupt_cntlr>;
