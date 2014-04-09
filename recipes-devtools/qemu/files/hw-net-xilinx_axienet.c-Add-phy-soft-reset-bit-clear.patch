@@ -1,0 +1,29 @@
+From 425580f9241098c9ef554a33b80153624b1e0318 Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan.rossi@xilinx.com>
+Date: Wed, 9 Apr 2014 11:15:25 +1000
+Subject: [PATCH] hw/net/xilinx_axienet.c: Add phy soft reset bit clearing
+
+* Clear the BMCR Reset when writing to registers.
+
+Signed-off-by: Nathan Rossi <nathan.rossi@xilinx.com>
+---
+ hw/net/xilinx_axienet.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
+index 3eb7715..d9c15df 100644
+--- a/hw/net/xilinx_axienet.c
++++ b/hw/net/xilinx_axienet.c
+@@ -142,6 +142,9 @@ tdk_write(struct PHY *phy, unsigned int req, unsigned int data)
+             phy->regs[regnum] = data;
+             break;
+     }
++
++    /* Unconditionally clear regs[BMCR][BMCR_RESET] */
++    phy->regs[0] &= ~0x8000;
+ }
+ 
+ static void
+-- 
+1.9.0
+
