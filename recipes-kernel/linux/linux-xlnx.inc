@@ -23,8 +23,3 @@ require linux-machine-kconfig.inc
 
 # Override COMPATIBLE_MACHINE to include your machine in a bbappend file.
 COMPATIBLE_MACHINE = "qemumicroblaze|qemuzynq|microblaze|zynq"
-
-# Common kernel configuration parts
-# Arch specific kernel configuration parts
-MACHINE_KCONFIG_append_zynq += "common/linux/zynq/defconfig_${LINUX_VERSION}.cfg"
-MACHINE_KCONFIG_append_microblaze += "common/linux/microblaze/defconfig_${LINUX_VERSION}.cfg"

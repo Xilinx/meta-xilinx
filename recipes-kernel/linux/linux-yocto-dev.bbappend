@@ -1,8 +1,8 @@
 
 require linux-machine-common.inc
 
+# Use the 3.10 defconfigs
+MACHINE_KCONFIG_LINUX_VERSION = "3.10"
+
 COMPATIBLE_MACHINE_zynq = "zynq"
 COMPATIBLE_MACHINE_microblaze = "microblaze"
-
-MACHINE_KCONFIG_append_zynq += "common/linux/zynq/defconfig_3.10.cfg"
-MACHINE_KCONFIG_append_microblaze += "common/linux/microblaze/defconfig_3.10.cfg"
