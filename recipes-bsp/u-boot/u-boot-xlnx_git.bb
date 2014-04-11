@@ -11,6 +11,8 @@ UBOOT_XLNX_DEV_BRANCH ?= "master-next"
 
 include u-boot-xlnx.inc
 
+LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
+
 SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;protocol=https;branch=${UBOOT_XLNX_DEV_BRANCH}"
 
 # Set default SRCREVs. SRCREVs statically set to prevent network access during 
