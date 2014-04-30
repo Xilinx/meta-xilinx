@@ -6,8 +6,8 @@
  *
  * To use this dtsi, include it after the base include. e.g.
  *     ...
- *     /include/ "zynq-7-base.dtsi"
- *     /include/ "zynq-7-mainline-gem.dtsi"
+ *     /include/ "zynq7-base.dtsi"
+ *     /include/ "zynq7-mainline-gem.dtsi"
  *     / {
  *     ...
  */

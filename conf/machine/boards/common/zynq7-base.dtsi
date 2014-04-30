@@ -3,7 +3,7 @@
  *
  * To use this base include it in the dts/dtsi which relies on it.
  *     /dts-v1/;
- *     /include/ "zynq-7-base.dtsi"
+ *     /include/ "zynq7-base.dtsi"
  *     / {
  *     ...
  *

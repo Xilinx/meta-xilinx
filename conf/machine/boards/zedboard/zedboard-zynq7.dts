@@ -1,5 +1,5 @@
 /dts-v1/;
-/include/ "zynq-7-base.dtsi"
+/include/ "zynq7-base.dtsi"
 /include/ "zedboard-zynq7-board.dtsi"
 / {
 } ;
