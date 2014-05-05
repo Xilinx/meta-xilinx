@@ -1,7 +1,7 @@
 # Default Xilinx BSP Machine settings
 
 # File System Configuration
-IMAGE_FSTYPES ?= "cpio tar.gz ext2 ext2.gz.u-boot"
+IMAGE_FSTYPES ?= "cpio tar.gz ext2 ext2.gz.u-boot cpio.gz.u-boot"
 IMAGE_CLASSES += "image_types_uboot"
 
 # Kernel Configuration
