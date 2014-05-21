@@ -256,9 +256,9 @@
 		ps7_ethernet_0: ps7-ethernet@e000b000 {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			clock-names = "ref_clk", "aper_clk";
-			clocks = <&clkc 13>, <&clkc 30>;
-			compatible = "xlnx,ps7-ethernet-1.00.a";
+			clock-names = "ref_clk", "aper_clk", "pclk", "hclk", "tx_clk";
+			clocks = <&clkc 13>, <&clkc 30>, <&clkc 30>, <&clkc 30>, <&clkc 13>;
+			compatible = "cdns,gem", "xlnx,ps7-ethernet-1.00.a";
 			interrupt-parent = <&ps7_scugic_0>;
 			interrupts = <0 22 4>;
 			local-mac-address = [ 00 0a 35 00 00 00 ];
@@ -275,9 +275,9 @@
 		ps7_ethernet_1: ps7-ethernet@e000c000 {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			clock-names = "ref_clk", "aper_clk";
-			clocks = <&clkc 14>, <&clkc 31>;
-			compatible = "xlnx,ps7-ethernet-1.00.a";
+			clock-names = "ref_clk", "aper_clk", "pclk", "hclk", "tx_clk";
+			clocks = <&clkc 14>, <&clkc 31>, <&clkc 31>, <&clkc 31>, <&clkc 14>;
+			compatible = "cdns,gem", "xlnx,ps7-ethernet-1.00.a";
 			interrupt-parent = <&ps7_scugic_0>;
 			interrupts = <0 45 4>;
 			local-mac-address = [ 00 0a 35 00 00 01 ];
