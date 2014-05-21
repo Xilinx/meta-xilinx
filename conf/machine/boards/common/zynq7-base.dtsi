@@ -136,9 +136,15 @@
 			arm,tag-latency = <2 2 2>;
 		} ;
 		ps7_ddrc_0: ps7-ddrc@f8006000 {
-			compatible = "xlnx,ps7-ddrc-1.00.a", "xlnx,ps7-ddrc";
+			compatible = "xlnx,ps7-ddrc-1.00.a", "xlnx,ps7-ddrc", "xlnx,zynq-ddrc-1.0";
 			reg = <0xf8006000 0x1000>;
 			xlnx,has-ecc = <0x0>;
+		} ;
+		ps7_ocmc_0: ps7-ocmc@f800c000 {
+			compatible = "xlnx,zynq-ocmc-1.0";
+			interrupt-parent = <&ps7_scugic_0>;
+			interrupts = <0 3 4>;
+			reg = <0xf800c000 0x1000>;
 		} ;
 		ps7_ram_0: ps7-ram@fffc0000 {
 			compatible = "xlnx,ps7-ram-1.00.a", "xlnx,ps7-ocm";
@@ -356,8 +362,8 @@
 		} ;
 
 		ps7_sd_0: ps7-sdio@e0100000 {
-			clock-names = "ref_clk", "aper_clk";
-			clocks = <&clkc 21>, <&clkc 32>;
+			clock-names = "ref_clk", "aper_clk", "clk_xin", "clk_ahb";
+			clocks = <&clkc 21>, <&clkc 32>, <&clkc 21>, <&clkc 32>;
 			clock-frequency = <50000000>;
 			compatible = "xlnx,ps7-sdio-1.00.a", "arasan,sdhci", "arasan,sdhci-8.9a", "generic-sdhci";
 			interrupt-parent = <&ps7_scugic_0>;
@@ -368,8 +374,8 @@
 			xlnx,has-wp = <0x1>;
 		} ;
 		ps7_sd_1: ps7-sdio@e0101000 {
-			clock-names = "ref_clk", "aper_clk";
-			clocks = <&clkc 22>, <&clkc 33>;
+			clock-names = "ref_clk", "aper_clk", "clk_xin", "clk_ahb";
+			clocks = <&clkc 22>, <&clkc 33>, <&clkc 22>, <&clkc 33>;
 			clock-frequency = <50000000>;
 			compatible = "xlnx,ps7-sdio-1.00.a", "arasan,sdhci", "arasan,sdhci-8.9a", "generic-sdhci";
 			interrupt-parent = <&ps7_scugic_0>;
