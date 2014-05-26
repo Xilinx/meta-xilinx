@@ -247,7 +247,7 @@
 		ps7_dev_cfg_0: ps7-dev-cfg@f8007000 {
 			clock-names = "ref_clk", "fclk0", "fclk1", "fclk2", "fclk3";
 			clocks = <&clkc 12>, <&clkc 15>, <&clkc 16>, <&clkc 17>, <&clkc 18>;
-			compatible = "xlnx,ps7-dev-cfg-1.00.a";
+			compatible = "xlnx,ps7-dev-cfg-1.00.a", "xlnx,zynq-devcfg-1.0";
 			interrupt-parent = <&ps7_scugic_0>;
 			interrupts = <0 8 4>;
 			reg = <0xf8007000 0x100>;
@@ -301,7 +301,7 @@
 		ps7_gpio_0: ps7-gpio@e000a000 {
 			#gpio-cells = <2>;
 			clocks = <&clkc 42>;
-			compatible = "xlnx,ps7-gpio-1.00.a";
+			compatible = "xlnx,ps7-gpio-1.00.a", "xlnx,zynq-gpio-1.0";
 			emio-gpio-width = <64>;
 			gpio-controller ;
 			gpio-mask-high = <0x0>;
@@ -312,16 +312,15 @@
 		} ;
 
 		ps7_qspi_0: ps7-qspi@e000d000 {
-			bus-num = <2>;
-			clock-names = "ref_clk", "aper_clk";
-			clocks = <&clkc 10>, <&clkc 43>;
-			compatible = "xlnx,ps7-qspi-1.00.a";
+			clock-names = "ref_clk", "aper_clk", "pclk";
+			clocks = <&clkc 10>, <&clkc 43>, <&clkc 43>;
+			compatible = "xlnx,ps7-qspi-1.00.a", "xlnx,zynq-qspi-1.0";
 			reg = <0xe000d000 0x1000>;
 			interrupt-parent = <&ps7_scugic_0>;
 			interrupts = <0 19 4>;
 			is-dual = <0>;
 			num-chip-select = <1>;
-			speed-hz = <200000000>;
+			num-cs = <1>;
 			xlnx,fb-clk = <0x1>;
 			xlnx,qspi-mode = <0x0>;
 			#address-cells = <1>;
@@ -335,7 +334,6 @@
 		} ;
 
 		ps7_spi_0: ps7-spi@e0006000 {
-			bus-num = <0>;
 			clock-names = "ref_clk", "aper_clk";
 			clocks = <&clkc 25>, <&clkc 34>;
 			compatible = "xlnx,ps7-spi-1.00.a";
@@ -343,12 +341,10 @@
 			interrupts = <0 26 4>;
 			num-chip-select = <4>;
 			reg = <0xe0006000 0x1000>;
-			speed-hz = <166666666>;
 			#address-cells = <1>;
 			#size-cells = <0>;
 		} ;
 		ps7_spi_1: ps7-spi@e0007000 {
-			bus-num = <1>;
 			clock-names = "ref_clk", "aper_clk";
 			clocks = <&clkc 26>, <&clkc 35>;
 			compatible = "xlnx,ps7-spi-1.00.a";
@@ -356,7 +352,6 @@
 			interrupts = <0 49 4>;
 			num-chip-select = <4>;
 			reg = <0xe0007000 0x1000>;
-			speed-hz = <166666666>;
 			#address-cells = <1>;
 			#size-cells = <0>;
 		} ;
