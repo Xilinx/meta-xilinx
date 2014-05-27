@@ -1,24 +1,30 @@
+From 7944750e435100e72913f01aa0a43b7d7cffd421 Mon Sep 17 00:00:00 2001
 From: nagaraju <nmekala@xilix.com>
 Date: Tue, 3 Sep 2013 12:09:47 +0530
-Subject: Added Backtrace support to GDB
+Subject: [PATCH 08/16] [Patch, microblaze]: Added Backtrace support to GDB
 
-Added backtrace support without debugging information, Earlier backtrace used to work only when debug information is avialable.
-Previous pc & sp values are calculated incorrectly due to which backtrace was failing.
-In this patch, previous frame sp & pc values are calculated correctly in microblaze_frame_cache function
-and supplied them to microblaze_frame_prev_register function
+Added backtrace support without debugging information.
+
+Earlier backtrace used to work only when debug information is available.
+Previous pc & sp values are calculated incorrectly due to which backtrace
+was failing.
+
+In this patch, previous frame sp & pc values are calculated correctly
+in microblaze_frame_cache function and supplied them to
+microblaze_frame_prev_register function
 
 Signed-off-by:nagaraju <nmekala@xilix.com>
 Upstream-Status: Pending
 ---
- gdb/microblaze-tdep.c |   44 ++++++++++++++++++++++++++++++--------------
- gdb/microblaze-tdep.h |    5 +++--
- 2 files changed, 33 insertions(+), 16 deletions(-)
+ gdb/microblaze-tdep.c | 42 ++++++++++++++++++++++++++++++++++--------
+ gdb/microblaze-tdep.h |  5 +++--
+ 2 files changed, 37 insertions(+), 10 deletions(-)
 
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index 9c9f3a9..f4b48a6 100644
+index 0ce4947..247740e 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
-@@ -226,6 +226,7 @@ microblaze_alloc_frame_cache (void)
+@@ -225,6 +225,7 @@ microblaze_alloc_frame_cache (void)
    /* Base address.  */
    cache->base = 0;
    cache->pc = 0;
@@ -81,11 +87,10 @@ index 9c9f3a9..f4b48a6 100644
  }
  
  static struct value *
-@@ -558,18 +569,23 @@ microblaze_frame_prev_register (struct frame_info *this_frame,
+@@ -558,6 +569,14 @@ microblaze_frame_prev_register (struct frame_info *this_frame,
    struct microblaze_frame_cache *cache =
      microblaze_frame_cache (this_frame, this_cache);
  
--  if (cache->frameless_p)
 +  if ((regnum == MICROBLAZE_SP_REGNUM &&
 +      cache->register_offsets[MICROBLAZE_SP_REGNUM])
 +      || (regnum == MICROBLAZE_FP_REGNUM &&
@@ -94,21 +99,26 @@ index 9c9f3a9..f4b48a6 100644
 +     return frame_unwind_got_constant (this_frame, regnum,
 +                                       cache->register_offsets[MICROBLAZE_SP_REGNUM]);
 +
-+  if (regnum == MICROBLAZE_PC_REGNUM)
+   if (cache->frameless_p)
      {
--      if (regnum == MICROBLAZE_PC_REGNUM)
--        regnum = 15;
--      if (regnum == MICROBLAZE_SP_REGNUM)
--        regnum = 1;
--      return trad_frame_get_prev_register (this_frame,
+       if (regnum == MICROBLAZE_PC_REGNUM)
+@@ -565,11 +584,18 @@ microblaze_frame_prev_register (struct frame_info *this_frame,
+       if (regnum == MICROBLAZE_SP_REGNUM)
+         regnum = 1;
+       return trad_frame_get_prev_register (this_frame,
 -					   cache->saved_regs, regnum);
-+      regnum = 15;
-+      return frame_unwind_got_memory (this_frame, regnum,
-+                                      cache->register_offsets[MICROBLAZE_PREV_PC_REGNUM]);
++            cache->saved_regs, regnum);
      }
 -  else
 -    return trad_frame_get_prev_register (this_frame, cache->saved_regs,
 -					 regnum);
++
++  if (regnum == MICROBLAZE_PC_REGNUM)
++    {
++      regnum = 15;
++      return frame_unwind_got_memory (this_frame, regnum,
++                                      cache->register_offsets[MICROBLAZE_PREV_PC_REGNUM]);
++    }
 +
 +  return trad_frame_get_prev_register (this_frame, cache->saved_regs,
 +					regnum);
@@ -116,7 +126,7 @@ index 9c9f3a9..f4b48a6 100644
  }
  
 diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
-index 23dc77a..cf24ed4 100644
+index cd32e9f..14eb3ab 100644
 --- a/gdb/microblaze-tdep.h
 +++ b/gdb/microblaze-tdep.h
 @@ -57,6 +57,7 @@ struct microblaze_frame_cache
@@ -142,5 +152,5 @@ index 23dc77a..cf24ed4 100644
    MICROBLAZE_R21_REGNUM,
    MICROBLAZE_R22_REGNUM,
 -- 
-1.7.9.5
+1.9.0
 

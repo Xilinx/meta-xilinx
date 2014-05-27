@@ -1,64 +1,68 @@
+From 5c3a08f407e1cbee5b0a4ca6092165b97acddda5 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar@axis.com>
 Date: Fri, 24 Feb 2012 11:52:30 +0100
-Subject: Add mb singlestepping.
+Subject: [PATCH 05/16] [Patch, microblaze]: Add mb singlestepping.
 
 Fix prologue analysis for little-endian.
 Always provide a frame base.
 
 Signed-off-by: Edgar E. Iglesias <edgar@axis.com>
-
-Conflicts:
-
-	gdb/microblaze-tdep.c
-
-Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 Upstream-Status: Pending
 ---
- gdb/microblaze-tdep.c |  117 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 114 insertions(+), 3 deletions(-)
+ gdb/microblaze-tdep.c | 123 ++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 108 insertions(+), 15 deletions(-)
 
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index a245169..9c9f3a9 100644
+index 76e87b3..50b68d2 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
-@@ -282,6 +282,8 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
-   int flags = 0;
+@@ -243,9 +243,7 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
    int save_hidden_pointer_found = 0;
    int non_stack_instruction_found = 0;
-+  int n_insns;
+   int n_insns;
+-  unsigned long *insn_block;
+-  gdb_byte *buf_block;
+-  int ti, tj;
 +  unsigned int *insn_block;
  
    /* Find the start of this function.  */
    find_pc_partial_function (pc, &name, &func_addr, &func_end);
-@@ -321,11 +323,17 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
- 		    name, paddress (gdbarch, func_addr), 
- 		    paddress (gdbarch, stop));
+@@ -287,23 +285,16 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
  
-+  /* Do a block read to minimize the transaction with the Debug Agent */
-+  n_insns = (stop == func_addr) ? 1 : ((stop - func_addr) / INST_WORD_SIZE);
+ /* Do a block read to minimize the transaction with the Debug Agent */
+   n_insns = (stop == func_addr) ? 1 : ((stop - func_addr) / INST_WORD_SIZE);
+-  insn_block = (unsigned long *)calloc(n_insns, sizeof(unsigned long));
+-  buf_block = (gdb_byte *)calloc(n_insns * INST_WORD_SIZE, sizeof(gdb_byte));
 +  insn_block = calloc(n_insns, sizeof(unsigned long));
-+
+ 
+-  target_read_memory (func_addr, buf_block, n_insns * INST_WORD_SIZE );
+-
+-  for(ti = 0; ti < n_insns; ti++){
+-         insn_block[ti] = 0;
+-         for( tj = ti * INST_WORD_SIZE; tj < (ti + 1) * INST_WORD_SIZE; tj++ )
+-                 insn_block[ti] = (insn_block[ti] << 8) | buf_block[tj];
+-  }
 +  target_read_memory (func_addr, (void*) insn_block, n_insns * INST_WORD_SIZE );
-+
+ 
    for (addr = func_addr; addr < stop; addr += INST_WORD_SIZE)
      {
-       insn = microblaze_fetch_instruction (addr);
+      //insn = microblaze_fetch_instruction (addr);
+       insn = insn_block[(addr - func_addr) / INST_WORD_SIZE];
        op = microblaze_decode_insn (insn, &rd, &ra, &rb, &imm);
 -      microblaze_debug ("%s %08lx\n", paddress (gdbarch, pc), insn);
 +      microblaze_debug ("%s %08lx op=%x r%d r%d imm=%d\n", paddress (gdbarch, addr), insn, op, rd, ra, imm);
  
        /* This code is very sensitive to what functions are present in the
  	 prologue.  It assumes that the (addi, addik, swi, sw) can be the 
-@@ -449,7 +457,7 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
-      part of the prologue.  */
+@@ -428,7 +419,6 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
    if (save_hidden_pointer_found)
      prologue_end_addr -= INST_WORD_SIZE;
--
-+    free(insn_block);
-   return prologue_end_addr;
+     free(insn_block);
+-    free(buf_block);
+     return prologue_end_addr;
  }
  
-@@ -523,6 +531,7 @@ microblaze_frame_cache (struct frame_info *next_frame, void **this_cache)
+@@ -502,6 +492,7 @@ microblaze_frame_cache (struct frame_info *next_frame, void **this_cache)
  
    func = get_frame_func (next_frame);
  
@@ -66,7 +70,7 @@ index a245169..9c9f3a9 100644
    cache->pc = get_frame_address_in_block (next_frame);
  
    return cache;
-@@ -539,7 +548,7 @@ microblaze_frame_this_id (struct frame_info *next_frame, void **this_cache,
+@@ -518,7 +509,7 @@ microblaze_frame_this_id (struct frame_info *next_frame, void **this_cache,
    if (cache->base == 0)
      return;
  
@@ -75,7 +79,7 @@ index a245169..9c9f3a9 100644
  }
  
  static struct value *
-@@ -682,6 +691,107 @@ microblaze_stabs_argument_has_addr (struct gdbarch *gdbarch, struct type *type)
+@@ -661,6 +652,107 @@ microblaze_stabs_argument_has_addr (struct gdbarch *gdbarch, struct type *type)
    return (TYPE_LENGTH (type) == 16);
  }
  
@@ -183,8 +187,8 @@ index a245169..9c9f3a9 100644
  static void
  microblaze_write_pc (struct regcache *regcache, CORE_ADDR pc)
  {
-@@ -832,6 +942,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
-   set_gdbarch_memory_remove_breakpoint (gdbarch, microblaze_linux_memory_remove_breakpoint);
+@@ -809,6 +901,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   set_gdbarch_inner_than (gdbarch, core_addr_lessthan);
  
    set_gdbarch_breakpoint_from_pc (gdbarch, microblaze_breakpoint_from_pc);
 +  set_gdbarch_software_single_step (gdbarch, microblaze_software_single_step);
@@ -192,5 +196,5 @@ index a245169..9c9f3a9 100644
    set_gdbarch_frame_args_skip (gdbarch, 8);
  
 -- 
-1.7.9.5
+1.9.0
 

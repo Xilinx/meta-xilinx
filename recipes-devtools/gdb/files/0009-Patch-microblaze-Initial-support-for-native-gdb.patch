@@ -1,6 +1,7 @@
+From c7b918283f2e438deef78aae84f6b748a7a1bb54 Mon Sep 17 00:00:00 2001
 From: David Holsgrove <david.holsgrove@petalogix.com>
 Date: Fri, 20 Jul 2012 15:18:35 +1000
-Subject: Initial support for native gdb
+Subject: [PATCH 09/16] [Patch, microblaze]: Initial support for native gdb
 
 microblaze: Follow PPC method of getting setting registers
 using PTRACE PEEK/POKE
@@ -8,18 +9,18 @@ using PTRACE PEEK/POKE
 Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
 Upstream-Status: Pending
 ---
- gdb/Makefile.in                |    4 +-
- gdb/config/microblaze/linux.mh |    9 +
- gdb/microblaze-linux-nat.c     |  431 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 442 insertions(+), 2 deletions(-)
+ gdb/Makefile.in                |   4 +-
+ gdb/config/microblaze/linux.mh |  10 +
+ gdb/microblaze-linux-nat.c     | 431 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 443 insertions(+), 2 deletions(-)
  create mode 100644 gdb/config/microblaze/linux.mh
  create mode 100644 gdb/microblaze-linux-nat.c
 
 diff --git a/gdb/Makefile.in b/gdb/Makefile.in
-index 3fd5425..e5781f2 100644
+index f2c16ec..12870a4 100644
 --- a/gdb/Makefile.in
 +++ b/gdb/Makefile.in
-@@ -821,7 +821,7 @@ config/rs6000/nm-rs6000.h top.h bsd-kvm.h gdb-stabs.h reggroups.h \
+@@ -904,7 +904,7 @@ top.h bsd-kvm.h gdb-stabs.h reggroups.h \
  annotate.h sim-regno.h dictionary.h dfp.h main.h frame-unwind.h	\
  remote-fileio.h i386-linux-tdep.h vax-tdep.h objc-lang.h \
  sentinel-frame.h bcache.h symfile.h windows-tdep.h linux-tdep.h \
@@ -28,7 +29,7 @@ index 3fd5425..e5781f2 100644
  psymtab.h psympriv.h progspace.h bfin-tdep.h ia64-hpux-tdep.h \
  amd64-darwin-tdep.h charset-list.h \
  config/djgpp/langinfo.h config/djgpp/nl_types.h darwin-nat.h \
-@@ -1481,7 +1481,7 @@ ALLDEPFILES = \
+@@ -1631,7 +1631,7 @@ ALLDEPFILES = \
  	m68kbsd-nat.c m68kbsd-tdep.c \
  	m68klinux-nat.c m68klinux-tdep.c \
  	m88k-tdep.c m88kbsd-nat.c \
@@ -39,22 +40,23 @@ index 3fd5425..e5781f2 100644
  	mips-irix-tdep.c \
 diff --git a/gdb/config/microblaze/linux.mh b/gdb/config/microblaze/linux.mh
 new file mode 100644
-index 0000000..a4eaf54
+index 0000000..547d103
 --- /dev/null
 +++ b/gdb/config/microblaze/linux.mh
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,10 @@
 +# Host: Microblaze, running Linux
 +
 +NAT_FILE= config/nm-linux.h
 +NATDEPFILES= inf-ptrace.o fork-child.o \
 +	microblaze-linux-nat.o proc-service.o linux-thread-db.o \
-+	linux-nat.o linux-osdata.o linux-fork.o linux-procfs.o linux-ptrace.o
++	linux-nat.o linux-osdata.o linux-fork.o linux-procfs.o linux-ptrace.o \
++	linux-waitpid.o
 +NAT_CDEPS = $(srcdir)/proc-service.list
 +
 +LOADLIBES = -ldl $(RDYNAMIC)
 diff --git a/gdb/microblaze-linux-nat.c b/gdb/microblaze-linux-nat.c
 new file mode 100644
-index 0000000..e9b8c9c
+index 0000000..81f8346
 --- /dev/null
 +++ b/gdb/microblaze-linux-nat.c
 @@ -0,0 +1,431 @@
@@ -97,7 +99,7 @@ index 0000000..e9b8c9c
 +#include "osabi.h"
 +
 +#include "gdb_assert.h"
-+#include "gdb_string.h"
++#include <string.h>
 +#include "target-descriptions.h"
 +#include "opcodes/microblaze-opcm.h"
 +#include "opcodes/microblaze-dis.h"
@@ -130,9 +132,9 @@ index 0000000..e9b8c9c
 +int
 +get_thread_id (ptid_t ptid)
 +{
-+  int tid = TIDGET (ptid);
++  int tid = ptid_get_lwp (ptid);
 +  if (0 == tid)
-+    tid = PIDGET (ptid);
++    tid = ptid_get_pid (ptid);
 +  return tid;
 +}
 +
@@ -490,5 +492,4 @@ index 0000000..e9b8c9c
 +  linux_nat_add_target (t);
 +}
 -- 
-1.7.9.5
-
+1.9.0

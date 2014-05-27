@@ -1,6 +1,8 @@
+From 8ab9a20c73acedbb636a41842a681872af8ae1d6 Mon Sep 17 00:00:00 2001
 From: David Holsgrove <david.holsgrove@xilinx.com>
 Date: Wed, 8 May 2013 11:03:36 +1000
-Subject: Add wdc.ext.clear and wdc.ext.flush insns
+Subject: [PATCH 01/16] [Patch, microblaze]: Add wdc.ext.clear and
+ wdc.ext.flush insns
 
 Added two new instructions, wdc.ext.clear and wdc.ext.flush,
 to enable MicroBlaze to flush an external cache, which is
@@ -10,12 +12,12 @@ Signed-off-by:nagaraju <nmekala@xilix.com>
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 Upstream-Status: Pending
 ---
- opcodes/microblaze-opc.h  |    5 ++++-
- opcodes/microblaze-opcm.h |    6 +++---
+ opcodes/microblaze-opc.h  | 5 ++++-
+ opcodes/microblaze-opcm.h | 6 +++---
  2 files changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index e9da12a..dd56ab5 100644
+index e3cc1d9..f453097 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -91,6 +91,7 @@
@@ -46,7 +48,7 @@ index e9da12a..dd56ab5 100644
    {"mfs",   INST_TYPE_RD_SPECIAL, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_MFS, 0x94008000, OPCODE_MASK_H23S, mfs, special_inst },
    {"br",    INST_TYPE_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x98000000, OPCODE_MASK_H124, br, branch_inst },
 diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
-index 124cdec..8e531f9 100644
+index 6868389..8f5c1cb 100644
 --- a/opcodes/microblaze-opcm.h
 +++ b/opcodes/microblaze-opcm.h
 @@ -31,9 +31,9 @@ enum microblaze_instr
@@ -63,5 +65,5 @@ index 124cdec..8e531f9 100644
    brki, beqi, beqid, bnei, bneid, blti, bltid, blei, bleid, bgti,
    bgtid, bgei, bgeid, lbu, lbur, lhu, lhur, lw, lwr, lwx, sb, sbr, sh, 
 -- 
-1.7.9.5
+1.9.0
 

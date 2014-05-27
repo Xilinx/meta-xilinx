@@ -1,17 +1,19 @@
+From c9f1f07e5b0756069e3d4b04eb9505027f09677f Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Date: Tue, 14 Feb 2012 01:00:22 +0100
-Subject: Fix relaxation of assembler resolved references
+Subject: [PATCH 13/16] [LOCAL]: Fix relaxation of assembler resolved
+ references
 
 Upstream-Status: Pending
 ---
- bfd/elf32-microblaze.c |   39 +++++++++++++++++++++++++++++++++++++++
+ bfd/elf32-microblaze.c     | 39 +++++++++++++++++++++++++++++++++++++++
  1 file changed, 39 insertions(+)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 365546c..61926a4 100644
+index cbd18f0..f90df47 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
-@@ -1967,6 +1967,45 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1968,6 +1968,45 @@ microblaze_elf_relax_section (bfd *abfd,
            irelscanend = irelocs + o->reloc_count;
            for (irelscan = irelocs; irelscan < irelscanend; irelscan++)
              {
@@ -58,5 +60,5 @@ index 365546c..61926a4 100644
                  {
  	          isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
 -- 
-1.7.9.5
+1.9.0
 

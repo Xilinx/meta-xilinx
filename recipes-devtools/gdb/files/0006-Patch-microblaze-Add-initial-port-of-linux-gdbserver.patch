@@ -1,6 +1,8 @@
+From 2112c9ded01ddd08f0e31e5ce23eecac6c04e8c4 Mon Sep 17 00:00:00 2001
 From: David Holsgrove <david.holsgrove@petalogix.com>
 Date: Mon, 6 Feb 2012 10:28:29 +1000
-Subject: Add initial port of linux gdbserver
+Subject: [PATCH 06/16] [Patch, microblaze]: Add initial port of linux
+ gdbserver
 
 add gdb_proc_service_h to gdbserver microblaze-linux
 
@@ -10,6 +12,7 @@ other archs use this step to run a *_arch_setup() to carry out all
 architecture specific setup - may need to add in future
 
  * add linux-ptrace.o to gdbserver configure
+ * gdb/configure.tgt: Set build_gdbserver=yes
  * Update breakpoint opcode
  * fix segfault on connecting gdbserver
  * add microblaze_linux_memory_remove_breakpoint
@@ -21,21 +24,24 @@ Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
 Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
 Upstream-Status: Pending
 ---
- gdb/configure.host                   |    3 +
- gdb/gdbserver/linux-microblaze-low.c |  228 ++++++++++++++++++++++++++++++++++
- gdb/microblaze-linux-tdep.c          |   30 ++++-
- gdb/microblaze-tdep.c                |   35 ++++++
- gdb/microblaze-tdep.h                |    3 +-
- gdb/regformats/reg-microblaze.dat    |   39 ++++++
- 6 files changed, 336 insertions(+), 2 deletions(-)
+ gdb/configure.host                   |   3 +
+ gdb/configure.tgt                    |   1 +
+ gdb/gdbserver/Makefile.in            |   4 +
+ gdb/gdbserver/configure.srv          |   6 +
+ gdb/gdbserver/linux-microblaze-low.c | 228 +++++++++++++++++++++++++++++++++++
+ gdb/microblaze-linux-tdep.c          |  25 +++-
+ gdb/microblaze-tdep.c                |  45 ++++++-
+ gdb/microblaze-tdep.h                |   3 +-
+ gdb/regformats/reg-microblaze.dat    |  39 ++++++
+ 9 files changed, 348 insertions(+), 6 deletions(-)
  create mode 100644 gdb/gdbserver/linux-microblaze-low.c
  create mode 100644 gdb/regformats/reg-microblaze.dat
 
 diff --git a/gdb/configure.host b/gdb/configure.host
-index 85f4491..98b0f43 100644
+index 15a8288..76cc5fe 100644
 --- a/gdb/configure.host
 +++ b/gdb/configure.host
-@@ -47,6 +47,7 @@ i[34567]86*)		gdb_host_cpu=i386 ;;
+@@ -59,6 +59,7 @@ i[34567]86*)		gdb_host_cpu=i386 ;;
  m68*)			gdb_host_cpu=m68k ;;
  m88*)			gdb_host_cpu=m88k ;;
  mips*)			gdb_host_cpu=mips ;;
@@ -43,15 +49,73 @@ index 85f4491..98b0f43 100644
  powerpc* | rs6000)	gdb_host_cpu=powerpc ;;
  sparcv9 | sparc64)	gdb_host_cpu=sparc ;;
  s390*)			gdb_host_cpu=s390 ;;
-@@ -126,6 +127,8 @@ mips*-*-netbsd* | mips*-*-knetbsd*-gnu)
+@@ -133,6 +134,8 @@ mips*-*-netbsd* | mips*-*-knetbsd*-gnu)
  			gdb_host=nbsd ;;
  mips64*-*-openbsd*)	gdb_host=obsd64 ;;
  
-+microblaze*-*linux*)	gdb_host=linux ;;
++microblaze*-*linux*)    gdb_host=linux ;;
 +
- powerpc-*-aix* | rs6000-*-*)
+ powerpc-*-aix* | rs6000-*-* | powerpc64-*-aix*)
  			gdb_host=aix ;;
  powerpc*-*-freebsd*)	gdb_host=fbsd ;;
+diff --git a/gdb/configure.tgt b/gdb/configure.tgt
+index 9297c56..3a7951a 100644
+--- a/gdb/configure.tgt
++++ b/gdb/configure.tgt
+@@ -343,6 +343,7 @@ microblaze*-linux-*|microblaze*-*-linux*)
+ 	gdb_target_obs="microblaze-tdep.o microblaze-linux-tdep.o microblaze-rom.o glibc-tdep.o \
+ 			monitor.o dsrec.o solib-svr4.o symfile-mem.o linux-tdep.o"
+ 	gdb_sim=../sim/microblaze/libsim.a
++	build_gdbserver=yes
+ 	;;
+ microblaze*-*-*)
+ 	# Target: Xilinx MicroBlaze running standalone
+diff --git a/gdb/gdbserver/Makefile.in b/gdb/gdbserver/Makefile.in
+index f773fa2..a11ace1 100644
+--- a/gdb/gdbserver/Makefile.in
++++ b/gdb/gdbserver/Makefile.in
+@@ -148,6 +148,7 @@ SFILES=	$(srcdir)/gdbreplay.c $(srcdir)/inferiors.c $(srcdir)/dll.c \
+ 	$(srcdir)/linux-ia64-low.c $(srcdir)/linux-low.c \
+ 	$(srcdir)/linux-m32r-low.c \
+ 	$(srcdir)/linux-m68k-low.c $(srcdir)/linux-mips-low.c \
++	$(srcdir)/linux-microblaze-low.c \
+ 	$(srcdir)/linux-nios2-low.c \
+ 	$(srcdir)/linux-ppc-low.c \
+ 	$(srcdir)/linux-s390-low.c \
+@@ -329,6 +330,7 @@ clean:
+ 	rm -f arm-with-iwmmxt.c
+ 	rm -f arm-with-vfpv2.c arm-with-vfpv3.c arm-with-neon.c
+ 	rm -f mips-linux.c mips64-linux.c
++	rm -f microblaze-linux.c
+ 	rm -f nios2-linux.c
+ 	rm -f powerpc-32.c powerpc-32l.c powerpc-64l.c powerpc-e500l.c
+ 	rm -f powerpc-altivec32l.c powerpc-cell32l.c powerpc-vsx32l.c
+@@ -612,6 +614,8 @@ reg-m68k.c : $(srcdir)/../regformats/reg-m68k.dat $(regdat_sh)
+ 	$(SHELL) $(regdat_sh) $(srcdir)/../regformats/reg-m68k.dat reg-m68k.c
+ reg-cf.c : $(srcdir)/../regformats/reg-cf.dat $(regdat_sh)
+ 	$(SHELL) $(regdat_sh) $(srcdir)/../regformats/reg-cf.dat reg-cf.c
++microblaze-linux.c : $(srcdir)/../regformats/reg-microblaze.dat $(regdat_sh)
++	$(SHELL) $(regdat_sh) $(srcdir)/../regformats/reg-microblaze.dat microblaze-linux.c
+ mips-linux.c : $(srcdir)/../regformats/mips-linux.dat $(regdat_sh)
+ 	$(SHELL) $(regdat_sh) $(srcdir)/../regformats/mips-linux.dat mips-linux.c
+ mips-dsp-linux.c : $(srcdir)/../regformats/mips-dsp-linux.dat $(regdat_sh)
+diff --git a/gdb/gdbserver/configure.srv b/gdb/gdbserver/configure.srv
+index cc4f53d..359c756 100644
+--- a/gdb/gdbserver/configure.srv
++++ b/gdb/gdbserver/configure.srv
+@@ -198,6 +198,12 @@ case "${target}" in
+ 			srv_linux_usrregs=yes
+ 			srv_linux_thread_db=yes
+ 			;;
++  microblaze*-*-linux*)	srv_regobj=microblaze-linux.o
++			srv_tgtobj="$srv_linux_obj linux-microblaze-low.o"
++			srv_linux_usrregs=yes
++			srv_linux_regsets=yes
++			srv_linux_thread_db=yes
++			;;
+   nios2*-*-linux*)	srv_regobj="nios2-linux.o"
+ 			srv_tgtobj="$srv_linux_obj linux-nios2-low.o"
+ 			srv_xmlfiles="nios2-linux.xml"
 diff --git a/gdb/gdbserver/linux-microblaze-low.c b/gdb/gdbserver/linux-microblaze-low.c
 new file mode 100644
 index 0000000..279df9f
@@ -288,10 +352,10 @@ index 0000000..279df9f
 +}
 \ No newline at end of file
 diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
-index 99fc497..69c333e 100644
+index 7e6b61b..cf58e21 100644
 --- a/gdb/microblaze-linux-tdep.c
 +++ b/gdb/microblaze-linux-tdep.c
-@@ -37,6 +37,22 @@
+@@ -38,6 +38,22 @@
  #include "tramp-frame.h"
  #include "linux-tdep.h"
  
@@ -314,7 +378,7 @@ index 99fc497..69c333e 100644
  static int
  microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch, 
  					   struct bp_target_info *bp_tgt)
-@@ -46,20 +62,27 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+@@ -47,20 +63,27 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
    int val;
    int bplen;
    gdb_byte old_contents[BREAKPOINT_MAX];
@@ -343,23 +407,11 @@ index 99fc497..69c333e 100644
    return val;
  }
  
-@@ -135,6 +158,11 @@ microblaze_linux_init_abi (struct gdbarch_info info,
-   /* Trampolines.  */
-   tramp_frame_prepend_unwinder (gdbarch,
- 				&microblaze_linux_sighandler_tramp_frame);
-+
-+  /* Enable TLS support.  */
-+  set_gdbarch_fetch_tls_load_module_address (gdbarch,
-+                                             svr4_fetch_objfile_link_map);
-+
- }
- 
- /* -Wmissing-prototypes */
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index dcf556f..079d34e 100644
+index 50b68d2..1c6dbfe 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
-@@ -157,6 +157,39 @@ microblaze_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
+@@ -164,6 +164,39 @@ microblaze_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
    return sp;
  }
  
@@ -399,20 +451,49 @@ index dcf556f..079d34e 100644
  static const gdb_byte *
  microblaze_breakpoint_from_pc (struct gdbarch *gdbarch, CORE_ADDR *pc, 
  			       int *len)
-@@ -707,6 +740,8 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -291,8 +324,8 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+ 
+   for (addr = func_addr; addr < stop; addr += INST_WORD_SIZE)
+     {
+-     //insn = microblaze_fetch_instruction (addr);
+-      insn = insn_block[(addr - func_addr) / INST_WORD_SIZE];
++      insn = microblaze_fetch_instruction (addr);
++      //insn = insn_block[(addr - func_addr) / INST_WORD_SIZE];
+       op = microblaze_decode_insn (insn, &rd, &ra, &rb, &imm);
+       microblaze_debug ("%s %08lx op=%x r%d r%d imm=%d\n", paddress (gdbarch, addr), insn, op, rd, ra, imm);
+ 
+@@ -724,13 +757,15 @@ microblaze_software_single_step (struct frame_info *frame)
+ 	  rb = get_frame_register_unsigned (frame, lrb);
+ 	else
+ 	  rb = 0;
++
+ 	stepbreaks[1].address = microblaze_get_target_address (insn, immfound, imm, pc, ra, rb, &targetvalid, &unconditionalbranch);
+-        microblaze_debug ("single-step uncondbr=%d targetvalid=%d target=%x\n", unconditionalbranch, targetvalid, stepbreaks[1].address);
++	microblaze_debug ("single-step uncondbr=%d targetvalid=%d target=%x\n", unconditionalbranch, targetvalid, stepbreaks[1].address);
++
+ 	if (unconditionalbranch)
+ 	  stepbreaks[0].valid = FALSE; /* This is a unconditional branch: will not come to the next address */
+ 	if (targetvalid && (stepbreaks[0].valid == FALSE ||
+ 			    (stepbreaks[0].address != stepbreaks[1].address))
+-	                && (stepbreaks[1].address != pc)) {
++			&& (stepbreaks[1].address != pc)) {
+ 	  stepbreaks[1].valid = TRUE;
+ 	} else {
+ 	  stepbreaks[1].valid = FALSE;
+@@ -900,6 +935,8 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
    /* Stack grows downward.  */
    set_gdbarch_inner_than (gdbarch, core_addr_lessthan);
  
 +  set_gdbarch_memory_remove_breakpoint (gdbarch, microblaze_linux_memory_remove_breakpoint);
 +
    set_gdbarch_breakpoint_from_pc (gdbarch, microblaze_breakpoint_from_pc);
+   set_gdbarch_software_single_step (gdbarch, microblaze_software_single_step);
  
-   set_gdbarch_frame_args_skip (gdbarch, 8);
 diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
-index ff4515e..9fdbda7 100644
+index fec24b9..98aa0f5 100644
 --- a/gdb/microblaze-tdep.h
 +++ b/gdb/microblaze-tdep.h
-@@ -115,6 +115,7 @@ enum microblaze_regnum
+@@ -129,7 +129,8 @@ enum microblaze_regnum
  
  /* MICROBLAZE_BREAKPOINT defines the breakpoint that should be used.
     Only used for native debugging.  */
@@ -420,7 +501,8 @@ index ff4515e..9fdbda7 100644
 +#define MICROBLAZE_BREAKPOINT {0xba, 0x0c, 0x00, 0x18}
 +#define MICROBLAZE_BREAKPOINT_LE {0x18, 0x00, 0x0c, 0xba}
  
- #endif /* microblaze-tdep.h */
+ extern void microblaze_supply_gregset (const struct microblaze_gregset *gregset,
+                                     struct regcache *regcache,
 diff --git a/gdb/regformats/reg-microblaze.dat b/gdb/regformats/reg-microblaze.dat
 new file mode 100644
 index 0000000..a5dd0a0
@@ -467,5 +549,5 @@ index 0000000..a5dd0a0
 +32:esr
 +32:fsr
 -- 
-1.7.9.5
+1.9.0
 
