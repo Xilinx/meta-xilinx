@@ -1,35 +1,29 @@
-From: David Holsgrove <david.holsgrove@xilinx.com>
-Subject: [PATCH 4/8] [Patch, microblaze]: Add TARGET_ASM_OUTPUT_MI_THUNK to
- support varargs thunk
+From 0462b5fb1e91183c16e204e1a6cf436ef0d8d0f8 Mon Sep 17 00:00:00 2001
+From: eager <eager@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Sun, 23 Feb 2014 18:44:27 +0000
+Subject: [PATCH] 2014-02-23  David Holsgrove <david.holsgrove@xilinx.com>
 
-Without this macro, generic gcc generates a less efficient thunk
-that calls function instead of jumping to it. The generic code
-does not support varargs and produces an error message on compilation;
+	* /config/microblaze/microblaze.c: Add microblaze_asm_output_mi_thunk
+	and define TARGET_ASM_OUTPUT_MI_THUNK and
+	TARGET_ASM_CAN_OUTPUT_MI_THUNK.
 
- error: generic thunk code fails for method
- 'virtual void C::f(const char*, ...)' which uses '...'
-
-Changelog
-
-2013-03-18  David Holsgrove <david.holsgrove@xilinx.com>
-
- * gcc/config/microblaze/microblaze.c: Add microblaze_asm_output_mi_thunk
-   and define TARGET_ASM_OUTPUT_MI_THUNK and TARGET_ASM_CAN_OUTPUT_MI_THUNK
-
-Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
-Upstream-Status: Pending
+Upstream-Status: Backport
+---
+ gcc/config/microblaze/microblaze.c | 73 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 79 insertions(+)
 
 diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 1562e60..7418e49 100644
+index 985d26a..ba8109b 100644
 --- a/gcc/config/microblaze/microblaze.c
 +++ b/gcc/config/microblaze/microblaze.c
-@@ -3005,6 +3005,74 @@ microblaze_secondary_reload (bool in_p ATTRIBUTE_UNUSED, rtx x ATTRIBUTE_UNUSED,
+@@ -3087,6 +3087,73 @@ expand_pic_symbol_ref (enum machine_mode mode ATTRIBUTE_UNUSED, rtx op)
+   return result;
  }
  
- static void
++static void
 +microblaze_asm_output_mi_thunk (FILE *file, tree thunk_fndecl ATTRIBUTE_UNUSED,
-+				HOST_WIDE_INT delta, HOST_WIDE_INT vcall_offset,
-+				tree function)
++        HOST_WIDE_INT delta, HOST_WIDE_INT vcall_offset,
++        tree function)
 +{
 +  rtx this_rtx, insn, funexp;
 +
@@ -54,14 +48,14 @@ index 1562e60..7418e49 100644
 +  if (vcall_offset)
 +  {
 +    rtx vcall_offset_rtx = GEN_INT (vcall_offset);
-+    rtx tmp = gen_rtx_REG (Pmode, MB_ABI_TEMP1_REGNUM);
++    rtx temp1 = gen_rtx_REG (Pmode, MB_ABI_TEMP1_REGNUM);
 +
-+    emit_move_insn (tmp, gen_rtx_MEM (Pmode, this_rtx));
++    emit_move_insn (temp1, gen_rtx_MEM (Pmode, this_rtx));
 +
-+    rtx loc = gen_rtx_PLUS (Pmode, tmp, vcall_offset_rtx);
-+    emit_move_insn (tmp, gen_rtx_MEM (Pmode, loc));
++    rtx loc = gen_rtx_PLUS (Pmode, temp1, vcall_offset_rtx);
++    emit_move_insn (temp1, gen_rtx_MEM (Pmode, loc));
 +
-+    emit_insn (gen_addsi3 (this_rtx, this_rtx, tmp));
++    emit_insn (gen_addsi3 (this_rtx, this_rtx, temp1));
 +  }
 +
 +  /* Generate a tail call to the target function.  */
@@ -70,17 +64,16 @@ index 1562e60..7418e49 100644
 +    assemble_external (function);
 +    TREE_USED (function) = 1;
 +  }
++
 +  funexp = XEXP (DECL_RTL (function), 0);
++  rtx temp2 = gen_rtx_REG (Pmode, MB_ABI_TEMP2_REGNUM);
 +
 +  if (flag_pic)
-+  {
-+    rtx scratch = gen_rtx_REG (Pmode, MB_ABI_TEMP2_REGNUM);
-+    rtx reg = microblaze_legitimize_address(funexp, scratch, FUNCTION_MODE);
-+    emit_move_insn (scratch, reg);
-+    funexp = scratch;
-+  }
++    emit_move_insn (temp2, expand_pic_symbol_ref (Pmode, funexp));
++  else
++    emit_move_insn (temp2, funexp);
 +
-+  emit_insn (gen_jump (funexp));
++  emit_insn (gen_indirect_jump (temp2));
 +
 +  /* Run just enough of rest_of_compilation.  This sequence was
 +     "borrowed" from rs6000.c.  */
@@ -94,11 +87,10 @@ index 1562e60..7418e49 100644
 +  epilogue_completed = 0;
 +}
 +
-+static void
- microblaze_globalize_label (FILE * stream, const char *name)
+ bool
+ microblaze_expand_move (enum machine_mode mode, rtx operands[])
  {
-   fputs ("\t.globl\t", stream);
-@@ -3532,6 +3600,12 @@ microblaze_legitimate_constant_p (enum machine_mode mode ATTRIBUTE_UNUSED, rtx x
+@@ -3504,6 +3571,12 @@ microblaze_legitimate_constant_p (enum machine_mode mode ATTRIBUTE_UNUSED, rtx x
  #undef TARGET_SECONDARY_RELOAD
  #define TARGET_SECONDARY_RELOAD		microblaze_secondary_reload
  
@@ -112,5 +104,5 @@ index 1562e60..7418e49 100644
  #define TARGET_SCHED_ADJUST_COST	microblaze_adjust_cost
  
 -- 
-1.7.5.4
+1.9.0
 

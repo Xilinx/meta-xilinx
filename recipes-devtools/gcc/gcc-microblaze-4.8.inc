@@ -5,7 +5,7 @@ SRC_URI_append += " \
 		file://0001-Patch-microblaze-Enable-DWARF-exception-handling-sup.patch \
 		file://0002-Patch-microblaze-Add-4-byte-implementation-for-atomi.patch \
 		file://0003-Patch-microblaze-Extend-jump-insn-to-accept-bri-to-S.patch \
-		file://0004-Patch-microblaze-Add-TARGET_ASM_OUTPUT_MI_THUNK-to-s.patch \
+		file://0462b5f-2014-02-23-David-Holsgrove-david.holsgrove.patch \
 		file://0005-Patch-microblaze-Add-fstack-usage-support.patch \
 		file://0006-Patch-microblaze-Remove-SECONDARY_MEMORY_NEEDED.patch \
 		file://0007-Patch-microblaze-Add-SIZE_TYPE-and-PTRDIFF_TYPE-to-m.patch \
