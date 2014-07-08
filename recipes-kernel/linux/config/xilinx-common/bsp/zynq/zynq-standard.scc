@@ -1,0 +1,14 @@
+define KMACHINE zynq
+define KTYPE standard
+define KARCH arm
+
+include ktypes/standard/standard.scc
+
+include bsp/zynq/zynq.scc
+
+# Common board drivers
+include features/xilinx/board-common.scc
+
+# default policy for standard kernels
+include features/latencytop/latencytop.scc
+include features/profiling/profiling.scc

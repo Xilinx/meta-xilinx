@@ -1,0 +1,6 @@
+
+if [ "$KARCH" = "microblaze" ]; then
+	kconf hardware microblaze.cfg
+	include cfg/timer/hz_100.scc
+fi
+

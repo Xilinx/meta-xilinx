@@ -1,0 +1,14 @@
+define KMACHINE microblaze
+define KTYPE standard
+define KARCH microblaze
+
+include ktypes/standard/standard.scc
+
+include bsp/microblaze/microblaze.scc
+
+# Common board drivers
+include features/xilinx/board-common.scc
+
+# default policy for standard kernels
+include features/latencytop/latencytop.scc
+include features/profiling/profiling.scc

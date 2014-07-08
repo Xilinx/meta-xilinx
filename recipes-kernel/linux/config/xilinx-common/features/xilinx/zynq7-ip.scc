@@ -1,0 +1,5 @@
+define KFEATURE_DESCRIPTION "Xilinx Zynq 7000 IP Core Drivers/Support"
+define KFEATURE_COMPATIBILITY board
+
+kconfig hardware zynq7-ip.cfg
+

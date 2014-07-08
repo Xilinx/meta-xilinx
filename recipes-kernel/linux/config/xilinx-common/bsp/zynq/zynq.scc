@@ -1,0 +1,17 @@
+kconf hardware zynq.cfg
+
+include cfg/timer/no_hz.scc
+
+include features/xilinx/zynq7-ip.scc
+include features/xilinx/xilinx-ip.scc
+
+include cfg/usb-mass-storage.scc
+
+include features/scsi/scsi.scc
+include features/scsi/scsi-generic.scc
+include features/scsi/disk.scc
+
+include features/mtd/mtd.scc
+include features/uio/uio.scc
+
+include cfg/fs/debugfs.scc

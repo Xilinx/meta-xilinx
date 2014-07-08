@@ -1,5 +1,4 @@
 
-require linux-machine-common.inc
+require linux-xilinx-configs.inc
+require linux-xilinx-machines.inc
 
-COMPATIBLE_MACHINE_zynq = "zynq"
-COMPATIBLE_MACHINE_microblaze = "microblaze"
