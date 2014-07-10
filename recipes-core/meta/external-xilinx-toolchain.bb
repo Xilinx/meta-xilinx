@@ -72,10 +72,12 @@ do_install() {
 		fi
 	done
 
-	# Move libstdc++ to /usr/lib
-	if [ -e ${D}${base_libdir}/libstdc++.so ]; then
-		mv ${D}${base_libdir}/libstdc++.* ${D}${libdir}/
-	fi
+	# Move some of the libs in /lib to /usr/lib
+	for i in libstdc++ libssp libatomic; do
+		if [ -e ${D}${base_libdir}/$i.so ]; then
+			mv ${D}${base_libdir}/$i.* ${D}${libdir}/
+		fi
+	done
 
 	sed -i -e 's/__packed/__attribute__ ((packed))/' ${D}${includedir}/mtd/ubi-user.h
 	sed -i -e "s# ${base_libdir}# ../..${base_libdir}#g" -e "s# ${libdir}# .#g" ${D}${libdir}/libc.so
@@ -84,6 +86,8 @@ do_install() {
 
 PACKAGES =+ " \
 		libgcc libgcc-dev \
+		libssp libssp-dev libssp-staticdev \
+		libatomic libatomic-dev libatomic-staticdev \
 		libstdc++ libstdc++-dev libstdc++-staticdev \
 		linux-libc-headers linux-libc-headers-dev \
 		gdbserver gdbserver-dbg \
@@ -97,6 +101,8 @@ INSANE_SKIP_${PN}-utils += "ldflags"
 INSANE_SKIP_${PN}-dev += "ldflags"
 INSANE_SKIP_libstdc++ += "ldflags"
 INSANE_SKIP_libgcc += "ldflags"
+INSANE_SKIP_libssp += "ldflags"
+INSANE_SKIP_libatomic += "ldflags"
 INSANE_SKIP_gdbserver += "ldflags"
 
 PKG_${PN} = "eglibc"
@@ -112,6 +118,12 @@ PKG_${PN}-thread-db = "eglibc-thread-db"
 PKG_${PN}-pcprofile = "eglibc-pcprofile"
 
 PKGV = "${CSL_VER_LIBC}"
+PKGV_libssp = "${CSL_VER_GCC}"
+PKGV_libssp-dev = "${CSL_VER_GCC}"
+PKGV_libssp-staticdev = "${CSL_VER_GCC}"
+PKGV_libatomic = "${CSL_VER_GCC}"
+PKGV_libatomic-dev = "${CSL_VER_GCC}"
+PKGV_libatomic-staticdev = "${CSL_VER_GCC}"
 PKGV_libgcc = "${CSL_VER_GCC}"
 PKGV_libgcc-dev = "${CSL_VER_GCC}"
 PKGV_libstdc++ = "${CSL_VER_GCC}"
@@ -122,6 +134,12 @@ PKGV_linux-libc-headers-dev = "${CSL_VER_KERNEL}"
 PKGV_gdbserver = "${CSL_VER_GDB}"
 PKGV_gdbserver-dbg = "${CSL_VER_GDB}"
 
+FILES_libssp = "${libdir}/libssp.so.*"
+FILES_libssp-dev = "${libdir}/libssp.so ${libdir}/libssp_nonshared.a ${libdir}/libssp_nonshared.la"
+FILES_libssp-staticdev = "${libdir}/libssp.a ${libdir}/libssp.la"
+FILES_libatomic = "${libdir}/libatomic.so.*"
+FILES_libatomic-dev = "${libdir}/libatomic.so"
+FILES_libatomic-staticdev = "${libdir}/libatomic.a ${libdir}/libatomic.la"
 FILES_libgcc = "${base_libdir}/libgcc_s.so.1"
 FILES_libgcc-dev = "${base_libdir}/libgcc_s.so"
 FILES_libstdc++ = "${libdir}/libstdc++.so.*"
