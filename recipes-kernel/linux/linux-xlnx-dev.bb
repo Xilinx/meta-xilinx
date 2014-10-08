@@ -3,13 +3,10 @@
 #
 # To enable this recipe, set PREFERRED_PROVIDER_virtual/kernel = "linux-yocto-dev"
 
-KBRANCH = "master-next"
-KBRANCH_DEFAULT = "${KBRANCH}"
-
-include linux-xlnx.inc
+KBRANCH ?= "master-next"
 
 # Use the SRCREV for the last tagged revision of linux-xlnx.
-SRCREV = "f27f400f43062b28d2b6f0977e50492b851d7464"
+SRCREV ?= "f27f400f43062b28d2b6f0977e50492b851d7464"
 
 python () {
     if d.getVar("PREFERRED_PROVIDER_virtual/kernel", True) != "linux-xlnx-dev":
@@ -21,3 +18,5 @@ python () {
 LINUX_VERSION ?= "3.14+"
 LINUX_VERSION_EXTENSION = "-xilinx-dev"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
+
+include linux-xlnx.inc
