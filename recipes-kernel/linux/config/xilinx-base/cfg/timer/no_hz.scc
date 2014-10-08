@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable CONFIG_NO_HZ"
+define KFEATURE_COMPATIBILITY all
+
+kconf non-hardware no_hz.cfg

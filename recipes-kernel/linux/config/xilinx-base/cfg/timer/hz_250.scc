@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable 250Hz Timer frequency"
+define KFEATURE_COMPATIBILITY all
+
+kconf non-hardware hz_250.cfg

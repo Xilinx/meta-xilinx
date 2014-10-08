@@ -1,0 +1,6 @@
+define KFEATURE_DESCRIPTION "Enable options for SCSI disk support"
+define KFEATURE_COMPATIBILITY board
+
+include scsi.scc
+
+kconf hardware disk.cfg

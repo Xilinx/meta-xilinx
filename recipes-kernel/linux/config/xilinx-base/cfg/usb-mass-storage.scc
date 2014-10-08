@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable options required for USB mass storage devices"
+define KFEATURE_COMPATIBILITY all
+
+kconf non-hardware usb-mass-storage.cfg
