@@ -177,6 +177,7 @@
 			xlnx,sg-use-stsapp-length = <0x1>;
 		} ;
 		axi_xadc_0: axi-xadc@40d00000 {
+			clocks = <&clk_bus>;
 			compatible = "xlnx,axi-xadc-1.00.a";
 			interrupt-parent = <&interrupt_cntlr>;
 			interrupts = < 7 2 >;
