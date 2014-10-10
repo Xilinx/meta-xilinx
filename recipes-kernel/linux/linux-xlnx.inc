@@ -11,6 +11,8 @@ SRC_URI = " \
 		file://xilinx-base;type=kmeta;destsuffix=xilinx-base \
 		"
 
+SRCREV_machine ?= "${SRCREV}"
+
 require recipes-kernel/linux/linux-yocto.inc
 
 DESCRIPTION = "Xilinx Kernel"

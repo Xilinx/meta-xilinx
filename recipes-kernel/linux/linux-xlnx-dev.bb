@@ -6,13 +6,11 @@
 KBRANCH ?= "master-next"
 
 # Use the SRCREV for the last tagged revision of linux-xlnx.
-SRCREV ?= "f27f400f43062b28d2b6f0977e50492b851d7464"
+SRCREV ?= '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/kernel", "linux-xlnx-dev", "${AUTOREV}", "f27f400f43062b28d2b6f0977e50492b851d7464", d)}'
 
 python () {
     if d.getVar("PREFERRED_PROVIDER_virtual/kernel", True) != "linux-xlnx-dev":
         raise bb.parse.SkipPackage("Set PREFERRED_PROVIDER_virtual/kernel to linux-xlnx-dev to enable it")
-    else:
-        d.setVar("SRCREV", "${AUTOREV}")
 }
 
 LINUX_VERSION ?= "3.14+"
