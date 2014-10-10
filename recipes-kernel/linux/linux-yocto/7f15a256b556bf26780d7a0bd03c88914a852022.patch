@@ -1,0 +1,44 @@
+From 7f15a256b556bf26780d7a0bd03c88914a852022 Mon Sep 17 00:00:00 2001
+From: Michal Simek <michal.simek@xilinx.com>
+Date: Wed, 6 Nov 2013 16:36:08 +0100
+Subject: microblaze: Calculate kernel pad automatically
+
+The kernel needs to setup the first two tlbs with pad
+which is used for early page allocation which is used
+by mapin_ram() to allocate tables for lowmem memory
+before memory initialisation is done.
+Calculate pad directly from lowmem size.
+
+Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+Upstream-Status: Backport
+---
+diff --git a/arch/microblaze/Kconfig b/arch/microblaze/Kconfig
+index d8ec74b..655e1ca 100644
+--- a/arch/microblaze/Kconfig
++++ b/arch/microblaze/Kconfig
+@@ -245,10 +245,6 @@ config MICROBLAZE_64K_PAGES
+ 
+ endchoice
+ 
+-config KERNEL_PAD
+-	hex "Kernel PAD for unpacking" if ADVANCED_OPTIONS
+-	default "0x80000" if MMU
+-
+ endmenu
+ 
+ source "mm/Kconfig"
+diff --git a/arch/microblaze/kernel/head.S b/arch/microblaze/kernel/head.S
+index fcc797f..817b7ee 100644
+--- a/arch/microblaze/kernel/head.S
++++ b/arch/microblaze/kernel/head.S
+@@ -176,7 +176,7 @@ _invalidate:
+ 	/* start to do TLB calculation */
+ 	addik	r12, r0, _end
+ 	rsub	r12, r3, r12
+-	addik	r12, r12, CONFIG_KERNEL_PAD /* that's the pad */
++	addik	r12, r12, CONFIG_LOWMEM_SIZE >> PTE_SHIFT /* that's the pad */
+ 
+ 	or r9, r0, r0 /* TLB0 = 0 */
+ 	or r10, r0, r0 /* TLB1 = 0 */
+-- 
+
