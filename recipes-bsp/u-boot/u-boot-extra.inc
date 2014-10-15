@@ -1,23 +1,6 @@
 
 inherit xilinx-utils
 
-S = "${WORKDIR}/git"
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-
-# Also deploy u-boot elf file with same file format as bin file
-UBOOTXTENSION ?= "${XILINX_EXTENSION}-${MACHINE}"
-SRC_ELF ?= "u-boot"
-DEST_ELF ?= "u-boot${UBOOTXTENSION}-${PV}-${PR}.elf"
-ELF_SYMLINK ?= "u-boot${UBOOTXTENSION}.elf"
-do_deploy_append() {
-	install ${S}/${SRC_ELF} ${DEPLOYDIR}/${DEST_ELF}
-
-	cd ${DEPLOYDIR}
-	rm -f ${SRC_ELF} ${ELF_SYMLINK}
-	ln -sf ${DEST_ELF} ${ELF_SYMLINK}
-	ln -sf ${DEST_ELF} ${SRC_ELF}.elf
-}
-
 # Appends the '<layer>/conf/machine/boards' path to FILESEXTRAPATHS for all
 # layers (using the ${BBPATH})
 FILESEXTRAPATHS_append := "${@get_additional_bbpath_filespath('conf/machine/boards', d)}"
