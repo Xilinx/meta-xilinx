@@ -18,11 +18,16 @@
 			phy-mode = "rgmii-id";
 			mdio {
 				phy0: phy@0 {
-					compatible = "marvell,88e1518";
+					compatible = "marvell,88e1518", "marvell,88e1510";
 					device_type = "ethernet-phy";
 					reg = <0>;
+					marvell,reg-init = <3 16 0xff00 0x1e 3 17 0xfff0 0x0a>;
 				} ;
 			} ;
+		} ;
+		ps7_usb_0: ps7-usb@e0002000 {
+			xlnx,phy-reset-gpio = <&ps7_gpio_0 85 0>;
+			dr_mode = "host";
 		} ;
 		ps7_qspi_0: ps7-qspi@e000d000 {
 			flash@0 {
