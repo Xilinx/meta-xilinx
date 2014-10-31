@@ -128,10 +128,6 @@
 				};
 			};
 		};
-		ps7_gpio_0: ps7-gpio@e000a000 {
-			gpio-mask-high = <0x0>;
-			gpio-mask-low = <0x5600>;
-		} ;
 		ps7_usb_0: ps7-usb@e0002000 {
 			usb-reset = <&ps7_gpio_0 7 0>; /* MIO USB PHY Reset */
 		} ;

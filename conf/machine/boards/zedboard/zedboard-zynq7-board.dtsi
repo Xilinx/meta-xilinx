@@ -60,10 +60,6 @@
 				};
 			};
 		} ;
-		ps7_gpio_0: ps7-gpio@e000a000 {
-			gpio-mask-high = <0xc0000>;
-			gpio-mask-low = <0xfe81>;
-		} ;
 
 		/* Disabled Devices */
 		ps7_sd_1: ps7-sdio@e0101000 { compatible = "invalid"; };
