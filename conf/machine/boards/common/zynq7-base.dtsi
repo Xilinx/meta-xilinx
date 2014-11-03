@@ -325,8 +325,6 @@
 			is-dual = <0>;
 			num-chip-select = <1>;
 			num-cs = <1>;
-			xlnx,fb-clk = <0x1>;
-			xlnx,qspi-mode = <0x0>;
 			#address-cells = <1>;
 			#size-cells = <0>;
 		} ;
