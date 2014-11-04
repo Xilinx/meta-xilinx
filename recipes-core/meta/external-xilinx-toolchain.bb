@@ -93,6 +93,9 @@ PACKAGES =+ " \
 		gdbserver gdbserver-dbg \
 		"
 
+RDEPENDS_ldd += "bash"
+RDEPENDS_tzcode += "bash"
+
 # This test should be fixed to ignore .a files in .debug dirs
 INSANE_SKIP_${PN}-dbg = "staticdev"
 
