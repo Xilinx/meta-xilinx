@@ -111,7 +111,6 @@
 					};
 				};
 
-
 				i2c@7 {
 					#address-cells = <1>;
 					#size-cells = <0>;
@@ -124,9 +123,9 @@
 			};
 		};
 		ps7_usb_0: ps7-usb@e0002000 {
-			usb-reset = <&ps7_gpio_0 7 0>; /* MIO USB PHY Reset */
+			xlnx,phy-reset-gpio = <&ps7_gpio_0 7 0>; /* MIO USB PHY Reset */
 		} ;
-		
+
 		/* Disabled Devices */
 		ps7_sd_1: ps7-sdio@e0101000 { compatible = "invalid"; };
 		ps7_uart_0: serial@e0000000 { compatible = "invalid"; };

@@ -27,7 +27,6 @@
 		} ;
 		ps7_usb_0: ps7-usb@e0002000 {
 			xlnx,phy-reset-gpio = <&ps7_gpio_0 85 0>;
-			dr_mode = "host";
 		} ;
 		ps7_qspi_0: ps7-qspi@e000d000 {
 			flash@0 {
