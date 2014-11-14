@@ -1,0 +1,5 @@
+define KFEATURE_DESCRIPTION "Increase size of /dev/ram Blocks"
+define KFEATURE_COMPATIBILITY board
+
+kconfig hardware dev-ram-32mb.cfg
+

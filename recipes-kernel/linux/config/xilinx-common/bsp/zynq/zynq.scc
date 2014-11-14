@@ -11,6 +11,7 @@ include features/scsi/scsi.scc
 include features/scsi/scsi-generic.scc
 include features/scsi/disk.scc
 
+include features/blk/dev-ram-32mb.scc
 include features/mtd/mtd.scc
 include features/uio/uio.scc
 
