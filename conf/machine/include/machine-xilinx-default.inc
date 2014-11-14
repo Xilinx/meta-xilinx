@@ -14,9 +14,6 @@ PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-xlnx"
 PREFERRED_PROVIDER_u-boot ?= "u-boot-xlnx"
 PREFERRED_VERSION_u-boot-xlnx ?= "v2014.01%"
 
-# Architecture specific kernel configuration parts, defconfigs for Xilinx architectures
-MACHINE_KCONFIG_prepend += "common/linux/${SOC_FAMILY}/defconfig_${@'.'.join(d.getVar('LINUX_VERSION', True).split('.')[0:2]).strip('+')}.cfg "
-
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree"
 
 # Common Device Tree Includes
