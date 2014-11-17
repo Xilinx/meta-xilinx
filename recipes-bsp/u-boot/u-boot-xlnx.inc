@@ -12,7 +12,6 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 include u-boot-extra.inc
 
 SPL_BINARY_zynq = "boot.bin"
-UBOOT_SUFFIX = "img"
 
 do_configure_prepend () {
 	if test -e ${WORKDIR}/ps7_init.h; then
