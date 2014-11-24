@@ -9,3 +9,8 @@ include linux-xlnx.inc
 # The MACB driver is non-functional in the 3.10 kernel
 KERNEL_FEATURES_append_zynq += "features/xilinx/disable-macb.scc"
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx/3.10:"
+SRC_URI_append += " \
+		file://tty-xuartps-Fix-RX-hang-and-TX-corruption-in-set_termios.patch \
+		"
+

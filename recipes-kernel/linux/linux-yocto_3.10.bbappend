@@ -12,3 +12,7 @@ SRC_URI_append_microblaze += " \
 		file://7f15a256b556bf26780d7a0bd03c88914a852022.patch \
 		file://99399545d62533b4ae742190b5c6b11f7a5826d9.patch \
 		"
+SRC_URI_append_zynq += " \
+		file://tty-xuartps-Fix-RX-hang-and-TX-corruption-in-set_termios.patch \
+		"
+
