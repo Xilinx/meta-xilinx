@@ -5,7 +5,7 @@ require linux-xilinx-machines.inc
 # The MACB driver is non-functional in the 3.10 kernel
 KERNEL_FEATURES_append_zynq += "features/xilinx/disable-macb.scc"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/linux-yocto:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/linux-yocto/3.10:"
 SRC_URI_append_microblaze += " \
 		file://ec2eba55f0c0e74dd39aca14dcc597583cf1eb67.patch \
 		file://218a12f1f41f6fdce18d084e5ddd3c6439db0983.patch \
