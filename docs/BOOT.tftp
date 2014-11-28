@@ -7,7 +7,7 @@ Note: This boot flow requires a TFTP server.
 Boot your system into U-Boot, using an alternative boot method (e.g. JTAG, SD).
 
 Place the following images into the root of the TFTP server directory:
-	* core-image-minimal-<machine name>.ext2.gz.u-boot (RootFS)
+	* core-image-minimal-<machine name>.cpio.gz.u-boot (RootFS)
 	* linux.bin.ub or uImage (Linux Kernel)
 	* <kernel binary>-<machine name>.dtb (DTB)
 

@@ -28,7 +28,7 @@ Use an SD card with partition one in FAT16 format.
 
 Copy the following to the SD card partition one:
 	* Kernel:     uImage
-	* Root FS:    core-image-minimal-<machine name>.ext2.gz.u-boot
+	* Root FS:    core-image-minimal-<machine name>.cpio.gz.u-boot
 	* Devicetree: uImage-<machine name>.dtb
 
 Also create the file "uEnv.txt" on the SD card parition one, with the following
@@ -38,7 +38,7 @@ correct name for you machine/system.
 
 	kernel_image=uImage
 	devicetree_image=uImage-<machine name>.dtb
-	ramdisk_image=core-image-minimal-<machine name>.ext2.gz.u-boot
+	ramdisk_image=core-image-minimal-<machine name>.cpio.gz.u-boot
 
 Alternatively you can use the default names for the images, rename them
 according to below and copy them onto partition one. Doing this removes the need
@@ -54,7 +54,7 @@ board. (Ensure the board is configured via the MIO's for SD Boot).
 Booting the Kernel (with mmcblk/SD card rootfs)
 -----------------------------------------------
 Use an SD card with partition one in FAT16 format, and an additional partition
-for the root filesystem (formatted as EXT2).
+for the root filesystem (formatted as EXT2/3/4).
 
 Copy the following to the SD card partition one:
 	* Kernel:     uImage

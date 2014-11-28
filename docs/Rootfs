@@ -1,0 +1,11 @@
+
+Configuring Additional RootFS Output Images
+===========================================
+
+To configure the build or the machine to output additional rootfs image types
+the IMAGE_FSTYPES variable can be overridden or appended to.
+
+e.g. Add ext2 and ext2.gz.u-boot image types to the local.conf
+
+	IMAGE_FSTYPES += "ext2 ext2.gz.u-boot"
+
