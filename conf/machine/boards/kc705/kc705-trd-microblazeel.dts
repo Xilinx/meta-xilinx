@@ -13,7 +13,7 @@
 		serial0 = &rs232_uart_1;
 	} ;
 	chosen {
-		bootargs = "console=ttyS0,115200 root=/dev/ram rw";
+		bootargs = "console=ttyS0,115200 root=/dev/ram rw udev.children-max=1";
 		linux,stdout-path = "/axi@2/serial@40400000";
 	} ;
 	cpus {
