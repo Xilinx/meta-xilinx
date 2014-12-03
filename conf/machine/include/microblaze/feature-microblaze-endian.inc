@@ -4,7 +4,7 @@ MBPKGENDIAN = ""
 
 TUNEVALID[little-endian] = "Use Microblaze Little Endian."
 MBCCARGSENDIAN += "${@bb.utils.contains("TUNE_FEATURES", "little-endian", "-mlittle-endian", "" ,d)}"
-MBPKGENDIAN .= "${@bb.utils.contains("TUNE_FEATURES", "little-endian", "el", "eb" ,d)}"
+MBPKGENDIAN .= "${@bb.utils.contains("TUNE_FEATURES", "little-endian", "el", "" ,d)}"
 
 TUNEVALID[big-endian] = "Use Microblaze Big Endian."
 MBCCARGSENDIAN += "${@bb.utils.contains("TUNE_FEATURES", "big-endian", "-mbig-endian", "" ,d)}"
