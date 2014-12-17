@@ -18,3 +18,9 @@ UBOOT_MACHINE ?= "microblaze-generic"
 
 # linux-yocto KMACHINE
 KMACHINE ?= "microblaze"
+
+# default to use the gdb 7.7.1
+PREFERRED_VERSION_gdb ?= "7.7.1"
+PREFERRED_VERSION_gdb-cross ?= "7.7.1"
+PREFERRED_VERSION_gdb-cross-canadian ?= "7.7.1"
+
