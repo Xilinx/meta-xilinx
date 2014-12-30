@@ -21,8 +21,11 @@ def csl_get_version(d):
 		bb.error('Make sure that MACHINE is set correctly in your local.conf and the toolchain supports %s.' % d.getVar("TARGET_ARCH", True))
 		return 'UNKNOWN'
 	else:
-		last_line = stderr.splitlines()[-1]
-		return last_line
+		lines = stderr.splitlines()
+		for i in reversed(range(len(lines))):
+			if len(lines[i]) != 0:
+				return lines[i]
+		return 'UNKNOWN'
 
 def csl_get_main_version(d):
 	version = csl_get_version(d)
