@@ -1,0 +1,46 @@
+From 9f0f9df61d6c198528ba2fd43981b166ea337dd3 Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Date: Mon, 28 Apr 2014 11:15:24 +1000
+Subject: [PATCH 4/7] arm64: mm: Correct check for EXEC faults
+
+ESR_LNX_EXEC doesn't match anything in the specs. Replace it
+with ESR.EC IABT based checks.
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+---
+ arch/arm64/mm/fault.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index c11cd27..276529a 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -36,6 +36,7 @@
+ #include <asm/system_misc.h>
+ #include <asm/pgtable.h>
+ #include <asm/tlbflush.h>
++#include <asm/esr.h>
+ 
+ static const char *fault_name(unsigned int esr);
+ 
+@@ -199,6 +200,7 @@ static int __kprobes do_page_fault(unsigned long addr, unsigned int esr,
+ 	int fault, sig, code;
+ 	unsigned long vm_flags = VM_READ | VM_WRITE | VM_EXEC;
+ 	unsigned int mm_flags = FAULT_FLAG_ALLOW_RETRY | FAULT_FLAG_KILLABLE;
++	unsigned long esr_ec = esr >> ESR_EL1_EC_SHIFT;
+ 
+ 	tsk = current;
+ 	mm  = tsk->mm;
+@@ -217,7 +219,7 @@ static int __kprobes do_page_fault(unsigned long addr, unsigned int esr,
+ 	if (user_mode(regs))
+ 		mm_flags |= FAULT_FLAG_USER;
+ 
+-	if (esr & ESR_LNX_EXEC) {
++	if (esr_ec == ESR_EL1_EC_IABT_EL0 || esr_ec == ESR_EL1_EC_IABT_EL1) {
+ 		vm_flags = VM_EXEC;
+ 	} else if ((esr & ESR_EL1_WRITE) && !(esr & ESR_EL1_CM)) {
+ 		vm_flags = VM_WRITE;
+-- 
+2.1.1
+

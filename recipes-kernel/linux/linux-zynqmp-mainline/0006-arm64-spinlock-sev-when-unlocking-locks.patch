@@ -1,0 +1,28 @@
+From 761cba95ae66984cf60423190aefb3b794774033 Mon Sep 17 00:00:00 2001
+From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Date: Thu, 12 Jun 2014 17:05:43 -0700
+Subject: [PATCH 6/7] arm64: spinlock: sev when unlocking locks
+
+Because spinners are doing a wfe in their poll of the lock.
+
+Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+---
+ arch/arm64/include/asm/spinlock.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm64/include/asm/spinlock.h b/arch/arm64/include/asm/spinlock.h
+index cee1287..c4df86f 100644
+--- a/arch/arm64/include/asm/spinlock.h
++++ b/arch/arm64/include/asm/spinlock.h
+@@ -87,6 +87,7 @@ static inline void arch_spin_unlock(arch_spinlock_t *lock)
+ {
+ 	asm volatile(
+ "	stlrh	%w1, %0\n"
++"	sev\n"
+ 	: "=Q" (lock->owner)
+ 	: "r" (lock->owner + 1)
+ 	: "memory");
+-- 
+2.1.1
+
