@@ -1,0 +1,41 @@
+From 8ef4b6e8f95d99dcee6ae1bae92f24cd05d1ff3a Mon Sep 17 00:00:00 2001
+From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Date: Mon, 23 Feb 2015 15:04:54 -0800
+Subject: [PATCH 14/15] arm: xilinx-zynq-mp-generic: Add bootloading
+
+Using standard ARM bootloader.
+
+Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+---
+ hw/arm/xlnx-zynq-mp-generic.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/hw/arm/xlnx-zynq-mp-generic.c b/hw/arm/xlnx-zynq-mp-generic.c
+index 7394e82..a86f10d 100644
+--- a/hw/arm/xlnx-zynq-mp-generic.c
++++ b/hw/arm/xlnx-zynq-mp-generic.c
+@@ -25,6 +25,8 @@ typedef struct XlnxZynqMPGeneric {
+     MemoryRegion ddr_ram;
+ } XlnxZynqMPGeneric;
+ 
++static struct arm_boot_info xlnx_zynq_mp_generic_binfo;
++
+ static void xlnx_zynq_mp_generic_init(MachineState *machine)
+ {
+     XlnxZynqMPGeneric *s = g_new0(XlnxZynqMPGeneric, 1);
+@@ -43,6 +45,12 @@ static void xlnx_zynq_mp_generic_init(MachineState *machine)
+                            &error_abort);
+     vmstate_register_ram_global(&s->ddr_ram);
+     memory_region_add_subregion(get_system_memory(), 0, &s->ddr_ram);
++
++    xlnx_zynq_mp_generic_binfo.ram_size = machine->ram_size;
++    xlnx_zynq_mp_generic_binfo.kernel_filename = machine->kernel_filename;
++    xlnx_zynq_mp_generic_binfo.kernel_cmdline = machine->kernel_cmdline;
++    xlnx_zynq_mp_generic_binfo.initrd_filename = machine->initrd_filename;
++    arm_load_kernel(&s->soc.cpu[0], &xlnx_zynq_mp_generic_binfo);
+ }
+ 
+ static QEMUMachine xlnx_zynq_mp_generic_machine = {
+-- 
+2.1.1
+

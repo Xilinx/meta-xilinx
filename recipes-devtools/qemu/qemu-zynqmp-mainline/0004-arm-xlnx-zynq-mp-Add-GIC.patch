@@ -1,0 +1,83 @@
+From 307b6f846c7cc878f399a34a29a9db48f32e3432 Mon Sep 17 00:00:00 2001
+From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Date: Mon, 23 Feb 2015 15:04:43 -0800
+Subject: [PATCH 04/15] arm: xlnx-zynq-mp: Add GIC
+
+And connect IRQ outputs to the CPUs.
+
+Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+---
+ hw/arm/xlnx-zynq-mp.c         | 19 +++++++++++++++++++
+ include/hw/arm/xlnx-zynq-mp.h |  2 ++
+ 2 files changed, 21 insertions(+)
+
+diff --git a/hw/arm/xlnx-zynq-mp.c b/hw/arm/xlnx-zynq-mp.c
+index d553fb0..9cdff13 100644
+--- a/hw/arm/xlnx-zynq-mp.c
++++ b/hw/arm/xlnx-zynq-mp.c
+@@ -17,6 +17,11 @@
+ 
+ #include "hw/arm/xlnx-zynq-mp.h"
+ 
++#define GIC_NUM_SPI_INTR 128
++
++#define GIC_DIST_ADDR       0xf9010000
++#define GIC_CPU_ADDR        0xf9020000
++
+ static void xlnx_zynq_mp_init(Object *obj)
+ {
+     XlnxZynqMPState *s = XLNX_ZYNQ_MP(obj);
+@@ -27,6 +32,9 @@ static void xlnx_zynq_mp_init(Object *obj)
+                           "cortex-a53-" TYPE_ARM_CPU);
+         object_property_add_child(obj, "cpu", OBJECT(&s->cpu[i]), NULL);
+     }
++
++    object_initialize(&s->gic, sizeof(s->gic), TYPE_ARM_GIC);
++    qdev_set_parent_bus(DEVICE(&s->gic), sysbus_get_default());
+ }
+ 
+ #define ERR_PROP_CHECK_RETURN(err, errp) do { \
+@@ -42,9 +50,20 @@ static void xlnx_zynq_mp_realize(DeviceState *dev, Error **errp)
+     uint8_t i;
+     Error *err = NULL;
+ 
++    qdev_prop_set_uint32(DEVICE(&s->gic), "num-irq", GIC_NUM_SPI_INTR + 32);
++    qdev_prop_set_uint32(DEVICE(&s->gic), "revision", 2);
++    qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", XLNX_ZYNQ_MP_NUM_CPUS);
++    object_property_set_bool(OBJECT(&s->gic), true, "realized", &err);
++    ERR_PROP_CHECK_RETURN(err, errp);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 0, GIC_DIST_ADDR);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 1, GIC_CPU_ADDR);
++
+     for (i = 0; i < XLNX_ZYNQ_MP_NUM_CPUS; i++) {
+         object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &err);
+         ERR_PROP_CHECK_RETURN(err, errp);
++
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i,
++                           qdev_get_gpio_in(DEVICE(&s->cpu[i]), ARM_CPU_IRQ));
+     }
+ }
+ 
+diff --git a/include/hw/arm/xlnx-zynq-mp.h b/include/hw/arm/xlnx-zynq-mp.h
+index f7410dc..22b2af0 100644
+--- a/include/hw/arm/xlnx-zynq-mp.h
++++ b/include/hw/arm/xlnx-zynq-mp.h
+@@ -2,6 +2,7 @@
+ 
+ #include "qemu-common.h"
+ #include "hw/arm/arm.h"
++#include "hw/intc/arm_gic.h"
+ 
+ #define TYPE_XLNX_ZYNQ_MP "xlnx,zynq-mp"
+ #define XLNX_ZYNQ_MP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
+@@ -15,6 +16,7 @@ typedef struct XlnxZynqMPState {
+     /*< public >*/
+ 
+     ARMCPU cpu[XLNX_ZYNQ_MP_NUM_CPUS];
++    GICState gic;
+ }  XlnxZynqMPState;
+ 
+ #define XLNX_ZYNQ_MP_H_
+-- 
+2.1.1
+

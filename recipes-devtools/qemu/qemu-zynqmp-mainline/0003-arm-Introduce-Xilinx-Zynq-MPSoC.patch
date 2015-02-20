@@ -1,0 +1,143 @@
+From 37b74b0626d6403da8d9b946d77d29296bc47bcc Mon Sep 17 00:00:00 2001
+From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Date: Mon, 23 Feb 2015 15:04:42 -0800
+Subject: [PATCH 03/15] arm: Introduce Xilinx Zynq MPSoC
+
+With quad Cortex-A53 CPUs.
+
+Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+---
+ default-configs/aarch64-softmmu.mak |  2 +-
+ hw/arm/Makefile.objs                |  1 +
+ hw/arm/xlnx-zynq-mp.c               | 71 +++++++++++++++++++++++++++++++++++++
+ include/hw/arm/xlnx-zynq-mp.h       | 21 +++++++++++
+ 4 files changed, 94 insertions(+), 1 deletion(-)
+ create mode 100644 hw/arm/xlnx-zynq-mp.c
+ create mode 100644 include/hw/arm/xlnx-zynq-mp.h
+
+diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch64-softmmu.mak
+index 6d3b5c7..a8011e0 100644
+--- a/default-configs/aarch64-softmmu.mak
++++ b/default-configs/aarch64-softmmu.mak
+@@ -3,4 +3,4 @@
+ # We support all the 32 bit boards so need all their config
+ include arm-softmmu.mak
+ 
+-# Currently no 64-bit specific config requirements
++CONFIG_XLNX_ZYNQ_MP=y
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index 6088e53..9bf072b 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -8,3 +8,4 @@ obj-y += armv7m.o exynos4210.o pxa2xx.o pxa2xx_gpio.o pxa2xx_pic.o
+ obj-$(CONFIG_DIGIC) += digic.o
+ obj-y += omap1.o omap2.o strongarm.o
+ obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
++obj-$(CONFIG_XLNX_ZYNQ_MP) += xlnx-zynq-mp.o
+diff --git a/hw/arm/xlnx-zynq-mp.c b/hw/arm/xlnx-zynq-mp.c
+new file mode 100644
+index 0000000..d553fb0
+--- /dev/null
++++ b/hw/arm/xlnx-zynq-mp.c
+@@ -0,0 +1,71 @@
++/*
++ * Xilinx Zynq MPSoC emulation
++ *
++ * Copyright (C) 2015 Xilinx Inc
++ * Written by Peter Crosthwaite <peter.crosthwaite@xilinx.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
++ * for more details.
++ */
++
++#include "hw/arm/xlnx-zynq-mp.h"
++
++static void xlnx_zynq_mp_init(Object *obj)
++{
++    XlnxZynqMPState *s = XLNX_ZYNQ_MP(obj);
++    int i;
++
++    for (i = 0; i < XLNX_ZYNQ_MP_NUM_CPUS; i++) {
++        object_initialize(&s->cpu[i], sizeof(s->cpu[i]),
++                          "cortex-a53-" TYPE_ARM_CPU);
++        object_property_add_child(obj, "cpu", OBJECT(&s->cpu[i]), NULL);
++    }
++}
++
++#define ERR_PROP_CHECK_RETURN(err, errp) do { \
++    if (err) { \
++        error_propagate((errp), (err)); \
++        return; \
++    } \
++} while (0)
++
++static void xlnx_zynq_mp_realize(DeviceState *dev, Error **errp)
++{
++    XlnxZynqMPState *s = XLNX_ZYNQ_MP(dev);
++    uint8_t i;
++    Error *err = NULL;
++
++    for (i = 0; i < XLNX_ZYNQ_MP_NUM_CPUS; i++) {
++        object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &err);
++        ERR_PROP_CHECK_RETURN(err, errp);
++    }
++}
++
++static void xlnx_zynq_mp_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = xlnx_zynq_mp_realize;
++}
++
++static const TypeInfo xlnx_zynq_mp_type_info = {
++    .name = TYPE_XLNX_ZYNQ_MP,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(XlnxZynqMPState),
++    .instance_init = xlnx_zynq_mp_init,
++    .class_init = xlnx_zynq_mp_class_init,
++};
++
++static void xlnx_zynq_mp_register_types(void)
++{
++    type_register_static(&xlnx_zynq_mp_type_info);
++}
++
++type_init(xlnx_zynq_mp_register_types)
+diff --git a/include/hw/arm/xlnx-zynq-mp.h b/include/hw/arm/xlnx-zynq-mp.h
+new file mode 100644
+index 0000000..f7410dc
+--- /dev/null
++++ b/include/hw/arm/xlnx-zynq-mp.h
+@@ -0,0 +1,21 @@
++#ifndef XLNX_ZYNQ_MP_H_
++
++#include "qemu-common.h"
++#include "hw/arm/arm.h"
++
++#define TYPE_XLNX_ZYNQ_MP "xlnx,zynq-mp"
++#define XLNX_ZYNQ_MP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
++                                       TYPE_XLNX_ZYNQ_MP)
++
++#define XLNX_ZYNQ_MP_NUM_CPUS 4
++
++typedef struct XlnxZynqMPState {
++    /*< private >*/
++    DeviceState parent_obj;
++    /*< public >*/
++
++    ARMCPU cpu[XLNX_ZYNQ_MP_NUM_CPUS];
++}  XlnxZynqMPState;
++
++#define XLNX_ZYNQ_MP_H_
++#endif
+-- 
+2.1.1
+

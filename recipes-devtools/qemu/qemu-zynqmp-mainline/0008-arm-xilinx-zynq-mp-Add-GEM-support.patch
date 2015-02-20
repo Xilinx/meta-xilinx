@@ -1,0 +1,107 @@
+From eed690e857579901b4571a250af0259e5051692f Mon Sep 17 00:00:00 2001
+From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Date: Mon, 23 Feb 2015 15:04:48 -0800
+Subject: [PATCH 08/15] arm: xilinx-zynq-mp: Add GEM support
+
+There are 4x Cadence GEMs in Zynq MP. Add them.
+
+Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+---
+ hw/arm/xlnx-zynq-mp.c         | 32 ++++++++++++++++++++++++++++++++
+ include/hw/arm/xlnx-zynq-mp.h |  3 +++
+ 2 files changed, 35 insertions(+)
+
+diff --git a/hw/arm/xlnx-zynq-mp.c b/hw/arm/xlnx-zynq-mp.c
+index be82a66..2ef57d9 100644
+--- a/hw/arm/xlnx-zynq-mp.c
++++ b/hw/arm/xlnx-zynq-mp.c
+@@ -25,6 +25,14 @@
+ #define GIC_DIST_ADDR       0xf9010000
+ #define GIC_CPU_ADDR        0xf9020000
+ 
++static const uint64_t gem_addr[XLNX_ZYNQ_MP_NUM_GEMS] = {
++    0xFF0B0000, 0xFF0C0000, 0xFF0D0000, 0xFF0E0000,
++};
++
++static const int gem_intr[XLNX_ZYNQ_MP_NUM_GEMS] = {
++    57, 59, 61, 63,
++};
++
+ static inline int arm_gic_ppi_index(int cpu_nr, int ppi_index)
+ {
+     return GIC_NUM_SPI_INTR + cpu_nr * 32 + ppi_index;
+@@ -43,6 +51,11 @@ static void xlnx_zynq_mp_init(Object *obj)
+ 
+     object_initialize(&s->gic, sizeof(s->gic), TYPE_ARM_GIC);
+     qdev_set_parent_bus(DEVICE(&s->gic), sysbus_get_default());
++
++    for (i = 0; i < XLNX_ZYNQ_MP_NUM_GEMS; i++) {
++        object_initialize(&s->gem[i], sizeof(s->gem[i]), TYPE_CADENCE_GEM);
++        qdev_set_parent_bus(DEVICE(&s->gem[i]), sysbus_get_default());
++    }
+ }
+ 
+ #define ERR_PROP_CHECK_RETURN(err, errp) do { \
+@@ -56,6 +69,7 @@ static void xlnx_zynq_mp_realize(DeviceState *dev, Error **errp)
+ {
+     XlnxZynqMPState *s = XLNX_ZYNQ_MP(dev);
+     uint8_t i;
++    qemu_irq gic_spi[GIC_NUM_SPI_INTR];
+     Error *err = NULL;
+ 
+     qdev_prop_set_uint32(DEVICE(&s->gic), "num-irq", GIC_NUM_SPI_INTR + 32);
+@@ -81,6 +95,24 @@ static void xlnx_zynq_mp_realize(DeviceState *dev, Error **errp)
+                                arm_gic_ppi_index(i, ARM_VIRT_TIMER_PPI));
+         qdev_connect_gpio_out(DEVICE(&s->cpu[i]), 1, irq);
+     }
++
++    for (i = 0; i < GIC_NUM_SPI_INTR; i++) {
++        gic_spi[i] = qdev_get_gpio_in(DEVICE(&s->gic), i);
++    }
++
++    for (i = 0; i < XLNX_ZYNQ_MP_NUM_GEMS; i++) {
++        NICInfo *nd = &nd_table[i];
++
++        if (nd->used) {
++            qemu_check_nic_model(nd, TYPE_CADENCE_GEM);
++            qdev_set_nic_properties(DEVICE(&s->gem[i]), nd);
++        }
++        object_property_set_bool(OBJECT(&s->gem[i]), true, "realized", &err);
++        ERR_PROP_CHECK_RETURN(err, errp);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->gem[i]), 0, gem_addr[i]);
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gem[i]), 0,
++                           gic_spi[gem_intr[i]]);
++    }
+ }
+ 
+ static void xlnx_zynq_mp_class_init(ObjectClass *oc, void *data)
+diff --git a/include/hw/arm/xlnx-zynq-mp.h b/include/hw/arm/xlnx-zynq-mp.h
+index 22b2af0..470503c 100644
+--- a/include/hw/arm/xlnx-zynq-mp.h
++++ b/include/hw/arm/xlnx-zynq-mp.h
+@@ -3,12 +3,14 @@
+ #include "qemu-common.h"
+ #include "hw/arm/arm.h"
+ #include "hw/intc/arm_gic.h"
++#include "hw/net/cadence_gem.h"
+ 
+ #define TYPE_XLNX_ZYNQ_MP "xlnx,zynq-mp"
+ #define XLNX_ZYNQ_MP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
+                                        TYPE_XLNX_ZYNQ_MP)
+ 
+ #define XLNX_ZYNQ_MP_NUM_CPUS 4
++#define XLNX_ZYNQ_MP_NUM_GEMS 4
+ 
+ typedef struct XlnxZynqMPState {
+     /*< private >*/
+@@ -17,6 +19,7 @@ typedef struct XlnxZynqMPState {
+ 
+     ARMCPU cpu[XLNX_ZYNQ_MP_NUM_CPUS];
+     GICState gic;
++    CadenceGEMState gem[XLNX_ZYNQ_MP_NUM_GEMS];
+ }  XlnxZynqMPState;
+ 
+ #define XLNX_ZYNQ_MP_H_
+-- 
+2.1.1
+

@@ -1,0 +1,90 @@
+From ef634b1cf1766a5798868d1299a9a4ae2e87bcc9 Mon Sep 17 00:00:00 2001
+From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Date: Mon, 23 Feb 2015 15:04:51 -0800
+Subject: [PATCH 11/15] arm: xilinx-zynq-mp: Add UART support
+
+There are 2x Cadence UARTSs in Zynq MP. Add them.
+
+Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+---
+ hw/arm/xlnx-zynq-mp.c         | 21 +++++++++++++++++++++
+ include/hw/arm/xlnx-zynq-mp.h |  3 +++
+ 2 files changed, 24 insertions(+)
+
+diff --git a/hw/arm/xlnx-zynq-mp.c b/hw/arm/xlnx-zynq-mp.c
+index 2ef57d9..9d7e834 100644
+--- a/hw/arm/xlnx-zynq-mp.c
++++ b/hw/arm/xlnx-zynq-mp.c
+@@ -33,6 +33,14 @@ static const int gem_intr[XLNX_ZYNQ_MP_NUM_GEMS] = {
+     57, 59, 61, 63,
+ };
+ 
++static const uint64_t uart_addr[XLNX_ZYNQ_MP_NUM_UARTS] = {
++    0xFF000000, 0xFF010000,
++};
++
++static const int uart_intr[XLNX_ZYNQ_MP_NUM_UARTS] = {
++    21, 22,
++};
++
+ static inline int arm_gic_ppi_index(int cpu_nr, int ppi_index)
+ {
+     return GIC_NUM_SPI_INTR + cpu_nr * 32 + ppi_index;
+@@ -56,6 +64,11 @@ static void xlnx_zynq_mp_init(Object *obj)
+         object_initialize(&s->gem[i], sizeof(s->gem[i]), TYPE_CADENCE_GEM);
+         qdev_set_parent_bus(DEVICE(&s->gem[i]), sysbus_get_default());
+     }
++
++    for (i = 0; i < XLNX_ZYNQ_MP_NUM_UARTS; i++) {
++        object_initialize(&s->uart[i], sizeof(s->uart[i]), TYPE_CADENCE_UART);
++        qdev_set_parent_bus(DEVICE(&s->uart[i]), sysbus_get_default());
++    }
+ }
+ 
+ #define ERR_PROP_CHECK_RETURN(err, errp) do { \
+@@ -113,6 +126,14 @@ static void xlnx_zynq_mp_realize(DeviceState *dev, Error **errp)
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->gem[i]), 0,
+                            gic_spi[gem_intr[i]]);
+     }
++
++    for (i = 0; i < XLNX_ZYNQ_MP_NUM_UARTS; i++) {
++        object_property_set_bool(OBJECT(&s->uart[i]), true, "realized", &err);
++        ERR_PROP_CHECK_RETURN(err, errp);
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->uart[i]), 0, uart_addr[i]);
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart[i]), 0,
++                           gic_spi[uart_intr[i]]);
++    }
+ }
+ 
+ static void xlnx_zynq_mp_class_init(ObjectClass *oc, void *data)
+diff --git a/include/hw/arm/xlnx-zynq-mp.h b/include/hw/arm/xlnx-zynq-mp.h
+index 470503c..c4ee658 100644
+--- a/include/hw/arm/xlnx-zynq-mp.h
++++ b/include/hw/arm/xlnx-zynq-mp.h
+@@ -4,6 +4,7 @@
+ #include "hw/arm/arm.h"
+ #include "hw/intc/arm_gic.h"
+ #include "hw/net/cadence_gem.h"
++#include "hw/char/cadence_uart.h"
+ 
+ #define TYPE_XLNX_ZYNQ_MP "xlnx,zynq-mp"
+ #define XLNX_ZYNQ_MP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
+@@ -11,6 +12,7 @@
+ 
+ #define XLNX_ZYNQ_MP_NUM_CPUS 4
+ #define XLNX_ZYNQ_MP_NUM_GEMS 4
++#define XLNX_ZYNQ_MP_NUM_UARTS 2
+ 
+ typedef struct XlnxZynqMPState {
+     /*< private >*/
+@@ -20,6 +22,7 @@ typedef struct XlnxZynqMPState {
+     ARMCPU cpu[XLNX_ZYNQ_MP_NUM_CPUS];
+     GICState gic;
+     CadenceGEMState gem[XLNX_ZYNQ_MP_NUM_GEMS];
++    CadenceUARTState uart[XLNX_ZYNQ_MP_NUM_UARTS];
+ }  XlnxZynqMPState;
+ 
+ #define XLNX_ZYNQ_MP_H_
+-- 
+2.1.1
+

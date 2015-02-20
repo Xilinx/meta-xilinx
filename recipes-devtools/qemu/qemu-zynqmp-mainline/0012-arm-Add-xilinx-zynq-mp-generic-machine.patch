@@ -1,0 +1,87 @@
+From 48860a59e9fe23da638dde9c47a3665466ceefae Mon Sep 17 00:00:00 2001
+From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Date: Mon, 23 Feb 2015 15:04:52 -0800
+Subject: [PATCH 12/15] arm: Add xilinx-zynq-mp-generic machine
+
+Add a generic machine for the Xilinx Zynq MP SoC. This is a minimal
+machine that exposes the capabilities of the raw SoC as a usable
+machine.
+
+Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+---
+ hw/arm/Makefile.objs          |  2 +-
+ hw/arm/xlnx-zynq-mp-generic.c | 52 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 53 insertions(+), 1 deletion(-)
+ create mode 100644 hw/arm/xlnx-zynq-mp-generic.c
+
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index 9bf072b..776fbe3 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -8,4 +8,4 @@ obj-y += armv7m.o exynos4210.o pxa2xx.o pxa2xx_gpio.o pxa2xx_pic.o
+ obj-$(CONFIG_DIGIC) += digic.o
+ obj-y += omap1.o omap2.o strongarm.o
+ obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
+-obj-$(CONFIG_XLNX_ZYNQ_MP) += xlnx-zynq-mp.o
++obj-$(CONFIG_XLNX_ZYNQ_MP) += xlnx-zynq-mp.o xlnx-zynq-mp-generic.o
+diff --git a/hw/arm/xlnx-zynq-mp-generic.c b/hw/arm/xlnx-zynq-mp-generic.c
+new file mode 100644
+index 0000000..ff69b07
+--- /dev/null
++++ b/hw/arm/xlnx-zynq-mp-generic.c
+@@ -0,0 +1,52 @@
++#/*
++ * Xilinx Zynq MPSoC emulation
++ *
++ * Copyright (C) 2015 Xilinx Inc
++ * Written by Peter Crosthwaite <peter.crosthwaite@xilinx.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
++ * for more details.
++ */
++
++#include "hw/arm/xlnx-zynq-mp.h"
++#include "hw/boards.h"
++#include "qemu/error-report.h"
++
++typedef struct XlnxZynqMPGeneric {
++    XlnxZynqMPState soc;
++} XlnxZynqMPGeneric;
++
++static void xlnx_zynq_mp_generic_init(MachineState *machine)
++{
++    XlnxZynqMPGeneric *s = g_new0(XlnxZynqMPGeneric, 1);
++    Error *err = NULL;
++
++    object_initialize(&s->soc, sizeof(s->soc), TYPE_XLNX_ZYNQ_MP);
++    object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc), NULL);
++
++    object_property_set_bool(OBJECT(&s->soc), true, "realized", &err);
++    if (err) {
++        error_report("%s", error_get_pretty(err));
++        exit(1);
++    }
++}
++
++static QEMUMachine xlnx_zynq_mp_generic_machine = {
++    .name = "xlnx-zynq-mp-generic",
++    .desc = "Xilinx Zynq MP SoC generic machine",
++    .init = xlnx_zynq_mp_generic_init,
++};
++
++static void xlnx_zynq_mp_generic_machine_init(void)
++{
++    qemu_register_machine(&xlnx_zynq_mp_generic_machine);
++}
++
++machine_init(xlnx_zynq_mp_generic_machine_init);
+-- 
+2.1.1
+

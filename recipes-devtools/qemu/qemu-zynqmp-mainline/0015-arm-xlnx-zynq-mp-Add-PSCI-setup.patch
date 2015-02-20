@@ -1,0 +1,35 @@
+From 97287cf7c4f7550d298c0ef11dde88ee91c209a3 Mon Sep 17 00:00:00 2001
+From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Date: Mon, 23 Feb 2015 15:04:55 -0800
+Subject: [PATCH 15/15] arm: xlnx-zynq-mp: Add PSCI setup
+
+Use SMC PSCI, with the standard policy of secondaries starting in
+power-off.
+
+Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+---
+ hw/arm/xlnx-zynq-mp.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/hw/arm/xlnx-zynq-mp.c b/hw/arm/xlnx-zynq-mp.c
+index 9d7e834..0952221 100644
+--- a/hw/arm/xlnx-zynq-mp.c
++++ b/hw/arm/xlnx-zynq-mp.c
+@@ -96,6 +96,14 @@ static void xlnx_zynq_mp_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < XLNX_ZYNQ_MP_NUM_CPUS; i++) {
+         qemu_irq irq;
+ 
++        object_property_set_int(OBJECT(&s->cpu[i]), QEMU_PSCI_CONDUIT_SMC,
++                                "psci-conduit", NULL);
++        if (i > 0) {
++            /* Secondary CPUs start in PSCI powered-down state */
++            object_property_set_bool(OBJECT(&s->cpu[i]), true,
++                                     "start-powered-off", NULL);
++        }
++
+         object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &err);
+         ERR_PROP_CHECK_RETURN(err, errp);
+ 
+-- 
+2.1.1
+

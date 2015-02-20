@@ -1,0 +1,51 @@
+From 2390e80ace413722b0d41500c1927d78b2a0154b Mon Sep 17 00:00:00 2001
+From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Date: Mon, 23 Feb 2015 15:04:39 -0800
+Subject: [PATCH 02/15] target-arm: cpu64: Add support for cortex-a53
+
+Similar to a53, but with different L1 I cache policy, phys addr size and
+different cache geometries. The cache sizes is implementation
+configurable, but use these values (from Xilinx MPSoC) as a default
+until cache size configurability is added.
+
+Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+---
+ target-arm/cpu64.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/target-arm/cpu64.c b/target-arm/cpu64.c
+index 5cf3121..0b9728e 100644
+--- a/target-arm/cpu64.c
++++ b/target-arm/cpu64.c
+@@ -148,6 +148,20 @@ static void aarch64_a57_initfn(Object *obj)
+     cpu->ccsidr[2] = 0x70ffe07a; /* 2048KB L2 cache */
+ }
+ 
++static void aarch64_a53_initfn(Object *obj)
++{
++    ARMCPU *cpu = ARM_CPU(obj);
++
++    aarch64_axx_initfn(cpu);
++
++    cpu->midr = 0x410fd034;
++    cpu->ctr = 0x84448004; /* L1Ip = VIPT */
++    cpu->id_aa64mmfr0 = 0x00001122; /* 40 bit physical addr */
++    cpu->ccsidr[0] = 0x700fe01a; /* 32KB L1 dcache */
++    cpu->ccsidr[1] = 0x201fe00a; /* 32KB L1 icache */
++    cpu->ccsidr[2] = 0x707fe07a; /* 1024KB L2 cache */
++}
++
+ #ifdef CONFIG_USER_ONLY
+ static void aarch64_any_initfn(Object *obj)
+ {
+@@ -175,6 +189,7 @@ typedef struct ARMCPUInfo {
+ 
+ static const ARMCPUInfo aarch64_cpus[] = {
+     { .name = "cortex-a57",         .initfn = aarch64_a57_initfn },
++    { .name = "cortex-a53",         .initfn = aarch64_a53_initfn },
+ #ifdef CONFIG_USER_ONLY
+     { .name = "any",         .initfn = aarch64_any_initfn },
+ #endif
+-- 
+2.1.1
+

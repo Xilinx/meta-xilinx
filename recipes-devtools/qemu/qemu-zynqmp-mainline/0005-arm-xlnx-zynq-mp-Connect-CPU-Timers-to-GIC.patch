@@ -1,0 +1,58 @@
+From c2c5018da201c9eead0dba39263eb40549064511 Mon Sep 17 00:00:00 2001
+From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Date: Mon, 23 Feb 2015 15:04:44 -0800
+Subject: [PATCH 05/15] arm: xlnx-zynq-mp: Connect CPU Timers to GIC
+
+Connect the GPIO outputs from the individual CPUs for the timers to the
+GIC.
+
+Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+---
+ hw/arm/xlnx-zynq-mp.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/hw/arm/xlnx-zynq-mp.c b/hw/arm/xlnx-zynq-mp.c
+index 9cdff13..be82a66 100644
+--- a/hw/arm/xlnx-zynq-mp.c
++++ b/hw/arm/xlnx-zynq-mp.c
+@@ -19,9 +19,17 @@
+ 
+ #define GIC_NUM_SPI_INTR 128
+ 
++#define ARM_PHYS_TIMER_PPI  30
++#define ARM_VIRT_TIMER_PPI  27
++
+ #define GIC_DIST_ADDR       0xf9010000
+ #define GIC_CPU_ADDR        0xf9020000
+ 
++static inline int arm_gic_ppi_index(int cpu_nr, int ppi_index)
++{
++    return GIC_NUM_SPI_INTR + cpu_nr * 32 + ppi_index;
++}
++
+ static void xlnx_zynq_mp_init(Object *obj)
+ {
+     XlnxZynqMPState *s = XLNX_ZYNQ_MP(obj);
+@@ -59,11 +67,19 @@ static void xlnx_zynq_mp_realize(DeviceState *dev, Error **errp)
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 1, GIC_CPU_ADDR);
+ 
+     for (i = 0; i < XLNX_ZYNQ_MP_NUM_CPUS; i++) {
++        qemu_irq irq;
++
+         object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &err);
+         ERR_PROP_CHECK_RETURN(err, errp);
+ 
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i,
+                            qdev_get_gpio_in(DEVICE(&s->cpu[i]), ARM_CPU_IRQ));
++        irq = qdev_get_gpio_in(DEVICE(&s->gic),
++                               arm_gic_ppi_index(i, ARM_PHYS_TIMER_PPI));
++        qdev_connect_gpio_out(DEVICE(&s->cpu[i]), 0, irq);
++        irq = qdev_get_gpio_in(DEVICE(&s->gic),
++                               arm_gic_ppi_index(i, ARM_VIRT_TIMER_PPI));
++        qdev_connect_gpio_out(DEVICE(&s->cpu[i]), 1, irq);
+     }
+ }
+ 
+-- 
+2.1.1
+
