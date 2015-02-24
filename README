@@ -7,14 +7,21 @@ architectures as well as evaluation boards.
 Supported Boards/Machines
 =========================
 
-Boards Supported by this layer (Please refer to the associate .conf for more
-information):
+Boards Supported by this layer:
 	* Xilinx KC705 Embedded TRD (MicroBlaze)
 	* Xilinx ZC702 (Zynq)
 	* Xilinx ZC706 (Zynq)
+	* Xilinx EP108 (ZynqMP)
 	* Avnet/Digilent ZedBoard (Zynq)
 
-Additional information on the MicroBlaze or Zynq architectures can be found at:
+QEMU Models Supported by this layer:
+	* qemumicroblaze (MicroBlaze)
+	* qemuzynq (Zynq)
+	* qemuzynqmp (ZynqMP)
+
+(Please refer to the associate .conf for more information)
+
+Additional information on Xilinx architectures can be found at:
 	http://www.xilinx.com/support/index.htm
 
 Maintainers, Patches/Submissions, Community
@@ -27,7 +34,6 @@ Please send any patches, pull requests, comments or questions for this layer to:
 Maintainers:
 
 	Nathan Rossi <nathan.rossi@xilinx.com>
-	Sipke Vriend <sipke.vriend@xilinx.com>
 
 Dependencies
 ============
