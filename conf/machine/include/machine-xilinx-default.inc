@@ -13,8 +13,11 @@ PREFERRED_VERSION_linux-yocto ?= "3.14%"
 PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-xlnx"
 PREFERRED_PROVIDER_u-boot ?= "u-boot-xlnx"
 PREFERRED_VERSION_u-boot-xlnx ?= "v2015.01%"
-UBOOT_SUFFIX ?= "img"
 
+UBOOT_SUFFIX ?= "img"
+UBOOT_BINARY_zynq ?= "u-boot-dtb.${UBOOT_SUFFIX}"
+
+# Device Trees
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree"
 
 # Common Device Tree Includes
