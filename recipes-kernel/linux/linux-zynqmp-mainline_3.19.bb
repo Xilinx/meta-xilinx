@@ -1,5 +1,5 @@
 
-# Kernel version and SRCREV correspond to: xlnx_3.14 branch
+# This kernel is based on the mainline v3.19 release
 LINUX_VERSION = "3.19"
 KBRANCH ?= "master"
 SRCREV ?= "bfa76d49576599a4b9f9b7a71f23d73d6dcff735"
