@@ -1,4 +1,4 @@
-define KFEATURE_DESCRIPTION "Xilinx Evaluation Board Common Drivers"
+define KFEATURE_DESCRIPTION "Xilinx Common Board Drivers"
 define KFEATURE_COMPATIBILITY board
 
 kconfig hardware board-common.cfg

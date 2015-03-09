@@ -1,13 +1,13 @@
-define KMACHINE microblaze
+define KMACHINE zynq
 define KTYPE standard
-define KARCH microblaze
+define KARCH arm
 
 include ktypes/standard/standard.scc
 
-include bsp/microblaze/microblaze.scc
+include bsp/xilinx/soc/zynq.scc
 
 # Common board drivers
-include features/xilinx/board-common.scc
+include bsp/xilinx/board-common.scc
 
 # default policy for standard kernels
 include features/latencytop/latencytop.scc
