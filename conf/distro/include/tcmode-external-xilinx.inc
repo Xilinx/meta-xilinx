@@ -78,3 +78,6 @@ python toolchain_setup () {
 
 require conf/distro/include/xilinx-versions.inc
 
+# Setup suitable toolchain flags
+require conf/distro/include/as-needed.inc
+
