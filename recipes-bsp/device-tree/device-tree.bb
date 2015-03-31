@@ -13,6 +13,8 @@ DEPENDS += "dtc-native"
 FILES_${PN} = "/boot/devicetree*"
 DEVICETREE_FLAGS ?= "-R 8 -p 0x3000"
 
+S = "${WORKDIR}"
+
 do_compile() {
 	if test -n "${MACHINE_DEVICETREE}"; then
 		mkdir -p ${WORKDIR}/devicetree
