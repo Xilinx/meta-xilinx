@@ -7,6 +7,7 @@ include zynq7-platform-init.inc
 
 COMPATIBLE_MACHINE = "$^"
 COMPATIBLE_MACHINE_zybo-zynq7 = "zybo-zynq7"
+COMPATIBLE_MACHINE_picozed-zynq7 = "picozed-zynq7"
 
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "files://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
