@@ -1,0 +1,142 @@
+From 7bbdb62ff8513ff1d7c1bacb43be49d70c44539d Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan.rossi@xilinx.com>
+Date: Tue, 7 Apr 2015 11:27:20 +1000
+Subject: [PATCH] zynq: Add Zynq PicoZed board support
+
+The PicoZed is a System-on-Module board which is marketed as part of
+the ZedBoard/MicroZed/etc. collection. It includes a Zynq-7000
+processor.
+
+This patch adds support that covers all the variants of the PicoZed
+including the SKUs with Z7010/Z7020 and Z7015/Z7030 Zynq chips. This
+patch set however only covers support for the System-on-Module and does
+not cover any extra components that are available on carrier boards
+(except those that are fanned out of the module itself).
+
+More information on this board, its variants and available carrier
+boards is available at: http://zedboard.org/product/picozed
+
+Signed-off-by: Nathan Rossi <nathan.rossi@xilinx.com>
+---
+ arch/arm/cpu/armv7/zynq/Kconfig |    4 ++++
+ arch/arm/dts/Makefile           |    1 +
+ arch/arm/dts/zynq-picozed.dts   |   23 +++++++++++++++++++++++
+ configs/zynq_picozed_defconfig  |    6 ++++++
+ include/configs/zynq_picozed.h  |   28 ++++++++++++++++++++++++++++
+ 5 files changed, 62 insertions(+)
+ create mode 100644 arch/arm/dts/zynq-picozed.dts
+ create mode 100644 configs/zynq_picozed_defconfig
+ create mode 100644 include/configs/zynq_picozed.h
+
+diff --git a/arch/arm/cpu/armv7/zynq/Kconfig b/arch/arm/cpu/armv7/zynq/Kconfig
+index 2482bbb..d0874ab 100644
+--- a/arch/arm/cpu/armv7/zynq/Kconfig
++++ b/arch/arm/cpu/armv7/zynq/Kconfig
+@@ -9,6 +9,9 @@ config TARGET_ZYNQ_ZED
+ config TARGET_ZYNQ_MICROZED
+ 	bool "Zynq MicroZed"
+ 
++config TARGET_ZYNQ_PICOZED
++	bool "Zynq PicoZed"
++
+ config TARGET_ZYNQ_ZC70X
+ 	bool "Zynq ZC702/ZC706 Board"
+ 
+@@ -38,6 +41,7 @@ config SYS_SOC
+ config SYS_CONFIG_NAME
+ 	default "zynq_zed" if TARGET_ZYNQ_ZED
+ 	default "zynq_microzed" if TARGET_ZYNQ_MICROZED
++	default "zynq_picozed" if TARGET_ZYNQ_PICOZED
+ 	default "zynq_zc70x" if TARGET_ZYNQ_ZC70X
+ 	default "zynq_zc770" if TARGET_ZYNQ_ZC770
+ 	default "zynq_zybo" if TARGET_ZYNQ_ZYBO
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index 5b49004..8cdd003 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -44,6 +44,7 @@ dtb-$(CONFIG_ZYNQ) += zynq-zc702.dtb \
+ 	zynq-zed.dtb \
+ 	zynq-zybo.dtb \
+ 	zynq-microzed.dtb \
++	zynq-picozed.dtb \
+ 	zynq-cc108.dtb \
+ 	zynq-zc770-xm010.dtb \
+ 	zynq-zc770-xm011.dtb \
+diff --git a/arch/arm/dts/zynq-picozed.dts b/arch/arm/dts/zynq-picozed.dts
+new file mode 100644
+index 0000000..686b98f
+--- /dev/null
++++ b/arch/arm/dts/zynq-picozed.dts
+@@ -0,0 +1,23 @@
++/*
++ * Avnet PicoZed board DTS
++ *
++ * Copyright (C) 2015 Xilinx, Inc.
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++/dts-v1/;
++#include "zynq-7000.dtsi"
++
++/ {
++	model = "Zynq PicoZed Board";
++	compatible = "xlnx,zynq-picozed", "xlnx,zynq-7000";
++
++	aliases {
++		serial0 = &uart1;
++	};
++
++	memory {
++		device_type = "memory";
++		reg = <0 0x40000000>;
++	};
++};
+diff --git a/configs/zynq_picozed_defconfig b/configs/zynq_picozed_defconfig
+new file mode 100644
+index 0000000..8a4916a
+--- /dev/null
++++ b/configs/zynq_picozed_defconfig
+@@ -0,0 +1,6 @@
++CONFIG_SPL=y
+++S:CONFIG_ARM=y
+++S:CONFIG_ZYNQ=y
+++S:CONFIG_TARGET_ZYNQ_PICOZED=y
++CONFIG_OF_CONTROL=n
++CONFIG_DEFAULT_DEVICE_TREE="zynq-picozed"
+diff --git a/include/configs/zynq_picozed.h b/include/configs/zynq_picozed.h
+new file mode 100644
+index 0000000..337457c
+--- /dev/null
++++ b/include/configs/zynq_picozed.h
+@@ -0,0 +1,28 @@
++/*
++ * (C) Copyright 2015 Xilinx, Inc.
++ *
++ * Configuration for PicoZed
++ * See zynq-common.h for Zynq common configs
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++#ifndef __CONFIG_ZYNQ_PICOZED_H
++#define __CONFIG_ZYNQ_PICOZED_H
++
++#define CONFIG_SYS_SDRAM_SIZE		(1024 * 1024 * 1024)
++
++#define CONFIG_ZYNQ_SERIAL_UART1
++#define CONFIG_ZYNQ_GEM0
++#define CONFIG_ZYNQ_GEM_PHY_ADDR0	0
++
++#define CONFIG_SYS_NO_FLASH
++
++#define CONFIG_ZYNQ_SDHCI1
++#define CONFIG_ZYNQ_USB
++#define CONFIG_ZYNQ_QSPI
++#define CONFIG_ZYNQ_BOOT_FREEBSD
++
++#include <configs/zynq-common.h>
++
++#endif /* __CONFIG_ZYNQ_PICOZED_H */
+-- 
+1.7.10.4
+

@@ -1,11 +1,9 @@
-require u-boot-xlnx.inc
+include u-boot-xlnx.inc
+include u-boot-xlnx-2015.01.inc
 
 COMPATIBLE_MACHINE = "zynq"
 
 PROVIDES = "virtual/boot-bin"
-
-SRCREV = "03464615e241054a38cd920980d6b12feba95585"
-PV = "v2015.01${XILINX_EXTENSION}+git${SRCPV}"
 
 SPL_BINARY = "boot.bin"
 UBOOT_MAKE_TARGET ?= "boot.bin"
