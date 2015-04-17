@@ -1,8 +1,7 @@
 meta-xilinx
 ===========
 
-This layer provides Official support for Xilinx MicroBlaze and Zynq
-architectures as well as evaluation boards.
+This layer provides support for MicroBlaze, Zynq and ZynqMP.
 
 Supported Boards/Machines
 =========================
@@ -13,6 +12,8 @@ Boards Supported by this layer:
 	* Xilinx ZC706 (Zynq)
 	* Xilinx EP108 (ZynqMP)
 	* Avnet/Digilent ZedBoard (Zynq)
+	* Avnet MicroZed (Zynq)
+	* Avnet PicoZed (Zynq)
 
 QEMU Models Supported by this layer:
 	* qemumicroblaze (MicroBlaze)
