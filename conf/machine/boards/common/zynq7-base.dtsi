@@ -471,23 +471,21 @@
 
 		ps7_usb_0: ps7-usb@e0002000 {
 			clocks = <&clkc 28>;
-			compatible = "xlnx,ps7-usb-1.00.a", "xlnx,zynq-usb-1.00.a";
+			compatible = "xlnx,zynq-usb-2.20a", "chipidea,usb2", "xlnx,ps7-usb-1.00.a", "xlnx,zynq-usb-1.00.a";
 			reg = <0xe0002000 0x1000>;
 			interrupt-parent = <&ps7_scugic_0>;
 			interrupts = <0 21 4>;
 			dr_mode = "host";
 			phy_type = "ulpi";
-			xlnx,usb-reset = <0xffffffff>;
 		} ;
 		ps7_usb_1: ps7-usb@e0003000 {
 			clocks = <&clkc 29>;
-			compatible = "xlnx,ps7-usb-1.00.a", "xlnx,zynq-usb-1.00.a";
+			compatible = "xlnx,zynq-usb-2.20a", "chipidea,usb2", "xlnx,ps7-usb-1.00.a", "xlnx,zynq-usb-1.00.a";
 			reg = <0xe0003000 0x1000>;
 			interrupt-parent = <&ps7_scugic_0>;
 			interrupts = <0 44 4>;
 			dr_mode = "host";
 			phy_type = "ulpi";
-			xlnx,usb-reset = <0xffffffff>;
 		} ;
 
 		ps7_xadc: ps7-xadc@f8007100 {
