@@ -1,5 +1,7 @@
 # Default Xilinx BSP Machine settings
 
+MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc"
+
 # File System Configuration
 IMAGE_FSTYPES ?= "tar.gz cpio cpio.gz.u-boot"
 IMAGE_CLASSES += "image_types_uboot"
