@@ -55,6 +55,7 @@
 		} ;
 		ps7_usb_0: ps7-usb@e0002000 {
 			xlnx,phy-reset-gpio = <&ps7_gpio_0 7 0>; /* MIO USB PHY Reset */
+			usb-phy = <&usb0_phy>;
 		} ;
 
 		/* Disabled Devices */
@@ -67,5 +68,11 @@
 		ps7_can_0: ps7-can@e0008000 { compatible = "invalid"; };
 		ps7_can_1: ps7-can@e0009000 { compatible = "invalid"; };
 		ps7_usb_1: ps7-usb@e0003000 { compatible = "invalid"; };
+	} ;
+
+	usb0_phy: usb-phy {
+		#phy-cells = <0>;
+		compatible = "usb-nop-xceiv";
+		reset-gpios = <&ps7_gpio_0 7 1>; /* MIO 7, GPIO_ACTIVE_LOW */
 	} ;
 } ;
