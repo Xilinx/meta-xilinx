@@ -11,3 +11,6 @@ SRC_URI_append += " \
 		file://tty-xuartps-Fix-RX-hang-and-TX-corruption-in-set_termios.patch \
 		"
 
+# This kernel's Zynq USB driver cannot handle a seperate USB PHY device.
+KERNEL_FEATURES_append_zynq += "bsp/xilinx/disable-usb-phy.scc"
+
