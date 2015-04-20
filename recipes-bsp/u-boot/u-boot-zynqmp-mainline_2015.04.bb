@@ -3,13 +3,8 @@ require u-boot-elf.inc
 
 DEPENDS += "dtc-native"
 
-# This revision corresponds to the tag "v2015.04-rc1"
-SRCREV = "112db9407dd338f71200beb0fc99dffa8dcb57a8"
+# This revision corresponds to the tag "v2015.04"
+SRCREV = "f33cdaa4c3da4a8fd35aa2f9a3172f31cc887b35"
 
-PV = "v2015.04-rc1+git${SRCPV}"
-
-FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-zynqmp-mainline:"
-SRC_URI_append += " \
-		file://0001-arm64-Add-Xilinx-ZynqMP-support.patch \
-		"
+PV = "v2015.04+git${SRCPV}"
 
