@@ -23,9 +23,11 @@ UBOOT_SUFFIX ?= "img"
 UBOOT_BINARY_zynq ?= "u-boot-dtb.${UBOOT_SUFFIX}"
 
 # Device Trees
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS_append_zynq += "device-tree"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS_append_microblaze += "device-tree"
 
 # Common Device Tree Includes
 MACHINE_DEVICETREE_append_zynq += " \
 		common/zynq7-base.dtsi \
 		"
+
