@@ -19,10 +19,6 @@ SRC_URI = " \
 		file://0007-kbuild-Create-directory-for-target-DTB.patch \
 		"
 
-COMPATIBLE_MACHINE_ep108-zynqmp = "ep108-zynqmp"
-COMPATIBLE_MACHINE_qemuzynqmp = "qemuzynqmp"
-KMACHINE_ep108-zynqmp ?= "zynqmp"
-KMACHINE_qemuzynqmp ?= "zynqmp"
-
+COMPATIBLE_MACHINE_zynqmp = "zynqmp"
 KERNEL_DEVICETREE_ep108-zynqmp = "xilinx/zynqmp-ep108.dtb"
 KERNEL_DEVICETREE_qemuzynqmp = "xilinx/zynqmp-ep108.dtb"
