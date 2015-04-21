@@ -33,11 +33,9 @@
  *     ...
  *         ps7_axi_interconnect_0: amba@0 {
  *             ps7_ethernet_0: ps7-ethernet@e000b000 {
- *                 mdio {
- *                     phy0: phy@7 {
- *                         device_type = "ethernet-phy";
- *                         reg = <7>;
- *                     } ;
+ *                 phy0: phy@7 {
+ *                     device_type = "ethernet-phy";
+ *                     reg = <7>;
  *                 } ;
  *             } ;
  *         } ;
@@ -277,10 +275,6 @@
 			xlnx,eth-mode = <0x1>;
 			xlnx,has-mdio = <0x1>;
 			xlnx,ptp-enet-clock = <111111115>;
-			mdio {
-				#address-cells = <1>;
-				#size-cells = <0>;
-			} ;
 		} ;
 		ps7_ethernet_1: ps7-ethernet@e000c000 {
 			#address-cells = <1>;
@@ -296,10 +290,6 @@
 			xlnx,eth-mode = <0x1>;
 			xlnx,has-mdio = <0x1>;
 			xlnx,ptp-enet-clock = <111111115>;
-			mdio {
-				#address-cells = <1>;
-				#size-cells = <0>;
-			} ;
 		} ;
 
 		ps7_gpio_0: ps7-gpio@e000a000 {
