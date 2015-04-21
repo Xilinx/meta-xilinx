@@ -14,7 +14,7 @@ PACKAGE_EXTRA_ARCHS_tune-microblaze = "${TUNE_PKGARCH}"
 KERNEL_IMAGETYPE ?= "linux.bin.ub"
 
 # U-Boot Configuration
-UBOOT_MACHINE ?= "microblaze-generic"
+UBOOT_MACHINE ?= "microblaze-generic_config"
 
 # linux-yocto KMACHINE
 KMACHINE ?= "microblaze"
