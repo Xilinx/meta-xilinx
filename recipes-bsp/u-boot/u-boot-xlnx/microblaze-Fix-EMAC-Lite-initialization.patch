@@ -1,0 +1,31 @@
+From 83f0e6e733aba458b9afac67f3c95c4e29712263 Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan.rossi@xilinx.com>
+Date: Tue, 14 Apr 2015 15:35:57 +1000
+Subject: [PATCH] microblaze: Fix EMAC Lite initialization
+
+It is possible for CONFIG_XILINX_EMACLITE to be defined without
+XILINX_EMACLITE_BASEADDR being defined as the EMAC Lite driver support
+OF init. Check that the driver is enabled and the base address is
+available before initializing with a static base address.
+
+Signed-off-by: Nathan Rossi <nathan.rossi@xilinx.com>
+---
+ board/xilinx/microblaze-generic/microblaze-generic.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/board/xilinx/microblaze-generic/microblaze-generic.c b/board/xilinx/microblaze-generic/microblaze-generic.c
+index eee5f6b..8c926a2 100644
+--- a/board/xilinx/microblaze-generic/microblaze-generic.c
++++ b/board/xilinx/microblaze-generic/microblaze-generic.c
+@@ -63,7 +63,7 @@ int board_eth_init(bd_t *bis)
+ 						XILINX_AXIDMA_BASEADDR);
+ #endif
+ 
+-#ifdef CONFIG_XILINX_EMACLITE
++#if defined(CONFIG_XILINX_EMACLITE) && defined(XILINX_EMACLITE_BASEADDR)
+ 	u32 txpp = 0;
+ 	u32 rxpp = 0;
+ # ifdef CONFIG_XILINX_EMACLITE_TX_PING_PONG
+-- 
+1.7.10.4
+
