@@ -19,6 +19,7 @@ PREFERRED_PROVIDER_virtual/bootloader ??= "u-boot-xlnx"
 PREFERRED_VERSION_u-boot-xlnx ?= "v2015.01%"
 
 UBOOT_SUFFIX ?= "img"
+UBOOT_SUFFIX_zynqmp ?= "bin"
 UBOOT_BINARY_zynq ?= "u-boot-dtb.${UBOOT_SUFFIX}"
 
 # Device Trees
