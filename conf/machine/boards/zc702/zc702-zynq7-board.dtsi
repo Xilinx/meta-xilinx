@@ -16,12 +16,10 @@
 		ps7_ethernet_0: ps7-ethernet@e000b000 {
 			phy-handle = <&phy0>;
 			phy-mode = "rgmii-id";
-			mdio {
-				phy0: phy@7 {
-					compatible = "marvell,88e1116r";
-					device_type = "ethernet-phy";
-					reg = <7>;
-				} ;
+			phy0: phy@7 {
+				compatible = "marvell,88e1116r";
+				device_type = "ethernet-phy";
+				reg = <7>;
 			} ;
 		} ;
 		ps7_qspi_0: ps7-qspi@e000d000 {

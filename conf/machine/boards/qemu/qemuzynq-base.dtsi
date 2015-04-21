@@ -19,11 +19,9 @@
 			clocks = <&clkc 30>, <&clkc 30>, <&clk125mhz>, <&clk125mhz>, <&clkc 30>;
 			phy-handle = <&phy0>;
 			phy-mode = "gmii";
-			mdio {
-				phy0: phy@23 {
-					device_type = "ethernet-phy";
-					reg = <23>;
-				} ;
+			phy0: phy@23 {
+				device_type = "ethernet-phy";
+				reg = <23>;
 			} ;
 		} ;
 		ps7_qspi_0: ps7-qspi@e000d000 {
