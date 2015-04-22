@@ -18,7 +18,7 @@ Boards Supported by this layer:
 QEMU Models Supported by this layer:
 	* qemumicroblaze (MicroBlaze)
 	* qemuzynq (Zynq)
-	* qemuzynqmp (ZynqMP)
+	* Xilinx EP108 (ZynqMP)
 
 (Please refer to the associate .conf for more information)
 
