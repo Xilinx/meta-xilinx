@@ -1,16 +1,17 @@
-From 3acfa69c02afc5c8f84c4e5b528a18959ddd8c1b Mon Sep 17 00:00:00 2001
+From 9f9cd8a67975d0973bf5d0dd0bdf6e0bff168774 Mon Sep 17 00:00:00 2001
 From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Date: Mon, 23 Feb 2015 15:04:46 -0800
+Date: Mon, 23 Mar 2015 04:05:15 -0700
 Subject: [PATCH 07/15] net: cadence_gem: Split state struct and type into
  header
 
 To allow using the device with modern SoC programming conventions. The
 state struct needs to be visible to embed the device in SoC containers.
 
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
 ---
- hw/net/cadence_gem.c         | 43 +-------------------------------------
- include/hw/net/cadence_gem.h | 49 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/net/cadence_gem.c         |   43 +-----------------------------------
+ include/hw/net/cadence_gem.h |   49 ++++++++++++++++++++++++++++++++++++++++++
  2 files changed, 50 insertions(+), 42 deletions(-)
  create mode 100644 include/hw/net/cadence_gem.h
 
@@ -84,7 +85,7 @@ index 5994306..dafe914 100644
  
 diff --git a/include/hw/net/cadence_gem.h b/include/hw/net/cadence_gem.h
 new file mode 100644
-index 0000000..e6413ff
+index 0000000..12de820
 --- /dev/null
 +++ b/include/hw/net/cadence_gem.h
 @@ -0,0 +1,49 @@
@@ -101,8 +102,8 @@ index 0000000..e6413ff
 +typedef struct CadenceGEMState {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
-+    /*< public >*/
 +
++    /*< public >*/
 +    MemoryRegion iomem;
 +    NICState *nic;
 +    NICConf conf;
@@ -138,5 +139,5 @@ index 0000000..e6413ff
 +#define CADENCE_GEM_H_
 +#endif
 -- 
-2.1.1
+1.7.10.4
 

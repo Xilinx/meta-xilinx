@@ -1,22 +1,23 @@
-From 37b74b0626d6403da8d9b946d77d29296bc47bcc Mon Sep 17 00:00:00 2001
+From 7f403cd27dbef216c77faa32d015965dfa5fe34e Mon Sep 17 00:00:00 2001
 From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Date: Mon, 23 Feb 2015 15:04:42 -0800
-Subject: [PATCH 03/15] arm: Introduce Xilinx Zynq MPSoC
+Date: Mon, 23 Mar 2015 04:05:13 -0700
+Subject: [PATCH 03/15] arm: Introduce Xilinx ZynqMP SoC
 
 With quad Cortex-A53 CPUs.
 
 Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- default-configs/aarch64-softmmu.mak |  2 +-
- hw/arm/Makefile.objs                |  1 +
- hw/arm/xlnx-zynq-mp.c               | 71 +++++++++++++++++++++++++++++++++++++
- include/hw/arm/xlnx-zynq-mp.h       | 21 +++++++++++
- 4 files changed, 94 insertions(+), 1 deletion(-)
- create mode 100644 hw/arm/xlnx-zynq-mp.c
- create mode 100644 include/hw/arm/xlnx-zynq-mp.h
+ default-configs/aarch64-softmmu.mak |    2 +-
+ hw/arm/Makefile.objs                |    1 +
+ hw/arm/xlnx-zynqmp.c                |   72 +++++++++++++++++++++++++++++++++++
+ include/hw/arm/xlnx-zynqmp.h        |   21 ++++++++++
+ 4 files changed, 95 insertions(+), 1 deletion(-)
+ create mode 100644 hw/arm/xlnx-zynqmp.c
+ create mode 100644 include/hw/arm/xlnx-zynqmp.h
 
 diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch64-softmmu.mak
-index 6d3b5c7..a8011e0 100644
+index 6d3b5c7..96dd994 100644
 --- a/default-configs/aarch64-softmmu.mak
 +++ b/default-configs/aarch64-softmmu.mak
 @@ -3,4 +3,4 @@
@@ -24,22 +25,22 @@ index 6d3b5c7..a8011e0 100644
  include arm-softmmu.mak
  
 -# Currently no 64-bit specific config requirements
-+CONFIG_XLNX_ZYNQ_MP=y
++CONFIG_XLNX_ZYNQMP=y
 diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 6088e53..9bf072b 100644
+index 2577f68..d7cd5f4 100644
 --- a/hw/arm/Makefile.objs
 +++ b/hw/arm/Makefile.objs
-@@ -8,3 +8,4 @@ obj-y += armv7m.o exynos4210.o pxa2xx.o pxa2xx_gpio.o pxa2xx_pic.o
- obj-$(CONFIG_DIGIC) += digic.o
+@@ -10,3 +10,4 @@ obj-$(CONFIG_DIGIC) += digic.o
  obj-y += omap1.o omap2.o strongarm.o
  obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
-+obj-$(CONFIG_XLNX_ZYNQ_MP) += xlnx-zynq-mp.o
-diff --git a/hw/arm/xlnx-zynq-mp.c b/hw/arm/xlnx-zynq-mp.c
+ obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
++obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp.o
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
 new file mode 100644
-index 0000000..d553fb0
+index 0000000..41c207a
 --- /dev/null
-+++ b/hw/arm/xlnx-zynq-mp.c
-@@ -0,0 +1,71 @@
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -0,0 +1,72 @@
 +/*
 + * Xilinx Zynq MPSoC emulation
 + *
@@ -57,17 +58,18 @@ index 0000000..d553fb0
 + * for more details.
 + */
 +
-+#include "hw/arm/xlnx-zynq-mp.h"
++#include "hw/arm/xlnx-zynqmp.h"
 +
-+static void xlnx_zynq_mp_init(Object *obj)
++static void xlnx_zynqmp_init(Object *obj)
 +{
-+    XlnxZynqMPState *s = XLNX_ZYNQ_MP(obj);
++    XlnxZynqMPState *s = XLNX_ZYNQMP(obj);
 +    int i;
 +
-+    for (i = 0; i < XLNX_ZYNQ_MP_NUM_CPUS; i++) {
++    for (i = 0; i < XLNX_ZYNQMP_NUM_CPUS; i++) {
 +        object_initialize(&s->cpu[i], sizeof(s->cpu[i]),
 +                          "cortex-a53-" TYPE_ARM_CPU);
-+        object_property_add_child(obj, "cpu", OBJECT(&s->cpu[i]), NULL);
++        object_property_add_child(obj, "cpu[*]", OBJECT(&s->cpu[i]),
++                                  &error_abort);
 +    }
 +}
 +
@@ -78,66 +80,66 @@ index 0000000..d553fb0
 +    } \
 +} while (0)
 +
-+static void xlnx_zynq_mp_realize(DeviceState *dev, Error **errp)
++static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
 +{
-+    XlnxZynqMPState *s = XLNX_ZYNQ_MP(dev);
++    XlnxZynqMPState *s = XLNX_ZYNQMP(dev);
 +    uint8_t i;
 +    Error *err = NULL;
 +
-+    for (i = 0; i < XLNX_ZYNQ_MP_NUM_CPUS; i++) {
++    for (i = 0; i < XLNX_ZYNQMP_NUM_CPUS; i++) {
 +        object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &err);
 +        ERR_PROP_CHECK_RETURN(err, errp);
 +    }
 +}
 +
-+static void xlnx_zynq_mp_class_init(ObjectClass *oc, void *data)
++static void xlnx_zynqmp_class_init(ObjectClass *oc, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(oc);
 +
-+    dc->realize = xlnx_zynq_mp_realize;
++    dc->realize = xlnx_zynqmp_realize;
 +}
 +
-+static const TypeInfo xlnx_zynq_mp_type_info = {
-+    .name = TYPE_XLNX_ZYNQ_MP,
++static const TypeInfo xlnx_zynqmp_type_info = {
++    .name = TYPE_XLNX_ZYNQMP,
 +    .parent = TYPE_DEVICE,
 +    .instance_size = sizeof(XlnxZynqMPState),
-+    .instance_init = xlnx_zynq_mp_init,
-+    .class_init = xlnx_zynq_mp_class_init,
++    .instance_init = xlnx_zynqmp_init,
++    .class_init = xlnx_zynqmp_class_init,
 +};
 +
-+static void xlnx_zynq_mp_register_types(void)
++static void xlnx_zynqmp_register_types(void)
 +{
-+    type_register_static(&xlnx_zynq_mp_type_info);
++    type_register_static(&xlnx_zynqmp_type_info);
 +}
 +
-+type_init(xlnx_zynq_mp_register_types)
-diff --git a/include/hw/arm/xlnx-zynq-mp.h b/include/hw/arm/xlnx-zynq-mp.h
++type_init(xlnx_zynqmp_register_types)
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
 new file mode 100644
-index 0000000..f7410dc
+index 0000000..d6b3b92
 --- /dev/null
-+++ b/include/hw/arm/xlnx-zynq-mp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
 @@ -0,0 +1,21 @@
-+#ifndef XLNX_ZYNQ_MP_H_
++#ifndef XLNX_ZYNQMP_H_
 +
 +#include "qemu-common.h"
 +#include "hw/arm/arm.h"
 +
-+#define TYPE_XLNX_ZYNQ_MP "xlnx,zynq-mp"
-+#define XLNX_ZYNQ_MP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
-+                                       TYPE_XLNX_ZYNQ_MP)
++#define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
++#define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
++                                       TYPE_XLNX_ZYNQMP)
 +
-+#define XLNX_ZYNQ_MP_NUM_CPUS 4
++#define XLNX_ZYNQMP_NUM_CPUS 4
 +
 +typedef struct XlnxZynqMPState {
 +    /*< private >*/
 +    DeviceState parent_obj;
 +    /*< public >*/
 +
-+    ARMCPU cpu[XLNX_ZYNQ_MP_NUM_CPUS];
++    ARMCPU cpu[XLNX_ZYNQMP_NUM_CPUS];
 +}  XlnxZynqMPState;
 +
-+#define XLNX_ZYNQ_MP_H_
++#define XLNX_ZYNQMP_H_
 +#endif
 -- 
-2.1.1
+1.7.10.4
 

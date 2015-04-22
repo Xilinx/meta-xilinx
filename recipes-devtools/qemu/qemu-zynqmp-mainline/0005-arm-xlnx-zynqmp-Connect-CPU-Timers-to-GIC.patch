@@ -1,20 +1,20 @@
-From c2c5018da201c9eead0dba39263eb40549064511 Mon Sep 17 00:00:00 2001
+From 6eb0b99419e4f20cef0c0af2847e1635b2dbc04e Mon Sep 17 00:00:00 2001
 From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Date: Mon, 23 Feb 2015 15:04:44 -0800
-Subject: [PATCH 05/15] arm: xlnx-zynq-mp: Connect CPU Timers to GIC
+Date: Mon, 23 Mar 2015 04:05:14 -0700
+Subject: [PATCH 05/15] arm: xlnx-zynqmp: Connect CPU Timers to GIC
 
 Connect the GPIO outputs from the individual CPUs for the timers to the
 GIC.
 
 Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
 ---
- hw/arm/xlnx-zynq-mp.c | 16 ++++++++++++++++
+ hw/arm/xlnx-zynqmp.c |   16 ++++++++++++++++
  1 file changed, 16 insertions(+)
 
-diff --git a/hw/arm/xlnx-zynq-mp.c b/hw/arm/xlnx-zynq-mp.c
-index 9cdff13..be82a66 100644
---- a/hw/arm/xlnx-zynq-mp.c
-+++ b/hw/arm/xlnx-zynq-mp.c
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 9465185..29954f5 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
 @@ -19,9 +19,17 @@
  
  #define GIC_NUM_SPI_INTR 128
@@ -30,13 +30,13 @@ index 9cdff13..be82a66 100644
 +    return GIC_NUM_SPI_INTR + cpu_nr * 32 + ppi_index;
 +}
 +
- static void xlnx_zynq_mp_init(Object *obj)
+ static void xlnx_zynqmp_init(Object *obj)
  {
-     XlnxZynqMPState *s = XLNX_ZYNQ_MP(obj);
-@@ -59,11 +67,19 @@ static void xlnx_zynq_mp_realize(DeviceState *dev, Error **errp)
+     XlnxZynqMPState *s = XLNX_ZYNQMP(obj);
+@@ -60,11 +68,19 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
      sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 1, GIC_CPU_ADDR);
  
-     for (i = 0; i < XLNX_ZYNQ_MP_NUM_CPUS; i++) {
+     for (i = 0; i < XLNX_ZYNQMP_NUM_CPUS; i++) {
 +        qemu_irq irq;
 +
          object_property_set_bool(OBJECT(&s->cpu[i]), true, "realized", &err);
@@ -54,5 +54,5 @@ index 9cdff13..be82a66 100644
  }
  
 -- 
-2.1.1
+1.7.10.4
 

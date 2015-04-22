@@ -1,21 +1,22 @@
-From 33e66004378aa203562e5b051282c1a7ffb8ee3b Mon Sep 17 00:00:00 2001
+From f50fc4d6e1ee32e47f0f9cd6b8b98aa754ced588 Mon Sep 17 00:00:00 2001
 From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Date: Mon, 23 Feb 2015 15:04:50 -0800
+Date: Mon, 23 Mar 2015 04:05:16 -0700
 Subject: [PATCH 10/15] char: cadence_uart: Split state struct and type into
  header
 
 To allow using the device with modern SoC programming conventions. The
 state struct needs to be visible to embed the device in SoC containers.
 
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
 ---
- hw/char/cadence_uart.c         | 29 +----------------------------
- include/hw/char/cadence_uart.h | 35 +++++++++++++++++++++++++++++++++++
+ hw/char/cadence_uart.c         |   29 +----------------------------
+ include/hw/char/cadence_uart.h |   35 +++++++++++++++++++++++++++++++++++
  2 files changed, 36 insertions(+), 28 deletions(-)
  create mode 100644 include/hw/char/cadence_uart.h
 
 diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
-index 23f548d..4509e01 100644
+index 4a4d3eb..9d379e5 100644
 --- a/hw/char/cadence_uart.c
 +++ b/hw/char/cadence_uart.c
 @@ -16,9 +16,7 @@
@@ -70,7 +71,7 @@ index 23f548d..4509e01 100644
  {
 diff --git a/include/hw/char/cadence_uart.h b/include/hw/char/cadence_uart.h
 new file mode 100644
-index 0000000..0404785
+index 0000000..3456d4c
 --- /dev/null
 +++ b/include/hw/char/cadence_uart.h
 @@ -0,0 +1,35 @@
@@ -92,8 +93,8 @@ index 0000000..0404785
 +typedef struct {
 +    /*< private >*/
 +    SysBusDevice parent_obj;
-+    /*< public >*/
 +
++    /*< public >*/
 +    MemoryRegion iomem;
 +    uint32_t r[CADENCE_UART_R_MAX];
 +    uint8_t rx_fifo[CADENCE_UART_RX_FIFO_SIZE];
@@ -110,5 +111,5 @@ index 0000000..0404785
 +#define CADENCE_UART_H_
 +#endif
 -- 
-2.1.1
+1.7.10.4
 

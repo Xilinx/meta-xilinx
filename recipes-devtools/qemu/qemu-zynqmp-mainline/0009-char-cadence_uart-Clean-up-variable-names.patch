@@ -1,6 +1,6 @@
-From 246128b68939e7cede11cf60cffbbc194e7643ed Mon Sep 17 00:00:00 2001
+From 7f5e56c8f0a8393b9cb930883059d873802338c6 Mon Sep 17 00:00:00 2001
 From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Date: Mon, 23 Feb 2015 15:04:49 -0800
+Date: Mon, 23 Mar 2015 04:05:16 -0700
 Subject: [PATCH 09/15] char: cadence_uart: Clean up variable names
 
 In preparation for migrating the state struct and type cast macro to a public
@@ -10,13 +10,14 @@ more global namespace so preface with "cadence". Fix the capitalisation of
 used by the state struct itself with CADENCE_UART so they don't conflict
 in namespace either.
 
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
 ---
- hw/char/cadence_uart.c | 100 ++++++++++++++++++++++++++-----------------------
- 1 file changed, 53 insertions(+), 47 deletions(-)
+ hw/char/cadence_uart.c |  102 +++++++++++++++++++++++++-----------------------
+ 1 file changed, 54 insertions(+), 48 deletions(-)
 
 diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
-index 7044b35..23f548d 100644
+index d145378..4a4d3eb 100644
 --- a/hw/char/cadence_uart.c
 +++ b/hw/char/cadence_uart.c
 @@ -85,8 +85,8 @@
@@ -271,14 +272,23 @@ index 7044b35..23f548d 100644
      s->r[R_IMR] = 0;
 @@ -478,7 +482,7 @@ static void cadence_uart_reset(DeviceState *dev)
  
- static int cadence_uart_init(SysBusDevice *dev)
+ static void cadence_uart_realize(DeviceState *dev, Error **errp)
  {
 -    UartState *s = CADENCE_UART(dev);
 +    CadenceUARTState *s = CADENCE_UART(dev);
  
-     memory_region_init_io(&s->iomem, OBJECT(s), &uart_ops, s, "uart", 0x1000);
-     sysbus_init_mmio(dev, &s->iomem);
-@@ -501,7 +505,7 @@ static int cadence_uart_init(SysBusDevice *dev)
+     s->fifo_trigger_handle = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+                                           fifo_trigger_update, s);
+@@ -495,7 +499,7 @@ static void cadence_uart_realize(DeviceState *dev, Error **errp)
+ static void cadence_uart_init(Object *obj)
+ {
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+-    UartState *s = CADENCE_UART(obj);
++    CadenceUARTState *s = CADENCE_UART(obj);
+ 
+     memory_region_init_io(&s->iomem, obj, &uart_ops, s, "uart", 0x1000);
+     sysbus_init_mmio(sbd, &s->iomem);
+@@ -506,7 +510,7 @@ static void cadence_uart_init(Object *obj)
  
  static int cadence_uart_post_load(void *opaque, int version_id)
  {
@@ -287,7 +297,7 @@ index 7044b35..23f548d 100644
  
      uart_parameters_setup(s);
      uart_update_status(s);
-@@ -514,13 +518,15 @@ static const VMStateDescription vmstate_cadence_uart = {
+@@ -519,13 +523,15 @@ static const VMStateDescription vmstate_cadence_uart = {
      .minimum_version_id = 2,
      .post_load = cadence_uart_post_load,
      .fields = (VMStateField[]) {
@@ -310,15 +320,15 @@ index 7044b35..23f548d 100644
          VMSTATE_END_OF_LIST()
      }
  };
-@@ -538,7 +544,7 @@ static void cadence_uart_class_init(ObjectClass *klass, void *data)
+@@ -544,7 +550,7 @@ static void cadence_uart_class_init(ObjectClass *klass, void *data)
  static const TypeInfo cadence_uart_info = {
      .name          = TYPE_CADENCE_UART,
      .parent        = TYPE_SYS_BUS_DEVICE,
 -    .instance_size = sizeof(UartState),
 +    .instance_size = sizeof(CadenceUARTState),
+     .instance_init = cadence_uart_init,
      .class_init    = cadence_uart_class_init,
  };
- 
 -- 
-2.1.1
+1.7.10.4
 

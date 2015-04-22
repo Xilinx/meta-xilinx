@@ -1,7 +1,10 @@
-From 67513395caa586a2f6bc79e3791e26a129e6ec1c Mon Sep 17 00:00:00 2001
+From 7c37c0a33c598fe0dcb015aa4d48712e33e21a8b Mon Sep 17 00:00:00 2001
 From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Date: Mon, 23 Feb 2015 15:04:45 -0800
+Date: Mon, 23 Mar 2015 04:05:14 -0700
 Subject: [PATCH 06/15] net: cadence_gem: Clean up variable names
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 In preparation for migrating the state struct and type cast macro to a public
 header. The acronym "GEM" on it's own is not specific enough to be used in a
@@ -9,9 +12,11 @@ more global namespace so preface with "cadence". Fix the capitalisation of
 "gem" in the state type while touching the typename. Also preface the
 GEM_MAXREG macro as this will need to migrate to public header.
 
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
 ---
- hw/net/cadence_gem.c | 70 ++++++++++++++++++++++++++--------------------------
+ hw/net/cadence_gem.c |   70 +++++++++++++++++++++++++-------------------------
  1 file changed, 35 insertions(+), 35 deletions(-)
 
 diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
@@ -260,5 +265,5 @@ index 55b6293..5994306 100644
  };
  
 -- 
-2.1.1
+1.7.10.4
 

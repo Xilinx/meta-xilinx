@@ -1,7 +1,10 @@
-From 17c53bfa9ce6bb75f9ff55722bc02e4050a148c1 Mon Sep 17 00:00:00 2001
+From 56489633015d2ac71d680bdd27accbd6f87b4fe3 Mon Sep 17 00:00:00 2001
 From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Date: Mon, 23 Feb 2015 15:04:38 -0800
+Date: Mon, 23 Mar 2015 04:05:11 -0700
 Subject: [PATCH 01/15] target-arm: cpu64: Factor out ARM cortex init
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 In preparation for support for Cortex a53. Use "axx" to describe the
 shareable features. Some of the CP15 registers (such as ACTLR) are
@@ -13,13 +16,14 @@ The cache sizes and geometeries, the L1 I-cache policy and the physical
 address range differ between A53 and A57 so those particulars are left
 as A57 specific. The rest are moved to the generalisation.
 
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
 ---
- target-arm/cpu64.c | 32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+ target-arm/cpu64.c |   34 ++++++++++++++++++++--------------
+ 1 file changed, 20 insertions(+), 14 deletions(-)
 
 diff --git a/target-arm/cpu64.c b/target-arm/cpu64.c
-index 823c739..5cf3121 100644
+index 270bc2f..3eb58c6 100644
 --- a/target-arm/cpu64.c
 +++ b/target-arm/cpu64.c
 @@ -38,22 +38,22 @@ static inline void unset_feature(CPUARMState *env, int feature)
@@ -49,7 +53,7 @@ index 823c739..5cf3121 100644
        .writefn = arm_cp_write_ignore },
  #endif
      { .name = "L2ECTLR_EL1", .state = ARM_CP_STATE_AA64,
-@@ -92,10 +92,8 @@ static const ARMCPRegInfo cortexa57_cp_reginfo[] = {
+@@ -92,11 +92,8 @@ static const ARMCPRegInfo cortexa57_cp_reginfo[] = {
      REGINFO_SENTINEL
  };
  
@@ -58,10 +62,11 @@ index 823c739..5cf3121 100644
  {
 -    ARMCPU *cpu = ARM_CPU(obj);
 -
+-    cpu->dtb_compatible = "arm,cortex-a57";
      set_feature(&cpu->env, ARM_FEATURE_V8);
      set_feature(&cpu->env, ARM_FEATURE_VFP4);
      set_feature(&cpu->env, ARM_FEATURE_NEON);
-@@ -107,13 +105,10 @@ static void aarch64_a57_initfn(Object *obj)
+@@ -108,13 +105,10 @@ static void aarch64_a57_initfn(Object *obj)
      set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
      set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
      set_feature(&cpu->env, ARM_FEATURE_CRC);
@@ -75,7 +80,7 @@ index 823c739..5cf3121 100644
      cpu->reset_sctlr = 0x00c50838;
      cpu->id_pfr0 = 0x00000131;
      cpu->id_pfr1 = 0x00011011;
-@@ -132,14 +127,25 @@ static void aarch64_a57_initfn(Object *obj)
+@@ -133,14 +127,26 @@ static void aarch64_a57_initfn(Object *obj)
      cpu->id_aa64pfr0 = 0x00002222;
      cpu->id_aa64dfr0 = 0x10305106;
      cpu->id_aa64isar0 = 0x00011120;
@@ -92,6 +97,7 @@ index 823c739..5cf3121 100644
 +
 +    aarch64_axx_initfn(cpu);
 +
++    cpu->dtb_compatible = "arm,cortex-a57";
 +    cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A57;
 +    cpu->midr = 0x411fd070;
 +    cpu->ctr = 0x8444c004; /* L1Ip = PIPT */
@@ -105,5 +111,5 @@ index 823c739..5cf3121 100644
  
  #ifdef CONFIG_USER_ONLY
 -- 
-2.1.1
+1.7.10.4
 
