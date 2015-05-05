@@ -44,8 +44,8 @@ EXTERNAL_TOOLCHAIN_SYSROOT_armv7a ??= "${EXTERNAL_TOOLCHAIN}/${CSL_TARGET_SYS}/l
 EXTERNAL_TOOLCHAIN_DBGROOT_armv7a ??= ""
 
 # Default sysroot is inside the Xilinx MicroBlaze toolchain in the '<CSL_TARGET_SYS>/sys-root'
-EXTERNAL_TOOLCHAIN_SYSROOT_microblaze ??= "${EXTERNAL_TOOLCHAIN}/${CSL_TARGET_SYS}/sys-root"
-EXTERNAL_TOOLCHAIN_DBGROOT_microblaze ??= "${EXTERNAL_TOOLCHAIN}/${CSL_TARGET_SYS}/debug-root"
+EXTERNAL_TOOLCHAIN_SYSROOT_microblazeel ??= "${EXTERNAL_TOOLCHAIN}/${CSL_TARGET_SYS}/sys-root"
+EXTERNAL_TOOLCHAIN_DBGROOT_microblazeel ??= "${EXTERNAL_TOOLCHAIN}/${CSL_TARGET_SYS}/debug-root"
 
 addhandler toolchain_setup
 toolchain_setup[eventmask] = "bb.event.BuildStarted"
