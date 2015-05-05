@@ -1,2 +1,2 @@
-QEMU_TARGETS += "microblazeel"
+QEMU_TARGETS += "microblazeel microblaze"
 
