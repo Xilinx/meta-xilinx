@@ -9,7 +9,7 @@ require conf/machine/include/microblaze/feature-microblaze-pattern-compare.inc
 require conf/machine/include/microblaze/feature-microblaze-reorder.inc
 
 # Architecture name, either 'microblaze' or 'microblazeel' depending on endianess
-TUNE_ARCH = "microblaze${@bb.utils.contains("TUNE_FEATURES", "little-endian", "el", "" ,d)}"
+TUNE_ARCH = "microblaze${@bb.utils.contains("TUNE_FEATURES", "little-endian", "el", "eb" ,d)}"
 
 # Compiler args
 TUNE_CCARGS += "${MBCCARGSENDIAN} ${MBCCARGSVERSION} ${MBCCARGSBARRELSHIFT} ${MBCCARGSMUL} ${MBCCARGSDIV} ${MBCCARGSFPU} ${MBCCARGSPATTERNCOMPARE} ${MBCCARGSREORDER}"
@@ -17,3 +17,4 @@ TUNE_CCARGS += "${MBCCARGSENDIAN} ${MBCCARGSVERSION} ${MBCCARGSBARRELSHIFT} ${MB
 # Package Architecture formatting
 MBPKGMATH = "${MBPKGMUL}${MBPKGDIV}${MBPKGFPU}"
 TUNE_PKGARCH = "microblaze${MBPKGENDIAN}${MBPKGVERSION}${MBPKGBARRELSHIFT}${MBPKGSPATTERNCOMPARE}${MBPKGREORDER}${MBPKGMATH}"
+
