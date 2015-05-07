@@ -18,7 +18,7 @@ python do_configmk_generate () {
 
     machine_xparameters = d.getVar("UBOOT_XPARAMETERS", True)
 
-    if d.getVar("SOC_FAMILY") == "microblaze" and machine_xparameters and os.path.exists(machine_xparameters):
+    if machine_xparameters and os.path.exists(machine_xparameters):
         boardpath = os.path.join("board", "xilinx", "microblaze-generic")
         configmk = os.path.join(d.getVar("S", True), boardpath, "config.mk")
         xparameters = os.path.join(d.getVar("S", True), boardpath, "xparameters.h")
