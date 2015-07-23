@@ -11,7 +11,7 @@ XILINX_DEFAULT_KERNEL := "linux-xlnx"
 XILINX_DEFAULT_KERNEL_microblaze := "linux-yocto"
 
 PREFERRED_PROVIDER_virtual/kernel ??= "${XILINX_DEFAULT_KERNEL}"
-PREFERRED_VERSION_linux-xlnx ?= "3.14%"
+PREFERRED_VERSION_linux-xlnx ?= "3.19%"
 PREFERRED_VERSION_linux-yocto ?= "3.19%"
 
 # U-Boot Configuration
