@@ -1,0 +1,32 @@
+From ea0d8135b0c204a674300486d3933bdef7ac220b Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan@nathanrossi.com>
+Date: Tue, 8 Sep 2015 23:07:11 +1000
+Subject: [PATCH] arm: xlnx-zynqmp: Fix up GIC region size
+
+The GIC in ZynqMP cover a 64K address space, however the actual
+registers are decoded within a 4K address space and mirrored at the 4K
+boundaries. This change fixes the defined size for these regions as it
+was set to 0x4000/16K incorrectly.
+
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+Upstream-Status: Submitted
+---
+ include/hw/arm/xlnx-zynqmp.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index 6ccb57b..23b8453 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -44,7 +44,7 @@
+  * number of memory region aliases.
+  */
+ 
+-#define XLNX_ZYNQMP_GIC_REGION_SIZE 0x4000
++#define XLNX_ZYNQMP_GIC_REGION_SIZE 0x1000
+ #define XLNX_ZYNQMP_GIC_ALIASES     (0x10000 / XLNX_ZYNQMP_GIC_REGION_SIZE - 1)
+ 
+ typedef struct XlnxZynqMPState {
+-- 
+2.5.1
+
