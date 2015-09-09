@@ -17,6 +17,7 @@ PREFERRED_VERSION_linux-yocto ?= "3.19%"
 
 # U-Boot Configuration
 XILINX_DEFAULT_UBOOT := "u-boot-xlnx"
+XILINX_DEFAULT_UBOOT_zynqmp := "u-boot"
 PREFERRED_PROVIDER_virtual/bootloader ??= "${XILINX_DEFAULT_UBOOT}"
 PREFERRED_VERSION_u-boot-xlnx ?= "v2015.01%"
 
