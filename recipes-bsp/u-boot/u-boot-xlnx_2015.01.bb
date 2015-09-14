@@ -1,6 +1,5 @@
 include u-boot-xlnx.inc
 include u-boot-xlnx-2015.01.inc
-include u-boot-elf.inc
 include u-boot-extra.inc
 
 UBOOT_ENV_zc702-zynq7 = "uEnv"

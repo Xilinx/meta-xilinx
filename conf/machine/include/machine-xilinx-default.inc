@@ -25,6 +25,8 @@ UBOOT_SUFFIX ?= "img"
 UBOOT_SUFFIX_zynqmp ?= "bin"
 UBOOT_BINARY ?= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_BINARY_zynq ?= "u-boot-dtb.${UBOOT_SUFFIX}"
+UBOOT_ELF ?= "u-boot"
+UBOOT_ELF_aarch64 ?= "u-boot.elf"
 
 # Device Trees
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS_append_zynq += "device-tree"

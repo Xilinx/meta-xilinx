@@ -7,7 +7,6 @@
 UBRANCH ?= "master"
 
 include u-boot-xlnx.inc
-include u-boot-elf.inc
 include u-boot-extra.inc
 
 DEPENDS += "openssl-native"
