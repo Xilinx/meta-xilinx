@@ -14,9 +14,11 @@ Boards Supported by this layer:
 	* Avnet/Digilent ZedBoard (Zynq)
 	* Avnet MicroZed (Zynq)
 	* Avnet PicoZed (Zynq)
+	* Digilent Zybo (Zynq)
 
 QEMU Models Supported by this layer:
 	* qemumicroblaze (MicroBlaze)
+	* qemumicroblazeeb-s3adsp1800 (MicroBlaze)
 	* qemuzynq (Zynq)
 	* Xilinx EP108 (ZynqMP)
 
@@ -34,7 +36,7 @@ Please send any patches, pull requests, comments or questions for this layer to:
 
 Maintainers:
 
-	Nathan Rossi <nathan.rossi@xilinx.com>
+	Nathan Rossi
 
 Dependencies
 ============
