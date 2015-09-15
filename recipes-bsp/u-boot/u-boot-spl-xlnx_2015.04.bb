@@ -1,5 +1,5 @@
 include u-boot-xlnx.inc
-include u-boot-xlnx-2015.01.inc
+include u-boot-xlnx-2015.04.inc
 
 COMPATIBLE_MACHINE = "zynq"
 
