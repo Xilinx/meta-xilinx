@@ -26,7 +26,7 @@
 			is-dual = <1>;
 			xlnx,qspi-mode = <0x2>;
 			flash@0 {
-				compatible = "n25q128";
+				compatible = "micron,m25p80", "spansion,s25fl128s", "jedec,spi-nor";
 				reg = <0x0>;
 				spi-tx-bus-width = <1>;
 				spi-rx-bus-width = <4>;
