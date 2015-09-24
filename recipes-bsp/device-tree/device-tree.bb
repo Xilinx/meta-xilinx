@@ -58,7 +58,6 @@ do_deploy() {
 
 # Deploy ${KERNEL_IMAGETYPE}-${DTS_NAME}.dtb for compatibility with runqemu
 DEPLOY_KERNEL_DTB_qemuzynq = "1"
-DEPLOY_KERNEL_DTB_qemumicroblaze = "1"
 do_deploy_append() {
 	if [ ! -z "${DEPLOY_KERNEL_DTB}" -a ! -z "${KERNEL_IMAGETYPE}" ]; then
 		for DTS_FILE in ${DEVICETREE}; do
