@@ -27,9 +27,8 @@ UBOOT_BINARY_zynq ?= "u-boot-dtb.${UBOOT_SUFFIX}"
 UBOOT_ELF ?= "u-boot"
 UBOOT_ELF_aarch64 ?= "u-boot.elf"
 
-# Device Trees
+# By default use the device-tree recipe to generate device trees for Zynq machines
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS_append_zynq += "device-tree"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS_append_microblaze += "device-tree"
 
 # Common Device Tree Includes
 MACHINE_DEVICETREE_append_zynq += " \
