@@ -13,7 +13,7 @@ COMPATIBLE_MACHINE = "zc702-zynq7|zc706-zynq7|zedboard-zynq7|microzed-zynq7"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "files://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 
-SRC_URI = "git://github.com/Xilinx/embeddedsw.git;protocol=https;branch=master"
+SRC_URI = "git://github.com/Xilinx/embeddedsw.git;protocol=https;nobranch=1"
 SRCREV = "5f9ae570bf665fcded71364d19b6fae73e63190b"
 
 S = "${WORKDIR}/git"
