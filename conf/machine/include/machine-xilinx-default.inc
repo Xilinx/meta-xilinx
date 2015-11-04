@@ -11,6 +11,12 @@ XILINX_DEFAULT_KERNEL := "linux-xlnx"
 XILINX_DEFAULT_KERNEL_microblaze := "linux-yocto"
 XILINX_DEFAULT_KERNEL_zynqmp := "linux-yocto"
 
+KBUILD_DEFCONFIG_zynq = "xilinx_zynq_defconfig"
+KBUILD_DEFCONFIG_zynqmp = "xilinx_zynqmp_defconfig"
+KBUILD_DEFCONFIG_microblaze = "mmu_defconfig"
+
+KCONFIG_MODE = "--alldefconfig"
+
 PREFERRED_PROVIDER_virtual/kernel ??= "${XILINX_DEFAULT_KERNEL}"
 PREFERRED_VERSION_linux-xlnx ?= "3.19%"
 PREFERRED_VERSION_linux-yocto ?= "4.1%"

@@ -9,3 +9,8 @@ SRC_URI_append = " \
 		file://xilinx-machine;type=kmeta;destsuffix=xilinx-machine \
 		"
 
+do_configure_prepend() {
+	if [ -n "${KBUILD_DEFCONFIG}" ]; then
+		cp ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
+	fi
+}
