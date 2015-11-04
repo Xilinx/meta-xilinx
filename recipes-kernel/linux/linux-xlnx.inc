@@ -3,11 +3,13 @@
 LINUX_VERSION_EXTENSION ?= "-xilinx"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 
-# Sources
-KBRANCH ?= "master"
+# Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
+SRCBRANCH ?= ""
+SRCBRANCHARG = "${@['nobranch=1', 'branch=${SRCBRANCH}'][d.getVar('SRCBRANCH', True) != '']}"
+
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 SRC_URI = " \
-		git://github.com/Xilinx/linux-xlnx.git;protocol=https;branch=${KBRANCH} \
+		git://github.com/Xilinx/linux-xlnx.git;protocol=https;${SRCBRANCHARG} \
 		file://xilinx-base;type=kmeta;destsuffix=xilinx-base \
 		"
 
