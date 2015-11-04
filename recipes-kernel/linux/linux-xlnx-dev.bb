@@ -15,7 +15,7 @@ python () {
 }
 
 LINUX_VERSION ?= "4.0+"
-LINUX_VERSION_EXTENSION = "-xilinx-dev"
+LINUX_VERSION_EXTENSION ?= "-xilinx-dev"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 
 include linux-xlnx.inc
