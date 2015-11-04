@@ -9,9 +9,6 @@ UBRANCH ?= "master"
 include u-boot-xlnx.inc
 include u-boot-extra.inc
 
-DEPENDS += "openssl-native"
-EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC}" HOSTCFLAGS="${BUILD_CFLAGS}" HOSTLD="${BUILD_LD}" HOSTLDFLAGS="${BUILD_LDFLAGS}"'
-
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
 
 SRCREV = "c0dc1a884dc3509fa3e12235c099f1e4edc24431"
