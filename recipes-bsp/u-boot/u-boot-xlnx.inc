@@ -1,5 +1,7 @@
 require recipes-bsp/u-boot/u-boot.inc
 
+DEPENDS += "dtc-native"
+
 XILINX_EXTENSION = "-xilinx"
 
 UBRANCH ?= "master"
