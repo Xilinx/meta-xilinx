@@ -19,3 +19,6 @@ LINUX_VERSION_EXTENSION ?= "-xilinx-dev"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 
 include linux-xlnx.inc
+
+COMPATIBLE_MACHINE_zynqmp = "zynqmp"
+
