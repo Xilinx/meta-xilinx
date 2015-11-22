@@ -8,5 +8,6 @@ SRC_URI_append_zynq += " \
 		"
 SRC_URI_append_microblaze += " \
 		file://microblaze-Drop-architecture-specific-declaration-of.patch \
+		file://kernel-use-the-gnu89-standard-explicitly.patch \
 		"
 
