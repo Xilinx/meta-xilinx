@@ -28,10 +28,10 @@ UBOOT_ELF ?= "u-boot"
 UBOOT_ELF_aarch64 ?= "u-boot.elf"
 
 # By default use the device-tree recipe to generate device trees for Zynq machines
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS_append_zynq += "device-tree"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS_append_zynq = " device-tree"
 
 # Common Device Tree Includes
-MACHINE_DEVICETREE_append_zynq += " \
+MACHINE_DEVICETREE_append_zynq = " \
 		common/zynq7-base.dtsi \
 		"
 

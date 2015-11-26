@@ -37,7 +37,7 @@ ENABLE_BINARY_LOCALE_GENERATION = ""
 
 TOOLCHAIN_OPTIONS = " --sysroot=${STAGING_DIR_HOST}"
 # Fix up default hash, enforce it in for CC_ARCH for packages that ignore LDFLAGS.
-TARGET_CC_ARCH_append += "${TARGET_LINK_HASH_STYLE}"
+TARGET_CC_ARCH_append = " ${TARGET_LINK_HASH_STYLE}"
 
 # Default sysroot is inside the Xilinx ARM v7-A toolchain in the '<CSL_TARGET_SYS>/libc' (no debug-root)
 EXTERNAL_TOOLCHAIN_SYSROOT_armv7a ??= "${EXTERNAL_TOOLCHAIN}/${CSL_TARGET_SYS}/libc"
