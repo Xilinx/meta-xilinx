@@ -4,7 +4,7 @@ LTTNGUST_microblaze = ""
 
 # Add MicroBlaze Patches
 FILESEXTRAPATHS_append := "${THISDIR}/files:"
-SRC_URI_append += " \
+SRC_URI_append = " \
 		file://0001-Patch-microblaze-Add-wdc.ext.clear-and-wdc.ext.flush.patch \
 		file://0003-Patch-microblaze-Initial-port-of-microblaze-core-rea.patch \
 		file://0004-Patch-microblaze-Communicate-in-larger-blocks-with-t.patch \

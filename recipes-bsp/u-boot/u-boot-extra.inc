@@ -6,7 +6,7 @@ inherit xilinx-utils
 FILESEXTRAPATHS_append := "${@get_additional_bbpath_filespath('conf/machine/boards', d)}"
 
 # Append the xparameters file to the SRC_URI if set
-SRC_URI_append += " ${@paths_affix(d.getVar("MACHINE_XPARAMETERS", True) or '', prefix = 'file://')}"
+SRC_URI_append = " ${@paths_affix(d.getVar("MACHINE_XPARAMETERS", True) or '', prefix = 'file://')}"
 
 # Full path to the xparameters.h file
 UBOOT_XPARAMETERS ?= "${@expand_workdir_paths("MACHINE_XPARAMETERS", d)}"
