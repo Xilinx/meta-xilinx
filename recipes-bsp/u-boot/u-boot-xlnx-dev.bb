@@ -25,9 +25,3 @@ HAS_PS7INIT ?= " \
 		zynq_zc706_config \
 		"
 
-do_compile_append() {
-    # link u-boot-dtb.img to u-boot.img.
-    if [ ! -e ${B}/u-boot-dtb.img ]; then
-        ln -sf u-boot.img ${B}/u-boot-dtb.img
-    fi
-}
