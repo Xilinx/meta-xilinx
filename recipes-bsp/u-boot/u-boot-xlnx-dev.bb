@@ -11,9 +11,8 @@ include u-boot-extra.inc
 
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
 
-SRCREV ?= '${@oe.utils.conditional( \
-           "PREFERRED_PROVIDER_virtual/bootloader","u-boot-xlnx-dev",    \
-           "${AUTOREV}", "c0dc1a884dc3509fa3e12235c099f1e4edc24431", d)}'
+SRCREV_DEFAULT = "4942ae4d03ee4ef4b2dd750d441f730150ee9288"
+SRCREV ?= "${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/bootloader", "u-boot-xlnx-dev", "${AUTOREV}", "${SRCREV_DEFAULT}", d)}"
 
 PV = "${UBRANCH}${XILINX_EXTENSION}+git${SRCPV}"
 
