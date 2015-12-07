@@ -1,5 +1,5 @@
 define KFEATURE_DESCRIPTION "Xilinx Soft IP Core Drivers/Support (For linux-xlnx kernels)"
 define KFEATURE_COMPATIBILITY board
 
-kconfig hardware xilinx-drivers-linux-xlnx.cfg
+include bsp/xilinx/soc/linux-xlnx/drivers/xilinx.scc
 
