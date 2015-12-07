@@ -1,0 +1,5 @@
+define KFEATURE_DESCRIPTION "Xilinx Zynq 7000 Drivers (From linux-xlnx kernels)"
+define KFEATURE_COMPATIBILITY board
+
+kconfig hardware zynq7.cfg
+
