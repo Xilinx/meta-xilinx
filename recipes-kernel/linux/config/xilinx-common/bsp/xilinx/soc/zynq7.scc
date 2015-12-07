@@ -1,7 +1,7 @@
 
-kconf hardware zynq.cfg
-kconf hardware zynq7-drivers.cfg
-include bsp/xilinx/soc/xilinx-drivers.scc
+kconf hardware zynq7.cfg
+include bsp/xilinx/soc/drivers/xilinx.scc
+include bsp/xilinx/soc/drivers/zynq7.scc
 include bsp/xilinx/common.scc
 
 include cfg/timer/no_hz.scc

@@ -4,7 +4,7 @@ define KARCH arm
 
 include ktypes/standard/standard.scc
 
-include bsp/xilinx/soc/zynq.scc
+include bsp/xilinx/soc/zynq7.scc
 
 # Common board drivers
 include bsp/xilinx/board-common.scc
