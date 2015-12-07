@@ -12,6 +12,6 @@ SRC_URI_append = " \
 		file://kernel-use-the-gnu89-standard-explicitly.patch \
 		"
 
-# This kernel's Zynq USB driver cannot handle a seperate USB PHY device.
-KERNEL_FEATURES_append_zynq = " bsp/xilinx/disable-usb-phy.scc"
+# This kernel's Zynq USB driver is different to the newer kernels.
+KERNEL_FEATURES_append_zynq = " bsp/xilinx/soc/linux-xlnx/xlnx-3.14-usb.scc"
 
