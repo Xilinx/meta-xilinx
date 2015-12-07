@@ -22,3 +22,7 @@ DESCRIPTION = "Xilinx Kernel"
 require linux-xilinx-configs.inc
 require linux-xilinx-machines.inc
 
+KERNEL_FEATURES_append = " bsp/xilinx/soc/linux-xlnx/drivers/xilinx.scc"
+KERNEL_FEATURES_append_zynq = " bsp/xilinx/soc/linux-xlnx/drivers/zynq7.scc"
+KERNEL_FEATURES_append_zynqmp = " bsp/xilinx/soc/linux-xlnx/drivers/zynqmp.scc"
+
