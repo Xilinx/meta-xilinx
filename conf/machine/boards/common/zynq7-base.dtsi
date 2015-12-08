@@ -70,8 +70,11 @@
 			i-cache-size = <0x8000>;
 			interrupt-handle = <&ps7_scugic_0>;
 			cpu0-supply = <&regulator_vccpint>;
-			operating-points = <666667 1000000 333334 1000000 222223 1000000>;
 			reg = <0x0>;
+			operating-points = <
+					666667 1000000
+					333334 1000000
+				>;
 		} ;
 		ps7_cortexa9_1: cpu@1 {
 			bus-handle = <&ps7_axi_interconnect_0>;
@@ -156,7 +159,7 @@
 		ps7_slcr_0: ps7-slcr@f8000000 {
 			#address-cells = <1>;
 			#size-cells = <1>;
-			compatible = "xlnx,zynq-slcr", "syscon", "xlnx,ps7-slcr-1.00.a";
+			compatible = "xlnx,zynq-slcr", "syscon", "simple-bus", "xlnx,ps7-slcr-1.00.a";
 			ranges ;
 			reg = <0xf8000000 0x1000>;
 			clkc: clkc@100 {
@@ -186,6 +189,17 @@
 				ps-clk-frequency = <33333333>;
 				reg = <0x100 0x100>;
 			} ;
+			rstc: rstc@200 {
+				compatible = "xlnx,zynq-reset";
+				reg = <0x200 0x48>;
+				#reset-cells = <1>;
+				syscon = <&ps7_slcr_0>;
+			} ;
+			pinctl0: pinctrl@700 {
+				compatible = "xlnx,pinctrl-zynq";
+				reg = <0x700 0x200>;
+				syscon = <&ps7_slcr_0>;
+			} ;
 		} ;
 		ps7_globaltimer_0: ps7-globaltimer@f8f00200 {
 			clocks = <&clkc 4>;
@@ -211,13 +225,11 @@
 		} ;
 		ps7_wdt_0: ps7-wdt@f8005000 {
 			clocks = <&clkc 45>;
-			compatible = "xlnx,zynq-wdt-r1p2", "xlnx,ps7-wdt-1.00.a";
-			device_type = "watchdog";
+			compatible = "cdns,wdt-r1p2", "xlnx,zynq-wdt-r1p2";
 			interrupt-parent = <&ps7_scugic_0>;
 			interrupts = <0 9 4>;
 			reg = <0xf8005000 0x1000>;
 			reset = <0>;
-			timeout = <10>;
 			timeout-sec = <10>;
 		} ;
 		/*ps7_dma_ns: ps7-dma@f8004000 {
@@ -253,6 +265,7 @@
 			interrupt-parent = <&ps7_scugic_0>;
 			interrupts = <0 8 4>;
 			reg = <0xf8007000 0x100>;
+			syscon = <&ps7_slcr_0>;
 		} ;
 		ps7_iop_bus_config_0: ps7-iop-bus-config@e0200000 {
 			compatible = "xlnx,ps7-iop-bus-config-1.00.a";
@@ -266,7 +279,7 @@
 			#size-cells = <0>;
 			clock-names = "pclk", "hclk", "tx_clk", "ref_clk", "aper_clk";
 			clocks = <&clkc 30>, <&clkc 30>, <&clkc 13>, <&clkc 13>, <&clkc 30>;
-			compatible = "cdns,gem", "xlnx,ps7-ethernet-1.00.a";
+			compatible = "cdns,zynq-gem", "cdns,gem", "xlnx,ps7-ethernet-1.00.a";
 			interrupt-parent = <&ps7_scugic_0>;
 			interrupts = <0 22 4>;
 			local-mac-address = [ 00 0a 35 00 00 00 ];
@@ -281,7 +294,7 @@
 			#size-cells = <0>;
 			clock-names = "pclk", "hclk", "tx_clk", "ref_clk", "aper_clk";
 			clocks = <&clkc 31>, <&clkc 31>, <&clkc 14>, <&clkc 14>, <&clkc 31>;
-			compatible = "cdns,gem", "xlnx,ps7-ethernet-1.00.a";
+			compatible = "cdns,zynq-gem", "cdns,gem", "xlnx,ps7-ethernet-1.00.a";
 			interrupt-parent = <&ps7_scugic_0>;
 			interrupts = <0 45 4>;
 			local-mac-address = [ 00 0a 35 00 00 01 ];
@@ -294,12 +307,14 @@
 
 		ps7_gpio_0: ps7-gpio@e000a000 {
 			#gpio-cells = <2>;
+			#interrupt-cells = <2>;
 			clocks = <&clkc 42>;
 			compatible = "xlnx,zynq-gpio-1.0", "xlnx,ps7-gpio-1.00.a";
 			emio-gpio-width = <64>;
 			gpio-controller ;
 			gpio-mask-high = <0x0>;
 			gpio-mask-low = <0x0>;
+			interrupt-controller;
 			interrupt-parent = <&ps7_scugic_0>;
 			interrupts = <0 20 4>;
 			reg = <0xe000a000 0x1000>;
