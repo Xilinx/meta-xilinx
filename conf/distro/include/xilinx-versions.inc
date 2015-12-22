@@ -1,4 +1,4 @@
-def csl_run(d, cmd, *args):
+def xlnx_run(d, cmd, *args):
 	import bb.process
 	import subprocess
 
@@ -13,9 +13,9 @@ def csl_run(d, cmd, *args):
 
 	return bb.process.run(args, cwd=topdir, stderr=subprocess.PIPE)
 
-def csl_get_version(d):
+def xlnx_get_version(d):
 	try:
-		stdout, stderr = csl_run(d, 'gcc', '-v')
+		stdout, stderr = xlnx_run(d, 'gcc', '-v')
 	except bb.process.CmdError as exc:
 		bb.error('Failed to obtain CodeSourcery toolchain version: %s' % exc)
 		bb.error('Make sure that MACHINE is set correctly in your local.conf and the toolchain supports %s.' % d.getVar("TARGET_ARCH", True))
@@ -27,21 +27,16 @@ def csl_get_version(d):
 				return lines[i]
 		return 'UNKNOWN'
 
-def csl_get_main_version(d):
-	version = csl_get_version(d)
-	if version != 'UNKNOWN':
-		return version.split()[-1].rstrip(')')
-	else:
-		return version
-
-def csl_get_gcc_version(d):
-	version = csl_get_version(d)
+def xlnx_get_gcc_version(d):
+	version = xlnx_get_version(d)
 	if version != 'UNKNOWN':
 		return version.split()[2]
 	else:
 		return version
 
-def xilinx_get_libc_version(d):
+def xlnx_get_libc_version(d):
+	import fnmatch
+
 	syspath = d.expand('${EXTERNAL_TOOLCHAIN_SYSROOT}')
 	if not syspath:
 		return 'UNKNOWN'
@@ -51,12 +46,12 @@ def xilinx_get_libc_version(d):
 		libpath = syspath + '/sgxx-glibc/lib/'
 
 	if os.path.exists(libpath):
-		for file in os.listdir(libpath):
-			if file.find('libc-') == 0:
-				return file[5:-3]
+		for root,dirs,files in os.walk(libpath):
+			for filename in fnmatch.filter(files,'libc-*.so'):
+				return filename[5:-3]
 	return 'UNKNOWN'
 
-def xilinx_get_kernel_version(d):
+def xlnx_get_kernel_version(d):
 	syspath = d.expand('${EXTERNAL_TOOLCHAIN_SYSROOT}')
 	if not syspath:
 		return 'UNKNOWN'
@@ -82,9 +77,9 @@ def xilinx_get_kernel_version(d):
 			return str(maj)+'.'+str(min)+'.'+str(ver)
 	return 'UNKNOWN'
 
-def csl_get_gdb_version(d):
+def xlnx_get_gdb_version(d):
 	try:
-		stdout, stderr = csl_run(d, 'gdb', '-v')
+		stdout, stderr = xlnx_run(d, 'gdb', '-v')
 	except bb.process.CmdError:
 		return 'UNKNOWN'
 	else:
@@ -96,15 +91,14 @@ python xilinx_version_handler () {
     ld = d.createCopy()
     ld.finalize()
 
-    d.setVar('CSL_VER_MAIN', csl_get_main_version(ld))
-    d.setVar('CSL_VER_GCC', csl_get_gcc_version(ld))
-    d.setVar('CSL_VER_LIBC', xilinx_get_libc_version(ld))
-    d.setVar('CSL_VER_KERNEL', xilinx_get_kernel_version(ld))
-    d.setVar('CSL_VER_GDB', csl_get_gdb_version(ld))
+    d.setVar('XILINX_VER_GCC', xlnx_get_gcc_version(ld))
+    d.setVar('XILINX_VER_LIBC', xlnx_get_libc_version(ld))
+    d.setVar('XILINX_VER_KERNEL', xlnx_get_kernel_version(ld))
+    d.setVar('XILINX_VER_GDB', xlnx_get_gdb_version(ld))
 }
 addhandler xilinx_version_handler
 xilinx_version_handler[eventmask] = "bb.event.ConfigParsed"
 
 # Ensure that any variable which includes the --sysroot (CC, CXX, etc) also
 # depends on the toolchain version
-TOOLCHAIN_OPTIONS[vardeps] += "CSL_VER_MAIN CSL_VER_GCC"
+TOOLCHAIN_OPTIONS[vardeps] += "XILINX_VER_MAIN XILINX_VER_GCC"
