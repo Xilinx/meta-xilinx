@@ -9,14 +9,14 @@
 		reg = <0x0 0x40000000>;
 	} ;
 	ps7_axi_interconnect_0: amba@0 {
-		/* Setup a fixed 125 MHz clock to trick the ethernet driver */
-		clk125mhz: clock {
+		/* Setup a fixed 25 MHz clock (100Mbps) to trick the ethernet driver */
+		fixednetclk: clock {
 			#clock-cells = <0>;
 			compatible = "fixed-clock";
-			clock-frequency = <125000000>;
+			clock-frequency = <25000000>;
 		} ;
 		ps7_ethernet_0: ps7-ethernet@e000b000 {
-			clocks = <&clkc 30>, <&clkc 30>, <&clk125mhz>, <&clk125mhz>, <&clkc 30>;
+			clocks = <&clkc 30>, <&clkc 30>, <&fixednetclk>, <&fixednetclk>, <&clkc 30>;
 			phy-handle = <&phy0>;
 			phy-mode = "gmii";
 			phy0: phy@23 {
