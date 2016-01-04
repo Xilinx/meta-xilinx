@@ -1,6 +1,7 @@
 # Setup for MicroBlaze and Zynq architectures
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynq = "zynq"
+COMPATIBLE_MACHINE_zynqmp = "zynqmp"
 COMPATIBLE_MACHINE_microblaze = "microblaze"
 
 # Default kernel config fragements for specific machines
