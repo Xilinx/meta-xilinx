@@ -21,9 +21,9 @@ And then boot Linux using the 'bootm' command. (Note the load addresses will
 be dependant on machine used)
 
 For MicroBlaze (kc705-trd-microblazeel):
-	U-Boot> tftp 0x85000000 linux.bin.ub
-	U-Boot> tftp 0x86000000 core-image-minimal-<machine name>.cpio.gz.u-boot
-	U-Boot> tftp 0x84000000 linux.bin.ub-<machine name>.dtb
+	U-Boot> tftpboot 0x85000000 linux.bin.ub
+	U-Boot> tftpboot 0x86000000 core-image-minimal-<machine name>.cpio.gz.u-boot
+	U-Boot> tftpboot 0x84000000 linux.bin.ub-<machine name>.dtb
 	U-Boot> bootm 0x85000000 0x86000000 0x84000000
 
 For Zynq:
