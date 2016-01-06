@@ -1,0 +1,215 @@
+From 0a6818050dcc711f36bd96decc7a2abba5871928 Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan@nathanrossi.com>
+Date: Wed, 6 Jan 2016 15:40:17 +1000
+Subject: [PATCH] microblaze: kc705-trd: Convert microblaze-generic to
+ kc705-trd
+
+Change the microblaze-generic board to match the kc705-trd. This patch
+is not intended for upstream and serves as an intermediate solution
+until OF support in upstream u-boot allows for easy support for custom
+microblaze boards.
+
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+Upstream-Status: Not-Upstreamable [meta-xilinx/kc705 specific]
+---
+ arch/microblaze/dts/microblaze-generic.dts    |  4 ++
+ board/xilinx/microblaze-generic/config.mk     | 23 +++----
+ board/xilinx/microblaze-generic/xparameters.h | 86 ++++++++++-----------------
+ include/configs/microblaze-generic.h          | 11 ++--
+ 4 files changed, 52 insertions(+), 72 deletions(-)
+
+diff --git a/arch/microblaze/dts/microblaze-generic.dts b/arch/microblaze/dts/microblaze-generic.dts
+index 2033309..8c21cd3 100644
+--- a/arch/microblaze/dts/microblaze-generic.dts
++++ b/arch/microblaze/dts/microblaze-generic.dts
+@@ -4,4 +4,8 @@
+ 	#size-cells = <1>;
+ 	aliases {
+ 	} ;
++	memory: memory@80000000 {
++		device_type = "memory";
++		reg = <0x80000000 0x40000000>;
++	} ;
+ } ;
+diff --git a/board/xilinx/microblaze-generic/config.mk b/board/xilinx/microblaze-generic/config.mk
+index 36bdd96..25e97de 100644
+--- a/board/xilinx/microblaze-generic/config.mk
++++ b/board/xilinx/microblaze-generic/config.mk
+@@ -1,18 +1,11 @@
+-#
+-# (C) Copyright 2007 Michal Simek
+-#
+-# Michal  SIMEK <monstr@monstr.eu>
+-#
+ # SPDX-License-Identifier:	GPL-2.0+
+-#
+-# CAUTION: This file is a faked configuration !!!
+-#          There is no real target for the microblaze-generic
+-#          configuration. You have to replace this file with
+-#          the generated file from your Xilinx design flow.
+-#
+ 
+-CONFIG_SYS_TEXT_BASE = 0x29000000
++CONFIG_SYS_TEXT_BASE = 0xbfc00000
+ 
+-PLATFORM_CPPFLAGS += -mno-xl-soft-mul
+-PLATFORM_CPPFLAGS += -mno-xl-soft-div
+-PLATFORM_CPPFLAGS += -mxl-barrel-shift
++PLATFORM_CCPFLAGS += -mlittle-endian
++PLATFORM_CCPFLAGS += -mcpu=v8.50.a
++PLATFORM_CCPFLAGS += -mxl-barrel-shift
++PLATFORM_CCPFLAGS += -mno-xl-soft-mul
++PLATFORM_CCPFLAGS += -mxl-soft-div
++PLATFORM_CCPFLAGS += -mxl-pattern-compare
++PLATFORM_CCPFLAGS += -mxl-reorder
+diff --git a/board/xilinx/microblaze-generic/xparameters.h b/board/xilinx/microblaze-generic/xparameters.h
+index d6d0d67..f539044 100644
+--- a/board/xilinx/microblaze-generic/xparameters.h
++++ b/board/xilinx/microblaze-generic/xparameters.h
+@@ -1,67 +1,47 @@
+-/*
+- * (C) Copyright 2007 Michal Simek
+- *
+- * Michal  SIMEK <monstr@monstr.eu>
+- *
+- * SPDX-License-Identifier:	GPL-2.0+
+- *
+- * CAUTION: This file is a faked configuration !!!
+- *          There is no real target for the microblaze-generic
+- *          configuration. You have to replace this file with
+- *          the generated file from your Xilinx design flow.
+- */
+-
+-#define XILINX_BOARD_NAME	microblaze-generic
+-
+-/* System Clock Frequency */
+-#define XILINX_CLOCK_FREQ	100000000
+-
+ /* Microblaze is microblaze_0 */
+ #define XILINX_USE_MSR_INSTR	1
+-#define XILINX_FSL_NUMBER	3
++#define XILINX_PVR		2
++#define XILINX_FSL_NUMBER	0
++#define XILINX_USE_ICACHE	1
++#define XILINX_USE_DCACHE	1
++#define XILINX_DCACHE_BYTE_SIZE	8192
+ 
+-/* Interrupt controller is opb_intc_0 */
+-#define XILINX_INTC_BASEADDR	0x41200000
+-#define XILINX_INTC_NUM_INTR_INPUTS	6
++/* Interrupt controller is interrupt_cntlr */
++#define XILINX_INTC_BASEADDR		0x40100000
++#define XILINX_INTC_NUM_INTR_INPUTS	8
+ 
+-/* Timer pheriphery is opb_timer_1 */
+-#define XILINX_TIMER_BASEADDR	0x41c00000
+-#define XILINX_TIMER_IRQ	0
++/* Timer pheriphery is dual_timer_counter */
++#define XILINX_TIMER_BASEADDR	0x40300000
++#define XILINX_TIMER_IRQ	3
+ 
+-/* Uart pheriphery is RS232_Uart */
+-#define XILINX_UARTLITE_BASEADDR	0x40600000
+-#define XILINX_UARTLITE_BAUDRATE	115200
++/* System Timer Clock Frequency */
++#define XILINX_CLOCK_FREQ	100000000
++
++/* Uart console is rs232_uart_1 */
++#define XILINX_UART16550
++#define XILINX_UART16550_BASEADDR	0x40400000
++#define XILINX_UART16550_CLOCK_HZ	100000000
++#define CONFIG_CONS_INDEX		1
+ 
+-/* IIC pheriphery is IIC_EEPROM */
+-#define XILINX_IIC_0_BASEADDR	0x40800000
++/* IIC pheriphery is iic_eeprom */
++#define XILINX_IIC_0_BASEADDR	0x40a00000
+ #define XILINX_IIC_0_FREQ	100000
+ #define XILINX_IIC_0_BIT	0
+ 
+-/* GPIO is LEDs_4Bit*/
+-#define XILINX_GPIO_BASEADDR	0x40000000
+-
+-/* Flash Memory is FLASH_2Mx32 */
+-#define XILINX_FLASH_START	0x2c000000
+-#define XILINX_FLASH_SIZE	0x00800000
++/* GPIO doesn't exist */
+ 
+-/* Main Memory is DDR_SDRAM_64Mx32 */
+-#define XILINX_RAM_START	0x28000000
+-#define XILINX_RAM_SIZE	0x04000000
++/* SDIO doesn't exist */
+ 
+-/* Sysace Controller is SysACE_CompactFlash */
+-#define XILINX_SYSACE_BASEADDR	0x41800000
+-#define XILINX_SYSACE_HIGHADDR	0x4180ffff
+-#define XILINX_SYSACE_MEM_WIDTH	16
++/* Main Memory is ddr3_sdram */
++#define XILINX_RAM_START	0x80000000
++#define XILINX_RAM_SIZE		0x40000000
+ 
+-/* Ethernet controller is Ethernet_MAC */
+-#define XILINX_EMACLITE_BASEADDR       0x40C00000
++/* Flash Memory is linear_flash */
++#define XILINX_FLASH_START	0x48000000
++#define XILINX_FLASH_SIZE	0x08000000
+ 
+-/* LL_TEMAC Ethernet controller */
+-#define XILINX_LLTEMAC_BASEADDR			0x44000000
+-#define XILINX_LLTEMAC_SDMA_CTRL_BASEADDR	0x42000180
+-#define XILINX_LLTEMAC_BASEADDR1		0x44200000
+-#define XILINX_LLTEMAC_FIFO_BASEADDR1		0x42100000
++/* Sysace doesn't exist */
+ 
+-/* Watchdog IP is wxi_timebase_wdt_0 */
+-#define XILINX_WATCHDOG_BASEADDR	0x50000000
+-#define XILINX_WATCHDOG_IRQ		1
++/* Ethernet controller is soft_ethernet_mac */
++#define XILINX_AXIEMAC_BASEADDR			0x50100000
++#define XILINX_AXIDMA_BASEADDR			0x50000000
+diff --git a/include/configs/microblaze-generic.h b/include/configs/microblaze-generic.h
+index e16965c..f463b83 100644
+--- a/include/configs/microblaze-generic.h
++++ b/include/configs/microblaze-generic.h
+@@ -151,7 +151,7 @@
+ /* max number of memory banks */
+ # define CONFIG_SYS_MAX_FLASH_BANKS	1
+ /* max number of sectors on one chip */
+-# define CONFIG_SYS_MAX_FLASH_SECT	512
++# define CONFIG_SYS_MAX_FLASH_SECT	2048
+ /* hardware flash protection */
+ # define CONFIG_SYS_FLASH_PROTECTION
+ /* use buffered writes (20x faster) */
+@@ -247,7 +247,9 @@
+ #define CONFIG_CMD_ASKENV
+ #define CONFIG_CMD_IRQ
+ #define CONFIG_CMD_MFSL
+-#define CONFIG_CMD_GPIO
++#ifdef CONFIG_XILINX_GPIO
++# define CONFIG_CMD_GPIO
++#endif
+ 
+ #if defined(CONFIG_DCACHE) || defined(CONFIG_ICACHE)
+ # define CONFIG_CMD_CACHE
+@@ -317,7 +319,7 @@
+ #endif
+ 
+ /* Miscellaneous configurable options */
+-#define	CONFIG_SYS_PROMPT	"U-Boot-mONStR> "
++#define	CONFIG_SYS_PROMPT	"U-Boot> "
+ /* size of console buffer */
+ #define	CONFIG_SYS_CBSIZE	512
+  /* print buffer size */
+@@ -350,7 +352,8 @@
+ 					"nc=setenv stdout nc;"\
+ 					"setenv stdin nc\0" \
+ 					"serial=setenv stdout serial;"\
+-					"setenv stdin serial\0"
++					"setenv stdin serial\0" \
++					"ethaddr=00:0a:35:00:01:22\0"
+ 
+ #define CONFIG_CMDLINE_EDITING
+ 
+-- 
+2.6.4
+

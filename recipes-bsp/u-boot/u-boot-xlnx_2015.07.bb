@@ -1,5 +1,4 @@
 include u-boot-xlnx.inc
-include u-boot-extra.inc
 include u-boot-spl-zynq-init.inc
 
 # this matches u-boot-xlnx 'xilinx-v2015.4' release tag
@@ -11,6 +10,8 @@ SRC_URI += " \
 		file://0001-microblaze-Fix-style-issues-in-header-files.patch \
 		file://0002-microblaze-Fix-C99-gnu99-compatiblity-for-inline-fun.patch \
 		"
+
+SRC_URI_append_kc705-trd-microblazeel = " file://microblaze-kc705-trd-Convert-microblaze-generic-to-k.patch"
 
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
 
