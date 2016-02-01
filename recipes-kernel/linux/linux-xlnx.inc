@@ -7,10 +7,11 @@ PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 SRCBRANCH ?= ""
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${SRCBRANCH}'][d.getVar('SRCBRANCH', True) != '']}"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/config:"
 SRC_URI = " \
 		git://github.com/Xilinx/linux-xlnx.git;protocol=https;${SRCBRANCHARG} \
-		file://xilinx-base;type=kmeta;destsuffix=xilinx-base \
+		file://kc705;type=kmeta;destsuffix=kc705 \
+		file://zynqmp;type=kmeta;destsuffix=zynqmp \
 		"
 
 SRCREV_machine ?= "${SRCREV}"
@@ -19,6 +20,5 @@ require recipes-kernel/linux/linux-yocto.inc
 
 DESCRIPTION = "Xilinx Kernel"
 
-require linux-xilinx-configs.inc
 require linux-xilinx-machines.inc
 
