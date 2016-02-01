@@ -1,0 +1,36 @@
+Change Makefile to be compatible with Yocto
+
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Upstream Status: Pending
+--- driver/src/devicedrv/mali/Makefile	2015-03-29 20:38:45.000000000 -0700
++++ b/Makefile	2016-01-26 20:13:56.053436042 -0800
+@@ -85,7 +85,11 @@
+ # Define host system directory
+ KDIR-$(shell uname -m):=/lib/modules/$(shell uname -r)/build
+ 
+-include $(KDIR)/.config
++ifeq ($(O),)
++	include $(KDIR)/.config
++else
++	include $(O)/.config
++endif
+ 
+ ifeq ($(ARCH), arm)
+ # when compiling for ARM we're cross compiling
+@@ -170,10 +174,15 @@
+ EXTRA_DEFINES += -DPROFILING_SKIP_PP_JOBS=1 -DPROFILING_SKIP_GP_JOBS=1
+ endif
+ 
++EXTRA_DEFINES += -Wno-error=date-time
++
+ all: $(UMP_SYMVERS_FILE)
+-	$(MAKE) ARCH=$(ARCH) -C $(KDIR) M=$(CURDIR) modules
++	$(MAKE) ARCH=$(ARCH) -C $(KDIR) M=$(CURDIR) O=$(O) modules
+ 	@rm $(FILES_PREFIX)__malidrv_build_info.c $(FILES_PREFIX)__malidrv_build_info.o
+ 
++modules_install:
++	$(MAKE) ARCH=$(ARCH) -C $(KDIR) M=$(CURDIR) modules_install
++
+ clean:
+ 	$(MAKE) ARCH=$(ARCH) -C $(KDIR) M=$(CURDIR) clean
+ 
