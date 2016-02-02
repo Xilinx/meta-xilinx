@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Kernel Config for zcu102 specific setup"
+define KFEATURE_COMPATIBILITY board
+
+kconf hardware zynqmp.cfg
