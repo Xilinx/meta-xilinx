@@ -13,6 +13,9 @@ DEPENDS += "dtc-native"
 FILES_${PN} = "/boot/devicetree*"
 DEVICETREE_FLAGS ?= "-R 8 -p 0x3000"
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+SRC_URI_append_zynq = " file://common/zynq7-base.dtsi"
+
 S = "${WORKDIR}"
 
 KERNEL_DTS_INCLUDE ??= ""
