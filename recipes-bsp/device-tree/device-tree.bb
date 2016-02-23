@@ -15,7 +15,26 @@ DEVICETREE_FLAGS ?= "-R 8 -p 0x3000"
 
 S = "${WORKDIR}"
 
+KERNEL_DTS_INCLUDE ??= ""
+KERNEL_DTS_INCLUDE_zynq = "arch/arm/boot/dts/skeleton.dtsi arch/arm/boot/dts/zynq-7000.dtsi"
+KERNEL_DTS_INCLUDE_zynqmp = "arch/arm/boot/dts/skeleton.dtsi arch/arm64/boot/dts/xilinx/zynqmp.dtsi"
+
+python () {
+    # auto add dependency on kernel tree
+    if d.getVar("KERNEL_DTS_INCLUDE", True) != "":
+        d.setVarFlag("do_compile", "depends",
+            " ".join([d.getVarFlag("do_compile", "depends", True) or "", "virtual/kernel:do_shared_workdir"]))
+}
+
 do_compile() {
+	for i in ${KERNEL_DTS_INCLUDE}; do
+		DTSI_NAME=`basename $i`
+		if test -e ${STAGING_KERNEL_DIR}/$i; then
+			mkdir -p ${WORKDIR}/devicetree
+			cp ${STAGING_KERNEL_DIR}/$i ${WORKDIR}/devicetree/${DTSI_NAME}
+		fi
+	done
+
 	if test -n "${MACHINE_DEVICETREE}"; then
 		mkdir -p ${WORKDIR}/devicetree
 		for i in ${MACHINE_DEVICETREE}; do
@@ -27,7 +46,7 @@ do_compile() {
 	fi
 
 	for DTS_FILE in ${DEVICETREE}; do
-		DTS_NAME=`basename ${DTS_FILE} | awk -F "." '{print $1}'`
+		DTS_NAME=`basename -s .dts ${DTS_FILE}`
 		dtc -I dts -O dtb ${DEVICETREE_FLAGS} -o ${DTS_NAME}.dtb ${DTS_FILE}
 	done
 }
@@ -38,7 +57,7 @@ do_install() {
 			echo "Warning: ${DTS_FILE} is not available!"
 			continue
 		fi
-		DTS_NAME=`basename ${DTS_FILE} | awk -F "." '{print $1}'`
+		DTS_NAME=`basename -s .dts ${DTS_FILE}`
 		install -d ${D}/boot/devicetree
 		install -m 0644 ${B}/${DTS_NAME}.dtb ${D}/boot/devicetree/${DTS_NAME}.dtb
 	done
@@ -50,7 +69,7 @@ do_deploy() {
 			echo "Warning: ${DTS_FILE} is not available!"
 			continue
 		fi
-		DTS_NAME=`basename ${DTS_FILE} | awk -F "." '{print $1}'`
+		DTS_NAME=`basename -s .dts ${DTS_FILE}`
 		install -d ${DEPLOY_DIR_IMAGE}
 		install -m 0644 ${B}/${DTS_NAME}.dtb ${DEPLOY_DIR_IMAGE}/${DTS_NAME}.dtb
 	done
@@ -61,7 +80,7 @@ DEPLOY_KERNEL_DTB_qemuzynq = "1"
 do_deploy_append() {
 	if [ ! -z "${DEPLOY_KERNEL_DTB}" -a ! -z "${KERNEL_IMAGETYPE}" ]; then
 		for DTS_FILE in ${DEVICETREE}; do
-			DTS_NAME=`basename ${DTS_FILE} | awk -F "." '{print $1}'`
+			DTS_NAME=`basename -s .dts ${DTS_FILE}`
 			KERNELDTBPATH=${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTS_NAME}.dtb
 			if [ ! -e ${KERNELDTBPATH} -o -h ${KERNELDTBPATH} ]; then
 				ln -sf ${DTS_NAME}.dtb ${KERNELDTBPATH}
