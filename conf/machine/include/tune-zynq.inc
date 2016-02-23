@@ -1,4 +1,4 @@
-DEFAULTTUNE ?= "cortexa9-neon"
+DEFAULTTUNE ?= "cortexa9thf-neon"
 SOC_FAMILY ?= "zynq"
 
 require conf/machine/include/tune-cortexa9.inc
