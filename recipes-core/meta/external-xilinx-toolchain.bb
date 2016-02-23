@@ -168,6 +168,6 @@ FILES_gdbserver-dbg = "${bindir}/.debug/gdbserver"
 CSL_VER_MAIN ??= ""
 
 python () {
-    if not d.getVar("CSL_VER_MAIN"):
+    if not d.getVar("CSL_VER_MAIN", True):
         raise bb.parse.SkipPackage("External toolchain not configured (CSL_VER_MAIN not set).")
 }
