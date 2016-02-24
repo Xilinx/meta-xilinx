@@ -1,5 +1,0 @@
-/dts-v1/;
-/include/ "zynq7-base.dtsi"
-/include/ "picozed-zynq7-board.dtsi"
-/ {
-} ;
