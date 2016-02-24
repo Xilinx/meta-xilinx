@@ -1,4 +1,4 @@
 kernel_image=uImage
-devicetree_image=zedboard-zynq7.dtb
+devicetree_image=uImage-zynq-zed.dtb
 bootargs=console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootwait earlyprintk
 uenvcmd=echo Copying Linux from SD to RAM... && fatload mmc 0 0x3000000 ${kernel_image} && fatload mmc 0 0x2A00000 ${devicetree_image} && bootm 0x3000000 - 0x2A00000
