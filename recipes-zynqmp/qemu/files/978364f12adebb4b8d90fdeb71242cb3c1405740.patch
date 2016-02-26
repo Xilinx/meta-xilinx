@@ -1,0 +1,49 @@
+From 978364f12adebb4b8d90fdeb71242cb3c1405740 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 18 Feb 2016 14:16:17 +0000
+Subject: [PATCH] target-arm: Add the pmovsclr_el0 and pmintenclr_el1 registers
+
+Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Tested-by: Nathan Rossi <nathan@nathanrossi.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 50deeafb24958a5b6d7f594b5dda399a022c0e5b.1455060548.git.alistair.francis@xilinx.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Upstream-Status: Backport
+---
+ target-arm/helper.c |   12 ++++++++++++
+ 1 files changed, 12 insertions(+), 0 deletions(-)
+
+diff --git a/target-arm/helper.c b/target-arm/helper.c
+index 6a4ec01..9e47f3d 100644
+--- a/target-arm/helper.c
++++ b/target-arm/helper.c
+@@ -1057,6 +1057,13 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .accessfn = pmreg_access,
+       .writefn = pmovsr_write,
+       .raw_writefn = raw_write },
++    { .name = "PMOVSCLR_EL0", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 12, .opc2 = 3,
++      .access = PL0_RW, .accessfn = pmreg_access,
++      .type = ARM_CP_ALIAS,
++      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmovsr),
++      .writefn = pmovsr_write,
++      .raw_writefn = raw_write },
+     /* Unimplemented so WI. */
+     { .name = "PMSWINC", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 4,
+       .access = PL0_W, .accessfn = pmreg_access, .type = ARM_CP_NOP },
+@@ -1107,6 +1114,11 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .access = PL1_RW, .type = ARM_CP_ALIAS,
+       .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
+       .writefn = pmintenclr_write, },
++    { .name = "PMINTENCLR_EL1", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 2,
++      .access = PL1_RW, .type = ARM_CP_ALIAS,
++      .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
++      .writefn = pmintenclr_write },
+     { .name = "VBAR", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .crn = 12, .crm = 0, .opc1 = 0, .opc2 = 0,
+       .access = PL1_RW, .writefn = vbar_write,
+-- 
+1.7.0.4
+

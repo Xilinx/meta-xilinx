@@ -1,0 +1,37 @@
+From 8a83ffc2dafad3499b87a736b17ab1b203fdb00b Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 18 Feb 2016 14:16:17 +0000
+Subject: [PATCH] target-arm: Add PMUSERENR_EL0 register
+
+The Linux kernel accesses this register early in its setup.
+
+Signed-off-by: Christopher Covington <christopher.covington@linaro.org>
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: b30d536cb16ec57b4412172bb6dbc3f00d293e7d.1455060548.git.alistair.francis@xilinx.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Upstream-Status: Backport
+---
+ target-arm/helper.c |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
+
+diff --git a/target-arm/helper.c b/target-arm/helper.c
+index 9e47f3d..5a0447b 100644
+--- a/target-arm/helper.c
++++ b/target-arm/helper.c
+@@ -1105,6 +1105,12 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmuserenr),
+       .resetvalue = 0,
+       .writefn = pmuserenr_write, .raw_writefn = raw_write },
++    { .name = "PMUSERENR_EL0", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 14, .opc2 = 0,
++      .access = PL0_R | PL1_RW, .type = ARM_CP_ALIAS,
++      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmuserenr),
++      .resetvalue = 0,
++      .writefn = pmuserenr_write, .raw_writefn = raw_write },
+     { .name = "PMINTENSET", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 1,
+       .access = PL1_RW,
+       .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
+-- 
+1.7.0.4
+

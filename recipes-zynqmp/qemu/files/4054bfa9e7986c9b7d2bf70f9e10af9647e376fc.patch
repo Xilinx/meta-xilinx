@@ -1,0 +1,90 @@
+From 4054bfa9e7986c9b7d2bf70f9e10af9647e376fc Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 18 Feb 2016 14:16:17 +0000
+Subject: [PATCH] target-arm: Add the pmceid0 and pmceid1 registers
+
+Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Tested-by: Nathan Rossi <nathan@nathanrossi.com>
+Message-id: da0563119a9f56fd5fbdc26e7ed19a8a8457c5b9.1455060548.git.alistair.francis@xilinx.com
+[PMM: Use 0 for PMCEID0 values for A15 and A57 since our PMU
+ does not currently implement any events.]
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Upstream-Status: Backport
+---
+ target-arm/cpu-qom.h |    2 ++
+ target-arm/cpu.c     |    2 ++
+ target-arm/cpu64.c   |    2 ++
+ target-arm/helper.c  |   16 ++++++++++++++++
+ 4 files changed, 22 insertions(+), 0 deletions(-)
+
+diff --git a/target-arm/cpu-qom.h b/target-arm/cpu-qom.h
+index 07c0a71..1cc4502 100644
+--- a/target-arm/cpu-qom.h
++++ b/target-arm/cpu-qom.h
+@@ -148,6 +148,8 @@ typedef struct ARMCPU {
+     uint32_t id_pfr0;
+     uint32_t id_pfr1;
+     uint32_t id_dfr0;
++    uint32_t pmceid0;
++    uint32_t pmceid1;
+     uint32_t id_afr0;
+     uint32_t id_mmfr0;
+     uint32_t id_mmfr1;
+diff --git a/target-arm/cpu.c b/target-arm/cpu.c
+index f2393cd..e95b030 100644
+--- a/target-arm/cpu.c
++++ b/target-arm/cpu.c
+@@ -1156,6 +1156,8 @@ static void cortex_a15_initfn(Object *obj)
+     cpu->id_pfr0 = 0x00001131;
+     cpu->id_pfr1 = 0x00011011;
+     cpu->id_dfr0 = 0x02010555;
++    cpu->pmceid0 = 0x0000000;
++    cpu->pmceid1 = 0x00000000;
+     cpu->id_afr0 = 0x00000000;
+     cpu->id_mmfr0 = 0x10201105;
+     cpu->id_mmfr1 = 0x20000000;
+diff --git a/target-arm/cpu64.c b/target-arm/cpu64.c
+index c5bc19a..fa5eda2 100644
+--- a/target-arm/cpu64.c
++++ b/target-arm/cpu64.c
+@@ -135,6 +135,8 @@ static void aarch64_a57_initfn(Object *obj)
+     cpu->id_isar5 = 0x00011121;
+     cpu->id_aa64pfr0 = 0x00002222;
+     cpu->id_aa64dfr0 = 0x10305106;
++    cpu->pmceid0 = 0x00000000;
++    cpu->pmceid1 = 0x00000000;
+     cpu->id_aa64isar0 = 0x00011120;
+     cpu->id_aa64mmfr0 = 0x00001124;
+     cpu->dbgdidr = 0x3516d000;
+diff --git a/target-arm/helper.c b/target-arm/helper.c
+index a420a2a..6a4ec01 100644
+--- a/target-arm/helper.c
++++ b/target-arm/helper.c
+@@ -4380,6 +4380,22 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 3, .opc2 = 2,
+               .access = PL1_R, .type = ARM_CP_CONST,
+               .resetvalue = cpu->mvfr2 },
++            { .name = "PMCEID0", .state = ARM_CP_STATE_AA32,
++              .cp = 15, .opc1 = 0, .crn = 9, .crm = 12, .opc2 = 6,
++              .access = PL0_R, .accessfn = pmreg_access, .type = ARM_CP_CONST,
++              .resetvalue = cpu->pmceid0 },
++            { .name = "PMCEID0_EL0", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 12, .opc2 = 6,
++              .access = PL0_R, .accessfn = pmreg_access, .type = ARM_CP_CONST,
++              .resetvalue = cpu->pmceid0 },
++            { .name = "PMCEID1", .state = ARM_CP_STATE_AA32,
++              .cp = 15, .opc1 = 0, .crn = 9, .crm = 12, .opc2 = 7,
++              .access = PL0_R, .accessfn = pmreg_access, .type = ARM_CP_CONST,
++              .resetvalue = cpu->pmceid1 },
++            { .name = "PMCEID1_EL0", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 12, .opc2 = 7,
++              .access = PL0_R, .accessfn = pmreg_access, .type = ARM_CP_CONST,
++              .resetvalue = cpu->pmceid1 },
+             REGINFO_SENTINEL
+         };
+         /* RVBAR_EL1 is only implemented if EL1 is the highest EL */
+-- 
+1.7.0.4
+
