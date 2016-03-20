@@ -27,3 +27,12 @@ UBOOT_SUFFIX_zynqmp ?= "bin"
 UBOOT_BINARY ?= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_ELF ?= "u-boot"
 UBOOT_ELF_aarch64 ?= "u-boot.elf"
+
+XSERVER = " \
+           xserver-xorg \
+           xf86-input-evdev \
+           xf86-input-mouse \
+           xf86-input-keyboard \
+           ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'xserver-xorg-extension-glx', '', d)} \
+           "
+
