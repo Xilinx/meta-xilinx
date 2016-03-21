@@ -16,6 +16,7 @@ SRC_URI = " \
 	git://anongit.freedesktop.org/xorg/driver/xf86-video-armsoc \
         file://0001-src-drmmode_xilinx-Add-the-dumb-gem-support-for-Xili.patch \
         file://0002-enable-subdir-objects.patch \
+	file://10-input.conf \
 	file://20-zynqmp.conf \
 	"
 
@@ -26,5 +27,6 @@ CFLAGS += " -I${STAGING_INCDIR}/xorg "
 
 do_install_append() {
 	install -d ${D}/etc/X11/xorg.conf.d
+	install -m 0644 ${WORKDIR}/10-input.conf ${D}/etc/X11/xorg.conf.d
 	install -m 0644 ${WORKDIR}/20-zynqmp.conf ${D}/etc/X11/xorg.conf.d
 }
