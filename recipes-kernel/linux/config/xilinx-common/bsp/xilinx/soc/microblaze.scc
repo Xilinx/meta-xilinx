@@ -1,6 +1,0 @@
-include arch/microblaze/microblaze.scc
-
-kconf hardware microblaze.cfg
-include bsp/xilinx/common.scc
-include bsp/xilinx/soc/xilinx-drivers.scc
-

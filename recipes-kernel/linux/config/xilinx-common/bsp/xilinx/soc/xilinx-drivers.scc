@@ -1,5 +1,0 @@
-define KFEATURE_DESCRIPTION "Xilinx Soft IP Core Drivers"
-define KFEATURE_COMPATIBILITY board
-
-kconfig hardware xilinx-drivers.cfg
-

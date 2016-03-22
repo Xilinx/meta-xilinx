@@ -1,4 +1,0 @@
-define KFEATURE_DESCRIPTION "Kernel Config for qemumicroblaze specific setup"
-define KFEATURE_COMPATIBILITY board
-
-kconf hardware qemumicroblaze.cfg
