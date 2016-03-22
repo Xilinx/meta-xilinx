@@ -8,8 +8,6 @@ IMAGE_CLASSES += "image_types_uboot"
 
 # Kernel Configuration
 XILINX_DEFAULT_KERNEL := "linux-xlnx"
-XILINX_DEFAULT_KERNEL_microblaze := "linux-yocto"
-XILINX_DEFAULT_KERNEL_zynqmp := "linux-yocto"
 
 KBUILD_DEFCONFIG_zynq = "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG_zynqmp = "xilinx_zynqmp_defconfig"
@@ -19,7 +17,6 @@ KCONFIG_MODE = "--alldefconfig"
 
 PREFERRED_PROVIDER_virtual/kernel ??= "${XILINX_DEFAULT_KERNEL}"
 PREFERRED_VERSION_linux-xlnx ?= "4.0%"
-PREFERRED_VERSION_linux-yocto ?= "4.1%"
 
 # U-Boot Configuration
 XILINX_DEFAULT_UBOOT := "u-boot-xlnx"
