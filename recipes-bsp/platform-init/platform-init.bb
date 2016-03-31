@@ -6,7 +6,6 @@ SECTION = "bsp"
 include zynq7-platform-init.inc
 
 COMPATIBLE_MACHINE = "$^"
-COMPATIBLE_MACHINE_zybo-zynq7 = "zybo-zynq7"
 COMPATIBLE_MACHINE_picozed-zynq7 = "picozed-zynq7"
 
 LICENSE = "GPLv2+"
