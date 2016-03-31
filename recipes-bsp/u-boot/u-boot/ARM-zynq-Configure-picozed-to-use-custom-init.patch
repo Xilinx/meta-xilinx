@@ -1,0 +1,29 @@
+From f60d8854e743f0ec89c137f49686efaa600d75a3 Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan@nathanrossi.com>
+Date: Thu, 31 Mar 2016 19:35:33 +1000
+Subject: [PATCH] ARM: zynq: Configure picozed to use custom init
+
+Setup the picozed target to use the ZYNQ_CUSTOM_INIT config option so
+that the user can provide a ps7_init for the board.
+
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+Upstream-Status: Not Submitted
+---
+ arch/arm/mach-zynq/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/mach-zynq/Kconfig b/arch/arm/mach-zynq/Kconfig
+index d396a13..3c6960e 100644
+--- a/arch/arm/mach-zynq/Kconfig
++++ b/arch/arm/mach-zynq/Kconfig
+@@ -20,6 +20,7 @@ config TARGET_ZYNQ_MICROZED
+ 
+ config TARGET_ZYNQ_PICOZED
+ 	bool "Zynq PicoZed"
++	select ZYNQ_CUSTOM_INIT
+ 
+ config TARGET_ZYNQ_ZC702
+ 	bool "Zynq ZC702 Board"
+-- 
+2.7.0
+
