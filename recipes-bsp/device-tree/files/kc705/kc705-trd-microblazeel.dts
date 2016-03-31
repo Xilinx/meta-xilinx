@@ -13,8 +13,8 @@
 		serial0 = &rs232_uart_1;
 	} ;
 	chosen {
-		bootargs = "console=ttyS0,115200 root=/dev/ram rw udev.children-max=1";
-		linux,stdout-path = "/axi@2/serial@40400000";
+		bootargs = "";
+		stdout-path = "serial0:115200";
 	} ;
 	cpus {
 		#address-cells = <1>;
@@ -480,6 +480,7 @@
 			interrupt-parent = <&interrupt_cntlr>;
 			interrupts = < 2 2 >;
 			local-mac-address = [ 00 0a 35 00 d9 4e ];
+			phy-mode = "gmii";
 			phy-handle = <&phy0>;
 			reg = < 0x50100000 0x40000 >;
 			xlnx,avb = <0x0>;
