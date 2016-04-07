@@ -1,0 +1,52 @@
+From b977025153a6f43ec5070d2f7a26f2ecb22c0319 Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan@nathanrossi.com>
+Date: Wed, 3 Feb 2016 22:41:05 +1000
+Subject: [PATCH] ARM: dts: zynq: Enable USB and USB PHY for ZYBO
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Setup the USB controller and configure it to operate in host mode.
+Additionally add the USB phy node for the ZYBO, including reset gpio
+which is connected to a external MIO pin.
+
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+Cc: Rob Herring <robh+dt@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Michal Simek <michal.simek@xilinx.com>
+Cc: Sören Brinkmann <soren.brinkmann@xilinx.com>
+Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+Upstream-Status: Backport
+---
+ arch/arm/boot/dts/zynq-zybo.dts | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/arch/arm/boot/dts/zynq-zybo.dts b/arch/arm/boot/dts/zynq-zybo.dts
+index 16c9cac..8f085b3 100644
+--- a/arch/arm/boot/dts/zynq-zybo.dts
++++ b/arch/arm/boot/dts/zynq-zybo.dts
+@@ -33,6 +33,11 @@
+ 		stdout-path = "serial0:115200n8";
+ 	};
+ 
++	usb_phy0: phy0 {
++		#phy-cells = <0>;
++		compatible = "usb-nop-xceiv";
++		reset-gpios = <&gpio0 46 1>;
++	};
+ };
+ 
+ &clkc {
+@@ -56,3 +61,9 @@
+ &uart1 {
+ 	status = "okay";
+ };
++
++&usb0 {
++	status = "okay";
++	dr_mode = "host";
++	usb-phy = <&usb_phy0>;
++};
+-- 
+2.8.0.rc3
+
