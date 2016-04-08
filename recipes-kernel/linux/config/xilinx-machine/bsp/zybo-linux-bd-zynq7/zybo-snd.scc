@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Sound support for Digilent ZYBO linux_bd project"
+define KFEATURE_COMPATIBILITY board
+
+kconfig hardware zybo-snd.cfg
