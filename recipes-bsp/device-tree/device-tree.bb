@@ -44,6 +44,18 @@ python () {
             " ".join([d.getVarFlag("do_compile", "depends", True) or "", "virtual/kernel:do_shared_workdir"]))
 }
 
+python do_deprecation_check() {
+    # check for use of 'zynq7-base.dtsi'
+    import re
+    for i in d.getVar('MACHINE_DEVICETREE', True).split():
+        filepath = os.path.join(d.getVar("WORKDIR", True), i)
+        if os.path.exists(filepath):
+            with open(filepath, 'rb') as f:
+                if re.search("/include/ \"zynq7-base.dtsi\"", f.read()):
+                    bb.warn("%s includes 'zynq7-base.dtsi', this include is deprecated." % i)
+}
+addtask do_deprecation_check after do_unpack
+
 do_compile() {
 	if test -n "${MACHINE_DEVICETREE}"; then
 		mkdir -p ${WORKDIR}/devicetree
