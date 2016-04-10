@@ -14,7 +14,7 @@ python () {
         raise bb.parse.SkipPackage("Set PREFERRED_PROVIDER_virtual/kernel to linux-xlnx-dev to enable it")
 }
 
-LINUX_VERSION ?= "4.0+"
+LINUX_VERSION ?= "4.4+"
 LINUX_VERSION_EXTENSION ?= "-xilinx-dev"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 
