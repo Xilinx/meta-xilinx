@@ -44,9 +44,13 @@ do_compile() {
 		DTS_NAME=`basename -s .dts ${DTS_FILE}`
 		for d in ${KERNEL_DTS_INCLUDE}; do
 			dtc_include="${dtc_include} -i $d"
+			cpp_include="${cpp_include} -I${d}"
 		done
+		${CPP} -E -nostdinc -Ulinux -I${WORKDIR}/devicetree \
+			${cpp_include} -x assembler-with-cpp \
+			-o ${DTS_FILE}.pp ${DTS_FILE}
 		dtc -I dts -O dtb ${DEVICETREE_FLAGS} -i ${WORKDIR}/devicetree \
-			${dtc_include} -o ${DTS_NAME}.dtb ${DTS_FILE}
+			${dtc_include} -o ${DTS_NAME}.dtb ${DTS_FILE}.pp
 	done
 }
 
