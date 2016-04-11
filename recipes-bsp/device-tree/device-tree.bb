@@ -19,8 +19,8 @@ SRC_URI_append_zynq = " file://common/zynq7-base.dtsi"
 S = "${WORKDIR}"
 
 KERNEL_DTS_INCLUDE ??= ""
-KERNEL_DTS_INCLUDE_zynq = "arch/arm/boot/dts/skeleton.dtsi arch/arm/boot/dts/zynq-7000.dtsi"
-KERNEL_DTS_INCLUDE_zynqmp = "arch/arm/boot/dts/skeleton.dtsi arch/arm64/boot/dts/xilinx/zynqmp.dtsi"
+KERNEL_DTS_INCLUDE_zynq = "${STAGING_KERNEL_DIR}/arch/arm/boot/dts"
+KERNEL_DTS_INCLUDE_zynqmp = "${STAGING_KERNEL_DIR}/arch/arm/boot/dts ${STAGING_KERNEL_DIR}/arch/arm64/boot/dts/xilinx"
 
 python () {
     # auto add dependency on kernel tree
@@ -30,14 +30,6 @@ python () {
 }
 
 do_compile() {
-	for i in ${KERNEL_DTS_INCLUDE}; do
-		DTSI_NAME=`basename $i`
-		if test -e ${STAGING_KERNEL_DIR}/$i; then
-			mkdir -p ${WORKDIR}/devicetree
-			cp ${STAGING_KERNEL_DIR}/$i ${WORKDIR}/devicetree/${DTSI_NAME}
-		fi
-	done
-
 	if test -n "${MACHINE_DEVICETREE}"; then
 		mkdir -p ${WORKDIR}/devicetree
 		for i in ${MACHINE_DEVICETREE}; do
@@ -50,7 +42,11 @@ do_compile() {
 
 	for DTS_FILE in ${DEVICETREE}; do
 		DTS_NAME=`basename -s .dts ${DTS_FILE}`
-		dtc -I dts -O dtb ${DEVICETREE_FLAGS} -o ${DTS_NAME}.dtb ${DTS_FILE}
+		for d in ${KERNEL_DTS_INCLUDE}; do
+			dtc_include="${dtc_include} -i $d"
+		done
+		dtc -I dts -O dtb ${DEVICETREE_FLAGS} -i ${WORKDIR}/devicetree \
+			${dtc_include} -o ${DTS_NAME}.dtb ${DTS_FILE}
 	done
 }
 
