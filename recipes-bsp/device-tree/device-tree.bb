@@ -11,7 +11,15 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 DEPENDS += "dtc-native"
 
 FILES_${PN} = "/boot/devicetree*"
-DEVICETREE_FLAGS ?= "-R 8 -p 0x3000"
+DEVICETREE_FLAGS ?= "-R 8 -p 0x3000 \
+		-i ${WORKDIR}/devicetree \
+		${@' '.join(['-i %s' % i for i in d.getVar('KERNEL_DTS_INCLUDE', True).split()])} \
+		"
+DEVICETREE_PP_FLAGS ?= "-nostdinc -Ulinux \
+		-I${WORKDIR}/devicetree \
+		${@' '.join(['-I%s' % i for i in d.getVar('KERNEL_DTS_INCLUDE', True).split()])} \
+		-x assembler-with-cpp \
+		"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI_append_zynq = " file://common/zynq7-base.dtsi"
@@ -41,7 +49,6 @@ do_compile() {
 		mkdir -p ${WORKDIR}/devicetree
 		for i in ${MACHINE_DEVICETREE}; do
 			if test -e ${WORKDIR}/$i; then
-				echo cp ${WORKDIR}/$i ${WORKDIR}/devicetree
 				cp ${WORKDIR}/$i ${WORKDIR}/devicetree
 			fi
 		done
@@ -49,15 +56,8 @@ do_compile() {
 
 	for DTS_FILE in ${DEVICETREE}; do
 		DTS_NAME=`basename -s .dts ${DTS_FILE}`
-		for d in ${KERNEL_DTS_INCLUDE}; do
-			dtc_include="${dtc_include} -i $d"
-			cpp_include="${cpp_include} -I${d}"
-		done
-		${CPP} -E -nostdinc -Ulinux -I${WORKDIR}/devicetree \
-			${cpp_include} -x assembler-with-cpp \
-			-o ${DTS_FILE}.pp ${DTS_FILE}
-		dtc -I dts -O dtb ${DEVICETREE_FLAGS} -i ${WORKDIR}/devicetree \
-			${dtc_include} -o ${DTS_NAME}.dtb ${DTS_FILE}.pp
+		${BUILD_CPP} ${DEVICETREE_PP_FLAGS} -o ${DTS_FILE}.pp ${DTS_FILE}
+		dtc -I dts -O dtb ${DEVICETREE_FLAGS} -o ${DTS_NAME}.dtb ${DTS_FILE}.pp
 	done
 }
 
