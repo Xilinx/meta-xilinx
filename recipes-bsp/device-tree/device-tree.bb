@@ -19,8 +19,15 @@ SRC_URI_append_zynq = " file://common/zynq7-base.dtsi"
 S = "${WORKDIR}"
 
 KERNEL_DTS_INCLUDE ??= ""
-KERNEL_DTS_INCLUDE_zynq = "${STAGING_KERNEL_DIR}/arch/arm/boot/dts"
-KERNEL_DTS_INCLUDE_zynqmp = "${STAGING_KERNEL_DIR}/arch/arm/boot/dts ${STAGING_KERNEL_DIR}/arch/arm64/boot/dts/xilinx"
+KERNEL_DTS_INCLUDE_zynq = " \
+		${STAGING_KERNEL_DIR}/arch/arm/boot/dts \
+		${STAGING_KERNEL_DIR}/arch/arm/boot/dts/include \
+		"
+KERNEL_DTS_INCLUDE_zynqmp = " \
+		${STAGING_KERNEL_DIR}/arch/arm64/boot/dts \
+		${STAGING_KERNEL_DIR}/arch/arm64/boot/dts/include \
+		${STAGING_KERNEL_DIR}/arch/arm64/boot/dts/xilinx \
+		"
 
 python () {
     # auto add dependency on kernel tree
