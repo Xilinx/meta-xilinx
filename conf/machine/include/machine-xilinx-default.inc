@@ -24,6 +24,7 @@ PREFERRED_PROVIDER_virtual/bootloader ??= "${XILINX_DEFAULT_UBOOT}"
 
 UBOOT_SUFFIX ?= "img"
 UBOOT_SUFFIX_zynqmp ?= "bin"
+UBOOT_SUFFIX_microblaze ?= "bin"
 UBOOT_BINARY ?= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_ELF ?= "u-boot"
 UBOOT_ELF_aarch64 ?= "u-boot.elf"
