@@ -16,7 +16,7 @@ KBUILD_DEFCONFIG_microblaze = "mmu_defconfig"
 KCONFIG_MODE = "--alldefconfig"
 
 PREFERRED_PROVIDER_virtual/kernel ??= "${XILINX_DEFAULT_KERNEL}"
-PREFERRED_VERSION_linux-xlnx ?= "4.0%"
+PREFERRED_VERSION_linux-xlnx ?= "4.4%"
 
 # U-Boot Configuration
 XILINX_DEFAULT_UBOOT := "u-boot-xlnx"
