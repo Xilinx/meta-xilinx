@@ -10,3 +10,4 @@ KERNEL_IMAGETYPE ?= "Image"
 # KMACHINE
 KMACHINE ?= "zynqmp"
 
+XSERVER_append = "xf86-video-armsoc"
