@@ -20,7 +20,7 @@ Using the U-Boot console; load the Kernel, RootFS and the DTB into memory.
 And then boot Linux using the 'bootm' command. (Note the load addresses will
 be dependant on machine used)
 
-For MicroBlaze (kc705-trd-microblazeel):
+For MicroBlaze (kc705-microblazeel):
 	U-Boot> tftp 0x85000000 linux.bin.ub
 	U-Boot> tftp 0x86000000 core-image-minimal-<machine name>.cpio.gz.u-boot
 	U-Boot> tftp 0x84000000 linux.bin.ub-<machine name>.dtb
