@@ -13,7 +13,6 @@ BRANCH = "master"
 SRC_URI = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https;branch=${BRANCH}"
 
 # This points at the 'xilinx-v2016.1' tag
-# This will be updated when the ATF is released
 SRCREV ?= "9681f857302bb64ad440e287799d3088e5e10f3a"
 
 PV = "1.1+xilinx+git${SRCPV}"
