@@ -13,8 +13,5 @@ LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce
 SRCREV_DEFAULT = "4942ae4d03ee4ef4b2dd750d441f730150ee9288"
 SRCREV ?= "${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/bootloader", "u-boot-xlnx-dev", "${AUTOREV}", "${SRCREV_DEFAULT}", d)}"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-xlnx:"
-SRC_URI_append_kc705-trd-microblazeel = " file://microblaze-kc705-trd-Convert-microblaze-generic-to-k.patch"
-
 PV = "${UBRANCH}${XILINX_EXTENSION}+git${SRCPV}"
 
