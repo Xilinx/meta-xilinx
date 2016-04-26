@@ -1,7 +1,6 @@
 LINUX_VERSION = "4.4"
-# Current bleeding edge of master linux-xlnx
-# Will be updated to v4.4 kernel once it is released
-SRCREV ?="9c1d9104c4cd786ac80151bc11f548ca46c5f098"
+# This points to released tag xilinx-v2016.1
+SRCREV ?="dd7c1f0b5c23bcac5046d77bd5e0631e657003a4"
 
 include linux-xlnx.inc
 
