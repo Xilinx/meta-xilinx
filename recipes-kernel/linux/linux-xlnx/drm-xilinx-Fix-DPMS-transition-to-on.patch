@@ -1,0 +1,46 @@
+From e4264e80116684297e353f6da4156c4ad6f8a03a Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan@nathanrossi.com>
+Date: Mon, 2 May 2016 23:46:42 +1000
+Subject: [PATCH] drm: xilinx: Fix DPMS transition to on
+
+Fix the issues where the VTC is reset (losing its timing config) as well
+as fixing the issue where the plane destroys its DMA descriptor but
+never recreates it when turning back on.
+
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+Upstream-Status: Pending [This is a workaround]
+---
+ drivers/gpu/drm/xilinx/xilinx_drm_crtc.c  | 2 +-
+ drivers/gpu/drm/xilinx/xilinx_drm_plane.c | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/xilinx/xilinx_drm_crtc.c b/drivers/gpu/drm/xilinx/xilinx_drm_crtc.c
+index 5925d11..ddb75fc 100644
+--- a/drivers/gpu/drm/xilinx/xilinx_drm_crtc.c
++++ b/drivers/gpu/drm/xilinx/xilinx_drm_crtc.c
+@@ -78,7 +78,7 @@ static void xilinx_drm_crtc_dpms(struct drm_crtc *base_crtc, int dpms)
+ 	default:
+ 		if (crtc->vtc) {
+ 			xilinx_vtc_disable(crtc->vtc);
+-			xilinx_vtc_reset(crtc->vtc);
++			/*xilinx_vtc_reset(crtc->vtc);*/
+ 		}
+ 		if (crtc->cresample) {
+ 			xilinx_cresample_disable(crtc->cresample);
+diff --git a/drivers/gpu/drm/xilinx/xilinx_drm_plane.c b/drivers/gpu/drm/xilinx/xilinx_drm_plane.c
+index 8a86735..6de8eb7 100644
+--- a/drivers/gpu/drm/xilinx/xilinx_drm_plane.c
++++ b/drivers/gpu/drm/xilinx/xilinx_drm_plane.c
+@@ -146,7 +146,8 @@ void xilinx_drm_plane_dpms(struct drm_plane *base_plane, int dpms)
+ 		}
+ 
+ 		/* start dma engine */
+-		dma_async_issue_pending(plane->dma.chan);
++		/*dma_async_issue_pending(plane->dma.chan);*/
++		xilinx_drm_plane_commit(base_plane);
+ 
+ 		if (plane->rgb2yuv)
+ 			xilinx_rgb2yuv_enable(plane->rgb2yuv);
+-- 
+2.8.1
+
