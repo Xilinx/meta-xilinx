@@ -56,6 +56,10 @@ do_install() {
 	done
 }
 
+sysroot_stage_all () {
+	sysroot_stage_dir ${D}${PLATFORM_INIT_DIR} ${SYSROOT_DESTDIR}/${PLATFORM_INIT_DIR}
+}
+
 do_deploy () {
 	if [ -e ${D}/download.bit ]; then
 		install -d ${DEPLOY_DIR_IMAGE}
