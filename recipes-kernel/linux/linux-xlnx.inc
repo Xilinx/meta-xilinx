@@ -22,3 +22,4 @@ DESCRIPTION = "Xilinx Kernel"
 
 require linux-xilinx-machines.inc
 
+KERNEL_FEATURES_append_zynqmp = " zynqmp.scc"
