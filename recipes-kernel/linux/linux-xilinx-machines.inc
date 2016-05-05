@@ -5,9 +5,6 @@ COMPATIBLE_MACHINE_zynqmp = "zynqmp"
 COMPATIBLE_MACHINE_microblaze = "microblaze"
 
 # Default kernel config fragements for specific machines
-KERNEL_FEATURES_append_qemumicroblaze = " bsp/qemumicroblaze/qemumicroblaze.scc"
-KERNEL_FEATURES_append_qemumicroblaze-s3adsp1800 = " bsp/qemumicroblaze-s3adsp1800/qemumicroblaze-s3adsp1800.scc"
-KERNEL_FEATURES_append_kc705-microblazeel = " bsp/kc705-microblazeel/kc705-microblazeel.scc"
 
 # MicroBlaze is a uImage target, but its not called 'uImage' instead it is called 'linux.bin.ub'
 python () {
