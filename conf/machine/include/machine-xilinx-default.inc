@@ -35,3 +35,4 @@ UBOOT_BINARY ?= "u-boot${UBOOT_OFEMBED}.${UBOOT_SUFFIX}"
 UBOOT_ELF ?= "u-boot"
 UBOOT_ELF_aarch64 ?= "u-boot.elf"
 
+MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS_zynqmp += "kernel-module-mali-modules"
