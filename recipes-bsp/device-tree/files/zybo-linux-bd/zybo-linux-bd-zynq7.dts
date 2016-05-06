@@ -1,6 +1,7 @@
 /dts-v1/;
 /include/ "skeleton.dtsi"
 /include/ "zynq-7000.dtsi"
+/include/ "zynq-7000-qspi-dummy.dtsi"
 /include/ "pcw.dtsi"
 /include/ "pl.dtsi"
 

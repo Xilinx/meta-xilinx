@@ -1,5 +1,6 @@
 /dts-v1/;
 /include/ "zynq-7000.dtsi"
+/include/ "zynq-7000-qspi-dummy.dtsi"
 
 / {
 	model = "Zynq A9 QEMU";
@@ -28,9 +29,6 @@
 		compatible = "fixed-clock";
 		clock-frequency = <25000000>;
 	};
-
-	/* empty defintion for kernels that don't have qspi node */
-	qspi: spi@e000d000 { };
 };
 
 &gem0 {

@@ -22,7 +22,10 @@ DEVICETREE_PP_FLAGS ?= "-nostdinc -Ulinux \
 		"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-SRC_URI_append_zynq = " file://common/zynq7-base.dtsi"
+MACHINE_DEVICETREE_prepend_zynq = " \
+		common/zynq-7000-qspi-dummy.dtsi \
+		common/zynq7-base.dtsi \
+		"
 
 S = "${WORKDIR}"
 
