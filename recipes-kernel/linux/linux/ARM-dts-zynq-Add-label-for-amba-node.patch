@@ -1,0 +1,27 @@
+From d50be0b34c21d763d2fa17998e7f236f69c850bc Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan@nathanrossi.com>
+Date: Fri, 6 May 2016 23:09:53 +1000
+Subject: [PATCH] ARM: dts: zynq: Add label for amba node
+
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+Upstream-Status: Backport [backport part of 6835fe484]
+---
+ arch/arm/boot/dts/zynq-7000.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/zynq-7000.dtsi b/arch/arm/boot/dts/zynq-7000.dtsi
+index 9ea54b3..8a4af9c 100644
+--- a/arch/arm/boot/dts/zynq-7000.dtsi
++++ b/arch/arm/boot/dts/zynq-7000.dtsi
+@@ -57,7 +57,7 @@
+ 		regulator-always-on;
+ 	};
+ 
+-	amba {
++	amba: amba {
+ 		compatible = "simple-bus";
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+-- 
+2.8.1
+
