@@ -1,4 +1,4 @@
-From 4054bfa9e7986c9b7d2bf70f9e10af9647e376fc Mon Sep 17 00:00:00 2001
+From 9b3c2f321954251e3eb0c908786d0b6953fe9f79 Mon Sep 17 00:00:00 2001
 From: Alistair Francis <alistair.francis@xilinx.com>
 Date: Thu, 18 Feb 2016 14:16:17 +0000
 Subject: [PATCH] target-arm: Add the pmceid0 and pmceid1 registers
@@ -62,10 +62,10 @@ diff --git a/target-arm/helper.c b/target-arm/helper.c
 index a420a2a..6a4ec01 100644
 --- a/target-arm/helper.c
 +++ b/target-arm/helper.c
-@@ -4380,6 +4380,22 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 3, .opc2 = 2,
+@@ -4324,6 +4324,22 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 3, .opc2 = 7,
                .access = PL1_R, .type = ARM_CP_CONST,
-               .resetvalue = cpu->mvfr2 },
+               .resetvalue = 0 },
 +            { .name = "PMCEID0", .state = ARM_CP_STATE_AA32,
 +              .cp = 15, .opc1 = 0, .crn = 9, .crm = 12, .opc2 = 6,
 +              .access = PL0_R, .accessfn = pmreg_access, .type = ARM_CP_CONST,
