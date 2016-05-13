@@ -22,6 +22,7 @@ PREFERRED_PROVIDER_virtual/bootloader ??= "${XILINX_DEFAULT_UBOOT}"
 
 UBOOT_SUFFIX ?= "img"
 UBOOT_SUFFIX_zynqmp ?= "bin"
+UBOOT_SUFFIX_microblaze ?= "bin"
 
 # u-boot-xlnx setups up all zynq configs to have embedded device trees (OF_EMBED=y)
 UBOOT_OFEMBED ?= ""
