@@ -1,0 +1,49 @@
+
+/ {
+	model = "Xilinx-KC705-AXI-full-2016.1";
+	hard-reset-gpios = <&reset_gpio 0 1>;
+	aliases {
+		serial0 = &rs232_uart;
+		ethernet0 = &axi_ethernet;
+	};
+	chosen {
+		bootargs = "console=ttyS0,115200 earlyprintk";
+		stdout-path = "serial0:115200ns";
+	};
+	memory {
+		device_type = "memory";
+		reg = <0x80000000 0x40000000>;
+	};
+};
+
+/include/ "pl.dtsi"
+&axi_ethernet {
+	local-mac-address = [00 0a 35 00 22 01];
+};
+
+&linear_flash {
+	reg = <0x60000000 0x08000000>;
+	#address-cells = <1>;
+	#size-cells = <1>;
+	partition@0x00000000 {
+		label = "fpga";
+		reg = <0x00000000 0x00b00000>;
+	};
+	partition@0x00b00000 {
+		label = "boot";
+		reg = <0x00b00000 0x00060000>;
+	};
+	partition@0x00b60000 {
+		label = "bootenv";
+		reg = <0x00b60000 0x00020000>;
+	};
+	partition@0x00b80000 {
+		label = "kernel";
+		reg = <0x00b80000 0x00c00000>;
+	};
+	partition@0x01780000 {
+		label = "spare";
+		reg = <0x01780000 0x00000000>;
+	};
+};
+
