@@ -7,20 +7,11 @@ Supported Boards/Machines
 =========================
 
 Boards Supported by this layer:
-	* Xilinx KC705 Embedded TRD (MicroBlaze)
+	* Xilinx KC705 Embedded (MicroBlaze)
 	* Xilinx ZC702 (Zynq)
 	* Xilinx ZC706 (Zynq)
-	* Xilinx EP108 (ZynqMP)
+	* Xilinx ZCU102 (ZynqMP)
 	* Avnet/Digilent ZedBoard (Zynq)
-	* Avnet MicroZed (Zynq)
-	* Avnet PicoZed (Zynq)
-	* Digilent Zybo (Zynq)
-
-QEMU Models Supported by this layer:
-	* qemumicroblaze (MicroBlaze)
-	* qemumicroblazeeb-s3adsp1800 (MicroBlaze)
-	* qemuzynq (Zynq)
-	* Xilinx EP108 (ZynqMP)
 
 (Please refer to the associate .conf for more information)
 
@@ -71,6 +62,12 @@ Build the target file system image using bitbake:
 
 Once complete the images for the target machine will be available in the output
 directory 'tmp/deploy/images'.
+
+MALI USERSPACE BINARIES
+=======================
+
+Please follow the instructions to include MALI 400 userspace binaries
+        http://www.wiki.xilinx.com/Adding+MALI+userspace+binaries+in+Yocto+builds
 
 Additional Documentation
 ========================
