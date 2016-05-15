@@ -7,14 +7,16 @@ Supported Boards/Machines
 =========================
 
 Boards Supported by this layer:
-	* Xilinx KC705 Embedded TRD (MicroBlaze)
+	* Xilinx KC705 (MicroBlaze)
 	* Xilinx ZC702 (Zynq)
 	* Xilinx ZC706 (Zynq)
+	* Xilinx ZCU102 (ZynqMP)
 	* Xilinx EP108 (ZynqMP)
 	* Avnet/Digilent ZedBoard (Zynq)
 	* Avnet MicroZed (Zynq)
 	* Avnet PicoZed (Zynq)
 	* Digilent Zybo (Zynq)
+		* Digilent Zybo Linux BD Reference Design (Zynq)
 
 QEMU Models Supported by this layer:
 	* qemumicroblaze (MicroBlaze)
