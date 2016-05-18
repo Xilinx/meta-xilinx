@@ -2,6 +2,9 @@
 
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc"
 
+# MicroBlaze cannot handle the execution of qemu-linux-user for gobject-introspection-data
+MACHINE_FEATURES_BACKFILL_CONSIDERED_append_microblaze = " qemu-usermode"
+
 # File System Configuration
 IMAGE_FSTYPES ?= "tar.gz cpio cpio.gz.u-boot"
 IMAGE_CLASSES += "image_types_uboot"
