@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
 
 S = "${WORKDIR}/${BPN}-${PV}"
 
+SRC_URI = "${GNU_MIRROR}/gdb/gdb-${PV}.tar.gz"
 SRC_URI[md5sum] = "45b07b53d81832d32ccd4829465d4886"
 SRC_URI[sha256sum] = "eefadb9831e3695d1eaef34e98b8f1fb441df6fe5071317ea49c6bd6ba213eff"
 
