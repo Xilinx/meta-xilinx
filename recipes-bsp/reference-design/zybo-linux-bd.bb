@@ -45,6 +45,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit zynq7-platform-paths
 
+SYSROOT_DIRS += "${PLATFORM_INIT_DIR}"
+
 do_install() {
 	fn=$(unzip -l ${S}/${HDF} | awk '{print $NF}' | grep ".bit$")
 	unzip -o ${S}/${HDF} ${fn} -d ${D}
@@ -54,10 +56,6 @@ do_install() {
 	for fn in ${PLATFORM_INIT}; do
 		unzip -o ${S}/${HDF} ${fn} -d ${D}${PLATFORM_INIT_DIR}
 	done
-}
-
-sysroot_stage_all () {
-	sysroot_stage_dir ${D}${PLATFORM_INIT_DIR} ${SYSROOT_DESTDIR}/${PLATFORM_INIT_DIR}
 }
 
 do_deploy () {

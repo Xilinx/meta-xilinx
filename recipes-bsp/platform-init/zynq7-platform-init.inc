@@ -5,16 +5,14 @@ PROVIDES += "virtual/zynq7-platform-init"
 INHIBIT_DEFAULT_DEPS = "1"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+SYSROOT_DIRS += "${PLATFORM_INIT_DIR}"
+
 do_compile() {
 	:
 }
 
 do_install() {
 	install -d ${D}${PLATFORM_INIT_DIR}
-}
-
-python sysroot_stage_all () {
-    oe.path.copytree(d.expand("${D}${PLATFORM_INIT_DIR}"), d.expand("${SYSROOT_DESTDIR}${PLATFORM_INIT_DIR}"))
 }
 
 FILES_${PN} += " \
