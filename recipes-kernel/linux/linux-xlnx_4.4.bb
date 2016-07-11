@@ -1,6 +1,6 @@
 LINUX_VERSION = "4.4"
-# This points to released tag xilinx-v2016.1.01
-SRCREV ?="89cc643affcce18122373fe7c78e780526243fdf"
+# This points to released tag xilinx-v2016.2
+SRCREV ?="dfb97bc345e323f2851022be24b0846183d158cc"
 
 include linux-xlnx.inc
 
