@@ -7,6 +7,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit deploy
 
+DEPENDS += "u-boot-mkimage-native"
+
 S = "${WORKDIR}/git"
 
 BRANCH = "master"
@@ -45,5 +47,6 @@ do_deploy() {
 	install -d ${DEPLOYDIR}
 	install -m 0644 ${S}/build/${PLATFORM}/release/bl31/bl31.elf ${DEPLOYDIR}/bl31-${MACHINE}.elf
 	install -m 0644 ${S}/build/${PLATFORM}/release/bl31.bin ${DEPLOYDIR}/bl31-${MACHINE}.bin
+	mkimage -A arm64 -O linux -T kernel -C none -a 0xfffe5000 -e 0xfffe5000 -d ${S}/build/${PLATFORM}/release/bl31.bin ${DEPLOYDIR}/atf.ub
 }
 addtask deploy before do_build after do_compile
