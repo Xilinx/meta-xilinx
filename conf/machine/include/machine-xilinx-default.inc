@@ -36,5 +36,5 @@ UBOOT_ELF ?= "u-boot"
 UBOOT_ELF_aarch64 ?= "u-boot.elf"
 
 # kernel modules for ZynqMP
-MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS_append_zynqmp = " kernel-module-mali-modules"
+MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS_append_zynqmp = " kernel-module-mali"
 
