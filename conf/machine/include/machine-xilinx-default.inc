@@ -32,3 +32,13 @@ UBOOT_ELF ?= "u-boot"
 UBOOT_ELF_aarch64 ?= "u-boot.elf"
 
 MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS_zynqmp += "kernel-module-mali-modules"
+
+XSERVER ?= " \
+        xserver-xorg \
+        xf86-input-evdev \
+        xf86-input-mouse \
+        xf86-input-keyboard \
+        xf86-video-fbdev \
+        "
+
+XSERVER_EXT_zynqmp ?= "${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'xserver-xorg-extension-glx', '', d)}"
