@@ -451,7 +451,7 @@ emit_config() {
 		conf@${1} {
 			description = "${conf_desc}";
 			${kernel_line}${fdt_line}
-			hash at 1 {
+			hash@1 {
 				algo = "${conf_csum}";
 			};
 EOF
