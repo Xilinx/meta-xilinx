@@ -72,6 +72,7 @@ IMAGE_CMD_xilinx-fitimage () {
 	ln -sf ${its_base_name} ${DEPLOY_DIR_IMAGE}/${its_symlink_name}
 }
 
+do_assemble_xilinx_fitimage[vardepsexclude] = "DEPLOY_DIR_IMAGE  XILINXBASE FITIMAGE_KERNELIMG FITIMAGE_DTBIMG"
 do_assemble_xilinx_fitimage() {
 	if [ -z "${FITIMAGE_DTBIMG}" ]; then
 		bbfatal "No dtb was defined, Please set FITIMAGE_DTBIMG appropriately."
