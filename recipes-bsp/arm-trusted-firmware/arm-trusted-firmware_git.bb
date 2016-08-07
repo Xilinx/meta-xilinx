@@ -13,7 +13,7 @@ BRANCH = "master"
 SRC_URI = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https;branch=${BRANCH}"
 
 # This points at the 'xilinx-v2016.1' tag
-SRCREV ?= "9681f857302bb64ad440e287799d3088e5e10f3a"
+SRCREV ?= "${AUTOREV}"
 
 PV = "1.2+xilinx+git${SRCPV}"
 
