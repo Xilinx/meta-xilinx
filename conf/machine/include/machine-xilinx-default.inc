@@ -36,5 +36,7 @@ UBOOT_ELF ?= "u-boot"
 UBOOT_ELF_aarch64 ?= "u-boot.elf"
 
 # kernel modules for ZynqMP
-MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS_append_zynqmp = " kernel-module-mali"
+MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS_append_zynqmp = " \
+		${@bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-xlnx', 'kernel-module-mali', '', d)} \
+		"
 
