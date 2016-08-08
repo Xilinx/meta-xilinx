@@ -13,7 +13,7 @@ IMAGE_CLASSES += "image_types_uboot"
 XILINX_DEFAULT_KERNEL := "linux-xlnx"
 
 PREFERRED_PROVIDER_virtual/kernel ??= "${XILINX_DEFAULT_KERNEL}"
-PREFERRED_VERSION_linux-xlnx ?= "4.4%"
+PREFERRED_VERSION_linux-xlnx ?= "4.6%"
 
 # U-Boot Configuration
 XILINX_DEFAULT_UBOOT := "u-boot-xlnx"
@@ -31,7 +31,7 @@ UBOOT_BINARY ?= "u-boot${UBOOT_OFEMBED}.${UBOOT_SUFFIX}"
 UBOOT_ELF ?= "u-boot"
 UBOOT_ELF_aarch64 ?= "u-boot.elf"
 
-MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS_zynqmp += "kernel-module-mali-modules"
+MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS_append_zynqmp = " kernel-module-mali"
 
 XSERVER ?= " \
         xserver-xorg \
