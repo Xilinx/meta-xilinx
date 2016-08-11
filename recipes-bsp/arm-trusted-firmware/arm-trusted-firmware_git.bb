@@ -3,6 +3,8 @@ DESCRIPTION = "ARM Trusted Firmware"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://license.md;md5=829bdeb34c1d9044f393d5a16c068371"
 
+PROVIDES = "virtual/atf"
+
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit deploy
