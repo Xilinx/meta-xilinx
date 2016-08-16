@@ -22,6 +22,9 @@ DEVICETREE_PP_FLAGS ?= "-nostdinc -Ulinux \
 		"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+MACHINE_DEVICETREE_prepend_zynq = " \
+		qemu/zynq-7000-qspi-dummy.dtsi \
+		"
 
 S = "${WORKDIR}"
 
