@@ -8,6 +8,7 @@ MACHINE_FEATURES_BACKFILL_CONSIDERED_append_microblaze = " qemu-usermode"
 # File System Configuration
 IMAGE_FSTYPES ?= "tar.gz cpio cpio.gz.u-boot"
 IMAGE_CLASSES += "image_types_uboot"
+EXTRA_IMAGEDEPENDS_append_zynqmp = " arm-trusted-firmware"
 
 # Kernel Configuration
 XILINX_DEFAULT_KERNEL := "linux-xlnx"
