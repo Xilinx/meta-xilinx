@@ -43,7 +43,7 @@ do_install() {
 
 do_deploy() {
 	install -d ${DEPLOYDIR}
-	install -m 0644 ${S}/build/${PLATFORM}/release/bl31/bl31.elf ${DEPLOYDIR}/bl31-${MACHINE}.elf
-	install -m 0644 ${S}/build/${PLATFORM}/release/bl31.bin ${DEPLOYDIR}/bl31-${MACHINE}.bin
+	install -m 0644 ${S}/build/${PLATFORM}/release/bl31/bl31.elf ${DEPLOYDIR}/bl31-${PACKAGE_ARCH}.elf
+	install -m 0644 ${S}/build/${PLATFORM}/release/bl31.bin ${DEPLOYDIR}/bl31-${PACKAGE_ARCH}.bin
 }
 addtask deploy before do_build after do_compile
