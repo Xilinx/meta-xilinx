@@ -3,12 +3,13 @@ HOMEPAGE = "https://github.com/xilinx/qemu-devicetrees/"
 LICENSE = "BSD"
 DEPENDS += "dtc-native"
 
+inherit deploy
+
 LIC_FILES_CHKSUM = "file://README;md5=0f52b512c21e3541b90ca9fa39aff8fe"
 
-SRCREV = "643dbd197187d5eb865d48c9883b654155c846f7"
+SRCREV = "46faf58cd14cdfd06cae7c076cb486af8565ab6a"
 SRC_URI = "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https;nobranch=1  \
           "
-
 S = "${WORKDIR}/git"
 
 FILES_${PN} += " \
@@ -23,11 +24,14 @@ do_deploy() {
 
        for DTS_FILE in ${S}/LATEST/SINGLE_ARCH/*.dtb; do
                DTS_NAME=`basename -s .dtb ${DTS_FILE}`
-               install -m 0644 ${S}/LATEST/SINGLE_ARCH/${DTS_NAME}.dtb ${DEPLOY_DIR_IMAGE}/qemu-hw-devicetrees/${DTS_NAME}-single.dtb
+               install -m 0644 ${S}/LATEST/SINGLE_ARCH/${DTS_NAME}.dtb \
+                     ${DEPLOY_DIR_IMAGE}/qemu-hw-devicetrees/${DTS_NAME}-single.dtb
        done
+
        for DTS_FILE in ${S}/LATEST/MULTI_ARCH/*.dtb; do
                DTS_NAME=`basename -s .dtb ${DTS_FILE}`
-               install -m 0644 ${S}/LATEST/MULTI_ARCH/${DTS_NAME}.dtb ${DEPLOY_DIR_IMAGE}/qemu-hw-devicetrees/${DTS_NAME}-multi.dtb
+               install -m 0644 ${S}/LATEST/MULTI_ARCH/${DTS_NAME}.dtb \
+                            ${DEPLOY_DIR_IMAGE}/qemu-hw-devicetrees/${DTS_NAME}-multi.dtb
        done
 }
 
