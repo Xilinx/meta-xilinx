@@ -488,13 +488,13 @@ config_qemush4() {
 
 config_qemuzynq() {
     set_mem_size 1024
-    QEMU=qemu-system-arm
+    QEMU=qemu-system-aarch64
     QEMU_NETWORK_CMD="-net nic -net nic $QEMU_TAP_CMD"
-    QEMU_SYSTEM_OPTIONS="$QEMU_NETWORK_CMD -M xilinx-zynq-a9 -serial null -serial mon:stdio -nographic -dtb $KERNEL-$MACHINE.dtb"
+    QEMU_SYSTEM_OPTIONS="$QEMU_NETWORK_CMD -M arm-generic-fdt-plnx -serial null -serial mon:stdio -nographic -dtb $KERNEL-$MACHINE.dtb"
     # zynq serial ports are named 'ttyPS0' and 'ttyPS1', fixup the default values
     SCRIPT_KERNEL_OPT=$(echo "$SCRIPT_KERNEL_OPT" | sed 's/console=ttyS/console=ttyPS/g')
     if [ "${FSTYPE:0:3}" = "ext" -o "${FSTYPE:0:4}" = "cpio" ]; then
-        KERNCMDLINE="earlyprintk root=/dev/ram rw $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY"
+        KERNCMDLINE="earlyprintk root=/dev/ram rw mem=$QEMU_MEMORY"
         QEMUOPTIONS="$QEMU_SYSTEM_OPTIONS -initrd $ROOTFS"
     fi
 }
@@ -523,8 +523,12 @@ config_qemuzynqmp() {
 }
 
 config_qemumicroblaze() {
-    set_mem_size 256
+    # We don't actually need 2GB, but the RAM offset in the image is wrong
+    # So we need to do this to ensure the kernel executes from memory
+    set_mem_size 2048
     QEMU=qemu-system-microblazeel
+
+    QEMU_NETWORK_CMD=""
     QEMU_SYSTEM_OPTIONS="$QEMU_NETWORK_CMD -M petalogix-ml605 -serial mon:stdio"
     if [ "${FSTYPE:0:3}" = "ext" -o "${FSTYPE:0:4}" = "cpio" ]; then
         KERNCMDLINE="earlyprintk root=/dev/ram rw $KERNEL_NETWORK_CMD mem=$QEMU_MEMORY"
