@@ -12,8 +12,8 @@ S = "${WORKDIR}/git"
 BRANCH = "master"
 SRC_URI = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https;branch=${BRANCH}"
 
-# This points at the 'xilinx-v2016.1' tag
-SRCREV ?= "${AUTOREV}"
+# This points at the 'xilinx-v2016.3-rc1' tag
+SRCREV ?= "7919085aa98b1645677305ed8071bff8af8aa014"
 
 PV = "1.2+xilinx+git${SRCPV}"
 
