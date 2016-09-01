@@ -43,5 +43,3 @@ XSERVER ?= " \
 
 XSERVER_EXT_zynqmp ?= "${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'xserver-xorg-extension-glx', '', d)}"
 
-PREFERRED_VERSION_qemu = "2.2.5"
-PREFERRED_VERSION_qemu-native = "2.2.5"
