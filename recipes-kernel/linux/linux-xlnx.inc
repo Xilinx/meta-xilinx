@@ -23,7 +23,7 @@ require linux-xilinx-configs.inc
 require linux-xilinx-machines.inc
 
 KBUILD_DEFCONFIG_zcu102-zynqmp = "xilinx_zynqmp_defconfig"
-KCONFIG_MODE_zcu102-zynqmp = "--alldefconfig"
+KCONFIG_MODE_zcu102-zynqmp = "alldefconfig"
 
 KERNEL_FEATURES_append = " bsp/xilinx/soc/linux-xlnx/drivers/xilinx.scc"
 KERNEL_FEATURES_append_zynq = " bsp/xilinx/soc/linux-xlnx/drivers/zynq7.scc"
