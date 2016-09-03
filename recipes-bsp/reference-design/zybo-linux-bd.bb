@@ -44,6 +44,7 @@ BITSTREAM ?= "bitstream-${PV}-${PR}.bit"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit zynq7-platform-paths
+inherit deploy
 
 SYSROOT_DIRS += "${PLATFORM_INIT_DIR}"
 
@@ -60,11 +61,11 @@ do_install() {
 
 do_deploy () {
 	if [ -e ${D}/download.bit ]; then
-		install -d ${DEPLOY_DIR_IMAGE}
-		install -m 0644 ${D}/download.bit ${DEPLOY_DIR_IMAGE}/${BITSTREAM}
-		ln -sf ${BITSTREAM} ${DEPLOY_DIR_IMAGE}/download.bit
+		install -d ${DEPLOYDIR}
+		install -m 0644 ${D}/download.bit ${DEPLOYDIR}/${BITSTREAM}
+		ln -sf ${BITSTREAM} ${DEPLOYDIR}/download.bit
 		# for u-boot 2016.3 with spl load bitstream patch
-		ln -sf ${BITSTREAM} ${DEPLOY_DIR_IMAGE}/bitstream
+		ln -sf ${BITSTREAM} ${DEPLOYDIR}/bitstream
 	fi
 }
 addtask deploy before do_build after do_install
