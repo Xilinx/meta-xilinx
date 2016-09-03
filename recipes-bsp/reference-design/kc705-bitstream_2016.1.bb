@@ -8,6 +8,8 @@ LIC_FILES_CHKSUM = "file://implementation/system.mmi;md5=1992d9c9006c524f4178949
 
 COMPATIBLE_MACHINE = "kc705-microblazeel"
 
+inherit deploy
+
 SRC_URI = "http://www.xilinx.com/support/documentation/boards_and_kits/k7_emb/2016_1/xilinx-kc705-axi-full-2016.1.tar"
 SRC_URI[md5sum] = "59ade57ab0a15c8700c129f040fe4c75"
 SRC_URI[sha256sum] = "8e3e5c5d30e6d02eaa58cb6e9255b8d6456857185744904fb931e3d8e44ba62e"
@@ -32,9 +34,9 @@ do_compile() {
 }
 
 do_deploy () {
-	install -d ${DEPLOY_DIR_IMAGE}
+	install -d ${DEPLOYDIR}
 	if [ -e ${D}/boot/download.bit ]; then
-		install ${D}/boot/download.bit ${DEPLOY_DIR_IMAGE}/download.bit
+		install ${D}/boot/download.bit ${DEPLOYDIR}/download.bit
 	fi
 }
 
