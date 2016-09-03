@@ -26,7 +26,7 @@ Boards/Machines supported by this layer:
   * [Digilent Zybo Linux BD](conf/machine/zybo-linux-bd-zynq7.conf) - `zybo-linux-bd-zynq7`
  * ZynqMP:
   * [Xilinx EP108](conf/machine/ep108-zynqmp.conf) - `ep108-zynqmp` (QEMU support)
-  * [Xilinx ZCU102](conf/machine/zcu102-zynqmp.conf) - `zcu102-zynqmp`
+  * [Xilinx ZCU102](conf/machine/zcu102-zynqmp.conf) - `zcu102-zynqmp` (QEMU support)
 
 Additional information on Xilinx architectures can be found at:
 	http://www.xilinx.com/support/index.htm
