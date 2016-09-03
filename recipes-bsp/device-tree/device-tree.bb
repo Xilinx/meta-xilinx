@@ -5,6 +5,8 @@ SECTION = "bsp"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
+inherit deploy
+
 INHIBIT_DEFAULT_DEPS = "1"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -95,8 +97,8 @@ do_deploy() {
 			continue
 		fi
 		DTS_NAME=`basename -s .dts ${DTS_FILE}`
-		install -d ${DEPLOY_DIR_IMAGE}
-		install -m 0644 ${B}/${DTS_NAME}.dtb ${DEPLOY_DIR_IMAGE}/${DTS_NAME}.dtb
+		install -d ${DEPLOYDIR}
+		install -m 0644 ${B}/${DTS_NAME}.dtb ${DEPLOYDIR}/${DTS_NAME}.dtb
 	done
 }
 
@@ -106,7 +108,7 @@ do_deploy_append() {
 	if [ ! -z "${DEPLOY_KERNEL_DTB}" -a ! -z "${KERNEL_IMAGETYPE}" ]; then
 		for DTS_FILE in ${DEVICETREE}; do
 			DTS_NAME=`basename -s .dts ${DTS_FILE}`
-			KERNELDTBPATH=${DEPLOY_DIR_IMAGE}/${KERNEL_IMAGETYPE}-${DTS_NAME}.dtb
+			KERNELDTBPATH=${DEPLOYDIR}/${KERNEL_IMAGETYPE}-${DTS_NAME}.dtb
 			if [ ! -e ${KERNELDTBPATH} -o -h ${KERNELDTBPATH} ]; then
 				ln -sf ${DTS_NAME}.dtb ${KERNELDTBPATH}
 			fi
