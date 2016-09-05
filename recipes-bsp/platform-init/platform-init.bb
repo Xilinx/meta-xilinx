@@ -9,7 +9,7 @@ COMPATIBLE_MACHINE = "$^"
 COMPATIBLE_MACHINE_picozed-zynq7 = "picozed-zynq7"
 
 LICENSE = "GPLv2+"
-LIC_FILES_CHKSUM = "files://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 
 SRC_URI = "file://ps7_init_gpl.c file://ps7_init_gpl.h"
 
