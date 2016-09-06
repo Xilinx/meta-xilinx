@@ -607,6 +607,8 @@ if [ "$TCPSERIAL_PORTNUM" != "" ]; then
 fi
 
 PATH=$OECORE_NATIVE_SYSROOT/usr/bin:$PATH
+# Default to Xilinx's QEMU if possible
+PATH=$OECORE_NATIVE_SYSROOT/usr/bin/qemu-xilinx:$PATH
 
 QEMUBIN=`which $QEMU 2> /dev/null`
 if [ ! -x "$QEMUBIN" ]; then
