@@ -9,13 +9,18 @@ do_configure_prepend() {
 			cp ${PLATFORM_INIT_STAGE_DIR}/ps7_init_gpl.h ${S}/board/xilinx/zynq/
 			cp ${PLATFORM_INIT_STAGE_DIR}/ps7_init_gpl.c ${S}/board/xilinx/zynq/
 		fi
-		if [ -n "${FORCE_PS7INIT}" -a -d "${S}/board/xilinx/zynq/${FORCE_PS7INIT}_hw_platform/" ]; then
-			# overwrite the existing platforms ps7_init files
-			cp ${PLATFORM_INIT_STAGE_DIR}/ps7_init_gpl.h ${S}/board/xilinx/zynq/${FORCE_PS7INIT}_hw_platform/
-			cp ${PLATFORM_INIT_STAGE_DIR}/ps7_init_gpl.c ${S}/board/xilinx/zynq/${FORCE_PS7INIT}_hw_platform/
+		if [ -n "${FORCE_PS7INIT}" ]; then
+			# overwrite all the existing platforms ps7_init files, this is a shotgun approach and only works due to
+			# u-boot being built for each machine seperately with seperate source directories.
+			for i in ${S}/board/xilinx/zynq/*/; do
+				cp ${PLATFORM_INIT_STAGE_DIR}/ps7_init_gpl.h $i
+				cp ${PLATFORM_INIT_STAGE_DIR}/ps7_init_gpl.c $i
+			done
 		fi
 	fi
 }
+
+FORCE_PS7INIT[doc] = "This variable is used to force the overriding of all ps7_init_gpl.* files in u-boot source with what is provided by virtual/zynq7-platform-init."
 
 python () {
 	# Determine if target machine needs to provide a custom ps7_init_gpl.*
