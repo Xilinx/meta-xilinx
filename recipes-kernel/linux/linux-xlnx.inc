@@ -16,6 +16,7 @@ SRC_URI = " \
 
 SRC_URI_append_zynqmp += "${@base_contains('DISTRO_FEATURES', 'xen', ' file://zynqmp/xen/xen.scc', '', d)}"
 SRC_URI_append_kc705-microblazeel += "file://kc705-microblazeel/kc705-microblazeel.scc"
+SRC_URI_append_qemumicroblaze += "file://qemumicroblaze/qemumicroblaze.scc"
 
 SRCREV_machine ?= "${SRCREV}"
 
