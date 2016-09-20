@@ -102,20 +102,6 @@ do_deploy() {
 	done
 }
 
-# Deploy ${KERNEL_IMAGETYPE}-${DTS_NAME}.dtb for compatibility with runqemu
-DEPLOY_KERNEL_DTB_qemuzynq = "1"
-do_deploy_append() {
-	if [ ! -z "${DEPLOY_KERNEL_DTB}" -a ! -z "${KERNEL_IMAGETYPE}" ]; then
-		for DTS_FILE in ${DEVICETREE}; do
-			DTS_NAME=`basename -s .dts ${DTS_FILE}`
-			KERNELDTBPATH=${DEPLOYDIR}/${KERNEL_IMAGETYPE}-${DTS_NAME}.dtb
-			if [ ! -e ${KERNELDTBPATH} -o -h ${KERNELDTBPATH} ]; then
-				ln -sf ${DTS_NAME}.dtb ${KERNELDTBPATH}
-			fi
-		done
-	fi
-}
-
 addtask deploy before do_build after do_install
 
 inherit xilinx-utils
