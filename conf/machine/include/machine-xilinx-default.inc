@@ -29,7 +29,7 @@ UBOOT_SUFFIX_microblaze ?= "bin"
 
 # u-boot-xlnx setups up all zynq configs to have embedded device trees (OF_EMBED=y)
 UBOOT_OFEMBED ?= ""
-UBOOT_OFEMBED_zynq ?= "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/bootloader', 'u-boot-xlnx', '', '-dtb', d)}"
+UBOOT_OFEMBED_zynq ?= "${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/bootloader', 'u-boot-xlnx u-boot-xlnx-dev', '', '-dtb', d)}"
 
 UBOOT_BINARY ?= "u-boot${UBOOT_OFEMBED}.${UBOOT_SUFFIX}"
 UBOOT_ELF ?= "u-boot"
