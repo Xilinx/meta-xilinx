@@ -1,0 +1,103 @@
+From 86090b41b2fd86c5b5391fac9f5785e79fe177c2 Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan@nathanrossi.com>
+Date: Sat, 24 Sep 2016 22:07:42 +1000
+Subject: [PATCH] bfd/elf32-microblaze.c: Fix regression with RELA* values
+ being wrong
+
+Commit 4ade44b727ee77adaa9c22719935d012e253a5e6 introduced a change
+to microblaze where the section was accessed from dynamic sections
+instead of from the output bfd. This meant that for some shared objects
+(mainly executables) the .rela.dyn section was not available, causing
+the DT_RELA* table entries to be set to 0.
+
+This change modifies how microblaze handles the setting of the various
+dynamic table values. Specifically it lets the generic final function
+handle setting RELA* values and modifies the RELASZ value of the dynamic
+table by subtracting the size of other DT_RELA type sections (this is
+how other targets handle the RELASZ value needing to only be the size of
+the .rela.dyn section). This resolves the regression mentioned above.
+
+Additionally this patch changes code for how dynamic table entries are
+modified for microblaze specific requirements. This makes the microblaze
+handling match how other targets modify the values.
+
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+Upstream-Status: Pending
+---
+ bfd/elf32-microblaze.c | 52 +++++++++++++++++++++++++++++---------------------
+ 1 file changed, 30 insertions(+), 22 deletions(-)
+
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index 5496d1613a..34e8ae4261 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -3381,36 +3381,44 @@ microblaze_elf_finish_dynamic_sections (bfd *output_bfd,
+       for (; dyncon < dynconend; dyncon++)
+         {
+           Elf_Internal_Dyn dyn;
+-          const char *name;
+-          bfd_boolean size;
++          asection *s;
+ 
+           bfd_elf32_swap_dyn_in (dynobj, dyncon, &dyn);
+ 
+           switch (dyn.d_tag)
+             {
+-            case DT_PLTGOT:   name = ".got.plt"; size = FALSE; break;
+-            case DT_PLTRELSZ: name = ".rela.plt"; size = TRUE; break;
+-            case DT_JMPREL:   name = ".rela.plt"; size = FALSE; break;
+-            case DT_RELA:     name = ".rela.dyn"; size = FALSE; break;
+-            case DT_RELASZ:   name = ".rela.dyn"; size = TRUE; break;
+-            default:	  name = NULL; size = FALSE; break;
+-            }
++            default:
++              break;
+ 
+-          if (name != NULL)
+-            {
+-              asection *s;
++            case DT_PLTGOT:
++              s = bfd_get_linker_section (dynobj, ".got.plt");
++              if (s != NULL)
++                dyn.d_un.d_ptr = s->output_section->vma + s->output_offset;
++              bfd_elf32_swap_dyn_out (output_bfd, &dyn, dyncon);
++              break;
+ 
+-              s = bfd_get_linker_section (dynobj, name);
+-              if (s == NULL)
+-                dyn.d_un.d_val = 0;
+-              else
+-                {
+-                  if (! size)
+-                    dyn.d_un.d_ptr = s->output_section->vma + s->output_offset;
+-                  else
+-                    dyn.d_un.d_val = s->size;
+-                }
++            case DT_PLTRELSZ:
++              s = bfd_get_linker_section (dynobj, ".rela.plt");
++              if (s != NULL)
++                dyn.d_un.d_val = s->size;
++              bfd_elf32_swap_dyn_out (output_bfd, &dyn, dyncon);
++              break;
++
++            case DT_JMPREL:
++              s = bfd_get_linker_section (dynobj, ".rela.plt");
++              if (s != NULL)
++                dyn.d_un.d_ptr = s->output_section->vma + s->output_offset;
++              bfd_elf32_swap_dyn_out (output_bfd, &dyn, dyncon);
++              break;
++
++            case DT_RELASZ:
++              /* The PLT relocs are not counted in the RELASZ value of the
++               * .dynamic table. */
++              s = bfd_get_linker_section (dynobj, ".rela.plt");
++              if (s != NULL)
++                dyn.d_un.d_val -= s->size;
+               bfd_elf32_swap_dyn_out (output_bfd, &dyn, dyncon);
++              break;
+             }
+         }
+ 
+-- 
+2.9.3
+
