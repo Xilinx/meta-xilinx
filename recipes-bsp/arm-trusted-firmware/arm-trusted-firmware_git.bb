@@ -43,10 +43,17 @@ do_install() {
 	:
 }
 
+OUTPUT_DIR = "${S}/build/${PLATFORM}/release"
+
 do_deploy() {
 	install -d ${DEPLOYDIR}
-	install -m 0644 ${S}/build/${PLATFORM}/release/bl31/bl31.elf ${DEPLOYDIR}/bl31-${MACHINE}.elf
-	install -m 0644 ${S}/build/${PLATFORM}/release/bl31.bin ${DEPLOYDIR}/bl31-${MACHINE}.bin
-	mkimage -A arm64 -O linux -T kernel -C none -a 0xfffe5000 -e 0xfffe5000 -d ${S}/build/${PLATFORM}/release/bl31.bin ${DEPLOYDIR}/atf.ub
+	install -m 0644 ${OUTPUT_DIR}/bl31/bl31.elf ${DEPLOYDIR}/bl31-${MACHINE}.elf
+	install -m 0644 ${OUTPUT_DIR}/bl31.bin ${DEPLOYDIR}/bl31-${MACHINE}.bin
+
+	# Get the entry point address from the elf.
+	BL31_BASE_ADDR=$(${READELF} -h ${OUTPUT_DIR}/bl31/bl31.elf | egrep -m 1 -i "entry point.*?0x" | sed -r 's/.*?(0x.*?)/\1/g')
+	mkimage -A arm64 -O linux -T kernel -C none \
+		-a $BL31_BASE_ADDR -e $BL31_BASE_ADDR \
+		-d ${OUTPUT_DIR}/bl31.bin ${DEPLOYDIR}/atf.ub
 }
 addtask deploy before do_build after do_compile
