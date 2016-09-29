@@ -4,8 +4,8 @@ LINUX_VERSION_EXTENSION ?= "-xilinx"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 
 # Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
-SRCBRANCH ?= ""
-SRCBRANCHARG = "${@['nobranch=1', 'branch=${SRCBRANCH}'][d.getVar('SRCBRANCH', True) != '']}"
+KBRANCH ?= ""
+SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
 SRC_URI = " \

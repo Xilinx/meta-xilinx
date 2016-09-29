@@ -4,7 +4,6 @@
 # To enable this recipe, set PREFERRED_PROVIDER_virtual/kernel = "linux-xlnx-dev"
 
 KBRANCH ?= "master"
-SRCBRANCH = "${KBRANCH}"
 
 # Use the SRCREV for the last tagged revision of linux-xlnx.
 SRCREV ?= '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/kernel", "linux-xlnx-dev", "${AUTOREV}", "629041605b93343ad2e8971ceaac3edcef0b043b", d)}'
