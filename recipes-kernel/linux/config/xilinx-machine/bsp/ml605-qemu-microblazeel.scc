@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Kernel Config for ml605-qemu-microblazeel specific setup"
+define KFEATURE_COMPATIBILITY board
+
+kconf hardware ml605-qemu-microblazeel.cfg

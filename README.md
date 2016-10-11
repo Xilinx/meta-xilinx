@@ -12,11 +12,11 @@ Supported Boards/Machines
 
 Boards/Machines supported by this layer:
  * MicroBlaze:
-  * [qemumicroblaze](conf/machine/qemumicroblaze.conf) - `qemumicroblaze`
-  * [qemumicroblaze-s3adsp1800](conf/machine/qemumicroblaze-s3adsp1800.conf) - `qemumicroblaze-s3adsp1800`
+  * [Xilinx ML605 (QEMU)](conf/machine/ml605-qemu-microblazeel.conf) - `ml605-qemu-microblazeel` (QEMU support)
+  * [Xilinx S3A DSP 1800 (QEMU)](conf/machine/s3adsp1800-qemu-microblazeeb.conf) - `s3adsp1800-qemu-microblazeeb` (QEMU support)
   * [Xilinx KC705](conf/machine/kc705-microblazeel.conf) - `kc705-microblazeel`
  * Zynq:
-  * [qemuzynq](conf/machine/qemuzynq.conf) - `qemuzynq`
+  * [Zynq (QEMU)](conf/machine/qemu-zynq7.conf) - `qemu-zynq7` (QEMU Support)
   * [Xilinx ZC702](conf/machine/zc702-zynq7.conf) - `zc702-zynq7`
   * [Xilinx ZC706](conf/machine/zc706-zynq7.conf) - `zc706-zynq7`
   * [Avnet MicroZed](conf/machine/microzed-zynq7.conf) - `microzed-zynq7`

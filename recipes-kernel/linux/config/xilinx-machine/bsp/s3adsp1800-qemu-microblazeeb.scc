@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Kernel Config for s3adsp1800-qemu-microblazeeb specific setup"
+define KFEATURE_COMPATIBILITY board
+
+kconf hardware s3adsp1800-qemu-microblazeeb.cfg
