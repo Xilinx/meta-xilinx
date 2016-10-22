@@ -1,5 +1,7 @@
 define KFEATURE_DESCRIPTION "Xilinx Zynq UltraScale+ MPSoC Drivers"
 define KFEATURE_COMPATIBILITY board
 
+include features/net/net.scc
+
 kconfig hardware zynqmp.cfg
 

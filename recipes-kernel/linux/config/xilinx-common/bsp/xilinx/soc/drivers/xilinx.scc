@@ -1,5 +1,7 @@
 define KFEATURE_DESCRIPTION "Xilinx Soft IP Core Drivers"
 define KFEATURE_COMPATIBILITY board
 
+include features/net/net.scc
+
 kconfig hardware xilinx.cfg
 
