@@ -3,3 +3,5 @@ define KFEATURE_COMPATIBILITY board
 
 kconfig hardware board-common.cfg
 
+include features/leds/leds.scc
+

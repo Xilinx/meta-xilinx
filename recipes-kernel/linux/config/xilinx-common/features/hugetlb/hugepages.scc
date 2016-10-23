@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable Huge Pages support"
+define KFEATURE_COMPATIBILITY arch
+
+kconf non-hardware hugepages.cfg

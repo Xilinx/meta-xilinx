@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable LED class and triggers"
+define KFEATURE_COMPATIBILITY board
+
+kconf hardware leds.cfg

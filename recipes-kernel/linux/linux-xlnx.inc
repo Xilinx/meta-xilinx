@@ -27,5 +27,9 @@ KCONFIG_MODE_zcu102-zynqmp = "alldefconfig"
 
 KERNEL_FEATURES_append = " bsp/xilinx/soc/linux-xlnx/drivers/xilinx.scc"
 KERNEL_FEATURES_append_zynq = " bsp/xilinx/soc/linux-xlnx/drivers/zynq7.scc"
-KERNEL_FEATURES_append_zynqmp = " bsp/xilinx/soc/linux-xlnx/drivers/zynqmp.scc"
+KERNEL_FEATURES_append_zynqmp = " \
+		bsp/xilinx/soc/linux-xlnx/drivers/zynqmp.scc \
+		features/drm/drm-xilinx.scc \
+		features/v4l2/v4l2-xilinx.scc \
+		"
 

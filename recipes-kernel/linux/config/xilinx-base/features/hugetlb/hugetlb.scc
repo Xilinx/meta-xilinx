@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable Huge TLB support"
+define KFEATURE_COMPATIBILITY arch
+
+kconf non-hardware hugetlb.cfg

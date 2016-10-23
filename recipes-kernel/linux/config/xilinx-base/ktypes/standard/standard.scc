@@ -2,3 +2,6 @@
 
 kconf non-hardware standard.cfg
 
+include features/hugetlb/hugetlb.scc
+include features/hugetlb/hugepages.scc
+
