@@ -11,6 +11,7 @@ SRC_URI_append = " file://0001-compiler-gcc6.h-Fix-u-boot-issue-for-gcc6.patch"
 
 SRC_URI_append_kc705-microblazeel = " file://microblaze-kc705-Convert-microblaze-generic-to-k.patch"
 
+LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
 
 UBOOT_ENV_zc702-zynq7 = "uEnv"

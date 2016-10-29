@@ -9,6 +9,7 @@ UBRANCH ?= "master"
 include u-boot-xlnx.inc
 include u-boot-spl-zynq-init.inc
 
+LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
 
 SRCREV_DEFAULT = "aebea9d20a5aa32857f320c07ca8f9fd1b3dec1f"
