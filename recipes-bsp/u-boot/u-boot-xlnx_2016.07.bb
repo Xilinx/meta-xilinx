@@ -1,7 +1,7 @@
 include u-boot-xlnx.inc
 
-# this matches u-boot-xlnx 'xilinx-v2016.3' release tag
-SRCREV = "95e11f6eb4bc07bbee12a4217c58146bddac61b2"
+# this matches u-boot-xlnx 'xilinx-v2016.4' release tag
+SRCREV = "0b94ce5ed4a6c2cd0fec7b8337e776b03e387347"
 PV = "v2016.07${XILINX_EXTENSION}+git${SRCPV}"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-xlnx:"
