@@ -1,5 +1,5 @@
 LINUX_VERSION = "4.6"
-# This points to xilinx-v2016.3 tag
-SRCREV ?="0e4e4071493171bbac37bf60709022f49171c813"
+# This points to xilinx-v2016.4 tag
+SRCREV ?="2762bc9163bb8576f63ff82801a65576f59e1e57"
 
 include linux-xlnx.inc
