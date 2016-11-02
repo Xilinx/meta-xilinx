@@ -112,7 +112,7 @@ Zynq:
 	xsdb% stop
 	xsdb% dow -data uImage 0x2000000
 	xsdb% dow -data core-image-minimal-<machine name>.cpio.gz.u-boot 0x3000000
-	xsdb% dow -data <machine name>.dtb 0x2A00000
+	xsdb% dow -data uImage-<machine name>.dtb 0x2A00000
 	xsdb% con
 
 ### Booting via U-Boot
@@ -149,7 +149,7 @@ Add the following files to the first partition:
 ### Installing Kernel and Device Tree
 Add the following files to the first partition:
  * `uImage`
- * `<machine name>.dtb`
+ * `uImage-<machine name>.dtb`
 
 ### Installing Root Filesystem
 If using a ramdisk also add the `.cpio.gz.u-boot` type of root filesystem image
@@ -168,7 +168,7 @@ Also create the file `uEnv.txt` on the first partition of the SD card partition,
 with the following contents. Replacing the names of files where appropriate.
 
 	kernel_image=uImage
-	devicetree_image=<machine name>.dtb
+	devicetree_image=uImage-<machine name>.dtb
 
 If using a ramdisk root filesystem setup the `ramdisk_image` variable.
 
@@ -199,7 +199,7 @@ Boot your system into U-Boot, using one of boot methods (e.g. JTAG, SD, QSPI).
 Place the following images into the root of the TFTP server directory:
  * `core-image-minimal-<machine name>.cpio.gz.u-boot`
  * `uImage` (Zynq) or `linux.bin.ub` (MicroBlaze)
- * `<machine name>.dtb`
+ * `uImage-<machine name>.dtb`
 
 ### Booting via U-Boot
 The serial console of the target board will display the U-Boot console.
@@ -223,7 +223,7 @@ Zynq:
 
 	U-Boot> tftpboot 0x2000000 uImage
 	U-Boot> tftpboot 0x3000000 core-image-minimal-<machine name>.cpio.gz.u-boot
-	U-Boot> tftpboot 0x2A00000 <machine name>.dtb
+	U-Boot> tftpboot 0x2A00000 uImage-<machine name>.dtb
 	U-Boot> bootm 0x2000000 0x3000000 0x2A00000
 
 U-Boot will prepare the Kernel for boot and then it will being to execute.
