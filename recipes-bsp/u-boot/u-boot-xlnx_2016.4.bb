@@ -12,6 +12,7 @@ SRC_URI_append = " \
 		file://0001-fdt-add-memory-bank-decoding-functions-for-board-set.patch \
 		file://0002-ARM-zynq-Replace-board-specific-with-generic-memory-.patch \
 		file://0003-ARM64-zynqmp-Replace-board-specific-with-generic-mem.patch \
+		file://arm-zynqmp-xilinx_zynqmp.h-Auto-boot-in-JTAG-if-imag.patch \
 		"
 
 SRC_URI_append_kc705-microblazeel = " file://microblaze-kc705-Convert-microblaze-generic-to-k.patch"
