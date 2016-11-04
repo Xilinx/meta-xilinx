@@ -1,0 +1,38 @@
+From 79e49b32d8d52ac765e6ee30ff7d25b8660bd704 Mon Sep 17 00:00:00 2001
+From: Yasir-Khan <yasir_khan@mentor.com>
+Date: Fri, 4 Nov 2016 18:43:43 +0500
+Subject: [PATCH] mali: r5p1-01rel0: Remove unused trace macros
+
+TRACE_SYSTEM_STRING is not needed in each trace file anymore.
+
+Based on:
+https://patchwork.kernel.org/patch/6150651/
+https://github.com/Xilinx/linux-xlnx/commit/dadb5e41f28f9619debc9aae4ae543aa1dcd5be8
+
+Upstream-status: Pending
+
+Signed-off-by: Yasir-Khan <yasir_khan@mentor.com>
+---
+ src/devicedrv/mali/linux/mali_linux_trace.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/driver/src/devicedrv/mali/linux/mali_linux_trace.h b/driver/src/devicedrv/mali/linux/mali_linux_trace.h
+index c6cd2bf..195e3cf 100644
+--- a/linux/mali_linux_trace.h
++++ b/linux/mali_linux_trace.h
+@@ -13,12 +13,10 @@
+ 
+ #include <linux/types.h>
+ 
+-#include <linux/stringify.h>
+ #include <linux/tracepoint.h>
+ 
+ #undef  TRACE_SYSTEM
+ #define TRACE_SYSTEM mali
+-#define TRACE_SYSTEM_STRING __stringfy(TRACE_SYSTEM)
+ 
+ #define TRACE_INCLUDE_PATH .
+ #define TRACE_INCLUDE_FILE mali_linux_trace
+-- 
+2.8.1
+

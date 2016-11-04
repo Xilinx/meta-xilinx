@@ -11,6 +11,7 @@ PV = "r5p1-01rel0"
 SRC_URI = " \
 	http://malideveloper.arm.com/downloads/drivers/DX910/${PV}/DX910-SW-99002-${PV}.tgz \
 	file://Makefile.patch \
+	file://0001-mali-r5p1-01rel0-Remove-unused-trace-macros.patch \
 	"
 SRC_URI[md5sum] = "9c85c113e4d41ae992e45ba27287d1ab"
 SRC_URI[sha256sum] = "86209c99c36a7622402b016b6f764c212b738ccdec9cdc6d6f16758c013957a0"
