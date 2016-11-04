@@ -7,6 +7,7 @@ inherit deploy
 
 LIC_FILES_CHKSUM = "file://Makefile;beginline=1;endline=27;md5=7348b6cbcae69912cb1dee68d6c68d99"
 
+# This is the commit used in the 2016.3 tag
 SRCREV = "46faf58cd14cdfd06cae7c076cb486af8565ab6a"
 SRC_URI = "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https;nobranch=1"
 
