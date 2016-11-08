@@ -7,9 +7,10 @@ inherit deploy
 
 LIC_FILES_CHKSUM = "file://README;md5=0f52b512c21e3541b90ca9fa39aff8fe"
 
-SRCREV = "46faf58cd14cdfd06cae7c076cb486af8565ab6a"
-SRC_URI = "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https;nobranch=1  \
-          "
+# Xilinx release 2016.4
+SRCREV = "2311b00a5a8ebbde9fe5be542f654981110064d0"
+SRC_URI = "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https;nobranch=1"
+
 S = "${WORKDIR}/git"
 
 FILES_${PN} += " \
