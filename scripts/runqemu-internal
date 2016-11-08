@@ -513,7 +513,7 @@ config_qemuzynqmp() {
     # Networking and system options required for QEMU ZynqMP machine
     QEMU_NETWORK_CMD="-net nic -net nic -net nic -net nic -net user,net=10.10.70.0,dhcpstart=10.10.70.1,host=10.0.2.2"
     QEMU_SYSTEM_OPTIONS="$QEMU_NETWORK_CMD -M arm-generic-fdt -serial mon:stdio"
-    QEMU_SYSTEM_OPTIONS="$QEMU_SYSTEM_OPTIONS -device loader,file=$DEPLOY_DIR_IMAGE/arm-trusted-firmware-aarch64.elf,cpu=0"
+    QEMU_SYSTEM_OPTIONS="$QEMU_SYSTEM_OPTIONS -device loader,file=$DEPLOY_DIR_IMAGE/arm-trusted-firmware-aarch64.elf,cpu-num=0"
 
     # Assume we need to start APU0 and are modeling a ZCU102
     QEMU_SYSTEM_OPTIONS="$QEMU_SYSTEM_OPTIONS -hw-dtb $DEPLOY_DIR_IMAGE/qemu-hw-devicetrees/zcu102-arm-single.dtb"
