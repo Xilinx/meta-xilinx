@@ -1,0 +1,65 @@
+From aec919daafd960b5bfcb8eb2352bc7f2857df56f Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan@nathanrossi.com>
+Date: Mon, 2 May 2016 23:46:42 +1000
+Subject: [PATCH 3/3] drm: xilinx: Fix DPMS transition to on
+
+Fix the issues where the VTC is reset (losing its timing config).
+
+Also fix the issue where the plane destroys its DMA descriptors and
+marks the DMA channels as inactive but never recreates the descriptors
+and never updates the active state when turning DPMS back on.
+
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+Upstream-Status: Pending [This is a workaround]
+---
+ drivers/gpu/drm/xilinx/xilinx_drm_crtc.c  | 1 -
+ drivers/gpu/drm/xilinx/xilinx_drm_plane.c | 7 +++----
+ 2 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/gpu/drm/xilinx/xilinx_drm_crtc.c b/drivers/gpu/drm/xilinx/xilinx_drm_crtc.c
+index 33a7931c2e..0f346c53de 100644
+--- a/drivers/gpu/drm/xilinx/xilinx_drm_crtc.c
++++ b/drivers/gpu/drm/xilinx/xilinx_drm_crtc.c
+@@ -78,7 +78,6 @@ static void xilinx_drm_crtc_dpms(struct drm_crtc *base_crtc, int dpms)
+ 	default:
+ 		if (crtc->vtc) {
+ 			xilinx_vtc_disable(crtc->vtc);
+-			xilinx_vtc_reset(crtc->vtc);
+ 		}
+ 		if (crtc->cresample) {
+ 			xilinx_cresample_disable(crtc->cresample);
+diff --git a/drivers/gpu/drm/xilinx/xilinx_drm_plane.c b/drivers/gpu/drm/xilinx/xilinx_drm_plane.c
+index 7fc110a8a5..83fcfd6db5 100644
+--- a/drivers/gpu/drm/xilinx/xilinx_drm_plane.c
++++ b/drivers/gpu/drm/xilinx/xilinx_drm_plane.c
+@@ -151,9 +151,7 @@ void xilinx_drm_plane_dpms(struct drm_plane *base_plane, int dpms)
+ 		}
+ 
+ 		/* start dma engine */
+-		for (i = 0; i < MAX_NUM_SUB_PLANES; i++)
+-			if (plane->dma[i].chan && plane->dma[i].is_active)
+-				dma_async_issue_pending(plane->dma[i].chan);
++		xilinx_drm_plane_commit(base_plane);
+ 
+ 		if (plane->rgb2yuv)
+ 			xilinx_rgb2yuv_enable(plane->rgb2yuv);
+@@ -228,7 +226,7 @@ void xilinx_drm_plane_commit(struct drm_plane *base_plane)
+ 	for (i = 0; i < MAX_NUM_SUB_PLANES; i++) {
+ 		struct xilinx_drm_plane_dma *dma = &plane->dma[i];
+ 
+-		if (dma->chan && dma->is_active) {
++		if (dma->chan) {
+ 			flags = DMA_CTRL_ACK | DMA_PREP_INTERRUPT;
+ 			desc = dmaengine_prep_interleaved_dma(dma->chan,
+ 							      &dma->xt,
+@@ -241,6 +239,7 @@ void xilinx_drm_plane_commit(struct drm_plane *base_plane)
+ 			dmaengine_submit(desc);
+ 
+ 			dma_async_issue_pending(dma->chan);
++			dma->is_active = true;
+ 		}
+ 	}
+ }
+-- 
+2.10.2
+

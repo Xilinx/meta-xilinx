@@ -1,7 +1,7 @@
-From e3b9c3186bbdf9cd5d084c62ecd232b57a316d3f Mon Sep 17 00:00:00 2001
+From b1c1dbc241385fcf1f85c5be9a6fb30fd70c784d Mon Sep 17 00:00:00 2001
 From: Jason Wu <jason.wu.misc@gmail.com>
 Date: Sun, 10 Apr 2016 13:16:06 +1000
-Subject: [PATCH] clk: Add driver for axi_dynclk IP Core
+Subject: [PATCH 2/3] clk: Add driver for axi_dynclk IP Core
 
 Add support for the axi_dynclk IP Core available from Digilent. This IP
 core dynamically configures the clock resources inside a Xilinx FPGA to
@@ -11,12 +11,18 @@ Upstream-Status: Pending
 
 Signed-off-by: Sam Bobrowicz <sbobrowicz@digilentinc.com>
 Signed-off-by: Jason Wu <jason.wu.misc@gmail.com>
+---
+ drivers/clk/Kconfig            |   8 +
+ drivers/clk/Makefile           |   1 +
+ drivers/clk/clk-dglnt-dynclk.c | 547 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 556 insertions(+)
+ create mode 100644 drivers/clk/clk-dglnt-dynclk.c
 
 diff --git a/drivers/clk/Kconfig b/drivers/clk/Kconfig
-index c3e3a02..29dfd15 100644
+index d42af55820..e276d9a27e 100644
 --- a/drivers/clk/Kconfig
 +++ b/drivers/clk/Kconfig
-@@ -147,6 +147,14 @@ config CLK_QORIQ
+@@ -158,6 +158,14 @@ config CLK_QORIQ
  	  This adds the clock driver support for Freescale QorIQ platforms
  	  using common clock framework.
  
@@ -32,12 +38,12 @@ index c3e3a02..29dfd15 100644
  	bool "Clock driver for APM XGene SoC"
  	default y
 diff --git a/drivers/clk/Makefile b/drivers/clk/Makefile
-index 820714c..9043f45 100644
+index e861470ef1..6c0a5a8d6b 100644
 --- a/drivers/clk/Makefile
 +++ b/drivers/clk/Makefile
-@@ -22,6 +22,7 @@ obj-$(CONFIG_COMMON_CLK_AXI_CLKGEN)	+= clk-axi-clkgen.o
- obj-$(CONFIG_ARCH_AXXIA)		+= clk-axm5516.o
+@@ -23,6 +23,7 @@ obj-$(CONFIG_ARCH_AXXIA)		+= clk-axm5516.o
  obj-$(CONFIG_COMMON_CLK_CDCE706)	+= clk-cdce706.o
+ obj-$(CONFIG_COMMON_CLK_CS2000_CP)	+= clk-cs2000-cp.o
  obj-$(CONFIG_ARCH_CLPS711X)		+= clk-clps711x.o
 +obj-$(CONFIG_COMMON_CLK_DGLNT_DYNCLK)	+= clk-dglnt-dynclk.o
  obj-$(CONFIG_ARCH_EFM32)		+= clk-efm32gg.o
@@ -45,7 +51,7 @@ index 820714c..9043f45 100644
  obj-$(CONFIG_MACH_LOONGSON32)		+= clk-ls1x.o
 diff --git a/drivers/clk/clk-dglnt-dynclk.c b/drivers/clk/clk-dglnt-dynclk.c
 new file mode 100644
-index 0000000..496ad5f
+index 0000000000..496ad5fc90
 --- /dev/null
 +++ b/drivers/clk/clk-dglnt-dynclk.c
 @@ -0,0 +1,547 @@
@@ -597,5 +603,5 @@ index 0000000..496ad5f
 +MODULE_AUTHOR("Sam Bobrowicz <sbobrowicz@digilentinc.com>");
 +MODULE_DESCRIPTION("CCF Driver for Digilent axi_dynclk IP Core");
 -- 
-1.9.1
+2.10.2
 
