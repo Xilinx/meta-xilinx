@@ -13,7 +13,8 @@
 		spi0 = &qspi;
 	};
 	chosen {
-		bootargs = "console=ttyPS0,115200 earlyprintk";
+		bootargs = "";
+		stdout-path = "serial0:115200n8";
 	};
 	memory {
 		device_type = "memory";
@@ -68,7 +69,7 @@
 			xlnx,pixel-format = "xrgb8888";
 			plane0 {
 				dmas = <&axi_vdma_0 0>;
-				dma-names = "dma";
+				dma-names = "dma0";
 			};
 		};
 	};
@@ -126,12 +127,10 @@
 	phy-handle = <&phy0>;
 	phy-mode = "rgmii-id";
 	local-mac-address = [];
-	gem0_mdio: mdio {
-		phy0: phy@1 {
-			compatible = "realtek,RTL8211E";
-			device_type = "ethernet-phy";
-			reg = <1>;
-		};
+	phy0: phy@1 {
+		compatible = "realtek,rtl8211e";
+		device_type = "ethernet-phy";
+		reg = <1>;
 	};
 };
 

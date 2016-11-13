@@ -106,6 +106,8 @@
 		axi_vdma_0: dma@43000000 {
 			#dma-cells = <1>;
 			compatible = "xlnx,axi-vdma-1.00.a";
+			clocks = <&clkc 15>;
+			clock-names = "s_axi_lite_aclk";
 			interrupt-parent = <&intc>;
 			interrupts = <0 30 4>;
 			reg = <0x43000000 0x10000>;
