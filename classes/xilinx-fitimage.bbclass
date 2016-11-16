@@ -44,7 +44,7 @@ python () {
     if fitimg is None or fitimg == "":
         kimg_type = d.getVar('KERNEL_IMAGETYPE', True)
         if kimg_type == "zImage" or kimg_type == "Image":
-            d.setVar('FITIMAGE_KERNELIMG', "%s" %kimg_type)
+            d.setVar('FITIMAGE_KERNELIMG', "${DEPLOY_DIR_IMAGE}/%s" %kimg_type)
         else:
             raise bb.parse.SkipPackage("Set KERNEL_IMAGETYPE to zImage|Image to enable xilinx-fitimage")
 
@@ -53,7 +53,7 @@ python () {
     if fitdtb is None or fitdtb == "":
         import glob
         for dtb in glob.glob("%s/*.dtb" %d.getVar("DEPLOY_DIR_IMAGE", True)):
-            d.setVar('FITIMAGE_DTBIMG', "%s" %(os.path.basename(dtb)))
+            d.setVar('FITIMAGE_DTBIMG', "${DEPLOY_DIR_IMAGE}/%s" %(os.path.basename(dtb)))
             break
 }
 
@@ -78,13 +78,13 @@ do_assemble_xilinx_fitimage() {
 		bbfatal "No dtb was defined, Please set FITIMAGE_DTBIMG appropriately."
 	fi
 	${XILINXBASE}/scripts/bin/mkits.sh -v "${MACHINE}" \
-		-k "${DEPLOY_DIR_IMAGE}/${FITIMAGE_KERNELIMG}" -c 1 -c 2 \
+		-k "${FITIMAGE_KERNELIMG}" -c 1 -c 2 \
 		-C "${FITIMAGE_KERNEL_COMPRESSION_TYPE}" \
 		-e "${FITIMAGE_KERNEL_ENTRYPOINT}" \
 		-a "${FITIMAGE_KERNEL_LOADADDRESS}" \
 		-r "${DEPLOY_DIR_IMAGE}/${FITIMAGE_ROOTFSIMG}" -c 1 \
 		-C "${FITIMAGE_ROOTFS_COMPRESSION_TYPE}" \
-		-d "${DEPLOY_DIR_IMAGE}/${FITIMAGE_DTBIMG}" -c 1 -c 2 \
+		-d "${FITIMAGE_DTBIMG}" -c 1 -c 2 \
 		-o fit-image.its
 	uboot-mkimage -f fit-image.its fitImage
 }
