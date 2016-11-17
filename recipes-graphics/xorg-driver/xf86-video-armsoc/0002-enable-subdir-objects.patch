@@ -1,0 +1,16 @@
+Add foreign for automake
+Upstream-Status: Pending
+---
+diff --git a/configure.ac b/configure.ac
+index eeffd92..88473a3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -32,7 +32,7 @@ AC_CONFIG_HEADERS([config.h])
+ AC_CONFIG_AUX_DIR(.)
+ AC_CONFIG_MACRO_DIR([m4])
+ 
+-AM_INIT_AUTOMAKE([dist-bzip2])
++AM_INIT_AUTOMAKE([dist-bzip2 foreign subdir-objects])
+ 
+ AM_MAINTAINER_MODE
+ 
