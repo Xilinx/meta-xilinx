@@ -1,9 +1,9 @@
 include u-boot-xlnx.inc
 include u-boot-spl-zynq-init.inc
 
-# this matches u-boot-xlnx 'xilinx-v2016.2' release tag
+XILINX_RELEASE_VERSION = "v2016.2"
 SRCREV = "0daf88c7f8c9085a81336a0ad2dd3bcc84c7a18a"
-PV = "v2016.01${XILINX_EXTENSION}+git${SRCPV}"
+PV = "v2016.01-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-xlnx:"
 
