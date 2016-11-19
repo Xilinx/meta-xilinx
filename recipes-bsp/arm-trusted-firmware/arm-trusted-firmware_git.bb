@@ -14,10 +14,10 @@ S = "${WORKDIR}/git"
 BRANCH = "master"
 SRC_URI = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https;branch=${BRANCH}"
 
-# This points at the 'xilinx-v2016.3' tag
+XILINX_RELEASE_VERSION = "v2016.3"
 SRCREV ?= "a9e3716615a23c78e3cdea5b5b2f840f89817cb1"
 
-PV = "1.2+xilinx+git${SRCPV}"
+PV = "1.2-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 COMPATIBLE_MACHINE = "zynqmp"
 PLATFORM_zynqmp = "zynqmp"
