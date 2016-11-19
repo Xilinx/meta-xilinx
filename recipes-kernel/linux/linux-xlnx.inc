@@ -1,6 +1,7 @@
 
 # This version extension should match CONFIG_LOCALVERSION in defconfig
-LINUX_VERSION_EXTENSION ?= "-xilinx"
+XILINX_RELEASE_VERSION ?= ""
+LINUX_VERSION_EXTENSION ?= "-xilinx-${XILINX_RELEASE_VERSION}"
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 
 # Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
