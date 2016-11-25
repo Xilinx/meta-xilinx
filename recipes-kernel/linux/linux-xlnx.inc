@@ -22,6 +22,8 @@ SRCREV_machine ?= "${SRCREV}"
 
 require recipes-kernel/linux/linux-yocto.inc
 
+SRCTREECOVEREDTASKS = "do_kernel_configme do_validate_branches do_kernel_configcheck do_kernel_checkout do_fetch do_unpack do_patch"
+
 DESCRIPTION = "Xilinx Kernel"
 
 require linux-xilinx-machines.inc
