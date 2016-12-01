@@ -39,4 +39,18 @@ UBOOT_ELF_aarch64 ?= "u-boot.elf"
 MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS_append_zynqmp = " \
 		${@bb.utils.contains('MACHINE_FEATURES', 'mali', bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-xlnx', 'kernel-module-mali', '', d), '', d)} \
 		"
+XSERVER ?= " \
+	xserver-xorg \
+	xf86-input-evdev \
+	xf86-input-mouse \
+	xf86-input-keyboard \
+	xf86-video-fbdev \
+	${XSERVER_EXT} \
+	"
+
+XSERVER_EXT ?= ""
+XSERVER_EXT_zynqmp ?= " \
+	${@bb.utils.contains('MACHINE_FEATURES', 'mali', bb.utils.contains('DISTRO_FEATURES', 'opengl', 'xserver-xorg-extension-glx', '', d), '', d)} \
+	xf86-video-armsoc \
+	"
 
