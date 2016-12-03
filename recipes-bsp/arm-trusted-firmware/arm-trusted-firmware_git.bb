@@ -10,6 +10,7 @@ inherit deploy
 DEPENDS += "u-boot-mkimage-native"
 
 S = "${WORKDIR}/git"
+B = "${WORKDIR}/build"
 
 BRANCH = "master"
 SRC_URI = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https;branch=${BRANCH}"
@@ -36,14 +37,14 @@ do_configure() {
 }
 
 do_compile() {
-	oe_runmake PLAT=${PLATFORM} RESET_TO_BL31=1 bl31
+	oe_runmake -C ${S} BUILD_BASE=${B} PLAT=${PLATFORM} RESET_TO_BL31=1 bl31
 }
 
 do_install() {
 	:
 }
 
-OUTPUT_DIR = "${S}/build/${PLATFORM}/release"
+OUTPUT_DIR = "${B}/${PLATFORM}/release"
 
 do_deploy() {
 	install -d ${DEPLOYDIR}
