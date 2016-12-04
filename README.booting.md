@@ -60,7 +60,8 @@ Ensure the board is configured to boot from JTAG. The Zynq platform requires the
 loading of SPL first, this can be done by loading the `u-boot-spl.bin` and
 executing it at location `0x0`. `u-boot-spl.bin` is not output to the deploy
 directory by default, it can be obtained from the work directory for U-Boot
-(`git/spl/u-boot-spl.bin`).
+(`git/spl/u-boot-spl.bin`) or can be extracted from `boot.bin` using
+`dd if=boot.bin of=u-boot-spl.bin bs=1 skip=2240`.
 
 	xsdb% targets -set -filter {name =~ "ARM*#0"}
 	xsdb% dow -data u-boot-spl.bin 0x0
