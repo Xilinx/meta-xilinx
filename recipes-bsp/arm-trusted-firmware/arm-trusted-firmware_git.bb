@@ -8,6 +8,7 @@ PROVIDES = "virtual/atf"
 inherit deploy
 
 S = "${WORKDIR}/git"
+B = "${WORKDIR}/build"
 
 BRANCH = "master"
 SRC_URI = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https;branch=${BRANCH}"
@@ -34,7 +35,7 @@ do_configure() {
 }
 
 do_compile() {
-	oe_runmake PLAT=${PLATFORM} RESET_TO_BL31=1 bl31
+	oe_runmake -C ${S} BUILD_BASE=${B} PLAT=${PLATFORM} RESET_TO_BL31=1 bl31
 }
 
 do_install() {
@@ -43,7 +44,7 @@ do_install() {
 
 do_deploy() {
 	install -d ${DEPLOYDIR}
-	install -m 0644 ${S}/build/${PLATFORM}/release/bl31/bl31.elf ${DEPLOYDIR}/arm-trusted-firmware-${PACKAGE_ARCH}.elf
-	install -m 0644 ${S}/build/${PLATFORM}/release/bl31.bin ${DEPLOYDIR}/arm-trusted-firmware-${PACKAGE_ARCH}.bin
+	install -m 0644 ${B}/${PLATFORM}/release/bl31/bl31.elf ${DEPLOYDIR}/arm-trusted-firmware-${PACKAGE_ARCH}.elf
+	install -m 0644 ${B}/${PLATFORM}/release/bl31.bin ${DEPLOYDIR}/arm-trusted-firmware-${PACKAGE_ARCH}.bin
 }
 addtask deploy before do_build after do_compile
