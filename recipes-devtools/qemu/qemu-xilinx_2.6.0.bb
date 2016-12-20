@@ -10,13 +10,13 @@ LIC_FILES_CHKSUM = " \
 		file://COPYING.LIB;endline=24;md5=c04def7ae38850e7d3ef548588159913 \
 		"
 
-XILINX_RELEASE_VERSION = "v2016.3"
-SRCREV = "de453ab4cf993f63de502c4efd8a08a347c3b164"
+XILINX_RELEASE_VERSION = "v2016.4"
+SRCREV = "4b90a13118b6e005d688d7aefb0900f7a67531df"
 SRC_URI = "git://github.com/Xilinx/qemu.git;protocol=https;nobranch=1"
 
 S = "${WORKDIR}/git"
 
-PV = "2.2.50-xilinx-${XILINX_RELEASE_VERSION}+git+${SRCPV}"
+PV = "2.6.0-xilinx-${XILINX_RELEASE_VERSION}+git+${SRCPV}"
 
 # Disable KVM completely
 KVMENABLE = "--disable-kvm"
@@ -25,16 +25,6 @@ KVMENABLE = "--disable-kvm"
 SRC_URI[_append] = ""
 
 DISABLE_STATIC_pn-qemu-xilinx-native = ""
-
-PACKAGECONFIG[quorum] = "--enable-quorum, --disable-quorum, gnutls,"
-PACKAGECONFIG[vnc-tls] = "--enable-vnc --enable-vnc-tls,--disable-vnc-tls, gnutls,"
-PACKAGECONFIG[vnc-ws] = "--enable-vnc --enable-vnc-ws,--disable-vnc-ws, gnutls,"
-PACKAGECONFIG[gcrypt] = "--enable-libgcrypt,--disable-libgcrypt,libgcrypt,"
-PACKAGECONFIG[nss] = ""
-PACKAGECONFIG[nettle] = ""
-PACKAGECONFIG[glx] = ""
-PACKAGECONFIG[gnutls] = ""
-PACKAGECONFIG[bzip2] = ""
 
 # append a suffix dir, to allow multiple versions of QEMU to be installed
 datadir_append = "/qemu-xilinx"
