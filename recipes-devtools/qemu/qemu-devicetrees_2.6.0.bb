@@ -7,11 +7,13 @@ inherit deploy
 
 LIC_FILES_CHKSUM = "file://Makefile;beginline=1;endline=27;md5=7348b6cbcae69912cb1dee68d6c68d99"
 
-# This is the commit used in the 2016.3 tag
-SRCREV = "46faf58cd14cdfd06cae7c076cb486af8565ab6a"
+XILINX_RELEASE_VERSION = "v2016.4"
+SRCREV = "1085e32a9ddc232963512923332094a58a05d1af"
 SRC_URI = "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https;nobranch=1"
 
 S = "${WORKDIR}/git"
+
+PV = "2.6.0-xilinx-${XILINX_RELEASE_VERSION}+git+${SRCPV}"
 
 # Don't need to do anything
 do_install() {
