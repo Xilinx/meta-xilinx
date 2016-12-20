@@ -7,6 +7,13 @@ SRCREV = "95e11f6eb4bc07bbee12a4217c58146bddac61b2"
 PV = "v2016.07-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-xlnx:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot:"
+
+SRC_URI_append = " \
+		file://0001-fdt-add-memory-bank-decoding-functions-for-board-set.patch \
+		file://0002-ARM-zynq-Replace-board-specific-with-generic-memory-.patch \
+		file://0003-ARM64-zynqmp-Replace-board-specific-with-generic-mem.patch \
+		"
 
 SRC_URI_append_kc705-microblazeel = " file://microblaze-kc705-Convert-microblaze-generic-to-k.patch"
 
