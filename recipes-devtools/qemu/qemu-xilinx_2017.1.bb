@@ -11,20 +11,17 @@ LIC_FILES_CHKSUM = " \
 		"
 
 SRCREV = "a83265d7403ee49c9a911c920961ef29deac96eb"
-SRC_URI = "git://github.com/Xilinx/qemu.git;protocol=https;nobranch=1 \
-		"
+SRC_URI = "git://github.com/Xilinx/qemu.git;protocol=https;nobranch=1"
 
 S = "${WORKDIR}/git"
 
 # Disable KVM completely
-KVMENABLE = "--disable-kvm"
+PACKAGECONFIG_remove = "kvm"
 
-# Strip all appends (needed because qemu.inc adds patches using overrides)
-SRC_URI[_append] = ""
+# Enable libgcrypt
+PACKAGECONFIG_append = " gcrypt"
 
-DISABLE_STATIC_pn-qemu-xilinx = ""
-DISABLE_STATIC_pn-qemu-xilinx-native = ""
-DISABLE_STATIC_pn-nativesdk-qemu-xilinx = ""
+DISABLE_STATIC_pn-${PN} = ""
 
 PTEST_ENABLED = ""
 
@@ -32,13 +29,15 @@ PTEST_ENABLED = ""
 EXTRA_OECONF_append = " \
 		--bindir=${bindir}/qemu-xilinx \
 		--libexecdir=${libexecdir}/qemu-xilinx \
-		--datadir=${datadir}/qemu-xilinx \
 		"
 
-do_install() {
-	export STRIP="true"
-	autotools_do_install
+do_configure_prepend() {
+	# rewrite usage of 'libgcrypt-config' with 'pkg-config libgcrypt'
+	sed -r -i 's/libgcrypt-config(\s*--)/pkg-config libgcrypt\1/g' ${S}/configure
+}
 
+do_install_append() {
 	# Prevent QA warnings about installed ${localstatedir}/run
 	if [ -d ${D}${localstatedir}/run ]; then rmdir ${D}${localstatedir}/run; fi
 }
+
