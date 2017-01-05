@@ -32,5 +32,6 @@ KERNEL_FEATURES_append_zynqmp = " \
 		bsp/xilinx/soc/linux-xlnx/drivers/zynqmp.scc \
 		features/drm/drm-xilinx.scc \
 		features/v4l2/v4l2-xilinx.scc \
+		${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} \
 		"
 
