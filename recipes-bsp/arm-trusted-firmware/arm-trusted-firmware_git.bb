@@ -15,8 +15,8 @@ B = "${WORKDIR}/build"
 BRANCH = "master"
 SRC_URI = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https;branch=${BRANCH}"
 
-XILINX_RELEASE_VERSION = "v2016.3"
-SRCREV ?= "a9e3716615a23c78e3cdea5b5b2f840f89817cb1"
+XILINX_RELEASE_VERSION = "v2016.4"
+SRCREV ?= "1bb07308f32cce4850804db7939ec93300467e49"
 
 PV = "1.2-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
