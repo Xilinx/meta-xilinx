@@ -1,5 +1,4 @@
 include u-boot-xlnx.inc
-include u-boot-spl-zynq-init.inc
 
 XILINX_RELEASE_VERSION = "v2016.4"
 # this matches u-boot-xlnx 'xilinx-v2016.4' release tag
@@ -25,13 +24,4 @@ UBOOT_ENV_zedboard-zynq7 = "uEnv"
 
 SRC_URI_append_zc702-zynq7 = " file://uEnv.txt"
 SRC_URI_append_zedboard-zynq7 = " file://uEnv.txt"
-
-# u-boot 2016.07 has support for these
-HAS_PS7INIT ?= " \
-		zynq_microzed_config \
-		zynq_zed_config \
-		zynq_zc702_config \
-		zynq_zc706_config \
-		zynq_zybo_config \
-		"
 
