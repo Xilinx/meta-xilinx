@@ -20,7 +20,6 @@ PREFERRED_VERSION_linux-yocto ?= "4.8%"
 
 # U-Boot Configuration
 XILINX_DEFAULT_UBOOT := "u-boot-xlnx"
-XILINX_DEFAULT_UBOOT_zynqmp := "u-boot"
 PREFERRED_PROVIDER_virtual/bootloader ??= "${XILINX_DEFAULT_UBOOT}"
 
 UBOOT_SUFFIX ?= "img"
