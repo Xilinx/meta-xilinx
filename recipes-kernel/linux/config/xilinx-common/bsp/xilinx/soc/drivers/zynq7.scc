@@ -1,7 +1,0 @@
-define KFEATURE_DESCRIPTION "Xilinx Zynq 7000 Drivers"
-define KFEATURE_COMPATIBILITY board
-
-include features/net/net.scc
-
-kconfig hardware zynq7.cfg
-
