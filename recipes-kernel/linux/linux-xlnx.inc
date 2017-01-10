@@ -21,6 +21,8 @@ DESCRIPTION = "Xilinx Kernel"
 
 require linux-xilinx-machines.inc
 
-KBUILD_DEFCONFIG_zcu102-zynqmp = "xilinx_zynqmp_defconfig"
-KCONFIG_MODE_zcu102-zynqmp = "alldefconfig"
+KBUILD_DEFCONFIG_zynqmp = "xilinx_zynqmp_defconfig"
+KBUILD_DEFCONFIG_zynq = "xilinx_zynq_defconfig"
+KBUILD_DEFCONFIG_microblaze = "mmu_defconfig"
+KCONFIG_MODE = "alldefconfig"
 
