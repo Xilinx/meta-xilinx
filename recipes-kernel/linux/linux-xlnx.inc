@@ -8,10 +8,13 @@ PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 KBRANCH ?= ""
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
 
-FILESOVERRIDES_append = ":${LINUX_VERSION}"
+FILESEXTRAPATHS_prepend := "${THISDIR}/config:"
 SRC_URI = " \
 		git://github.com/Xilinx/linux-xlnx.git;protocol=https;${SRCBRANCHARG} \
 		"
+
+SRC_URI_append_zynqmp += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' file://zynqmp/xen/xen.scc', '', d)}"
+SRC_URI_append_kc705-microblazeel += "file://kc705-microblazeel/kc705-microblazeel.scc"
 
 SRCREV_machine ?= "${SRCREV}"
 
