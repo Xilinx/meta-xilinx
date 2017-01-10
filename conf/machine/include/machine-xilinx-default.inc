@@ -35,6 +35,8 @@ UBOOT_ELF_aarch64 ?= "u-boot.elf"
 MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS_append_zynqmp = " \
 		${@bb.utils.contains('MACHINE_FEATURES', 'mali', bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-xlnx', 'kernel-module-mali', '', d), '', d)} \
 		"
+KERNEL_MODULE_AUTOLOAD_zynqmp = "mali"
+
 XSERVER ?= " \
 	xserver-xorg \
 	xf86-input-evdev \
