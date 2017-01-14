@@ -27,7 +27,7 @@ SRC_URI_append_zc702-zynq7 = " file://uEnv.txt"
 SRC_URI_append_zedboard-zynq7 = " file://uEnv.txt"
 
 # u-boot 2016.07 has support for these
-HAS_PS7INIT ?= " \
+HAS_PLATFORM_INIT ?= " \
 		zynq_microzed_config \
 		zynq_zed_config \
 		zynq_zc702_config \

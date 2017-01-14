@@ -1,38 +1,48 @@
-inherit zynq7-platform-paths
+inherit xilinx-platform-init
+
+PLATFORM_BOARD_DIR ?= ""
+PLATFORM_BOARD_DIR_zynq = "board/xilinx/zynq"
+PLATFORM_BOARD_DIR_zynqmp = "board/xilinx/zynqmp"
 
 do_configure_prepend() {
-	if ${@bb.utils.contains('DEPENDS', 'virtual/zynq7-platform-init', 'true', 'false', d)}; then
-		if [ -d "${S}/board/xilinx/zynq/custom_hw_platform" ]; then
-			cp ${PLATFORM_INIT_STAGE_DIR}/ps7_init_gpl.h ${S}/board/xilinx/zynq/custom_hw_platform/
-			cp ${PLATFORM_INIT_STAGE_DIR}/ps7_init_gpl.c ${S}/board/xilinx/zynq/custom_hw_platform/
-		else
-			cp ${PLATFORM_INIT_STAGE_DIR}/ps7_init_gpl.h ${S}/board/xilinx/zynq/
-			cp ${PLATFORM_INIT_STAGE_DIR}/ps7_init_gpl.c ${S}/board/xilinx/zynq/
-		fi
-		if [ -n "${FORCE_PS7INIT}" ]; then
-			# overwrite all the existing platforms ps7_init files, this is a shotgun approach and only works due to
-			# u-boot being built for each machine seperately with seperate source directories.
-			for i in ${S}/board/xilinx/zynq/*/; do
-				cp ${PLATFORM_INIT_STAGE_DIR}/ps7_init_gpl.h $i
-				cp ${PLATFORM_INIT_STAGE_DIR}/ps7_init_gpl.c $i
+	if ${@bb.utils.contains('DEPENDS', 'virtual/xilinx-platform-init', 'true', 'false', d)}; then
+		for f in ${PLATFORM_INIT_FILES}; do
+			if [ -d "${S}/${PLATFORM_BOARD_DIR}/custom_hw_platform" ]; then
+				cp ${PLATFORM_INIT_STAGE_DIR}/$f ${S}/${PLATFORM_BOARD_DIR}/custom_hw_platform/
+			else
+				cp ${PLATFORM_INIT_STAGE_DIR}/$f ${S}/${PLATFORM_BOARD_DIR}/
+			fi
+			# Newer u-boot sources use the init files in a sub directory named
+			# based on the name of the device tree. This is not straight
+			# forward to detect. Instead of detecting just overwrite all the
+			# platform init files so that the correct one is always used. This
+			# shotgun approach only works due to this recipe being machine arch
+			# specific. Do this overwrite un-conditionally as there is no
+			# guarantees that the chosen board config does not have the device
+			# tree config set.
+			for i in ${S}/${PLATFORM_BOARD_DIR}/*/; do
+				[ -d $i ] && cp ${PLATFORM_INIT_STAGE_DIR}/$f $i
 			done
-		fi
+		done
 	fi
 }
 
-FORCE_PS7INIT[doc] = "This variable is used to force the overriding of all ps7_init_gpl.* files in u-boot source with what is provided by virtual/zynq7-platform-init."
+FORCE_PLATFORM_INIT[doc] = "This variable is used to force the overriding of all platform init files in u-boot source."
 
 python () {
-	# Determine if target machine needs to provide a custom ps7_init_gpl.*
-	if d.getVar("SOC_FAMILY", True) == "zynq":
-		if d.getVar("SPL_BINARY", True):
-			# only add the dependency if u-bopt doesn't already provide the platform init files
-			if d.getVar("FORCE_PS7INIT", True) or not bb.utils.contains("HAS_PS7INIT", d.getVar("UBOOT_MACHINE", True), True, False, d):
-				# force the dependency on a recipe that provides the platform init files
-				d.setVar("DEPENDS", "%s virtual/zynq7-platform-init" % d.getVar("DEPENDS", True))
+	hasconfigs = (d.getVar("HAS_PLATFORM_INIT") or "").split() + (d.getVar("HAS_PS7INIT") or "").split()
+	forceoverride = (d.getVar("FORCE_PLATFORM_INIT") == "1") or (d.getVar("FORCE_PS7INIT"))
 
-		if d.getVar("SPL_BINARY", True) == "boot.bin":
-			# Add this for backwards compatiblity
-			d.setVar("PROVIDES", "%s virtual/boot-bin" % d.getVar("PROVIDES", True))
+	# Determine if target machine needs to provide a custom platform init files
+	if d.getVar("SOC_FAMILY") in ["zynq", "zynqmp"]:
+		if d.getVar("SPL_BINARY"):
+			# only add the dependency if u-boot doesn't already provide the platform init files
+			if forceoverride or not (d.getVar("UBOOT_MACHINE") in hasconfigs):
+				# force the dependency on a recipe that provides the platform init files
+				d.appendVar("DEPENDS", " virtual/xilinx-platform-init")
+
+		if d.getVar("SPL_BINARY") == "boot.bin":
+			# Add this for backwards compatibility
+			d.setVar("PROVIDES", "%s virtual/boot-bin" % d.getVar("PROVIDES"))
 }
 
