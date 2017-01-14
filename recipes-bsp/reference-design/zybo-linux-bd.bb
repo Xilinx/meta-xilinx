@@ -24,15 +24,9 @@ HDF = "/Projects/${HW_BD}/hw_handoff/${HW_BD}_wrapper.hdf"
 
 S ?= "${WORKDIR}/${MACHINE}"
 
-PROVIDES = "virtual/bitstream virtual/zynq7-platform-init"
+PROVIDES = "virtual/bitstream virtual/xilinx-platform-init"
 
-PLATFORM_INIT ?= "ps7_init_gpl.c \
-		  ps7_init_gpl.h"
-
-FILES_${PN}-platform-init += " \
-		${PLATFORM_INIT_DIR}/ps7_init_gpl.c \
-		${PLATFORM_INIT_DIR}/ps7_init_gpl.h \
-		"
+FILES_${PN}-platform-init += "${PLATFORM_INIT_DIR}/*"
 
 FILES_${PN}-bitstream += " \
 		download.bit \
@@ -44,7 +38,7 @@ BITSTREAM ?= "bitstream-${PV}-${PR}.bit"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-inherit zynq7-platform-paths
+inherit xilinx-platform-init
 inherit deploy
 
 SYSROOT_DIRS += "${PLATFORM_INIT_DIR}"
@@ -55,7 +49,7 @@ do_install() {
 	[ "${fn}" == "download.bit" ] || mv ${D}/${fn} ${D}/download.bit
 
 	install -d ${D}${PLATFORM_INIT_DIR}
-	for fn in ${PLATFORM_INIT}; do
+	for fn in ${PLATFORM_INIT_FILES}; do
 		unzip -o ${S}/${HDF} ${fn} -d ${D}${PLATFORM_INIT_DIR}
 	done
 }
