@@ -15,6 +15,9 @@ def qemu_default_dtb(d):
 def qemu_default_serial(d):
     if d.getVar("SERIAL_CONSOLE", True):
         speed, console = d.getVar("SERIAL_CONSOLE", True).split(" ", 1)
+        # zynqmp uses earlycon and stdout (in dtb)
+        if "zynqmp" in d.getVar("MACHINEOVERRIDES", True).split(":"):
+            return ""
         return "console=%s,%s earlyprintk" % (console, speed)
     return ""
 
@@ -24,12 +27,42 @@ def qemu_target_binary(d):
         ta = "microblaze"
     elif ta == "arm":
         ta = "aarch64"
+    if qemuboot_xilinx_enabled(d):
+        return "qemu-xilinx/qemu-system-%s" % ta
     return "qemu-system-%s" % ta
+
+def qemuboot_xilinx_enabled(d):
+    if bb.utils.contains("MACHINE_FEATURES", "qemu-system-xilinx", True, False, d):
+        if d.getVar("XILINX_QEMUBOOT", True) == "1":
+            return True
+    return False
 
 # For runqemu, default setup across all machines in meta-xilinx
 IMAGE_CLASSES += "qemuboot"
 QB_SYSTEM_NAME ?= "${@qemu_target_binary(d)}"
 QB_DEFAULT_FSTYPE ?= "cpio"
+
+XILINX_QEMUBOOT[doc] = "Set this variable to '1' to enable the generation of qemuboot.conf which uses the Xilinx QEMU."
+XILINX_QEMUBOOT ?= ""
+
+# Dependencies for native Xilinx QEMU
+XILINX_QEMU_DEPENDS ?= "qemu-xilinx-native"
+# If the machine supports the Xilinx QEMU, add the dependencies
+EXTRA_IMAGEDEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qemu-system-xilinx', '${XILINX_QEMU_DEPENDS}', '', d)}"
+
+# Add an override for when booting with the Xilinx QEMU
+MACHINEOVERRIDES .= "${@':qemuboot-xilinx' if qemuboot_xilinx_enabled(d) else ''}"
+
+# This is ignored if using Xilinx's QEMU fork
 QB_DTB ?= "${@qemu_default_dtb(d)}"
+
+# ZynqMP machines need special "-hw-dtb" device trees for the Xilinx QEMU
+XILINX_QEMU_DEPENDS_append_zynqmp = " qemu-devicetrees"
+
+QB_DEFAULT_KERNEL_qemuboot-xilinx = "none"
 QB_KERNEL_CMDLINE_APPEND ?= "${@qemu_default_serial(d)}"
 
+# Default machine targets for Xilinx QEMU (FDT Generic)
+QB_MACHINE_qemuboot-xilinx_aarch64 = "-machine arm-generic-fdt"
+QB_MACHINE_qemuboot-xilinx_arm = "-machine arm-generic-fdt-plnx"
+QB_MACHINE_qemuboot-xilinx_microblaze = "-machine microblaze-generic-fdt"
