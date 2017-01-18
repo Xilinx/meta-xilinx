@@ -11,7 +11,9 @@ LIC_FILES_CHKSUM = " \
 		"
 
 SRCREV = "4b90a13118b6e005d688d7aefb0900f7a67531df"
-SRC_URI = "git://github.com/Xilinx/qemu.git;protocol=https;nobranch=1"
+SRC_URI = "git://github.com/Xilinx/qemu.git;protocol=https;nobranch=1 \
+		file://xilinx-dp-Add-support-for-yuy2-video-format.patch \
+		"
 
 S = "${WORKDIR}/git"
 
