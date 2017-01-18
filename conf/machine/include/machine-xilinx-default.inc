@@ -1,5 +1,8 @@
 # Default Xilinx BSP Machine settings
 
+include conf/machine/include/machine-xilinx-${SOCFAMILY}.inc
+include conf/machine/include/machine-xilinx-${MACHINE}.inc
+
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc"
 
 # MicroBlaze cannot handle the execution of qemu-linux-user for gobject-introspection-data
@@ -50,3 +53,4 @@ XSERVER_EXT_zynqmp ?= " \
 	xf86-video-armsoc \
 	"
 
+EXTRA_IMAGEDEPENDS_zynqmp += "arm-trusted-firmware"
