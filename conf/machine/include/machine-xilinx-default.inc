@@ -53,4 +53,4 @@ XSERVER_EXT_zynqmp ?= " \
 	xf86-video-armsoc \
 	"
 
-EXTRA_IMAGEDEPENDS_zynqmp += "arm-trusted-firmware"
+EXTRA_IMAGEDEPENDS_append_zynqmp += " arm-trusted-firmware"
