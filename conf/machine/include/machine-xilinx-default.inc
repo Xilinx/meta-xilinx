@@ -1,6 +1,6 @@
 # Default Xilinx BSP Machine settings
 
-include conf/machine/include/machine-xilinx-${SOCFAMILY}.inc
+include conf/machine/include/machine-xilinx-${SOC_FAMILY}.inc
 include conf/machine/include/machine-xilinx-${MACHINE}.inc
 
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc"
