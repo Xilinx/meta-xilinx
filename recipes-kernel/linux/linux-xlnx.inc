@@ -9,8 +9,9 @@ KBRANCH ?= ""
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
 
 FILESOVERRIDES_append = ":${LINUX_VERSION}"
+KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https"
 SRC_URI = " \
-		git://github.com/Xilinx/linux-xlnx.git;protocol=https;${SRCBRANCHARG} \
+		${KERNELURI};${SRCBRANCHARG} \
 		file://xilinx-base;type=kmeta;destsuffix=xilinx-base \
 		"
 
