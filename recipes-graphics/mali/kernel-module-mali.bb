@@ -3,26 +3,30 @@ SECTION = "kernel/modules"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = " \
-	file://linux/license/gpl/mali_kernel_license.h;md5=68c66513a9dacef77a52c3d6c5e6afd5 \
+	file://linux/license/gpl/mali_kernel_license.h;md5=1436c0d104589824163a3eb50fbb5050 \
 	"
 
-PV = "r5p1-01rel0"
+PV = "r7p0-00rel0"
 
 SRC_URI = " \
 	http://malideveloper.arm.com/downloads/drivers/DX910/${PV}/DX910-SW-99002-${PV}.tgz \
-	file://Makefile.patch \
-	file://0001-mali-r5p1-01rel0-Remove-unused-trace-macros.patch \
-	file://0002-staging-mali-r5p1-01rel0-Add-the-ZYNQ-ZYNQMP-platfor.patch \
-	file://0003-staging-mali-r5p1-01rel0-Don-t-include-mali_read_phy.patch \
+	file://0001-Change-Makefile-to-be-compatible-with-Yocto.patch \
+	file://0002-staging-mali-r7p0-00rel0-Add-the-ZYNQ-ZYNQMP-platfor.patch \
+	file://0003-staging-mali-r7p0-00rel0-Remove-unused-trace-macros.patch \
+	file://0004-staging-mali-r7p0-00rel0-Don-t-include-mali_read_phy.patch \
+	file://0005-mali-r7p0-PAGE_CACHE_SHIFT-to-PAGE_CACHE.patch \
+	file://0006-staging-mali-r7p0-page_cache_release-to-put_page.patch \
+	file://0007-mali_memory_os_alloc.c-Align-with-dma_attrs-changes-.patch \
+	file://0008-arm.c-dma_ops-will-be-modified-by-the-driver-only-ti.patch \
 	"
-SRC_URI[md5sum] = "9c85c113e4d41ae992e45ba27287d1ab"
-SRC_URI[sha256sum] = "86209c99c36a7622402b016b6f764c212b738ccdec9cdc6d6f16758c013957a0"
+SRC_URI[md5sum] = "db3ef3258eb55700484ecadfdce1fee1"
+SRC_URI[sha256sum] = "496ba80684aa4236806891a8445978849f7dd07299f5e58b14d52cd5e7ba0536"
 
 inherit module
 
 do_make_scripts[depends] += "virtual/kernel:do_unpack"
 
-S = "${WORKDIR}/driver/src/devicedrv/mali"
+S = "${WORKDIR}/DX910-SW-99002-${PV}/driver/src/devicedrv/mali"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynqmp = "zynqmp"
@@ -35,4 +39,5 @@ EXTRA_OEMAKE = 'KDIR="${STAGING_KERNEL_DIR}" \
 		MALI_SHARED_INTERRUPTS=1 \
 		CROSS_COMPILE="${TARGET_PREFIX}" \
 		O=${STAGING_KERNEL_BUILDDIR} \
+		MALI_QUIET=1 \
 		'
