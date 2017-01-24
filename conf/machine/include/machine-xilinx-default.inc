@@ -13,14 +13,17 @@ IMAGE_FSTYPES ?= "tar.gz cpio cpio.gz.u-boot"
 IMAGE_CLASSES += "image_types_uboot"
 
 # Kernel Configuration
-XILINX_DEFAULT_KERNEL := "linux-xlnx"
+XILINX_DEFAULT_KERNEL ?= "linux-xlnx"
+XILINX_DEFAULT_KERNEL_VERSION ?= "4.6%"
 
 PREFERRED_PROVIDER_virtual/kernel ??= "${XILINX_DEFAULT_KERNEL}"
-PREFERRED_VERSION_linux-xlnx ?= "4.6%"
+PREFERRED_VERSION_linux-xlnx ?= "${XILINX_DEFAULT_KERNEL_VERSION}"
 
 # U-Boot Configuration
-XILINX_DEFAULT_UBOOT := "u-boot-xlnx"
+XILINX_DEFAULT_UBOOT ?= "u-boot-xlnx"
+XILINX_DEFAULT_UBOOT_VERSION ?= "v2016.07%"
 PREFERRED_PROVIDER_virtual/bootloader ??= "${XILINX_DEFAULT_UBOOT}"
+PREFERRED_VERSION_u-boot-xlnx ?= "${XILINX_DEFAULT_UBOOT_VERSION}"
 
 UBOOT_SUFFIX ?= "bin"
 
