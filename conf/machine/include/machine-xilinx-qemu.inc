@@ -46,7 +46,7 @@ XILINX_QEMUBOOT[doc] = "Set this variable to '1' to enable the generation of qem
 XILINX_QEMUBOOT ?= ""
 
 # Dependencies for native Xilinx QEMU
-XILINX_QEMU_DEPENDS ?= "qemu-xilinx-native"
+# XILINX_QEMU_DEPENDS ?= "qemu-xilinx-native"
 # If the machine supports the Xilinx QEMU, add the dependencies
 EXTRA_IMAGEDEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qemu-system-xilinx', '${XILINX_QEMU_DEPENDS}', '', d)}"
 
