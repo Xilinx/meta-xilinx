@@ -23,7 +23,7 @@ do_deploy() {
 			bbwarn "${DTS_FILE} is not available!"
 			continue
 		fi
-		DTS_NAME=`basename -s .dtb ${DTS_FILE}`
+		DTS_NAME=`basename ${DTS_FILE} .dtb`
 		install -d ${DEPLOYDIR}
 		install -d ${DEPLOYDIR}/qemu-hw-devicetrees
 		install -m 0644 ${S}/LATEST/SINGLE_ARCH/${DTS_NAME}.dtb ${DEPLOYDIR}/qemu-hw-devicetrees/${DTS_NAME}.dtb
