@@ -24,6 +24,7 @@ KVMENABLE = "--disable-kvm"
 SRC_URI[_append] = ""
 
 DISABLE_STATIC_pn-qemu-xilinx-native = ""
+DISABLE_STATIC_pn-nativesdk-qemu-xilinx-native = ""
 
 # append a suffix dir, to allow multiple versions of QEMU to be installed
 datadir_append = "/qemu-xilinx"
