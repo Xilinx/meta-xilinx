@@ -23,6 +23,7 @@ KVMENABLE = "--disable-kvm"
 # Strip all appends (needed because qemu.inc adds patches using overrides)
 SRC_URI[_append] = ""
 
+DISABLE_STATIC_pn-qemu-xilinx = ""
 DISABLE_STATIC_pn-qemu-xilinx-native = ""
 DISABLE_STATIC_pn-nativesdk-qemu-xilinx-native = ""
 
@@ -38,6 +39,14 @@ EXTRA_OECONF += " \
 		--mandir=${mandir} \
 		--docdir=${docdir} \
 		"
+do_compile_ptest() {
+       :
+}
+
+do_install_ptest() {
+       :
+}
+
 
 do_install() {
 	export STRIP="true"
