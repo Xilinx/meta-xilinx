@@ -22,23 +22,23 @@ KVMENABLE = "--disable-kvm"
 # Strip all appends (needed because qemu.inc adds patches using overrides)
 SRC_URI[_append] = ""
 
+DISABLE_STATIC_pn-qemu-xilinx = ""
 DISABLE_STATIC_pn-qemu-xilinx-native = ""
-DISABLE_STATIC_pn-nativesdk-qemu-xilinx-native = ""
+DISABLE_STATIC_pn-nativesdk-qemu-xilinx = ""
+
+PTEST_ENABLED = ""
 
 # append a suffix dir, to allow multiple versions of QEMU to be installed
-datadir_append = "/qemu-xilinx"
-bindir_append = "/qemu-xilinx"
-libexecdir_append = "/qemu-xilinx"
-
-# ensure configure is passed the modified dirs
-EXTRA_OECONF += " \
-		--bindir=${bindir} \
-		--datadir=${datadir} \
-		--mandir=${mandir} \
-		--docdir=${docdir} \
+EXTRA_OECONF_append = " \
+		--bindir=${bindir}/qemu-xilinx \
+		--libexecdir=${libexecdir}/qemu-xilinx \
+		--datadir=${datadir}/qemu-xilinx \
 		"
 
 do_install() {
 	export STRIP="true"
 	autotools_do_install
+
+	# Prevent QA warnings about installed ${localstatedir}/run
+	if [ -d ${D}${localstatedir}/run ]; then rmdir ${D}${localstatedir}/run; fi
 }
