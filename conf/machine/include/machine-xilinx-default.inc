@@ -57,3 +57,6 @@ XSERVER_EXT_zynqmp ?= " \
 	"
 
 EXTRA_IMAGEDEPENDS_append_zynqmp += " arm-trusted-firmware"
+
+# Support multilib on zynqmp
+DEFAULTTUNE_virtclass-multilib-lib32_zynqmp = "armv7vehf-neon-vfpv4"
