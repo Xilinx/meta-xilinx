@@ -10,10 +10,8 @@ LIC_FILES_CHKSUM = " \
 		file://COPYING.LIB;endline=24;md5=c04def7ae38850e7d3ef548588159913 \
 		"
 
-SRCREV = "4b90a13118b6e005d688d7aefb0900f7a67531df"
-SRC_URI = "git://github.com/Xilinx/qemu.git;protocol=https;nobranch=1 \
-		file://xilinx-dp-Add-support-for-yuy2-video-format.patch \
-		"
+SRCREV = "a83265d7403ee49c9a911c920961ef29deac96eb"
+SRC_URI = "git://github.com/Xilinx/qemu.git;protocol=https;nobranch=1"
 
 S = "${WORKDIR}/git"
 
@@ -25,30 +23,21 @@ SRC_URI[_append] = ""
 
 DISABLE_STATIC_pn-qemu-xilinx = ""
 DISABLE_STATIC_pn-qemu-xilinx-native = ""
-DISABLE_STATIC_pn-nativesdk-qemu-xilinx-native = ""
+DISABLE_STATIC_pn-nativesdk-qemu-xilinx = ""
+
+PTEST_ENABLED = ""
 
 # append a suffix dir, to allow multiple versions of QEMU to be installed
-datadir_append = "/qemu-xilinx"
-bindir_append = "/qemu-xilinx"
-libexecdir_append = "/qemu-xilinx"
-
-# ensure configure is passed the modified dirs
-EXTRA_OECONF += " \
-		--bindir=${bindir} \
-		--datadir=${datadir} \
-		--mandir=${mandir} \
-		--docdir=${docdir} \
+EXTRA_OECONF_append = " \
+		--bindir=${bindir}/qemu-xilinx \
+		--libexecdir=${libexecdir}/qemu-xilinx \
+		--datadir=${datadir}/qemu-xilinx \
 		"
-do_compile_ptest() {
-       :
-}
-
-do_install_ptest() {
-       :
-}
-
 
 do_install() {
 	export STRIP="true"
 	autotools_do_install
+
+	# Prevent QA warnings about installed ${localstatedir}/run
+	if [ -d ${D}${localstatedir}/run ]; then rmdir ${D}${localstatedir}/run; fi
 }
