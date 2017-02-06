@@ -12,11 +12,14 @@ DEPENDS += "u-boot-mkimage-native"
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
-BRANCH = "master"
-SRC_URI = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https;branch=${BRANCH}"
+BRANCH ?= "master"
+REPO ?= "git://gitenterprise.xilinx.com/Linux/arm-trusted-firmware.git"
+SRCREV ?= "a7a49d7f6373633d3a6c45929bc8105e91b182fe"
+
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+SRC_URI = "${REPO};protocol=https;${BRANCHARG}"
 
 XILINX_RELEASE_VERSION = "v2017.1"
-SRCREV ?= "a7a49d7f6373633d3a6c45929bc8105e91b182fe"
 
 PV = "1.3-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
