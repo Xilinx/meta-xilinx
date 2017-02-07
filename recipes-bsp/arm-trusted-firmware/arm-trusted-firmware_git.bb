@@ -16,7 +16,7 @@ BRANCH = "master"
 SRC_URI = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https;branch=${BRANCH}"
 
 XILINX_RELEASE_VERSION = "v2017.1"
-SRCREV ?= "${AUTOREV}"
+SRCREV ?= "a7a49d7f6373633d3a6c45929bc8105e91b182fe"
 
 PV = "1.3-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
