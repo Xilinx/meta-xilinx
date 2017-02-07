@@ -12,7 +12,7 @@ FILESOVERRIDES_append = ":${LINUX_VERSION}"
 KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https"
 SRC_URI = " \
 		${KERNELURI};${SRCBRANCHARG} \
-		file://xilinx-base;type=kmeta;destsuffix=xilinx-base \
+		file://xilinx-base;type=kmeta;name=kmeta-xilinx-base;destsuffix=xilinx-base \
 		"
 
 SRCREV_machine ?= "${SRCREV}"
