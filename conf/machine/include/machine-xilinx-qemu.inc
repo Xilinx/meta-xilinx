@@ -43,7 +43,7 @@ QB_SYSTEM_NAME ?= "${@qemu_target_binary(d)}"
 QB_DEFAULT_FSTYPE ?= "cpio"
 
 XILINX_QEMUBOOT[doc] = "Set this variable to '1' to enable the generation of qemuboot.conf which uses the Xilinx QEMU."
-XILINX_QEMUBOOT ?= ""
+XILINX_QEMUBOOT ??= ""
 
 # Dependencies for native Xilinx QEMU
 XILINX_QEMU_DEPENDS ?= "qemu-xilinx-native"
