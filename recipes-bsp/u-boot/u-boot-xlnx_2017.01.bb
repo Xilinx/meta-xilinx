@@ -1,7 +1,7 @@
 include u-boot-xlnx.inc
 
 XILINX_RELEASE_VERSION = "v2017.1"
-SRCREV = "f6ea909b0e119b68c187ded2605279fb605562b9"
+SRCREV ?= "f6ea909b0e119b68c187ded2605279fb605562b9"
 PV = "v2017.01-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-xlnx:"
