@@ -9,7 +9,7 @@ MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc"
 MACHINE_FEATURES_BACKFILL_CONSIDERED_append_microblaze = " qemu-usermode"
 
 # File System Configuration
-IMAGE_FSTYPES ?= "tar.gz cpio cpio.gz.u-boot"
+IMAGE_FSTYPES ?= "tar.gz cpio cpio.gz.u-boot cpio.gz"
 IMAGE_CLASSES += "image_types_uboot"
 
 # Kernel Configuration
