@@ -19,7 +19,7 @@ IMAGE_TYPEDEP_xilinx-fitimage = "${FITIMAGE_ROOTFS_TYPE}"
 # Use an uncompressed cpio by default as rootfs
 FITIMAGE_ROOTFS_TYPE ?= "cpio"
 FITIMAGE_ROOTFS_COMPRESSION_TYPE ?= "none"
-FITIMAGE_ROOTFSIMG ?= "${IMAGE_BASENAME}-${MACHINE}.${FITIMAGE_ROOTFS_TYPE}"
+FITIMAGE_ROOTFSIMG ?= ""
 
 FITIMAGE_KERNELIMG ?= ""
 FITIMAGE_KERNEL_COMPRESSION_TYPE ?= "none"
@@ -77,14 +77,24 @@ do_assemble_xilinx_fitimage() {
 	if [ -z "${FITIMAGE_DTBIMG}" ]; then
 		bbfatal "No dtb was defined, Please set FITIMAGE_DTBIMG appropriately."
 	fi
-	${XILINXBASE}/scripts/bin/mkits.sh -v "${MACHINE}" \
-		-k "${FITIMAGE_KERNELIMG}" -c 1 -c 2 \
-		-C "${FITIMAGE_KERNEL_COMPRESSION_TYPE}" \
-		-e "${FITIMAGE_KERNEL_ENTRYPOINT}" \
-		-a "${FITIMAGE_KERNEL_LOADADDRESS}" \
-		-r "${DEPLOY_DIR_IMAGE}/${FITIMAGE_ROOTFSIMG}" -c 1 \
-		-C "${FITIMAGE_ROOTFS_COMPRESSION_TYPE}" \
-		-d "${FITIMAGE_DTBIMG}" -c 1 -c 2 \
-		-o fit-image.its
+
+	if [ "${FITIMAGE_ROOTFSIMG}" = "" ]; then
+		${XILINXBASE}/scripts/bin/mkits.sh -v "${MACHINE}" \
+			-k "${FITIMAGE_KERNELIMG}" -c 2 \
+			-e "${FITIMAGE_KERNEL_ENTRYPOINT}" \
+			-a "${FITIMAGE_KERNEL_LOADADDRESS}" \
+			-d "${FITIMAGE_DTBIMG}" -c 2 \
+			-o fit-image.its
+	else
+		${XILINXBASE}/scripts/bin/mkits.sh -v "${MACHINE}" \
+			-k "${FITIMAGE_KERNELIMG}" -c 1 -c 2 \
+			-C "${FITIMAGE_KERNEL_COMPRESSION_TYPE}" \
+			-e "${FITIMAGE_KERNEL_ENTRYPOINT}" \
+			-a "${FITIMAGE_KERNEL_LOADADDRESS}" \
+			-r "${DEPLOY_DIR_IMAGE}/${FITIMAGE_ROOTFSIMG}" -c 1 \
+			-C "${FITIMAGE_ROOTFS_COMPRESSION_TYPE}" \
+			-d "${FITIMAGE_DTBIMG}" -c 1 -c 2 \
+			-o fit-image.its
+	fi
 	uboot-mkimage -f fit-image.its fitImage
 }
