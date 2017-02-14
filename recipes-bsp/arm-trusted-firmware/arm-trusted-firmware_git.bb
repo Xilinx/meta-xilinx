@@ -13,11 +13,11 @@ S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 BRANCH ?= "master"
-REPO ?= "git://gitenterprise.xilinx.com/Linux/arm-trusted-firmware.git"
+REPO ?= "git://gitenterprise.xilinx.com/Linux/arm-trusted-firmware.git;protocol=https"
 SRCREV ?= "a7a49d7f6373633d3a6c45929bc8105e91b182fe"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
-SRC_URI = "${REPO};protocol=https;${BRANCHARG}"
+SRC_URI = "${REPO};${BRANCHARG}"
 
 XILINX_RELEASE_VERSION = "v2017.1"
 
