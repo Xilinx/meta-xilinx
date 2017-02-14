@@ -7,8 +7,12 @@ inherit deploy
 
 LIC_FILES_CHKSUM = "file://Makefile;beginline=1;endline=27;md5=7348b6cbcae69912cb1dee68d6c68d99"
 
-SRCREV = "1085e32a9ddc232963512923332094a58a05d1af"
-SRC_URI = "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https;nobranch=1"
+BRANCH ?= ""
+REPO ?= "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https"
+SRCREV ?= "1085e32a9ddc232963512923332094a58a05d1af"
+
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+SRC_URI = "${REPO};${BRANCHARG}"
 
 S = "${WORKDIR}/git"
 
