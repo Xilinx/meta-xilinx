@@ -37,6 +37,24 @@ def qemuboot_xilinx_enabled(d):
             return True
     return False
 
+def qemuboot_xilinx_multi_enabled(d):
+    if bb.utils.contains("MACHINE_FEATURES", "qemu-system-xilinx", True, False, d):
+        if d.getVar("XILINX_QEMUBOOT_MULTI", True) == "1":
+            return True
+    return False
+
+def qemuboot_xilinx_hw_devicetrees(d):
+    if bb.utils.contains("MACHINE_FEATURES", "qemu-system-xilinx", True, False, d):
+        if d.getVar("XILINX_QEMUBOOT_MULTI", True) == "1":
+            return " -hw-dtb ${DEPLOY_DIR_IMAGE}/qemu-hw-devicetrees/MULTI_ARCH/"
+    return " -hw-dtb ${DEPLOY_DIR_IMAGE}/qemu-hw-devicetrees/SINGLE_ARCH/"
+
+def qemuboot_xilinx_unhalt(d):
+    if bb.utils.contains("MACHINE_FEATURES", "qemu-system-xilinx", True, False, d):
+        if d.getVar("XILINX_QEMUBOOT_MULTI", True) == "1":
+            return " -global xlnx,zynqmp-boot.cpu-num=0 -global xlnx,zynqmp-boot.use-pmufw=true "
+    return " -device loader,addr=0xfd1a0104,data=0x8000000e,data-len=4 "
+
 # For runqemu, default setup across all machines in meta-xilinx
 IMAGE_CLASSES += "qemuboot"
 QB_SYSTEM_NAME ?= "${@qemu_target_binary(d)}"
@@ -52,6 +70,7 @@ EXTRA_IMAGEDEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qemu-system-xil
 
 # Add an override for when booting with the Xilinx QEMU
 MACHINEOVERRIDES .= "${@':qemuboot-xilinx' if qemuboot_xilinx_enabled(d) else ''}"
+MACHINEOVERRIDES .= "${@':qemuboot-xilinx-multi' if qemuboot_xilinx_multi_enabled(d) else ''}"
 
 # This is ignored if using Xilinx's QEMU fork
 QB_DTB ?= "${@qemu_default_dtb(d)}"
