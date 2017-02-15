@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://Makefile;beginline=1;endline=27;md5=7348b6cbcae69912c
 
 BRANCH ?= ""
 REPO ?= "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https"
-SRCREV ?= "1085e32a9ddc232963512923332094a58a05d1af"
+SRCREV ?= "0451d662f6cfe0abcb6570589f637786295b6a14"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
@@ -30,7 +30,10 @@ do_deploy() {
 		DTS_NAME=`basename ${DTS_FILE} .dtb`
 		install -d ${DEPLOYDIR}
 		install -d ${DEPLOYDIR}/qemu-hw-devicetrees
-		install -m 0644 ${S}/LATEST/SINGLE_ARCH/${DTS_NAME}.dtb ${DEPLOYDIR}/qemu-hw-devicetrees/${DTS_NAME}.dtb
+		install -d ${DEPLOYDIR}/qemu-hw-devicetrees/SINGLE_ARCH
+		install -m 0644 ${S}/LATEST/SINGLE_ARCH/${DTS_NAME}.dtb ${DEPLOYDIR}/qemu-hw-devicetrees/SINGLE_ARCH/${DTS_NAME}.dtb
+		install -d ${DEPLOYDIR}/qemu-hw-devicetrees/MULTI_ARCH
+		install -m 0644 ${S}/LATEST/MULTI_ARCH/${DTS_NAME}.dtb ${DEPLOYDIR}/qemu-hw-devicetrees/MULTI_ARCH/${DTS_NAME}.dtb
 	done
 }
 
