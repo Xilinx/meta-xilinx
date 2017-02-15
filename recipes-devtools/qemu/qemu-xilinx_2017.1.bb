@@ -1,6 +1,6 @@
-QEMU_TARGETS ?= "aarch64 arm microblaze microblazeel"
-
 require recipes-devtools/qemu/qemu.inc
+
+QEMU_TARGETS += "aarch64 arm microblaze microblazeel"
 
 SUMMARY = "Xilinx's fork of a fast open source processor emulator"
 HOMEPAGE = "https://github.com/xilinx/qemu/"
