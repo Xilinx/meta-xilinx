@@ -18,6 +18,7 @@ SRC_URI = " \
 	file://0006-staging-mali-r7p0-page_cache_release-to-put_page.patch \
 	file://0007-mali_memory_os_alloc.c-Align-with-dma_attrs-changes-.patch \
 	file://0008-arm.c-dma_ops-will-be-modified-by-the-driver-only-ti.patch \
+	file://0009-linux-mali_kernel_linux.c-Handle-clock-when-probed-a.patch \
 	"
 SRC_URI[md5sum] = "db3ef3258eb55700484ecadfdce1fee1"
 SRC_URI[sha256sum] = "496ba80684aa4236806891a8445978849f7dd07299f5e58b14d52cd5e7ba0536"
