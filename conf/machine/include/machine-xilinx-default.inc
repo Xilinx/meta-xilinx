@@ -51,10 +51,7 @@ XSERVER ?= " \
 	"
 
 XSERVER_EXT ?= ""
-XSERVER_EXT_zynqmp ?= " \
-	${@bb.utils.contains('MACHINE_FEATURES', 'mali', bb.utils.contains('DISTRO_FEATURES', 'opengl', 'xserver-xorg-extension-glx', '', d), '', d)} \
-	xf86-video-armsoc \
-	"
+XSERVER_EXT_zynqmp ?= "xf86-video-armsoc"
 
 EXTRA_IMAGEDEPENDS_append_zynqmp += " arm-trusted-firmware"
 
