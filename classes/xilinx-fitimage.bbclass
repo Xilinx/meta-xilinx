@@ -31,8 +31,8 @@ FITIMAGE_DTBIMG ?= ""
 IMAGE_DEPENDS_xilinx-fitimage = " \
 			u-boot-mkimage-native \
 			dtc-native \
-			device-tree \
 			virtual/kernel \
+			virtual/dtb:do_deploy \
 			"
 
 # Final fitimage name
