@@ -13,6 +13,8 @@ B = "${WORKDIR}/build"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+DEPENDS += "kern-tools-native"
+
 inherit uboot-config uboot-extlinux-config uboot-sign cml1 deploy
 
 EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} CC="${TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS}" V=1'
