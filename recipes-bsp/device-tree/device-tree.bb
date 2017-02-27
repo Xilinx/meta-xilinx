@@ -12,6 +12,8 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 DEPENDS += "dtc-native"
 
+PROVIDES = "virtual/dtb"
+
 FILES_${PN} = "/boot/devicetree*"
 DEVICETREE_FLAGS ?= "-R 8 -p 0x3000 \
 		-i ${WORKDIR}/devicetree \
