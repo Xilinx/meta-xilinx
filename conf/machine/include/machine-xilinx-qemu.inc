@@ -63,8 +63,6 @@ QB_DEFAULT_FSTYPE ?= "cpio"
 XILINX_QEMUBOOT[doc] = "Set this variable to '1' to enable the generation of qemuboot.conf which uses the Xilinx QEMU."
 XILINX_QEMUBOOT ?= ""
 
-# Dependencies for native Xilinx QEMU
-# XILINX_QEMU_DEPENDS ?= "qemu-xilinx-native"
 # If the machine supports the Xilinx QEMU, add the dependencies
 EXTRA_IMAGEDEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'qemu-system-xilinx', '${XILINX_QEMU_DEPENDS}', '', d)}"
 
@@ -77,6 +75,9 @@ QB_DTB ?= "${@qemu_default_dtb(d)}"
 
 # ZynqMP machines need special "-hw-dtb" device trees for the Xilinx QEMU
 XILINX_QEMU_DEPENDS_append_zynqmp = " qemu-devicetrees"
+
+# Dependencies for native Xilinx QEMU
+XILINX_QEMU_DEPENDS_qemuboot-xilinx ?= "qemu-xilinx-native"
 
 QB_DEFAULT_KERNEL_qemuboot-xilinx = "none"
 QB_KERNEL_CMDLINE_APPEND ?= "${@qemu_default_serial(d)}"
