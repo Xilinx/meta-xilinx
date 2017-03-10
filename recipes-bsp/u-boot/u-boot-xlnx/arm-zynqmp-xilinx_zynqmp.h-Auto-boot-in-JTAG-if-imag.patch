@@ -28,7 +28,7 @@ index 4714b3317d..0441f3f24f 100644
 -	"jtagboot=tftpboot 80000 Image && tftpboot $fdt_addr system.dtb && " \
 -		 "tftpboot 6000000 rootfs.cpio.ub && booti 80000 6000000 $fdt_addr\0" \
 +	"jtagmemboot=if itest.w *0x80038 == 0x644d5241; then if iminfo 0x6000000; then booti 0x80000 0x6000000 $fdt_addr; else booti 0x80000 - $fdt_addr; fi; fi\0" \
-+	"jtagboot=run jtagmemboot && " \
++	"jtagboot=run jtagmemboot || " \
 +		"tftpboot 80000 Image && tftpboot $fdt_addr system.dtb && " \
 +		"tftpboot 6000000 rootfs.cpio.ub && booti 80000 6000000 $fdt_addr\0" \
  	"nosmp=setenv bootargs $bootargs maxcpus=1\0" \
