@@ -6,9 +6,12 @@
 KBRANCH ?= "master"
 
 # Use the SRCREV for the last tagged revision of linux-xlnx.
-SRCREV ?= '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/kernel", "linux-xlnx-dev", "${AUTOREV}", "629041605b93343ad2e8971ceaac3edcef0b043b", d)}'
+SRCREV ?= '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/kernel", "linux-xlnx-dev", "${AUTOREV}", "84fb0cc65aae5970471cbc54b0c89009b9b904af", d)}'
 
-LINUX_VERSION ?= "4.6+"
+# skip version sanity, because the version moves with AUTOREV
+KERNEL_VERSION_SANITY_SKIP = "1"
+
+LINUX_VERSION ?= "4.9+"
 LINUX_VERSION_EXTENSION ?= "-xilinx-dev"
 
 include linux-xlnx.inc
