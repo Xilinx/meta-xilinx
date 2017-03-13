@@ -25,6 +25,12 @@ XILINX_DEFAULT_UBOOT_VERSION ?= "v2017.01%"
 PREFERRED_PROVIDER_virtual/bootloader ??= "${XILINX_DEFAULT_UBOOT}"
 PREFERRED_VERSION_u-boot-xlnx ?= "${XILINX_DEFAULT_UBOOT_VERSION}"
 
+PREFERRED_PROVIDER_virtual/mesa_zynqmp = "mesa-gl"
+PREFERRED_PROVIDER_virtual/libgl_zynqmp = "mesa-gl"
+PREFERRED_PROVIDER_virtual/libgles1_zynqmp = "libmali-xlnx"
+PREFERRED_PROVIDER_virtual/libgles2_zynqmp = "libmali-xlnx"
+PREFERRED_PROVIDER_virtual/egl_zynqmp = "libmali-xlnx"
+
 UBOOT_SUFFIX ?= "bin"
 
 # u-boot-xlnx setups up all zynq configs to have embedded device trees (OF_EMBED=y)
@@ -34,12 +40,6 @@ UBOOT_OFEMBED_zynq ?= "${@bb.utils.contains_any('PREFERRED_PROVIDER_virtual/boot
 UBOOT_BINARY ?= "u-boot${UBOOT_OFEMBED}.${UBOOT_SUFFIX}"
 UBOOT_ELF ?= "u-boot"
 UBOOT_ELF_aarch64 ?= "u-boot.elf"
-
-# kernel modules for ZynqMP
-MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS_append_zynqmp = " \
-		${@bb.utils.contains('MACHINE_FEATURES', 'mali', bb.utils.contains('PREFERRED_PROVIDER_virtual/kernel', 'linux-xlnx', 'kernel-module-mali', '', d), '', d)} \
-		"
-KERNEL_MODULE_AUTOLOAD_zynqmp = "mali"
 
 XSERVER ?= " \
 	xserver-xorg \
