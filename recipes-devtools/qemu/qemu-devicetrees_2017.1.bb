@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://Makefile;beginline=1;endline=27;md5=7348b6cbcae69912c
 
 BRANCH ?= ""
 REPO ?= "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https"
-SRCREV ?= "0451d662f6cfe0abcb6570589f637786295b6a14"
+SRCREV ?= "5bc48d28f474c90733e72a425f75acb481520323"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"

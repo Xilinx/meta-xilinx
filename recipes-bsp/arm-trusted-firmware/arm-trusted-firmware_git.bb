@@ -13,8 +13,8 @@ S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 BRANCH ?= "master"
-REPO ?= "git://gitenterprise.xilinx.com/Linux/arm-trusted-firmware.git;protocol=https"
-SRCREV ?= "a7a49d7f6373633d3a6c45929bc8105e91b182fe"
+REPO ?= "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https"
+SRCREV ?= "eebf046095f77a074b8575fdca509384ab9fb412"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
