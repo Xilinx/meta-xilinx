@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = " \
 
 BRANCH ?= ""
 REPO ?= "git://github.com/Xilinx/qemu.git;protocol=https"
-SRCREV ?= "c62e86a758475ff42137bd44c50994a198ac5633"
+SRCREV ?= "45d810957b0f837a5685fbe4bc8d9e3268c1fe64"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
