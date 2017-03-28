@@ -13,9 +13,9 @@ FILESEXTRAPATHS_append := " \
                 ${THISDIR}/files: \
                 ${THISDIR}/r7p0-00rel0: "
 
-REPO ?= "git://gitenterprise.xilinx.com/hyunk/mali400-xlnx-release.git;protocol=https"
+REPO ?= "git://gitenterprise.xilinx.com/Graphics/mali400-xlnx-userspace.git;protocol=https"
 BRANCH ?= "master"
-SRCREV ?= "16ae952957b5c1498b37745d55f7ae829002ffd9"
+SRCREV ?= "dce796615dd346926e09af37f66123c03903b6e9"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 PV = "r7p0-00rel0"
