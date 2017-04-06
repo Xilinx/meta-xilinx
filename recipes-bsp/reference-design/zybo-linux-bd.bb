@@ -3,7 +3,8 @@ DESCRIPTION = "Contains the Reference Design Files and hardware software \
 hand-off file. The HDF provides bitstream and Xilinx ps7_init_gpl.c/h \
 platform headers."
 SECTION = "bsp"
-DEPENDS += "unzip"
+
+DEPENDS += "unzip-native"
 
 LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://Projects/${HW_BD}/readme.txt;md5=e1cb7639bf00b6e730ff3a7f13714951"
