@@ -3,7 +3,8 @@ Booting meta-xilinx boards
 
 Contents
 --------
- * [Loading via JTAG](#loading-via-jtag)
+
+* [Loading via JTAG](#loading-via-jtag)
   * [XSDB](#xsdb)
   * [Load Bitstream](#load-bitstream)
   * [Load U-Boot (MicroBlaze)](#load-u-boot-microblaze)
@@ -11,14 +12,14 @@ Contents
   * [U-Boot Console](#u-boot-console)
   * [Kernel, Root Filesystem and Device Tree](#kernel-root-filesystem-and-device-tree)
   * [Booting via U-Boot](#booting-via-u-boot)
- * [Loading via SD](#loading-via-sd)
+* [Loading via SD](#loading-via-sd)
   * [Preparing SD/MMC](#preparing-sdmmc)
   * [Installing U-Boot](#installing-u-boot)
   * [Installing Kernel and Device Tree](#installing-kernel-and-device-tree)
   * [Installing Root Filesystem](#installing-root-filesystem)
   * [U-Boot Configuration File](#u-boot-configuration-file)
   * [Booting](#booting)
- * [Loading via TFTP](#loading-via-tftp)
+* [Loading via TFTP](#loading-via-tftp)
   * [Kernel, Root Filesystem and Device Tree](#kernel-root-filesystem-and-device-tree-1)
   * [Booting via U-Boot](#booting-via-u-boot-1)
 
@@ -143,19 +144,22 @@ how large the ramdisk is.
 
 ### Installing U-Boot
 Add the following files to the first partition:
- * `boot.bin`
- * `u-boot.img` (if using u-boot-xlnx)
- * `u-boot-dtb.img` (if using u-boot)
+
+* `boot.bin`
+* `u-boot.img` (if using u-boot-xlnx)
+* `u-boot-dtb.img` (if using u-boot)
 
 ### Installing Kernel and Device Tree
 Add the following files to the first partition:
- * `uImage`
- * `<machine name>.dtb`
+
+* `uImage`
+* `<machine name>.dtb`
 
 ### Installing Root Filesystem
 If using a ramdisk also add the `.cpio.gz.u-boot` type of root filesystem image
 to the first partition.
- * `core-image-minimal-<machine name>.cpio.gz.u-boot`
+
+* `core-image-minimal-<machine name>.cpio.gz.u-boot`
 
 If using the SD card as the root filesystem, populate the second partition with
 the content of the root filesystem. To install the root filesystem extract the
@@ -198,9 +202,10 @@ Boot your system into U-Boot, using one of boot methods (e.g. JTAG, SD, QSPI).
 
 ### Kernel, Root Filesystem and Device Tree
 Place the following images into the root of the TFTP server directory:
- * `core-image-minimal-<machine name>.cpio.gz.u-boot`
- * `uImage` (Zynq) or `linux.bin.ub` (MicroBlaze)
- * `<machine name>.dtb`
+
+* `core-image-minimal-<machine name>.cpio.gz.u-boot`
+* `uImage` (Zynq) or `linux.bin.ub` (MicroBlaze)
+* `<machine name>.dtb`
 
 ### Booting via U-Boot
 The serial console of the target board will display the U-Boot console.
