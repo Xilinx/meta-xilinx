@@ -1,15 +1,18 @@
 EXTRA_IMAGEDEPENDS += "qemu-native qemu-helper-native"
 
 def qemu_default_dtb(d):
-    if d.getVar("MACHINE_DEVICETREE", True):
-        dtbs = d.getVar("MACHINE_DEVICETREE", True).split(" ")
-        dtbs = [os.path.splitext(os.path.basename(d)) for d in dtbs]
-        dtbs = ["%s.dtb" % name for name, ext in dtbs if ext == ".dts" or ext == ".dtb"]
-        return dtbs[0] if dtbs else ""
-    elif d.getVar("KERNEL_DEVICETREE", True):
+    if d.getVar("IMAGE_BOOT_FILES", True):
+        dtbs = d.getVar("IMAGE_BOOT_FILES", True).split(" ")
+        # IMAGE_BOOT_FILES has extra renaming info in the format '<source>;<target>'
+        dtbs = [f.split(";")[0] for f in dtbs]
+        dtbs = [f for f in dtbs if f.endswith(".dtb")]
+        if len(dtbs) != 0:
+            return dtbs[0]
+    if d.getVar("KERNEL_DEVICETREE", True):
         dtbs = d.getVar("KERNEL_DEVICETREE", True).split(" ")
         dtbs = [os.path.basename(d) for d in dtbs]
-        return d.getVar("KERNEL_IMAGETYPE", True) + "-" + (dtbs[0] if dtbs else "")
+        if len(dtbs) != 0:
+            return d.getVar("KERNEL_IMAGETYPE", True) + "-" + dtbs[0]
     return ""
 
 def qemu_default_serial(d):
