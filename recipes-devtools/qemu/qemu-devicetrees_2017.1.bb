@@ -7,7 +7,7 @@ inherit deploy
 
 LIC_FILES_CHKSUM = "file://Makefile;beginline=1;endline=27;md5=7348b6cbcae69912cb1dee68d6c68d99"
 
-SRCREV = "1085e32a9ddc232963512923332094a58a05d1af"
+SRCREV = "294ffabc02d8a3933f7acfb2256489677776af8d"
 SRC_URI = "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https;nobranch=1"
 
 S = "${WORKDIR}/git"
