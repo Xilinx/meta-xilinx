@@ -1,0 +1,11 @@
+
+Obtaining MALI userspace binaries
+===========================================
+
+Xilinx ZynqMPSoC has the MALI 400MP GPU from ARM. The ARM MALI 400MP is an OpenGLES 2.0 capable GPU.
+
+Please agree to the license in the given link below
+
+http://www.xilinx.com/products/design-tools/embedded-software/petalinux-sdk/arm-mali-400-software-download.html
+
+Once done, you can download MALI-400 userspace binaries relevant to ZynqMP
