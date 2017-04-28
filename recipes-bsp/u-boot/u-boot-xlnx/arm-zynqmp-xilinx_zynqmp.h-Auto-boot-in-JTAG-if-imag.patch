@@ -1,0 +1,48 @@
+From 9d44bd18191a56331273beb7c26b18afe154c82c Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan@nathanrossi.com>
+Date: Fri, 4 Nov 2016 21:33:14 +1000
+Subject: [PATCH] arm: zynqmp: xilinx_zynqmp.h: Auto boot in JTAG if images in
+ memory
+
+Add a command that checks if the Kernel image (in aarch64 Image format)
+and optionally a rootfs is in memory and automatically boot these images
+if in JTAG boot mode.
+
+This allows for simpler boot automation in JTAG boot environments
+(including QEMU) where manual interaction would otherwise be required.
+
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+Upstream-Status: Denied [Upstream prefers FIT instead]
+---
+ include/configs/xilinx_zynqmp.h | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/include/configs/xilinx_zynqmp.h b/include/configs/xilinx_zynqmp.h
+index 4714b3317d..0441f3f24f 100644
+--- a/include/configs/xilinx_zynqmp.h
++++ b/include/configs/xilinx_zynqmp.h
+@@ -246,8 +246,10 @@
+ 		"run xen_prepare_dt_qemu && " \
+ 		"tftpb 6000000 xen.ub && tftpb 0x1000000 image.ub && " \
+ 		"bootm 6000000 0x1000000 $fdt_addr\0" \
+-	"jtagboot=tftpboot 80000 Image && tftpboot $fdt_addr system.dtb && " \
+-		 "tftpboot 6000000 rootfs.cpio.ub && booti 80000 6000000 $fdt_addr\0" \
++	"jtagmemboot=if itest.w *0x80038 == 0x644d5241; then if iminfo 0x6000000; then booti 0x80000 0x6000000 $fdt_addr; else booti 0x80000 - $fdt_addr; fi; fi\0" \
++	"jtagboot=run jtagmemboot || " \
++		"tftpboot 80000 Image && tftpboot $fdt_addr system.dtb && " \
++		"tftpboot 6000000 rootfs.cpio.ub && booti 80000 6000000 $fdt_addr\0" \
+ 	"nosmp=setenv bootargs $bootargs maxcpus=1\0" \
+ 	"nfsroot=setenv bootargs $bootargs root=/dev/nfs nfsroot=$serverip:/mnt/sata,tcp ip=$ipaddr:$serverip:$serverip:255.255.255.0:zynqmp:eth0:off rw\0" \
+ 	"sdroot0=setenv bootargs $bootargs root=/dev/mmcblk0p2 rw rootwait\0" \
+@@ -269,7 +271,7 @@
+ 
+ /* Do not preserve environment */
+ #define CONFIG_ENV_IS_NOWHERE		1
+-#define CONFIG_ENV_SIZE			0x1000
++#define CONFIG_ENV_SIZE			0x2000
+ 
+ /* Monitor Command Prompt */
+ /* Console I/O Buffer Size */
+-- 
+2.11.0
+
