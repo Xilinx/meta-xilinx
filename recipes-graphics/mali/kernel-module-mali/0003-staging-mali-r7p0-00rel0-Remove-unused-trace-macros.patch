@@ -1,0 +1,33 @@
+From c86d22f1133647518a68f9f1cbe73e1797e68fa8 Mon Sep 17 00:00:00 2001
+From: Hyun Kwon <hyun.kwon@xilinx.com>
+Date: Tue, 3 May 2016 08:11:38 -0700
+Subject: [PATCH 3/6] staging: mali: r7p0-00rel0: Remove unused trace macros
+
+TRACE_SYSTEM_STRING is not need in each trace file anymore.
+
+Signed-off-by: Hyun Kwon <hyun.kwon@xilinx.com>
+Upstream Status: Pending
+---
+ driver/src/devicedrv/mali/linux/mali_linux_trace.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/driver/src/devicedrv/mali/linux/mali_linux_trace.h b/driver/src/devicedrv/mali/linux/mali_linux_trace.h
+index 2c91ddc..d4e45ab 100755
+--- linux/mali_linux_trace.h
++++ b/linux/mali_linux_trace.h
+@@ -13,12 +13,10 @@
+ 
+ #include <linux/types.h>
+ 
+-#include <linux/stringify.h>
+ #include <linux/tracepoint.h>
+ 
+ #undef  TRACE_SYSTEM
+ #define TRACE_SYSTEM mali
+-#define TRACE_SYSTEM_STRING __stringfy(TRACE_SYSTEM)
+ 
+ #define TRACE_INCLUDE_PATH .
+ #define TRACE_INCLUDE_FILE mali_linux_trace
+-- 
+2.7.4
+

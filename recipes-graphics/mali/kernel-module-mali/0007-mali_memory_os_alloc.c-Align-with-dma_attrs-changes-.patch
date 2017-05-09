@@ -1,0 +1,92 @@
+From f0a49bccbdd910c48aab59e07aed98093f4a0fea Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Date: Wed, 25 Jan 2017 02:59:40 -0800
+Subject: [PATCH 1/2] mali_memory_os_alloc.c: Align with dma_attrs changes from
+ 4.8 Kernel
+
+From 4.8 Kernel the DMA attributes is no longer a pointer but an unsigned long.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Upstream Status: Pending
+---
+ .../devicedrv/mali/linux/mali_memory_os_alloc.c    | 25 +++++++++++++++++-----
+ 1 file changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/driver/src/devicedrv/mali/linux/mali_memory_os_alloc.c b/driver/src/devicedrv/mali/linux/mali_memory_os_alloc.c
+index 7f229eb..08fa2fb 100755
+--- linux/mali_memory_os_alloc.c
++++ b/linux/mali_memory_os_alloc.c
+@@ -26,9 +26,11 @@
+ #define MALI_OS_MEMORY_KERNEL_BUFFER_SIZE_IN_PAGES (MALI_OS_MEMORY_KERNEL_BUFFER_SIZE_IN_MB * 256)
+ #define MALI_OS_MEMORY_POOL_TRIM_JIFFIES (10 * CONFIG_HZ) /* Default to 10s */
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0) && LINUX_VERSION_CODE < KERNEL_VERSION(4, 8, 0))
+ /* Write combine dma_attrs */
+ static DEFINE_DMA_ATTRS(dma_attrs_wc);
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
++static unsigned long dma_attrs_wc;
+ #endif
+ 
+ #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 0, 0)
+@@ -511,10 +513,14 @@ _mali_osk_errcode_t mali_mem_os_get_table_page(mali_dma_addr *phys, mali_io_addr
+ 	spin_unlock(&mali_mem_page_table_page_pool.lock);
+ 
+ 	if (_MALI_OSK_ERR_OK != ret) {
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0) && LINUX_VERSION_CODE < KERNEL_VERSION(4, 8, 0))
+ 		*mapping = dma_alloc_attrs(&mali_platform_device->dev,
+ 					   _MALI_OSK_MALI_PAGE_SIZE, &tmp_phys,
+ 					   GFP_KERNEL, &dma_attrs_wc);
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
++		*mapping = dma_alloc_attrs(&mali_platform_device->dev,
++					   _MALI_OSK_MALI_PAGE_SIZE, &tmp_phys,
++					   GFP_KERNEL, dma_attrs_wc);
+ #else
+ 		*mapping = dma_alloc_writecombine(&mali_platform_device->dev,
+ 						  _MALI_OSK_MALI_PAGE_SIZE, &tmp_phys, GFP_KERNEL);
+@@ -550,10 +556,14 @@ void mali_mem_os_release_table_page(mali_dma_addr phys, void *virt)
+ 	} else {
+ 		spin_unlock(&mali_mem_page_table_page_pool.lock);
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0) && LINUX_VERSION_CODE < KERNEL_VERSION(4, 8, 0))
+ 		dma_free_attrs(&mali_platform_device->dev,
+ 			       _MALI_OSK_MALI_PAGE_SIZE, virt, phys,
+ 			       &dma_attrs_wc);
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
++		dma_free_attrs(&mali_platform_device->dev,
++				_MALI_OSK_MALI_PAGE_SIZE, virt, phys,
++				dma_attrs_wc);
+ #else
+ 		dma_free_writecombine(&mali_platform_device->dev,
+ 				      _MALI_OSK_MALI_PAGE_SIZE, virt, phys);
+@@ -606,9 +616,12 @@ static void mali_mem_os_page_table_pool_free(size_t nr_to_free)
+ 
+ 	/* After releasing the spinlock: free the pages we removed from the pool. */
+ 	for (i = 0; i < nr_to_free; i++) {
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0) && LINUX_VERSION_CODE < KERNEL_VERSION(4, 8, 0))
+ 		dma_free_attrs(&mali_platform_device->dev, _MALI_OSK_MALI_PAGE_SIZE,
+ 			       virt_arr[i], (dma_addr_t)phys_arr[i], &dma_attrs_wc);
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
++		dma_free_attrs(&mali_platform_device->dev, _MALI_OSK_MALI_PAGE_SIZE,
++				virt_arr[i], (dma_addr_t)phys_arr[i], dma_attrs_wc);
+ #else
+ 		dma_free_writecombine(&mali_platform_device->dev,
+ 				      _MALI_OSK_MALI_PAGE_SIZE,
+@@ -757,8 +770,10 @@ _mali_osk_errcode_t mali_mem_os_init(void)
+ 		return _MALI_OSK_ERR_NOMEM;
+ 	}
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0)
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 8, 0) && LINUX_VERSION_CODE < KERNEL_VERSION(4, 8, 0))
+ 	dma_set_attr(DMA_ATTR_WRITE_COMBINE, &dma_attrs_wc);
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
++	dma_attrs_wc |= DMA_ATTR_WRITE_COMBINE;
+ #endif
+ 
+ 	register_shrinker(&mali_mem_os_allocator.shrinker);
+-- 
+2.7.4
+

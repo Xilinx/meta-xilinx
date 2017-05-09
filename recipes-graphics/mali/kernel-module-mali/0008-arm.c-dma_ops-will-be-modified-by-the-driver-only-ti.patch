@@ -1,0 +1,34 @@
+From 4bb78550d818b9e6491fa2d3b9706bb217a1597b Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Date: Wed, 25 Jan 2017 10:00:33 -0800
+Subject: [PATCH 2/2] arm.c: dma_ops will be modified by the driver only till
+ Kernel v4.7
+
+From v4.8(Platform specific) Kernel the arch_setup_dma_ops will
+not give a dummy_dma_ops if acpi is disabled rather pass a valid
+dma_ops.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Upstream Status: Pending
+---
+ driver/src/devicedrv/mali/platform/arm/arm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/driver/src/devicedrv/mali/platform/arm/arm.c b/driver/src/devicedrv/mali/platform/arm/arm.c
+index c6f58d8..36965fe 100755
+--- platform/arm/arm.c
++++ b/platform/arm/arm.c
+@@ -529,8 +529,9 @@ int mali_platform_device_init(struct platform_device *device)
+ 	 */
+ 	if (!device->dev.dma_mask)
+ 		device->dev.dma_mask = &device->dev.coherent_dma_mask;
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 8, 0))
+ 	device->dev.archdata.dma_ops = dma_ops;
+-
++#endif
+ 	err = platform_device_add_data(device, &mali_gpu_data, sizeof(mali_gpu_data));
+ 
+ 	if (0 == err) {
+-- 
+2.7.4
+
