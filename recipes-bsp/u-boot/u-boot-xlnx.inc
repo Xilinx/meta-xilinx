@@ -8,3 +8,7 @@ SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;protocol=https;branch=${UBRAN
 S = "${WORKDIR}/git"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-xlnx:"
+FILESEXTRAPATHS_prepend := "${@'${THISDIR}/u-boot-xlnx/${XILINX_RELEASE_VERSION}:' if d.getVar('XILINX_RELEASE_VERSION') else ''}"
+
