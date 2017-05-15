@@ -6,7 +6,7 @@ DESCRIPTION = "Xilinx ARM SOC display driver "
 LICENSE = "MIT-X & GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=10ce5de3b111315ea652a5f74ec0c602"
 
-DEPENDS += "libx11 libdrm xf86driproto"
+DEPENDS += "virtual/libx11 libdrm xf86driproto"
 RDEPENDS_${PN} += "xserver-xorg-module-exa"
 
 PV = "1.4.1+git${SRCPV}"
