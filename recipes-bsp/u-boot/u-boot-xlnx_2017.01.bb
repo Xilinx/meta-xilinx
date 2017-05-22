@@ -12,7 +12,9 @@ LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce
 
 UBOOT_ENV_zc702-zynq7 = "uEnv"
 UBOOT_ENV_zedboard-zynq7 = "uEnv"
+UBOOT_ENV_microzed-zynq7 = "uEnv"
 
 SRC_URI_append_zc702-zynq7 = " file://uEnv.txt"
 SRC_URI_append_zedboard-zynq7 = " file://uEnv.txt"
+SRC_URI_append_microzed-zynq7 = " file://uEnv.txt"
 

@@ -17,6 +17,7 @@ PROVIDES = "virtual/dtb"
 FILES_${PN} = "/boot/devicetree*"
 DEVICETREE_FLAGS ?= "-R 8 -p 0x3000 \
 		-i ${WORKDIR}/devicetree \
+		-i ${WORKDIR}/devicetree/microzed \
 		${@' '.join(['-i %s' % i for i in d.getVar('KERNEL_DTS_INCLUDE', True).split()])} \
 		"
 DEVICETREE_PP_FLAGS ?= "-nostdinc -Ulinux \
@@ -69,6 +70,8 @@ do_compile() {
 		done
 	fi
 
+	cp ${WORKDIR}/microzed/pl.dtsi ${WORKDIR}/devicetree
+
 	for DTS_FILE in ${DEVICETREE}; do
 		DTS_NAME=`basename -s .dts ${DTS_FILE}`
 		${BUILD_CPP} ${DEVICETREE_PP_FLAGS} -o ${DTS_FILE}.pp ${DTS_FILE}
@@ -109,4 +112,5 @@ FILESEXTRAPATHS_append := "${@get_additional_bbpath_filespath('conf/machine/boar
 
 # Using the MACHINE_DEVICETREE and MACHINE_KCONFIG vars, append them to SRC_URI
 SRC_URI += "${@paths_affix(d.getVar("MACHINE_DEVICETREE", True) or '', prefix = 'file://')}"
+SRC_URI += "file://microzed/pl.dtsi"
 
