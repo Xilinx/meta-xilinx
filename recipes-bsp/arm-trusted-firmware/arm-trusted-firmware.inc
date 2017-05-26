@@ -15,6 +15,9 @@ B = "${WORKDIR}/build"
 BRANCH = "master"
 SRC_URI = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https;branch=${BRANCH}"
 
+ATF_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}-${DATETIME}"
+ATF_BASE_NAME[vardepsexclude] = "DATETIME"
+
 COMPATIBLE_MACHINE = "zynqmp"
 PLATFORM_zynqmp = "zynqmp"
 
@@ -43,13 +46,16 @@ OUTPUT_DIR = "${B}/${PLATFORM}/release"
 
 do_deploy() {
 	install -d ${DEPLOYDIR}
-	install -m 0644 ${OUTPUT_DIR}/bl31/bl31.elf ${DEPLOYDIR}/arm-trusted-firmware.elf
-	install -m 0644 ${OUTPUT_DIR}/bl31.bin ${DEPLOYDIR}/arm-trusted-firmware.bin
+	install -m 0644 ${OUTPUT_DIR}/bl31/bl31.elf ${DEPLOYDIR}/${ATF_BASE_NAME}.elf
+	ln -sf ${ATF_BASE_NAME}.elf ${DEPLOYDIR}/${PN}.elf
+	install -m 0644 ${OUTPUT_DIR}/bl31.bin ${DEPLOYDIR}/${ATF_BASE_NAME}.bin
+	ln -sf ${ATF_BASE_NAME}.bin ${DEPLOYDIR}/${PN}.bin
 
 	# Get the entry point address from the elf.
 	BL31_BASE_ADDR=$(${READELF} -h ${OUTPUT_DIR}/bl31/bl31.elf | egrep -m 1 -i "entry point.*?0x" | sed -r 's/.*?(0x.*?)/\1/g')
 	mkimage -A arm64 -O linux -T kernel -C none \
 		-a $BL31_BASE_ADDR -e $BL31_BASE_ADDR \
-		-d ${OUTPUT_DIR}/bl31.bin ${DEPLOYDIR}/arm-trusted-firmware.ub
+		-d ${OUTPUT_DIR}/bl31.bin ${DEPLOYDIR}/${ATF_BASE_NAME}.ub
+	ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/${PN}.ub
 }
 addtask deploy before do_build after do_compile
