@@ -43,8 +43,8 @@ OUTPUT_DIR = "${B}/${PLATFORM}/release"
 
 do_deploy() {
 	install -d ${DEPLOYDIR}
-	install -m 0644 ${OUTPUT_DIR}/bl31/bl31.elf ${DEPLOYDIR}/arm-trusted-firmware-${MACHINE}.elf
-	install -m 0644 ${OUTPUT_DIR}/bl31.bin ${DEPLOYDIR}/arm-trusted-firmware-${MACHINE}.bin
+	install -m 0644 ${OUTPUT_DIR}/bl31/bl31.elf ${DEPLOYDIR}/arm-trusted-firmware.elf
+	install -m 0644 ${OUTPUT_DIR}/bl31.bin ${DEPLOYDIR}/arm-trusted-firmware.bin
 
 	# Get the entry point address from the elf.
 	BL31_BASE_ADDR=$(${READELF} -h ${OUTPUT_DIR}/bl31/bl31.elf | egrep -m 1 -i "entry point.*?0x" | sed -r 's/.*?(0x.*?)/\1/g')
