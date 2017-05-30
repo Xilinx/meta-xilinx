@@ -18,15 +18,14 @@ do_install() {
 }
 
 do_deploy() {
+	# single-arch dtbs
 	for DTS_FILE in ${S}/LATEST/SINGLE_ARCH/*.dtb; do
-		if [ ! -f ${DTS_FILE} ]; then
-			bbwarn "${DTS_FILE} is not available!"
-			continue
-		fi
-		DTS_NAME=`basename ${DTS_FILE} .dtb`
-		install -d ${DEPLOYDIR}
-		install -d ${DEPLOYDIR}/qemu-hw-devicetrees
-		install -m 0644 ${S}/LATEST/SINGLE_ARCH/${DTS_NAME}.dtb ${DEPLOYDIR}/qemu-hw-devicetrees/${DTS_NAME}.dtb
+		install -Dm 0644 $DTS_FILE ${DEPLOYDIR}/qemu-hw-devicetrees/$(basename $DTS_FILE .dtb).dtb
+	done
+
+	# multi-arch dtbs
+	for DTS_FILE in ${S}/LATEST/MULTI_ARCH/*.dtb; do
+		install -Dm 0644 $DTS_FILE ${DEPLOYDIR}/qemu-hw-devicetrees/multiarch/$(basename $DTS_FILE .dtb).dtb
 	done
 }
 
