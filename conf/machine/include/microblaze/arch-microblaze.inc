@@ -23,7 +23,13 @@ TUNEVALID[reorder] = "Enable Reorder Instructions"
 # General feature compiler args
 TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "barrel-shift", "-mxl-barrel-shift", "-mno-xl-barrel-shift" ,d)}"
 TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "pattern-compare", "-mxl-pattern-compare", "-mno-xl-pattern-compare" ,d)}"
-TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "reorder", "-mxl-reorder", "-mno-xl-reorder" ,d)}"
+
+# Disable reorder for v8.30 if pattern-compare is not enabled
+TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "reorder", \
+        bb.utils.contains("TUNE_FEATURES", "v8.30", \
+            bb.utils.contains("TUNE_FEATURES", "pattern-compare", \
+                "-mxl-reorder", "-mno-xl-reorder", d), \
+            "-mxl-reorder", d), "-mno-xl-reorder", d)}"
 
 # General feature package architecture formatting
 MBPKGARCH_TUNE = ""

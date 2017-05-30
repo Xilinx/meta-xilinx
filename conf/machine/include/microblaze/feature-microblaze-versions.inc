@@ -92,13 +92,3 @@ TUNECONFLICTS[v8.20] += "reorder"
 TUNE_CCARGS += "-mcpu=${@microblaze_format_gcc_version(microblaze_current_version(d))}"
 MBPKGARCH_VERSION = "-${@microblaze_format_pkg_version(microblaze_current_version(d))}"
 
-# Perform some additional tune feature dependency enforcement
-python __anonymous () {
-    tunes = (d.getVar('TUNE_FEATURES') or "").split()
-    if len(tunes) != 0:
-        # For v8.30 pattern-compare is required if reorder is enabled, enforce
-        # this in tune features.
-        if 'v8.30' in tunes and 'reorder' in tunes and 'pattern-compare' not in tunes:
-            d.setVar("TUNE_FEATURES_append", " pattern-compare")
-}
-
