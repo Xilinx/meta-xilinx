@@ -24,28 +24,14 @@ def microblaze_version_conflict(ver, d):
             conflict.append(i)
     return " ".join(conflict)
 
-def microblaze_current_version(d):
+def microblaze_current_version(d, gcc = False):
     tunes = (d.getVar("TUNE_FEATURES") or "").split()
-    for i in tunes:
-        version = microblaze_parse_version(i)
-        if version:
-            return version
-    return None
-
-def microblaze_format_gcc_version(ver):
-    if ver:
-        if ver[0] <= 8 and len(ver) > 2:
-            return "v%d.%d.%s" % ver[0:3]
+    version = next((v for v in [microblaze_parse_version(i) for i in tunes] if v), None)
+    if version:
+        if version[0] <= 8 and len(version) > 2 and (gcc or version[2] != "a"):
+            return "v%d.%d.%s" % version[0:3]
         else:
-            return "v%d.%d" % ver[0:2]
-    return ""
-
-def microblaze_format_pkg_version(ver):
-    if ver:
-        if ver[0] <= 8 and len(ver) > 2 and ver[2] != "a":
-            return "v%d.%d.%s" % ver[0:3]
-        else:
-            return "v%d.%d" % ver[0:2]
+            return "v%d.%d" % version[0:2]
     return ""
 
 # MicroBlaze versions
@@ -89,6 +75,6 @@ TUNECONFLICTS[v8.10] += "reorder"
 TUNECONFLICTS[v8.20] += "reorder"
 
 # Version flags
-TUNE_CCARGS += "-mcpu=${@microblaze_format_gcc_version(microblaze_current_version(d))}"
-MBPKGARCH_VERSION = "-${@microblaze_format_pkg_version(microblaze_current_version(d))}"
+TUNE_CCARGS += "-mcpu=${@microblaze_current_version(d, True)}"
+MBPKGARCH_VERSION = "-${@microblaze_current_version(d)}"
 
