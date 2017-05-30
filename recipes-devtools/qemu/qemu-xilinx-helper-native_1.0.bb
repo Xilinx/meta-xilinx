@@ -21,5 +21,8 @@ PROVIDES += "qemu-helper-native"
 
 # replace qemu with qemu-xilinx
 DEPENDS_remove = "qemu-native"
-DEPENDS_append = " qemu-xilinx-native"
+DEPENDS_append = " \
+		qemu-xilinx-native \
+		qemu-xilinx-multiarch-helper-native \
+		"
 
