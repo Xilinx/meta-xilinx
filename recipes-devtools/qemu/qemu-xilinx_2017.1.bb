@@ -1,4 +1,4 @@
-QEMU_TARGETS ?= "aarch64 arm microblaze microblazeel"
+QEMU_TARGETS = "aarch64 arm microblaze microblazeel"
 
 require recipes-devtools/qemu/qemu.inc
 
