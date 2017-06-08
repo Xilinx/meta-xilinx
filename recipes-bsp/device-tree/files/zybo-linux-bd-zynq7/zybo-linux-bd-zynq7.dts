@@ -127,10 +127,9 @@
 	phy-handle = <&phy0>;
 	phy-mode = "rgmii-id";
 	local-mac-address = [];
-	phy0: phy@1 {
-		compatible = "realtek,rtl8211e";
+	phy0: phy@0 {
 		device_type = "ethernet-phy";
-		reg = <1>;
+		reg = <0>;
 	};
 };
 
