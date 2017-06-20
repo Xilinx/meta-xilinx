@@ -45,7 +45,9 @@ do_compile() {
 	echo "machine_name=${MACHINE}" > ${WORKDIR}/uEnv.txt
 
 	echo "kernel_image=${KERNEL_IMAGETYPE}" >> ${WORKDIR}/uEnv.txt
+	echo "kernel_load_address=0x2080000" >> ${WORKDIR}/uEnv.txt
 	echo "devicetree_image=${@bootfiles_dtb_filepath(d)}" >> ${WORKDIR}/uEnv.txt
+	echo "devicetree_load_address=0x2000000" >> ${WORKDIR}/uEnv.txt
 
 	# bootargs, default to booting with the rootfs device being partition 2 of the first mmc device
 	echo 'bootargs=console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootwait earlyprintk' >> ${WORKDIR}/uEnv.txt
