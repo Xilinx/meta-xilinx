@@ -69,7 +69,7 @@ TUNECONFLICTS[v9.6] := "${@microblaze_version_conflict('v9.6', d)}"
 TUNECONFLICTS[v10.0] := "${@microblaze_version_conflict('v10.0', d)}"
 
 # Version/feature conflicts
-TUNECONFLICTS[v7.30] += "reorder little-endian"
+TUNECONFLICTS[v7.30] += "reorder"
 TUNECONFLICTS[v8.00] += "reorder"
 TUNECONFLICTS[v8.10] += "reorder"
 TUNECONFLICTS[v8.20] += "reorder"

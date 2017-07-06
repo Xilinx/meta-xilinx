@@ -18,7 +18,7 @@ ORIG_TARGET_ARCH := "${TARGET_ARCH}"
 # zynqmp-pmu target arch (hardcoded based on pre-gen data from arch-microblaze.inc)
 ABIEXTENSION = ""
 TUNE_ARCH = "microblazeel"
-#TUNE_FEATURES_tune-microblaze += "v9.2 little-endian barrel-shift pattern-compare"
+#TUNE_FEATURES_tune-microblaze += "v9.2 barrel-shift pattern-compare"
 TUNE_CCARGS = "-mlittle-endian -mxl-barrel-shift -mxl-pattern-compare -mno-xl-reorder -mcpu=v9.2 -mxl-soft-mul -mxl-soft-div"
 TUNE_LDARGS = ""
 TUNE_ASARGS = ""

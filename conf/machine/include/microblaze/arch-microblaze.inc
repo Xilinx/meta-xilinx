@@ -5,15 +5,11 @@ TUNEVALID[microblaze] = "MicroBlaze"
 MACHINEOVERRIDES =. "${@bb.utils.contains("TUNE_FEATURES", "microblaze", "microblaze:", "" ,d)}"
 
 # Endian
-TUNEVALID[big-endian] = "Use Microblaze Big Endian."
-TUNECONFLICTS[big-endian] = "little-endian"
-TUNEVALID[little-endian] = "Use Microblaze Little Endian."
-TUNECONFLICTS[little-endian] = "big-endian"
+TUNEVALID[bigendian] = "Use Microblaze Big Endian."
 
-MBPKGARCH_ENDIAN = "${@bb.utils.contains("TUNE_FEATURES", "little-endian", "el", "eb" ,d)}"
+MBPKGARCH_ENDIAN = "${@bb.utils.contains("TUNE_FEATURES", "bigendian", "eb", "el" ,d)}"
 
-TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "big-endian", "-mbig-endian", "" ,d)}"
-TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "little-endian", "-mlittle-endian", "" ,d)}"
+TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "bigendian", "-mbig-endian", "-mlittle-endian" ,d)}"
 
 # General features
 TUNEVALID[barrel-shift] = "Enable Hardware Barrel Shifter"
@@ -42,7 +38,7 @@ require conf/machine/include/microblaze/feature-microblaze-versions.inc
 require conf/machine/include/microblaze/feature-microblaze-math.inc
 
 # Architecture name, either 'microblazeeb' or 'microblazeel' depending on endianess
-TUNE_ARCH = "microblaze${@bb.utils.contains("TUNE_FEATURES", "little-endian", "el", "eb" ,d)}"
+TUNE_ARCH = "microblaze${@bb.utils.contains("TUNE_FEATURES", "bigendian", "eb", "el" ,d)}"
 
 # Package Architecture formatting
 TUNE_PKGARCH = "microblaze${MBPKGARCH_ENDIAN}${MBPKGARCH_VERSION}${MBPKGARCH_TUNE}${MBPKGARCH_MATH}"
