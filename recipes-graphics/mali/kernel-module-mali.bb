@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = " \
 PV = "r7p0-00rel0"
 
 SRC_URI = " \
-	http://malideveloper.arm.com/downloads/drivers/DX910/${PV}/DX910-SW-99002-${PV}.tgz \
+	https://developer.arm.com/-/media/Files/downloads/mali-drivers/kernel/mali-utgard-gpu/DX910-SW-99002-${PV}.tgz \
 	file://0001-Change-Makefile-to-be-compatible-with-Yocto.patch \
 	file://0002-staging-mali-r7p0-00rel0-Add-the-ZYNQ-ZYNQMP-platfor.patch \
 	file://0003-staging-mali-r7p0-00rel0-Remove-unused-trace-macros.patch \
