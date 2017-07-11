@@ -29,13 +29,12 @@ def microblaze_current_version(d, gcc = False):
     version = next((v for v in [microblaze_parse_version(i) for i in tunes] if v), None)
     if version:
         if version[0] <= 8 and len(version) > 2 and (gcc or version[2] != "a"):
-            return "v%d.%d.%s" % version[0:3]
+            return "v%d.%02d.%s" % version[0:3]
         else:
             return "v%d.%d" % version[0:2]
     return ""
 
 # MicroBlaze versions
-TUNEVALID[v7.30] = "MicroBlaze version 7.30"
 TUNEVALID[v8.00] = "MicroBlaze version 8.00"
 TUNEVALID[v8.10] = "MicroBlaze version 8.10"
 TUNEVALID[v8.20] = "MicroBlaze version 8.20"
@@ -52,7 +51,6 @@ TUNEVALID[v9.6] = "MicroBlaze version 9.6"
 TUNEVALID[v10.0] = "MicroBlaze version 10.0"
 
 # Version conflict matrix
-TUNECONFLICTS[v7.30] := "${@microblaze_version_conflict('v7.30', d)}"
 TUNECONFLICTS[v8.00] := "${@microblaze_version_conflict('v8.00', d)}"
 TUNECONFLICTS[v8.10] := "${@microblaze_version_conflict('v8.10', d)}"
 TUNECONFLICTS[v8.20] := "${@microblaze_version_conflict('v8.20', d)}"
@@ -69,7 +67,6 @@ TUNECONFLICTS[v9.6] := "${@microblaze_version_conflict('v9.6', d)}"
 TUNECONFLICTS[v10.0] := "${@microblaze_version_conflict('v10.0', d)}"
 
 # Version/feature conflicts
-TUNECONFLICTS[v7.30] += "reorder"
 TUNECONFLICTS[v8.00] += "reorder"
 TUNECONFLICTS[v8.10] += "reorder"
 TUNECONFLICTS[v8.20] += "reorder"
