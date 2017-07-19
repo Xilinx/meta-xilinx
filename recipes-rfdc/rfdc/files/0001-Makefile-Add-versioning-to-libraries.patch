@@ -1,0 +1,50 @@
+From 1640194f56be4b7614378fd33c3af7fa3352ba3c Mon Sep 17 00:00:00 2001
+From: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+Date: Mon, 24 Jul 2017 13:03:57 -0700
+Subject: [PATCH] Makefile: Add versioning to the library
+
+Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
+---
+ rfdc/src/Makefile | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 7d8b08c..52753df 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,18 +1,25 @@
+ APP = rfdc
+ 
+ LIBSOURCES=*.c
+-OUTS = *.o 
+-LIB=rfdc
++OUTS = *.o
++NAME := rfdc
+ MAJOR = 1
+ MINOR = 1
+ VERSION = $(MAJOR).$(MINOR)
+ 
+-%.o: %.c
+-	$(CC) $(CFLAGS) -c -fPIC $(LIBSOURCES) 
++all: lib$(NAME).so
++
++lib$(NAME).so.$(VERSION): $(OUTS)
++	$(CC) $(LDFLAGS) $(OUTS) -shared -Wl,-soname,lib$(NAME).so.$(MAJOR) -o lib$(NAME).so.$(VERSION) -lmetal
+ 
+-all: $(OUTS)
+-	$(CC) $(LDFLAGS) $(OUTS) -shared -o $(LIB).so.$(VERSION) -lmetal
++lib$(NAME).so: lib$(NAME).so.$(VERSION)
++	rm -f lib$(NAME).so.$(MAJOR) lib$(NAME).so
++	ln -s lib$(NAME).so.$(VERSION) lib$(NAME).so.$(MAJOR)
++	ln -s lib$(NAME).so.$(MAJOR) lib$(NAME).so
++
++%.o: %.c
++	$(CC) $(CFLAGS) -c -fPIC $(LIBSOURCES)
+ 
+ clean:
+-	rm -rf *.o *.so
++	rm -rf *.o *.so *.so.*
+ 
+-- 
+2.7.4
+
