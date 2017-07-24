@@ -1,7 +1,7 @@
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-SRCREV = "${AUTOREV}"
+SRCREV = "cdfe336d88c31ba882b37e36a69fb4762332540b"
 REPO ?= "git://gitenterprise.xilinx.com/uspea/uspea.git;protocol=https"
 BRANCH ?= "master"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
