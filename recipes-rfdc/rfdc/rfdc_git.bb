@@ -39,4 +39,4 @@ do_install() {
 }
 
 FILES_${PN} = "${libdir}/*.so.* ${includedir}/*"
-FILES_${PN}-dev = "${libdir}/*.so ${includedir}/*"
+FILES_${PN}-dev = "${libdir}/*.so"
