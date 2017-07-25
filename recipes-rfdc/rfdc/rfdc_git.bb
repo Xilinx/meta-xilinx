@@ -33,7 +33,7 @@ do_configure() {
 do_install() {
     install -d ${D}${libdir}
     install -d ${D}${includedir}
-    cp -P librfdc.so* ${D}${libdir}
+    oe_libinstall -so librfdc ${D}${libdir}
     install -m 0644 ${S}/xrfdc_hw.h ${D}${includedir}/xrfdc_hw.h
     install -m 0644 ${S}/xrfdc.h ${D}${includedir}/xrfdc.h
 }
