@@ -12,7 +12,8 @@ PACKAGE_EXTRA_ARCHS_tune-microblaze = "${TUNE_PKGARCH}"
 MACHINEOVERRIDES =. "${@bb.utils.contains("TUNE_FEATURES", "microblaze", "microblaze:", "" ,d)}"
 
 # Linux Configuration
-KERNEL_IMAGETYPE ?= "linux.bin.ub"
+KERNEL_IMAGETYPE ?= "linux.bin"
+KERNEL_IMAGETYPES += "linux.bin.ub"
 
 # U-Boot Configuration
 UBOOT_MACHINE ?= "microblaze-generic_config"
