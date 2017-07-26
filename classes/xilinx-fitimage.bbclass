@@ -1,5 +1,3 @@
-inherit image_types
-
 #
 # Create an fitImage image that contents:
 #  - 1 kernel image
@@ -11,13 +9,7 @@ inherit image_types
 #
 # Assuming the images are in the ${DEPLOY_DIR_IMAGE} directory
 #
-IMAGE_TYPES_append = " xilinx-fitimage"
 
-# This image depends on the rootfs image
-IMAGE_TYPEDEP_xilinx-fitimage = "${FITIMAGE_ROOTFS_TYPE}"
-
-# Use an uncompressed cpio by default as rootfs
-FITIMAGE_ROOTFS_TYPE ?= "cpio"
 FITIMAGE_ROOTFS_COMPRESSION_TYPE ?= "none"
 FITIMAGE_ROOTFSIMG ?= ""
 
@@ -28,12 +20,10 @@ FITIMAGE_KERNEL_LOADADDRESS ?= "0x80000"
 
 FITIMAGE_DTBIMG ?= ""
 
-IMAGE_DEPENDS_xilinx-fitimage = " \
-			u-boot-mkimage-native \
-			dtc-native \
-			virtual/kernel \
-			virtual/dtb:do_deploy \
-			"
+DEPENDS = " \
+	u-boot-mkimage-native \
+	dtc-native \
+	"
 
 # Final fitimage name
 FITIMAGE_NAME ?= "fit.itb"
@@ -57,7 +47,10 @@ python () {
             break
 }
 
-IMAGE_CMD_xilinx-fitimage () {
+addtask do_xilinx_fitimage after do_image_complete before do_build
+
+do_xilinx_fitimage[depends] += "virtual/kernel:do_deploy virtual/dtb:do_deploy"
+do_xilinx_fitimage () {
 	cd ${B}
 	do_assemble_xilinx_fitimage
 
