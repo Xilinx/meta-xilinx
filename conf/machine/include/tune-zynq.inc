@@ -5,7 +5,8 @@ require conf/machine/include/tune-cortexa9.inc
 require conf/machine/include/soc-family.inc
 
 # Linux Configuration
-KERNEL_IMAGETYPE ?= "uImage"
+KERNEL_IMAGETYPE ?= "zImage"
+KERNEL_IMAGETYPES += "uImage"
 
 # Set default load address.
 # Override with KERNEL_EXTRA_ARGS_<board> += "..." in machine file if required
