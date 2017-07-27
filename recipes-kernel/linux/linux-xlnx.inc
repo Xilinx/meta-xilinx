@@ -14,7 +14,10 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 KERNELURI ?= "git://gitenterprise.xilinx.com/Linux/linux-xlnx.git;protocol=https"
 SRC_URI = "${KERNELURI};${SRCBRANCHARG}"
 
-SRC_URI += "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' file://zynqmp/xen/xen.scc', '', d)}"
+SRC_URI += " \
+	${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' file://zynqmp/xen/xen.scc', '', d)} \
+	file://zynqmp/sdfec/sdfec.cfg \
+	"
 SRC_URI_append_kc705-microblazeel = " file://kc705-microblazeel/kc705-microblazeel.scc"
 
 SRCREV_machine ?= "${SRCREV}"
