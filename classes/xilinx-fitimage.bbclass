@@ -51,7 +51,7 @@ addtask do_xilinx_fitimage after do_image_complete before do_build
 
 do_xilinx_fitimage[depends] += "virtual/kernel:do_deploy virtual/dtb:do_deploy"
 do_xilinx_fitimage () {
-	cd ${B}
+	cd ${WORKDIR}
 	do_assemble_xilinx_fitimage
 
 	echo "Copying fit-image.its source file..."
