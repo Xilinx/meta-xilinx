@@ -19,7 +19,7 @@ SRCREV ?= "0d9d51a17f7ba2c1e5864e196047a170d341796e"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-XILINX_RELEASE_VERSION = "v2017.2"
+XILINX_RELEASE_VERSION = "v2017.3"
 
 PV = "1.3-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
