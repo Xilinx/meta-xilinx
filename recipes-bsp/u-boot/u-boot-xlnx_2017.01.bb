@@ -15,4 +15,4 @@ UBOOT_ENV_zedboard-zynq7 = "uEnv"
 
 SRC_URI_append_zc702-zynq7 = " file://uEnv.txt"
 SRC_URI_append_zedboard-zynq7 = " file://uEnv.txt"
-
+SRC_URI_append_kc705-microblazeel = " file://microblaze-kc705-Convert-microblaze-generic-to-k.patch"

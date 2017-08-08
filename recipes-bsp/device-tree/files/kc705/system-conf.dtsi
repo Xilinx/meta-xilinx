@@ -5,23 +5,12 @@
 
 
 / {
-	model = "Xilinx-KC705-AXI-full-2016.3";
-	hard-reset-gpios = <&reset_gpio 0 1>;
-	aliases {
-		serial0 = &rs232_uart;
-		ethernet0 = &axi_ethernet;
-	};
 	chosen {
 		bootargs = "console=ttyS0,115200 earlyprintk";
-		stdout-path = "serial0:115200ns";
-	};
-	memory {
-		device_type = "memory";
-		reg = <0x80000000 0x40000000>;
+		stdout-path = "serial0:115200n8";
 	};
 };
 
-/include/ "pl.dtsi"
 &axi_ethernet {
 	local-mac-address = [00 0a 35 00 22 01];
 };
