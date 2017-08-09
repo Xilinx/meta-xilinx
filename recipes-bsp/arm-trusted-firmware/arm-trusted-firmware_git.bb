@@ -14,7 +14,7 @@ B = "${WORKDIR}/build"
 
 BRANCH ?= "master"
 REPO ?= "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https"
-SRCREV ?= "0d9d51a17f7ba2c1e5864e196047a170d341796e"
+SRCREV ?= "f9b244beaa7ac6a670b192192b6e92e5fd6044dc"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
