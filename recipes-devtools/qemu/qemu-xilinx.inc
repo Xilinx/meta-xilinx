@@ -10,9 +10,9 @@ LIC_FILES_CHKSUM = " \
 		file://COPYING.LIB;endline=24;md5=c04def7ae38850e7d3ef548588159913 \
 		"
 
+PV = "${XILINX_QEMU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 BRANCH ?= ""
 REPO ?= "git://github.com/Xilinx/qemu.git;protocol=https"
-SRCREV ?= "4987c78c6c7cf370ba1c456f67278df6daae6bbc"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
