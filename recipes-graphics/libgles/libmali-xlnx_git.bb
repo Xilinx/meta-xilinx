@@ -27,8 +27,8 @@ SRC_URI = " \
     file://glesv2.pc \
     "
 
-COMPATIBLE_MACHINE = "(-)"
-COMPATIBLE_MACHINE_zynqmp = "(.*)"
+COMPATIBLE_MACHINE = "^$"
+COMPATIBLE_MACHINE_zynqmp = "zynqmp"
 
 S = "${WORKDIR}/git"
 
