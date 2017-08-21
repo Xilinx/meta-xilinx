@@ -16,6 +16,7 @@
 ORIG_TARGET_ARCH := "${TARGET_ARCH}"
 
 # zynqmp-pmu target arch (hardcoded based on pre-gen data from arch-microblaze.inc)
+DEFAULTTUNE = "microblaze"
 ABIEXTENSION = ""
 TUNE_ARCH = "microblazeel"
 #TUNE_FEATURES_tune-microblaze += "v9.2 barrel-shift pattern-compare"
@@ -64,6 +65,9 @@ python multitarget_zynqmp_pmu_virtclass_handler () {
     initialpn = e.data.getVar("PN").replace("-" + variant, "").replace(variant + "-", "")
     e.data.setVar("MLPREFIX", variant + "-")
     e.data.setVar("OVERRIDES", e.data.getVar("OVERRIDES", False) + ":virtclass-" + variant)
+
+    # hide multilib variants, this class is not one but this works around recipes thinking it is (due to MLPREFIX).
+    e.data.setVar("MULTILIB_VARIANTS", "")
 
     # work around for -cross recipes that embed the TARGET_ARCH value
     if bb.data.inherits_class('cross', e.data):
