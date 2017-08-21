@@ -5,3 +5,4 @@ SRCREV ?= "7d1a6732c9ae113999aeabcb9912369760d05c13"
 
 PV = "1.3-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
+SRC_URI += "file://zynqmp-Remove-duplicate-const-declaration.patch"
