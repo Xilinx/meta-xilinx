@@ -1,0 +1,40 @@
+From 0197ad57b44fb7f10ca604891e0974110748fbd5 Mon Sep 17 00:00:00 2001
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 21 Aug 2017 10:19:40 -0700
+Subject: [PATCH] psci_common: Resolve GCC static analysis false positive
+
+Previously commit 555ebb34db8f3424c1b394df2f10ec attmpted to fix this
+GCC issue:
+
+services/std_svc/psci/psci_common.c: In function 'psci_do_state_coordination':
+services/std_svc/psci/psci_common.c:220:27: error: array subscript is above
+array bounds [-Werror=array-bounds]
+  psci_req_local_pwr_states[pwrlvl - 1][cpu_idx] = req_pwr_state;
+
+This fix doesn't work as asserts aren't built in non-debug build flows.
+Let's ensure this error is fixed for all build cases.
+
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
+---
+Upstream Status: Pending
+
+ lib/psci/psci_common.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/psci/psci_common.c b/lib/psci/psci_common.c
+index 68cdd6eb..a8c94215 100644
+--- a/lib/psci/psci_common.c
++++ b/lib/psci/psci_common.c
+@@ -394,6 +394,8 @@ void psci_do_state_coordination(unsigned int end_pwrlvl,
+ 	plat_local_state_t target_state, *req_states;
+ 
+ 	assert(end_pwrlvl <= PLAT_MAX_PWR_LVL);
++	if (end_pwrlvl > PLAT_MAX_PWR_LVL)
++		return;
+ 	parent_idx = psci_cpu_pd_nodes[cpu_idx].parent_node;
+ 
+ 	/* For level 0, the requested state will be equivalent
+-- 
+2.11.0
+
