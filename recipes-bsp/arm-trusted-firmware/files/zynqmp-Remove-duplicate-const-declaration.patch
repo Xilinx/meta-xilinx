@@ -10,7 +10,7 @@ Fixing compilation errors due to duplicate 'const' keyword:
 
 Signed-off-by: Soren Brinkmann <soren.brinkmann@xilinx.com>
 ---
-Upstream Status: Accepted in mainline, patch send to Xilinx
+Upstream Status: Accepted for 2017.3
 
  plat/xilinx/zynqmp/pm_service/pm_client.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
