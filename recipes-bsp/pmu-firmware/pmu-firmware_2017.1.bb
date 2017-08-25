@@ -80,6 +80,10 @@ do_deploy() {
 	install -Dm 0644 ${B}/executable.elf ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.elf
 	ln -sf ${PMU_FIRMWARE_BASE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}.elf
 	ln -sf ${BPN}-${MACHINE}.elf ${DEPLOYDIR}/pmu-${MACHINE}.elf
+	${OBJCOPY} -O binary ${B}/executable.elf ${B}/executable.bin
+	install -m 0644 ${B}/executable.bin ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.bin
+	ln -sf ${PMU_FIRMWARE_BASE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}.bin
+	ln -sf ${BPN}-${MACHINE}.bin ${DEPLOYDIR}/pmu-${MACHINE}.bin
 }
 addtask deploy before do_build after do_install
 
