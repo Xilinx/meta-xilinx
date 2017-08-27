@@ -5,6 +5,15 @@ SECTION = "bsp"
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = "virtual/${TARGET_PREFIX}gcc newlib libgloss libgcc"
 
+# force this recipe to provide a target virtual/pmu-firmware. this is applied
+# after any class extender mapping and results in this recipe always providing
+# 'virtual/pmu-firmware'.
+python append_target_provides () {
+    d.appendVar("PROVIDES", " virtual/pmu-firmware")
+}
+addhandler append_target_provides
+append_target_provides[eventmask] = "bb.event.RecipeParsed"
+
 # This source links in a number of components with differing licenses, and some
 # licenses are not Open Source compatible. Additionally the pmu-firmware source
 # itself is licensed under a modified MIT license which restricts use to Xilinx
