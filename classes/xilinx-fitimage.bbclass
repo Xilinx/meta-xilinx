@@ -20,7 +20,7 @@ FITIMAGE_KERNEL_LOADADDRESS ?= "0x80000"
 
 FITIMAGE_DTBIMG ?= ""
 
-DEPENDS = " \
+DEPENDS += " \
 	u-boot-mkimage-native \
 	dtc-native \
 	"
