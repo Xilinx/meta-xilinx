@@ -1,4 +1,1 @@
-
-require linux-xilinx-configs.inc
-require linux-xilinx-machines.inc
-
+require linux-yocto-xilinx.inc
