@@ -1,7 +1,8 @@
-From ba9d2df1fa18243bd9fd77e499caa0224a1a13bc Mon Sep 17 00:00:00 2001
+From db7a0ac634ccaa1781d0a0d17dfffd3f1719bb6d Mon Sep 17 00:00:00 2001
 From: Nathan Rossi <nathan@nathanrossi.com>
 Date: Thu, 12 Nov 2015 16:09:31 +1000
-Subject: [PATCH] microblaze.md: Improve 'adddi3' and 'subdi3' insn definitions
+Subject: [PATCH 2/4] microblaze.md: Improve 'adddi3' and 'subdi3' insn
+ definitions
 
 Change adddi3 to handle DI immediates as the second operand, this
 requires modification to the output template however reduces the need to
@@ -26,10 +27,10 @@ Upstream-Status: Unsubmitted
  1 file changed, 6 insertions(+), 7 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 67e509c..1ab10b7 100644
+index b3a0011fd7..8a372d7ebb 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
-@@ -480,17 +480,16 @@
+@@ -483,17 +483,16 @@
  ;; Adding 2 DI operands in register or reg/imm
  
  (define_insn "adddi3"
@@ -52,7 +53,7 @@ index 67e509c..1ab10b7 100644
  
  ;;----------------------------------------------------------------
  ;; Subtraction
-@@ -516,7 +515,7 @@
+@@ -530,7 +529,7 @@
  (define_insn "subdi3"
    [(set (match_operand:DI 0 "register_operand" "=&d")
  	(minus:DI (match_operand:DI 1 "register_operand" "d")
@@ -62,5 +63,5 @@ index 67e509c..1ab10b7 100644
    "rsub\t%L0,%L2,%L1\;rsubc\t%M0,%M2,%M1"
    [(set_attr "type"	"darith")
 -- 
-2.6.2
+2.11.0
 
