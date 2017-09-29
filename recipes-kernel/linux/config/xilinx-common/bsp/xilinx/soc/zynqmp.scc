@@ -1,11 +1,10 @@
-# include arch/arm64/arm64.scc
-include cfg/timer/hz_100.scc
+define KFEATURE_DESCRIPTION "Xilinx Zynq UltraScale+ MPSoC"
+define KFEATURE_COMPATIBILITY board
+
+include features/net/net.scc
+include cfg/timer/no_hz.scc
 
 kconf hardware zynqmp.cfg
-include bsp/xilinx/soc/drivers/xilinx.scc
-include bsp/xilinx/soc/drivers/zynqmp.scc
-include bsp/xilinx/common.scc
-
-include cfg/timer/no_hz.scc
-include cfg/usb-mass-storage.scc
+kconf hardware drivers-zynqmp.cfg
+include bsp/xilinx/soc/drivers-softip.scc
 
