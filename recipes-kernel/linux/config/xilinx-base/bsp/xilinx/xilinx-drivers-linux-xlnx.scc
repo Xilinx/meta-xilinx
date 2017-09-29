@@ -1,5 +1,0 @@
-define KFEATURE_DESCRIPTION "Xilinx Soft IP Core Drivers/Support (For linux-xlnx kernels)"
-define KFEATURE_COMPATIBILITY board
-
-include bsp/xilinx/soc/linux-xlnx/drivers/xilinx.scc
-

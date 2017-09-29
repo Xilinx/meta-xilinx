@@ -1,4 +1,0 @@
-define KFEATURE_DESCRIPTION "Enable debugfs support"
-define KFEATURE_COMPATIBILITY all
-
-kconf non-hardware debugfs.cfg
