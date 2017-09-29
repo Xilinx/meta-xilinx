@@ -6,7 +6,3 @@ require conf/machine/include/soc-family.inc
 
 # Linux Configuration
 KERNEL_IMAGETYPE ?= "Image"
-
-# KMACHINE
-KMACHINE ?= "zynqmp"
-

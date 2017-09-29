@@ -12,9 +12,6 @@ KERNEL_IMAGETYPE ?= "linux.bin.ub"
 # U-Boot Configuration
 UBOOT_MACHINE ?= "microblaze-generic_config"
 
-# linux-yocto KMACHINE
-KMACHINE ?= "microblaze"
-
 # default to use the gdb 7.7.1
 PREFERRED_VERSION_gdb ?= "7.7.1"
 PREFERRED_VERSION_gdb-cross ?= "7.7.1"

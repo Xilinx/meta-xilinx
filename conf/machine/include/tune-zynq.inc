@@ -10,6 +10,3 @@ KERNEL_IMAGETYPE ?= "uImage"
 # Set default load address.
 # Override with KERNEL_EXTRA_ARGS_<board> += "..." in machine file if required
 KERNEL_EXTRA_ARGS_zynq += "UIMAGE_LOADADDR=0x8000"
-
-# KMACHINE
-KMACHINE ?= "zynq"
