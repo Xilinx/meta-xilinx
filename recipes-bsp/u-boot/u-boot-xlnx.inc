@@ -1,6 +1,6 @@
 require recipes-bsp/u-boot/u-boot.inc
 
-DEPENDS += "dtc-native"
+DEPENDS += "bc-native dtc-native"
 
 UBRANCH ?= "master"
 SRC_URI = "git://github.com/Xilinx/u-boot-xlnx.git;protocol=https;branch=${UBRANCH}"
