@@ -1,0 +1,5 @@
+include qemu-xilinx.inc
+
+XILINX_QEMU_VERSION = "v2.8.1"
+XILINX_RELEASE_VERSION = "v2017.4"
+SRCREV ?= "1d9d9d8bdb02aa2ab316e6571d495b8090f8a25d"

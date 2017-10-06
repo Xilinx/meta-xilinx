@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = " \
 		"
 
 PV = "${XILINX_QEMU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
-BRANCH ?= ""
+BRANCH ?= "pub/stable/xilinx-v2017.3"
 REPO ?= "git://github.com/Xilinx/qemu.git;protocol=https"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
