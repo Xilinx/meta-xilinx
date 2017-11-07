@@ -6,3 +6,6 @@ require conf/machine/include/soc-family.inc
 
 # Linux Configuration
 KERNEL_IMAGETYPE ?= "Image"
+
+# Support multilib on zynqmp
+DEFAULTTUNE_virtclass-multilib-lib32 ?= "armv7vethf-neon-vfpv4"
