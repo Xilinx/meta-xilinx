@@ -21,6 +21,8 @@ FILES_${PN} = "/boot/devicetree/*.dtb /boot/devicetree/*.dtbo"
 S = "${WORKDIR}"
 B = "${WORKDIR}/build"
 
+SYSROOT_DIRS += "/boot/devicetree"
+
 # By default provide the current kernel arch's boot/dts and boot/dts/include.
 KERNEL_DTS_INCLUDE ??= " \
 		${STAGING_KERNEL_DIR}/arch/${ARCH}/boot/dts \
