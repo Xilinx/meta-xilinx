@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = " \
 		file://COPYING.LIB;endline=24;md5=c04def7ae38850e7d3ef548588159913 \
 		"
 
-SRCREV = "45d810957b0f837a5685fbe4bc8d9e3268c1fe64"
+SRCREV = "8f8c89b18f6e4523099e41d81769fc534064b8de"
 SRC_URI = "git://github.com/Xilinx/qemu.git;protocol=https;nobranch=1"
 
 S = "${WORKDIR}/git"

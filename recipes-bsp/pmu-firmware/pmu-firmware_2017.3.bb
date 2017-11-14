@@ -19,12 +19,12 @@ append_target_provides[eventmask] = "bb.event.RecipeParsed"
 # itself is licensed under a modified MIT license which restricts use to Xilinx
 # devices only.
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=8c0025a6b0e91b4ab8e4ba9f6d2fb65c"
+LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=530190e8d7ebcdfeddbe396f3f20417f"
 
 inherit deploy
 
-XILINX_RELEASE_VERSION = "v2017.1"
-SRCREV = "3813f14966bd69e7e1d59943d2a58c64efafa17b"
+XILINX_RELEASE_VERSION = "v2017.3"
+SRCREV = "3c9f0cfde9307c2dc1a298f9f22d492601232821"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 SRC_URI = "git://github.com/Xilinx/embeddedsw.git;protocol=https;nobranch=1"

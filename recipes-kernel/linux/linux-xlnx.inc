@@ -7,7 +7,7 @@ PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 KBRANCH ?= ""
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
 
-FILESOVERRIDES_append = ":${LINUX_VERSION}"
+FILESOVERRIDES_append = ":${XILINX_RELEASE_VERSION}"
 KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https"
 SRC_URI = "${KERNELURI};${SRCBRANCHARG}"
 

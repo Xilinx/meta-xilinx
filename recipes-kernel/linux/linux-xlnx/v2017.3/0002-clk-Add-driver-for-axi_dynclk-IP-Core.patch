@@ -1,4 +1,4 @@
-From 8554dd34a68262849622c1c539b0176d525188f4 Mon Sep 17 00:00:00 2001
+From 217e3b6f4393926b8dcad841381527ef3fc808c2 Mon Sep 17 00:00:00 2001
 From: Jason Wu <jason.wu.misc@gmail.com>
 Date: Sun, 10 Apr 2016 13:16:06 +1000
 Subject: [PATCH 2/3] clk: Add driver for axi_dynclk IP Core
@@ -603,5 +603,5 @@ index 0000000000..496ad5fc90
 +MODULE_AUTHOR("Sam Bobrowicz <sbobrowicz@digilentinc.com>");
 +MODULE_DESCRIPTION("CCF Driver for Digilent axi_dynclk IP Core");
 -- 
-2.11.0
+2.14.2
 
