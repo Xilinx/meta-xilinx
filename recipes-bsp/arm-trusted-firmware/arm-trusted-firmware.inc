@@ -59,5 +59,6 @@ do_deploy() {
 		-a $BL31_BASE_ADDR -e $BL31_BASE_ADDR \
 		-d ${OUTPUT_DIR}/bl31.bin ${DEPLOYDIR}/${ATF_BASE_NAME}.ub
 	ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/${PN}.ub
+	ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/atf-uboot.ub
 }
 addtask deploy before do_build after do_compile
