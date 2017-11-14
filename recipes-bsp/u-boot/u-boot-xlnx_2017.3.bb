@@ -5,6 +5,10 @@ XILINX_RELEASE_VERSION = "v2017.3"
 SRCREV ?= "da811c4511ef9caeb95f9a22fe49d38bd8e56ded"
 PV = "v2017.01-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
+SRC_URI_append = " \
+		file://arm64-zynqmp-Setup-partid-for-QEMU-to-match-silicon.patch \
+		"
+
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
 
