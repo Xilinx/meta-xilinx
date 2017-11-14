@@ -45,5 +45,13 @@ python () {
             d.appendVar("DEPENDS", " virtual/xilinx-platform-init")
             # setup task to modify platform init after unpack and before configure
             bb.build.addtask("do_zynq_platform_init", "do_configure", "do_prepare_recipe_sysroot", d)
+
+    if "boot.bin" in d.getVar("SPL_BINARY") and d.getVar("SOC_FAMILY") in ["zynqmp"]:
+        # depend on the pmu-firmware build
+        d.appendVar("DEPENDS", " virtual/pmu-firmware")
+        # determine the path relative to the source tree
+        relpath = os.path.relpath(d.expand("${DEPLOY_DIR_IMAGE}/pmu-${MACHINE}.bin"), d.getVar("S"))
+        # setup PMU Firmware path via MAKEFLAGS
+        d.appendVar("EXTRA_OEMAKE", " CONFIG_PMUFW_INIT_FILE=\"{0}\"".format(relpath))
 }
 
