@@ -18,7 +18,7 @@ SRCREV ?= "${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/bootloader", "u-b
 PV = "${UBRANCH}-xilinx-dev+git${SRCPV}"
 
 # Newer versions of u-boot have support for these
-HAS_PS7INIT ?= " \
+HAS_PLATFORM_INIT ?= " \
 		zynq_microzed_config \
 		zynq_zed_config \
 		zynq_zc702_config \
