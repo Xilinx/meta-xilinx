@@ -6,7 +6,8 @@ INHIBIT_DEFAULT_DEPS = "1"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynq = "zynq"
+COMPATIBLE_MACHINE_zynq = ".*"
+COMPATIBLE_MACHINE_zynqmp = ".*"
 
 inherit deploy
 
@@ -19,8 +20,9 @@ def bootfiles_bitstream(d):
         if ';' in f:
             sf, rf = f.split(';')
 
-        # skip boot.bin, it is not a bitstream
-        if sf == "boot.bin" or rf == "boot.bin":
+        # skip boot.bin and u-boot.bin, it is not a bitstream
+        skip = ["boot.bin", "u-boot.bin"]
+        if sf in skip or rf in skip:
             continue
 
         for e, t in expectedfiles:
@@ -41,34 +43,64 @@ def bootfiles_dtb_filepath(d):
             return dtbs[0]
     return ""
 
-do_compile() {
-	echo "machine_name=${MACHINE}" > ${WORKDIR}/uEnv.txt
+def uboot_boot_cmd(d):
+    if d.getVar("KERNEL_IMAGETYPE") in ["uImage", "fitImage"]:
+        return "bootm"
+    if d.getVar("KERNEL_IMAGETYPE") in ["zImage"]:
+        return "bootz"
+    if d.getVar("KERNEL_IMAGETYPE") in ["Image"]:
+        return "booti"
+    raise bb.parse.SkipRecipe("Unsupport kernel image type")
 
-	echo "kernel_image=${KERNEL_IMAGETYPE}" >> ${WORKDIR}/uEnv.txt
-	echo "kernel_load_address=0x2080000" >> ${WORKDIR}/uEnv.txt
-	echo "devicetree_image=${@bootfiles_dtb_filepath(d)}" >> ${WORKDIR}/uEnv.txt
-	echo "devicetree_load_address=0x2000000" >> ${WORKDIR}/uEnv.txt
+def uenv_populate(d):
+    # populate the environment values
+    env = {}
 
-	# bootargs, default to booting with the rootfs device being partition 2 of the first mmc device
-	echo 'bootargs=console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootwait earlyprintk' >> ${WORKDIR}/uEnv.txt
+    env["machine_name"] = d.getVar("MACHINE")
 
-	echo 'loadkernel=fatload mmc 0 ${kernel_load_address} ${kernel_image}' >> ${WORKDIR}/uEnv.txt
-	echo 'loaddtb=fatload mmc 0 ${devicetree_load_address} ${devicetree_image}' >> ${WORKDIR}/uEnv.txt
-	echo 'bootkernel=run loadkernel && run loaddtb && bootm ${kernel_load_address} - ${devicetree_load_address}' >> ${WORKDIR}/uEnv.txt
+    env["kernel_image"] = d.getVar("KERNEL_IMAGETYPE")
+    env["kernel_load_address"] = d.getVar("KERNEL_LOAD_ADDRESS")
 
-	BITSTREAMPATH="${@bootfiles_bitstream(d)[0]}"
-	if [ ! -z "$BITSTREAMPATH" ]; then
-		echo "bitstream_image=$BITSTREAMPATH" >> ${WORKDIR}/uEnv.txt
-		# if bitstream is "bit" format use loadb, otherwise use load
-		echo "bitstream_type=${@'loadb' if bootfiles_bitstream(d)[1] else 'load'}" >> ${WORKDIR}/uEnv.txt
-		echo 'loadfpga=fatload mmc 0 ${loadbit_addr} ${bitstream_image} && fpga ${bitstream_type} 0 ${loadbit_addr} ${filesize}' >> ${WORKDIR}/uEnv.txt
+    env["devicetree_image"] = bootfiles_dtb_filepath(d)
+    env["devicetree_load_address"] = d.getVar("DEVICETREE_LOAD_ADDRESS")
 
-		# load bitstream first
-		echo "uenvcmd=run loadfpga && run bootkernel" >> ${WORKDIR}/uEnv.txt
-	else
-		# no need to load bitstream during boot
-		echo "uenvcmd=run bootkernel" >> ${WORKDIR}/uEnv.txt
-	fi
+    env["bootargs"] = d.getVar("KERNEL_BOOTARGS")
+
+    env["loadkernel"] = "fatload mmc 0 ${kernel_load_address} ${kernel_image}"
+    env["loaddtb"] = "fatload mmc 0 ${devicetree_load_address} ${devicetree_image}"
+    env["bootkernel"] = "run loadkernel && run loaddtb && " + uboot_boot_cmd(d) + " ${kernel_load_address} - ${devicetree_load_address}"
+
+    # default uenvcmd does not load bitstream
+    env["uenvcmd"] = "run bootkernel"
+
+    bitstream, bitstreamtype = bootfiles_bitstream(d)
+    if bitstream:
+        env["bitstream_image"] = bitstream
+        env["bitstream_load_address"] = "0x100000"
+
+        # if bitstream is "bit" format use loadb, otherwise use load
+        env["bitstream_type"] = "loadb" if bitstreamtype else "load"
+
+        # load bitstream first with loadfpa
+        env["loadfpga"] = "fatload mmc 0 ${bitstream_load_address} ${bitstream_image} && fpga ${bitstream_type} 0 ${bitstream_load_address} ${filesize}"
+        env["uenvcmd"] = "run loadfpga && run bootkernel"
+
+    return env
+
+# bootargs, default to booting with the rootfs device being partition 2 of the first mmc device
+KERNEL_BOOTARGS_zynq = "earlyprintk console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootwait"
+KERNEL_BOOTARGS_zynqmp = "earlycon clk_ignore_unused root=/dev/mmcblk0p2 rw rootwait"
+
+KERNEL_LOAD_ADDRESS_zynq = "0x2080000"
+KERNEL_LOAD_ADDRESS_zynqmp = "0x80000"
+DEVICETREE_LOAD_ADDRESS_zynq = "0x2000000"
+DEVICETREE_LOAD_ADDRESS_zynqmp = "0x4000000"
+
+python do_compile() {
+    env = uenv_populate(d)
+    with open(d.expand("${WORKDIR}/uEnv.txt"), "w") as f:
+        for k, v in env.items():
+            f.write("{0}={1}\n".format(k, v))
 }
 
 FILES_${PN} += "/boot/uEnv.txt"
