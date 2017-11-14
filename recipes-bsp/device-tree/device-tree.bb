@@ -14,6 +14,8 @@ inherit kernel-arch
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS += "dtc-native"
 
+COMPATIBLE_MACHINE ?= "^$"
+
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILES_${PN} = "/boot/devicetree/*.dtb /boot/devicetree/*.dtbo"
