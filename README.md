@@ -19,7 +19,7 @@ Boards/Machines supported by this layer:
   * [Xilinx KC705](conf/machine/kc705-microblazeel.conf) - `kc705-microblazeel`
 * Zynq:
   * [Zynq (QEMU)](conf/machine/qemu-zynq7.conf) - `qemu-zynq7` (QEMU Support)
-  * [Xilinx ZC702](conf/machine/zc702-zynq7.conf) - `zc702-zynq7`
+  * [Xilinx ZC702](conf/machine/zc702-zynq7.conf) - `zc702-zynq7` (with QEMU support)
   * [Xilinx ZC706](conf/machine/zc706-zynq7.conf) - `zc706-zynq7`
   * [Avnet MicroZed](conf/machine/microzed-zynq7.conf) - `microzed-zynq7`
   * [Avnet PicoZed](conf/machine/picozed-zynq7.conf) - `picozed-zynq7`
