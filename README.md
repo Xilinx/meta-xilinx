@@ -20,7 +20,7 @@ Boards/Machines supported by this layer:
 * Zynq:
   * [Zynq (QEMU)](conf/machine/qemu-zynq7.conf) - `qemu-zynq7` (QEMU Support)
   * [Xilinx ZC702](conf/machine/zc702-zynq7.conf) - `zc702-zynq7` (with QEMU support)
-  * [Xilinx ZC706](conf/machine/zc706-zynq7.conf) - `zc706-zynq7`
+  * [Xilinx ZC706](conf/machine/zc706-zynq7.conf) - `zc706-zynq7` (with QEMU support)
   * [Avnet MicroZed](conf/machine/microzed-zynq7.conf) - `microzed-zynq7`
   * [Avnet PicoZed](conf/machine/picozed-zynq7.conf) - `picozed-zynq7`
   * [Avnet/Digilent ZedBoard](conf/machine/zedboard-zynq7.conf) - `zedboard-zynq7`
