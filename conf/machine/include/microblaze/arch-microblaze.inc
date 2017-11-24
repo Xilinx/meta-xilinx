@@ -15,6 +15,7 @@ TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "bigendian", "-mbig-endian
 TUNEVALID[barrel-shift] = "Enable Hardware Barrel Shifter"
 TUNEVALID[pattern-compare] = "Enable Pattern Compare Instructions"
 TUNEVALID[reorder] = "Enable Reorder Instructions"
+TUNECONFLICTS[reorder] += "v8.00 v8.10 v8.20"
 
 # General feature compiler args
 TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "barrel-shift", "-mxl-barrel-shift", "-mno-xl-barrel-shift" ,d)}"

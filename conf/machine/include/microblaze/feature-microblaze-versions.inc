@@ -1,35 +1,30 @@
 # MicroBlaze versions are defined as features, the features are setup to
 # conflict with other versions as well as unavailable features for particular
 # versions.
-
-def microblaze_parse_version(s):
-    # versions before v9 use the "vX.YY.Z" scheme where Z = [ab]
-    # versions after v8 use the "vX.Y" scheme
-    import re
-    m = re.search("^v(\d+)\.(\d+)(\.([ab]))?", s)
-    if m:
-        major, minor = int(m.group(1)), int(m.group(2))
-        if major < 9:
-            return (major, minor, m.group(4) or "a")
-        return (major, minor)
-    return None
-
-def microblaze_version_conflict(ver, d):
-    tunes = d.getVarFlags("TUNEVALID").keys()
-    conflict = []
-    version = microblaze_parse_version(ver)
-    for i in tunes:
-        iversion = microblaze_parse_version(i)
-        if iversion and iversion != version:
-            conflict.append(i)
-    return " ".join(conflict)
+#
+# Versions before v9.0 of MicroBlaze use a versioning scheme of "vX.YY.Z"
+# (where Z = [abc]). For v8.* versions of MicroBlaze the revision (Z) changes
+# did not affect ABI and are ignored by this tune configuration. Though this
+# format is expected by GCC including the revision, but this is defaulted to
+# ".a".
+#
+# Since v9.0 of MicroBlaze the revision (Z) part of versions was entirely
+# dropped and the version scheme was changed to "vX.Y".
 
 def microblaze_current_version(d, gcc = False):
-    tunes = (d.getVar("TUNE_FEATURES") or "").split()
-    version = next((v for v in [microblaze_parse_version(i) for i in tunes] if v), None)
+    import re
+    # find the current version, and convert it to major/minor integers
+    version = None
+    for t in (d.getVar("TUNE_FEATURES") or "").split():
+        m = re.search("^v(\d+)\.(\d+)", t)
+        if m:
+            version = int(m.group(1)), int(m.group(2))
+            break
+
+    # format the version string in generic or GCC specific formats
     if version:
-        if version[0] <= 8 and len(version) > 2 and (gcc or version[2] != "a"):
-            return "v%d.%02d.%s" % version[0:3]
+        if version[0] <= 8:
+            return ("v%d.%02d" % version[0:2]) + (".a" if gcc else "")
         else:
             return "v%d.%d" % version[0:2]
     return ""
@@ -41,35 +36,30 @@ TUNEVALID[v8.20] = "MicroBlaze version 8.20"
 TUNEVALID[v8.30] = "MicroBlaze version 8.30"
 TUNEVALID[v8.40] = "MicroBlaze version 8.40"
 TUNEVALID[v8.50] = "MicroBlaze version 8.50"
-TUNEVALID[v9.0] = "MicroBlaze version 9.0"
-TUNEVALID[v9.1] = "MicroBlaze version 9.1"
-TUNEVALID[v9.2] = "MicroBlaze version 9.2"
-TUNEVALID[v9.3] = "MicroBlaze version 9.3"
-TUNEVALID[v9.4] = "MicroBlaze version 9.4"
-TUNEVALID[v9.5] = "MicroBlaze version 9.5"
-TUNEVALID[v9.6] = "MicroBlaze version 9.6"
+TUNEVALID[v9.0]  = "MicroBlaze version 9.0"
+TUNEVALID[v9.1]  = "MicroBlaze version 9.1"
+TUNEVALID[v9.2]  = "MicroBlaze version 9.2"
+TUNEVALID[v9.3]  = "MicroBlaze version 9.3"
+TUNEVALID[v9.4]  = "MicroBlaze version 9.4"
+TUNEVALID[v9.5]  = "MicroBlaze version 9.5"
+TUNEVALID[v9.6]  = "MicroBlaze version 9.6"
 TUNEVALID[v10.0] = "MicroBlaze version 10.0"
 
 # Version conflict matrix
-TUNECONFLICTS[v8.00] := "${@microblaze_version_conflict('v8.00', d)}"
-TUNECONFLICTS[v8.10] := "${@microblaze_version_conflict('v8.10', d)}"
-TUNECONFLICTS[v8.20] := "${@microblaze_version_conflict('v8.20', d)}"
-TUNECONFLICTS[v8.30] := "${@microblaze_version_conflict('v8.30', d)}"
-TUNECONFLICTS[v8.40] := "${@microblaze_version_conflict('v8.40', d)}"
-TUNECONFLICTS[v8.50] := "${@microblaze_version_conflict('v8.50', d)}"
-TUNECONFLICTS[v9.0] := "${@microblaze_version_conflict('v9.0', d)}"
-TUNECONFLICTS[v9.1] := "${@microblaze_version_conflict('v9.1', d)}"
-TUNECONFLICTS[v9.2] := "${@microblaze_version_conflict('v9.2', d)}"
-TUNECONFLICTS[v9.3] := "${@microblaze_version_conflict('v9.3', d)}"
-TUNECONFLICTS[v9.4] := "${@microblaze_version_conflict('v9.4', d)}"
-TUNECONFLICTS[v9.5] := "${@microblaze_version_conflict('v9.5', d)}"
-TUNECONFLICTS[v9.6] := "${@microblaze_version_conflict('v9.6', d)}"
-TUNECONFLICTS[v10.0] := "${@microblaze_version_conflict('v10.0', d)}"
-
-# Version/feature conflicts
-TUNECONFLICTS[v8.00] += "reorder"
-TUNECONFLICTS[v8.10] += "reorder"
-TUNECONFLICTS[v8.20] += "reorder"
+TUNECONFLICTS[v8.00] = ""
+TUNECONFLICTS[v8.10] = "v8.00"
+TUNECONFLICTS[v8.20] = "v8.00 v8.10"
+TUNECONFLICTS[v8.30] = "v8.00 v8.10 v8.20"
+TUNECONFLICTS[v8.40] = "v8.00 v8.10 v8.20 v8.30"
+TUNECONFLICTS[v8.50] = "v8.00 v8.10 v8.20 v8.30 v8.40"
+TUNECONFLICTS[v9.0]  = "v8.00 v8.10 v8.20 v8.30 v8.40 v8.50"
+TUNECONFLICTS[v9.1]  = "v8.00 v8.10 v8.20 v8.30 v8.40 v8.50 v9.0"
+TUNECONFLICTS[v9.2]  = "v8.00 v8.10 v8.20 v8.30 v8.40 v8.50 v9.0 v9.1"
+TUNECONFLICTS[v9.3]  = "v8.00 v8.10 v8.20 v8.30 v8.40 v8.50 v9.0 v9.1 v9.2"
+TUNECONFLICTS[v9.4]  = "v8.00 v8.10 v8.20 v8.30 v8.40 v8.50 v9.0 v9.1 v9.2 v9.3"
+TUNECONFLICTS[v9.5]  = "v8.00 v8.10 v8.20 v8.30 v8.40 v8.50 v9.0 v9.1 v9.2 v9.3 v9.4"
+TUNECONFLICTS[v9.6]  = "v8.00 v8.10 v8.20 v8.30 v8.40 v8.50 v9.0 v9.1 v9.2 v9.3 v9.4 v9.5"
+TUNECONFLICTS[v10.0] = "v8.00 v8.10 v8.20 v8.30 v8.40 v8.50 v9.0 v9.1 v9.2 v9.3 v9.4 v9.5 v9.6"
 
 # Version flags
 TUNE_CCARGS += "-mcpu=${@microblaze_current_version(d, True)}"
