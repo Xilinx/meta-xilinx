@@ -18,9 +18,14 @@ TUNEVALID[pattern-compare] = "Enable Pattern Compare Instructions"
 TUNEVALID[reorder] = "Enable Reorder Instructions"
 TUNECONFLICTS[reorder] += "v8.00 v8.10 v8.20"
 
-# General feature compiler args
+# Core configuration tune optimizations
+TUNEVALID[frequency-optimized] = "Enabling tuning for frequency optimized core (AREA_OPTIMIZED_2)"
+TUNECONFLICTS[frequency-optimized] += "v8.00 v8.10 v8.20 v8.30 v8.40 v8.50 v9.0 v9.1 v9.2 v9.3 v9.4 v9.5 v9.6"
+
+# Feature compiler args
 TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "barrel-shift", "-mxl-barrel-shift", "-mno-xl-barrel-shift" ,d)}"
 TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "pattern-compare", "-mxl-pattern-compare", "-mno-xl-pattern-compare" ,d)}"
+TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "frequency-optimized", "-mxl-frequency", "", d)}"
 
 # Disable reorder for v8.30 if pattern-compare is not enabled
 TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "reorder", \
@@ -29,11 +34,12 @@ TUNE_CCARGS += "${@bb.utils.contains("TUNE_FEATURES", "reorder", \
                 "-mxl-reorder", "-mno-xl-reorder", d), \
             "-mxl-reorder", d), "-mno-xl-reorder", d)}"
 
-# General feature package architecture formatting
+# Feature package architecture formatting
 MBPKGARCH_TUNE = ""
 MBPKGARCH_TUNE .= "${@bb.utils.contains("TUNE_FEATURES", "barrel-shift", "-bs", "" ,d)}"
 MBPKGARCH_TUNE .= "${@bb.utils.contains("TUNE_FEATURES", "pattern-compare", "-cmp", "" ,d)}"
 MBPKGARCH_TUNE .= "${@bb.utils.contains("TUNE_FEATURES", "reorder", "-re", "" ,d)}"
+MBPKGARCH_TUNE .= "${@bb.utils.contains("TUNE_FEATURES", "frequency-optimized", "-fo", "" ,d)}"
 
 # Additional features
 require conf/machine/include/microblaze/feature-microblaze-versions.inc
