@@ -13,11 +13,11 @@ COMPATIBLE_MACHINE = "kc705-microblazeel"
 inherit deploy
 inherit xilinx-fetch-restricted
 
-BSP_NAME = "Xilinx-KC705"
+BSP_NAME = "xilinx-kc705"
 BSP_FILE = "${BSP_NAME}-v${PV}-final.bsp"
 SRC_URI = "https://www.xilinx.com/member/forms/download/xef.html?filename=${BSP_FILE};downloadfilename=${BSP_FILE}"
-SRC_URI[md5sum] = "6a2276088759f10b9504eae2f13fe8a2"
-SRC_URI[sha256sum] = "dbb722cc051a2d8517238948ddec1c029511ff391a8f9fc0b0f1e58e52ade399"
+SRC_URI[md5sum] = "e4c4de43dcbcb955a3c63e4c68542792"
+SRC_URI[sha256sum] = "3e2b0e426958dad01a0ee810822001700065e9ed988f5c1c12b984ad2b48bc5c"
 
 PROVIDES = "virtual/bitstream"
 
@@ -31,7 +31,7 @@ DEPENDS += "tar-native gzip-native"
 
 do_compile() {
 	# Extract the bitstream into workdir
-	tar -xf ${WORKDIR}/${BSP_FILE} ${BSP_NAME}-AXI-full-${PV}/pre-built/linux/images/download.bit -C ${S}
+	tar -xf ${WORKDIR}/${BSP_FILE} ${BSP_NAME}-axi-full-${PV}/pre-built/linux/images/download.bit -C ${S}
 	# move the bit file to ${S}/ as it is in a subdir in the tar file
 	for i in $(find -type f -name download.bit); do mv $i ${S}; done
 }
