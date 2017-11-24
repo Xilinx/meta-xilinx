@@ -5,7 +5,8 @@ TUNEVALID[microblaze] = "MicroBlaze"
 MACHINEOVERRIDES =. "${@bb.utils.contains("TUNE_FEATURES", "microblaze", "microblaze:", "" ,d)}"
 
 # Endian
-TUNEVALID[bigendian] = "Use Microblaze Big Endian."
+TUNEVALID[bigendian] = "Use Microblaze Big Endian"
+TUNECONFLICTS[bigendian] += "v10.0"
 
 MBPKGARCH_ENDIAN = "${@bb.utils.contains("TUNE_FEATURES", "bigendian", "eb", "el" ,d)}"
 
