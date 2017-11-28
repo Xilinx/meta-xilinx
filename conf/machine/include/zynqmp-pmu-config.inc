@@ -3,7 +3,7 @@
 def zynqmp_pmu_enable_for_bpns(d):
     bpn = d.getVar("BPN")
     crossbpns = ["binutils", "gcc"]
-    targetbpns = ["libgcc", "newlib", "libgloss", "pmu-firmware"]
+    targetbpns = ["libgcc", "newlib", "libgloss"]
     if bpn in targetbpns:
         return True
     if bpn in crossbpns and bb.data.inherits_class('cross', d):
