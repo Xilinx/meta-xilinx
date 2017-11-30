@@ -37,6 +37,7 @@ KERNEL_DTS_INCLUDE_append_zynqmp = " \
 DTS_FILES_PATH ?= "${S}"
 DTS_INCLUDE ?= "${DTS_FILES_PATH} ${KERNEL_DTS_INCLUDE}"
 
+DT_PADDING_SIZE ?= "0x3000"
 DEVICETREE_FLAGS ?= " \
 		-R 8 -p ${DT_PADDING_SIZE} -b 0 \
 		${@' '.join(['-i %s' % i for i in d.getVar('DTS_INCLUDE', True).split()])} \
