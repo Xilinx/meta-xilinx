@@ -34,14 +34,17 @@ KERNEL_DTS_INCLUDE_append_zynqmp = " \
 		${STAGING_KERNEL_DIR}/arch/${ARCH}/boot/dts/xilinx \
 		"
 
+DTS_FILES_PATH ?= "${S}"
+DTS_INCLUDE ?= "${DTS_FILES_PATH} ${KERNEL_DTS_INCLUDE}"
+
 DEVICETREE_FLAGS ?= " \
-		-R 8 -p 0x3000 -b 0 -i ${S} \
-		${@' '.join(['-i %s' % i for i in d.getVar('KERNEL_DTS_INCLUDE', True).split()])} \
-		"
+		-R 8 -p ${DT_PADDING_SIZE} -b 0 \
+		${@' '.join(['-i %s' % i for i in d.getVar('DTS_INCLUDE', True).split()])} \
+               "
 DEVICETREE_OFLAGS ?= "-@ -H epapr"
 DEVICETREE_PP_FLAGS ?= " \
-		-nostdinc -Ulinux -x assembler-with-cpp -I${S} \
-		${@' '.join(['-I%s' % i for i in d.getVar('KERNEL_DTS_INCLUDE', True).split()])} \
+		-nostdinc -Ulinux -x assembler-with-cpp \
+		${@' '.join(['-I%s' % i for i in d.getVar('DTS_INCLUDE', True).split()])} \
 		"
 
 python () {
@@ -51,7 +54,7 @@ python () {
 }
 
 do_compile() {
-	for DTS_FILE in ${S}/*.dts; do
+	for DTS_FILE in ${DTS_FILES_PATH}/*.dts; do
 		DTS_NAME=`basename -s .dts ${DTS_FILE}`
 		${BUILD_CPP} ${DEVICETREE_PP_FLAGS} -o `basename ${DTS_FILE}`.pp ${DTS_FILE}
 
