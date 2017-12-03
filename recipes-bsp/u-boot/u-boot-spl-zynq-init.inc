@@ -34,8 +34,12 @@ python () {
                 return c[0:len(c) - len(i)]
         return c
 
+    if d.getVar("SOC_FAMILY") not in ["zynq", "zynqmp"]:
+        # continue on this is not a zynq/zynqmp target
+        return
+
     # Determine if target machine needs to provide a custom platform init files
-    if d.getVar("SPL_BINARY") and d.getVar("SOC_FAMILY") in ["zynq", "zynqmp"]:
+    if d.getVar("SPL_BINARY"):
         hasconfigs = [strip_config_name(c) for c in (d.getVar("HAS_PLATFORM_INIT") or "").split()]
         currentconfig = strip_config_name(d.getVar("UBOOT_MACHINE"))
 
@@ -46,7 +50,20 @@ python () {
             # setup task to modify platform init after unpack and before configure
             bb.build.addtask("do_zynq_platform_init", "do_configure", "do_prepare_recipe_sysroot", d)
 
-    if "boot.bin" in d.getVar("SPL_BINARY") and d.getVar("SOC_FAMILY") in ["zynqmp"]:
+    if "boot.bin" not in d.getVar("SPL_BINARY"):
+        # not deploying the boot.bin, just building SPL
+        return
+
+    # assume that U-Boot is to provide the boot.bin if no other provides are selected or U-Boot is selected
+    providesbin = not(d.getVar("PREFERRED_PROVIDER_virtual/boot-bin")) or d.getVar("PREFERRED_PROVIDER_virtual/boot-bin") == d.getVar("PN")
+    if providesbin:
+        # add provides, if U-Boot is set to provide boot.bin
+        d.appendVar("PROVIDES", " virtual/boot-bin")
+    else:
+        # prevent U-Boot from deploying the boot.bin
+        d.setVar("SPL_BINARY", "")
+
+    if providesbin and d.getVar("SOC_FAMILY") in ["zynqmp"]:
         # depend on the pmu-firmware build
         d.appendVar("DEPENDS", " virtual/pmu-firmware")
         # determine the path relative to the source tree
