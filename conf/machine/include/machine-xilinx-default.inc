@@ -18,6 +18,7 @@ PREFERRED_PROVIDER_virtual/kernel ??= "${XILINX_DEFAULT_KERNEL}"
 XILINX_DEFAULT_UBOOT := "u-boot-xlnx"
 XILINX_DEFAULT_UBOOT_zynqmp := "u-boot"
 PREFERRED_PROVIDER_virtual/bootloader ??= "${XILINX_DEFAULT_UBOOT}"
+PREFERRED_PROVIDER_virtual/boot-bin ??= "${PREFERRED_PROVIDER_virtual/bootloader}"
 
 UBOOT_SUFFIX ?= "img"
 UBOOT_SUFFIX_zynqmp ?= "bin"
