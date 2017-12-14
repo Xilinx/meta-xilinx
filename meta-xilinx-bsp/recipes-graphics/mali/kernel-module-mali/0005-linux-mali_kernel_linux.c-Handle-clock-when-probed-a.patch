@@ -1,20 +1,20 @@
-From ba8c94302a1c606315109a9d1cee342213fdbf98 Mon Sep 17 00:00:00 2001
+From e67e20ec6ff0c9720d87844270421453c738066a Mon Sep 17 00:00:00 2001
 From: Madhurkiran Harikrishnan <madhurki@xilinx.com>
 Date: Thu, 16 Feb 2017 12:15:58 -0800
-Subject: [PATCH] linux/mali_kernel_linux.c: Handle clock when probed and
+Subject: [PATCH 5/9] linux/mali_kernel_linux.c: Handle clock when probed and
  removed
 
 This patch will handle the clock through clock
 specifier for GPU PP0 and PP1.
 
 Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
-Upstream-Status: Inappropriate  [Specific to Xilinx ZynqMP]
+Upstream Status: Inappropriate [Xilinx specific]
 ---
  .../src/devicedrv/mali/linux/mali_kernel_linux.c   | 40 +++++++++++++++++++++-
  1 file changed, 39 insertions(+), 1 deletion(-)
 
 diff --git a/driver/src/devicedrv/mali/linux/mali_kernel_linux.c b/driver/src/devicedrv/mali/linux/mali_kernel_linux.c
-index 9bfa2bd..cfde20f 100755
+index d7893a3..f15fb56 100644
 --- linux/mali_kernel_linux.c
 +++ b/linux/mali_kernel_linux.c
 @@ -45,6 +45,14 @@
