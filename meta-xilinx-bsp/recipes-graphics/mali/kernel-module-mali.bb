@@ -3,26 +3,27 @@ SECTION = "kernel/modules"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = " \
-	file://linux/license/gpl/mali_kernel_license.h;md5=1436c0d104589824163a3eb50fbb5050 \
+	file://linux/license/gpl/mali_kernel_license.h;md5=436192a2c5cfd47df0ad1987dffc4ae6 \
 	"
 
-PV = "r7p0-00rel0"
+PV = "r8p0-01rel0"
 
 SRC_URI = " \
 	https://developer.arm.com/-/media/Files/downloads/mali-drivers/kernel/mali-utgard-gpu/DX910-SW-99002-${PV}.tgz \
 	file://0001-Change-Makefile-to-be-compatible-with-Yocto.patch \
-	file://0002-staging-mali-r7p0-00rel0-Add-the-ZYNQ-ZYNQMP-platfor.patch \
-	file://0003-staging-mali-r7p0-00rel0-Remove-unused-trace-macros.patch \
-	file://0004-staging-mali-r7p0-00rel0-Don-t-include-mali_read_phy.patch \
-	file://0005-mali-r7p0-PAGE_CACHE_SHIFT-to-PAGE_CACHE.patch \
-	file://0006-staging-mali-r7p0-page_cache_release-to-put_page.patch \
-	file://0007-mali_memory_os_alloc.c-Align-with-dma_attrs-changes-.patch \
-	file://0008-arm.c-dma_ops-will-be-modified-by-the-driver-only-ti.patch \
-	file://0009-linux-mali_kernel_linux.c-Handle-clock-when-probed-a.patch \
+	file://0002-staging-mali-r8p0-01rel0-Add-the-ZYNQ-ZYNQMP-platfor.patch \
+	file://0003-staging-mali-r8p0-01rel0-Remove-unused-trace-macros.patch \
+	file://0004-staging-mali-r8p0-01rel0-Don-t-include-mali_read_phy.patch \
+	file://0005-linux-mali_kernel_linux.c-Handle-clock-when-probed-a.patch \
+	file://0006-arm.c-global-variable-dma_ops-is-removed-from-the-ke.patch \
+	file://0007-Replace-__GFP_REPEAT-by-__GFP_RETRY_MAYFAIL.patch \
+	file://0008-mali_internal_sync-Rename-wait_queue_t-with-wait_que.patch \
+	file://0009-mali_memory_swap_alloc.c-Rename-global_page_state-wi.patch \
 	file://0010-common-mali_pm.c-Add-PM-runtime-barrier-after-removi.patch \
+	file://0011-linux-mali_kernel_linux.c-Enable-disable-clock-for-r.patch\
 	"
-SRC_URI[md5sum] = "db3ef3258eb55700484ecadfdce1fee1"
-SRC_URI[sha256sum] = "496ba80684aa4236806891a8445978849f7dd07299f5e58b14d52cd5e7ba0536"
+SRC_URI[md5sum] = "8f04ae86957fd56197ad5a9d017b84ff"
+SRC_URI[sha256sum] = "bfd14fa3f75a71d4ba313534e651ca1c58dc354e882c0b39867e335882a06350"
 
 inherit module
 

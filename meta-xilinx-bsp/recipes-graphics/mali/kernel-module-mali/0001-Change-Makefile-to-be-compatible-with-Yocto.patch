@@ -1,20 +1,21 @@
-From d9a4441c31faef60b7f39692df6913d58ec69d1b Mon Sep 17 00:00:00 2001
-From: Hyun Kwon <hyun.kwon@xilinx.com>
-Date: Thu, 8 Sep 2016 09:56:40 -0700
-Subject: [PATCH 1/6] Change Makefile to be compatible with Yocto
+From 6d283b9aa3f7fb761da4cb076b47a62275fc4caa Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Date: Tue, 21 Nov 2017 03:57:25 -0800
+Subject: [PATCH 1/9] Change Makefile to be compatible with Yocto
 
 Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
 Signed-off-by: Hyun Kwon <hyun.kwon@xilinx.com>
-Upstream Status: Pending
+Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Upstream Status: Inappropriate [Xilinx specific]
 ---
- driver/src/devicedrv/mali/Makefile | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ driver/src/devicedrv/mali/Makefile | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/driver/src/devicedrv/mali/Makefile b/driver/src/devicedrv/mali/Makefile
-index f39ae4d..9ef9713 100755
+index 5a259fe..a6dd94c 100644
 --- Makefile
 +++ b/Makefile
-@@ -88,7 +88,11 @@ endif
+@@ -89,7 +89,11 @@ endif
  # Define host system directory
  KDIR-$(shell uname -m):=/lib/modules/$(shell uname -r)/build
  
@@ -27,12 +28,9 @@ index f39ae4d..9ef9713 100755
  
  ifeq ($(ARCH), arm)
  # when compiling for ARM we're cross compiling
-@@ -193,10 +197,15 @@ ifeq ($(MALI_MEM_SWAP_TRACKING),1)
- EXTRA_DEFINES += -DMALI_MEM_SWAP_TRACKING=1
+@@ -204,9 +208,12 @@ EXTRA_DEFINES += -DMALI_MEM_SWAP_TRACKING=1
  endif
  
-+EXTRA_DEFINES += -Wno-error=date-time
-+
  all: $(UMP_SYMVERS_FILE)
 -	$(MAKE) ARCH=$(ARCH) -C $(KDIR) M=$(CURDIR) modules
 +	$(MAKE) ARCH=$(ARCH) -C $(KDIR) M=$(CURDIR) O=$(O) modules

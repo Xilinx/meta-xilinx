@@ -1,21 +1,22 @@
-From c86d22f1133647518a68f9f1cbe73e1797e68fa8 Mon Sep 17 00:00:00 2001
-From: Hyun Kwon <hyun.kwon@xilinx.com>
-Date: Tue, 3 May 2016 08:11:38 -0700
-Subject: [PATCH 3/6] staging: mali: r7p0-00rel0: Remove unused trace macros
+From d6e44bbf8d1377f78481f611dec237e8d24baf74 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Date: Tue, 21 Nov 2017 04:00:27 -0800
+Subject: [PATCH 3/9] staging: mali: r8p0-01rel0: Remove unused trace macros
 
 TRACE_SYSTEM_STRING is not need in each trace file anymore.
 
 Signed-off-by: Hyun Kwon <hyun.kwon@xilinx.com>
+Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
 Upstream Status: Pending
 ---
  driver/src/devicedrv/mali/linux/mali_linux_trace.h | 2 --
  1 file changed, 2 deletions(-)
 
 diff --git a/driver/src/devicedrv/mali/linux/mali_linux_trace.h b/driver/src/devicedrv/mali/linux/mali_linux_trace.h
-index 2c91ddc..d4e45ab 100755
+index 7f0b19d..33cb1ca 100644
 --- linux/mali_linux_trace.h
 +++ b/linux/mali_linux_trace.h
-@@ -13,12 +13,10 @@
+@@ -13,13 +13,11 @@
  
  #include <linux/types.h>
  
@@ -24,8 +25,9 @@ index 2c91ddc..d4e45ab 100755
  
  #undef  TRACE_SYSTEM
  #define TRACE_SYSTEM mali
+ #ifndef TRACEPOINTS_ENABLED
 -#define TRACE_SYSTEM_STRING __stringfy(TRACE_SYSTEM)
- 
+ #endif
  #define TRACE_INCLUDE_PATH .
  #define TRACE_INCLUDE_FILE mali_linux_trace
 -- 

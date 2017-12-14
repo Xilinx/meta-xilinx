@@ -1,19 +1,19 @@
-From 3e6fb4697bddc4cfbb82e6a0b2f9f28d5c1d0a04 Mon Sep 17 00:00:00 2001
+From 2f5e8944357f43fbde4cb642c6ee4a699c88efb5 Mon Sep 17 00:00:00 2001
 From: Hyun Kwon <hyun.kwon@xilinx.com>
 Date: Wed, 29 Jun 2016 09:14:37 -0700
-Subject: [PATCH 4/6] staging: mali: r7p0-00rel0: Don't include
+Subject: [PATCH 4/9] staging: mali: r8p0-01rel0: Don't include
  mali_read_phys() for zynq/zynqmp
 
 mali_read_phys() is not used with CONFIG_ARCH_ZYNQ and CONFIG_ARCH_ZYNQMP.
 
 Signed-off-by: Hyun Kwon <hyun.kwon@xilinx.com>
-Upstream Status: Pending
+Upstream Status: Inappropriate [Xilinx specific]
 ---
  driver/src/devicedrv/mali/platform/arm/arm.c | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/driver/src/devicedrv/mali/platform/arm/arm.c b/driver/src/devicedrv/mali/platform/arm/arm.c
-index 0682842..c6f58d8 100755
+index fac99bc..62f9be6 100644
 --- platform/arm/arm.c
 +++ b/platform/arm/arm.c
 @@ -38,7 +38,9 @@
