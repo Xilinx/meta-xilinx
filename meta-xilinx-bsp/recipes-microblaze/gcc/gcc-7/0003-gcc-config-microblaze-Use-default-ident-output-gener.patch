@@ -1,8 +1,7 @@
-From 308ac81945b2674953797a9db4aee98397f88362 Mon Sep 17 00:00:00 2001
+From 89b0d852718f0ad2b48899880c2bc1e5dc979704 Mon Sep 17 00:00:00 2001
 From: Nathan Rossi <nathan@nathanrossi.com>
 Date: Sat, 27 May 2017 00:00:17 +1000
-Subject: [PATCH 4/4] gcc/config/microblaze: Use default ident output
- generation
+Subject: [PATCH] gcc/config/microblaze: Use default ident output generation
 
 Remove the MicroBlaze specific TARGET_ASM_OUTPUT_IDENT definition, and
 use the default.
@@ -76,5 +75,5 @@ index 2c9ece1d6c..ccd77e8b4d 100644
  /* Default to -G 8 */
  #ifndef MICROBLAZE_DEFAULT_GVALUE
 -- 
-2.11.0
+2.14.2
 
