@@ -1,8 +1,7 @@
-From db7a0ac634ccaa1781d0a0d17dfffd3f1719bb6d Mon Sep 17 00:00:00 2001
+From 2d90c10cf4d95999f68f474305828c7dfc51af18 Mon Sep 17 00:00:00 2001
 From: Nathan Rossi <nathan@nathanrossi.com>
 Date: Thu, 12 Nov 2015 16:09:31 +1000
-Subject: [PATCH 2/4] microblaze.md: Improve 'adddi3' and 'subdi3' insn
- definitions
+Subject: [PATCH] microblaze.md: Improve 'adddi3' and 'subdi3' insn definitions
 
 Change adddi3 to handle DI immediates as the second operand, this
 requires modification to the output template however reduces the need to
@@ -63,5 +62,5 @@ index b3a0011fd7..8a372d7ebb 100644
    "rsub\t%L0,%L2,%L1\;rsubc\t%M0,%M2,%M1"
    [(set_attr "type"	"darith")
 -- 
-2.11.0
+2.14.2
 
