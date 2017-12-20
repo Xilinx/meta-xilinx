@@ -6,9 +6,6 @@ AVAILTUNES += "microblaze"
 TUNE_FEATURES_tune-microblaze = "microblaze"
 PACKAGE_EXTRA_ARCHS_tune-microblaze = "${TUNE_PKGARCH}"
 
-# Linux Configuration
-KERNEL_IMAGETYPE ?= "linux.bin.ub"
-
 # U-Boot Configuration
 UBOOT_MACHINE ?= "microblaze-generic_config"
 
