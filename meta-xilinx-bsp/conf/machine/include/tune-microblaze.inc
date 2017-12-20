@@ -9,8 +9,3 @@ PACKAGE_EXTRA_ARCHS_tune-microblaze = "${TUNE_PKGARCH}"
 # U-Boot Configuration
 UBOOT_MACHINE ?= "microblaze-generic_config"
 
-# default to use the gdb 7.7.1
-PREFERRED_VERSION_gdb ?= "7.7.1"
-PREFERRED_VERSION_gdb-cross ?= "7.7.1"
-PREFERRED_VERSION_gdb-cross-canadian ?= "7.7.1"
-

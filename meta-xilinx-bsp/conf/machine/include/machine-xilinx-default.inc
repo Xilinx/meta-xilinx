@@ -36,3 +36,7 @@ XSERVER ?= " \
 
 XSERVER_EXT ?= ""
 XSERVER_EXT_zynqmp ?= "xf86-video-armsoc"
+
+# For MicroBlaze default all microblaze machines to use GDB 7.7.1 (for gdbserver/gdb)
+PREFERRED_VERSION_gdb_microblaze = "7.7.1"
+
