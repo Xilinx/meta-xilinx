@@ -8,6 +8,8 @@ SRCREV ?= "949e5cb9a736bac32ea8886e3953da55bdd30754"
 include u-boot-xlnx.inc
 include u-boot-spl-zynq-init.inc
 
+SRC_URI_append_kc705-microblazeel = " file://microblaze-kc705-Convert-microblaze-generic-to-k.patch"
+
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
 
