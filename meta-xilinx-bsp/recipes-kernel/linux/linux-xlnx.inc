@@ -27,7 +27,7 @@ do_kernel_metadata_prepend () {
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE_zynq = ".*"
 COMPATIBLE_MACHINE_zynqmp = ".*"
-COMPATIBLE_MACHINE_kc705-microblazeel = ".*"
+COMPATIBLE_MACHINE_microblaze = ".*"
 
 # Use DEFCONFIGs for configuring linux-xlnx kernels
 KCONFIG_MODE ?= "alldefconfig"
