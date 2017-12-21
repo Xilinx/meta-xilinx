@@ -9,6 +9,8 @@ SRC_URI_append = " \
 		file://arm64-zynqmp-Setup-partid-for-QEMU-to-match-silicon.patch \
 		"
 
+SRC_URI_append_kc705-microblazeel = " file://microblaze-kc705-Convert-microblaze-generic-to-k.patch"
+
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=6;md5=157ab8408beab40cd8ce1dc69f702a6c"
 
