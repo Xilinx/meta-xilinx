@@ -51,7 +51,7 @@ DEVICETREE_PP_FLAGS ?= " \
 python () {
     # auto add dependency on kernel tree
     if d.getVar("KERNEL_DTS_INCLUDE") != "":
-        d.appendVarFlag("do_compile", "depends", " virtual/kernel:do_shared_workdir")
+        d.appendVarFlag("do_compile", "depends", " virtual/kernel:do_configure")
 }
 
 do_compile() {
