@@ -1,9 +1,9 @@
-include u-boot-xlnx.inc
-include u-boot-spl-zynq-init.inc
-
+UBOOT_VERSION = "v2017.01"
 XILINX_RELEASE_VERSION = "v2017.3"
 SRCREV ?= "da811c4511ef9caeb95f9a22fe49d38bd8e56ded"
-PV = "v2017.01-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
+
+include u-boot-xlnx.inc
+include u-boot-spl-zynq-init.inc
 
 SRC_URI_append = " \
 		file://arm64-zynqmp-Setup-partid-for-QEMU-to-match-silicon.patch \
