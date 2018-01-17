@@ -23,6 +23,24 @@ do_kernel_metadata_prepend () {
 	[ -n "${KBUILD_DEFCONFIG}" ] && [ -e ${WORKDIR}/defconfig ] && rm ${WORKDIR}/defconfig
 }
 
+python __anonymous () {
+   kerneltypes = d.getVar('KERNEL_IMAGETYPES') or ""
+   if 'simpleImage.mb' in kerneltypes.split():
+      providerdtb = d.getVar("PREFERRED_PROVIDER_virtual/dtb") or ""
+      if providerdtb:
+         d.appendVarFlag('do_compile', 'depends', ' virtual/dtb:do_populate_sysroot')
+      else:
+         bb.error("For MB dts/dtb provider needs to be set")
+}
+
+do_compile_prepend_microblaze () {
+	if (echo "${KERNEL_IMAGETYPES}" | grep -wq "simpleImage.mb"); then
+		install -d ${B}/arch/microblaze/boot/dts
+		cp ${RECIPE_SYSROOT}/boot/devicetree/*.dts ${B}/arch/microblaze/boot/dts/mb.dts
+	fi
+}
+
+
 # Default to be only compatible with specific machines or soc families
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE_zynq = ".*"
