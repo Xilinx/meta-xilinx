@@ -19,8 +19,6 @@ COMPATIBLE_MACHINE ?= "^$"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES_${PN} = "/boot/devicetree/*.dtb /boot/devicetree/*.dtbo"
-
 S = "${WORKDIR}"
 B = "${WORKDIR}/build"
 
@@ -66,6 +64,7 @@ do_compile() {
 			dtc ${DEVICETREE_OFLAGS} -I dts -O dtb ${DEVICETREE_FLAGS} -o ${DTS_NAME}.dtbo `basename ${DTS_FILE}`.pp
 		else
 			dtc -I dts -O dtb ${DEVICETREE_FLAGS} -o ${DTS_NAME}.dtb `basename ${DTS_FILE}`.pp
+			dtc -I dtb -O dts -o ${DTS_NAME}.dts ${DTS_NAME}.dtb
 		fi
 	done
 }
@@ -76,6 +75,13 @@ do_install() {
 	done
 }
 
+do_install_append_microblaze() {
+	for DTS_FILE in `ls *.dts`; do
+		install -Dm 0644 ${B}/${DTS_FILE} ${D}/boot/devicetree/mb.dts
+	done
+}
+
+
 do_deploy() {
 	for DTB_FILE in `ls *.dtb *.dtbo`; do
 		install -Dm 0644 ${B}/${DTB_FILE} ${DEPLOYDIR}/${DTB_FILE}
@@ -83,3 +89,5 @@ do_deploy() {
 }
 addtask deploy before do_build after do_install
 
+FILES_${PN} = "/boot/devicetree/*.dtb /boot/devicetree/*.dtbo"
+FILES_${PN}_append_microblaze = " /boot/devicetree/*.dts"
