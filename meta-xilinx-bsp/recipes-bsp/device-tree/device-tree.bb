@@ -10,6 +10,8 @@ LIC_FILES_CHKSUM = " \
 
 inherit deploy kernel-arch
 
+PROVIDES = "virtual/dtb"
+
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS += "dtc-native"
 
