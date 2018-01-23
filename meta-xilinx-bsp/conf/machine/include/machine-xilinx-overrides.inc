@@ -1,0 +1,2 @@
+SOC_VARIANT ??= ""
+MACHINEOVERRIDES =. "${@['', '${SOC_FAMILY}${SOC_VARIANT}:']['${SOC_VARIANT}' != '']}"
