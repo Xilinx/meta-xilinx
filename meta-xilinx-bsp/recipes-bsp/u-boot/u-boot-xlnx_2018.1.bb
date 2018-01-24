@@ -22,5 +22,6 @@ HAS_PLATFORM_INIT ?= " \
 		zynq_zybo_config \
 		xilinx_zynqmp_zcu102_rev1_0_config \
 		xilinx_zynqmp_zcu106_revA_config \
+		xilinx_zynqmp_zcu104_revC_config \
 		"
 
