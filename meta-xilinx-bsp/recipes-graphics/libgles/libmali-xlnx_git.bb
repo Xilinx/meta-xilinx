@@ -7,7 +7,6 @@ inherit distro_features_check
 ANY_OF_DISTRO_FEATURES = "fbdev x11"
 
 PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl"
-RPROVIDES_${PN} += "libegl libgles1 libglesv1-cm1 libgles2 libglesv2-2"
 
 FILESEXTRAPATHS_append := " \
                 ${THISDIR}/files: \
@@ -32,10 +31,16 @@ COMPATIBLE_MACHINE_zynqmp = "zynqmp"
 
 S = "${WORKDIR}/git"
 
-X11RDEPENDS = "libxdamage libxext libx11 libdrm libxau libxcb libxdmcp libxfixes"
+X11RDEPENDS = "libxdamage libxext libx11 libdrm libxfixes"
+X11DEPENDS = "libxdamage libxext virtual/libx11 libdrm libxfixes"
+
 RDEPENDS_${PN} = " \
 	kernel-module-mali \
 	${@bb.utils.contains('DISTRO_FEATURES', 'x11', '${X11RDEPENDS}', '', d)} \
+	"
+
+DEPENDS = "\
+	${@bb.utils.contains('DISTRO_FEATURES', 'x11', '${X11DEPENDS}', '', d)} \
 	"
 
 EGL_TYPE = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11',  \
@@ -79,6 +84,10 @@ do_install() {
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 INHIBIT_PACKAGE_STRIP = "1"
 INHIBIT_SYSROOT_STRIP = "1"
+
+RREPLACES_${PN} = "libegl libgles1 libglesv1-cm1 libgles2 libglesv2-2"
+RPROVIDES_${PN} = "libegl libgles1 libglesv1-cm1 libgles2 libglesv2-2"
+RCONFLICTS_${PN} = "libegl libgles1 libglesv1-cm1 libgles2 libglesv2-2"
 
 # These libraries shouldn't get installed in world builds unless something
 # explicitly depends upon them.
