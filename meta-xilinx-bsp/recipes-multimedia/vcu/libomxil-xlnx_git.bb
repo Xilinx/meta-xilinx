@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=03a7aef7e6f6a76a59fd9b8ba450b493"
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/xilinx/vcu-omx-il.git;protocol=https"
-SRCREV ?= "90ee4c515f6d7447699a174b6e835431d20e5b77"
+SRCREV ?= "99688be92171ecb2a848dd01bf0c1b8f9db294e1"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
