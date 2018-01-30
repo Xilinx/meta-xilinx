@@ -8,6 +8,7 @@ PACKAGE_EXTRA_ARCHS_tune-microblaze = "${TUNE_PKGARCH}"
 
 # Linux Configuration
 KERNEL_IMAGETYPE ?= "linux.bin.ub"
+KERNEL_IMAGETYPES += "simpleImage.mb"
 
 # U-Boot Configuration
 UBOOT_MACHINE ?= "microblaze-generic_config"
