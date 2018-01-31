@@ -42,6 +42,14 @@ XSERVER ?= " \
 	${XSERVER_EXT} \
 	"
 
+def get_dtb_list(d):
+    if d.getVar("KERNEL_DEVICETREE"):
+        dtbs = d.getVar("KERNEL_DEVICETREE").split(" ")
+        dtbs = [os.path.basename(d) for d in dtbs]
+        if len(dtbs) != 0:
+            return " ".join([d.getVar("KERNEL_IMAGETYPE") + "-" + dtb for dtb in dtbs])
+    return ""
+
 XSERVER_EXT ?= ""
 XSERVER_EXT_zynqmp ?= "xf86-video-armsoc"
 
