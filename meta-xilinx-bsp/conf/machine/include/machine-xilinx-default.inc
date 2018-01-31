@@ -42,13 +42,28 @@ XSERVER ?= " \
 	${XSERVER_EXT} \
 	"
 
-def get_dtb_list(d):
+IMAGE_BOOT_FILES ?= "${@get_default_image_boot_files(d)}"
+
+def get_default_image_boot_files(d):
+    files = []
+
+    # kernel images
+    kerneltypes = set((d.getVar("KERNEL_IMAGETYPE") or "").split())
+    kerneltypes |= set((d.getVar("KERNEL_IMAGETYPES") or "").split())
+    for i in kerneltypes:
+        files.append(i)
+
+    # u-boot image
+    if d.getVar("UBOOT_BINARY"):
+        files.append(d.getVar("UBOOT_BINARY"))
+
+    # device trees (kernel only)
     if d.getVar("KERNEL_DEVICETREE"):
         dtbs = d.getVar("KERNEL_DEVICETREE").split(" ")
         dtbs = [os.path.basename(d) for d in dtbs]
         if len(dtbs) != 0:
-            return " ".join([d.getVar("KERNEL_IMAGETYPE") + "-" + dtb for dtb in dtbs])
-    return ""
+            files += [d.getVar("KERNEL_IMAGETYPE") + "-" + dtb for dtb in dtbs]
+    return " ".join(files)
 
 XSERVER_EXT ?= ""
 XSERVER_EXT_zynqmp ?= "xf86-video-armsoc"
