@@ -19,6 +19,7 @@ SRC_URI = " \
 	file://0007-Replace-__GFP_REPEAT-by-__GFP_RETRY_MAYFAIL.patch \
 	file://0008-mali_internal_sync-Rename-wait_queue_t-with-wait_que.patch \
 	file://0009-mali_memory_swap_alloc.c-Rename-global_page_state-wi.patch \
+	file://0010-common-mali_pm.c-Add-PM-runtime-barrier-after-removi.patch \
 	"
 SRC_URI[md5sum] = "8f04ae86957fd56197ad5a9d017b84ff"
 SRC_URI[sha256sum] = "bfd14fa3f75a71d4ba313534e651ca1c58dc354e882c0b39867e335882a06350"
