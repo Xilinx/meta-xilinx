@@ -3,7 +3,7 @@ FILESEXTRAPATHS_append_microblaze := "${THISDIR}/gcc-7:"
 SRC_URI_append_microblaze = " \
 		file://0001-Revert.patch \
 		file://0002-microblaze.md-Improve-adddi3-and-subdi3-insn-definit.patch \
-		file://0003-gcc-config-microblaze-Use-default-ident-output-gener.patch \
+		file://0003-PR-target-83013.patch \
 		file://0004-dejagnu-static-testing-on-qemu-suppress-warnings.patch \
 		file://0005-Testsuite-explicitly-add-fivopts-for-tests-that-depe.patch \
 		file://0006-Add-MicroBlaze-to-target-supports-for-atomic-builtin.patch \
