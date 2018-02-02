@@ -20,5 +20,7 @@ FILESEXTRAPATHS_prepend := "${@'${THISDIR}/u-boot-xlnx/${XILINX_RELEASE_VERSION}
 
 do_deploy_append_zcu102-zynqmp () {
 	# deploy u-boot-spl.bin for use by runqemu/QEMU
-	install -Dm 0644 ${B}/spl/u-boot-spl.bin ${DEPLOYDIR}/u-boot-spl.bin
+	if [ -e ${B}/spl/u-boot-spl.bin ];then
+		install -Dm 0644 ${B}/spl/u-boot-spl.bin ${DEPLOYDIR}/u-boot-spl.bin
+	fi
 }
