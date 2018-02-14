@@ -53,6 +53,12 @@ KBUILD_DEFCONFIG_zynqmp = "xilinx_zynqmp_defconfig"
 KBUILD_DEFCONFIG_zynq = "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG_microblaze = "mmu_defconfig"
 
+do_configure_prepend() {
+	if [ -n "${KBUILD_DEFCONFIG}" ]; then
+		cp ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
+	fi
+}
+
 # Add meta-xilinx kmeta, used for MicroBlaze BSP fragments
 FILESEXTRAPATHS_prepend := "${THISDIR}:"
 SRC_URI_append = " file://xilinx-kmeta;type=kmeta;name=xilinx-kmeta;destsuffix=xilinx-kmeta"
