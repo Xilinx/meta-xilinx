@@ -10,7 +10,7 @@ PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl"
 
 FILESEXTRAPATHS_append := " \
                 ${THISDIR}/files: \
-                ${THISDIR}/r7p0-00rel0: "
+                ${THISDIR}/r8p0-00rel0: "
 
 REPO ?= "git://gitenterprise.xilinx.com/Graphics/mali400-xlnx-userspace.git;protocol=https"
 BRANCH ?= "master"
