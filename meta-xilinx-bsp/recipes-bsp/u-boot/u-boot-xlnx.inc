@@ -1,6 +1,6 @@
 require recipes-bsp/u-boot/u-boot.inc
 
-DEPENDS += "bc-native dtc-native coreutils-native"
+DEPENDS += "bc-native dtc-native"
 
 XILINX_RELEASE_VERSION ?= ""
 UBOOT_VERSION_EXTENSION ?= "-xilinx-${XILINX_RELEASE_VERSION}"
