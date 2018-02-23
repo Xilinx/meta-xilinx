@@ -5,3 +5,5 @@ INHERIT += "machine-overrides-extender"
 
 MACHINEOVERRIDES_EXTENDER_zynqmpeg = "mali400"
 MACHINEOVERRIDES_EXTENDER_zynqmpev = "mali400:vcu"
+
+PACKAGE_EXTRA_ARCHS_append = " ${SOC_FAMILY} ${SOC_FAMILY}${SOC_VARIANT}"

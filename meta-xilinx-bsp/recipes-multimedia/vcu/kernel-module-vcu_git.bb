@@ -24,3 +24,5 @@ RDEPENDS_${PN} = "vcu-firmware"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynqmp = "zynqmp"
+
+PACKAGE_ARCH = "${SOC_FAMILY}"
