@@ -18,6 +18,8 @@ SRC_URI = "${REPO};${BRANCHARG}"
 
 inherit module
 
+EXTRA_OEMAKE += "O=${STAGING_KERNEL_BUILDDIR}"
+
 RDEPENDS_${PN} = "vcu-firmware"
 
 COMPATIBLE_MACHINE = "^$"
