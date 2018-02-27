@@ -1,4 +1,0 @@
-require qemu-devicetrees.inc
-
-XILINX_RELEASE_VERSION = "v2017.3"
-SRCREV ?= "4b951c594078562e9dd828430075968dd91ac425"
