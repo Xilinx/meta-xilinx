@@ -11,6 +11,7 @@ inherit xilinx-platform-init
 
 COMPATIBLE_MACHINE = "$^"
 COMPATIBLE_MACHINE_picozed-zynq7 = "picozed-zynq7"
+COMPATIBLE_MACHINE_zturn-zynq7 = "zturn-zynq7"
 
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
