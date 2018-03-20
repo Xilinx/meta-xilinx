@@ -14,7 +14,7 @@ FILESEXTRAPATHS_append := " \
 
 REPO ?= "git://gitenterprise.xilinx.com/Graphics/mali400-xlnx-userspace.git;protocol=https"
 BRANCH ?= "master"
-SRCREV ?= "7b0d2dd5dbe2b46ab5cff65cd88d534e230fec25"
+SRCREV ?= "e706eac39ee32e5c7dc852b75e2c45ff546a90f1"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 PV = "r8p0-01rel0"
