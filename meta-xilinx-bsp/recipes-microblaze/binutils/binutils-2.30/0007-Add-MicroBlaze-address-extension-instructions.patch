@@ -1,4 +1,4 @@
-From 82c8eacbceb51422d3da75ac30912f9dedc0e832 Mon Sep 17 00:00:00 2001
+From 3895968b5c55321d203cadb7630a2baee8699e17 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
 Date: Mon, 28 Aug 2017 19:53:59 -0700
 Subject: [PATCH] Add MicroBlaze address extension instructions
@@ -14,13 +14,14 @@ for supporting Address extension feature.
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
 Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
 Upstream-Status: Pending
+
 ---
  opcodes/microblaze-opc.h  | 13 ++++++++++++-
  opcodes/microblaze-opcm.h | 10 +++++-----
  2 files changed, 17 insertions(+), 6 deletions(-)
 
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index b33178145f..a64f8362da 100644
+index 773dc81..4e69f76 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -102,7 +102,7 @@
@@ -79,7 +80,7 @@ index b33178145f..a64f8362da 100644
    {"swaph",     INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x900001E2, OPCODE_MASK_H4,   swaph,     arithmetic_inst },
    {"", 0, 0, 0, 0, 0, 0, 0, 0},
 diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
-index 00dc131302..21a3dc8d76 100644
+index 7338f6a..c75f10a 100644
 --- a/opcodes/microblaze-opcm.h
 +++ b/opcodes/microblaze-opcm.h
 @@ -33,13 +33,13 @@ enum microblaze_instr
@@ -101,6 +102,3 @@ index 00dc131302..21a3dc8d76 100644
    sbi, shi, swi, msrset, msrclr, tuqula, fadd, frsub, fmul, fdiv,
    fcmp_lt, fcmp_eq, fcmp_le, fcmp_gt, fcmp_ne, fcmp_ge, fcmp_un, flt,
    fint, fsqrt,
--- 
-2.15.0
-

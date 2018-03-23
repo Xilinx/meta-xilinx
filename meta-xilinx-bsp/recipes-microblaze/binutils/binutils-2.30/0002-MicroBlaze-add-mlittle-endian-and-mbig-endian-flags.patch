@@ -1,4 +1,4 @@
-From 90fa3cca5ce8ca19c9aca521bbc3d47485f02bf1 Mon Sep 17 00:00:00 2001
+From 8b733a61ab54ba4cedb234020562502d20eebcbb Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
 Date: Mon, 28 Aug 2017 19:53:53 -0700
 Subject: [PATCH] MicroBlaze add mlittle-endian and mbig-endian flags
@@ -13,12 +13,13 @@ Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
 Upstream-Status: Pending
+
 ---
  gas/config/tc-microblaze.c | 9 +++++++++
  1 file changed, 9 insertions(+)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 0124422168..d47793646b 100644
+index 0194cd9..42dd7ae 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -37,6 +37,8 @@
@@ -61,6 +62,3 @@ index 0124422168..d47793646b 100644
  }
  
  
--- 
-2.15.0
-

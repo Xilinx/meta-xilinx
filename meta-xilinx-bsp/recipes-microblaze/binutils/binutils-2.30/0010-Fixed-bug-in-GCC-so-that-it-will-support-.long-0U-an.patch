@@ -1,4 +1,4 @@
-From 4449e15997a576761433cc76daf3635742acec62 Mon Sep 17 00:00:00 2001
+From e1bacaa7c1aa387f167afff74876c5acdffc39d9 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 15 Nov 2017 17:45:35 -0800
 Subject: [PATCH] Fixed bug in GCC so that it will support .long 0U and .long
@@ -7,12 +7,13 @@ Subject: [PATCH] Fixed bug in GCC so that it will support .long 0U and .long
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
 Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
 Upstream-Status: Pending
+
 ---
  gas/expr.c | 9 +++++++++
  1 file changed, 9 insertions(+)
 
 diff --git a/gas/expr.c b/gas/expr.c
-index 6fc707b8a5..a54b1f4b76 100644
+index 3e28af6..0b7cc76 100644
 --- a/gas/expr.c
 +++ b/gas/expr.c
 @@ -810,6 +810,15 @@ operand (expressionS *expressionP, enum expr_mode mode)
@@ -31,6 +32,3 @@ index 6fc707b8a5..a54b1f4b76 100644
        c = *input_line_pointer;
        switch (c)
  	{
--- 
-2.15.0
-
