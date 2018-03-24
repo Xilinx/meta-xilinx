@@ -16,4 +16,6 @@ SOC_OVERRIDES = "${@get_soc_overrides(d.getVar('SOC_FAMILY'),d.getVar('SOC_VARIA
 
 MACHINEOVERRIDES  =. "${SOC_OVERRIDES}"
 
-PACKAGE_EXTRA_ARCHS_append = " ${SOC_FAMILY} ${SOC_FAMILY}${SOC_VARIANT}"
+PACKAGE_EXTRA_ARCHS_append = " ${SOC_FAMILY}"
+PACKAGE_EXTRA_ARCHS_append = "${@['', ' ${SOC_FAMILY}${SOC_VARIANT}']['${SOC_VARIANT}' != '']}"
+
