@@ -1,9 +1,19 @@
 SOC_VARIANT ??= ""
 MACHINEOVERRIDES =. "${@['', '${SOC_FAMILY}${SOC_VARIANT}:']['${SOC_VARIANT}' != '']}"
 
-INHERIT += "machine-overrides-extender"
+# Here we can extend overrides for the corresponding family and variant
+def get_soc_overrides(fam, var, d):
+  extender = ''
+  if (fam == 'zynqmp'):
+    if (var == 'eg'):
+      extender = 'mali400:'
+    elif (var == 'ev'):
+      extender = 'mali400:vcu:'
+  return extender
 
-MACHINEOVERRIDES_EXTENDER_zynqmpeg = "mali400"
-MACHINEOVERRIDES_EXTENDER_zynqmpev = "mali400:vcu"
+# Gets OVERRIDES extender depending on the board
+SOC_OVERRIDES = "${@get_soc_overrides(d.getVar('SOC_FAMILY'),d.getVar('SOC_VARIANT'), d)}"
+
+MACHINEOVERRIDES  =. "${SOC_OVERRIDES}"
 
 PACKAGE_EXTRA_ARCHS_append = " ${SOC_FAMILY} ${SOC_FAMILY}${SOC_VARIANT}"
