@@ -30,7 +30,7 @@ COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynqmpeg = "zynqmpeg"
 COMPATIBLE_MACHINE_zynqmpev = "zynqmpev"
 
-PACKAGE_ARCH = "${SOC_FAMILY}${SOC_VARIANT}"
+PACKAGE_ARCH = "${SOC_FAMILY}"
 
 S = "${WORKDIR}/git"
 
