@@ -1,7 +1,7 @@
 DESCRIPTION = "ARM Trusted Firmware"
 
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://license.md;md5=829bdeb34c1d9044f393d5a16c068371"
+LIC_FILES_CHKSUM = "file://license.rst;md5=33065335ea03d977d0569f270b39603e"
 
 PROVIDES = "virtual/arm-trusted-firmware"
 
@@ -13,6 +13,7 @@ S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 XILINX_RELEASE_VERSION ?= ""
+ATF_VERSION ?= "1.4"
 ATF_VERSION_EXTENSION ?= "-xilinx-${XILINX_RELEASE_VERSION}"
 PV = "${ATF_VERSION}${ATF_VERSION_EXTENSION}+git${SRCPV}"
 

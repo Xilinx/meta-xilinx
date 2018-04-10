@@ -10,12 +10,16 @@ LIC_FILES_CHKSUM = " \
 		file://COPYING.LIB;endline=24;md5=c04def7ae38850e7d3ef548588159913 \
 		"
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+
 PV = "${XILINX_QEMU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 BRANCH ?= ""
 REPO ?= "git://github.com/Xilinx/qemu.git;protocol=https"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
-SRC_URI = "${REPO};${BRANCHARG}"
+SRC_URI = "${REPO};${BRANCHARG} \
+	file://memfd.patch \
+	"
 
 S = "${WORKDIR}/git"
 
