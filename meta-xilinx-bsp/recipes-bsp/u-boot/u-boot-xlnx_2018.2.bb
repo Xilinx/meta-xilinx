@@ -1,9 +1,9 @@
 UBOOT_VERSION = "v2018.01"
-XILINX_RELEASE_VERSION = "v2018.1"
+XILINX_RELEASE_VERSION = "v2018.2"
 
 UBRANCH ?= "master"
 
-SRCREV ?= "1c81b42a326e5b74a5b79e55de9c52b5781b7a8a"
+SRCREV ?= "21812b5fd359d8756d619a15b49b6079ae3f9f36"
 
 include u-boot-xlnx.inc
 include u-boot-spl-zynq-init.inc
