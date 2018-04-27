@@ -27,6 +27,7 @@ ATF_BASE_NAME[vardepsexclude] = "DATETIME"
 COMPATIBLE_MACHINE = "zynqmp"
 PLATFORM_zynqmp = "zynqmp"
 
+
 # requires CROSS_COMPILE set by hand as there is no configure script
 export CROSS_COMPILE="${TARGET_PREFIX}"
 
@@ -36,8 +37,12 @@ LDFLAGS[unexport] = "1"
 AS[unexport] = "1"
 LD[unexport] = "1"
 
+ATF_CONSOLE ?= "cadence"
+
+EXTRA_OEMAKE += "ZYNQMP_CONSOLE=${ATF_CONSOLE}"
+
 do_configure() {
-	:
+	oe_runmake clean -C ${S} BUILD_BASE=${B} PLAT=${PLATFORM}
 }
 
 do_compile() {
