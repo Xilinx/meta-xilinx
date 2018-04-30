@@ -44,7 +44,6 @@ the [meta-xilinx mailing list](https://lists.yoctoproject.org/listinfo/meta-xili
 
 Maintainers:
 
-	Nathan Rossi <nathan@nathanrossi.com>
 	Manjukumar Harthikote Matha <manjukumar.harthikote-matha@xilinx.com>
 
 Dependencies
