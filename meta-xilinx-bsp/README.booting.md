@@ -131,7 +131,7 @@ Zynq:
 
 Loading via SD
 ---------------------
-**(Note: This section only applies to Zynq.)**
+**(Note: This section only applies to Zynq and ZynqMP.)**
 
 ### Preparing SD/MMC
 Setup the card with the first partition formatted as FAT16. If you intend to
@@ -148,17 +148,39 @@ formatted and prepared such that they can be written directly to a disk. Refer
 to the Yocto Project Development Manual for more details:
 	http://www.yoctoproject.org/docs/current/dev-manual/dev-manual.html#creating-partitioned-images
 
-### Installing U-Boot
+### Installing U-Boot (Zynq)
 Add the following files to the first partition:
 
 * `boot.bin`
 * `u-boot.img`
 
-### Installing Kernel and Device Tree
+### Installing U-Boot (ZynqMP)
+Add the following files to the first partition:
+
+* `boot.bin`
+* `u-boot.bin`
+
+### Installing Kernel and Device Tree (Zynq)
 Add the following files to the first partition:
 
 * `uImage`
 * `<machine name>.dtb`
+
+### Installing Kernel and Device Tree (ZynqMP)
+Add the following files to the first partition:
+
+* `Image`
+* `<machine name>.dtb`
+
+### Install ARM Trusted Firmware (ZynqMP)
+Add the following file to the first partition:
+
+ * `atf-uboot.ub`
+
+### Install U-boot environment file (ZynqMP)
+Add the following file to the first partition:
+
+ * `uEnv.txt`
 
 ### Installing Root Filesystem
 If using a ramdisk also add the `.cpio.gz.u-boot` type of root filesystem image
