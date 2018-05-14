@@ -16,8 +16,8 @@ inherit xilinx-fetch-restricted
 BSP_NAME = "xilinx-zcu102"
 BSP_FILE = "${BSP_NAME}-v${PV}-final.bsp"
 SRC_URI = "https://www.xilinx.com/member/forms/download/xef.html?filename=${BSP_FILE};downloadfilename=${BSP_FILE}"
-SRC_URI[md5sum] = "d91b624bf5b7d2430a317ffb5067509b"
-SRC_URI[sha256sum] = "ff6f2e4faf877abba3c5f7f711c2aeb6b490df5da4f38852e7337d0251800f38"
+SRC_URI[md5sum] = "cea5f11761e7f38cbfcf0a07a19094e0"
+SRC_URI[sha256sum] = "7ac0ac3a5fb7dd162c0a922c66edb33b5737955ef6570a1a1d3b15b4344f7cc1"
 
 INHIBIT_DEFAULT_DEPS = "1"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
