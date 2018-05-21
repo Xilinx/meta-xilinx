@@ -16,8 +16,8 @@ inherit xilinx-fetch-restricted
 BSP_NAME = "xilinx-kc705"
 BSP_FILE = "${BSP_NAME}-v${PV}-final.bsp"
 SRC_URI = "https://www.xilinx.com/member/forms/download/xef.html?filename=${BSP_FILE};downloadfilename=${BSP_FILE}"
-SRC_URI[md5sum] = "e4c4de43dcbcb955a3c63e4c68542792"
-SRC_URI[sha256sum] = "3e2b0e426958dad01a0ee810822001700065e9ed988f5c1c12b984ad2b48bc5c"
+SRC_URI[md5sum] = "53e5e0ad87d0388fe5b11fa5fc029288"
+SRC_URI[sha256sum] = "301f994bd836ad78ebfc92af6c16470b53253121ca31762dc1f770a9ff11dc18"
 
 PROVIDES = "virtual/bitstream"
 
