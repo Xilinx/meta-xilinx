@@ -60,7 +60,7 @@ do_deploy() {
 
 	# Get the entry point address from the elf.
 	BL31_BASE_ADDR=$(${READELF} -h ${OUTPUT_DIR}/bl31/bl31.elf | egrep -m 1 -i "entry point.*?0x" | sed -r 's/.*?(0x.*?)/\1/g')
-	mkimage -A arm64 -O linux -T kernel -C none \
+	mkimage -A arm64 -O arm-trusted-firmware -T kernel -C none \
 		-a $BL31_BASE_ADDR -e $BL31_BASE_ADDR \
 		-d ${OUTPUT_DIR}/bl31.bin ${DEPLOYDIR}/${ATF_BASE_NAME}.ub
 	ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/${PN}.ub
