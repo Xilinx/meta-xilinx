@@ -47,8 +47,8 @@ python () {
         if (currentconfig not in hasconfigs) or (d.getVar("FORCE_PLATFORM_INIT") == "1"):
             # force the dependency on a recipe that provides the platform init files
             d.appendVar("DEPENDS", " virtual/xilinx-platform-init")
-            # setup task to modify platform init after unpack and before configure
-            bb.build.addtask("do_zynq_platform_init", "do_configure", "do_prepare_recipe_sysroot", d)
+            # setup task to modify platform init after unpack and prepare_recipe_sysroot, and before configure
+            bb.build.addtask("do_zynq_platform_init", "do_configure", "do_unpack do_prepare_recipe_sysroot", d)
 
     if "boot.bin" not in d.getVar("SPL_BINARY"):
         # not deploying the boot.bin, just building SPL
