@@ -39,8 +39,10 @@ AS[unexport] = "1"
 LD[unexport] = "1"
 
 ATF_CONSOLE ?= "cadence"
+DEBUG ?= ""
+EXTRA_OEMAKE_append = " ZYNQMP_CONSOLE=${ATF_CONSOLE} ${@bb.utils.contains('DEBUG', '1', ' DEBUG=${DEBUG}', '', d)}"
+OUTPUT_DIR = "${@bb.utils.contains('DEBUG', '1', '${B}/${PLATFORM}/debug', '${B}/${PLATFORM}/release', d)}"
 
-EXTRA_OEMAKE += "ZYNQMP_CONSOLE=${ATF_CONSOLE}"
 
 do_configure() {
 	oe_runmake clean -C ${S} BUILD_BASE=${B} PLAT=${PLATFORM}
@@ -53,8 +55,6 @@ do_compile() {
 do_install() {
 	:
 }
-
-OUTPUT_DIR = "${B}/${PLATFORM}/release"
 
 do_deploy() {
 	install -d ${DEPLOYDIR}
