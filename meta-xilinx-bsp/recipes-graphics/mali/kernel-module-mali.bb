@@ -32,7 +32,10 @@ do_make_scripts[depends] += "virtual/kernel:do_unpack"
 S = "${WORKDIR}/DX910-SW-99002-${PV}/driver/src/devicedrv/mali"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynqmp = "zynqmp"
+COMPATIBLE_MACHINE_zynqmpeg = "zynqmpeg"
+COMPATIBLE_MACHINE_zynqmpev = "zynqmpev"
+
+PACKAGE_ARCH = "${SOC_FAMILY}${SOC_VARIANT}"
 
 EXTRA_OEMAKE = 'KDIR="${STAGING_KERNEL_DIR}" \
 		ARCH="${ARCH}" \
