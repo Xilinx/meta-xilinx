@@ -30,6 +30,7 @@ SYSROOT_DIRS += "/boot/devicetree"
 KERNEL_DTS_INCLUDE ??= " \
 		${STAGING_KERNEL_DIR}/arch/${ARCH}/boot/dts \
 		${STAGING_KERNEL_DIR}/arch/${ARCH}/boot/dts/include \
+		${STAGING_KERNEL_DIR}/scripts/dtc/include-prefixes \
 		"
 # For arm64/zynqmp the xilinx specific includes are subdired under a vendor directory.
 KERNEL_DTS_INCLUDE_append_zynqmp = " \
