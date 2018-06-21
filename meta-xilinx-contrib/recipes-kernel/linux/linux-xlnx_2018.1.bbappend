@@ -6,3 +6,4 @@ SRC_URI_append_zybo-linux-bd-zynq7 = " \
 	file://0003-drm-xilinx-Fix-DPMS-transition-to-on.patch \
 	"
 
+SRC_URI_append_minized-zynq7 = " file://0004-minized-wifi-bluetooth.cfg"
