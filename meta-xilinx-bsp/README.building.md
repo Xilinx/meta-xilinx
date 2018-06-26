@@ -5,12 +5,16 @@ The following instructions require OE-Core meta and BitBake. Poky provides these
 components, however they can be acquired separately.
 
 Initialize a build using the `oe-init-build-env` script. Once initialized
-configure `bblayers.conf` by adding the `meta-xilinx` layer. e.g.:
+configure `bblayers.conf` by adding the `meta-xilinx-bsp` and
+`meta-xilinx-contrib` layer. e.g.:
 
 	BBLAYERS ?= " \
 		<path to layer>/oe-core/meta \
-		<path to layer>/meta-xilinx \
+		<path to layer>/meta-xilinx-bsp \
+		<path to layer>/meta-xilinx-contrib \
 		"
+
+meta-xilinx-contrib is a contribution layer and is optional.
 
 To build a specific target BSP configure the associated machine in `local.conf`:
 
