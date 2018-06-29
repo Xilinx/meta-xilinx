@@ -3,7 +3,7 @@ XILINX_RELEASE_VERSION = "v2018.3"
 
 UBRANCH ?= "master"
 
-SRCREV ?= "21812b5fd359d8756d619a15b49b6079ae3f9f36"
+SRCREV ??= "21812b5fd359d8756d619a15b49b6079ae3f9f36"
 
 include u-boot-xlnx.inc
 include u-boot-spl-zynq-init.inc

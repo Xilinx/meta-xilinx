@@ -8,10 +8,10 @@ KBRANCH ?= ""
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
 
 FILESOVERRIDES_append = ":${XILINX_RELEASE_VERSION}"
-KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https"
+KERNELURI ??= "git://github.com/Xilinx/linux-xlnx.git;protocol=https"
 SRC_URI = "${KERNELURI};${SRCBRANCHARG}"
 
-SRCREV_machine ?= "${SRCREV}"
+SRCREV_machine ??= "${SRCREV}"
 
 require recipes-kernel/linux/linux-yocto.inc
 require linux-microblaze.inc
