@@ -55,14 +55,14 @@ python () {
 }
 
 do_compile() {
-	for DTS_FILE in ${DTS_FILES_PATH}/*.dts; do
+	for DTS_FILE in ${DTS_FILES_PATH}/*.dts*; do
 		DTS_NAME=`basename -s .dts ${DTS_FILE}`
 		${BUILD_CPP} ${DEVICETREE_PP_FLAGS} -o `basename ${DTS_FILE}`.pp ${DTS_FILE}
 
 		# for now use the existance of the '/plugin/' tag to detect overlays
 		if grep -qse "/plugin/;" `basename ${DTS_FILE}`.pp; then
 			dtc ${DEVICETREE_OFLAGS} -I dts -O dtb ${DEVICETREE_FLAGS} -o ${DTS_NAME}.dtbo `basename ${DTS_FILE}`.pp
-		else
+		elif [[ "${DTS_FILE##*.}" == "dts" ]]; then
 			dtc -I dts -O dtb ${DEVICETREE_FLAGS} -o ${DTS_NAME}.dtb `basename ${DTS_FILE}`.pp
 			dtc -I dtb -O dts -o ${DTS_NAME}.dts ${DTS_NAME}.dtb
 		fi
