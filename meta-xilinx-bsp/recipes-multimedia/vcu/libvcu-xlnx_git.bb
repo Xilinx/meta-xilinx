@@ -3,9 +3,9 @@ DESCRIPTION = "Control software libraries, test applications and headers provide
 LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=03a7aef7e6f6a76a59fd9b8ba450b493"
 
-BRANCH ?= "master"
-REPO ?= "git://github.com/Xilinx/vcu-ctrl-sw.git;protocol=https"
-SRCREV = "2975ba25430a221a3feaca4839f5a13424972a68"
+BRANCH ??= "master"
+REPO ??= "git://github.com/Xilinx/vcu-ctrl-sw.git;protocol=https"
+SRCREV ??= "2975ba25430a221a3feaca4839f5a13424972a68"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
