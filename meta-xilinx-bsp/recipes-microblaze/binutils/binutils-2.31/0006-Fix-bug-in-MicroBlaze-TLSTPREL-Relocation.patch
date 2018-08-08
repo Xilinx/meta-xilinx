@@ -1,4 +1,4 @@
-From 0cad227ce495a975b32c10a8b6b0970c45024dd6 Mon Sep 17 00:00:00 2001
+From ca0336a49c33ccb78962530f2affff8982027e8e Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
 Date: Mon, 28 Aug 2017 19:53:58 -0700
 Subject: [PATCH] Fix bug in MicroBlaze TLSTPREL Relocation
@@ -18,10 +18,10 @@ Upstream-Status: Pending
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index fc0d3e1..a94799f 100644
+index 1dc56f7..d4e53de 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
-@@ -1402,9 +1402,9 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1451,9 +1451,9 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  	      relocation += addend;
  	      relocation -= dtprel_base(info);
  	      bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
@@ -31,5 +31,5 @@ index fc0d3e1..a94799f 100644
 -			  contents + offset + 2 + INST_WORD_SIZE);
 +			  contents + offset + endian + INST_WORD_SIZE);
  	      break;
- 	    case (int) R_MICROBLAZE_64_PCREL :
- 	    case (int) R_MICROBLAZE_64:
+ 	    case (int) R_MICROBLAZE_TEXTREL_64:
+ 	    case (int) R_MICROBLAZE_TEXTREL_32_LO:

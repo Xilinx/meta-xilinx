@@ -11,8 +11,9 @@ reference.
 This is a workaround for design flaws in the assembler to
 linker interface with regards to linker relaxation.
 
-03/2018
-Rebased for binutils 2.30
+08/2018
+Rebased for binutils 2.31
+ - Some RELOC_NUMBERs were added upstream, rebased to use 33 instead of 30
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 Signed-off-by: Nagaraju Mekala <nmekala@xilinx.com>
@@ -31,11 +32,11 @@ Upstream-Status: Pending
  include/elf/microblaze.h   |  1 +
  7 files changed, 61 insertions(+), 10 deletions(-)
 
-diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
-index 4228603..1906195 100644
---- a/bfd/bfd-in2.h
-+++ b/bfd/bfd-in2.h
-@@ -5826,10 +5826,15 @@ value relative to the read-write small data area anchor  */
+Index: git/bfd/bfd-in2.h
+===================================================================
+--- git.orig/bfd/bfd-in2.h
++++ git/bfd/bfd-in2.h
+@@ -5791,10 +5791,15 @@ value relative to the read-write small d
  expressions of the form "Symbol Op Symbol"  */
    BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM,
  
@@ -53,11 +54,11 @@ index 4228603..1906195 100644
  
  /* This is a 64 bit reloc that stores the 32 bit pc relative
  value in two words (with an imm instruction).  The relocation is
-diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index a1d810c..fc0d3e1 100644
---- a/bfd/elf32-microblaze.c
-+++ b/bfd/elf32-microblaze.c
-@@ -176,6 +176,20 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
+Index: git/bfd/elf32-microblaze.c
+===================================================================
+--- git.orig/bfd/elf32-microblaze.c
++++ git/bfd/elf32-microblaze.c
+@@ -176,6 +176,20 @@ static reloc_howto_type microblaze_elf_h
  	  0x0000ffff,		/* Dest Mask.  */
  	  FALSE),		/* PC relative offset?  */
  
@@ -78,7 +79,7 @@ index a1d810c..fc0d3e1 100644
     /* This reloc does nothing.	Used for relaxation.  */
     HOWTO (R_MICROBLAZE_64_NONE,	/* Type.  */
  	  0,			/* Rightshift.  */
-@@ -532,6 +546,9 @@ microblaze_elf_reloc_type_lookup (bfd * abfd ATTRIBUTE_UNUSED,
+@@ -562,6 +576,9 @@ microblaze_elf_reloc_type_lookup (bfd *
      case BFD_RELOC_NONE:
        microblaze_reloc = R_MICROBLAZE_NONE;
        break;
@@ -88,7 +89,7 @@ index a1d810c..fc0d3e1 100644
      case BFD_RELOC_MICROBLAZE_64_NONE:
        microblaze_reloc = R_MICROBLAZE_64_NONE;
        break;
-@@ -1832,14 +1849,23 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1918,14 +1935,23 @@ microblaze_elf_relax_section (bfd *abfd,
  		}
  	      break;
  	    case R_MICROBLAZE_NONE:
@@ -112,7 +113,7 @@ index a1d810c..fc0d3e1 100644
  		irel->r_addend -= (efix - sfix);
  		/* Should use HOWTO.  */
  		microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset,
-@@ -1887,12 +1913,16 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1973,12 +1999,16 @@ microblaze_elf_relax_section (bfd *abfd,
  	  irelscanend = irelocs + o->reloc_count;
  	  for (irelscan = irelocs; irelscan < irelscanend; irelscan++)
  	    {
@@ -130,7 +131,7 @@ index a1d810c..fc0d3e1 100644
                    /* This was a PC-relative instruction that was completely resolved.  */
                    if (ocontents == NULL)
                      {
-@@ -1917,15 +1947,16 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2003,15 +2033,16 @@ microblaze_elf_relax_section (bfd *abfd,
                          }
                      }
  
@@ -152,7 +153,7 @@ index a1d810c..fc0d3e1 100644
  	      if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32)
  		{
  		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
-@@ -1985,7 +2016,7 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2071,7 +2102,7 @@ microblaze_elf_relax_section (bfd *abfd,
  			      elf_section_data (o)->this_hdr.contents = ocontents;
  			    }
  			}
@@ -161,11 +162,11 @@ index a1d810c..fc0d3e1 100644
  							+ isym->st_value,
  							0,
  							sec);
-diff --git a/bfd/libbfd.h b/bfd/libbfd.h
-index 2f5f16e..854bb0c 100644
---- a/bfd/libbfd.h
-+++ b/bfd/libbfd.h
-@@ -2853,6 +2853,7 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
+Index: git/bfd/libbfd.h
+===================================================================
+--- git.orig/bfd/libbfd.h
++++ git/bfd/libbfd.h
+@@ -2862,6 +2862,7 @@ static const char *const bfd_reloc_code_
    "BFD_RELOC_MICROBLAZE_32_ROSDA",
    "BFD_RELOC_MICROBLAZE_32_RWSDA",
    "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
@@ -173,11 +174,11 @@ index 2f5f16e..854bb0c 100644
    "BFD_RELOC_MICROBLAZE_64_NONE",
    "BFD_RELOC_MICROBLAZE_64_GOTPC",
    "BFD_RELOC_MICROBLAZE_64_GOT",
-diff --git a/bfd/reloc.c b/bfd/reloc.c
-index a1353a2..4b57de7 100644
---- a/bfd/reloc.c
-+++ b/bfd/reloc.c
-@@ -6903,6 +6903,12 @@ ENUMDOC
+Index: git/bfd/reloc.c
+===================================================================
+--- git.orig/bfd/reloc.c
++++ git/bfd/reloc.c
+@@ -6865,6 +6865,12 @@ ENUMDOC
    This is a 32 bit reloc for the microblaze to handle
    expressions of the form "Symbol Op Symbol"
  ENUM
@@ -190,26 +191,26 @@ index a1353a2..4b57de7 100644
    BFD_RELOC_MICROBLAZE_64_NONE
  ENUMDOC
    This is a 64 bit reloc that stores the 32 bit pc relative
-diff --git a/binutils/readelf.c b/binutils/readelf.c
-index fed0387..92f655d 100644
---- a/binutils/readelf.c
-+++ b/binutils/readelf.c
-@@ -12774,6 +12774,10 @@ is_none_reloc (Filedata * filedata, unsigned int reloc_type)
+Index: git/binutils/readelf.c
+===================================================================
+--- git.orig/binutils/readelf.c
++++ git/binutils/readelf.c
+@@ -12908,6 +12908,10 @@ is_none_reloc (Filedata * filedata, unsi
  	      || reloc_type == 32 /* R_AVR_DIFF32.  */);
      case EM_METAG:
        return reloc_type == 3; /* R_METAG_NONE.  */
 +    case EM_MICROBLAZE:
-+      return reloc_type == 30 /* R_MICROBLAZE_32_NONE.  */
++      return reloc_type == 33 /* R_MICROBLAZE_32_NONE.  */
 +             || reloc_type == 0 /* R_MICROBLAZE_NONE.  */
 +             || reloc_type == 9; /* R_MICROBLAZE_64_NONE.  */
      case EM_NDS32:
        return (reloc_type == 0       /* R_XTENSA_NONE.  */
  	      || reloc_type == 204  /* R_NDS32_DIFF8.  */
-diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 50dbfc7..d66e949 100644
---- a/gas/config/tc-microblaze.c
-+++ b/gas/config/tc-microblaze.c
-@@ -2179,7 +2179,9 @@ md_apply_fix (fixS *   fixP,
+Index: git/gas/config/tc-microblaze.c
+===================================================================
+--- git.orig/gas/config/tc-microblaze.c
++++ git/gas/config/tc-microblaze.c
+@@ -2201,7 +2201,9 @@ md_apply_fix (fixS *   fixP,
        /* This fixup has been resolved.  Create a reloc in case the linker
  	 moves code around due to relaxing.  */
        if (fixP->fx_r_type == BFD_RELOC_64_PCREL)
@@ -220,7 +221,7 @@ index 50dbfc7..d66e949 100644
        else
  	fixP->fx_r_type = BFD_RELOC_NONE;
        fixP->fx_addsy = section_symbol (absolute_section);
-@@ -2401,6 +2403,7 @@ tc_gen_reloc (asection * section ATTRIBUTE_UNUSED, fixS * fixp)
+@@ -2426,6 +2428,7 @@ tc_gen_reloc (asection * section ATTRIBU
    switch (fixp->fx_r_type)
      {
      case BFD_RELOC_NONE:
@@ -228,15 +229,15 @@ index 50dbfc7..d66e949 100644
      case BFD_RELOC_MICROBLAZE_64_NONE:
      case BFD_RELOC_32:
      case BFD_RELOC_MICROBLAZE_32_LO:
-diff --git a/include/elf/microblaze.h b/include/elf/microblaze.h
-index ae98099..c8cc57b 100644
---- a/include/elf/microblaze.h
-+++ b/include/elf/microblaze.h
-@@ -58,6 +58,7 @@ START_RELOC_NUMBERS (elf_microblaze_reloc_type)
-   RELOC_NUMBER (R_MICROBLAZE_TLSDTPREL64, 27)   /* TLS Offset Within TLS Block */
-   RELOC_NUMBER (R_MICROBLAZE_TLSGOTTPREL32, 28) /* TLS Offset From Thread Pointer */
-   RELOC_NUMBER (R_MICROBLAZE_TLSTPREL32, 29)    /* TLS Offset From Thread Pointer */
-+  RELOC_NUMBER (R_MICROBLAZE_32_NONE, 30)
-    
+Index: git/include/elf/microblaze.h
+===================================================================
+--- git.orig/include/elf/microblaze.h
++++ git/include/elf/microblaze.h
+@@ -61,6 +61,7 @@ START_RELOC_NUMBERS (elf_microblaze_relo
+   RELOC_NUMBER (R_MICROBLAZE_TEXTPCREL_64, 30)  /* PC-relative TEXT offset.  */
+   RELOC_NUMBER (R_MICROBLAZE_TEXTREL_64, 31)    /* TEXT Entry offset 64-bit.  */
+   RELOC_NUMBER (R_MICROBLAZE_TEXTREL_32_LO, 32) /* TEXT Entry offset 32-bit.  */
++  RELOC_NUMBER (R_MICROBLAZE_32_NONE, 33)
  END_RELOC_NUMBERS (R_MICROBLAZE_max)
  
+ /* Global base address names.  */

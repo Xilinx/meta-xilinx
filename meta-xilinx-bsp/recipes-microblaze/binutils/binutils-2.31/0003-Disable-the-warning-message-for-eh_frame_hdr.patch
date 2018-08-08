@@ -3,30 +3,35 @@ From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Date: Mon, 28 Aug 2017 19:53:54 -0700
 Subject: [PATCH] Disable the warning message for eh_frame_hdr
 
+Upstream-Status: Inappropriate [workaround]
+
+Rebased to 2.31
+ - Error hanlder changed
+
+Signed-off-by: Alejandro Enedino Hernandez Samaniego <alejandr@xilinx.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
-Upstream-Status: Inappropriate [workaround]
 
 ---
  bfd/elf-eh-frame.c | 9 ++++++---
  1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/bfd/elf-eh-frame.c b/bfd/elf-eh-frame.c
-index 95697c4..704121d 100644
---- a/bfd/elf-eh-frame.c
-+++ b/bfd/elf-eh-frame.c
-@@ -1042,10 +1042,13 @@ _bfd_elf_parse_eh_frame (bfd *abfd, struct bfd_link_info *info,
+Index: git/bfd/elf-eh-frame.c
+===================================================================
+--- git.orig/bfd/elf-eh-frame.c
++++ git/bfd/elf-eh-frame.c
+@@ -1042,10 +1042,13 @@ _bfd_elf_parse_eh_frame (bfd *abfd, stru
    goto success;
  
   free_no_table:
--  (*info->callbacks->einfo)
+-  _bfd_error_handler
 +  /* FIXME: Remove the microblaze specifics when relaxing gets fixed.  */
 +  if (bfd_get_arch(abfd) != bfd_arch_microblaze) {
      /* xgettext:c-format */
--    (_("%P: error in %B(%A); no .eh_frame_hdr table will be created.\n"),
+-    (_("error in %pB(%pA); no .eh_frame_hdr table will be created"),
 -     abfd, sec);
-+    (*info->callbacks->einfo)
-+      (_("%P: error in %B(%A); no .eh_frame_hdr table will be created.\n"),
++    _bfd_error_handler
++      (_("error in %pB(%pA); no .eh_frame_hdr table will be created"),
 +       abfd, sec);
 +  }
    hdr_info->u.dwarf.table = FALSE;
