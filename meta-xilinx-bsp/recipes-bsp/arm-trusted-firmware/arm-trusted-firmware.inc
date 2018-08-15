@@ -38,9 +38,13 @@ LDFLAGS[unexport] = "1"
 AS[unexport] = "1"
 LD[unexport] = "1"
 
-ATF_CONSOLE ?= "cadence"
+ATF_CONSOLE ?= ""
+ATF_CONSOLE_zynqmp = "cadence"
+
 DEBUG ?= ""
-EXTRA_OEMAKE_append = " ZYNQMP_CONSOLE=${ATF_CONSOLE} ${@bb.utils.contains('DEBUG', '1', ' DEBUG=${DEBUG}', '', d)}"
+EXTRA_OEMAKE_zynqmp_append = "${@' ZYNQMP_CONSOLE=${ATF_CONSOLE}' if d.getVar('ATF_CONSOLE', True) != '' else ''}"
+EXTRA_OEMAKE_append = " ${@bb.utils.contains('DEBUG', '1', ' DEBUG=${DEBUG}', '', d)}"
+
 OUTPUT_DIR = "${@bb.utils.contains('DEBUG', '1', '${B}/${PLATFORM}/debug', '${B}/${PLATFORM}/release', d)}"
 
 
