@@ -47,6 +47,11 @@ EXTRA_OEMAKE_append = " ${@bb.utils.contains('DEBUG', '1', ' DEBUG=${DEBUG}', ''
 
 OUTPUT_DIR = "${@bb.utils.contains('DEBUG', '1', '${B}/${PLATFORM}/debug', '${B}/${PLATFORM}/release', d)}"
 
+ATF_MEM_BASE ?= ""
+ATF_MEM_SIZE ?= ""
+
+EXTRA_OEMAKE_zynqmp_append = "${@' ZYNQMP_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
+EXTRA_OEMAKE_zynqmp_append = "${@' ZYNQMP_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
 
 do_configure() {
 	oe_runmake clean -C ${S} BUILD_BASE=${B} PLAT=${PLATFORM}
