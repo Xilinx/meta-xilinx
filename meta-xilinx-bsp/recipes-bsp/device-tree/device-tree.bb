@@ -62,7 +62,7 @@ do_compile() {
 		# for now use the existance of the '/plugin/' tag to detect overlays
 		if grep -qse "/plugin/;" `basename ${DTS_FILE}`.pp; then
 			dtc ${DEVICETREE_OFLAGS} -I dts -O dtb ${DEVICETREE_FLAGS} -o ${DTS_NAME}.dtbo `basename ${DTS_FILE}`.pp
-		elif [[ "${DTS_FILE##*.}" == "dts" ]]; then
+		elif [ "${DTS_FILE##*.}" = "dts" ]; then
 			dtc -I dts -O dtb ${DEVICETREE_FLAGS} -o ${DTS_NAME}.dtb `basename ${DTS_FILE}`.pp
 			dtc -I dtb -O dts -o ${DTS_NAME}.dts ${DTS_NAME}.dtb
 		fi
