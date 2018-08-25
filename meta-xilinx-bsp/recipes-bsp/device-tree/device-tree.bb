@@ -41,7 +41,8 @@ DT_PADDING_SIZE ?= "0x3000"
 DEVICETREE_FLAGS ?= " \
 		-R 8 -p ${DT_PADDING_SIZE} -b 0 \
 		${@' '.join(['-i %s' % i for i in d.getVar('DTS_INCLUDE', True).split()])} \
-               "
+		${@bb.utils.contains('IMAGE_FEATURES', 'fpga-manager', ' -@', '', d)} \
+		"
 DEVICETREE_OFLAGS ?= "-@ -H epapr"
 DEVICETREE_PP_FLAGS ?= " \
 		-nostdinc -Ulinux -x assembler-with-cpp \
