@@ -3,9 +3,6 @@ DESCRIPTION = "libGLES for ZynqMP with Mali 400"
 LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://README.md;md5=d5750ae6496dd931669b454b5aaae2cd"
 
-inherit distro_features_check
-ANY_OF_DISTRO_FEATURES = "fbdev x11 wayland"
-
 PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl virtual/libgbm"
 
 FILESEXTRAPATHS_append := " \
@@ -14,7 +11,7 @@ FILESEXTRAPATHS_append := " \
 
 REPO ?= "git://gitenterprise.xilinx.com/Graphics/mali400-xlnx-userspace.git;protocol=https"
 BRANCH ?= "master"
-SRCREV ?= "cd864d3b42b1246a2d5e8e8a0ea8f48cb0ca8745"
+SRCREV ?= "1f46bb02916a6350d549509aef24eaadcb496a4e"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 PV = "r8p0-01rel0"
@@ -80,17 +77,23 @@ do_install() {
     install -d ${D}${libdir}
     install -d ${D}${includedir}
 
+    cp -a --no-preserve=ownership ${S}/${PV}/${ARCH_PLATFORM_DIR}/common/*.so* ${D}${libdir}
+
     if [ "${USE_WL}" = "yes" ]; then
 	install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
 	install -m 0644 ${WORKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
 	install -m 0644 ${WORKDIR}/wayland-egl.pc ${D}${libdir}/pkgconfig/wayland-egl.pc
-	cp -a --no-preserve=ownership ${S}/${PV}/${ARCH_PLATFORM_DIR}/wayland/usr/lib/*.so* ${D}${libdir}
+	install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/wayland/libMali.so.8.0 ${D}${libdir}/wayland/libMali.so.8.0
+	ln -snf wayland/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
     elif [ "${USE_X11}" = "yes" ]; then
-	cp -a --no-preserve=ownership ${S}/${PV}/${ARCH_PLATFORM_DIR}/x11/usr/lib/*.so* ${D}${libdir}
+	install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/x11/libMali.so.8.0 ${D}${libdir}/x11/libMali.so.8.0
+	ln -snf x11/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
     elif [ "${USE_FB}" = "yes" ]; then
-	cp -a --no-preserve=ownership ${S}/${PV}/${ARCH_PLATFORM_DIR}/fbdev/usr/lib/*.so* ${D}${libdir}
+	install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/fbdev/libMali.so.8.0 ${D}${libdir}/fbdev/libMali.so.8.0
+	ln -snf fbdev/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
     else
-	cp -a --no-preserve=ownership ${S}/${PV}/${ARCH_PLATFORM_DIR}/x11/usr/lib/*.so* ${D}${libdir}
+	install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/headless/libMali.so.8.0 ${D}${libdir}/headless/libMali.so.8.0
+	ln -snf headless/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
     fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'false', 'true', d)}; then
@@ -111,3 +114,5 @@ RCONFLICTS_${PN} = "libegl libgles1 libglesv1-cm1 libgles2 libglesv2-2 libgbm"
 # These libraries shouldn't get installed in world builds unless something
 # explicitly depends upon them.
 EXCLUDE_FROM_WORLD = "1"
+
+FILES_${PN} += "${libdir}/*"
