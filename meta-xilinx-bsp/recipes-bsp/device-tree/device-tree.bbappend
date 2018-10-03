@@ -27,4 +27,5 @@ SRC_URI_append_kc705-microblazeel = " \
 		file://pl.dtsi \
 		file://system-conf.dtsi \
 		"
+COMPATIBLE_MACHINE_versal = ".*"
 
