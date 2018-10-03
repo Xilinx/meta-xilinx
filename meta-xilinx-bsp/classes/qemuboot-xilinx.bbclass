@@ -6,7 +6,7 @@ OVERRIDES .= ":qemuboot-xilinx"
 QB_SYSTEM_NAME_prepend = "qemu-xilinx/"
 
 # Default machine targets for Xilinx QEMU (FDT Generic)
-QB_MACHINE_aarch64 = "-machine arm-generic-fdt"
+QB_MACHINE_aarch64 ?= "-machine arm-generic-fdt"
 QB_MACHINE_arm = "-machine arm-generic-fdt-7series"
 QB_MACHINE_microblaze = "-machine microblaze-generic-fdt-plnx"
 
