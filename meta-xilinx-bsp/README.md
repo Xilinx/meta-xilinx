@@ -11,28 +11,13 @@ Additional documentation:
 Supported Boards/Machines
 =========================
 
-Boards/Machines supported by this layer:
+Boards/Machines supported by this branch:
 
-* MicroBlaze:
-  * [Xilinx ML605 (QEMU)](conf/machine/ml605-qemu-microblazeel.conf) - `ml605-qemu-microblazeel` (QEMU support)
-  * [Xilinx S3A DSP 1800 (QEMU)](conf/machine/s3adsp1800-qemu-microblazeeb.conf) - `s3adsp1800-qemu-microblazeeb` (QEMU support)
-  * [Xilinx KC705](conf/machine/kc705-microblazeel.conf) - `kc705-microblazeel`
-* Zynq:
-  * [Zynq (QEMU)](conf/machine/qemu-zynq7.conf) - `qemu-zynq7` (QEMU Support)
-  * [Xilinx ZC702](conf/machine/zc702-zynq7.conf) - `zc702-zynq7` (with QEMU support)
-  * [Xilinx ZC706](conf/machine/zc706-zynq7.conf) - `zc706-zynq7` (with QEMU support)
-  * [Avnet MicroZed](conf/machine/microzed-zynq7.conf) - `microzed-zynq7`
-  * [Avnet PicoZed](conf/machine/picozed-zynq7.conf) - `picozed-zynq7`
-  * [Avnet/Digilent ZedBoard](conf/machine/zedboard-zynq7.conf) - `zedboard-zynq7`
-  * [Digilent Zybo](conf/machine/zybo-zynq7.conf) - `zybo-zynq7`
-  * [Digilent Zybo Linux BD](conf/machine/zybo-linux-bd-zynq7.conf) - `zybo-linux-bd-zynq7`
-* ZynqMP:
-  * [Xilinx ZCU102](conf/machine/zcu102-zynqmp.conf) - `zcu102-zynqmp` (QEMU support)
+virt-versal
 
 Additional information on Xilinx architectures can be found at:
 	http://www.xilinx.com/support/index.htm
 
-For Zybo Linux BD reference design, please see meta-xilinx-contrib layer
 
 Maintainers, Mailing list, Patches
 ==================================
@@ -44,7 +29,6 @@ the [meta-xilinx mailing list](https://lists.yoctoproject.org/listinfo/meta-xili
 
 Maintainers:
 
-	Nathan Rossi <nathan@nathanrossi.com>
 	Manjukumar Harthikote Matha <manjukumar.harthikote-matha@xilinx.com>
 
 Dependencies
