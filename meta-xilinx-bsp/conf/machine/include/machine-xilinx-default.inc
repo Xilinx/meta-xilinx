@@ -57,12 +57,18 @@ def get_default_image_boot_files(d):
     if d.getVar("UBOOT_BINARY"):
         files.append(d.getVar("UBOOT_BINARY"))
 
+    # device trees (device-tree only), these are first as they are likely desired over the kernel ones
+    if "device-tree" in (d.getVar("MACHINE_ESSENTIAL_EXTRA_RDEPENDS") or ""):
+        files.append("devicetree/*.dtb")
+
+
     # device trees (kernel only)
     if d.getVar("KERNEL_DEVICETREE"):
         dtbs = d.getVar("KERNEL_DEVICETREE").split(" ")
         dtbs = [os.path.basename(d) for d in dtbs]
-        if len(dtbs) != 0:
-            files += [d.getVar("KERNEL_IMAGETYPE") + "-" + dtb for dtb in dtbs]
+        for dtb in dtbs:
+            files.append(dtb)
+
     return " ".join(files)
 
 XSERVER_EXT ?= ""
