@@ -37,8 +37,8 @@ do_install() {
 
     install -m 0644 ${S}/omx_header/*.h ${D}${includedir}/vcu-omx-il
 
-    install -Dm 0755 ${S}/bin/omx_decoder.exe ${D}/${bindir}/omx_decoder.exe
-    install -Dm 0755 ${S}/bin/omx_encoder.exe ${D}/${bindir}/omx_encoder.exe
+    install -Dm 0755 ${S}/bin/omx_decoder.exe ${D}/${bindir}/omx_decoder
+    install -Dm 0755 ${S}/bin/omx_encoder.exe ${D}/${bindir}/omx_encoder
 
     oe_libinstall -C ${S}/bin/ -so libOMX.allegro.core ${D}/${libdir}/
     oe_libinstall -C ${S}/bin/ -so libOMX.allegro.video_decoder ${D}/${libdir}/
