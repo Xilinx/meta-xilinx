@@ -23,6 +23,8 @@ do_kernel_metadata_prepend () {
 	[ -n "${KBUILD_DEFCONFIG}" ] && [ -e ${WORKDIR}/defconfig ] && rm ${WORKDIR}/defconfig
 }
 
+inherit kernel-simpleimage
+
 # Default to be only compatible with specific machines or soc families
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE_zynq = ".*"
