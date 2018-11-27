@@ -3,4 +3,4 @@ require qemu-xilinx.inc
 XILINX_RELEASE_VERSION = "v2018.3"
 XILINX_QEMU_VERSION ?= "v2.11.0"
 BRANCH ??= "master"
-SRCREV ??= "f5fb2a88ffe61ccb049715cb11b34e9cb216fd5c"
+SRCREV ??= "f70bd86859c7a1a075ac864b4765168f821f1aae"

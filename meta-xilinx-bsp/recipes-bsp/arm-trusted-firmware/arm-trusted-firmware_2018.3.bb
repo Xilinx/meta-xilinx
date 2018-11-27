@@ -1,5 +1,5 @@
 include arm-trusted-firmware.inc
 ATF_VERSION = "1.4"
 XILINX_RELEASE_VERSION = "v2018.3"
-SRCREV ??= "93a69a5a3bc318027da4af5911124537f4907642"
+SRCREV ??= "08560c36ea5b6f48b962cb4bd9a79b35bb3d95ce"
 BRANCH ??= "master"

@@ -1,7 +1,7 @@
 DESCRIPTION = "ARM Trusted Firmware"
 
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://license.rst;md5=33065335ea03d977d0569f270b39603e"
+LIC_FILES_CHKSUM = "file://license.rst;md5=e927e02bca647e14efd87e9e914b2443"
 
 PROVIDES = "virtual/arm-trusted-firmware"
 
