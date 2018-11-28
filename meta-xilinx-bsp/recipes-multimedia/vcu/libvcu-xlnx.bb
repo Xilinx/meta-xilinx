@@ -29,8 +29,8 @@ do_install() {
     install -d ${D}${libdir}
     install -d ${D}${includedir}/vcu-ctrl-sw/include
 
-    install -Dm 0755 ${S}/bin/AL_Encoder.exe ${D}/${bindir}/ctrlsw_encoder
-    install -Dm 0755 ${S}/bin/AL_Decoder.exe ${D}/${bindir}/ctrlsw_decoder
+    install -Dm 0755 ${S}/bin/ctrlsw_encoder ${D}/${bindir}/ctrlsw_encoder
+    install -Dm 0755 ${S}/bin/ctrlsw_decoder ${D}/${bindir}/ctrlsw_decoder
 
     oe_runmake install_headers INSTALL_HDR_PATH=${D}${includedir}/vcu-ctrl-sw/include
     oe_libinstall -C ${S}/bin/ -so liballegro_decode ${D}/${libdir}/
