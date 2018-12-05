@@ -30,12 +30,14 @@ COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE_zynq = ".*"
 COMPATIBLE_MACHINE_zynqmp = ".*"
 COMPATIBLE_MACHINE_microblaze = ".*"
+COMPATIBLE_MACHINE_versal = ".*"
 
 # Use DEFCONFIGs for configuring linux-xlnx kernels
 KCONFIG_MODE ?= "alldefconfig"
 KBUILD_DEFCONFIG_zynqmp = "xilinx_zynqmp_defconfig"
 KBUILD_DEFCONFIG_zynq = "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG_microblaze = "mmu_defconfig"
+KBUILD_DEFCONFIG_versal = "xilinx_versal_defconfig"
 
 # Add meta-xilinx kmeta, used for MicroBlaze BSP fragments
 FILESEXTRAPATHS_prepend := "${THISDIR}:"
@@ -47,4 +49,6 @@ KERNEL_FEATURES_append_kc705-microblazeel = " bsp/kc705-microblazeel/kc705-micro
 KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' bsp/xilinx/xen.scc', '', d)}"
 
 KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('IMAGE_FEATURES', 'fpga-manager', ' features/overlay/overlay.scc', '', d)}"
+
+KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' bsp/xilinx/xen.scc', '', d)}"
 
