@@ -2,10 +2,9 @@ DESCRIPTION = "libGLES for ZynqMP with Mali 400"
 
 LICENSE = "Proprietary"
 LICENSE_FLAGS = "xilinx"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Proprietary;md5=0557f9d92cf58f2ccdd50f62f8ac0b28"
+LIC_FILES_CHKSUM = "file://README.md;md5=d5750ae6496dd931669b454b5aaae2cd"
 
 inherit distro_features_check
-inherit xilinx-fetch-restricted
 
 ANY_OF_DISTRO_FEATURES = "fbdev x11"
 
@@ -16,12 +15,15 @@ FILESEXTRAPATHS_append := " \
                 ${THISDIR}/r8p0-00rel0: "
 
 
-# Fetch the MALI 400 binaries from here
-# https://www.xilinx.com/member/forms/download/mali-driver-license.html?filename=mali-400-userspace.tar
+REPO ?= "git://gitenterprise.xilinx.com/Graphics/mali400-xlnx-userspace.git;protocol=https"
+BRANCH ?= "master"
+SRCREV ?= "bcb90f4fa3da93e3477558d9d50bb4d08c5a61b8"
+
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 
 PV = "r8p0-01rel0"
 SRC_URI = " \
-    https://www.xilinx.com/member/forms/download/mali-driver-license.html?filename=mali-400-userspace.tar;downloadfilename=mali-400-userspace.tar \
+    ${REPO};${BRANCHARG} \
     file://egl.pc \
     file://glesv1_cm.pc \
     file://glesv1.pc \
@@ -30,9 +32,6 @@ SRC_URI = " \
     file://gbm.pc \
     "
 
-SRC_URI[md5sum] = "4fd3456564ef8c818e21432221c9e1b7"
-SRC_URI[sha256sum] = "26d473ae77c36104a215710beca55a22a712850dc26547dde950c7398210602c"
-
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynqmpeg = "zynqmpeg"
 COMPATIBLE_MACHINE_zynqmpev = "zynqmpev"
@@ -40,7 +39,7 @@ COMPATIBLE_MACHINE_zynqmpev = "zynqmpev"
 PACKAGE_ARCH = "${SOC_FAMILY}"
 
 
-S = "${WORKDIR}/mali-400"
+S = "${WORKDIR}/git"
 
 X11RDEPENDS = "libxdamage libxext libx11 libdrm libxfixes"
 X11DEPENDS = "libxdamage libxext virtual/libx11 libdrm libxfixes"
@@ -58,11 +57,6 @@ DEPENDS = "\
 USE_X11 = "${@bb.utils.contains("DISTRO_FEATURES", "x11", "yes", "no", d)}"
 USE_FB = "${@bb.utils.contains("DISTRO_FEATURES", "fbdev", "yes", "no", d)}"
 USE_WL = "${@bb.utils.contains("DISTRO_FEATURES", "wayland", "yes", "no", d)}"
-
-do_compile() {
-	# Extract the MALI binaries into workdir
-	tar -xf ${WORKDIR}/mali/rel-v2018.3/r8p0-01rel0.tar -C ${S}
-}
 
 do_install() {
     #Identify the ARCH type
