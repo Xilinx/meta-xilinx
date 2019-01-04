@@ -17,11 +17,11 @@ FILESEXTRAPATHS_append := " \
 
 
 # Fetch the MALI 400 binaries from here
-# https://www.xilinx.com/member/forms/download/mali-driver-license.html?filename=mali-400-userspace.tar
+# https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar
 
 PV = "r8p0-01rel0"
 SRC_URI = " \
-    https://www.xilinx.com/member/forms/download/mali-driver-license.html?filename=mali-400-userspace.tar;downloadfilename=mali-400-userspace.tar \
+    https://www.xilinx.com/publications/products/tools/mali-400-userspace.tar \
     file://egl.pc \
     file://glesv1_cm.pc \
     file://glesv1.pc \
