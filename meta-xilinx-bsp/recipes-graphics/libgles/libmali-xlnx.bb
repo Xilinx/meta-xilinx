@@ -116,6 +116,12 @@ do_install() {
     fi
 }
 
+do_install_append () {
+    # libwayland-egl has been moved to wayland 1.15+
+    rm -f ${D}${libdir}/libwayland-egl*
+    rm -f ${D}${libdir}/pkgconfig/wayland-egl.pc
+    rmdir --ignore-fail-on-non-empty ${D}${libdir}/pkgconfig
+}
 
 # Inhibit warnings about files being stripped
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
