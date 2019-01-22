@@ -23,6 +23,7 @@ UBOOT_SUFFIX_microblaze ?= "bin"
 
 UBOOT_BINARY ?= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_ELF ?= "u-boot"
+UBOOT_ELF_zynq ?= "u-boot.elf"
 UBOOT_ELF_aarch64 ?= "u-boot.elf"
 
 #Hardware accelaration
