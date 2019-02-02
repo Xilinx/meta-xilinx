@@ -3,7 +3,7 @@
 # overrides everything on EXTRA_OECONF for gcc cross target it avoids
 # overlapping with crt0 because of --enable-linker-id from EXTRA_OECONF
 
-EXTRA_OECONF_BASE_pn-gcc-cross-${TARGET_ARCH}_append = " \
+EXTRA_OECONF_BASE_pn-gcc-cross-${TARGET_ARCH}_xilinx-standalone_append = " \
     ${LTO} \
     ${SSP} \
     --enable-libitm \
