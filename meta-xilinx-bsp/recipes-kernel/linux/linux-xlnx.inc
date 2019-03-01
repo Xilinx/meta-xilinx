@@ -18,9 +18,17 @@ require linux-microblaze.inc
 
 DESCRIPTION = "Xilinx Kernel"
 
+EXTKERNELSRC = "${@'1' if d.getVar('EXTERNALSRC') else ''}"
+
 # Force the use of the KBUILD_DEFCONFIG even if some other defconfig was generated in the ${WORKDIR}
 do_kernel_metadata_prepend () {
 	[ -n "${KBUILD_DEFCONFIG}" ] && [ -e ${WORKDIR}/defconfig ] && rm ${WORKDIR}/defconfig
+}
+
+do_configure_prepend () {
+	if [ -n "${KBUILD_DEFCONFIG}" ] && [ -n "${EXTKERNELSRC}" ]; then
+		cp ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
+	fi
 }
 
 inherit kernel-simpleimage
