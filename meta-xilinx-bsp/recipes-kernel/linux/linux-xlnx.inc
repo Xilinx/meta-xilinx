@@ -61,3 +61,4 @@ KERNEL_FEATURES_append_zynqmp = "${@' features/overlay/overlay.scc' if d.getVar(
 
 KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' bsp/xilinx/xen.scc', '', d)}"
 
+KERNEL_FEATURES_append_ultra96-zynqmp = " bsp/ultra96-zynqmp/mipi-config-ultra96.scc"
