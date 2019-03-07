@@ -44,3 +44,11 @@ EXTRA_OECONF_pn-gcc-cross-${TARGET_ARCH}_xilinx-standalone_append_zynqmp-pmu = "
 EXTRA_OECONF_pn-binutils-cross-${TARGET_ARCH}_xilinx-standalone_append_zynqmp-pmu = " \
 	${BINUTILS_CONFIGURE_MB} \
 "
+
+# Cortex-A9
+EXTRA_OECONF_pn-gcc-cross-${TARGET_ARCH}_xilinx-standalone_append_zc702-zynq7 = " \
+        ${GCC_CONFIGURE_A9} \
+"
+EXTRA_OECONF_pn-binutils-cross-${TARGET_ARCH}_xilinx-standalone_append_zc702-zynq7 = " \
+        ${BINUTILS_CONFIGURE_A9} \
+"
