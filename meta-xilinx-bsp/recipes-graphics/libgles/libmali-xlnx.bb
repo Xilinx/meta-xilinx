@@ -27,7 +27,6 @@ SRC_URI = " \
     file://glesv1_cm.pc \
     file://glesv1.pc \
     file://glesv2.pc \
-    file://wayland-egl.pc \
     file://gbm.pc \
     "
 
@@ -90,7 +89,6 @@ do_install() {
     if [ "${USE_WL}" = "yes" ]; then
 	install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
 	install -m 0644 ${WORKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
-	install -m 0644 ${WORKDIR}/wayland-egl.pc ${D}${libdir}/pkgconfig/wayland-egl.pc
 	install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/wayland/libMali.so.8.0 ${D}${libdir}/wayland/libMali.so.8.0
 	ln -snf wayland/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
     elif [ "${USE_X11}" = "yes" ]; then
