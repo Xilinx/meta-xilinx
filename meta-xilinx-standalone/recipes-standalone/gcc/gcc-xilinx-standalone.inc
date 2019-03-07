@@ -119,3 +119,28 @@ BINUTILS_CONFIGURE_MB ?= " \
 	--enable-ld=yes \
 	--enable-multilib \
 "
+
+GCC_CONFIGURE_A9 ?= " \
+	--disable-bootstrap \
+	--disable-multiarch \
+	--disable-nls \
+	--disable-threads \
+	--enable-c99 \
+	--enable-checking=yes \
+	--enable-linker-build-id \
+	--enable-long-long \
+	--enable-lto \
+	--enable-multilib \
+	--enable-plugins \
+	--enable-shared \
+	--with-cloog=no \
+	--with-gnu-as \
+	--with-gnu-ld \
+	--with-isl=no \
+	--with-ppl=no \
+"
+BINUTILS_CONFIGURE_A9 ?= " \
+	--disable-docs \
+	--disable-nls \
+	--enable-interwork \
+"
