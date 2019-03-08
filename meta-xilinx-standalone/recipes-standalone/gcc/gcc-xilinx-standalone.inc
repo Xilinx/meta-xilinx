@@ -111,6 +111,7 @@ GCC_CONFIGURE_MB ?= " \
         --with-isl=no \
         --with-ppl=no \
         --without-long-double-128 \
+	--disable-multilib \
 "
 BINUTILS_CONFIGURE_MB ?= " \
 	--disable-initfini-array \
