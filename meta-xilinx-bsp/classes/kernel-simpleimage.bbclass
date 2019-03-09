@@ -15,7 +15,8 @@ do_prep_simpleimage () {
     for type in ${KERNEL_IMAGETYPES} ; do
         if [[ "${type}" =~ "simpleImage" ]] && [ ${ARCH} = "microblaze" ]; then
             ext="${type##*.}"
-            cp ${RECIPE_SYSROOT}/boot/devicetree/${ext}.dtb ${B}/arch/${ARCH}/boot/dts/
+            # Microblaze simpleImage only works with dts file
+            cp ${RECIPE_SYSROOT}/boot/devicetree/${ext}.dts ${B}/arch/${ARCH}/boot/dts/
         fi
     done
 }
