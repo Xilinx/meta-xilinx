@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://EULA;md5=82e466d0ed92c5a15f568dbe6b31089c"
 
 inherit distro_features_check update-alternatives
 
-REQUIRED_DISTRO_FEATURES = "x11 fbdev wayland"
+ANY_OF_DISTRO_FEATURES = "x11 fbdev wayland"
 
 PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl virtual/libgbm"
 
