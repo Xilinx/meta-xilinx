@@ -17,7 +17,6 @@ FILESEXTRAPATHS_append := " \
 REPO ?= "git://github.com/Xilinx/mali-userspace-binaries.git;protocol=https"
 BRANCH ?= "rel-v2019.2"
 SRCREV ?= "90ea8555cddaa7979019fd7eeaeb01a9f1b26ac7"
-
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 
 PV = "r8p0-01rel0"
