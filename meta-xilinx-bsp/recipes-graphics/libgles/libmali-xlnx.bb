@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://README.md;md5=d5750ae6496dd931669b454b5aaae2cd"
 
 inherit distro_features_check update-alternatives
 
-REQUIRED_DISTRO_FEATURES = "x11 fbdev wayland"
+ANY_OF_DISTRO_FEATURES = "x11 fbdev wayland"
 
 PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl virtual/libgbm"
 
