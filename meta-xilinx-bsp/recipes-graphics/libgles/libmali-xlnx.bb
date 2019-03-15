@@ -38,14 +38,30 @@ PACKAGE_ARCH = "${SOC_FAMILY}"
 
 S = "${WORKDIR}/git"
 
-# If were switching at runtime, we need all RDEPENDS needed for all backends available
-RDEPENDS_${PN} = " kernel-module-mali libxdamage libxext libx11 libdrm libxfixes"
+# If were switching at runtime, we would need all RDEPENDS needed for all backends available
+X11RDEPENDS = "libxdamage libxext libx11 libdrm libxfixes"
+X11DEPENDS = "libxdamage libxext virtual/libx11 libdrm libxfixes"
+
+# Don't install runtime dependencies for other backends unless the DISTRO supports it
+RDEPENDS_${PN} = " \
+    kernel-module-mali \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', '${X11RDEPENDS}', '', d)} \
+"
 
 # We dont build anything but we want to avoid QA warning build-deps
-DEPENDS = "wayland"
+DEPENDS = "\
+    ${@bb.utils.contains('DISTRO_FEATURES', 'x11', '${X11DEPENDS}', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland libdrm', '', d)} \
+"
+
 
 # x11 is default, set to "fbdev" , "wayland", or "headless" if required
 MALI_BACKEND_DEFAULT ?= "x11"
+
+USE_X11 = "${@bb.utils.contains("DISTRO_FEATURES", "x11", "yes", "no", d)}"
+USE_FB = "${@bb.utils.contains("DISTRO_FEATURES", "fbdev", "yes", "no", d)}"
+USE_WL = "${@bb.utils.contains("DISTRO_FEATURES", "wayland", "yes", "no", d)}"
+
 
 do_install() {
     #Identify the ARCH type
@@ -77,16 +93,29 @@ do_install() {
 
     cp -a --no-preserve=ownership ${S}/${PV}/${ARCH_PLATFORM_DIR}/common/*.so* ${D}${libdir}
 
-
-    install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
-    install -m 0644 ${WORKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
-    install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/wayland/libMali.so.8.0 ${D}${libdir}/wayland/libMali.so.8.0
-    install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/x11/libMali.so.8.0 ${D}${libdir}/x11/libMali.so.8.0
-    install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/fbdev/libMali.so.8.0 ${D}${libdir}/fbdev/libMali.so.8.0
     install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/headless/libMali.so.8.0 ${D}${libdir}/headless/libMali.so.8.0
+    ln -snf headless/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
 
-    # We need to have one of the libraries available at build time for the linker
-    ln -snf x11/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
+    if [ "${USE_FB}" = "yes" ]; then
+        install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/fbdev/libMali.so.8.0 ${D}${libdir}/fbdev/libMali.so.8.0
+        if [ "${MALI_BACKEND_DEFAULT}" = "fbdev" ]; then
+            ln -snf fbdev/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
+        fi
+    fi
+    if [ "${USE_X11}" = "yes" ]; then
+        install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/x11/libMali.so.8.0 ${D}${libdir}/x11/libMali.so.8.0
+        if [ "${MALI_BACKEND_DEFAULT}" = "x11" ]; then
+            ln -snf x11/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
+        fi
+    fi
+    if [ "${USE_WL}" = "yes" ]; then
+        install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
+        install -m 0644 ${WORKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
+        install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/wayland/libMali.so.8.0 ${D}${libdir}/wayland/libMali.so.8.0
+        if [ "${MALI_BACKEND_DEFAULT}" = "wayland" ]; then
+            ln -snf wayland/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
+        fi
+    fi
 }
 
 
@@ -115,7 +144,9 @@ ALTERNATIVE_TARGET_libmali-xlnx-headless[libmali-xlnx] = "${libdir}/headless/lib
 ALTERNATIVE_PRIORITY_libmali-xlnx-x11[libmali-xlnx] = "${@bb.utils.contains("MALI_BACKEND_DEFAULT", "x11", "20", "10", d)}"
 ALTERNATIVE_PRIORITY_libmali-xlnx-fbdev[libmali-xlnx] = "${@bb.utils.contains("MALI_BACKEND_DEFAULT", "fbdev", "20", "10", d)}"
 ALTERNATIVE_PRIORITY_libmali-xlnx-wayland[libmali-xlnx] = "${@bb.utils.contains("MALI_BACKEND_DEFAULT", "wayland", "20", "10", d)}"
-ALTERNATIVE_PRIORITY_libmali-xlnx-headless[libmali-xlnx] = "${@bb.utils.contains("MALI_BACKEND_DEFAULT", "headless", "20", "10", d)}"
+
+# If misconfigured, fallback to headless
+ALTERNATIVE_PRIORITY_libmali-xlnx-headless[libmali-xlnx] = "${@bb.utils.contains("MALI_BACKEND_DEFAULT", "headless", "20", "15", d)}"
 
 
 # Package gets renamed on the debian class, but we want to keep -xlnx
