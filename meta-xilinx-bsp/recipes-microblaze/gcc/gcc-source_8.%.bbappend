@@ -55,4 +55,7 @@ file://0001-LOCAL-Testsuite-builtins-tests-require-fpic.patch \
         file://0052-fixing-the-32bit-LTO-related-issue9-1014024.patch \
         file://0053-Fixed-the-missing-stack-adjustment-in-prologue-of-mo.patch \
         file://0054-Patch-Microblaze-corrected-SPN-for-dlong-instruction.patch \
+        file://0055-fixing-the-long-long-long-mingw-toolchain-issue.patch \
+        file://0056-fix-the-lto-wrapper-issue-on-windows.patch \
+        file://0057-Fix-the-MB-64-bug-of-handling-QI-objects.patch \
 "
