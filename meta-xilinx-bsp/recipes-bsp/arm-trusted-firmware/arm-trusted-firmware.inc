@@ -12,6 +12,8 @@ DEPENDS += "u-boot-mkimage-native"
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
+SYSROOT_DIRS += "/boot"
+
 XILINX_RELEASE_VERSION ?= ""
 ATF_VERSION ?= "2.0"
 ATF_VERSION_EXTENSION ?= "-xilinx-${XILINX_RELEASE_VERSION}"
@@ -72,7 +74,7 @@ do_compile() {
 }
 
 do_install() {
-	:
+	install -Dm 0644 ${OUTPUT_DIR}/bl31/bl31.elf ${D}/boot/arm-trusted-firmware.elf
 }
 
 do_deploy() {
@@ -91,3 +93,4 @@ do_deploy() {
 	ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/atf-uboot.ub
 }
 addtask deploy before do_build after do_compile
+FILES_${PN} = "/boot/arm-trusted-firmware.elf"
