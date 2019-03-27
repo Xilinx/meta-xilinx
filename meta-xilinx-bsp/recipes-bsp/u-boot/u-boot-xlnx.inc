@@ -18,3 +18,4 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot:"
 FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot-xlnx:"
 FILESEXTRAPATHS_prepend := "${@'${THISDIR}/u-boot-xlnx/${XILINX_RELEASE_VERSION}:' if d.getVar('XILINX_RELEASE_VERSION') else ''}"
 
+SYSROOT_DIRS += "/boot"

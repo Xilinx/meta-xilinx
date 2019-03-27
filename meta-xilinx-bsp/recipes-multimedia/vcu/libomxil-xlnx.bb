@@ -4,12 +4,11 @@ LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=03a7aef7e6f6a76a59fd9b8ba450b493"
 
 XILINX_VCU_VERSION = "1.0.0"
-XILINX_RELEASE_VERSION = "v2019.1"
 PV = "${XILINX_VCU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
-BRANCH ?= "master-rel-2019.1"
+BRANCH ?= "release-2019.2"
 REPO   ?= "git://github.com/xilinx/vcu-omx-il.git;protocol=https"
-SRCREV ?= "b93cec02cd5da223fa965073dce130a08ffd6419"
+SRCREV ?= "9bbb40e3ceddd9e166d1d97aa4ac380459166344"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"

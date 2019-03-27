@@ -3,17 +3,16 @@ HOMEPAGE = "https://github.com/xilinx/qemu/"
 
 QEMU_TARGETS = "aarch64 arm microblaze microblazeel"
 
-XILINX_RELEASE_VERSION = "v2019.1"
-XILINX_QEMU_VERSION ?= "v2.11.1"
-BRANCH ?= "branch/xilinx-v2019.1"
-SRCREV ?= "5f38ea92fb697b94ad43f01fe162f3ed6e6b0e16"
-
-
 LIC_FILES_CHKSUM = " \
 		file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
 		file://COPYING.LIB;endline=24;md5=c04def7ae38850e7d3ef548588159913 \
 		"
 DEPENDS = "glib-2.0 zlib pixman"
+
+XILINX_RELEASE_VERSION = "v2019.2"
+XILINX_QEMU_VERSION ?= "v2.11.1"
+BRANCH ?= "branch/xilinx-v2019.2"
+SRCREV ?= "6617fbc8be3525ca524f7d4ef7fc7b14c5b0c822"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
@@ -24,13 +23,18 @@ REPO ?= "git://github.com/Xilinx/qemu.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
+SRC_URI_append = " file://0001-The-glibc-2.29.9000-6.fc31.x86_64-package-finally-in.patch"
+
 S = "${WORKDIR}/git"
+
+EXTRA_OECONF_append= " --python=python2.7"
 
 # Disable KVM completely
 PACKAGECONFIG_remove = "kvm"
+PACKAGECONFIG[ssh] = "--enable-libssh,,"
 
 # Enable libgcrypt
-PACKAGECONFIG_append = " gcrypt"
+PACKAGECONFIG_append = " gcrypt fdt alsa kvm"
 
 DISABLE_STATIC_pn-${PN} = ""
 
