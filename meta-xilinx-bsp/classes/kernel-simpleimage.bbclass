@@ -25,8 +25,10 @@ do_deploy_append () {
     for type in ${KERNEL_IMAGETYPES} ; do
         if [[ "${type}" =~ "simpleImage" ]] && [ ${ARCH} = "microblaze" ]; then
             base_name=${imageType}-${KERNEL_IMAGE_NAME}
+            install -m 0644 ${KERNEL_OUTPUT_DIR}/${type}.strip $deployDir/${base_name}.strip
             install -m 0644 ${KERNEL_OUTPUT_DIR}/${type}.unstrip $deployDir/${base_name}.unstrip
             symlink_name=${imageType}-${KERNEL_IMAGE_LINK_NAME}
+            ln -sf ${base_name}.strip $deployDir/${symlink_name}.strip
             ln -sf ${base_name}.unstrip $deployDir/${symlink_name}.unstrip
         fi
     done
