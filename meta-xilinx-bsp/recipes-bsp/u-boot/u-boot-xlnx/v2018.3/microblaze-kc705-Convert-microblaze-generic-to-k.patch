@@ -650,7 +650,7 @@ index a953977..cb75fde 100644
 +PLATFORM_CPPFLAGS += -mxl-pattern-compare
 +PLATFORM_CPPFLAGS += -mxl-multiply-high
 +PLATFORM_CPPFLAGS += -mno-xl-soft-mul
-+PLATFORM_CPPFLAGS += -mcpu=v10.0
++PLATFORM_CPPFLAGS += -mcpu=v11.0
 +PLATFORM_CPPFLAGS += -fgnu89-inline
 diff --git a/configs/microblaze-generic_defconfig b/configs/microblaze-generic_defconfig
 index 02e62e2..8d64be4 100644
