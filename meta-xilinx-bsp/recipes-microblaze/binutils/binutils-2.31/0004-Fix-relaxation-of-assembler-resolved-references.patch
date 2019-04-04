@@ -1,27 +1,20 @@
-From 927ef228dfedf229dc915b273a308ab2c7bf9e19 Mon Sep 17 00:00:00 2001
+From cafd454afbd2722b9249024332182e3e96b1bcc7 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Mon, 28 Aug 2017 19:53:55 -0700
-Subject: [PATCH] Fix relaxation of assembler resolved references
-
-03/2018
-Rebased for binutils 2.30
+Date: Tue, 14 Feb 2012 01:00:22 +0100
+Subject: [PATCH 04/31] Fix relaxation of assembler resolved references
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
-Signed-off-by: Alejandro Enedino Hernandez Samaniego <alejandr@xilinx.com>
-
-Upstream-Status: Pending
-
+Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
 ---
- bfd/elf32-microblaze.c     | 39 +++++++++++++++++++++++++++++++++++++++
+ bfd/elf32-microblaze.c     | 38 ++++++++++++++++++++++++++++++++++++++
  gas/config/tc-microblaze.c |  1 +
- 2 files changed, 40 insertions(+)
+ 2 files changed, 39 insertions(+)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index f1808bc..a1d810c 100644
+index 3d131bc..56c82ae 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
-@@ -1887,6 +1887,45 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1973,6 +1973,44 @@ microblaze_elf_relax_section (bfd *abfd,
  	  irelscanend = irelocs + o->reloc_count;
  	  for (irelscan = irelocs; irelscan < irelscanend; irelscan++)
  	    {
@@ -54,8 +47,7 @@ index f1808bc..a1d810c 100644
 +                          elf_section_data (o)->this_hdr.contents = ocontents;
 +                        }
 +                    }
-+
-+                  irelscan->r_addend -= calc_fixup (irelscan->r_addend
++                 irelscan->r_addend -= calc_fixup (irelscan->r_addend
 +                                                    + isym->st_value, sec);
 +                  val = bfd_get_32 (abfd, ocontents + irelscan->r_offset);
 +                  microblaze_bfd_write_imm_value_32 (abfd, ocontents + irelscan->r_offset,
@@ -68,10 +60,10 @@ index f1808bc..a1d810c 100644
  		{
  		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 42dd7ae..50dbfc7 100644
+index 360ccba..e3dd1e0 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
-@@ -2183,6 +2183,7 @@ md_apply_fix (fixS *   fixP,
+@@ -2205,6 +2205,7 @@ md_apply_fix (fixS *   fixP,
        else
  	fixP->fx_r_type = BFD_RELOC_NONE;
        fixP->fx_addsy = section_symbol (absolute_section);
@@ -79,3 +71,6 @@ index 42dd7ae..50dbfc7 100644
      }
    return;
  }
+-- 
+2.7.4
+

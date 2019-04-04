@@ -1,17 +1,14 @@
-From 91f39b692c48336117c092e4afd80899c97779e6 Mon Sep 17 00:00:00 2001
+From 6958c0c056b1597992d72d4b75e763e65862e1ad Mon Sep 17 00:00:00 2001
 From: David Holsgrove <david.holsgrove@xilinx.com>
-Date: Mon, 28 Aug 2017 19:53:52 -0700
-Subject: [PATCH] MicroBlaze Add wdc.ext.clear and wdc.ext.flush insns
+Date: Wed, 8 May 2013 11:03:36 +1000
+Subject: [PATCH 01/31] Add wdc.ext.clear and wdc.ext.flush insns
 
 Added two new instructions, wdc.ext.clear and wdc.ext.flush,
 to enable MicroBlaze to flush an external cache, which is
 used with the new coherency support for multiprocessing.
 
-Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
-Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
-Upstream-Status: Pending
-
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 ---
  opcodes/microblaze-opc.h  | 5 ++++-
  opcodes/microblaze-opcm.h | 4 ++--
@@ -63,3 +60,6 @@ index 92f3f19..7338f6a 100644
    bltd, ble, bled, bgt, bgtd, bge, bged, ori, andi, xori, andni,
    imm, rtsd, rtid, rtbd, rted, bri, brid, brlid, brai, braid, bralid,
    brki, beqi, beqid, bnei, bneid, blti, bltid, blei, bleid, bgti,
+-- 
+2.7.4
+
