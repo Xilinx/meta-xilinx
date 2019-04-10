@@ -56,7 +56,7 @@ KERNEL_FEATURES_append_kc705-microblazeel = " bsp/kc705-microblazeel/kc705-micro
 
 KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' bsp/xilinx/xen.scc', '', d)}"
 
-KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('IMAGE_FEATURES', 'fpga-manager', ' features/overlay/overlay.scc', '', d)}"
+KERNEL_FEATURES_append_zynqmp = "${@' features/overlay/overlay.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
 
 KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' bsp/xilinx/xen.scc', '', d)}"
 
