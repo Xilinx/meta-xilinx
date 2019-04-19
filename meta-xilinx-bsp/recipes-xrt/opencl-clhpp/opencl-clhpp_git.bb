@@ -25,3 +25,5 @@ do_install () {
 	install -d ${D}${includedir}/CL/
 	install -m 0644 ${S}/input_cl2.hpp ${D}${includedir}/CL/cl2.hpp
 }
+
+ALLOW_EMPTY_${PN} = "1"
