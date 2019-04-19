@@ -58,4 +58,8 @@ file://0001-LOCAL-Testsuite-builtins-tests-require-fpic.patch \
         file://0055-fixing-the-long-long-long-mingw-toolchain-issue.patch \
         file://0056-fix-the-lto-wrapper-issue-on-windows.patch \
         file://0057-Fix-the-MB-64-bug-of-handling-QI-objects.patch \
+        file://0058-Patch-Microblaze-We-will-check-the-possibility-of-pe.patch \
+        file://0059-Reverting-the-patch-as-kernel-boot-is-not-working-wi.patch \
+        file://0060-Patch-MicroBlaze-fixed-typos-in-mul-div-and-mod-asse.patch \
+        file://0061-Author-Nagaraju-nmekala-xilinx.com.patch \
 "
