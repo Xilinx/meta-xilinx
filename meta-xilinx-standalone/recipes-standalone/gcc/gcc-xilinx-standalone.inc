@@ -3,11 +3,6 @@
 # This should be applicable to both cross and cross-canadian toolchain.
 
 
-# By using tclibc-newlib we loose sysroot functionality due to some
-# append/override behavior We need to get that back , the following append
-# overrides everything on EXTRA_OECONF for gcc cross target it avoids
-# overlapping with crt0 because of --enable-linker-id from EXTRA_OECONF
-
 GCC_CONFIGURE_COMMON_XILINX_STANDALONE = " \
 	--disable-libmudflap \
 	--disable-libstdcxx-pch \
@@ -38,16 +33,6 @@ GCC_CONFIGURE_A53 ?= " \
         --with-ppl=no \
 "
 
-
-
-BINUTILS_CONFIGURE_A53 ?= " \
-	--disable-gprof \
-	--disable-libdecnumber \
-	--disable-readline \
-	--disable-shared \
-	--enable-lto \
-	--enable-static \
-"
 GCC_CONFIGURE_A72 ?= " \
         --disable-bootstrap \
         --disable-multiarch \
@@ -67,16 +52,6 @@ GCC_CONFIGURE_A72 ?= " \
         --with-isl=no \
 	--with-ppl=no \
 "
-BINUTILS_CONFIGURE_A72 ?= " \
-	--disable-gprof \
-	--disable-libdecnumber \
-	--disable-readline \
-	--disable-shared \
-	--enable-lto \
-	--enable-static \
-"
-
-
 
 GCC_CONFIGURE_R5 ?= " \
         --disable-decimal-float \
@@ -94,12 +69,6 @@ GCC_CONFIGURE_R5 ?= " \
         --with-host-libstdcxx=-static-libgcc \
          --with-multilib-list=rmprofile \
 "
-BINUTILS_CONFIGURE_R5 ?= " \
-	--disable-docs \
-	--disable-nls \
-	--enable-interwork \
-"
-
 
 GCC_CONFIGURE_MB ?= " \
         --disable-__cxa_atexit \
@@ -112,13 +81,6 @@ GCC_CONFIGURE_MB ?= " \
         --with-ppl=no \
         --without-long-double-128 \
 	--disable-multilib \
-"
-BINUTILS_CONFIGURE_MB ?= " \
-	--disable-initfini-array \
-	--disable-nls \
-	--enable-gold=no \
-	--enable-ld=yes \
-	--enable-multilib \
 "
 
 GCC_CONFIGURE_A9 ?= " \
@@ -139,9 +101,4 @@ GCC_CONFIGURE_A9 ?= " \
 	--with-gnu-ld \
 	--with-isl=no \
 	--with-ppl=no \
-"
-BINUTILS_CONFIGURE_A9 ?= " \
-	--disable-docs \
-	--disable-nls \
-	--enable-interwork \
 "
