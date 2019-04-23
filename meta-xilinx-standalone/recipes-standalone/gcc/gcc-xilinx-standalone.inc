@@ -101,4 +101,5 @@ GCC_CONFIGURE_A9 ?= " \
 	--with-gnu-ld \
 	--with-isl=no \
 	--with-ppl=no \
+	--with-multilib-list=aprofile \
 "
