@@ -27,5 +27,6 @@ HAS_PLATFORM_INIT ?= " \
 		xilinx_zynqmp_zc1275_revA_config \
 		xilinx_zynqmp_zc1275_revB_config \
 		xilinx_zynqmp_zc1254_revA_config \
+		xilinx_zynqmp_a2197_revA_config  \
 		"
 
