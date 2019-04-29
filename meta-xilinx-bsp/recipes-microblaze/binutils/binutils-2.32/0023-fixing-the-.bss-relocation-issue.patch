@@ -1,10 +1,11 @@
-From 2a2298c9f32e96a71d6295e7ef52b37d834e5224 Mon Sep 17 00:00:00 2001
+From 52f6c56353aad424dfdaf713e0192f8fc9c874f4 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Wed, 24 Oct 2018 12:34:37 +0530
-Subject: [PATCH 23/31] fixing the .bss relocation issue
+Subject: [PATCH] fixing the .bss relocation issue
 
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
 ---
  bfd/elf64-microblaze.c | 18 ++++++++++++------
  1 file changed, 12 insertions(+), 6 deletions(-)
@@ -73,6 +74,3 @@ index 4d9b906..184b7d5 100644
            immediate |= (instr_lo & 0x0000ffff);
  		      target_address = immediate;
  		      offset = calc_fixup (target_address, 0, sec);
--- 
-2.7.4
-

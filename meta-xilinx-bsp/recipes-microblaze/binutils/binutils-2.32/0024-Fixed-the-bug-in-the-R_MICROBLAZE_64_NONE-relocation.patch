@@ -1,18 +1,19 @@
-From 198f2ccd054613f39bbad49b3f0dbad23036b4fc Mon Sep 17 00:00:00 2001
+From ed3e6fad3e2a626fc987e9c7477f51d03d2b4512 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Wed, 28 Nov 2018 14:00:29 +0530
-Subject: [PATCH 24/31] Fixed the bug in the R_MICROBLAZE_64_NONE relocation.
- It was adjusting only lower 16bits.
+Subject: [PATCH] Fixed the bug in the R_MICROBLAZE_64_NONE relocation. It was
+ adjusting only lower 16bits.
 
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
 ---
  bfd/elf32-microblaze.c | 4 ++--
  bfd/elf64-microblaze.c | 4 ++--
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index b632dd1..ffb23d8 100644
+index 035e71f..2d8c062 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
 @@ -2022,8 +2022,8 @@ microblaze_elf_relax_section (bfd *abfd,
@@ -41,6 +42,3 @@ index 184b7d5..ef6a870 100644
  	      }
  	      break;
  	    }
--- 
-2.7.4
-

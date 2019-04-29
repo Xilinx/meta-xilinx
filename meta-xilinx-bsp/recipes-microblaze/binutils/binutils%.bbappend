@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_append_microblaze := "${THISDIR}/binutils-2.31:"
+FILESEXTRAPATHS_append_microblaze := "${THISDIR}/binutils-2.32:"
 SRC_URI_append_microblaze = " \
 	file://0001-Add-wdc.ext.clear-and-wdc.ext.flush-insns.patch \
 	file://0002-Add-mlittle-endian-and-mbig-endian-flags.patch \
@@ -26,8 +26,6 @@ SRC_URI_append_microblaze = " \
 	file://0024-Fixed-the-bug-in-the-R_MICROBLAZE_64_NONE-relocation.patch \
 	file://0025-Patch-MicroBlaze-fixed-Build-issue-which-are-due-to-.patch \
 	file://0026-Patch-Microblaze-changes-of-PR22458-failure-to-choos.patch \
-	file://0027-Patch-Microblaze-PR22471-undefined-reference-to-link.patch \
-	file://0028-Revert-ld-Remove-unused-expression-state.patch \
 	file://0029-Patch-Microblaze-Binutils-security-check-is-causing-.patch \
 	file://0030-fixing-the-long-long-long-mingw-toolchain-issue.patch \
 	file://0031-fixing-the-_STACK_SIZE-issue-with-the-flto-flag.patch \

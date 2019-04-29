@@ -1,10 +1,11 @@
-From a1961dbfa4324335116f84494396ce9801688f18 Mon Sep 17 00:00:00 2001
+From 6b6c4a67212ced3fe1593fb173cfc4bce8d7f922 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Tue, 11 Sep 2018 17:30:17 +0530
-Subject: [PATCH 18/31] Added relocations for MB-X
+Subject: [PATCH] Added relocations for MB-X
 
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
 ---
  bfd/bfd-in2.h              | 11 ++++--
  bfd/libbfd.h               |  4 +--
@@ -13,10 +14,10 @@ Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
  4 files changed, 62 insertions(+), 69 deletions(-)
 
 diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
-index 44cddc2..44e719b 100644
+index 90645d1..f74aac1 100644
 --- a/bfd/bfd-in2.h
 +++ b/bfd/bfd-in2.h
-@@ -5796,16 +5796,21 @@ done here - only used for relaxing  */
+@@ -5873,16 +5873,21 @@ done here - only used for relaxing  */
    BFD_RELOC_MICROBLAZE_32_NONE,
  
  /* This is a 64 bit reloc that stores the 32 bit pc relative
@@ -42,10 +43,10 @@ index 44cddc2..44e719b 100644
  PC-relative GOT offset  */
    BFD_RELOC_MICROBLAZE_64_GOTPC,
 diff --git a/bfd/libbfd.h b/bfd/libbfd.h
-index d7892a6..bb8fb42 100644
+index 450653f..d87a183 100644
 --- a/bfd/libbfd.h
 +++ b/bfd/libbfd.h
-@@ -2864,14 +2864,14 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
+@@ -2903,14 +2903,14 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
    "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
    "BFD_RELOC_MICROBLAZE_32_NONE",
    "BFD_RELOC_MICROBLAZE_64_NONE",
@@ -63,10 +64,10 @@ index d7892a6..bb8fb42 100644
    "BFD_RELOC_MICROBLAZE_64_TLSGD",
    "BFD_RELOC_MICROBLAZE_64_TLSLD",
 diff --git a/bfd/reloc.c b/bfd/reloc.c
-index 60eac77..2d73154 100644
+index ccf29f5..861f2d4 100644
 --- a/bfd/reloc.c
 +++ b/bfd/reloc.c
-@@ -6873,12 +6873,6 @@ ENUMDOC
+@@ -6804,12 +6804,6 @@ ENUMDOC
  ENUM
    BFD_RELOC_MICROBLAZE_64_NONE
  ENUMDOC
@@ -79,7 +80,7 @@ index 60eac77..2d73154 100644
    This is a 64 bit reloc that stores the 32 bit pc relative
    value in two words (with an imm instruction).  No relocation is
    done here - only used for relaxing
-@@ -6886,12 +6880,6 @@ ENUM
+@@ -6817,12 +6811,6 @@ ENUM
    BFD_RELOC_MICROBLAZE_64_GOTPC
  ENUMDOC
    This is a 64 bit reloc that stores the 32 bit pc relative
@@ -92,7 +93,7 @@ index 60eac77..2d73154 100644
    value in two words (with an imm instruction).  The relocation is
    PC-relative GOT offset
  ENUM
-@@ -6975,6 +6963,20 @@ ENUMDOC
+@@ -6906,6 +6894,20 @@ ENUMDOC
    value in two words (with an imm instruction).  The relocation is
    relative offset from start of TEXT.
  
@@ -114,7 +115,7 @@ index 60eac77..2d73154 100644
    BFD_RELOC_AARCH64_RELOC_START
  ENUMDOC
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 680a794..663e1a6 100644
+index 3f90b7c..587a4d5 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -95,6 +95,7 @@ const char FLT_CHARS[] = "rRsSfFdDxXpP";
@@ -345,6 +346,3 @@ index 680a794..663e1a6 100644
      case BFD_RELOC_MICROBLAZE_64_GOT:
      case BFD_RELOC_MICROBLAZE_64_PLT:
      case BFD_RELOC_MICROBLAZE_64_GOTOFF:
--- 
-2.7.4
-

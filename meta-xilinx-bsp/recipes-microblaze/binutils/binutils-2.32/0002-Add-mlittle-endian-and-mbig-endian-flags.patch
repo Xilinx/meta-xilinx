@@ -1,7 +1,7 @@
-From a570d7ef1fce2a1e4d4fde5f3ac36a741a01587b Mon Sep 17 00:00:00 2001
+From cd4e233a38df5eee833c77f4393e710ad5383ac0 Mon Sep 17 00:00:00 2001
 From: nagaraju <nmekala@xilix.com>
 Date: Tue, 19 Mar 2013 17:18:23 +0530
-Subject: [PATCH 02/31] Add mlittle-endian and mbig-endian flags
+Subject: [PATCH] Add mlittle-endian and mbig-endian flags
 
 Added support in gas for mlittle-endian and mbig-endian flags
 as options.
@@ -11,12 +11,13 @@ to include new entries.
 
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+
 ---
  gas/config/tc-microblaze.c | 9 +++++++++
  1 file changed, 9 insertions(+)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index ba6eabb..360ccba 100644
+index ab90c6b..c92e9ce 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -37,6 +37,8 @@
@@ -59,6 +60,3 @@ index ba6eabb..360ccba 100644
  }
  
  
--- 
-2.7.4
-

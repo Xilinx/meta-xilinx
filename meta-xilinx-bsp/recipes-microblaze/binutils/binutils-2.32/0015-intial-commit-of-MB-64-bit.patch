@@ -1,10 +1,11 @@
-From f548b7a7d92d8f06afee253a7faf71f5bb1cb163 Mon Sep 17 00:00:00 2001
+From e0a7cf883ed02a73fda5f7d3e131afc8f1ebe416 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Sun, 30 Sep 2018 16:28:28 +0530
-Subject: [PATCH 15/31] intial commit of MB 64-bit
+Subject: [PATCH] intial commit of MB 64-bit
 
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
 ---
  bfd/Makefile.am                    |    2 +
  bfd/Makefile.in                    |    3 +
@@ -31,10 +32,10 @@ Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
  create mode 100644 ld/emulparams/elf64microblazeel.sh
 
 diff --git a/bfd/Makefile.am b/bfd/Makefile.am
-index 3f3487f..ae6bf3e 100644
+index a919155..c5fd250 100644
 --- a/bfd/Makefile.am
 +++ b/bfd/Makefile.am
-@@ -568,6 +568,7 @@ BFD64_BACKENDS = \
+@@ -570,6 +570,7 @@ BFD64_BACKENDS = \
  	elf64-riscv.lo \
  	elfxx-riscv.lo \
  	elf64-s390.lo \
@@ -42,7 +43,7 @@ index 3f3487f..ae6bf3e 100644
  	elf64-sparc.lo \
  	elf64-tilegx.lo \
  	elf64-x86-64.lo \
-@@ -601,6 +602,7 @@ BFD64_BACKENDS_CFILES = \
+@@ -603,6 +604,7 @@ BFD64_BACKENDS_CFILES = \
  	elf64-nfp.c \
  	elf64-ppc.c \
  	elf64-s390.c \
@@ -51,10 +52,10 @@ index 3f3487f..ae6bf3e 100644
  	elf64-tilegx.c \
  	elf64-x86-64.c \
 diff --git a/bfd/Makefile.in b/bfd/Makefile.in
-index cc27ef0..3ba6eee 100644
+index 896df52..fd457cb 100644
 --- a/bfd/Makefile.in
 +++ b/bfd/Makefile.in
-@@ -992,6 +992,7 @@ BFD64_BACKENDS = \
+@@ -995,6 +995,7 @@ BFD64_BACKENDS = \
  	elf64-riscv.lo \
  	elfxx-riscv.lo \
  	elf64-s390.lo \
@@ -62,7 +63,7 @@ index cc27ef0..3ba6eee 100644
  	elf64-sparc.lo \
  	elf64-tilegx.lo \
  	elf64-x86-64.lo \
-@@ -1025,6 +1026,7 @@ BFD64_BACKENDS_CFILES = \
+@@ -1028,6 +1029,7 @@ BFD64_BACKENDS_CFILES = \
  	elf64-nfp.c \
  	elf64-ppc.c \
  	elf64-s390.c \
@@ -70,7 +71,7 @@ index cc27ef0..3ba6eee 100644
  	elf64-sparc.c \
  	elf64-tilegx.c \
  	elf64-x86-64.c \
-@@ -1489,6 +1491,7 @@ distclean-compile:
+@@ -1494,6 +1496,7 @@ distclean-compile:
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-ppc.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-riscv.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-s390.Plo@am__quote@
@@ -79,10 +80,10 @@ index cc27ef0..3ba6eee 100644
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-tilegx.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-x86-64.Plo@am__quote@
 diff --git a/bfd/config.bfd b/bfd/config.bfd
-index 6391f35..cde27b4 100644
+index aef1448..8072c8a 100644
 --- a/bfd/config.bfd
 +++ b/bfd/config.bfd
-@@ -844,11 +844,15 @@ case "${targ}" in
+@@ -850,11 +850,15 @@ case "${targ}" in
    microblazeel*-*)
      targ_defvec=microblaze_elf32_le_vec
      targ_selvecs=microblaze_elf32_vec
@@ -99,11 +100,11 @@ index 6391f35..cde27b4 100644
  
  #ifdef BFD64
 diff --git a/bfd/configure b/bfd/configure
-index 3c32a83..5934afd 100755
+index e5bde48..5bf94d5 100755
 --- a/bfd/configure
 +++ b/bfd/configure
-@@ -14844,6 +14844,8 @@ do
-     rx_elf32_le_vec)		 tb="$tb elf32-rx.lo elf32.lo $elf" ;;
+@@ -15502,6 +15502,8 @@ do
+     rx_elf32_linux_le_vec)	 tb="$tb elf32-rx.lo elf32.lo $elf" ;;
      s390_elf32_vec)		 tb="$tb elf32-s390.lo elf32.lo $elf" ;;
      s390_elf64_vec)		 tb="$tb elf64-s390.lo elf64.lo $elf"; target_size=64 ;;
 +    microblaze_elf64_vec)	 tb="$tb elf64-microblaze.lo elf64.lo $elf"; target_size=64 ;;
@@ -112,11 +113,11 @@ index 3c32a83..5934afd 100755
      score_elf32_le_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo $elf"; want64=true; target_size=64 ;;
      sh_coff_vec)		 tb="$tb coff-sh.lo $coff" ;;
 diff --git a/bfd/configure.ac b/bfd/configure.ac
-index c6193cd..901977d 100644
+index 7cdf9c8..998a651 100644
 --- a/bfd/configure.ac
 +++ b/bfd/configure.ac
-@@ -612,6 +612,8 @@ do
-     rx_elf32_le_vec)		 tb="$tb elf32-rx.lo elf32.lo $elf" ;;
+@@ -615,6 +615,8 @@ do
+     rx_elf32_linux_le_vec)	 tb="$tb elf32-rx.lo elf32.lo $elf" ;;
      s390_elf32_vec)		 tb="$tb elf32-s390.lo elf32.lo $elf" ;;
      s390_elf64_vec)		 tb="$tb elf64-s390.lo elf64.lo $elf"; target_size=64 ;;
 +    microblaze_elf64_vec)	 tb="$tb elf64-microblaze.lo elf64.lo $elf"; target_size=64 ;;
@@ -125,7 +126,7 @@ index c6193cd..901977d 100644
      score_elf32_le_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo $elf"; want64=true; target_size=64 ;;
      sh_coff_vec)		 tb="$tb coff-sh.lo $coff" ;;
 diff --git a/bfd/cpu-microblaze.c b/bfd/cpu-microblaze.c
-index 2ccf724..dd2d6ab 100644
+index 9bc2eb3..c91ba46 100644
 --- a/bfd/cpu-microblaze.c
 +++ b/bfd/cpu-microblaze.c
 @@ -23,7 +23,24 @@
@@ -3783,10 +3784,10 @@ index 0000000..0f43ae6
 +
 +#include "elf64-target.h"
 diff --git a/bfd/targets.c b/bfd/targets.c
-index 531703d..8ddbd39 100644
+index 158168c..ef567a3 100644
 --- a/bfd/targets.c
 +++ b/bfd/targets.c
-@@ -704,6 +704,8 @@ extern const bfd_target mep_elf32_le_vec;
+@@ -706,6 +706,8 @@ extern const bfd_target mep_elf32_le_vec;
  extern const bfd_target metag_elf32_vec;
  extern const bfd_target microblaze_elf32_vec;
  extern const bfd_target microblaze_elf32_le_vec;
@@ -3795,7 +3796,7 @@ index 531703d..8ddbd39 100644
  extern const bfd_target mips_ecoff_be_vec;
  extern const bfd_target mips_ecoff_le_vec;
  extern const bfd_target mips_ecoff_bele_vec;
-@@ -1067,6 +1069,10 @@ static const bfd_target * const _bfd_target_vector[] =
+@@ -1073,6 +1075,10 @@ static const bfd_target * const _bfd_target_vector[] =
  
  	&metag_elf32_vec,
  
@@ -3807,7 +3808,7 @@ index 531703d..8ddbd39 100644
  
  	&mips_ecoff_be_vec,
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index f1d97b9..eb7998f 100644
+index 16b10d0..c794347 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -35,10 +35,13 @@
@@ -4202,7 +4203,7 @@ index f1d97b9..eb7998f 100644
  
  
 diff --git a/gas/config/tc-microblaze.h b/gas/config/tc-microblaze.h
-index 1263f57..7a991ae 100644
+index ca9dbb8..9d38d2c 100644
 --- a/gas/config/tc-microblaze.h
 +++ b/gas/config/tc-microblaze.h
 @@ -78,7 +78,9 @@ extern const struct relax_type md_relax_table[];
@@ -4217,7 +4218,7 @@ index 1263f57..7a991ae 100644
  #define ELF_TC_SPECIAL_SECTIONS \
    { ".sdata",		SHT_PROGBITS,	SHF_ALLOC + SHF_WRITE }, \
 diff --git a/include/elf/common.h b/include/elf/common.h
-index 773f378..cd2114e 100644
+index 996acf9..2f1e5be 100644
 --- a/include/elf/common.h
 +++ b/include/elf/common.h
 @@ -339,6 +339,7 @@
@@ -4226,13 +4227,13 @@ index 773f378..cd2114e 100644
  #define EM_BPF		247	/* Linux BPF – in-kernel virtual machine.  */
 +#define EM_MB_64	248	/* Xilinx MicroBlaze 32-bit RISC soft processor core */
  #define EM_NFP		250	/* Netronome Flow Processor.  */
+ #define EM_CSKY		252	/* C-SKY processor family.  */
  
- /* If it is necessary to assign new unofficial EM_* values, please pick large
 diff --git a/ld/Makefile.am b/ld/Makefile.am
-index d86ad09..f531471 100644
+index d7faf19..f7b3b97 100644
 --- a/ld/Makefile.am
 +++ b/ld/Makefile.am
-@@ -420,6 +420,8 @@ ALL_64_EMULATION_SOURCES = \
+@@ -422,6 +422,8 @@ ALL_64_EMULATION_SOURCES = \
  	eelf32ltsmipn32.c \
  	eelf32ltsmipn32_fbsd.c \
  	eelf32mipswindiss.c \
@@ -4241,7 +4242,7 @@ index d86ad09..f531471 100644
  	eelf64_aix.c \
  	eelf64_ia64.c \
  	eelf64_ia64_fbsd.c \
-@@ -1688,6 +1690,12 @@ eelf32_x86_64_nacl.c: $(srcdir)/emulparams/elf32_x86_64_nacl.sh \
+@@ -1702,6 +1704,12 @@ eelf32_x86_64_nacl.c: $(srcdir)/emulparams/elf32_x86_64_nacl.sh \
    $(srcdir)/emulparams/elf_nacl.sh \
    $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
  
@@ -4255,10 +4256,10 @@ index d86ad09..f531471 100644
    $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
  
 diff --git a/ld/Makefile.in b/ld/Makefile.in
-index 4792b2b..1f75a81 100644
+index 8b14f52..ffc9a3e 100644
 --- a/ld/Makefile.in
 +++ b/ld/Makefile.in
-@@ -905,6 +905,8 @@ ALL_64_EMULATION_SOURCES = \
+@@ -907,6 +907,8 @@ ALL_64_EMULATION_SOURCES = \
  	eelf32ltsmipn32.c \
  	eelf32ltsmipn32_fbsd.c \
  	eelf32mipswindiss.c \
@@ -4267,7 +4268,7 @@ index 4792b2b..1f75a81 100644
  	eelf64_aix.c \
  	eelf64_ia64.c \
  	eelf64_ia64_fbsd.c \
-@@ -1350,6 +1352,8 @@ distclean-compile:
+@@ -1355,6 +1357,8 @@ distclean-compile:
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32xc16xs.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32xstormy16.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32xtensa.Po@am__quote@
@@ -4276,7 +4277,7 @@ index 4792b2b..1f75a81 100644
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_aix.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_ia64.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_ia64_fbsd.Po@am__quote@
-@@ -3289,6 +3293,12 @@ eelf32_x86_64_nacl.c: $(srcdir)/emulparams/elf32_x86_64_nacl.sh \
+@@ -3306,6 +3310,12 @@ eelf32_x86_64_nacl.c: $(srcdir)/emulparams/elf32_x86_64_nacl.sh \
    $(srcdir)/emulparams/elf_nacl.sh \
    $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
  
@@ -4290,10 +4291,10 @@ index 4792b2b..1f75a81 100644
    $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
  
 diff --git a/ld/configure.tgt b/ld/configure.tgt
-index fad8b2e..25615ea 100644
+index 1e37d74..42f106d 100644
 --- a/ld/configure.tgt
 +++ b/ld/configure.tgt
-@@ -419,6 +419,9 @@ microblaze*-linux*)	targ_emul="elf32mb_linux"
+@@ -424,6 +424,9 @@ microblaze*-linux*)	targ_emul="elf32mb_linux"
  microblazeel*)		targ_emul=elf32microblazeel
  			targ_extra_emuls=elf32microblaze
  			;;
@@ -4362,7 +4363,7 @@ index 0000000..9c7b0eb
 +TEMPLATE_NAME=elf32
 +#GENERATE_SHLIB_SCRIPT=yes
 diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
-index 5101ceb..09757d1 100644
+index f8aaf27..20ea6a8 100644
 --- a/opcodes/microblaze-dis.c
 +++ b/opcodes/microblaze-dis.c
 @@ -33,6 +33,7 @@
@@ -4456,7 +4457,7 @@ index 5101ceb..09757d1 100644
  	case INST_TYPE_RD:
  	  print_func (stream, "\t%s", get_field_rd (inst));
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index 4bc400a..c88092d 100644
+index ce8ac35..985834b 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -40,7 +40,7 @@
@@ -4684,7 +4685,7 @@ index 4bc400a..c88092d 100644
  #endif /* MICROBLAZE_OPC */
  
 diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
-index b69e6a4..265cea8 100644
+index 2866269..076dbcd 100644
 --- a/opcodes/microblaze-opcm.h
 +++ b/opcodes/microblaze-opcm.h
 @@ -25,6 +25,7 @@
@@ -4735,6 +4736,3 @@ index b69e6a4..265cea8 100644
  
  /* FSL imm mask for get, put instructions.  */
  #define  RFSL_MASK 0x000000F
--- 
-2.7.4
-

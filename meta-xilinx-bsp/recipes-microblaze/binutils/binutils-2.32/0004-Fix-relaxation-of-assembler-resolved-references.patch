@@ -1,17 +1,18 @@
-From cafd454afbd2722b9249024332182e3e96b1bcc7 Mon Sep 17 00:00:00 2001
+From 2b87c5c4ec4a7d6285c0991c202aae3cf8401d99 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Date: Tue, 14 Feb 2012 01:00:22 +0100
-Subject: [PATCH 04/31] Fix relaxation of assembler resolved references
+Subject: [PATCH] Fix relaxation of assembler resolved references
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
 ---
  bfd/elf32-microblaze.c     | 38 ++++++++++++++++++++++++++++++++++++++
  gas/config/tc-microblaze.c |  1 +
  2 files changed, 39 insertions(+)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 3d131bc..56c82ae 100644
+index e3c8027..359484d 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
 @@ -1973,6 +1973,44 @@ microblaze_elf_relax_section (bfd *abfd,
@@ -60,7 +61,7 @@ index 3d131bc..56c82ae 100644
  		{
  		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 360ccba..e3dd1e0 100644
+index c92e9ce..3e72840 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -2205,6 +2205,7 @@ md_apply_fix (fixS *   fixP,
@@ -71,6 +72,3 @@ index 360ccba..e3dd1e0 100644
      }
    return;
  }
--- 
-2.7.4
-

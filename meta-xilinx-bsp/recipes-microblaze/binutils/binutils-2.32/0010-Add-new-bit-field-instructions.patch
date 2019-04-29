@@ -1,7 +1,7 @@
-From bcb1dcdb9349fb2f6863daf9206552916bd4149b Mon Sep 17 00:00:00 2001
+From 200359b776fbb19a1423ff4d0c46f5301af197c6 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Mon, 18 Jul 2016 12:24:28 +0530
-Subject: [PATCH 10/31] Add new bit-field instructions
+Subject: [PATCH] Add new bit-field instructions
 
 This patches adds new bsefi and bsifi instructions.
 BSEFI- The instruction shall extract a bit field from a
@@ -12,6 +12,7 @@ from a register at another position in the destination register.
 The rest of the bits in the destination register shall be unchanged
 
 Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+
 ---
  gas/config/tc-microblaze.c | 71 +++++++++++++++++++++++++++++++++++++++++++++-
  opcodes/microblaze-dis.c   | 16 +++++++++++
@@ -20,7 +21,7 @@ Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
  4 files changed, 102 insertions(+), 3 deletions(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index b34796c..7b42c99 100644
+index fa665b4..71bb888 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -917,7 +917,7 @@ md_assemble (char * str)
@@ -110,7 +111,7 @@ index b34796c..7b42c99 100644
        if (strcmp (op_end, ""))
          op_end = parse_reg (op_end + 1, &reg1);  /* Get r1.  */
 diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
-index 3b676d8..5101ceb 100644
+index f691740..f8aaf27 100644
 --- a/opcodes/microblaze-dis.c
 +++ b/opcodes/microblaze-dis.c
 @@ -74,6 +74,18 @@ get_field_imm5_mbar (long instr)
@@ -144,7 +145,7 @@ index 3b676d8..5101ceb 100644
  	case INST_TYPE_RD:
  	  print_func (stream, "\t%s", get_field_rd (inst));
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index 4e69f76..4bc400a 100644
+index 2a6b841..ce8ac35 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -59,6 +59,9 @@
@@ -195,7 +196,7 @@ index 4e69f76..4bc400a 100644
  #endif /* MICROBLAZE_OPC */
  
 diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
-index c75f10a..b69e6a4 100644
+index 1c39dbf..2866269 100644
 --- a/opcodes/microblaze-opcm.h
 +++ b/opcodes/microblaze-opcm.h
 @@ -29,7 +29,7 @@ enum microblaze_instr
@@ -225,6 +226,3 @@ index c75f10a..b69e6a4 100644
  /* FSL imm mask for get, put instructions.  */
  #define  RFSL_MASK 0x000000F
  
--- 
-2.7.4
-

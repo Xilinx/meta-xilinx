@@ -1,7 +1,7 @@
-From 693a9f95f2fd78b334ed9bb7265ad2f95b536a2d Mon Sep 17 00:00:00 2001
+From 57675e049d815f6fce100bd5effaea187abacf04 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Mon, 18 Jan 2016 12:28:21 +0530
-Subject: [PATCH 08/31] Added Address extension instructions
+Subject: [PATCH] Added Address extension instructions
 
 This patch adds the support of new instructions which are required
 for supporting Address extension feature.
@@ -15,13 +15,14 @@ ChangeLog:
      Added new instructions
   *microblaze-opcm.h (microblaze_instr): Update
      Added new instructions
+
 ---
  opcodes/microblaze-opc.h  | 11 +++++++++++
  opcodes/microblaze-opcm.h | 10 +++++-----
  2 files changed, 16 insertions(+), 5 deletions(-)
 
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index 773dc81..292e3a4 100644
+index 865151f..330f104 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -178,8 +178,11 @@ struct op_code_struct
@@ -71,7 +72,7 @@ index 773dc81..292e3a4 100644
    {"swaph",     INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x900001E2, OPCODE_MASK_H4,   swaph,     arithmetic_inst },
    {"", 0, 0, 0, 0, 0, 0, 0, 0},
 diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
-index 7338f6a..c75f10a 100644
+index 42f3dd3..1c39dbf 100644
 --- a/opcodes/microblaze-opcm.h
 +++ b/opcodes/microblaze-opcm.h
 @@ -33,13 +33,13 @@ enum microblaze_instr
@@ -93,6 +94,3 @@ index 7338f6a..c75f10a 100644
    sbi, shi, swi, msrset, msrclr, tuqula, fadd, frsub, fmul, fdiv,
    fcmp_lt, fcmp_eq, fcmp_le, fcmp_gt, fcmp_ne, fcmp_ge, fcmp_un, flt,
    fint, fsqrt,
--- 
-2.7.4
-

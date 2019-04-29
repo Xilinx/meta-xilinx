@@ -1,11 +1,12 @@
-From b63b8ae83cc538808e06d84143df6b7150fb4037 Mon Sep 17 00:00:00 2001
+From 616031595c692c2181c3b1ce8c08678b68b2fe4e Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 28 Sep 2018 12:04:55 +0530
-Subject: [PATCH 19/31] -Fixed MB-x relocation issues -Added imml for required
- MB-x instructions
+Subject: [PATCH] -Fixed MB-x relocation issues -Added imml for required MB-x
+ instructions
 
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
 ---
  bfd/elf64-microblaze.c     |  68 ++++++++++++++++----
  gas/config/tc-microblaze.c | 152 ++++++++++++++++++++++++++++++++-------------
@@ -115,7 +116,7 @@ index 56a45f2..54a2461 100644
      instr_lo &= ~0x0000ffff;
      instr_lo |= (val & 0x0000ffff);
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 663e1a6..8d2980a 100644
+index 587a4d5..fa437b6 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -392,7 +392,7 @@ microblaze_s_weakext (int ignore ATTRIBUTE_UNUSED)
@@ -358,7 +359,7 @@ index 663e1a6..8d2980a 100644
      default:
        return 0;
 diff --git a/gas/tc.h b/gas/tc.h
-index beddb48..96c7559 100644
+index 0a50a69..529a73b 100644
 --- a/gas/tc.h
 +++ b/gas/tc.h
 @@ -22,7 +22,7 @@
@@ -370,6 +371,3 @@ index beddb48..96c7559 100644
  
  const char * md_atof (int, char *, int *);
  int    md_parse_option (int, const char *);
--- 
-2.7.4
-

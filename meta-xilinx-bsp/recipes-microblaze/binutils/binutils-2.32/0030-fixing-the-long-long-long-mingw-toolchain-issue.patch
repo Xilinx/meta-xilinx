@@ -1,17 +1,18 @@
-From 0e918ef176cf14073abca83c61d3978f3fa2551e Mon Sep 17 00:00:00 2001
+From 1eec84c155aeaeead673310f83293853f01b578d Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Thu, 29 Nov 2018 17:59:25 +0530
-Subject: [PATCH 30/31] fixing the long & long long mingw toolchain issue
+Subject: [PATCH] fixing the long & long long mingw toolchain issue
 
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
 ---
  gas/config/tc-microblaze.c | 10 +++++-----
  opcodes/microblaze-opc.h   |  4 ++--
  2 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index edc7985..9db9a7f 100644
+index b3e49f0..5b506d3 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -783,7 +783,7 @@ parse_imm (char * s, expressionS * e, offsetT min, offsetT max)
@@ -40,7 +41,7 @@ index edc7985..9db9a7f 100644
  
    if (atp)
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index 2096269..7df80d4 100644
+index 824afc0..d59ee0a 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -585,8 +585,8 @@ char pvr_register_prefix[] = "rpvr";
@@ -54,6 +55,3 @@ index 2096269..7df80d4 100644
  
  #endif /* MICROBLAZE_OPC */
  
--- 
-2.7.4
-

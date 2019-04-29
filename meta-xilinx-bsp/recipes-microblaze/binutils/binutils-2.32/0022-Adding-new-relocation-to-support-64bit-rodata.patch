@@ -1,10 +1,11 @@
-From e2c399e62b6b0f1940e73024a8076c8787602b9c Mon Sep 17 00:00:00 2001
+From 3eb0c068ad5a698007341b32c82d9e7ac6cabc49 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Sat, 13 Oct 2018 21:17:01 +0530
-Subject: [PATCH 22/31] Adding new relocation to support 64bit rodata
+Subject: [PATCH] Adding new relocation to support 64bit rodata
 
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
 ---
  bfd/elf64-microblaze.c     | 11 +++++++++--
  gas/config/tc-microblaze.c | 49 ++++++++++++++++++++++++++++++++++++++++++----
@@ -68,7 +69,7 @@ index 40f10aa..4d9b906 100644
              if (h != NULL && !bfd_link_pic (info))
  	      {
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 7ff93a1..442f72c 100644
+index 46df32e..c6d2e4c 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -1119,6 +1119,13 @@ md_assemble (char * str)
@@ -163,6 +164,3 @@ index 7ff93a1..442f72c 100644
            break;
          default:
            as_bad (_("unsupported BFD relocation size %u"), size);
--- 
-2.7.4
-

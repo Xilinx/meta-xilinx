@@ -1,11 +1,12 @@
-From 380ad65a2bdb42749c22783f53f4b2263721a2ca Mon Sep 17 00:00:00 2001
+From 8b98898add56667d28b7d6242c86603bb2f5946e Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Tue, 9 Oct 2018 10:14:22 +0530
-Subject: [PATCH 21/31] - Fixed address computation issues with 64bit address -
- Fixed imml dissassamble issue
+Subject: [PATCH] - Fixed address computation issues with 64bit address - Fixed
+ imml dissassamble issue
 
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
 ---
  bfd/bfd-in2.h              |  5 ++++
  bfd/elf64-microblaze.c     | 14 ++++-----
@@ -14,10 +15,10 @@ Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
  4 files changed, 79 insertions(+), 16 deletions(-)
 
 diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
-index 44e719b..a35e51d 100644
+index f74aac1..434b41c 100644
 --- a/bfd/bfd-in2.h
 +++ b/bfd/bfd-in2.h
-@@ -5805,6 +5805,11 @@ done here - only used for relaxing  */
+@@ -5882,6 +5882,11 @@ done here - only used for relaxing  */
   *   +done here - only used for relaxing  */
      BFD_RELOC_MICROBLAZE_64,
  
@@ -83,7 +84,7 @@ index e9b3cf3..40f10aa 100644
                 fprintf(stderr, "%d: CORRUPT relax reloc %x %lx\n", __LINE__, val, irel->r_addend);
              }
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 8d2980a..7ff93a1 100644
+index fa437b6..46df32e 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -402,7 +402,6 @@ pseudo_typeS md_pseudo_table[] =
@@ -202,7 +203,7 @@ index 8d2980a..7ff93a1 100644
          default:
            as_bad (_("unsupported BFD relocation size %u"), size);
 diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
-index 09757d1..69e11e6 100644
+index 20ea6a8..f679a43 100644
 --- a/opcodes/microblaze-dis.c
 +++ b/opcodes/microblaze-dis.c
 @@ -61,7 +61,7 @@ get_field_imml (long instr)
@@ -214,6 +215,3 @@ index 09757d1..69e11e6 100644
    return (strdup (tmpstr));
  }
  
--- 
-2.7.4
-

@@ -1,10 +1,11 @@
-From 05240f6bdb5e3789efdc03b90c073b78785268e4 Mon Sep 17 00:00:00 2001
+From 549bf1fafb7dfa2718e172a94ff68acb14320ed8 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Sun, 30 Sep 2018 16:31:26 +0530
-Subject: [PATCH 16/31] MB-X initial commit code cleanup is needed.
+Subject: [PATCH] MB-X initial commit code cleanup is needed.
 
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
 Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
+
 ---
  bfd/bfd-in2.h              |  10 +++
  bfd/elf32-microblaze.c     |  65 +++++++++++++++++--
@@ -18,10 +19,10 @@ Signed-off-by: Nagaraju Mekala <nagaraju.mekala@xilinx.com>
  9 files changed, 277 insertions(+), 35 deletions(-)
 
 diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
-index 5807f70..44cddc2 100644
+index fe6933a..90645d1 100644
 --- a/bfd/bfd-in2.h
 +++ b/bfd/bfd-in2.h
-@@ -5801,11 +5801,21 @@ done here - only used for relaxing  */
+@@ -5878,11 +5878,21 @@ done here - only used for relaxing  */
      BFD_RELOC_MICROBLAZE_64_NONE,
  
  /* This is a 64 bit reloc that stores the 32 bit pc relative
@@ -44,7 +45,7 @@ index 5807f70..44cddc2 100644
  GOT offset  */
    BFD_RELOC_MICROBLAZE_64_GOT,
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 94fa3cf..b632dd1 100644
+index d001437..035e71f 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
 @@ -116,6 +116,20 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
@@ -268,10 +269,10 @@ index 0f43ae6..56a45f2 100644
  	    case R_MICROBLAZE_32_NONE:
  	      {
 diff --git a/bfd/libbfd.h b/bfd/libbfd.h
-index 261086c..d7892a6 100644
+index feb9fad..450653f 100644
 --- a/bfd/libbfd.h
 +++ b/bfd/libbfd.h
-@@ -2864,7 +2864,9 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
+@@ -2903,7 +2903,9 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
    "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
    "BFD_RELOC_MICROBLAZE_32_NONE",
    "BFD_RELOC_MICROBLAZE_64_NONE",
@@ -282,10 +283,10 @@ index 261086c..d7892a6 100644
    "BFD_RELOC_MICROBLAZE_64_PLT",
    "BFD_RELOC_MICROBLAZE_64_GOTOFF",
 diff --git a/bfd/reloc.c b/bfd/reloc.c
-index d89bc5d..60eac77 100644
+index 87753ae..ccf29f5 100644
 --- a/bfd/reloc.c
 +++ b/bfd/reloc.c
-@@ -6873,6 +6873,12 @@ ENUMDOC
+@@ -6804,6 +6804,12 @@ ENUMDOC
  ENUM
    BFD_RELOC_MICROBLAZE_64_NONE
  ENUMDOC
@@ -298,7 +299,7 @@ index d89bc5d..60eac77 100644
    This is a 64 bit reloc that stores the 32 bit pc relative
    value in two words (with an imm instruction).  No relocation is
    done here - only used for relaxing
-@@ -6880,6 +6886,12 @@ ENUM
+@@ -6811,6 +6817,12 @@ ENUM
    BFD_RELOC_MICROBLAZE_64_GOTPC
  ENUMDOC
    This is a 64 bit reloc that stores the 32 bit pc relative
@@ -312,7 +313,7 @@ index d89bc5d..60eac77 100644
    PC-relative GOT offset
  ENUM
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index eb7998f..680a794 100644
+index c794347..3f90b7c 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -94,6 +94,7 @@ const char FLT_CHARS[] = "rRsSfFdDxXpP";
@@ -647,7 +648,7 @@ index eb7998f..680a794 100644
          default:
            as_bad (_("unsupported BFD relocation size %u"), size);
 diff --git a/include/elf/microblaze.h b/include/elf/microblaze.h
-index 7bdba67..454e2b4 100644
+index 6ee0966..16b2736 100644
 --- a/include/elf/microblaze.h
 +++ b/include/elf/microblaze.h
 @@ -62,6 +62,8 @@ START_RELOC_NUMBERS (elf_microblaze_reloc_type)
@@ -660,7 +661,7 @@ index 7bdba67..454e2b4 100644
  END_RELOC_NUMBERS (R_MICROBLAZE_max)
  
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index c88092d..8d43af0 100644
+index 985834b..9b6264b 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -538,8 +538,8 @@ struct op_code_struct
@@ -675,7 +676,7 @@ index c88092d..8d43af0 100644
    {"dadd",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000400, OPCODE_MASK_H4, dadd, arithmetic_inst },
    {"drsub",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000480, OPCODE_MASK_H4, drsub, arithmetic_inst },
 diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
-index 265cea8..abb5c9f 100644
+index 076dbcd..5f2e190 100644
 --- a/opcodes/microblaze-opcm.h
 +++ b/opcodes/microblaze-opcm.h
 @@ -40,8 +40,8 @@ enum microblaze_instr
@@ -689,6 +690,3 @@ index 265cea8..abb5c9f 100644
    fcmp_lt, fcmp_eq, fcmp_le, fcmp_gt, fcmp_ne, fcmp_ge, fcmp_un, flt,
    fint, fsqrt,
    tget, tcget, tnget, tncget, tput, tcput, tnput, tncput,
--- 
-2.7.4
-
