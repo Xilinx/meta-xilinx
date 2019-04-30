@@ -12,10 +12,14 @@ DEVICE_TREE_NAME ?= "system.dtb"
 KERNEL_BOOTCMD ?= "booti"
 
 BOOTMODE ?= "sd"
+BOOTMODE_virt-versal ?= "qspi"
 
 SRC_URI = " \
             file://boot.cmd.sd \
             "
+
+#boot.cmd.qspi is an example tuned only for virt-versal
+SRC_URI_virt-versal += "file://boot.cmd.qspi"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
