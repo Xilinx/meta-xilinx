@@ -109,6 +109,9 @@ do_install() {
         if [ "${MALI_BACKEND_DEFAULT}" = "x11" ]; then
             ln -snf x11/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
         fi
+    else
+        # We cant rely on the fact that all apps will use pkgconfig correctly
+        sed -i -e 's/^#if defined(MESA_EGL_NO_X11_HEADERS)$/#if (1)/' ${D}${includedir}/EGL/eglplatform.h
     fi
     if [ "${USE_WL}" = "yes" ]; then
         install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
