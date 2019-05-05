@@ -1,7 +1,7 @@
-LINUX_VERSION = "4.14"
+LINUX_VERSION = "4.19"
 XILINX_RELEASE_VERSION = "v2019.1"
-KBRANCH ?= "xlnx_rebase_v4.14"
-SRCREV ?= "eeab73d1207d6fc2082776c954eb19fd7290bfbe"
+KBRANCH ?= "xlnx_rebase_v4.19"
+SRCREV ?= "e07c64d5dd8c5f6e332440f056018419227624c1"
 
 include linux-xlnx.inc
 
