@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/git/LICENSE;md5=fa343562af4b9b922b8d7fe7b0
 SRC_URI = "git://github.com/Xilinx/XRT.git;protocol=https"
 
 PV = "2.2.0+git${SRCPV}"
-SRCREV = "69a7e181d8d53c3b5dde9e8f17ace790141eaa01"
+SRCREV = "89a0f0daa3e38d8621a2d1207a96c5d16029b9ad"
 
 S = "${WORKDIR}/git/src"
 
