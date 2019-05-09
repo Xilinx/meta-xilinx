@@ -80,8 +80,6 @@ do_install() {
     install -m 0644 ${S}/${PV}/glesHeaders/GLES/*.h ${D}${includedir}/GLES/
     install -d -m 0655 ${D}${includedir}/GLES2
     install -m 0644 ${S}/${PV}/glesHeaders/GLES2/*.h ${D}${includedir}/GLES2/
-    install -d -m 0655 ${D}${includedir}/KHR
-    install -m 0644 ${S}/${PV}/glesHeaders/KHR/*.h ${D}${includedir}/KHR/
 
     install -d ${D}${libdir}/pkgconfig
     install -m 0644 ${WORKDIR}/egl.pc ${D}${libdir}/pkgconfig/egl.pc
