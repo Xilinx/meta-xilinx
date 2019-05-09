@@ -1,7 +1,7 @@
-From d8b1af5c7ed5bd47d2644e20006b84f67701b856 Mon Sep 17 00:00:00 2001
+From e1b8cfe6c0b4a0bd90ecbd3e85ae7114df21b6cc Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Thu, 18 Apr 2019 16:00:37 +0530
-Subject: [PATCH 61/61] Author: Nagaraju <nmekala@xilinx.com> Date:   Wed Apr
+Subject: [PATCH 61/62] Author: Nagaraju <nmekala@xilinx.com> Date:   Wed Apr
  17 14:11:00 2019 +0530
 
     [Patch, microblaze]: MB-64 removal of barrel-shift instructions from default
@@ -29,7 +29,7 @@ index 33d183e..c321b03 100644
      }
    else  {
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 8bd175f..0d9bf8d 100644
+index 8bd175f..b5b60fb 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -545,7 +545,7 @@
@@ -138,7 +138,7 @@ index 8bd175f..0d9bf8d 100644
 +          {
 +            operands[2] = gen_rtx_REG (DImode, MB_ABI_ASM_TEMP_REGNUM);
 +            output_asm_insn ("addlik\t%0,r0,%h1", operands);
-+            output_asm_insn ("addlik\t%2,r0,GEN_INT(32)", operands);
++            output_asm_insn ("addlik\t%2,r0,32", operands);
 +            output_asm_insn ("addlik\t%2,%2,-1", operands);
 +            output_asm_insn ("beaneid\t%2,.-8", operands);
 +            output_asm_insn ("addlk\t%0,%0,%0", operands);
@@ -197,7 +197,7 @@ index 8bd175f..0d9bf8d 100644
 -	return "addlik\t%0,r0,%j1 \n\tbsllli\t%0,%0,32\n\taddlik\t%0,%0,%h1 #Xfer Lo";
 +	operands[2] = gen_rtx_REG (DImode, MB_ABI_ASM_TEMP_REGNUM);
 +	output_asm_insn ("addlik\t%0,r0,%h1", operands);
-+	output_asm_insn ("addlik\t%2,r0,GEN_INT(32)", operands);
++	output_asm_insn ("addlik\t%2,r0,32", operands);
 +	output_asm_insn ("addlik\t%2,%2,-1", operands);
 +	output_asm_insn ("beaneid\t%2,.-8", operands);
 +	output_asm_insn ("addlk\t%0,%0,%0", operands);
