@@ -1,10 +1,10 @@
 inherit deploy
 
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=71602ce1bc2917a9be07ceee6fab6711"
+LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=e9b6d01d45faccfbf05d8caea53f0a35"
 
 XILINX_RELEASE_VERSION = "v2019.1"
-SRCREV = "324e7b58ecc9ea06a929fb545d73565cafb9989a"
+SRCREV = "26c14d9861010a0e3a55c73fb79efdb816eb42ca"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 SRC_URI = "git://github.com/Xilinx/embeddedsw.git;protocol=https;nobranch=1"
