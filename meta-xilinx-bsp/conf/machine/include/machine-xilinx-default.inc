@@ -81,6 +81,9 @@ def get_default_image_boot_files(d):
 XSERVER_EXT ?= ""
 XSERVER_EXT_zynqmp ?= "xf86-video-armsoc"
 
+#Add preferred provider as qemu-xilinx-helper-native
+PREFERRED_PROVIDER_qemu-helper-native = "qemu-xilinx-helper-native"
+
 # For MicroBlaze default all microblaze machines to use GDB 7.7.1 (for gdbserver/gdb)
 PREFERRED_VERSION_gdb_microblaze = "7.7.1"
 
