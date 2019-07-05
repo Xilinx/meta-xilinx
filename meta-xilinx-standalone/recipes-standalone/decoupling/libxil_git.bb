@@ -16,7 +16,7 @@ COMPATIBLE_MACHINE_zynqmp-pmu = "zynqmp-pmu"
 
 S = "${WORKDIR}/git/XilinxProcessorIPLib/drivers/"
 
-DEPENDS += "dtc-native python3-pyyaml-native xilstandalone"
+DEPENDS += "dtc-native python3-pyyaml-native xilmem"
 
 DTBFILE="output.dtb"
 do_generate_cmake (){
@@ -58,4 +58,11 @@ cmake_do_generate_toolchain_file_append() {
     set( CMAKE_C_FLAGS "${OECMAKE_C_FLAGS}" CACHE STRING "CFLAGS" )
     set( CMAKE_C_LINK_FLAGS "${OECMAKE_C_LINK_FLAGS}" CACHE STRING "LDFLAGS" )
 EOF
+}
+
+do_install() {
+    install -d ${D}${libdir}
+    install -d ${D}${includedir}
+    install -m 0755  ${WORKDIR}/build/libxil.a ${D}${libdir}
+    install -m 0644  ${WORKDIR}/build/include/* ${D}${includedir}
 }

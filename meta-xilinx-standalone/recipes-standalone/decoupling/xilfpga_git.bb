@@ -4,7 +4,7 @@ LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=c83c24ed6555ade24e37e6b74ade2629"
 
 XILINX_RELEASE_VERSION = "v2019.1"
-DEPENDS = " libgloss"
+DEPENDS = " libxil xilsecure"
 
 SRCREV = "${AUTOREV}"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
@@ -14,7 +14,7 @@ COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynqmp-pmu = "zynqmp-pmu"
 
-S = "${WORKDIR}/git/lib/bsp/standalone/src/"
+S = "${WORKDIR}/git/lib/sw_services/xilfpga/src/"
 
 SRCREV_FORMAT = "src_decouple"
 
@@ -31,6 +31,6 @@ EOF
 do_install() {
     install -d ${D}${libdir}
     install -d ${D}${includedir}
-    install -m 0755  ${WORKDIR}/build/libxilstandalone.a ${D}${libdir}
+    install -m 0755  ${WORKDIR}/build/libxilfpga.a ${D}${libdir}
     install -m 0644  ${WORKDIR}/build/include/* ${D}${includedir}
 }

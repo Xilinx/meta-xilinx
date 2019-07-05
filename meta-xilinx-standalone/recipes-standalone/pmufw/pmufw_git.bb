@@ -4,7 +4,7 @@ LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=c83c24ed6555ade24e37e6b74ade2629"
 
 XILINX_RELEASE_VERSION = "v2019.1"
-DEPENDS = " libgloss"
+DEPENDS = " xilstandalone xilfpga xilskey"
 
 SRCREV = "${AUTOREV}"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
@@ -14,7 +14,7 @@ COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynqmp-pmu = "zynqmp-pmu"
 
-S = "${WORKDIR}/git/lib/bsp/standalone/src/"
+S = "${WORKDIR}/git/lib/sw_apps/zynqmp_pmufw/src"
 
 SRCREV_FORMAT = "src_decouple"
 
@@ -29,8 +29,17 @@ EOF
 }
 
 do_install() {
-    install -d ${D}${libdir}
-    install -d ${D}${includedir}
-    install -m 0755  ${WORKDIR}/build/libxilstandalone.a ${D}${libdir}
-    install -m 0644  ${WORKDIR}/build/include/* ${D}${includedir}
+    :
 }
+
+PMU_FIRMWARE_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
+PMU_FIRMWARE_BASE_NAME[vardepsexclude] = "DATETIME"
+
+do_deploy() {
+    install -Dm 0644 ${WORKDIR}/build/pmufw ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.elf
+    ln -sf ${PMU_FIRMWARE_BASE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}.elf
+    ${OBJCOPY} -O binary ${WORKDIR}/build/pmufw ${WORKDIR}/build/pmfw.bin
+    install -m 0644 ${WORKDIR}/build/pmufw.bin ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.bin
+    ln -sf ${PMU_FIRMWARE_BASE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}.bin
+}
+
