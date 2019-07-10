@@ -16,6 +16,7 @@ BOOTMODE_virt-versal ?= "qspi"
 
 SRC_URI = " \
             file://boot.cmd.sd \
+            file://pxeboot \
             "
 
 #boot.cmd.qspi is an example tuned only for virt-versal
@@ -25,6 +26,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 UBOOTSCR_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}-${DATETIME}"
 UBOOTSCR_BASE_NAME[vardepsexclude] = "DATETIME"
+UBOOTPXE_CONFIG ?= "pxelinux.cfg"
 
 do_compile() {
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
@@ -39,6 +41,8 @@ do_deploy() {
     install -d ${DEPLOYDIR}
     install -m 0644 boot.scr ${DEPLOYDIR}/${UBOOTSCR_BASE_NAME}.scr
     ln -sf ${UBOOTSCR_BASE_NAME}.scr ${DEPLOYDIR}/boot.scr
+    install -d ${DEPLOYDIR}/${UBOOTPXE_CONFIG}
+    install -m 0644 ${WORKDIR}/pxeboot ${DEPLOYDIR}/${UBOOTPXE_CONFIG}/default
 }
 
 addtask do_deploy after do_compile before do_build
