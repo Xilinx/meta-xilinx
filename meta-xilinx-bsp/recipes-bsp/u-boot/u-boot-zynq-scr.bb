@@ -8,29 +8,56 @@ inherit deploy nopackages
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-DEVICE_TREE_NAME ?= "system.dtb"
-KERNEL_BOOTCMD ?= "booti"
+COMPATIBLE_MACHINE ?= "^$"
+COMPATIBLE_MACHINE_zynqmp = "zynqmp"
+COMPATIBLE_MACHINE_zynq = "zynq"
+COMPATIBLE_MACHINE_versal = "versal"
+
+KERNELDT = "${@os.path.basename(d.getVar('KERNEL_DEVICETREE').split(' ')[0]) if d.getVar('KERNEL_DEVICETREE') else ''}"
+DEVICE_TREE_NAME ?= "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/dtb', 'device-tree', 'system.dtb', d.getVar('KERNELDT'), d)}"
+#Need to copy a rootfs.cpio.gz.u-boot as uramdisk.image.gz into boot partition
+RAMDISK_IMAGE ?= ""
+RAMDISK_IMAGE_zynq ?= "uramdisk.image.gz"
+
+KERNEL_BOOTCMD_zynqmp ?= "booti"
+KERNEL_BOOTCMD_zynq ?= "bootm"
+KERNEL_BOOTCMD_versal ?= "booti"
 
 BOOTMODE ?= "sd"
-BOOTMODE_virt-versal ?= "qspi"
+BOOTMODE_versal ?= "qspi"
 
 SRC_URI = " \
-            file://boot.cmd.sd \
+            file://boot.cmd.sd.zynq \
+            file://boot.cmd.sd.zynqmp \
+            file://boot.cmd.qspi.versal \
             "
-
-#boot.cmd.qspi is an example tuned only for virt-versal
-SRC_URI_virt-versal += "file://boot.cmd.qspi"
-
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 UBOOTSCR_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}-${DATETIME}"
 UBOOTSCR_BASE_NAME[vardepsexclude] = "DATETIME"
 
+DEVICETREE_ADDRESS_zynqmp ?= "0x4000000"
+DEVICETREE_ADDRESS_zynq ?= "0x2000000"
+DEVICETREE_ADDRESS_versal ?= "0x1000"
+KERNEL_LOAD_ADDRESS_zynqmp ?= "0x80000"
+KERNEL_LOAD_ADDRESS_zynq ?= "0x2080000"
+KERNEL_LOAD_ADDRESS_versal ?= "0x80000"
+
+RAMDISK_IMAGE_ADDRESS_zynq ?= "0x4000000"
+RAMDISK_IMAGE_ADDRESS_versal ?= "0x6000000"
+
+do_configure[noexec] = "1"
+do_install[noexec] = "1"
+
 do_compile() {
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
+        -e 's/@@KERNEL_LOAD_ADDRESS@@/${KERNEL_LOAD_ADDRESS}/' \
         -e 's/@@DEVICE_TREE_NAME@@/${DEVICE_TREE_NAME}/' \
+        -e 's/@@DEVICETREE_ADDRESS@@/${DEVICETREE_ADDRESS}/' \
+        -e 's/@@RAMDISK_IMAGE@@/${RAMDISK_IMAGE}/' \
+        -e 's/@@RAMDISK_IMAGE_ADDRESS@@/${RAMDISK_IMAGE_ADDRESS}/' \
         -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/' \
-        "${WORKDIR}/boot.cmd.${BOOTMODE}" > "${WORKDIR}/boot.cmd"
+        "${WORKDIR}/boot.cmd.${BOOTMODE}.${SOC_FAMILY}" > "${WORKDIR}/boot.cmd"
     mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
 }
 
