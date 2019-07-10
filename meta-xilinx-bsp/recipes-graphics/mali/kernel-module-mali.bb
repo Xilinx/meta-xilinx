@@ -3,10 +3,10 @@ SECTION = "kernel/modules"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = " \
-	file://linux/license/gpl/mali_kernel_license.h;md5=436192a2c5cfd47df0ad1987dffc4ae6 \
+	file://linux/license/gpl/mali_kernel_license.h;md5=f5af2d61f4c1eb262cb6a557aaa1070a \
 	"
 
-PV = "r8p0-01rel0"
+PV = "r9p0-01rel0"
 
 SRC_URI = " \
 	https://developer.arm.com/-/media/Files/downloads/mali-drivers/kernel/mali-utgard-gpu/DX910-SW-99002-${PV}.tgz \
@@ -16,9 +16,6 @@ SRC_URI = " \
 	file://0004-staging-mali-r8p0-01rel0-Don-t-include-mali_read_phy.patch \
 	file://0005-linux-mali_kernel_linux.c-Handle-clock-when-probed-a.patch \
 	file://0006-arm.c-global-variable-dma_ops-is-removed-from-the-ke.patch \
-	file://0007-Replace-__GFP_REPEAT-by-__GFP_RETRY_MAYFAIL.patch \
-	file://0008-mali_internal_sync-Rename-wait_queue_t-with-wait_que.patch \
-	file://0009-mali_memory_swap_alloc.c-Rename-global_page_state-wi.patch \
 	file://0010-common-mali_pm.c-Add-PM-runtime-barrier-after-removi.patch \
 	file://0011-linux-mali_kernel_linux.c-Enable-disable-clock-for-r.patch\
 	file://0012-linux-mali_memory_os_alloc-Remove-__GFP_COLD.patch\
@@ -26,8 +23,8 @@ SRC_URI = " \
 	file://0014-linux-mali_-timer-Get-rid-of-init_timer.patch\
 	file://0015-fix-driver-failed-to-check-map-error.patch \
 	"
-SRC_URI[md5sum] = "8f04ae86957fd56197ad5a9d017b84ff"
-SRC_URI[sha256sum] = "bfd14fa3f75a71d4ba313534e651ca1c58dc354e882c0b39867e335882a06350"
+SRC_URI[md5sum] = "85ea110dd6675c70b7d01af87ec9633c"
+SRC_URI[sha256sum] = "7a67127341d17640c1fff5dad80258fb2a37c8a2121b81525fe2327e4532ce2b"
 
 inherit module
 
