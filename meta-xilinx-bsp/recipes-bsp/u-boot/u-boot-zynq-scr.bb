@@ -24,11 +24,11 @@ KERNEL_BOOTCMD_zynq ?= "bootm"
 KERNEL_BOOTCMD_versal ?= "booti"
 
 BOOTMODE ?= "sd"
-BOOTMODE_versal ?= "qspi"
 
 SRC_URI = " \
             file://boot.cmd.sd.zynq \
             file://boot.cmd.sd.zynqmp \
+            file://boot.cmd.sd.versal \
             file://boot.cmd.qspi.versal \
             file://pxeboot.pxe \
             "
