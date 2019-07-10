@@ -64,6 +64,7 @@ USE_X11 = "${@bb.utils.contains("DISTRO_FEATURES", "x11", "yes", "no", d)}"
 USE_FB = "${@bb.utils.contains("DISTRO_FEATURES", "fbdev", "yes", "no", d)}"
 USE_WL = "${@bb.utils.contains("DISTRO_FEATURES", "wayland", "yes", "no", d)}"
 
+MONOLITHIC_LIBMALI = "libMali.so.8.0"
 
 do_install() {
     #Identify the ARCH type
@@ -95,19 +96,19 @@ do_install() {
 
     cp -a --no-preserve=ownership ${S}/${PV}/${ARCH_PLATFORM_DIR}/common/*.so* ${D}${libdir}
 
-    install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/headless/libMali.so.8.0 ${D}${libdir}/headless/libMali.so.8.0
-    ln -snf headless/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
+    install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/headless/${MONOLITHIC_LIBMALI} ${D}${libdir}/headless/${MONOLITHIC_LIBMALI}
+    ln -snf headless/${MONOLITHIC_LIBMALI} ${D}${libdir}/${MONOLITHIC_LIBMALI}
 
     if [ "${USE_FB}" = "yes" ]; then
-        install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/fbdev/libMali.so.8.0 ${D}${libdir}/fbdev/libMali.so.8.0
+        install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/fbdev/${MONOLITHIC_LIBMALI} ${D}${libdir}/fbdev/${MONOLITHIC_LIBMALI}
         if [ "${MALI_BACKEND_DEFAULT}" = "fbdev" ]; then
-            ln -snf fbdev/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
+            ln -snf fbdev/${MONOLITHIC_LIBMALI} ${D}${libdir}/${MONOLITHIC_LIBMALI}
         fi
     fi
     if [ "${USE_X11}" = "yes" ]; then
-        install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/x11/libMali.so.8.0 ${D}${libdir}/x11/libMali.so.8.0
+        install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/x11/${MONOLITHIC_LIBMALI} ${D}${libdir}/x11/${MONOLITHIC_LIBMALI}
         if [ "${MALI_BACKEND_DEFAULT}" = "x11" ]; then
-            ln -snf x11/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
+            ln -snf x11/${MONOLITHIC_LIBMALI} ${D}${libdir}/${MONOLITHIC_LIBMALI}
         fi
     else
         # We cant rely on the fact that all apps will use pkgconfig correctly
@@ -116,9 +117,9 @@ do_install() {
     if [ "${USE_WL}" = "yes" ]; then
         install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
         install -m 0644 ${WORKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
-        install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/wayland/libMali.so.8.0 ${D}${libdir}/wayland/libMali.so.8.0
+        install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/wayland/${MONOLITHIC_LIBMALI} ${D}${libdir}/wayland/${MONOLITHIC_LIBMALI}
         if [ "${MALI_BACKEND_DEFAULT}" = "wayland" ]; then
-            ln -snf wayland/libMali.so.8.0 ${D}${libdir}/libMali.so.8.0
+            ln -snf wayland/${MONOLITHIC_LIBMALI} ${D}${libdir}/${MONOLITHIC_LIBMALI}
         fi
     fi
 }
@@ -129,21 +130,21 @@ do_install() {
 PACKAGES += "${PN}-x11 ${PN}-fbdev ${PN}-wayland ${PN}-headless"
 
 # This is default/common for all alternatives
-ALTERNATIVE_LINK_NAME[libmali-xlnx] = "${libdir}/libMali.so.8.0"
+ALTERNATIVE_LINK_NAME[libmali-xlnx] = "${libdir}/${MONOLITHIC_LIBMALI}"
 
 
 # Declare alternatives and corresponding library location
 ALTERNATIVE_${PN}-x11 = "libmali-xlnx"
-ALTERNATIVE_TARGET_libmali-xlnx-x11[libmali-xlnx] = "${libdir}/x11/libMali.so.8.0"
+ALTERNATIVE_TARGET_libmali-xlnx-x11[libmali-xlnx] = "${libdir}/x11/${MONOLITHIC_LIBMALI}"
 
 ALTERNATIVE_${PN}-fbdev = "libmali-xlnx"
-ALTERNATIVE_TARGET_libmali-xlnx-fbdev[libmali-xlnx] = "${libdir}/fbdev/libMali.so.8.0"
+ALTERNATIVE_TARGET_libmali-xlnx-fbdev[libmali-xlnx] = "${libdir}/fbdev/${MONOLITHIC_LIBMALI}"
 
 ALTERNATIVE_${PN}-wayland = "libmali-xlnx"
-ALTERNATIVE_TARGET_libmali-xlnx-wayland[libmali-xlnx] = "${libdir}/wayland/libMali.so.8.0"
+ALTERNATIVE_TARGET_libmali-xlnx-wayland[libmali-xlnx] = "${libdir}/wayland/${MONOLITHIC_LIBMALI}"
 
 ALTERNATIVE_${PN}-headless = "libmali-xlnx"
-ALTERNATIVE_TARGET_libmali-xlnx-headless[libmali-xlnx] = "${libdir}/headless/libMali.so.8.0"
+ALTERNATIVE_TARGET_libmali-xlnx-headless[libmali-xlnx] = "${libdir}/headless/${MONOLITHIC_LIBMALI}"
 
 # Set priorities according to what we prveiously defined
 ALTERNATIVE_PRIORITY_libmali-xlnx-x11[libmali-xlnx] = "${@bb.utils.contains("MALI_BACKEND_DEFAULT", "x11", "20", "10", d)}"
@@ -164,7 +165,7 @@ DEBIAN_NOAUTONAME_libmali-xlnx = "1"
 python populate_packages_updatealternatives_append () {
     # We need to remove the 'fake' libmali-xlnx before creating any links
     libdir = d.getVar('libdir')
-    common_postinst = "#!/bin/sh\nrm " + libdir + "/libMali.so.8.0\n"
+    common_postinst = "#!/bin/sh\nrm " + libdir + "/${MONOLITHIC_LIBMALI}\n"
     for pkg in (d.getVar('PACKAGES') or "").split():
         # Not all packages provide an alternative (e.g. ${PN}-lic)
         postinst = d.getVar('pkg_postinst_%s' % pkg)
