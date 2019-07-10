@@ -11,7 +11,7 @@ PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl virtual/libgbm"
 
 FILESEXTRAPATHS_append := " \
                 ${THISDIR}/files: \
-                ${THISDIR}/r8p0-00rel0: "
+                ${THISDIR}/r9p0-01rel0: "
 
 
 REPO ?= "git://github.com/Xilinx/mali-userspace-binaries.git;protocol=https"
@@ -19,7 +19,7 @@ BRANCH ?= "rel-v2019.2"
 SRCREV ?= "90ea8555cddaa7979019fd7eeaeb01a9f1b26ac7"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 
-PV = "r8p0-01rel0"
+PV = "r9p0-01rel0"
 SRC_URI = " \
     ${REPO};${BRANCHARG} \
     file://egl.pc \
@@ -62,7 +62,7 @@ USE_X11 = "${@bb.utils.contains("DISTRO_FEATURES", "x11", "yes", "no", d)}"
 USE_FB = "${@bb.utils.contains("DISTRO_FEATURES", "fbdev", "yes", "no", d)}"
 USE_WL = "${@bb.utils.contains("DISTRO_FEATURES", "wayland", "yes", "no", d)}"
 
-MONOLITHIC_LIBMALI = "libMali.so.8.0"
+MONOLITHIC_LIBMALI = "libMali.so.9.0"
 
 do_install() {
     #Identify the ARCH type
