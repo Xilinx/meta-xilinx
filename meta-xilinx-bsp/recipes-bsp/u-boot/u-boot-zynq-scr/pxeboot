@@ -1,3 +1,0 @@
-LABEL Linux
-KERNEL Image
-FDT system.dtb
