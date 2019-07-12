@@ -1,20 +1,7 @@
-inherit pkgconfig cmake yocto-cmake-translation deploy
+inherit esw
 
-LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://../../license.txt;md5=c83c24ed6555ade24e37e6b74ade2629"
-
-XILINX_RELEASE_VERSION = "v2019.1"
-
-#SRCREV = "43d6e594666215e6f328376f21cb1c07fe57632f"
-SRCREV = "${AUTOREV}"
-PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
-SRC_URI = "git://gitenterprise.xilinx.com/appanad/decoupling_embeddedsw.git;branch=master;protocol=https"
-
-COMPATIBLE_HOST = "microblaze.*-elf"
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynqmp-pmu = "zynqmp-pmu"
-
-S = "${WORKDIR}/git/XilinxProcessorIPLib/drivers/"
+ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/"
+ESW_COMPONENT_NAME = "libxil.a"
 
 DEPENDS += "dtc-native python3-pyyaml-native xilmem"
 
@@ -47,22 +34,3 @@ addtask do_generate_cmake before do_configure after do_create_dtb
 addtask do_generate_driver_data before do_compile after do_create_dtb
 
 addtask do_create_dtb before do_compile after do_prepare_recipe_sysroot
-
-SRCREV_FORMAT = "src_decouple"
-
-cmake_do_generate_toolchain_file_append() {
-    cat >> ${WORKDIR}/toolchain.cmake <<EOF
-    include(CMakeForceCompiler)
-    CMAKE_FORCE_C_COMPILER("${OECMAKE_C_COMPILER}" GNU)
-    CMAKE_FORCE_CXX_COMPILER("${OECMAKE_CXX_COMPILER}" GNU)
-    set( CMAKE_C_FLAGS "${OECMAKE_C_FLAGS}" CACHE STRING "CFLAGS" )
-    set( CMAKE_C_LINK_FLAGS "${OECMAKE_C_LINK_FLAGS}" CACHE STRING "LDFLAGS" )
-EOF
-}
-
-do_install() {
-    install -d ${D}${libdir}
-    install -d ${D}${includedir}
-    install -m 0755  ${WORKDIR}/build/libxil.a ${D}${libdir}
-    install -m 0644  ${WORKDIR}/build/include/* ${D}${includedir}
-}
