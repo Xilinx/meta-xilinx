@@ -20,13 +20,13 @@ do_deploy() {
     # seems unnecessarily convoluted, unless there's an objection on performing do_install we
     # should do it this way since it easier to keep up with changes in oe-core.
 
-    install -Dm 0644 ${WORKDIR}/package/${base_libdir}/firmware/pmufw ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.elf
+    install -Dm 0644 ${WORKDIR}/package/${base_libdir}/firmware/pmufw.elf ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.elf
     ln -sf ${PMU_FIRMWARE_BASE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}.elf
-    ${OBJCOPY} -O binary ${WORKDIR}/package/${base_libdir}/firmware/pmufw ${WORKDIR}/package/${base_libdir}/firmware/pmufw.bin
+    ${OBJCOPY} -O binary ${WORKDIR}/package/${base_libdir}/firmware/pmufw.elf ${WORKDIR}/package/${base_libdir}/firmware/pmufw.bin
     install -m 0644 ${WORKDIR}/package/${base_libdir}/firmware/pmufw.bin ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.bin
     ln -sf ${PMU_FIRMWARE_BASE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}.bin
 }
 
-addtask deploy before do_build after do_install
+addtask deploy before do_build after do_package
 
 FILES_${PN} = "${base_libdir}/firmware/pmufw*"
