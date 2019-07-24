@@ -1,7 +1,7 @@
 inherit pkgconfig cmake yocto-cmake-translation
 
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=c83c24ed6555ade24e37e6b74ade2629"
+LIC_FILES_CHKSUM = "file://${ESWS}/license.txt;md5=c83c24ed6555ade24e37e6b74ade2629"
 
 XILINX_RELEASE_VERSION = "v2019.1"
 
@@ -16,9 +16,13 @@ ESWS = "${WORKDIR}/git/"
 S = "${ESWS}/${ESW_COMPONENT_SRC}"
 
 
-COMPATIBLE_HOST = "microblaze.*-elf"
+# We need to put these per recipe probably, e.g. pmu on mb, fsbl on a53
+COMPATIBLE_HOST_zynqmp-pmu = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynqmp-pmu = "zynqmp-pmu"
+
+COMPATIBLE_HOST_cortexa53 = "aarch64.*-elf"
+COMPATIBLE_MACHINE_cortexa53 = "cortexa53"
 
 cmake_do_generate_toolchain_file_append() {
     cat >> ${WORKDIR}/toolchain.cmake <<EOF
