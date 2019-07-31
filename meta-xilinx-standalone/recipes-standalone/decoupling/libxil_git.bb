@@ -43,3 +43,6 @@ addtask do_generate_driver_data before do_compile after do_create_dtb
 addtask do_create_dtb before do_compile after do_prepare_recipe_sysroot
 
 DEPENDS_append_cortexa53 = " device-tree"
+
+# Enable @ flag on dtc which is required by fsbl
+YAML_ENABLE_DT_OVERLAY_cortexa53 = "1"
