@@ -3,7 +3,7 @@ inherit pkgconfig cmake yocto-cmake-translation
 LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://${ESWS}/license.txt;md5=c83c24ed6555ade24e37e6b74ade2629"
 
-XILINX_RELEASE_VERSION = "v2019.1"
+XILINX_RELEASE_VERSION = "v2019.2"
 
 # We should move to an actual SRCREV eventually
 SRCREV = "${AUTOREV}"
