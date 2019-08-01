@@ -11,3 +11,5 @@ SRCREV = "${AUTOREV}"
 
 
 XSCTH_PROC_cortexa53 ??= "psu_cortexa53_0"
+# Enable @ flag on dtc which is required by fsbl
+YAML_ENABLE_DT_OVERLAY_cortexa53 = "1"
