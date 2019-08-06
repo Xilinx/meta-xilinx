@@ -12,6 +12,6 @@ SRC_URI = "${REPO};${BRANCHARG}"
 PV = "2.2.0+git${SRCPV}"
 SRCREV = "7e3540d2707443d8c824669ef4272b33ce2f9ba4"
 
-S = "${WORKDIR}/git/src/runtime_src/driver/zynq/drm/zocl"
+S = "${WORKDIR}/git/src/runtime_src/core/edge/drm/zocl"
 
 inherit module
