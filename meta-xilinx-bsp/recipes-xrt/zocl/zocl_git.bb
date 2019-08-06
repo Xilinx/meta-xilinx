@@ -9,6 +9,6 @@ SRC_URI = "git://github.com/Xilinx/XRT.git;protocol=https"
 PV = "2.2.0+git${SRCPV}"
 SRCREV = "69a7e181d8d53c3b5dde9e8f17ace790141eaa01"
 
-S = "${WORKDIR}/git/src/runtime_src/driver/zynq/drm/zocl"
+S = "${WORKDIR}/git/src/runtime_src/core/edge/drm/zocl"
 
 inherit module
