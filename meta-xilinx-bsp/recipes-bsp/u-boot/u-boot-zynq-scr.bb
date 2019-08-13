@@ -30,11 +30,15 @@ SRC_URI = " \
             file://boot.cmd.sd.zynq \
             file://boot.cmd.sd.zynqmp \
             file://boot.cmd.qspi.versal \
+            file://pxeboot.pxe \
             "
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 UBOOTSCR_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}-${DATETIME}"
 UBOOTSCR_BASE_NAME[vardepsexclude] = "DATETIME"
+UBOOTPXE_CONFIG ?= "pxelinux.cfg"
+UBOOTPXE_CONFIG_NAME = "${UBOOTPXE_CONFIG}-${DATETIME}"
+UBOOTPXE_CONFIG_NAME[vardepsexclude] = "DATETIME"
 
 DEVICETREE_ADDRESS_zynqmp ?= "0x4000000"
 DEVICETREE_ADDRESS_zynq ?= "0x2000000"
@@ -59,6 +63,9 @@ do_compile() {
         -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/' \
         "${WORKDIR}/boot.cmd.${BOOTMODE}.${SOC_FAMILY}" > "${WORKDIR}/boot.cmd"
     mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
+    sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
+        -e 's/@@DEVICE_TREE_NAME@@/${DEVICE_TREE_NAME}/' \
+	"${WORKDIR}/pxeboot.pxe" > "pxeboot.pxe"
 }
 
 
@@ -66,6 +73,9 @@ do_deploy() {
     install -d ${DEPLOYDIR}
     install -m 0644 boot.scr ${DEPLOYDIR}/${UBOOTSCR_BASE_NAME}.scr
     ln -sf ${UBOOTSCR_BASE_NAME}.scr ${DEPLOYDIR}/boot.scr
+    install -d ${DEPLOYDIR}/pxeboot/${UBOOTPXE_CONFIG_NAME}
+    install -m 0644 pxeboot.pxe ${DEPLOYDIR}/pxeboot/${UBOOTPXE_CONFIG_NAME}/default
+    ln -sf pxeboot/${UBOOTPXE_CONFIG_NAME} ${DEPLOYDIR}/${UBOOTPXE_CONFIG}
 }
 
 addtask do_deploy after do_compile before do_build
