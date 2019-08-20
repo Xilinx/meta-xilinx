@@ -1,8 +1,8 @@
 SUMMARY = "Building and installing flash strip utility"
 DESCRIPTION = "Building and installing flash strip utility"
 
-LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://../flash_stripe.c;beginline=1;endline=26;md5=4b2f1a11879b3f993b36cb6a42e884a2"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://../flash_stripe.c;beginline=1;endline=23;md5=abb859d98b7c4eede655e1b71824125a"
 
 B = "${WORKDIR}/build"
 
