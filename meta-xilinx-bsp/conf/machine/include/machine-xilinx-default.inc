@@ -17,6 +17,10 @@ XILINX_DEFAULT_UBOOT_zynqmp := "u-boot"
 PREFERRED_PROVIDER_virtual/bootloader ??= "${XILINX_DEFAULT_UBOOT}"
 PREFERRED_PROVIDER_virtual/boot-bin ??= "${PREFERRED_PROVIDER_virtual/bootloader}"
 
+WIC_DEPENDS ?= "virtual/kernel virtual/bootloader virtual/boot-bin virtual/arm-trusted-firmware"
+WIC_DEPENDS_zynq = "virtual/kernel virtual/bootloader virtual/boot-bin"
+do_image_wic[depends] += "${@' '.join('%s:do_deploy' % r for r in d.getVar('WIC_DEPENDS').split())}"
+
 UBOOT_SUFFIX ?= "img"
 UBOOT_SUFFIX_zynqmp ?= "bin"
 UBOOT_SUFFIX_microblaze ?= "bin"
