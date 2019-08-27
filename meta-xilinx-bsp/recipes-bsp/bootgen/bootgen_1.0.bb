@@ -2,7 +2,7 @@ SUMMARY = "Building and installing bootgen"
 DESCRIPTION = "Building and installing bootgen, a Xilinx tool that lets you stitch binary files together and generate device boot images"
 
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://README.txt;md5=700962930377ec09272fb114c5295a33"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=0c64669e3cd5e9cea3ad864ed14b0cb4"
 
 S = "${WORKDIR}/git"
 
