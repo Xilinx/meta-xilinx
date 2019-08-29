@@ -17,6 +17,7 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '
 SRC_URI = "${REPO};${BRANCHARG}"
 
 EXTRA_OEMAKE += 'CROSS_COMPILER="${CXX}" -C ${S}'
+CXXFLAGS_append = " -std=c++0x"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
