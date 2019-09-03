@@ -9,9 +9,9 @@ S = "${WORKDIR}/git"
 DEPENDS += "openssl"
 RDEPENDS_${PN} += "openssl"
 
-REPO = "git://gitenterprise.xilinx.com/SDK/bootgen.git;protocol=https"
-BRANCH = "master"
-SRCREV = "${AUTOREV}"
+REPO ?= "git://github.com/Xilinx/bootgen.git;protocol=https"
+BRANCH ?= "master"
+SRCREV ?= "d000746f9621000042d9469686ee867d73321c17"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
