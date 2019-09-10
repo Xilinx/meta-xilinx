@@ -17,6 +17,8 @@ ESWS = "${WORKDIR}/git/"
 S = "${ESWS}/${ESW_COMPONENT_SRC}"
 
 
+inherit ccmake
+
 # We need to put these per recipe probably, e.g. pmu on mb, fsbl on a53
 COMPATIBLE_HOST_zynqmp-pmu = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "^$"
