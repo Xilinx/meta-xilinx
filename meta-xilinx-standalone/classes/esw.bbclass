@@ -36,8 +36,8 @@ EOF
 do_install() {
     install -d ${D}${libdir}
     install -d ${D}${includedir}
-    install -m 0755  ${WORKDIR}/build/${ESW_COMPONENT_NAME} ${D}${libdir}
-    install -m 0644  ${WORKDIR}/build/include/*.h ${D}${includedir}
+    install -m 0755  ${B}/${ESW_COMPONENT_NAME} ${D}${libdir}
+    install -m 0644  ${B}/include/*.h ${D}${includedir}
 }
 
 
