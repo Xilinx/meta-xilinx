@@ -1,7 +1,8 @@
 inherit pkgconfig cmake yocto-cmake-translation
 
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://${ESWS}/license.txt;md5=c83c24ed6555ade24e37e6b74ade2629"
+LICFILENAME = "license.txt"
+LIC_FILES_CHKSUM = "file://${ESWS}/${LICFILENAME};md5=c83c24ed6555ade24e37e6b74ade2629"
 
 XILINX_RELEASE_VERSION = "v2019.2"
 
@@ -42,3 +43,22 @@ do_install() {
 
 # Should these be LDFLAGS?
 CFLAGS_append = " -Os -flto -ffat-lto-objects"
+
+
+# We need to find the license file, which vaires depending on the component
+# recurse a maximum of x times, could be fancier but it gets complicated since
+# we dont know for certain we are running devtool or just externalsrc
+python(){
+    import os.path
+    if bb.data.inherits_class('externalsrc', d) or d.getVar('EXTERNALSRC'):
+        externalsrc = d.getVar('EXTERNALSRC')
+        lic_file = d.getVar('LIC_FILES_CHKSUM', False)
+        licpath=externalsrc
+        for i in range(5):
+            licpath=os.path.dirname(licpath)
+            if os.path.isfile(licpath + '/' + d.getVar('LICFILENAME',True)):
+                lic_file = lic_file.replace('${ESWS}',licpath)
+                d.setVar('LIC_FILES_CHKSUM', lic_file)
+                return
+        bb.error("Couldn't find license file: %s, within directory %s or his parent directories" % (d.getVar('LICFILENAME',True), externalsrc))
+}
