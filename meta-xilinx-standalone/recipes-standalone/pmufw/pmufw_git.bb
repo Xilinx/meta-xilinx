@@ -7,7 +7,7 @@ DEPENDS += " xilstandalone xilfpga xilskey"
 do_install() {
     install -d ${D}/${base_libdir}/firmware
     # Note that we have to make the ELF executable for it to be stripped
-    install -m 0755  ${WORKDIR}/build/pmufw* ${D}/${base_libdir}/firmware
+    install -m 0755  ${B}/pmufw* ${D}/${base_libdir}/firmware
 }
 
 PMU_FIRMWARE_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
