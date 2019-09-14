@@ -6,7 +6,7 @@ PYNQBRANCH ?= "image_v2.4"
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${PYNQBRANCH}'][d.getVar('PYNQBRANCH', True) != '']}"
 PYNQURI ?= "git://github.com/Xilinx/PYNQ.git;protocol=https"
 
-SRC_URI ?= "${PYNQURI};${SRCBRANCHARG}"
+SRC_URI = "${PYNQURI};${SRCBRANCHARG}"
 
 SRCREV ?= "3d659d374701b7c34fa702e7aa23f71f9113f826"
 
