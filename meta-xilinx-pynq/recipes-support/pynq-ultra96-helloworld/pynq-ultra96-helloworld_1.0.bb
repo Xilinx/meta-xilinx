@@ -1,4 +1,4 @@
-SUMMARY = "PYNQ Helloworld"
+SUMMARY = "PYNQ Helloworld for Ultra96"
 LICENSE = "BSD"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f9990fcc34ccf1f82ccf1bc5a1cc3bfc"
@@ -23,7 +23,7 @@ SRC_URI[sha256sum] = "f522c54c9418d1b1fdb6098cd7139439d47b041900000812c51200482d
 SRCREV = "0e10a7ee06c3e7d873f4468e06e523e2d58d07f8"
 S = "${WORKDIR}/git"
 
-inherit setuptools3 xilinx-pynq
+inherit xilinx-pynq
 
 do_configure[noexec]="1"
 do_compile[noexec]="1"

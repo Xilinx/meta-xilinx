@@ -1,4 +1,4 @@
-DESCRIPTION = "Recipe to install BNN notebooks and PYNQ dependencies"
+DESCRIPTION = "Recipe to install BNN notebooks and PYNQ dependencies for ultra96"
 SUMMARY = "BNN example jupyter notebooks with PYNQ"
 
 LICENSE = "BSD"
@@ -10,7 +10,7 @@ SRC_URI = "git://github.com/Xilinx/BNN-PYNQ.git;protocol=https \
 
 SRCREV = "32eed91994228d1042a16c692047dfe81e47d498"
 
-inherit setuptools3 xilinx-pynq
+inherit xilinx-pynq
 
 RDEPENDS_${PN}-notebooks += "\
     python3-pynq \
