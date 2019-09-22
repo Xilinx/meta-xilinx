@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=8f625d3c898c18035639b6d6943b6a9c"
 
 SRC_URI = "git://github.com/Xilinx/BNN-PYNQ.git;protocol=https \
     file://0001-BNN-Notebooks-changed-default-picture-location.patch \
+    file://0001-Update-default-notebooks-path-from-home-xilinx-to-us.patch \
 "
 
 SRCREV = "32eed91994228d1042a16c692047dfe81e47d498"
