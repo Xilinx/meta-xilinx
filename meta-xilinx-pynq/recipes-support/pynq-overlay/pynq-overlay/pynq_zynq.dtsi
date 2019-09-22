@@ -1,7 +1,7 @@
 /dts-v1/;
 /plugin/;
 
-&amba {
+&{/amba} {
         xlnk {
                 compatible = "xlnx,xlnk-1.0";
         };

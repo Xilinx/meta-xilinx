@@ -29,6 +29,10 @@ is_running() {
 install_overlay() {
 if [ ! -e '/sys/kernel/config/device-tree/overlays/pynq' ]; then
   modprobe uio_pdrv_genirq
+  if [ ! -e /proc/device-tree/__symbols__ ]; then
+    mkdir /sys/kernel/config/device-tree/overlays/pynq-symbols
+    cat /lib/firmware/pynq-symbols.dtbo > /sys/kernel/config/device-tree/overlays/pynq-symbols/dtbo
+  fi
   mkdir /sys/kernel/config/device-tree/overlays/pynq
   cat /lib/firmware/pynq.dtbo > /sys/kernel/config/device-tree/overlays/pynq/dtbo
 fi
