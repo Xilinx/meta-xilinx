@@ -4,7 +4,7 @@ SOC_FAMILY ?= "versal"
 # Available SOC_VARIANT's for versal:
 # virt
 
-SOC_VARIANT ?= ""
+SOC_VARIANT ?= "s80"
 
 require conf/machine/include/arm/arch-armv8.inc
 require conf/machine/include/soc-family.inc
