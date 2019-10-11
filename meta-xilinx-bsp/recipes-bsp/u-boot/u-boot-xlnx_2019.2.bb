@@ -28,5 +28,6 @@ HAS_PLATFORM_INIT ?= " \
 		xilinx_zynqmp_zcu1275_revB_config \
 		xilinx_zynqmp_zc1254_revA_config \
 		xilinx_zynqmp_p_a2197_00_revA_config \
+		xilinx_versal_vc_p_a2197_revA_x_prc_01_revA \
 		"
 
