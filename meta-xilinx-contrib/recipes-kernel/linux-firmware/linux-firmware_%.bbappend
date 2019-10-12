@@ -29,13 +29,13 @@ FILES_${PN}-mfgtest_minized-zynq7 = " \
 "
 
 FILES_${PN}-bcm43430_append_minized-zynq7 = " \
-       ${nonarch_base_libdir}/firmware/brcm/ brcmfmac43430-sdio.txt \
+       ${nonarch_base_libdir}/firmware/brcm/brcmfmac43430-sdio.txt \
 "
 
 LICENSE_${PN}-bcm43430a1-hcd = "Firmware-cypress"
 
 FILES_${PN}-bcm43430a1-hcd = " \
-  ${nonarch_base_libdir}/firmware/brcm/BCM43430A1.1DX.hcd \
+  ${nonarch_base_libdir}/firmware/brcm/CYW43430A1.1DX.hcd \
 "
 
 RDEPENDS_${PN}-bcm43430a1-hcd += "${PN}-cypress-license"
