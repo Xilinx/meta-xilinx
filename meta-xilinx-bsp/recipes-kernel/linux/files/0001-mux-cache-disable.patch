@@ -1,0 +1,34 @@
+From c15589107895f82561e2db46166a47ce9f56da19 Mon Sep 17 00:00:00 2001
+From: Shubhrajyoti Datta <shubhrajyoti.datta@xilinx.com>
+Date: Fri, 30 Aug 2019 11:15:25 +0530
+Subject: [PATCH] i2c: mux: pca954x: Disable cacheing of the last channel
+
+In case of multimaster configuration the last channel cached value is
+not reliable. To fix that write always to the mux address.
+
+Upstream-Status: Pending
+Signed-off-by: Shubhrajyoti Datta <shubhrajyoti.datta@xilinx.com>
+---
+ drivers/i2c/muxes/i2c-mux-pca954x.c |    7 ++-----
+ 1 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/i2c/muxes/i2c-mux-pca954x.c b/drivers/i2c/muxes/i2c-mux-pca954x.c
+index 24bd927..52ec6b5 100644
+--- a/drivers/i2c/muxes/i2c-mux-pca954x.c
++++ b/drivers/i2c/muxes/i2c-mux-pca954x.c
+@@ -241,11 +241,8 @@ static int pca954x_select_chan(struct i2c_mux_core *muxc, u32 chan)
+ 	else
+ 		regval = 1 << chan;
+ 
+-	/* Only select the channel if its different from the last channel */
+-	if (data->last_chan != regval) {
+-		ret = pca954x_reg_write(muxc->parent, client, regval);
+-		data->last_chan = ret < 0 ? 0 : regval;
+-	}
++	ret = pca954x_reg_write(muxc->parent, client, regval);
++	data->last_chan = ret < 0 ? 0 : regval;
+ 
+ 	return ret;
+ }
+-- 
+1.7.1
