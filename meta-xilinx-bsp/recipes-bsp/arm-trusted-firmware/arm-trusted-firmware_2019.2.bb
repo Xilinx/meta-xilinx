@@ -1,6 +1,6 @@
 ATF_VERSION = "2.0"
 BRANCH ?= "master"
-SRCREV ?= "80d1c79007fda42d4cc0be31b185a1da5799cd4d"
+SRCREV ?= "713dace94b259845fd8eede11061fbd8f039011e"
 
 include arm-trusted-firmware.inc
 

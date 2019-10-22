@@ -2,16 +2,16 @@ SUMMARY = "Xilinx HDMI Linux Kernel module"
 DESCRIPTION = "Out-of-tree HDMI kernel modules provider for MPSoC EG/EV devices"
 SECTION = "kernel/modules"
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=9a8919bcf39aab0a98595874be20e842"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=f230abc77d436836711a1271433a8919"
 
-XLNX_HDMI_VERSION = "5.2.0"
+XLNX_HDMI_VERSION = "5.4.0"
 PV = "${XLNX_HDMI_VERSION}"
 
 S = "${WORKDIR}/git"
 
-BRANCH ?= "master"
+BRANCH ?= "rel-v2019.2"
 REPO   ?= "git://github.com/xilinx/hdmi-modules.git;protocol=https"
-SRCREV ?= "44d691f6937ad73ac974ed5b50722e73514459f6"
+SRCREV ?= "be354cc3c8889932aabede8cddda0770d77e7843"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"

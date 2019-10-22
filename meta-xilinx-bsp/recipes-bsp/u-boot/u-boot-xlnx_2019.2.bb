@@ -2,7 +2,7 @@ UBOOT_VERSION = "v2019.01"
 
 UBRANCH ?= "master"
 
-SRCREV ?= "d895ac5e94815d4b45dcf09d4752c5c2334a51db"
+SRCREV ?= "b8c91a002dcb98f0c7ce0fb9a3b0dc929bcd916c"
 
 include u-boot-xlnx.inc
 include u-boot-spl-zynq-init.inc
