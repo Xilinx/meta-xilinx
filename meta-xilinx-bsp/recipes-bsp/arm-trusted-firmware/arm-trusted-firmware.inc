@@ -64,6 +64,7 @@ EXTRA_OEMAKE_zynqmp_append = "${@' ZYNQMP_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.get
 
 EXTRA_OEMAKE_append_versal = "${@' VERSAL_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
 EXTRA_OEMAKE_append_versal = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
+EXTRA_OEMAKE_append_vc-p-a2197-00-versal =" VERSAL_PLATFORM=silicon"
 
 do_configure() {
 	oe_runmake clean -C ${S} BUILD_BASE=${B} PLAT=${PLATFORM}
