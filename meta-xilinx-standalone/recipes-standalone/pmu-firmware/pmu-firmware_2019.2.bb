@@ -4,7 +4,7 @@ LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=cdeb576635c5f585881bc24b1339765f"
 
 XILINX_RELEASE_VERSION = "v2019.2"
-SRCREV = "da1b622355c9bc0a80f1f08d88b01cbab6dc2698"
+SRCREV = "5eca1eabf09965015bbca5f9888a01aac47c680c"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 SRC_URI = "git://github.com/Xilinx/embeddedsw.git;protocol=https;nobranch=1"
