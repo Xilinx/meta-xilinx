@@ -1,8 +1,7 @@
 DESCRIPTION = "libGLES for ZynqMP with Mali 400"
 
 LICENSE = "Proprietary"
-LICENSE_FLAGS = "xilinx"
-LIC_FILES_CHKSUM = "file://README.md;md5=d5750ae6496dd931669b454b5aaae2cd"
+LIC_FILES_CHKSUM = "file://EULA;md5=82e466d0ed92c5a15f568dbe6b31089c"
 
 inherit distro_features_check update-alternatives
 
@@ -15,9 +14,9 @@ FILESEXTRAPATHS_append := " \
                 ${THISDIR}/r9p0-01rel0: "
 
 
-REPO ?= "git://gitenterprise.xilinx.com/Graphics/mali400-xlnx-userspace.git;protocol=https"
-BRANCH ?= "master"
-SRCREV ?= "d61e2c24279d57630a8cf4c7de468ae97c775777"
+REPO ?= "git://github.com/Xilinx/mali-userspace-binaries.git;protocol=https"
+BRANCH ?= "rel-v2019.2"
+SRCREV ?= "90ea8555cddaa7979019fd7eeaeb01a9f1b26ac7"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 
