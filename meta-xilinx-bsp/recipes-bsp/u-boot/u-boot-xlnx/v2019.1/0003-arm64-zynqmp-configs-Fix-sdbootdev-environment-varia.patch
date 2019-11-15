@@ -1,0 +1,44 @@
+From a3f54a40aefebccff66e653086407af6c593007d Mon Sep 17 00:00:00 2001
+From: Adrian Fiergolski <adrian.fiergolski@fastree3d.com>
+Date: Fri, 15 Nov 2019 15:10:28 +0100
+Subject: [PATCH] arm64: zynqmp: configs: Fix sdbootdev environment variable in
+ case two SDHCI controllers are used.
+
+With this patch, sdbootdev variable points to the right SDHCI
+controller, such the commands defined in
+CONFIG_EXTRA_ENV_BOARD_SETTINGS work properly also in case of
+a ZynqMP+ SoC with two controllers.
+
+Signed-off-by: Adrian Fiergolski <adrian.fiergolski@fastree3d.com>
+---
+ include/configs/xilinx_zynqmp.h | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/xilinx_zynqmp.h b/include/configs/xilinx_zynqmp.h
+index 8e600f3019..df0f03dd27 100644
+--- a/include/configs/xilinx_zynqmp.h
++++ b/include/configs/xilinx_zynqmp.h
+@@ -104,6 +104,14 @@
+ 
+ /* Xilinx initial environment variables */
+ #ifndef CONFIG_EXTRA_ENV_BOARD_SETTINGS
++
++/* if both controllers enabled, then these two are the second controller */
++#if defined(CONFIG_SPL_ZYNQMP_TWO_SDHCI)
++# define SDBOOTDEV "sdbootdev=1\0"
++#else
++# define SDBOOTDEV "sdbootdev=0\0"
++#endif
++
+ #define CONFIG_EXTRA_ENV_BOARD_SETTINGS \
+ 	"kernel_addr=0x80000\0" \
+ 	"initrd_addr=0xa00000\0" \
+@@ -111,7 +119,7 @@
+ 	"fdt_addr=4000000\0" \
+ 	"fdt_high=0x10000000\0" \
+ 	"loadbootenv_addr=0x100000\0" \
+-	"sdbootdev=0\0"\
++	SDBOOTDEV \
+ 	"kernel_offset=0x280000\0" \
+ 	"fdt_offset=0x200000\0" \
+ 	"kernel_size=0x1e00000\0" \
