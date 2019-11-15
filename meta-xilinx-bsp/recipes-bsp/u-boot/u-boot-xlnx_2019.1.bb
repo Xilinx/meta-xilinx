@@ -10,7 +10,9 @@ include u-boot-spl-zynq-init.inc
 
 SRC_URI_append_kc705-microblazeel = " file://microblaze-kc705-Convert-microblaze-generic-to-k.patch"
 
-SRC_URI += "file://0003-arm64-zynqmp-configs-Fix-sdbootdev-environment-varia.patch" 
+SRC_URI += "file://0003-arm64-zynqmp-configs-Fix-sdbootdev-environment-varia.patch \ 
+            file://0001-arm64-zynqmp-fix-preprocessor-check-for-SPL_ZYNQMP_T.patch \
+	   " 
 
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=4;md5=744e7e3bb0c94b4b9f6b3db3bf893897"
