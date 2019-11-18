@@ -26,6 +26,7 @@ https://lists.yoctoproject.org/listinfo/meta-xilinx
 Maintainers:
 
 	Manjukumar Harthikote Matha <manjukumar.harthikote-matha@xilinx.com>
+	Mark Hatle <mark.hatle@xilinx.com>
 
 Dependencies
 ============
