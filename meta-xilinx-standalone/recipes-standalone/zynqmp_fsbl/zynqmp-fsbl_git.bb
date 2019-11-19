@@ -2,7 +2,14 @@ inherit esw deploy
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/zynqmp_fsbl/src"
 
-DEPENDS += "xilstandalone xiltimer xilffs xilsecure xilpm"
+DEPENDS += "xilstandalone xiltimer xilffs xilsecure xilpm device-tree"
+
+PSU_INIT = "${RECIPE_SYSROOT}/boot/devicetree/psu_init*"
+
+do_copy_psu_init() {
+    # Copy psu_init* files to fsbl source code
+    cp ${PSU_INIT} ${WORKDIR}/git/lib/sw_apps/zynqmp_fsbl/src/
+}
 
 do_install() {
     install -d ${D}/${base_libdir}/firmware
@@ -28,6 +35,8 @@ do_deploy() {
 }
 
 addtask deploy before do_build after do_package
+
+addtask do_copy_psu_init before do_configure after do_prepare_recipe_sysroot
 
 CFLAGS_append = " -DARMA53_64"
 
