@@ -9,7 +9,7 @@ XILINX_RELEASE_VERSION = "v2019.2"
 # We should move to an actual SRCREV eventually
 SRCREV = "${AUTOREV}"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
-SRC_URI = "git://gitenterprise.xilinx.com/appanad/decoupling_embeddedsw.git;branch=master;protocol=https"
+SRC_URI = "git://gitenterprise.xilinx.com/appanad/decoupling_embeddedsw.git;branch=merge;protocol=https"
 
 SRCREV_FORMAT = "src_decouple"
 
@@ -24,9 +24,15 @@ COMPATIBLE_HOST_microblaze-pmu = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_microblaze-pmu = "microblaze-pmu"
 
+COMPATIBLE_HOST_microblaze-plm = "microblaze.*-elf"
+COMPATIBLE_MACHINE_microblaze-plm = "microblaze-plm"
+
 COMPATIBLE_HOST_cortexa53-zynqmp = "aarch64.*-elf"
 COMPATIBLE_MACHINE_cortexa53-zynqmp = "cortexa53-zynqmp"
 
+DTBFILE_microblaze-pmu ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
+DTBFILE_microblaze-plm ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
+DTBFILE_cortexa53-zynqmp ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
 
 def get_xlnx_cmake_machine(fam, d):
     if (fam == 'zynqmp'):
@@ -36,6 +42,8 @@ def get_xlnx_cmake_machine(fam, d):
     return cmake_machine
 
 def get_xlnx_cmake_processor(machine, d):
+    if (machine == 'cortexa53-zynqmp'):
+        cmake_processor = 'cortexa53'
     if (machine == 'cortexa53'):
         cmake_processor = 'cortexa53'
     elif (machine == 'cortexr5'):
@@ -55,7 +63,7 @@ cmake_do_generate_toolchain_file_append() {
     include(CMakeForceCompiler)
     CMAKE_FORCE_C_COMPILER("${OECMAKE_C_COMPILER}" GNU)
     CMAKE_FORCE_CXX_COMPILER("${OECMAKE_CXX_COMPILER}" GNU)
-    # set( CMAKE_SYSTEM_PROCESSOR "${XLNX_CMAKE_PROCESSOR}" )
+    set( CMAKE_SYSTEM_PROCESSOR "${XLNX_CMAKE_PROCESSOR}" )
     set( CMAKE_MACHINE "${XLNX_CMAKE_MACHINE}" )
     # Will need this in the future to make cmake understand esw variables
     # set( CMAKE_SYSTEM_NAME `echo elf | sed -e 's/^./\u&/' -e 's/^\(Linux\).*/\1/'` )

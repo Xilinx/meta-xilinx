@@ -2,7 +2,7 @@ inherit esw deploy
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/zynqmp_fsbl/src"
 
-DEPENDS += " xilstandalone xilffs xilsecure xilpm"
+DEPENDS += "xilstandalone xiltimer xilffs xilsecure xilpm"
 
 do_install() {
     install -d ${D}/${base_libdir}/firmware
