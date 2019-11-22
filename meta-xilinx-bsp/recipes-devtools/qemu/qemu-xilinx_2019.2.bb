@@ -11,4 +11,3 @@ EXTRA_OECONF_append_class-nativesdk = " --target-list=${@get_qemu_target_list(d)
 do_install_append_class-nativesdk() {
     ${@bb.utils.contains('PACKAGECONFIG', 'gtk+', 'make_qemu_wrapper', '', d)}
 }
-
