@@ -2,14 +2,14 @@ inherit pkgconfig cmake yocto-cmake-translation
 
 LICENSE = "Proprietary"
 LICFILENAME = "license.txt"
-LIC_FILES_CHKSUM = "file://${ESWS}/${LICFILENAME};md5=c83c24ed6555ade24e37e6b74ade2629"
+LIC_FILES_CHKSUM = "file://${ESWS}/${LICFILENAME};md5=f64f573816f568a50a7a8aad895b3d84"
 
 XILINX_RELEASE_VERSION = "v2019.2"
 
 # We should move to an actual SRCREV eventually
 SRCREV = "${AUTOREV}"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
-SRC_URI = "git://gitenterprise.xilinx.com/appanad/decoupling_embeddedsw.git;branch=merge;protocol=https"
+SRC_URI = "git://gitenterprise.xilinx.com/decoupling/embeddedsw.git;branch=master-next-test;protocol=https"
 
 SRCREV_FORMAT = "src_decouple"
 

@@ -3,8 +3,8 @@ COMPATIBLE_MACHINE_microblaze-pmu = ".*"
 COMPATIBLE_MACHINE_microblaze-plm = ".*"
 
 
-REPO = "git://gitenterprise.xilinx.com/Linux/device-tree-xlnx;protocol=https"
-BRANCH = "decoupling"
+REPO = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
+BRANCH = "master-next-test"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
