@@ -79,8 +79,8 @@ do_install() {
 }
 
 
-# Should these be LDFLAGS?
-CFLAGS_append = " -Os -flto -ffat-lto-objects"
+# Uncomment the below line for pmufw and zynqmp_fsbl applications
+#CFLAGS_append = " -Os -flto -ffat-lto-objects"
 
 
 # We need to find the license file, which vaires depending on the component
