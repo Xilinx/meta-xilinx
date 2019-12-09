@@ -78,10 +78,7 @@ do_install() {
     install -m 0644  ${B}/include/*.h ${D}${includedir}
 }
 
-
-# Uncomment the below line for pmufw and zynqmp_fsbl applications
-#CFLAGS_append = " -Os -flto -ffat-lto-objects"
-
+CFLAGS_append = " ${ESW_CFLAGS}"
 
 # We need to find the license file, which vaires depending on the component
 # recurse a maximum of x times, could be fancier but it gets complicated since
