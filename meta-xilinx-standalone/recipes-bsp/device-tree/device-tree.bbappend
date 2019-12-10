@@ -22,9 +22,7 @@ DT_INCLUDE_append = " ${WORKDIR}/git/device_tree/data/kernel_dtsi/2019.2/include
 
 
 do_install_append_cortexa53-zynqmp(){
-    install -d ${D}/var
-    install -m 0644 ${B}/${PN}/psu_init.c ${D}/boot/devicetree/psu_init.c
-    install -m 0644 ${B}/${PN}/psu_init.h ${D}/boot/devicetree/psu_init.h
+    install -d ${D}${includedir}/devicetree
+    install -m 0644 ${B}/${PN}/psu_init.c ${D}/${includedir}/devicetree/psu_init.c
+    install -m 0644 ${B}/${PN}/psu_init.h ${D}/${includedir}/devicetree/psu_init.h
 }
-
-FILES_${PN}-psu-init = "/boot/devicetree/psu_init.*"

@@ -4,7 +4,7 @@ ESW_COMPONENT_SRC = "/lib/sw_apps/zynqmp_fsbl/src"
 
 DEPENDS += "xilstandalone xiltimer xilffs xilsecure xilpm device-tree"
 
-PSU_INIT = "${RECIPE_SYSROOT}/boot/devicetree/psu_init*"
+PSU_INIT = "${RECIPE_SYSROOT}/${includedir}/devicetree/psu_init*"
 
 do_configure_prepend() {
     # Copy psu_init* files to fsbl source code
