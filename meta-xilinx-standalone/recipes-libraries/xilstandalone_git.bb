@@ -7,8 +7,8 @@ DEPENDS += "dtc-native python3-pyyaml-native libgloss device-tree"
 
 do_generate_bspcfg_data () {
     # This script should also not rely on relative paths and such
-    cd ${WORKDIR}/git
-    nativepython3 ${WORKDIR}/git/scripts/generate_libdata.py -d ${DTBFILE}
+    cd ${S}
+    nativepython3 ${S}/scripts/generate_libdata.py -d ${DTBFILE}
 }
 
 # Task dependencies might need to be fixed after unifying the DTB flow

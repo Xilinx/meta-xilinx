@@ -8,13 +8,13 @@ DEPENDS += "dtc-native python3-pyyaml-native xilmem device-tree"
 do_generate_cmake (){
     # This will generate CMakeLists.txt which contains
     # drivers for the libxil 
-    cd ${WORKDIR}/git
-    DRIVERS_LIST=$(nativepython3 ${WORKDIR}/git/scripts/getdrvlist.py -d ${DTBFILE})
+    cd ${S}
+    DRIVERS_LIST=$(nativepython3 ${S}/scripts/getdrvlist.py -d ${DTBFILE})
 }
 do_generate_driver_data (){
     # This script should also not rely on relative paths and such
-    cd ${WORKDIR}/git
-    nativepython3 ${WORKDIR}/git/scripts/generate_drvdata.py -d ${DTBFILE}
+    cd ${S}
+    nativepython3 ${S}/scripts/generate_drvdata.py -d ${DTBFILE}
 }
 
 # Task dependencies might need to be fixed after unifying the DTB flow

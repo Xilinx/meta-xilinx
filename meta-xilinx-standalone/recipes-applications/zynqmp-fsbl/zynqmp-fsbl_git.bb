@@ -8,13 +8,13 @@ PSU_INIT = "${RECIPE_SYSROOT}/${includedir}/devicetree/psu_init*"
 
 do_configure_prepend() {
     # Copy psu_init* files to fsbl source code
-    cp ${PSU_INIT} ${WORKDIR}/git/lib/sw_apps/zynqmp_fsbl/src/
+    cp ${PSU_INIT} ${S}/${ESW_COMPONENT_SRC}
 }
 
 do_install() {
     install -d ${D}/${base_libdir}/firmware
     # Note that we have to make the ELF executable for it to be stripped
-    install -m 0755  ${WORKDIR}/build/zynqmp_fsbl* ${D}/${base_libdir}/firmware
+    install -m 0755  ${B}/zynqmp_fsbl* ${D}/${base_libdir}/firmware
 }
 
 ZYNQMP_FSBL_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"

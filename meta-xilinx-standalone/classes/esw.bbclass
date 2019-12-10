@@ -2,7 +2,7 @@ inherit pkgconfig cmake yocto-cmake-translation
 
 LICENSE = "Proprietary"
 LICFILENAME = "license.txt"
-LIC_FILES_CHKSUM = "file://${ESWS}/${LICFILENAME};md5=f64f573816f568a50a7a8aad895b3d84"
+LIC_FILES_CHKSUM = "file://${S}/${LICFILENAME};md5=f64f573816f568a50a7a8aad895b3d84"
 
 XILINX_RELEASE_VERSION = "v2019.2"
 
@@ -13,8 +13,9 @@ SRC_URI = "git://gitenterprise.xilinx.com/decoupling/embeddedsw.git;branch=maste
 
 SRCREV_FORMAT = "src_decouple"
 
-ESWS = "${WORKDIR}/git/"
-S = "${ESWS}/${ESW_COMPONENT_SRC}"
+S = "${WORKDIR}/git/"
+B = "${WORKDIR}/build/"
+OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
 
 
 inherit ccmake
@@ -90,10 +91,10 @@ python(){
         lic_file = d.getVar('LIC_FILES_CHKSUM', False)
         licpath=externalsrc
         for i in range(5):
-            licpath=os.path.dirname(licpath)
             if os.path.isfile(licpath + '/' + d.getVar('LICFILENAME',True)):
-                lic_file = lic_file.replace('${ESWS}',licpath)
+                lic_file = lic_file.replace('${S}',licpath)
                 d.setVar('LIC_FILES_CHKSUM', lic_file)
                 return
+            licpath=os.path.dirname(licpath)
         bb.error("Couldn't find license file: %s, within directory %s or his parent directories" % (d.getVar('LICFILENAME',True), externalsrc))
 }
