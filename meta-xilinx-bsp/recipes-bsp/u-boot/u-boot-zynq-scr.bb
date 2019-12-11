@@ -65,6 +65,7 @@ do_compile() {
     mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
         -e 's/@@DEVICE_TREE_NAME@@/${DEVICE_TREE_NAME}/' \
+	-e 's/@@RAMDISK_IMAGE@@/${RAMDISK_IMAGE}/' \
 	"${WORKDIR}/pxeboot.pxe" > "pxeboot.pxe"
 }
 
