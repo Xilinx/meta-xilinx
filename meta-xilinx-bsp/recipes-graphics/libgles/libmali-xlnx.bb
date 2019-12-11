@@ -183,3 +183,17 @@ RCONFLICTS_${PN} = "libegl libgles1 libglesv1-cm1 libgles2 libglesv2-2 libgbm"
 # explicitly depends upon them.
 EXCLUDE_FROM_WORLD = "1"
 FILES_${PN} += "${libdir}/*"
+
+do_package_append() {
+
+    shlibswork_dir = d.getVar('SHLIBSWORKDIR')
+    pkg_filename = d.getVar('PN') + ".list"
+    shlibs_file = os.path.join(shlibswork_dir, pkg_filename)
+    lines = ""
+    with open(shlibs_file, "r") as f:
+        lines = f.readlines()
+    with open(shlibs_file, "w") as f:
+        for line in lines:
+            if d.getVar('MALI_BACKEND_DEFAULT') in line.strip("\n"):
+                 f.write(line)
+}
