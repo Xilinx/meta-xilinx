@@ -8,9 +8,7 @@ BRANCH = "master-next-test"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-# SRCREV = "0d68f68f0fc55f08c499589273eeb6d9c71ec285"
 SRCREV = "${AUTOREV}"
-
 
 XSCTH_PROC_cortexa53-zynqmp ??= "psu_cortexa53_0"
 XSCTH_PROC_microblaze-pmu ??= "psu_pmu_0"

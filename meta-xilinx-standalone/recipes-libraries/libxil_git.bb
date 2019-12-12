@@ -9,6 +9,11 @@ do_generate_cmake (){
     # This will generate CMakeLists.txt which contains
     # drivers for the libxil 
     cd ${S}
+    #TODO
+    # This call was initially used to get the list of drivers and libraries required
+    # by the design to the build system to use as dependencies to the application
+    # being built, at this point this is all done in a single cmake build bundling
+    # everything in libxil, which is undesired.
     DRIVERS_LIST=$(nativepython3 ${S}/scripts/getdrvlist.py -d ${DTBFILE})
 }
 do_generate_driver_data (){

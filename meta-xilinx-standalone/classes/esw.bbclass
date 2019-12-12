@@ -20,6 +20,7 @@ OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
 
 inherit ccmake
 
+# TODO
 # We need to put these per recipe probably, e.g. pmu on mb, fsbl on a53
 COMPATIBLE_HOST_microblaze-pmu = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "^$"
