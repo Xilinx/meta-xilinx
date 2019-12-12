@@ -1,4 +1,4 @@
-inherit esw
+inherit esw python3native
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/"
 ESW_COMPONENT_NAME = "libxil.a"

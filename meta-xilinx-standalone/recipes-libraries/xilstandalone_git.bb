@@ -1,4 +1,4 @@
-inherit esw
+inherit esw python3native
 
 ESW_COMPONENT_SRC = "/lib/bsp/standalone/src/"
 ESW_COMPONENT_NAME = "libxilstandalone.a"

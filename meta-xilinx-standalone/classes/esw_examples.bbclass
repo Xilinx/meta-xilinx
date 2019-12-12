@@ -1,4 +1,4 @@
-inherit esw deploy
+inherit esw deploy python3native
 
 DEPENDS += "dtc-native python3-pyyaml-native xilstandalone xiltimer device-tree"
 
