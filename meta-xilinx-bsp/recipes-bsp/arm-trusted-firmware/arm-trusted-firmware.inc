@@ -47,14 +47,14 @@ ATF_CONSOLE ?= ""
 ATF_CONSOLE_zynqmp = "cadence"
 ATF_CONSOLE_versal ?= "pl011"
 
-DEBUG ?= ""
-DEBUG_versal ?= "1"
+DEBUG_ATF ?= ""
+DEBUG_ATF_versal ?= "1"
 
 EXTRA_OEMAKE_zynqmp_append = "${@' ZYNQMP_CONSOLE=${ATF_CONSOLE}' if d.getVar('ATF_CONSOLE', True) != '' else ''}"
 EXTRA_OEMAKE_append_versal = "${@' VERSAL_CONSOLE=${ATF_CONSOLE}' if d.getVar('ATF_CONSOLE', True) != '' else ''}"
-EXTRA_OEMAKE_append = " ${@bb.utils.contains('DEBUG', '1', ' DEBUG=${DEBUG}', '', d)}"
+EXTRA_OEMAKE_append = " ${@bb.utils.contains('DEBUG_ATF', '1', ' DEBUG=${DEBUG_ATF}', '', d)}"
 
-OUTPUT_DIR = "${@bb.utils.contains('DEBUG', '1', '${B}/${PLATFORM}/debug', '${B}/${PLATFORM}/release', d)}"
+OUTPUT_DIR = "${@bb.utils.contains('DEBUG_ATF', '1', '${B}/${PLATFORM}/debug', '${B}/${PLATFORM}/release', d)}"
 
 ATF_MEM_BASE ?= ""
 ATF_MEM_SIZE ?= ""
