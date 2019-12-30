@@ -50,6 +50,8 @@ KERNEL_LOAD_ADDRESS_versal ?= "0x80000"
 RAMDISK_IMAGE_ADDRESS_zynq ?= "0x4000000"
 RAMDISK_IMAGE_ADDRESS_versal ?= "0x6000000"
 
+SDBOOTDEV ?= "0"
+
 do_configure[noexec] = "1"
 do_install[noexec] = "1"
 
@@ -61,6 +63,7 @@ do_compile() {
         -e 's/@@RAMDISK_IMAGE@@/${RAMDISK_IMAGE}/' \
         -e 's/@@RAMDISK_IMAGE_ADDRESS@@/${RAMDISK_IMAGE_ADDRESS}/' \
         -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/' \
+        -e 's/@@SDBOOTDEV@@/${SDBOOTDEV}/' \	
         "${WORKDIR}/boot.cmd.${BOOTMODE}.${SOC_FAMILY}" > "${WORKDIR}/boot.cmd"
     mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \

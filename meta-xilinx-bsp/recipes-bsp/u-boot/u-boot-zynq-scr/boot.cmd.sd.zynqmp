@@ -1,3 +1,4 @@
+setenv sdbootdev @@SDBOOTDEV@@
 setenv bootargs $bootargs root=/dev/mmcblk${sdbootdev}p2 rw rootwait earlycon clk_ignore_unused
 fatload mmc $sdbootdev @@DEVICETREE_ADDRESS@@ @@DEVICE_TREE_NAME@@
 fatload mmc $sdbootdev:$partid @@KERNEL_LOAD_ADDRESS@@ @@KERNEL_IMAGETYPE@@
