@@ -30,7 +30,7 @@ S = "${WORKDIR}/git"
 
 # Disable KVM completely
 PACKAGECONFIG_remove = "kvm"
-PACKAGECONFIG_append = " fdt"
+PACKAGECONFIG_append = " fdt gcrypt"
 
 DISABLE_STATIC_pn-${PN} = ""
 
