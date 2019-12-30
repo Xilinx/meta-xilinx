@@ -32,10 +32,6 @@ S = "${WORKDIR}/git"
 PACKAGECONFIG_remove = "kvm"
 PACKAGECONFIG_append = " fdt"
 
-# Enable libgcrypt
-PACKAGECONFIG[gcrypt] = "--enable-gcrypt,--disable-gcrypt,libgcrypt,"
-PACKAGECONFIG[fdt] = "--enable-fdt,--disable-fdt,dtc"
-
 DISABLE_STATIC_pn-${PN} = ""
 
 PTEST_ENABLED = ""
