@@ -64,4 +64,5 @@ SRC_URI_append_microblaze = " \
         file://0061-Patch-microblaze-Add-TARGET_OPTION_OPTIMIZATION-and-.patch \
         file://0062-Added-new-MB-64-single-register-arithmetic-instructi.patch \
         file://0063-Patch-MicroBlaze-Added-support-for-64-bit-Immediate-.patch \
+        file://0064-Patch-microblaze-Fix-Compiler-crash-with-freg-struct.patch \
 "
