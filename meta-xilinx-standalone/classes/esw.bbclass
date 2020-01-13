@@ -2,7 +2,7 @@ inherit pkgconfig cmake yocto-cmake-translation
 
 LICENSE = "Proprietary"
 LICFILENAME = "license.txt"
-LIC_FILES_CHKSUM = "file://${S}/${LICFILENAME};md5=f64f573816f568a50a7a8aad895b3d84"
+LIC_FILES_CHKSUM = "file://${S}/${LICFILENAME};md5=39ab6ab638f4d1836ba994ec6852de94"
 
 XILINX_RELEASE_VERSION = "v2019.2"
 
