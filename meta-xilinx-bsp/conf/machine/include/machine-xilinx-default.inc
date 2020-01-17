@@ -88,7 +88,4 @@ XSERVER_EXT_zynqmp ?= "xf86-video-armsoc"
 #Add preferred provider as qemu-xilinx-helper-native
 PREFERRED_PROVIDER_qemu-helper-native = "qemu-xilinx-helper-native"
 
-# For MicroBlaze default all microblaze machines to use GDB 7.7.1 (for gdbserver/gdb)
-PREFERRED_VERSION_gdb_microblaze = "7.7.1"
-
 FPGA_MNGR_RECONFIG_ENABLE ?= "${@bb.utils.contains('IMAGE_FEATURES', 'fpga-manager', '1', '0', d)}"
