@@ -1,6 +1,7 @@
 COMPATIBLE_MACHINE_cortexa53-zynqmp = ".*"
 COMPATIBLE_MACHINE_microblaze-pmu = ".*"
 COMPATIBLE_MACHINE_microblaze-plm = ".*"
+COMPATIBLE_MACHINE_cortexa72 = ".*"
 
 
 REPO = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
@@ -12,6 +13,7 @@ SRCREV = "${AUTOREV}"
 
 XSCTH_PROC_cortexa53-zynqmp ??= "psu_cortexa53_0"
 XSCTH_PROC_microblaze-pmu ??= "psu_pmu_0"
+XSCTH_PROC_cortexa72 ??= "psv_cortexa72_0"
 XSCTH_PROC_microblaze-plm ??= "psv_pmc_0"
 
 # Enable @ flag on dtc which is required by libxil
