@@ -50,11 +50,11 @@ def get_xlnx_cmake_machine(fam, d):
 def get_xlnx_cmake_processor(machine, d):
     if (machine == 'cortexa53-zynqmp'):
         cmake_processor = 'cortexa53'
-    if (machine == 'cortexa53'):
-        cmake_processor = 'cortexa53'
-    elif (machine == 'cortexr5'):
+    elif (machine == 'cortexr5-zynqmp'):
         cmake_processor = 'cortexar5'
-    elif (machine == 'cortexa72'):
+    elif (machine == 'cortexr5-versal'):
+        cmake_processor = 'cortexar5'
+    elif (machine == 'cortexa72-versal'):
         cmake_processor = 'cortexa72'
     elif (machine == 'microblaze-pmu'):
         cmake_processor = 'pmu_microblaze'
