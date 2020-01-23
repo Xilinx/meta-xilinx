@@ -1,0 +1,29 @@
+Index: gcc-9.2.0/gcc/config/microblaze/t-microblaze
+===================================================================
+--- gcc-9.2.0.orig/gcc/config/microblaze/t-microblaze
++++ gcc-9.2.0/gcc/config/microblaze/t-microblaze
+@@ -1,9 +1,12 @@
+-MULTILIB_OPTIONS = m64 mxl-barrel-shift mlittle-endian mno-xl-soft-mul mxl-multiply-high
+-MULTILIB_DIRNAMES = m64 bs le m mh
++MULTILIB_OPTIONS = mxl-barrel-shift mlittle-endian mno-xl-soft-mul mxl-multiply-high
++MULTILIB_DIRNAMES = bs le m mh
+ MULTILIB_EXCEPTIONS = *m64/mxl-multiply-high mxl-multiply-high
+ MULTILIB_EXCEPTIONS += *m64
++MULTILIB_EXCEPTIONS += *m64/mlittle-endian
++MULTILIB_EXCEPTIONS += *m64/mlittle-endian/mxl-soft-mul
++MULTILIB_EXCEPTIONS += *m64/mlittle-endian/mno-xl-soft-mul
++MULTILIB_EXCEPTIONS += *m64/mlittle-endian/mno-xl-soft-mul/mxl-multiply-high
+ MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift
+-MULTILIB_EXCEPTIONS += *m64/mno-xl-soft-mul
+ MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift/mno-xl-soft-mul
+ MULTILIB_EXCEPTIONS += *m64/mno-xl-soft-mul
+ MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift/mno-xl-soft-mul/mxl-multiply-high
+@@ -12,6 +15,8 @@ MULTILIB_EXCEPTIONS += *mxl-barrel-shift
+ MULTILIB_EXCEPTIONS += *mlittle-endian/mxl-multiply-high mxl-multiply-high
+ MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift/mlittle-endian/mxl-multiply-high
+ 
++
++
+ # Extra files
+ microblaze-c.o: $(srcdir)/config/microblaze/microblaze-c.c \
+     $(srcdir)/config/microblaze/microblaze-protos.h \
