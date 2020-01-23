@@ -1,4 +1,4 @@
-DEFAULTTUNE ?= "aarch64"
+DEFAULTTUNE ?= "cortexa72-cortexa53"
 SOC_FAMILY ?= "versal"
 
 # Available SOC_VARIANT's for versal:
@@ -6,7 +6,7 @@ SOC_FAMILY ?= "versal"
 
 SOC_VARIANT ?= "s80"
 
-require conf/machine/include/arm/arch-armv8a.inc
+require conf/machine/include/tune-cortexa72-cortexa53.inc
 require conf/machine/include/soc-family.inc
 
 # Linux Configuration

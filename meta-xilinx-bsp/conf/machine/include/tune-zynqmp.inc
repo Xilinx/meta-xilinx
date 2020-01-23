@@ -1,4 +1,4 @@
-DEFAULTTUNE ?= "aarch64"
+DEFAULTTUNE ?= "cortexa72-cortexa53"
 SOC_FAMILY ?= "zynqmp"
 
 # Available SOC_VARIANT's for zynqmp:
@@ -8,7 +8,7 @@ SOC_FAMILY ?= "zynqmp"
 
 SOC_VARIANT ?= "eg"
 
-require conf/machine/include/arm/arch-armv8a.inc
+require conf/machine/include/tune-cortexa72-cortexa53.inc
 require conf/machine/include/soc-family.inc
 
 # Linux Configuration
