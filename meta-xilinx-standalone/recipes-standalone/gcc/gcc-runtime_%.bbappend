@@ -14,8 +14,6 @@ EXTRA_OECONF_append_xilinx-standalone_class-target = " \
 
 EXTRA_OECONF_append_xilinx-standalone_aarch64_class-target = " \
 	--disable-multiarch \
-	--enable-fix-cortex-a53-835769 \
-	--enable-fix-cortex-a53-843419 \
 	--with-arch=armv8-a \
 	"
 
