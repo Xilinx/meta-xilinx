@@ -1,104 +1,40 @@
-# This inc file contains common configuration used for GCC for several
-# MACHINES when using xilinx-standalone a DISTRO.
-# This should be applicable to both cross and cross-canadian toolchain.
+# Any changes to this file should be synced with gcc-runtime_%.bbappend
 
+LINKER_HASH_STYLE_xilinx-standalone = ""
+SYMVERS_CONF_xilinx-standalone = ""
 
-GCC_CONFIGURE_COMMON_XILINX_STANDALONE = " \
-	--disable-libmudflap \
+EXTRA_OECONF_append_xilinx-standalone = " \
 	--disable-libstdcxx-pch \
-	--disable-nls \
-	--enable-languages=${LANGUAGES} \
 	--with-newlib \
-"
-
-
-GCC_CONFIGURE_A53 ?= " \
-        --disable-bootstrap \
-        --disable-multiarch \
-        --disable-threads \
-        --enable-c99 \
-        --enable-checking=yes \
-        --enable-fix-cortex-a53-835769 \
-        --enable-fix-cortex-a53-843419 \
-        --enable-linker-build-id \
-        --enable-long-long \
-        --enable-lto \
-        --enable-plugins \
-        --enable-shared \
-        --with-arch=armv8-a \
-        --with-cloog=no \
-        --with-gnu-as \
-        --with-gnu-ld \
-        --with-isl=no \
-        --with-ppl=no \
-"
-
-GCC_CONFIGURE_A72 ?= " \
-        --disable-bootstrap \
-        --disable-multiarch \
-        --disable-threads \
-        --enable-c99 \
-        --enable-checking=yes \
-        --enable-linker-build-id \
-        --enable-long-long \
-        --enable-lto \
-	--enable-multilib \
-        --enable-plugins \
-        --enable-shared \
-	--enable-threads=no \
-        --with-cloog=no \
-        --with-gnu-as \
-        --with-gnu-ld \
-        --with-isl=no \
-	--with-ppl=no \
-"
-
-GCC_CONFIGURE_R5 ?= " \
-        --disable-decimal-float \
-        --disable-libffi \
-        --disable-libgomp \
-        --disable-libquadmath \
-        --disable-libssp \
-        --disable-shared \
-        --disable-threads \
-        --disable-tls \
-        --enable-plugins \
-        --with-gnu-as \
-        --with-gnu-ld \
-        --with-headers=yes \
-        --with-host-libstdcxx=-static-libgcc \
-         --with-multilib-list=rmprofile \
-"
-
-GCC_CONFIGURE_MB ?= " \
-        --disable-__cxa_atexit \
-        --disable-libgomp \
-        --disable-shared \
-        --enable-lto \
-        --enable-target-optspace \
-        --enable-threads=no \
-        --with-isl=no \
-        --with-ppl=no \
-        --without-long-double-128 \
-"
-
-GCC_CONFIGURE_A9 ?= " \
-	--disable-bootstrap \
-	--disable-multiarch \
-	--disable-nls \
 	--disable-threads \
-	--enable-c99 \
-	--enable-checking=yes \
-	--enable-linker-build-id \
-	--enable-long-long \
-	--enable-lto \
-	--enable-multilib \
 	--enable-plugins \
-	--enable-shared \
-	--with-cloog=no \
 	--with-gnu-as \
-	--with-gnu-ld \
-	--with-isl=no \
-	--with-ppl=no \
-	--with-multilib-list=aprofile \
+	--disable-libitm \
+	--enable-multilib \
 "
+
+EXTRA_OECONF_append_xilinx-standalone_aarch64 = " \
+	--disable-multiarch \
+	--enable-fix-cortex-a53-835769 \
+	--enable-fix-cortex-a53-843419 \
+	--with-arch=armv8-a \
+	"
+
+# Both arm and cortexr5 overrides are set w/ r5
+# So only set rmprofile if r5 is defined.
+ARM_PROFILE = "aprofile"
+ARM_PROFILE_cortexr5 = "rmprofile"
+EXTRA_OECONF_append_xilinx-standalone_arm = " \
+	--with-multilib-list=${ARM_PROFILE} \
+	"
+
+EXTRA_OECONF_append_xilinx-standalone_cortexr5 = " \
+	--disable-tls \
+	--disable-decimal-float \
+	"
+
+EXTRA_OECONF_append_xilinx-standalone_microblaze = " \
+	--disable-__cxa_atexit \
+	--enable-target-optspace \
+	--without-long-double-128 \
+	"
