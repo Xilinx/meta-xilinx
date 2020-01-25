@@ -65,5 +65,4 @@ SRC_URI_append_microblaze = " \
         file://0062-Added-new-MB-64-single-register-arithmetic-instructi.patch \
         file://0063-Patch-MicroBlaze-Added-support-for-64-bit-Immediate-.patch \
         file://0064-Patch-microblaze-Fix-Compiler-crash-with-freg-struct.patch \
-        file://avoid_multilib_builds_that_arent_working.patch \
 "
