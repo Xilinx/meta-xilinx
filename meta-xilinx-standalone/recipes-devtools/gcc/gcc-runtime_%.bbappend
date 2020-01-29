@@ -9,7 +9,6 @@ EXTRA_OECONF_append_xilinx-standalone_class-target = " \
 	--enable-plugins \
 	--with-gnu-as \
 	--disable-libitm \
-	--enable-multilib \
 "
 
 EXTRA_OECONF_append_xilinx-standalone_aarch64_class-target = " \
@@ -45,28 +44,19 @@ EXTRA_OECONF_append_xilinx-standalone_microblaze_class-target = " \
 
 # Changes local to gcc-runtime...
 
-# Due to multilibs, we need to clear the default TUNE_CCARGS on arm
-TUNE_CCARGS_xilinx-standalone_arm_class-target = ""
-
-# Configure fails on multilib when using a cache file, this re-sets it to nothing
-EXTRA_OECONF_append_xilinx-standalone_class-target = " --cache-file="
-
 # Dont build libitm, etc.
 RUNTIMETARGET_xilinx-standalone_class-target = "libstdc++-v3"
 
-# Recursve 5 levels due to the several combinations of multilibs built
-FILES_libstdc++-staticdev_append_xilinx-standalone_class-target = " \
-    ${libdir}/libsupc++.a* \
-    ${libdir}/libstdc++*.a* \
-    ${libdir}/**/libsupc++.a* \
-    ${libdir}/**/libstdc++*.a* \
-    ${libdir}/**/**/libsupc++.a* \
-    ${libdir}/**/**/libstdc++*.a* \
-    ${libdir}/**/**/**/libsupc++.a* \
-    ${libdir}/**/**/**/libstdc++*.a* \
-    ${libdir}/**/**/**/**/libsupc++.a* \
-    ${libdir}/**/**/**/**/libstdc++*.a* \
-    ${libdir}/**/**/**/**/**/libsupc++.a* \
-    ${libdir}/**/**/**/**/**/libstdc++*.a* \
-"
+do_install_append_xilinx-standalone_class-target() {
+	# Fixup what gcc-runtime normally would do, we don't want linux directories!
+	rm -rf ${D}${includedir}/c++/${BINV}/${TARGET_ARCH}${TARGET_VENDOR}-linux
 
+	# The multilibs have different headers, so stop combining them!
+	if [ "${TARGET_VENDOR_MULTILIB_ORIGINAL}" != "" -a "${TARGET_VENDOR}" != "${TARGET_VENDOR_MULTILIB_ORIGINAL}" ]; then
+		rm -rf ${D}${includedir}/c++/${BINV}/${TARGET_ARCH}${TARGET_VENDOR_MULTILIB_ORIGINAL}-${TARGET_OS}
+	fi
+}
+
+FILES_${PN}-dbg_append_xilinx-standalone_class-target = "\
+    ${libdir}/libstdc++.a-gdb.py \
+"

@@ -1,5 +1,4 @@
 # Any changes to this file should be synced with gcc-runtime_%.bbappend
-
 LINKER_HASH_STYLE_xilinx-standalone = ""
 SYMVERS_CONF_xilinx-standalone = ""
 
@@ -10,7 +9,6 @@ EXTRA_OECONF_append_xilinx-standalone = " \
 	--enable-plugins \
 	--with-gnu-as \
 	--disable-libitm \
-	--enable-multilib \
 "
 
 EXTRA_OECONF_append_xilinx-standalone_aarch64 = " \

@@ -1,3 +1,6 @@
+# Some of the currently required multilibs require specific workarounds.
+# The override values below are linked specifically to the baremetal toolchain BSPs
+
 do_configure_prepend_microblaze() {
     # hack for microblaze, which needs xilinx.ld to literally do any linking (its hard coded in its LINK_SPEC)
     export CC="${CC} -L${S}/libgloss/microblaze"
@@ -5,6 +8,12 @@ do_configure_prepend_microblaze() {
 
 do_configure_prepend(){
     export CC_FOR_TARGET="${CC}"
+}
+
+# Fix for multilib newlib installations
+do_install_prepend() {
+	mkdir -p $(dirname ${D}${libdir})
+	mkdir -p $(dirname ${D}${includedir})
 }
 
 # Add MicroBlaze Patches
