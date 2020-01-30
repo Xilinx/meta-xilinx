@@ -20,12 +20,19 @@ EXTRA_OECONF_append_xilinx-standalone_aarch64_class-target = " \
 # Both arm and cortexr5 overrides are set w/ r5
 # So only set rmprofile if r5 is defined.
 ARM_PROFILE = "aprofile"
-ARM_PROFILE_cortexr5 = "rmprofile"
+ARM_PROFILE_cortexr5-zynqmp = "rmprofile"
+ARM_PROFILE_cortexr5-versal = "rmprofile"
+
 EXTRA_OECONF_append_xilinx-standalone_arm_class-target = " \
 	--with-multilib-list=${ARM_PROFILE} \
 	"
 
-EXTRA_OECONF_append_xilinx-standalone_cortexr5_class-target = " \
+EXTRA_OECONF_append_xilinx-standalone_cortexr5-versal_class-target = " \
+	--disable-tls \
+	--disable-decimal-float \
+	"
+
+EXTRA_OECONF_append_xilinx-standalone_cortexr5-versal_class-target = " \
 	--disable-tls \
 	--disable-decimal-float \
 	"
