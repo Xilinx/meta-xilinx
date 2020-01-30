@@ -41,7 +41,7 @@ Usage
 
 DISTRO="xilinx-standalone"
 
-MACHINE="zynqmp-pmu"
+MACHINE="microblaze-pmu"
 
 GCCVERSION="7.%"
 
