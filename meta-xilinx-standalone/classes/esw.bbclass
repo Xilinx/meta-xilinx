@@ -20,18 +20,46 @@ S = "${ESWS}/${ESW_COMPONENT_SRC}"
 inherit ccmake
 
 # We need to put these per recipe probably, e.g. pmu on mb, fsbl on a53
-COMPATIBLE_HOST_zynqmp-pmu = "microblaze.*-elf"
+COMPATIBLE_HOST_microblaze-pmu = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynqmp-pmu = "zynqmp-pmu"
+COMPATIBLE_MACHINE_microblaze-pmu = "microblaze-pmu"
 
-COMPATIBLE_HOST_cortexa53 = "aarch64.*-elf"
-COMPATIBLE_MACHINE_cortexa53 = "cortexa53"
+COMPATIBLE_HOST_cortexa53-zynqmp = "aarch64.*-elf"
+COMPATIBLE_MACHINE_cortexa53-zynqmp = "cortexa53-zynqmp"
+
+
+def get_xlnx_cmake_machine(fam, d):
+    if (fam == 'zynqmp'):
+        cmake_machine = 'ZynqMP'
+    elif (fam == 'versal'):
+        cmake_machine = 'Versal'
+    return cmake_machine
+
+def get_xlnx_cmake_processor(machine, d):
+    if (machine == 'cortexa53'):
+        cmake_processor = 'cortexa53'
+    elif (machine == 'cortexr5'):
+        cmake_processor = 'cortexar5'
+    elif (machine == 'microblaze-pmu'):
+        cmake_processor = 'pmu_microblaze'
+    elif (machine == 'microblaze-plm'):
+        cmake_processor = 'plm_microblaze'
+    return cmake_processor
+
+XLNX_CMAKE_MACHINE = "${@get_xlnx_cmake_machine(d.getVar('SOC_FAMILY'), d)}"
+XLNX_CMAKE_PROCESSOR = "${@get_xlnx_cmake_processor(d.getVar('MACHINE'), d)}"
+
 
 cmake_do_generate_toolchain_file_append() {
     cat >> ${WORKDIR}/toolchain.cmake <<EOF
     include(CMakeForceCompiler)
     CMAKE_FORCE_C_COMPILER("${OECMAKE_C_COMPILER}" GNU)
     CMAKE_FORCE_CXX_COMPILER("${OECMAKE_CXX_COMPILER}" GNU)
+    # set( CMAKE_SYSTEM_PROCESSOR "${XLNX_CMAKE_PROCESSOR}" )
+    set( CMAKE_MACHINE "${XLNX_CMAKE_MACHINE}" )
+    # Will need this in the future to make cmake understand esw variables
+    # set( CMAKE_SYSTEM_NAME `echo elf | sed -e 's/^./\u&/' -e 's/^\(Linux\).*/\1/'` )
+    set( CMAKE_SYSTEM_NAME "Generic" )
 EOF
 }
 

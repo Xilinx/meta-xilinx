@@ -1,5 +1,5 @@
-COMPATIBLE_MACHINE_cortexa53 = ".*"
-COMPATIBLE_MACHINE_zynqmp-pmu = ".*"
+COMPATIBLE_MACHINE_cortexa53-zynqmp = ".*"
+COMPATIBLE_MACHINE_microblaze-pmu = ".*"
 
 
 REPO = "git://gitenterprise.xilinx.com/Linux/device-tree-xlnx;protocol=https"
@@ -11,7 +11,7 @@ SRC_URI = "${REPO};${BRANCHARG}"
 SRCREV = "${AUTOREV}"
 
 
-XSCTH_PROC_cortexa53 ??= "psu_cortexa53_0"
-XSCTH_PROC_zynqmp-pmu ??= "psu_pmu_0"
+XSCTH_PROC_cortexa53-zynqmp ??= "psu_cortexa53_0"
+XSCTH_PROC_microblaze-pmu ??= "psu_pmu_0"
 # Enable @ flag on dtc which is required by fsbl
-YAML_ENABLE_DT_OVERLAY_cortexa53 = "1"
+YAML_ENABLE_DT_OVERLAY_cortexa53-zynqmp = "1"
