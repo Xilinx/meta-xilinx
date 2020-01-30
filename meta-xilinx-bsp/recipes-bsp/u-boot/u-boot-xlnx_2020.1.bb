@@ -14,21 +14,12 @@ LIC_FILES_CHKSUM = "file://README;beginline=1;endline=4;md5=744e7e3bb0c94b4b9f6b
 
 # u-boot-xlnx has support for these
 HAS_PLATFORM_INIT ?= " \
+		xilinx_zynqmp_virt_config \
 		zynq_microzed_config \
 		zynq_zed_config \
 		zynq_zc702_config \
 		zynq_zc706_config \
 		zynq_zybo_config \
-		xilinx_zynqmp_zcu102_rev1_0_config \
-		xilinx_zynqmp_zcu106_revA_config \
-		xilinx_zynqmp_zcu104_revC_config \
-		xilinx_zynqmp_zcu100_revC_config \
-		xilinx_zynqmp_zcu111_revA_config \
-		xilinx_zynqmp_zcu1275_revA_config \
-		xilinx_zynqmp_zcu1275_revB_config \
-		xilinx_zynqmp_zc1254_revA_config \
-		xilinx_zynqmp_p_a2197_00_revA_config \
 		xilinx_versal_vc_p_a2197_revA_x_prc_01_revA \
-		xilinx_zynqmp_zcu216_revA_config \
 		"
 
