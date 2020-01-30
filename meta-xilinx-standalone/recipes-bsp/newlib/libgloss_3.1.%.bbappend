@@ -11,6 +11,7 @@ do_install_append_microblaze-pmu(){
   cp ${D}/${libdir}/libgloss.a ${D}/${libdir}/libxil.a
 }
 
+
 # Add MicroBlaze Patches
 FILESEXTRAPATHS_append := "${THISDIR}/files:"
 SRC_URI_append = " \
