@@ -5,7 +5,7 @@ do_configure_prepend_microblaze() {
 
 
 # We use libgloss as if it was libxil, to avoid linking issues
-do_install_append_zynqmp-pmu(){
+do_install_append_microblaze-pmu(){
   cp ${D}/${libdir}/libgloss.a ${D}/${libdir}/libxil.a
 }
 
