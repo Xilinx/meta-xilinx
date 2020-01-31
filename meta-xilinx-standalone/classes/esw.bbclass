@@ -4,7 +4,7 @@ LICENSE = "Proprietary"
 LICFILENAME = "license.txt"
 LIC_FILES_CHKSUM = "file://${S}/${LICFILENAME};md5=39ab6ab638f4d1836ba994ec6852de94"
 
-XILINX_RELEASE_VERSION = "v2019.2"
+XILINX_RELEASE_VERSION = "v2020.1"
 
 # We should move to an actual SRCREV eventually
 SRCREV = "${AUTOREV}"
