@@ -10,7 +10,9 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '
 SRC_URI = "${REPO};${BRANCHARG}"
 
 PV = "2.2.0+git${SRCPV}"
-SRCREV = "7e3540d2707443d8c824669ef4272b33ce2f9ba4"
+SRCREV ?= "7e3540d2707443d8c824669ef4272b33ce2f9ba4"
+
+PACKAGE_CLASSES = "package_rpm"
 
 S = "${WORKDIR}/git/src/runtime_src/core/edge/drm/zocl"
 
