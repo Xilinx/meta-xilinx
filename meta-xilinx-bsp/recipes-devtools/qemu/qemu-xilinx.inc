@@ -1,7 +1,8 @@
 SUMMARY = "Xilinx's fork of a fast open source processor emulator"
 HOMEPAGE = "https://github.com/xilinx/qemu/"
 
-QEMU_TARGETS = "aarch64 arm microblaze microblazeel"
+# x86_64 is needed to build nativesdks
+QEMU_TARGETS = "aarch64 arm microblaze microblazeel x86_64"
 
 LIC_FILES_CHKSUM = " \
 		file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
@@ -38,12 +39,6 @@ PACKAGECONFIG[fdt] = "--enable-fdt,--disable-fdt,dtc"
 DISABLE_STATIC_pn-${PN} = ""
 
 PTEST_ENABLED = ""
-
-# append a suffix dir, to allow multiple versions of QEMU to be installed
-EXTRA_OECONF_append = " \
-		--bindir=${bindir}/qemu-xilinx \
-		--libexecdir=${libexecdir}/qemu-xilinx \
-		"
 
 do_install_append() {
 	# Prevent QA warnings about installed ${localstatedir}/run
