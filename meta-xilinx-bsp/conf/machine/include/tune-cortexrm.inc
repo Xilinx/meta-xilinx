@@ -9,6 +9,8 @@ TUNEVALID[cortexr5] = "Enable Cortex-r5 specific processor optimizations"
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexr5', ' -mcpu=cortex-r5', '', d)}"
 
 AVAILTUNES += "cortexr5"
-TUNE_FEATURES_tune-cortexr5 = "armrm cortexr5"
 ARMPKGARCH_tune-cortexr5 = "cortexr5"
+
+TUNE_FEATURES_tune-cortexr5 = "armrm cortexr5"
+PACKAGE_EXTRA_ARCHS_tune-cortexr5 = "cortexr5"
 
