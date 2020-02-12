@@ -5,6 +5,9 @@ BBCLASSEXTEND = "nativesdk"
 
 RDEPENDS_${PN}_class-target += "bash"
 
+PROVIDES_class-nativesdk = "nativesdk-qemu"
+RPROVIDES_${PN}_class-nativesdk = "nativesdk-qemu"
+
 EXTRA_OECONF_append_class-target = " --target-list=${@get_qemu_target_list(d)}"
 EXTRA_OECONF_append_class-nativesdk = " --target-list=${@get_qemu_target_list(d)}"
 
