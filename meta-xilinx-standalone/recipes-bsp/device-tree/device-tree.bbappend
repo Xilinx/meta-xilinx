@@ -4,7 +4,12 @@ COMPATIBLE_MACHINE_microblaze-pmu = ".*"
 COMPATIBLE_MACHINE_microblaze-plm = ".*"
 COMPATIBLE_MACHINE_cortexa72-versal = ".*"
 
-REPO = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
+REPO_cortexa53-zynqmp = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
+REPO_cortexr5-zynqmp = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
+REPO_microblaze-pmu = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
+REPO_microblaze-plm = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
+REPO_cortexa72-versal = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
+
 BRANCH = "master-next-test"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
