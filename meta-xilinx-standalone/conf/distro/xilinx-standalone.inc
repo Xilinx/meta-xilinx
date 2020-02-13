@@ -18,3 +18,5 @@ INHERIT += "uninative"
 LIBC_DEPENDENCIES_append = " newlib-staticdev libgloss-staticdev"
 
 ESW_CFLAGS ?= ""
+
+INHERIT += "buildhistory"
