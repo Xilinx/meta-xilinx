@@ -12,5 +12,10 @@ AVAILTUNES += "cortexr5"
 ARMPKGARCH_tune-cortexr5 = "cortexr5"
 
 TUNE_FEATURES_tune-cortexr5 = "armrm cortexr5"
-PACKAGE_EXTRA_ARCHS_tune-cortexr5 = "cortexr5"
+PACKAGE_EXTRA_ARCHS_tune-cortexr5 = "${TUNE_PKGARCH}"
 
+AVAILTUNES += "cortexr5f"
+ARMPKGARCH_tune-cortexr5f = "cortexr5f"
+
+TUNE_FEATURES_tune-cortexr5f = "armrm cortexr5 vfpv3d16 callconvention-hard"
+PACKAGE_EXTRA_ARCHS_tune-cortexr5f = "${TUNE_PKGARCH}"
