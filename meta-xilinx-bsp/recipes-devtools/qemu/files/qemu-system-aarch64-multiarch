@@ -6,8 +6,9 @@ import subprocess
 import sys
 import tempfile
 import shutil
+from pathlib import Path
 
-binpath = os.path.dirname(os.path.abspath(__file__))
+binpath = str(Path(os.path.dirname(os.path.abspath(__file__))).parent)
 mach_path = tempfile.mkdtemp()
 
 
