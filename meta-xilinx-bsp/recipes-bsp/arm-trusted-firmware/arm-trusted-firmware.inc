@@ -75,7 +75,8 @@ do_compile() {
 }
 
 do_install() {
-	install -Dm 0644 ${OUTPUT_DIR}/bl31/bl31.elf ${D}/boot/arm-trusted-firmware.elf
+	install -d ${D}/boot
+	install -Dm 0644 ${OUTPUT_DIR}/bl31/bl31.elf ${D}/boot/${PN}-${SRCPV}.elf
 }
 
 do_deploy() {
@@ -94,4 +95,4 @@ do_deploy() {
 	ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/atf-uboot.ub
 }
 addtask deploy before do_build after do_compile
-FILES_${PN} = "/boot/arm-trusted-firmware.elf"
+FILES_${PN} += "/boot/${PN}-${SRCPV}.elf"
