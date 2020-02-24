@@ -1,4 +1,4 @@
-inherit pkgconfig cmake yocto-cmake-translation
+inherit pkgconfig cmake
 
 LICENSE = "Proprietary"
 LICFILENAME = "license.txt"
@@ -36,6 +36,9 @@ COMPATIBLE_MACHINE_cortexr5-zynqmp = "cortexr5-zynqmp"
 
 COMPATIBLE_HOST_cortexa72-versal = "aarch64.*-elf"
 COMPATIBLE_MACHINE_cortexa72-versal = "cortexa72-versal"
+
+COMPATIBLE_OS = "elf"
+COMPATIBLE_OS_arm = "eabi"
 
 DTBFILE_microblaze-pmu ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
 DTBFILE_microblaze-plm ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"

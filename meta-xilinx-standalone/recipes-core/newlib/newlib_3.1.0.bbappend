@@ -1,3 +1,5 @@
+COMPATIBLE_OS_xilinx-standalone = "elf"
+COMPATIBLE_OS_arm_xilinx-standalone = "eabi"
 
 EXTRA_OECONF_append_xilinx-standalone = " \
 	--enable-newlib-io-c99-formats \

@@ -4,6 +4,8 @@ COMPATIBLE_MACHINE_microblaze-pmu = ".*"
 COMPATIBLE_MACHINE_microblaze-plm = ".*"
 COMPATIBLE_MACHINE_cortexa72-versal = ".*"
 
+COMPATIBLE_OS_xilinx-standalone = "${TARGET_OS}"
+
 REPO_cortexa53-zynqmp = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
 REPO_cortexr5-zynqmp = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
 REPO_microblaze-pmu = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"

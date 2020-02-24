@@ -23,3 +23,11 @@ INHERIT += "buildhistory"
 
 # Cortex R5 requires an additional cflag to be passed for compatibility with the embeddedsw
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexr5', ' -DARMR5', '', d)}"
+
+INHERIT += "xlnx-compatible-os"
+
+# Clear defaults
+DISTRO_FEATURES_BACKFILL_xilinx-standalone = ""
+VIRTUAL-RUNTIME_init_manager_xilinx-standalone = ""
+
+PREFERRED_PROVIDER_virtual/kernel = "linux-dummy"
