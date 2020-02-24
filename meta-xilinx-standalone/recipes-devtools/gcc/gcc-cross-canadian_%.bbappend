@@ -11,8 +11,9 @@ EXTRA_OECONF_append_xilinx-standalone = " \
 # has been removed from TARGET_OS for elf and eabi in gcc-cross-canadian.inc
 
 python() {
-    extraoeconfgcc = d.getVar('EXTRA_OECONF')
-    extraoeconfgcc += " --with-sysroot=/not/exist"
-    d.delVar('EXTRA_OECONF')
-    d.setVar('EXTRA_OECONF', extraoeconfgcc)
+    if 'xilinx-standalone' in d.getVar("DISTROOVERRIDES").split(':'):
+        extraoeconfgcc = d.getVar('EXTRA_OECONF')
+        extraoeconfgcc += " --with-sysroot=/not/exist"
+        d.delVar('EXTRA_OECONF')
+        d.setVar('EXTRA_OECONF', extraoeconfgcc)
 }

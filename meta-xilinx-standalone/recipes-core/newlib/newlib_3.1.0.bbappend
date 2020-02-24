@@ -8,12 +8,12 @@ EXTRA_OECONF_append_xilinx-standalone = " \
 "
 
 # Avoid trimmping CCARGS from CC by newlib configure
-do_configure_prepend(){
+do_configure_prepend_xilinx-standalone(){
     export CC_FOR_TARGET="${CC}"
 }
 
 # Fix for multilib newlib installations
-do_install_prepend() {
+do_install_prepend_xilinx-standalone() {
         mkdir -p $(dirname ${D}${libdir})
         mkdir -p $(dirname ${D}${includedir})
 }

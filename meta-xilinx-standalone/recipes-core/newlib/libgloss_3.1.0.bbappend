@@ -1,5 +1,5 @@
 # When building multiple, we need to depend on the multilib newlib
-DEPENDS += "${MLPREFIX}newlib"
+DEPENDS_append_xilinx-standalone = " ${MLPREFIX}newlib"
 
 EXTRA_OECONF_append_xilinx-standalone = " \
 	--enable-newlib-io-c99-formats \
