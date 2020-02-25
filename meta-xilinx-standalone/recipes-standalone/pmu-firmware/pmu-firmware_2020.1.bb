@@ -3,7 +3,6 @@ inherit deploy
 LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=39ab6ab638f4d1836ba994ec6852de94"
 
-XILINX_RELEASE_VERSION = "v2020.1"
 SRCREV = "e8db5fb118229fdc621e0ec7848641a23bf60998"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
 

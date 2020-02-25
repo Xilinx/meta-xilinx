@@ -10,7 +10,6 @@ LIC_FILES_CHKSUM = " \
 		"
 DEPENDS = "glib-2.0 zlib pixman"
 
-XILINX_RELEASE_VERSION = "v2020.1"
 XILINX_QEMU_VERSION ?= "v4.1.50"
 BRANCH ?= "master"
 SRCREV ?= "${AUTOREV}"
