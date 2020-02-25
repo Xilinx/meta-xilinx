@@ -1,22 +1,10 @@
+COMPATIBLE_OS_xilinx-standalone = "${TARGET_OS}"
+
 COMPATIBLE_MACHINE_cortexa53-zynqmp = ".*"
 COMPATIBLE_MACHINE_cortexr5-zynqmp = ".*"
 COMPATIBLE_MACHINE_microblaze-pmu = ".*"
 COMPATIBLE_MACHINE_microblaze-plm = ".*"
 COMPATIBLE_MACHINE_cortexa72-versal = ".*"
-
-COMPATIBLE_OS_xilinx-standalone = "${TARGET_OS}"
-
-REPO_cortexa53-zynqmp = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
-REPO_cortexr5-zynqmp = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
-REPO_microblaze-pmu = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
-REPO_microblaze-plm = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
-REPO_cortexa72-versal = "git://gitenterprise.xilinx.com/decoupling/device-tree-xlnx;protocol=https"
-
-BRANCH = "master-next-test"
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
-SRC_URI = "${REPO};${BRANCHARG}"
-
-SRCREV = "${AUTOREV}"
 
 XSCTH_PROC_cortexa53-zynqmp ??= "psu_cortexa53_0"
 XSCTH_PROC_cortexr5-zynqmp ??= "psu_cortexr5_0"
@@ -25,8 +13,8 @@ XSCTH_PROC_cortexa72-versal ??= "psv_cortexa72_0"
 XSCTH_PROC_microblaze-plm ??= "psv_pmc_0"
 
 # Enable @ flag on dtc which is required by libxil
-DTC_FLAGS_append = " -@"
-DT_INCLUDE_append = " ${WORKDIR}/git/device_tree/data/kernel_dtsi/2019.2/include/"
+DTC_FLAGS_append_xilinx-standalone = " -@"
+DT_INCLUDE_append_xilinx-standalone = " ${WORKDIR}/git/device_tree/data/kernel_dtsi/${XILINX_RELEASE_VERSION}/include/"
 
 
 do_install_append_cortexa53-zynqmp(){
