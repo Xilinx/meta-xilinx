@@ -22,6 +22,10 @@ SRC_URI = " \
 	file://0013-linux-mali_memory_secure-Add-header-file-dma-direct..patch\
 	file://0014-linux-mali_-timer-Get-rid-of-init_timer.patch\
 	file://0015-fix-driver-failed-to-check-map-error.patch \
+	file://0016-mali_memory_secure-Kernel-5.0-onwards-access_ok-API-.patch \
+	file://0017-Support-for-vm_insert_pfn-deprecated-from-kernel-4.2.patch \
+	file://0018-Change-return-type-to-vm_fault_t-for-fault-handler.patch \
+	file://0019-get_monotonic_boottime-ts-deprecated-from-kernel-4.2.patch \
 	"
 SRC_URI[md5sum] = "85ea110dd6675c70b7d01af87ec9633c"
 SRC_URI[sha256sum] = "7a67127341d17640c1fff5dad80258fb2a37c8a2121b81525fe2327e4532ce2b"
