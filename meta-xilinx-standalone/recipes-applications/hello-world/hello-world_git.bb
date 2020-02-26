@@ -2,7 +2,9 @@ inherit esw deploy
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/hello_world/src/"
 
-DEPENDS += "dtc-native libxil xiltimer device-tree"
+DEPENDS += "dtc-native python3-dtc-native libxil xiltimer device-tree"
+
+inherit python3native
 
 do_configure_prepend() {
     cd ${S}

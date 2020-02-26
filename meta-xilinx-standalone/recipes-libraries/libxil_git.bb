@@ -3,7 +3,7 @@ inherit esw python3native
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/"
 ESW_COMPONENT_NAME = "libxil.a"
 
-DEPENDS += "dtc-native python3-pyyaml-native xilstandalone xilmem device-tree"
+DEPENDS += "dtc-native python3-dtc-native python3-pyyaml-native xilstandalone xilmem device-tree"
 
 do_configure_prepend() {
     # This will generate CMakeLists.txt which contains
