@@ -1,6 +1,6 @@
 inherit esw deploy python3native
 
-DEPENDS += "dtc-native python3-pyyaml-native xilstandalone libxil xiltimer device-tree"
+DEPENDS += "dtc-native python3-dtc-native python3-pyyaml-native xilstandalone libxil xiltimer device-tree"
 
 do_configure_prepend() {
     cd ${S}
