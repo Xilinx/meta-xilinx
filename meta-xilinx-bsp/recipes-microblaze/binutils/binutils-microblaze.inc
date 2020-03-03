@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_append := "${THISDIR}/binutils:"
+FILESEXTRAPATHS_append := ":${THISDIR}/binutils"
 
 SRC_URI_append = " \
 	file://0001-Add-wdc.ext.clear-and-wdc.ext.flush-insns.patch \

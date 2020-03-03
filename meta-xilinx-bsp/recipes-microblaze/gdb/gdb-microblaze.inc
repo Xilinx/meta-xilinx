@@ -2,7 +2,7 @@
 LTTNGUST_microblaze = ""
 
 # Add MicroBlaze patches
-FILESEXTRAPATHS_append := "${THISDIR}/gdb:"
+FILESEXTRAPATHS_append := ":${THISDIR}/gdb"
 
 SRC_URI_append_microblaze = " \
 	file://0001-Add-wdc.ext.clear-and-wdc.ext.flush-insns.patch \
