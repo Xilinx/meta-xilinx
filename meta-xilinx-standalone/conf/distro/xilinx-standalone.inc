@@ -31,3 +31,11 @@ DISTRO_FEATURES_BACKFILL_xilinx-standalone = ""
 VIRTUAL-RUNTIME_init_manager_xilinx-standalone = ""
 
 PREFERRED_PROVIDER_virtual/kernel = "linux-dummy"
+
+# Hold this until it gets merged in core, we need libc.a and libgloss.a for cross-canadian
+LIBC_DEPENDENCIES_append = " newlib-staticdev libgloss-staticdev"
+
+# No cached configsite files
+TOOLCHAIN_NEED_CONFIGSITE_CACHE = ""
+
+TOOLCHAIN_HOST_TASK_append = " nativesdk-qemu-xilinx"
