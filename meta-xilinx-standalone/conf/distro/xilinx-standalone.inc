@@ -38,4 +38,5 @@ LIBC_DEPENDENCIES_append = " newlib-staticdev libgloss-staticdev"
 # No cached configsite files
 TOOLCHAIN_NEED_CONFIGSITE_CACHE = ""
 
-TOOLCHAIN_HOST_TASK_append = " nativesdk-qemu-xilinx"
+# Workaround for pulling in nativesdk-mingw-w64-winpthreads
+TOOLCHAIN_HOST_TASK_append_sdkmingw32 = " nativesdk-mingw-w64-winpthreads"
