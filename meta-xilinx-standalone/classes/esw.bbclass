@@ -31,6 +31,7 @@ COMPATIBLE_HOST_cortexa53-zynqmp = "aarch64.*-elf"
 COMPATIBLE_MACHINE_cortexa53-zynqmp = "cortexa53-zynqmp"
 
 COMPATIBLE_MACHINE_cortexr5-zynqmp = "cortexr5-zynqmp"
+COMPATIBLE_MACHINE_cortexr5-versal = "cortexr5-versal"
 
 COMPATIBLE_HOST_cortexa72-versal = "aarch64.*-elf"
 COMPATIBLE_MACHINE_cortexa72-versal = "cortexa72-versal"
@@ -43,6 +44,7 @@ DTBFILE_microblaze-plm ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
 DTBFILE_cortexa53-zynqmp ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
 DTBFILE_cortexr5-zynqmp ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
 DTBFILE_cortexa72-versal ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
+DTBFILE_cortexr5-versal ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
 
 def get_xlnx_cmake_machine(fam, d):
     if (fam == 'zynqmp'):
