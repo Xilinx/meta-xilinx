@@ -4,6 +4,8 @@ SECTION = "bootloader"
 LICENSE = "BSD-3-Clause"
 DEPENDS += "python3-dtc"
 
+RDEPENDS_${PN} += "python3-dtc"
+
 SRC_URI = "git://gitenterprise.xilinx.com/brucea/lopper.git"
 
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=fe0b8a4beea8f0813b606d15a3df3d3c"
