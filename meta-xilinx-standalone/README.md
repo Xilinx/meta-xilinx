@@ -2,7 +2,14 @@ meta-xilinx-standalone
 ======================
 
 This layer is meant to augment Yocto/OE functionality to provide a 
-Baremetal/Standalone Toolchain.
+Baremetal/Standalone Toolchain as well as the foundation for building
+the embeddedsw components that enable non-Linux software required for
+Xilinx based FPGA/SOCs.
+
+Note, the non-Linux software components are still in development and
+this should be considered to be a preview release only.  For instance,
+some components may not be buildable, expect APIs to change on various
+parts and pieces.
 
 
 Maintainers, Mailing list, Patches
