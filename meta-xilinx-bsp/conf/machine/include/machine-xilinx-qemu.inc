@@ -1,8 +1,14 @@
 # This include is used to setup default QEMU and qemuboot config for meta-xilinx
 # machines.
 
+# Use the xilinx specific version for these users
+IMAGE_CLASSES += "qemuboot-xilinx"
+
 # depend on qemu-helper-native, which will depend on QEMU
-EXTRA_IMAGEDEPENDS += "qemu-helper-native"
+EXTRA_IMAGEDEPENDS += "qemu-xilinx-helper-native"
+
+PREFERRED_PROVIDER_qemu-helper-native = "qemu-xilinx-helper-native"
+PREFERRED_PROVIDER_qemu = "qemu-xilinx"
 
 def qemu_default_dtb(d):
     if d.getVar("IMAGE_BOOT_FILES", True):
