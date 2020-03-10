@@ -13,7 +13,7 @@ MACHINEOVERRIDES_prepend_zynqmpeg = "mali400:"
 MACHINEOVERRIDES_prepend_zynqmpev = "mali400:vcu:"
 
 require conf/machine/include/tune-cortexa72-cortexa53.inc
-require conf/machine/include/soc-family.inc
+require conf/machine/include/xilinx-soc-family.inc
 
 # Linux Configuration
 KERNEL_IMAGETYPE ?= "Image"

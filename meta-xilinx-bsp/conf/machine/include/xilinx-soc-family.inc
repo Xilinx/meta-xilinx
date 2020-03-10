@@ -1,3 +1,5 @@
+require conf/machine/include/soc-family.inc
+
 SOC_VARIANT ??= ""
 MACHINEOVERRIDES =. "${@['', '${SOC_FAMILY}${SOC_VARIANT}:']['${SOC_VARIANT}' != '']}"
 

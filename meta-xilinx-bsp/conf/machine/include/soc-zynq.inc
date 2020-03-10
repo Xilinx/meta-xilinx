@@ -8,7 +8,7 @@ SOC_FAMILY ?= "zynq"
 SOC_VARIANT ?= "7z"
 
 require conf/machine/include/tune-cortexa9.inc
-require conf/machine/include/soc-family.inc
+require conf/machine/include/xilinx-soc-family.inc
 
 # Linux Configuration
 KERNEL_IMAGETYPE ?= "uImage"
