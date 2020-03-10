@@ -5,6 +5,7 @@ SOC_FAMILY ?= "zynqmp"
 # "cg" - Zynq UltraScale+  CG Devices
 # "eg" - Zynq UltraScale+  EG Devices
 # "ev" - Zynq UltraScale+  EV Devices
+# "dr" - Zynq UltraScale+  DR Devices
 
 SOC_VARIANT ?= "eg"
 
