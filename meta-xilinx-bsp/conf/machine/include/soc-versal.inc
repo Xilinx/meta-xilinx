@@ -6,8 +6,8 @@ SOC_FAMILY ?= "versal"
 
 SOC_VARIANT ?= "s80"
 
-require conf/machine/include/tune-cortexa72-cortexa53.inc
-require conf/machine/include/xilinx-soc-family.inc
+require soc-tune-include.inc
+require xilinx-soc-family.inc
 
 # Linux Configuration
 KERNEL_IMAGETYPE ?= "Image"
