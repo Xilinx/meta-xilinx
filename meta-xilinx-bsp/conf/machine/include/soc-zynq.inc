@@ -17,3 +17,8 @@ KERNEL_IMAGETYPES += "zImage"
 # Set default load address.
 # Override with KERNEL_EXTRA_ARGS_<board> += "..." in machine file if required
 KERNEL_EXTRA_ARGS_zynq += "UIMAGE_LOADADDR=0x8000"
+
+# WIC Specific dependencies
+WIC_DEPENDS ?= "virtual/kernel virtual/bootloader virtual/boot-bin"
+
+UBOOT_ELF ?= "u-boot.elf"

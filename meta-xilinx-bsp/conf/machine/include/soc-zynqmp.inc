@@ -20,3 +20,9 @@ KERNEL_IMAGETYPE ?= "Image"
 
 # Support multilib on zynqmp
 DEFAULTTUNE_virtclass-multilib-lib32 ?= "armv7vethf-neon-vfpv4"
+
+WIC_DEPENDS ?= "virtual/kernel virtual/bootloader virtual/boot-bin virtual/arm-trusted-firmware"
+
+UBOOT_SUFFIX ?= "bin"
+
+XSERVER_EXT_zynqmp ?= "xf86-video-armsoc"

@@ -12,3 +12,6 @@ require conf/machine/include/xilinx-soc-family.inc
 # Linux Configuration
 KERNEL_IMAGETYPE ?= "Image"
 
+WIC_DEPENDS ?= "virtual/kernel virtual/bootloader virtual/boot-bin virtual/arm-trusted-firmware"
+
+UBOOT_ELF ?= "u-boot.elf"
