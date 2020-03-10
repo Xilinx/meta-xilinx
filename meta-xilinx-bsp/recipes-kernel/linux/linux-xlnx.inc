@@ -8,10 +8,13 @@ KBRANCH ?= ""
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
 
 FILESOVERRIDES_append = ":${XILINX_RELEASE_VERSION}"
-KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https"
-SRC_URI = "${KERNELURI};${SRCBRANCHARG}"
+KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https;name=machine"
+YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.4;destsuffix=yocto-kmeta"
+SRC_URI = "${KERNELURI};${SRCBRANCHARG} ${YOCTO_META}"
 
 SRCREV_machine ?= "${SRCREV}"
+SRCREV_meta ?= "b8c82ba37370e4698ff0c42f3e54b8b4f2fb4ac0"
+SRCREV_FORMAT = "machine"
 
 require recipes-kernel/linux/linux-yocto.inc
 require linux-microblaze.inc
