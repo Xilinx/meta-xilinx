@@ -9,6 +9,9 @@ SOC_FAMILY ?= "zynqmp"
 
 SOC_VARIANT ?= "eg"
 
+MACHINEOVERRIDES_prepend_zynqmpeg = "mali400:"
+MACHINEOVERRIDES_prepend_zynqmpev = "mali400:vcu:"
+
 require conf/machine/include/tune-cortexa72-cortexa53.inc
 require conf/machine/include/soc-family.inc
 
