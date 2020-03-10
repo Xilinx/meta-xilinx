@@ -18,7 +18,7 @@ S  = "${WORKDIR}/git"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynqmp = "zynqmp"
 
-PACKAGE_ARCH = "${SOC_FAMILY}"
+PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
 
 RDEPENDS_${PN} = "kernel-module-vcu"
 

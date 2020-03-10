@@ -18,7 +18,7 @@ SRC_URI   = "${REPO};${BRANCHARG}"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynqmp = "zynqmp"
 
-PACKAGE_ARCH = "${SOC_FAMILY}"
+PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
 
 do_install() {
     install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5d_b.fw ${D}/lib/firmware/al5d_b.fw
