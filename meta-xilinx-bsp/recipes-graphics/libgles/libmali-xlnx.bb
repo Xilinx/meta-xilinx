@@ -7,6 +7,8 @@ inherit distro_features_check update-alternatives
 
 ANY_OF_DISTRO_FEATURES = "x11 fbdev wayland"
 
+PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl virtual/libgbm"
+
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 REPO ?= "git://github.com/Xilinx/mali-userspace-binaries.git;protocol=https"
