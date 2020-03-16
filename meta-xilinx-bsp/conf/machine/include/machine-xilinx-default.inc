@@ -12,7 +12,7 @@ PREFERRED_PROVIDER_virtual/kernel ??= "linux-xlnx"
 PREFERRED_PROVIDER_virtual/bootloader ??= "u-boot-xlnx"
 PREFERRED_PROVIDER_virtual/boot-bin ??= "${PREFERRED_PROVIDER_virtual/bootloader}"
 
-do_image_wic[depends] += "${@' '.join('%s:do_deploy' % r for r in d.getVar('WIC_DEPENDS').split())}"
+do_image_wic[depends] += "${@' '.join('%s:do_deploy' % r for r in (d.getVar('WIC_DEPENDS') or "").split())}"
 
 UBOOT_SUFFIX ?= "img"
 UBOOT_SUFFIX_microblaze ?= "bin"
