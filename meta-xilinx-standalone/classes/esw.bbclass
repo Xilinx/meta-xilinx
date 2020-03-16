@@ -70,7 +70,7 @@ def get_xlnx_cmake_processor(machine, d):
 
 XLNX_CMAKE_MACHINE = "${@get_xlnx_cmake_machine(d.getVar('SOC_FAMILY'), d)}"
 XLNX_CMAKE_PROCESSOR = "${@get_xlnx_cmake_processor(d.getVar('MACHINE'), d)}"
-
+XLNX_CMAKE_SYSTEM_NAME ?= "Generic"
 
 cmake_do_generate_toolchain_file_append() {
     cat >> ${WORKDIR}/toolchain.cmake <<EOF
@@ -81,7 +81,7 @@ cmake_do_generate_toolchain_file_append() {
     set( CMAKE_MACHINE "${XLNX_CMAKE_MACHINE}" )
     # Will need this in the future to make cmake understand esw variables
     # set( CMAKE_SYSTEM_NAME `echo elf | sed -e 's/^./\u&/' -e 's/^\(Linux\).*/\1/'` )
-    set( CMAKE_SYSTEM_NAME "Generic" )
+    set( CMAKE_SYSTEM_NAME "${XLNX_CMAKE_SYSTEM_NAME}" )
 EOF
 }
 
