@@ -4,6 +4,7 @@ ESW_COMPONENT_SRC = "/ThirdParty/sw_services/lwip211/src/"
 ESW_COMPONENT_NAME = "liblwip211.a"
 
 DEPENDS += "dtc-native python3-dtc-native libxil python3-pyyaml-native"
+DEPENDS_append_xilinx-freertos = "freertos10-xilinx"
 
 do_configure_prepend() {
     # This script should also not rely on relative paths and such
