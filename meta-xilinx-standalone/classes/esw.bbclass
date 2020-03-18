@@ -15,6 +15,11 @@ S = "${WORKDIR}/git/"
 B = "${WORKDIR}/build/"
 OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
 
+SPECFILE_PATH_arm = "${S}/scripts/specs/arm/Xilinx.spec"
+SPECFILE_PATH_aarch64 = "${S}/scripts/specs/arm/Xilinx.spec"
+SPECFILE_PATH_microblaze = "${S}/scripts/specs/microblaze/Xilinx.spec"
+
+ESW_CFLAGS += "-specs=${SPECFILE_PATH}"
 
 inherit ccmake
 
