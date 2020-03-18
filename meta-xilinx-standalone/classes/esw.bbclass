@@ -53,23 +53,25 @@ def get_xlnx_cmake_machine(fam, d):
         cmake_machine = 'Versal'
     return cmake_machine
 
-def get_xlnx_cmake_processor(machine, d):
-    if (machine == 'cortexa53-zynqmp'):
+def get_xlnx_cmake_processor(tune, machine, d):
+    cmake_processor = tune
+    if tune.startswith('microblaze'):
+        if (machine == 'microblaze-pmu'):
+            cmake_processor = 'pmu_microblaze'
+        elif (machine == 'microblaze-plm'):
+            cmake_processor = 'plm_microblaze'
+        else:
+            cmake_processor = 'microblaze'
+    elif (tune in [ 'cortexr5', 'cortexr5f' ]):
+        cmake_processor = 'cortexr5'
+    elif (tune in [ 'cortexa53', 'cortexa72-cortexa53' ]):
         cmake_processor = 'cortexa53'
-    elif (machine == 'cortexr5-zynqmp'):
-        cmake_processor = 'cortexr5'
-    elif (machine == 'cortexr5-versal'):
-        cmake_processor = 'cortexr5'
-    elif (machine == 'cortexa72-versal'):
+    elif tune == 'cortexa72':
         cmake_processor = 'cortexa72'
-    elif (machine == 'microblaze-pmu'):
-        cmake_processor = 'pmu_microblaze'
-    elif (machine == 'microblaze-plm'):
-        cmake_processor = 'plm_microblaze'
     return cmake_processor
 
 XLNX_CMAKE_MACHINE = "${@get_xlnx_cmake_machine(d.getVar('SOC_FAMILY'), d)}"
-XLNX_CMAKE_PROCESSOR = "${@get_xlnx_cmake_processor(d.getVar('MACHINE'), d)}"
+XLNX_CMAKE_PROCESSOR = "${@get_xlnx_cmake_processor(d.getVar('DEFAULTTUNE'), d.getVar('MACHINE'), d)}"
 XLNX_CMAKE_SYSTEM_NAME ?= "Generic"
 
 cmake_do_generate_toolchain_file_append() {
