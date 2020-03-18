@@ -21,12 +21,7 @@ inherit ccmake
 COMPATIBLE_OS = "elf"
 COMPATIBLE_OS_arm = "eabi"
 
-DTBFILE_microblaze-pmu ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
-DTBFILE_microblaze-plm ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
-DTBFILE_cortexa53-zynqmp ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
-DTBFILE_cortexr5-zynqmp ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
-DTBFILE_cortexa72-versal ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
-DTBFILE_cortexr5-versal ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
+DTBFILE ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
 
 def get_xlnx_cmake_machine(fam, d):
     if (fam == 'zynqmp'):
