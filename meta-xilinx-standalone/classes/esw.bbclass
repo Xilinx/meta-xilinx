@@ -24,10 +24,13 @@ COMPATIBLE_OS_arm = "eabi"
 DTBFILE ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
 
 def get_xlnx_cmake_machine(fam, d):
+    cmake_machine = fam
     if (fam == 'zynqmp'):
         cmake_machine = 'ZynqMP'
     elif (fam == 'versal'):
         cmake_machine = 'Versal'
+    elif (fam == 'zynq'):
+        cmake_machine = 'Zynq'
     return cmake_machine
 
 def get_xlnx_cmake_processor(tune, machine, d):
@@ -41,6 +44,8 @@ def get_xlnx_cmake_processor(tune, machine, d):
             cmake_processor = 'microblaze'
     elif (tune in [ 'cortexr5', 'cortexr5f' ]):
         cmake_processor = 'cortexr5'
+    elif tune.startswith('cortexa9'):
+        cmake_processor = 'cortexa9'
     elif (tune in [ 'cortexa53', 'cortexa72-cortexa53' ]):
         cmake_processor = 'cortexa53'
     elif tune == 'cortexa72':
