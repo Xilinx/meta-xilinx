@@ -1,5 +1,7 @@
 inherit esw deploy
 
+COMPATIBLE_MACHINE = "microblaze-pmu"
+
 ESW_COMPONENT_SRC = "/lib/sw_apps/zynqmp_pmufw/src"
 
 DEPENDS += "xilstandalone xiltimer xilfpga xilskey"

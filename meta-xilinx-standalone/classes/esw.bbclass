@@ -18,24 +18,6 @@ OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
 
 inherit ccmake
 
-# TODO
-# We need to put these per recipe probably, e.g. pmu on mb, fsbl on a53
-COMPATIBLE_HOST_microblaze-pmu = "microblaze.*-elf"
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_microblaze-pmu = "microblaze-pmu"
-
-COMPATIBLE_HOST_microblaze-plm = "microblaze.*-elf"
-COMPATIBLE_MACHINE_microblaze-plm = "microblaze-plm"
-
-COMPATIBLE_HOST_cortexa53-zynqmp = "aarch64.*-elf"
-COMPATIBLE_MACHINE_cortexa53-zynqmp = "cortexa53-zynqmp"
-
-COMPATIBLE_MACHINE_cortexr5-zynqmp = "cortexr5-zynqmp"
-COMPATIBLE_MACHINE_cortexr5-versal = "cortexr5-versal"
-
-COMPATIBLE_HOST_cortexa72-versal = "aarch64.*-elf"
-COMPATIBLE_MACHINE_cortexa72-versal = "cortexa72-versal"
-
 COMPATIBLE_OS = "elf"
 COMPATIBLE_OS_arm = "eabi"
 

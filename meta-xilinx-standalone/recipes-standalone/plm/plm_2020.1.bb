@@ -9,8 +9,7 @@ PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
 SRC_URI = "git://github.com/Xilinx/embeddedsw.git;protocol=https;nobranch=1"
 
 COMPATIBLE_HOST = "microblaze.*-elf"
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_versal-mb = "versal-mb"
+COMPATIBLE_MACHINE = "versal-mb"
 
 
 S = "${WORKDIR}/git/lib/sw_apps/versal_plm/src"

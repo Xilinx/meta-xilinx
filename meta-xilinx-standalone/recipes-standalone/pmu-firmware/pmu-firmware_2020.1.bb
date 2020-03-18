@@ -9,9 +9,7 @@ PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
 SRC_URI = "git://github.com/Xilinx/embeddedsw.git;protocol=https;nobranch=1"
 
 COMPATIBLE_HOST = "microblaze.*-elf"
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_microblaze-pmu = "microblaze-pmu"
-
+COMPATIBLE_MACHINE = "microblaze-pmu"
 
 S = "${WORKDIR}/git/lib/sw_apps/zynqmp_pmufw/src"
 

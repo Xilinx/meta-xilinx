@@ -1,5 +1,7 @@
 inherit esw deploy
 
+COMPATIBLE_MACHINE = ".*-zynqmp"
+
 ESW_COMPONENT_SRC = "/lib/sw_apps/zynqmp_fsbl/src"
 
 DEPENDS += "xilstandalone xiltimer xilffs xilsecure xilpm device-tree"
