@@ -5,9 +5,14 @@ LICFILENAME = "license.txt"
 LIC_FILES_CHKSUM = "file://${S}/${LICFILENAME};md5=39ab6ab638f4d1836ba994ec6852de94"
 
 # We should move to an actual SRCREV eventually
-SRCREV = "${AUTOREV}"
+include conf/xilinx/esw-srcrev.inc
+
+EMBEDDEDSW_SRCREV ?= "${AUTOREV}"
+SRCREV = "${EMBEDDEDSW_SRCREV}"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
-SRC_URI = "git://gitenterprise.xilinx.com/decoupling/embeddedsw.git;branch=master-next-test;protocol=https"
+EMBEDDEDSW_REPO ?= "git://github.com/xilinx/embeddedsw.git;protocol=https"
+EMBEDDEDSW_BRANCH ?= "master"
+SRC_URI = "${EMBEDDEDSW_REPO};branch=${EMBEDDEDSW_BRANCH}"
 
 SRCREV_FORMAT = "src_decouple"
 
