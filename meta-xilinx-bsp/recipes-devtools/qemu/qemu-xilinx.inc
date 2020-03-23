@@ -18,7 +18,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 PV = "${XILINX_QEMU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 BRANCH ?= ""
-REPO ?= "git://github.com/Xilinx/qemu.git;protocol=https"
+REPO ?= "gitsm://github.com/Xilinx/qemu.git;protocol=https"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
@@ -34,6 +34,8 @@ PACKAGECONFIG_append = " fdt gcrypt"
 DISABLE_STATIC_pn-${PN} = ""
 
 PTEST_ENABLED = ""
+
+EXTRA_OECONF_append = " --with-git=/bin/false --disable-git-update"
 
 do_install_append() {
 	# Prevent QA warnings about installed ${localstatedir}/run
