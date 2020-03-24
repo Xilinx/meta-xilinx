@@ -96,7 +96,7 @@ python(){
         raise bb.parse.SkipRecipe('Recipe is only compatible with xilinx-standalone')
 
     import os.path
-    if bb.data.inherits_class('externalsrc', d) or d.getVar('EXTERNALSRC'):
+    if bb.data.inherits_class('externalsrc', d) and d.getVar('EXTERNALSRC'):
         externalsrc = d.getVar('EXTERNALSRC')
         lic_file = d.getVar('LIC_FILES_CHKSUM', False)
         licpath=externalsrc
