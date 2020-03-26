@@ -28,9 +28,6 @@ ESW_CFLAGS += "-specs=${SPECFILE_PATH}"
 
 inherit ccmake
 
-COMPATIBLE_OS = "elf"
-COMPATIBLE_OS_arm = "eabi"
-
 DTBFILE ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
 
 def get_xlnx_cmake_machine(fam, d):

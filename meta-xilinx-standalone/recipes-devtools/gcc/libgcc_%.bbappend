@@ -1,5 +1,3 @@
-COMPATIBLE_OS_xilinx-standalone = "${TARGET_OS}"
-
 python do_multilib_install_xilinx-standalone_class-target () {
     pass
 }
