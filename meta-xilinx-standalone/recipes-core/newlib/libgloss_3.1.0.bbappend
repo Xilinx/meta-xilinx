@@ -1,3 +1,6 @@
+COMPATIBLE_HOST = ".*-elf"
+COMPATIBLE_HOST_arm = "[^-]*-[^-]*-eabi"
+
 # When building multiple, we need to depend on the multilib newlib
 DEPENDS_append_xilinx-standalone = " ${MLPREFIX}newlib"
 

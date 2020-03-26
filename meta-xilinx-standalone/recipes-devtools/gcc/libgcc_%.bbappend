@@ -1,3 +1,5 @@
+COMPATIBLE_HOST = "${HOST_SYS}"
+
 python do_multilib_install_xilinx-standalone_class-target () {
     pass
 }

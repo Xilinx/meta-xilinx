@@ -28,6 +28,9 @@ ESW_CFLAGS += "-specs=${SPECFILE_PATH}"
 
 inherit ccmake
 
+COMPATIBLE_HOST = ".*-elf"
+COMPATIBLE_HOST_arm = "[^-]*-[^-]*-eabi"
+
 DTBFILE ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
 
 def get_xlnx_cmake_machine(fam, d):

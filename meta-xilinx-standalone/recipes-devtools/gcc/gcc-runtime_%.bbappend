@@ -1,3 +1,5 @@
+COMPATIBLE_HOST = "${HOST_SYS}"
+
 # Copy of gcc-xilinx-standalone.inc, but with _class-target added
 LINKER_HASH_STYLE_xilinx-standalone_class-target = ""
 SYMVERS_CONF_xilinx-standalone_class-target = ""

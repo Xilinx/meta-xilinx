@@ -1,3 +1,5 @@
+COMPATIBLE_HOST = ".*-elf"
+COMPATIBLE_HOST_arm = "[^-]*-[^-]*-eabi"
 
 EXTRA_OECONF_append_xilinx-standalone = " \
 	--enable-newlib-io-c99-formats \
