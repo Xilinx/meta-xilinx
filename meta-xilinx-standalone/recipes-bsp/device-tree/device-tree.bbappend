@@ -1,4 +1,4 @@
-COMPATIBLE_OS_xilinx-standalone = "${TARGET_OS}"
+COMPATIBLE_HOST_xilinx-standalone = "${HOST_SYS}"
 
 COMPATIBLE_MACHINE_cortexa53-zynqmp = ".*"
 COMPATIBLE_MACHINE_cortexr5-zynqmp = ".*"
