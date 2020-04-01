@@ -33,6 +33,8 @@ GCCPIE_microblaze = ""
 GLIBCPIE_microblaze = ""
 SECURITY_CFLAGS_microblaze = ""
 SECURITY_LDFLAGS_microblaze = ""
+# Microblaze does not support gnu hash style
+LINKER_HASH_STYLE_microblaze = "sysv"
 
 XSERVER ?= " \
 	xserver-xorg \
