@@ -22,8 +22,9 @@ def qemu_default_dtb(d):
     return ""
 
 def qemu_default_serial(d):
-    if d.getVar("SERIAL_CONSOLE", True):
-        speed, console = d.getVar("SERIAL_CONSOLE", True).split(" ", 1)
+    if d.getVar("SERIAL_CONSOLES", True):
+        first_console = d.getVar("SERIAL_CONSOLES", True).split(" ")[0]
+        speed, console = first_console.split(";", 1)
         # zynqmp uses earlycon and stdout (in dtb)
         if "zynqmp" in d.getVar("MACHINEOVERRIDES", True).split(":"):
             return ""
