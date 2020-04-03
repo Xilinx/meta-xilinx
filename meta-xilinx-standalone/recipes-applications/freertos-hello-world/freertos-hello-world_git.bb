@@ -21,7 +21,7 @@ FREERTOS_HELLO_WORLD_BASE_NAME[vardepsexclude] = "DATETIME"
 do_deploy() {
 
     # We need to deploy the stripped elf, hence why not doing it from ${D}
-    install -Dm 0644 ${WORKDIR}/package/${base_libdir}/firmware/freertos_hello_world.elf ${DEPLOYDIR}/${HELLO_WORLD_BASE_NAME}.elf
+    install -Dm 0644 ${WORKDIR}/package/${base_libdir}/firmware/freertos_hello_world.elf ${DEPLOYDIR}/${FREERTOS_HELLO_WORLD_BASE_NAME}.elf
     ln -sf ${FREERTOS_HELLO_WORLD_BASE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}.elf 
     ${OBJCOPY} -O binary ${WORKDIR}/package/${base_libdir}/firmware/freertos_hello_world.elf ${WORKDIR}/package/${base_libdir}/firmware/freertos_hello_world.bin
     install -m 0644 ${WORKDIR}/package/${base_libdir}/firmware/freertos_hello_world.bin ${DEPLOYDIR}/${FREERTOS_HELLO_WORLD_BASE_NAME}.bin
