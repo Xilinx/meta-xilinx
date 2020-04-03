@@ -92,9 +92,6 @@ CFLAGS_append = " ${ESW_CFLAGS}"
 # recurse a maximum of x times, could be fancier but it gets complicated since
 # we dont know for certain we are running devtool or just externalsrc
 python(){
-    if not d.getVar('DISTRO').startswith('xilinx-standalone'):
-        raise bb.parse.SkipRecipe('Recipe is only compatible with xilinx-standalone')
-
     import os.path
     if bb.data.inherits_class('externalsrc', d) and d.getVar('EXTERNALSRC'):
         externalsrc = d.getVar('EXTERNALSRC')
