@@ -32,7 +32,7 @@ SRC_URI[sha256sum] = "7a67127341d17640c1fff5dad80258fb2a37c8a2121b81525fe2327e45
 
 inherit module
 
-do_make_scripts[depends] += "virtual/kernel:do_unpack"
+PARALLEL_MAKE = "-j 1"
 
 S = "${WORKDIR}/DX910-SW-99002-${PV}/driver/src/devicedrv/mali"
 
@@ -49,6 +49,5 @@ EXTRA_OEMAKE = 'KDIR="${STAGING_KERNEL_DIR}" \
 		USING_DT=1 \
 		MALI_SHARED_INTERRUPTS=1 \
 		CROSS_COMPILE="${TARGET_PREFIX}" \
-		O=${STAGING_KERNEL_BUILDDIR} \
 		MALI_QUIET=1 \
 		'
