@@ -34,6 +34,7 @@ do_deploy() {
 
 addtask deploy before do_build after do_package
 
-CFLAGS_append = " -DARMA53_64"
+CFLAGS_append_aarch64 = " -DARMA53_64"
+CFLAGS_append_armrm = " -DARMR5"
 
 FILES_${PN} = "${base_libdir}/firmware/zynqmp_fsbl*"
