@@ -46,4 +46,5 @@ SRC_URI_append = " \
 	file://0043-Removing-the-header-gdb_assert.h-from-MB-target-file.patch \
 	file://0044-gdb-microblaze-linux-nat.c-Fix-target-compilation-of.patch \
 	file://0045-Fixed-bug-in-generation-of-IMML-instruction-for-the.patch \
+	file://0046-Patch-MicroBlaze-m64-This-patch-will-remove-imml-0-a.patch \
 	"
