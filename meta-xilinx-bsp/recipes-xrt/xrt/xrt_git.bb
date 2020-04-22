@@ -31,6 +31,11 @@ EXTRA_OECMAKE += " \
 		-DCMAKE_EXPORT_COMPILE_COMANDS=ON \
 		"
 
+EXTRA_OECMAKE_append_versal += "-DXRT_AIE_BUILD=true"
+TARGET_CXXFLAGS_append_versal += "-DXRT_ENABLE_AIE"
+DEPENDS_append_versal += " libmetal libxaiengine"
+RDEPENDS_${PN}_append_versal += " libxaiengine"
+
 pkg_postinst_ontarget_${PN}() {
   #!/bin/sh
   if [ ! -e /etc/OpenCL/vendors/xilinx.icd ]; then
