@@ -1,6 +1,0 @@
-include bsp/xilinx/xt-checksum.scc
-include bsp/xilinx/ebtables.scc
-include bsp/xilinx/vswitch.scc
-include bsp/xilinx/lxc.scc
-include bsp/xilinx/docker.scc
-
