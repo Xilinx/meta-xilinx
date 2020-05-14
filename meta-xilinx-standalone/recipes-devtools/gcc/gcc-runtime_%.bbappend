@@ -1,8 +1,6 @@
-COMPATIBLE_HOST = "${HOST_SYS}"
+require gcc-configure-xilinx-standalone.inc
 
-# Copy of gcc-xilinx-standalone.inc, but with _class-target added
-LINKER_HASH_STYLE_xilinx-standalone_class-target = ""
-SYMVERS_CONF_xilinx-standalone_class-target = ""
+COMPATIBLE_HOST = "${HOST_SYS}"
 
 EXTRA_OECONF_append_xilinx-standalone_class-target = " \
 	--disable-libstdcxx-pch \
@@ -33,7 +31,6 @@ EXTRA_OECONF_append_xilinx-standalone_armrm_class-target = " \
 	"
 
 EXTRA_OECONF_append_xilinx-standalone_microblaze_class-target = " \
-	--disable-__cxa_atexit \
 	--enable-target-optspace \
 	--without-long-double-128 \
 	"
