@@ -8,13 +8,13 @@ LIC_FILES_CHKSUM = "file://../LICENSE;md5=fa343562af4b9b922b8d7fe7b0b6d000 \
                     file://runtime_src/core/pcie/linux/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57 \
                     file://runtime_src/core/pcie/tools/xbutil/LICENSE;md5=d273d63619c9aeaf15cdaf76422c4f87 "
 
-BRANCH ?= "2019.2"
+BRANCH ?= "2020.1"
 REPO ?= "git://github.com/Xilinx/XRT.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
 PV = "2.2.0+git${SRCPV}"
-SRCREV ?= "7e3540d2707443d8c824669ef4272b33ce2f9ba4"
+SRCREV ?= "a48f247fffc78109707d53e9e2b8966233caec51" 
 
 S = "${WORKDIR}/git/src"
 
