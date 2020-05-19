@@ -1,7 +1,7 @@
 SUMMARY  = "Xilinx Runtime(XRT) driver module"
 DESCRIPTION = "Xilinx Runtime driver module provides memory management and compute unit schedule"
 
-LICENSE = "GPLv2"
+LICENSE = "GPLv2 & Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=7d040f51aae6ac6208de74e88a3795f8"
 
 BRANCH ?= "2020.1"
@@ -9,7 +9,7 @@ REPO ?= "git://github.com/Xilinx/XRT.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-PV = "2.2.0+git${SRCPV}"
+PV = "202010.2.6.0"
 SRCREV ?= "a48f247fffc78109707d53e9e2b8966233caec51"
 
 S = "${WORKDIR}/git/src/runtime_src/core/edge/drm/zocl"
