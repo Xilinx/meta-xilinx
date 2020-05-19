@@ -12,7 +12,7 @@ DEPENDS = "glib-2.0 zlib pixman"
 
 XILINX_QEMU_VERSION ?= "v4.1.50"
 BRANCH ?= "branch/xilinx-v2020.1"
-SRCREV ?= "d1f07588c0128a1f98f8b1953c25e7827fe161e4"
+SRCREV ?= "e371d99ac19b9c4f3f98e6e6a3db1ea95091a50e"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
