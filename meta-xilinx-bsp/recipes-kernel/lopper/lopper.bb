@@ -4,13 +4,13 @@ SECTION = "bootloader"
 LICENSE = "BSD-3-Clause"
 DEPENDS += "python3-dtc"
 
-RDEPENDS_${PN} += "python3-dtc"
+RDEPENDS_${PN} += "python3-core python3-dtc"
 
-SRC_URI = "git://gitenterprise.xilinx.com/brucea/lopper.git"
+SRC_URI = "git://github.com/devicetree-org/lopper.git"
 
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=fe0b8a4beea8f0813b606d15a3df3d3c"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=8e5f5f691f01c9fdfa7a7f2d535be619"
 
-SRCREV = "70cd4578c8a0ca202ea063cb83768267ea69dd2a"
+SRCREV = "9398385d3ac06419b25d34de21501bc7ac0e8ac3"
 
 S = "${WORKDIR}/git"
 
