@@ -20,6 +20,7 @@ do_configure() {
 
 do_compile() {
 	sed -i 's,#!/usr/bin/python3,#!/usr/bin/env python3,' lopper.py
+	sed -i 's,#!/usr/bin/python3,#!/usr/bin/env python3,' lopper_sanity.py
 }
 
 do_install() {
