@@ -15,7 +15,7 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '
 SRC_URI = "${REPO};${BRANCHARG}"
 
 PV = "202010.2.6.0"
-SRCREV ?= "ddd5bb64ebedcab6df535d5d8525c854115b0555" 
+SRCREV ?= "4daa85e4e3cdd883c0832f82eacb60e7e2f1d093" 
 
 S = "${WORKDIR}/git/src"
 
