@@ -62,7 +62,7 @@ KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', 
 
 KERNEL_FEATURES_append_zynqmp = "${@' features/overlay/overlay.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
 
-KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
+KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} bsp/versal/hdmi-module.scc"
 
 KERNEL_FEATURES_append_ultra96-zynqmp = " bsp/ultra96-zynqmp/mipi-config-ultra96.scc"
 
