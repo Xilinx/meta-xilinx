@@ -50,4 +50,5 @@ SRC_URI_append = " \
 	file://0047-Patch-MicroBlaze-commit-for-triggering-build-to-remo.patch \
 	file://0048-Patch-MicroBlaze-Adding-more-description-to-the-imml.patch \
 	file://0049-Patch-MicroBlaze-improper-address-mapping-of-PROVIDE.patch \
+	file://0050-Fix-i386-md_pseudo_table.patch \
 	"

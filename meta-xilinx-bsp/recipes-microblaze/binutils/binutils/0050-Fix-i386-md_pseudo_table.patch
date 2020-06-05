@@ -1,0 +1,28 @@
+Fix a possible compilation issue on i386 when using microblaze patches
+
+Due to patch 0019, a later item may need to refer to this table.
+
+| ../../gas/config/tc-i386.c:1155:20: error: conflicting types for ‘md_pseudo_table’
+| const pseudo_typeS md_pseudo_table[] =
+|           ^~~~~~~~~~~~~~~
+| In file included from ../../gas/as.h:565:0,
+|         from ../../gas/config/tc-i386.c:28:
+| ../../gas/tc.h:25:21: note: previous declaration of ‘md_pseudo_table’ was here
+| extern pseudo_typeS md_pseudo_table[];
+|           ^~~~~~~~~~~~~~~
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+
+Index: git/gas/config/tc-i386.c
+===================================================================
+--- git.orig/gas/config/tc-i386.c
++++ git/gas/config/tc-i386.c
+@@ -1152,7 +1152,7 @@ pe_lcomm (int needs_align)
+ }
+ #endif
+ 
+-const pseudo_typeS md_pseudo_table[] =
++pseudo_typeS md_pseudo_table[] =
+ {
+ #if !defined(OBJ_AOUT) && !defined(USE_ALIGN_PTWO)
+   {"align", s_align_bytes, 0},
