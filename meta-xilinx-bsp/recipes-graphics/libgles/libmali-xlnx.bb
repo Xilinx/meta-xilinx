@@ -3,7 +3,7 @@ DESCRIPTION = "libGLES for ZynqMP with Mali 400"
 LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://EULA;md5=82e466d0ed92c5a15f568dbe6b31089c"
 
-inherit distro_features_check update-alternatives
+inherit features_check update-alternatives
 
 ANY_OF_DISTRO_FEATURES = "x11 fbdev wayland"
 
