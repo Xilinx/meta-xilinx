@@ -23,7 +23,9 @@ REPO ?= "gitsm://github.com/Xilinx/qemu.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-SRC_URI_append = " file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch"
+SRC_URI_append = " file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch \
+		   file://0001-Add-enable-disable-udev.patch \
+"
 
 S = "${WORKDIR}/git"
 
