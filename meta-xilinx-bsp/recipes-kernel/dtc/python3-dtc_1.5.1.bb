@@ -20,7 +20,7 @@ DEPENDS += "libyaml dtc"
 inherit distutils3
 
 do_configure_prepend() {
-    (cd .. ; make version_gen.h )
+    (cd ${S}/../ ; make version_gen.h )
 }
 
 BBCLASSEXTEND = "native nativesdk"
