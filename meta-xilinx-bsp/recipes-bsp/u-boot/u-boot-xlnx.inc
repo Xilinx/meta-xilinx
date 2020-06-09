@@ -13,6 +13,7 @@ UBRANCHARG = "${@['nobranch=1', 'branch=${UBRANCH}'][d.getVar('UBRANCH', True) !
 SRC_URI = "${UBOOTURI};${UBRANCHARG}"
 
 S = "${WORKDIR}/git"
+B = "${WORKDIR}/build"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot:"
 
