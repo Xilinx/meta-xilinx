@@ -13,7 +13,7 @@ YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=met
 SRC_URI = "${KERNELURI};${SRCBRANCHARG} ${YOCTO_META}"
 
 SRCREV_machine ?= "${SRCREV}"
-SRCREV_meta ?= "93b1325e4b9bff0d1ce7a2dd85aed0b26e3e76d7"
+SRCREV_meta ?= "0bb08af47fc2ae9f920708605adc286e8b3fbf6a"
 SRCREV_FORMAT = "machine"
 
 require recipes-kernel/linux/linux-yocto.inc
@@ -64,6 +64,6 @@ KERNEL_FEATURES_append_zynqmp = "${@' features/overlay/overlay.scc' if d.getVar(
 
 KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} bsp/versal/hdmi-module.scc"
 
-KERNEL_FEATURES_append_ultra96-zynqmp = " bsp/ultra96-zynqmp/mipi-config-ultra96.scc"
+KERNEL_FEATURES_append_ultra96-zynqmp = " bsp/xilinx/ultra96-zynqmp/mipi-config-ultra96.scc"
 
 KERNEL_FEATURES_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' features/ocicontainer/ocicontainer.scc', '', d)}"
