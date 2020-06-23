@@ -47,4 +47,7 @@ SRC_URI_append = " \
 	file://0044-gdb-microblaze-linux-nat.c-Fix-target-compilation-of.patch \
 	file://0045-Fixed-bug-in-generation-of-IMML-instruction-for-the.patch \
 	file://0046-Patch-MicroBlaze-m64-This-patch-will-remove-imml-0-a.patch \
+	file://0047-Patch-MicroBlaze-commit-for-triggering-build-to-remo.patch \
+	file://0048-Patch-MicroBlaze-Adding-more-description-to-the-imml.patch \
+	file://0049-Patch-MicroBlaze-improper-address-mapping-of-PROVIDE.patch \
 	"
