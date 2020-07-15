@@ -1,6 +1,7 @@
 # Default Xilinx BSP Machine settings
 
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS += "device-tree"
 
 # File System Configuration
 IMAGE_FSTYPES ?= "tar.gz cpio cpio.gz.u-boot"
