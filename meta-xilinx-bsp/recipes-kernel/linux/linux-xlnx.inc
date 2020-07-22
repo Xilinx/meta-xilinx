@@ -13,7 +13,7 @@ YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=met
 SRC_URI = "${KERNELURI};${SRCBRANCHARG} ${YOCTO_META}"
 
 SRCREV_machine ?= "${SRCREV}"
-SRCREV_meta ?= "9f527fb46cdf3f5918551ffb64f90347fc9d9b2d"
+SRCREV_meta ?= "98c91559fa60b12a898c4cc2ea53395e23818188"
 SRCREV_FORMAT = "machine"
 
 require recipes-kernel/linux/linux-yocto.inc
@@ -56,7 +56,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}:"
 SRC_URI_append = " file://xilinx-kmeta;type=kmeta;name=xilinx-kmeta;destsuffix=xilinx-kmeta"
 
 # MicroBlaze BSP fragments
-KERNEL_FEATURES_append_kc705-microblazeel = " bsp/kc705-microblazeel/kc705-microblazeel.scc"
+KERNEL_FEATURES_append_kc705-microblazeel = " bsp/xilinx/kc705-microblazeel-features/kc705-microblazeel-features.scc"
 
 KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
 
