@@ -1,5 +1,0 @@
-define KFEATURE_DESCRIPTION "Kernel Config for hdmi module "
-define KFEATURE_COMPATIBILITY board
-
-kconf hardware hdmi-module.cfg
-
