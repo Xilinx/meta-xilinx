@@ -51,10 +51,6 @@ KBUILD_DEFCONFIG_zynq = "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG_microblaze = "mmu_defconfig"
 KBUILD_DEFCONFIG_versal = "xilinx_versal_defconfig"
 
-# Add meta-xilinx kmeta, used for MicroBlaze BSP fragments
-FILESEXTRAPATHS_prepend := "${THISDIR}:"
-SRC_URI_append = " file://xilinx-kmeta;type=kmeta;name=xilinx-kmeta;destsuffix=xilinx-kmeta"
-
 # MicroBlaze BSP fragments
 KERNEL_FEATURES_append_kc705-microblazeel = " bsp/xilinx/kc705-microblazeel-features/kc705-microblazeel-features.scc"
 
