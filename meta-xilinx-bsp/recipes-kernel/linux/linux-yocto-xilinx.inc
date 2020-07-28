@@ -1,9 +1,5 @@
 require linux-microblaze.inc
 
-# Add meta-xilinx kmeta
-FILESEXTRAPATHS_prepend := "${THISDIR}:"
-SRC_URI_append = " file://xilinx-kmeta;type=kmeta;name=xilinx-kmeta;destsuffix=xilinx-kmeta"
-
 # Zynq default generic KMACHINE
 COMPATIBLE_MACHINE_zynq = "zynq"
 KMACHINE_zynq = "zynq"
