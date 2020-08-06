@@ -1,4 +1,4 @@
-DEFAULTTUNE ?= "cortexa72-cortexa53"
+DEFAULTTUNE ?= "cortexa53"
 SOC_FAMILY ?= "zynqmp"
 
 # Available SOC_VARIANT's for zynqmp:
