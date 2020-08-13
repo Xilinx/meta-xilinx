@@ -1,11 +1,12 @@
-From 1905061b279e6fe5fd9861fc490fd4075edac4a8 Mon Sep 17 00:00:00 2001
+From eeeb8ecda7cb71c033c850ce36162c92c7d0b781 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 16:41:43 +0530
-Subject: [PATCH 09/63] [Patch, microblaze]: Fix atomic side effects. In
- atomic_compare_and_swapsi, add side effects to prevent incorrect assumptions
- during optimization. Previously, the outputs were considered unused; this
- generated assembly code with undefined side effects after invocation of the
- atomic.
+Subject: [PATCH 09/58] [Patch, microblaze]: Fix atomic side effects.
+
+In atomic_compare_and_swapsi, add side effects to prevent incorrect
+assumptions during optimization. Previously, the outputs were
+considered unused; this generated assembly code with
+undefined side effects after invocation of the atomic.
 
 Signed-off-by: Kirk Meyer <kirk.meyer@sencore.com>
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
@@ -18,7 +19,7 @@ Conflicts:
  2 files changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 183afff..7a40c53 100644
+index 7049acd1dcd..eba2776ae56 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -43,6 +43,9 @@
@@ -32,7 +33,7 @@ index 183afff..7a40c53 100644
  
  (define_c_enum "unspec" [
 diff --git a/gcc/config/microblaze/sync.md b/gcc/config/microblaze/sync.md
-index 6f16ca6..bebab5c 100644
+index 76f530b9d3b..24cd67e1fdb 100644
 --- a/gcc/config/microblaze/sync.md
 +++ b/gcc/config/microblaze/sync.md
 @@ -18,14 +18,19 @@
@@ -64,5 +65,5 @@ index 6f16ca6..bebab5c 100644
    ""
    {
 -- 
-2.7.4
+2.17.1
 

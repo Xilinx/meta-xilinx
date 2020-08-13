@@ -1,7 +1,7 @@
-From 00b7561a868b08dab952b9b9f4a01118195aeb29 Mon Sep 17 00:00:00 2001
+From e7e06edfb6c24a993603c9100f8ab8c29999ef90 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 21 Feb 2018 12:32:02 +0530
-Subject: [PATCH 14/43] [Patch,Microblaze]: Compiler will give error messages
+Subject: [PATCH 14/40] [Patch,Microblaze]: Compiler will give error messages
  in more detail for mxl-gp-opt flag..
 
 ---
@@ -9,10 +9,10 @@ Subject: [PATCH 14/43] [Patch,Microblaze]: Compiler will give error messages
  1 file changed, 12 insertions(+)
 
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index 77cdbd0dd2..517d85baef 100644
+index 08be9030cb5..613d748fefd 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
-@@ -1446,6 +1446,18 @@ reloc_overflow (struct bfd_link_info *info,
+@@ -1515,6 +1515,18 @@ reloc_overflow (struct bfd_link_info *info,
  	  break;
  	case bfd_link_hash_defined:
  	case bfd_link_hash_defweak:

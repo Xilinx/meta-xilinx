@@ -1,62 +1,43 @@
-From fef2dfc9c55d19be25262175a4fa4921167a30b7 Mon Sep 17 00:00:00 2001
+From a06b9c4860af1f8f18ccb7c0653c76c623636034 Mon Sep 17 00:00:00 2001
 From: David Holsgrove <david.holsgrove@petalogix.com>
 Date: Fri, 20 Jul 2012 15:18:35 +1000
-Subject: [PATCH 38/43] Initial support for native gdb
+Subject: [PATCH 38/40] Initial support for native gdb
 
 microblaze: Follow PPC method of getting setting registers
 using PTRACE PEEK/POKE
 
 Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
-
-Conflicts:
-	gdb/Makefile.in
 ---
- gdb/Makefile.in                |   4 +-
+ gdb/Makefile.in                |   2 +
  gdb/config/microblaze/linux.mh |   9 +
  gdb/microblaze-linux-nat.c     | 431 +++++++++++++++++++++++++++++++++
- 3 files changed, 443 insertions(+), 1 deletion(-)
+ 3 files changed, 442 insertions(+)
  create mode 100644 gdb/config/microblaze/linux.mh
  create mode 100644 gdb/microblaze-linux-nat.c
 
 diff --git a/gdb/Makefile.in b/gdb/Makefile.in
-index 5614cc3386..d620580498 100644
+index c3e074b21fe..cbcd8f43326 100644
 --- a/gdb/Makefile.in
 +++ b/gdb/Makefile.in
-@@ -1316,6 +1316,7 @@ HFILES_NO_SRCDIR = \
+@@ -1337,6 +1337,7 @@ HFILES_NO_SRCDIR = \
  	memory-map.h \
  	memrange.h \
  	microblaze-tdep.h \
-+        microblaze-linux-tdep.h \
++	microblaze-linux-tdep.h \
  	mips-linux-tdep.h \
  	mips-nbsd-tdep.h \
  	mips-tdep.h \
-@@ -1349,6 +1350,7 @@ HFILES_NO_SRCDIR = \
- 	prologue-value.h \
- 	psympriv.h \
- 	psymtab.h \
-+        ia64-hpux-tdep.h \
- 	ravenscar-thread.h \
- 	record.h \
- 	record-full.h \
-@@ -2263,6 +2265,7 @@ ALLDEPFILES = \
+@@ -2261,6 +2262,7 @@ ALLDEPFILES = \
  	m68k-tdep.c \
  	microblaze-linux-tdep.c \
  	microblaze-tdep.c \
-+        microblaze-linux-nat.c \ 
++	microblaze-linux-nat.c \
  	mingw-hdep.c \
  	mips-fbsd-nat.c \
  	mips-fbsd-tdep.c \
-@@ -2365,7 +2368,6 @@ ALLDEPFILES = \
- 	xtensa-linux-tdep.c \
- 	xtensa-tdep.c \
- 	xtensa-xtregs.c \
--	common/mingw-strerror.c \
- 	common/posix-strerror.c
- 
- # Some files need explicit build rules (due to -Werror problems) or due
 diff --git a/gdb/config/microblaze/linux.mh b/gdb/config/microblaze/linux.mh
 new file mode 100644
-index 0000000000..a4eaf540e1
+index 00000000000..a4eaf540e1d
 --- /dev/null
 +++ b/gdb/config/microblaze/linux.mh
 @@ -0,0 +1,9 @@
@@ -71,7 +52,7 @@ index 0000000000..a4eaf540e1
 +LOADLIBES = -ldl $(RDYNAMIC)
 diff --git a/gdb/microblaze-linux-nat.c b/gdb/microblaze-linux-nat.c
 new file mode 100644
-index 0000000000..e9b8c9c522
+index 00000000000..e9b8c9c5221
 --- /dev/null
 +++ b/gdb/microblaze-linux-nat.c
 @@ -0,0 +1,431 @@
