@@ -46,10 +46,10 @@ COMPATIBLE_MACHINE_versal = ".*"
 
 # Use DEFCONFIGs for configuring linux-xlnx kernels
 KCONFIG_MODE ?= "alldefconfig"
-KBUILD_DEFCONFIG_zynqmp = "xilinx_zynqmp_defconfig"
+KBUILD_DEFCONFIG_zynqmp = "xilinx_defconfig"
 KBUILD_DEFCONFIG_zynq = "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG_microblaze = "mmu_defconfig"
-KBUILD_DEFCONFIG_versal = "xilinx_versal_defconfig"
+KBUILD_DEFCONFIG_versal = "xilinx_defconfig"
 
 # MicroBlaze BSP fragments
 KERNEL_FEATURES_append_kc705-microblazeel = " bsp/xilinx/kc705-microblazeel-features/kc705-microblazeel-features.scc"
