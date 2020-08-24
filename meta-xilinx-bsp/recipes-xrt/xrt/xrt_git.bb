@@ -32,6 +32,7 @@ EXTRA_OECMAKE += " \
 		-DCMAKE_EXPORT_COMPILE_COMANDS=ON \
 		"
 
+PACKAGE_ARCH_versal = "${SOC_FAMILY_ARCH}"
 EXTRA_OECMAKE_append_versal += "-DXRT_AIE_BUILD=true"
 TARGET_CXXFLAGS_append_versal += "-DXRT_ENABLE_AIE"
 DEPENDS_append_versal += " libmetal libxaiengine"
