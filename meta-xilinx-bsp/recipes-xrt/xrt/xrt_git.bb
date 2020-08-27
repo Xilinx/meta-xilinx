@@ -32,11 +32,11 @@ EXTRA_OECMAKE += " \
 		-DCMAKE_EXPORT_COMPILE_COMANDS=ON \
 		"
 
-PACKAGE_ARCH_versal = "${SOC_FAMILY_ARCH}"
-EXTRA_OECMAKE_append_versal += "-DXRT_AIE_BUILD=true"
-TARGET_CXXFLAGS_append_versal += "-DXRT_ENABLE_AIE"
-DEPENDS_append_versal += " libmetal libxaiengine"
-RDEPENDS_${PN}_append_versal += " libxaiengine"
+PACKAGE_ARCH_versal-ai-core = "${SOC_VARIANT_ARCH}"
+EXTRA_OECMAKE_append_versal-ai-core += "-DXRT_AIE_BUILD=true"
+TARGET_CXXFLAGS_append_versal-ai-core += "-DXRT_ENABLE_AIE"
+DEPENDS_append_versal-ai-core += " libmetal libxaiengine"
+RDEPENDS_${PN}_append_versal-ai-core += " libxaiengine"
 
 pkg_postinst_ontarget_${PN}() {
   #!/bin/sh
