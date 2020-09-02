@@ -60,4 +60,5 @@ SRC_URI_append_microblaze = " \
     file://0056-Patch-MicroBlaze-Added-support-for-64-bit-Immediate-.patch \
     file://0057-Patch-microblaze-Fix-Compiler-crash-with-freg-struct.patch \
     file://0058-microblaze-Avoid-UINTPTR_TYPE-macro-redefinition.patch \
+    file://0059-microblaze-multilib-hack.patch \
 "
