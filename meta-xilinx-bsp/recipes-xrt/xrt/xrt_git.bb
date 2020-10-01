@@ -38,6 +38,13 @@ TARGET_CXXFLAGS_append_versal-ai-core += "-DXRT_ENABLE_AIE"
 DEPENDS_append_versal-ai-core += " libmetal libxaiengine"
 RDEPENDS_${PN}_append_versal-ai-core += " libxaiengine"
 
+FILES_SOLIBSDEV = ""
+FILES_${PN} += "\
+    ${libdir}/lib*.so \
+    ${libdir}/lib*.so.* \
+    /lib/*.so* "
+INSANE_SKIP_${PN} += "dev-so"
+
 pkg_postinst_ontarget_${PN}() {
   #!/bin/sh
   if [ ! -e /etc/OpenCL/vendors/xilinx.icd ]; then
