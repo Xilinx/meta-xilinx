@@ -42,7 +42,6 @@ SRC_URI_append = " \
 	file://0039-Fixing-the-issues-related-to-GDB-7.12.patch \
 	file://0040-Patch-microblaze-Adding-64-bit-MB-support.patch \
 	file://0041-patch-MicroBlaze-porting-GDB-for-linux.patch \
-	file://0042-Correcting-the-register-names-from-slr-shr-to-rslr-r.patch \
 	file://0043-Removing-the-header-gdb_assert.h-from-MB-target-file.patch \
 	file://0044-gdb-microblaze-linux-nat.c-Fix-target-compilation-of.patch \
 	file://0045-Fixed-bug-in-generation-of-IMML-instruction-for-the.patch \
