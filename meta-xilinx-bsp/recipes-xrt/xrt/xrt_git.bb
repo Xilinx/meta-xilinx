@@ -14,6 +14,8 @@ REPO ?= "git://github.com/Xilinx/XRT.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
+FILESEXTRAPATHS_prepend := "${THISDIR}/xrt:"
+SRC_URI_append = " file://0001-Replace-boost-detail-endian.hpp-with-boost-predef-ot.patch"
 PV = "202010.2.7.0"
 SRCREV ?= "8a4c6eb5012c57423fba468e1af8df53a293dcd5"
 
