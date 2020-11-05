@@ -17,7 +17,7 @@ SRC_URI = "${REPO};${BRANCHARG}"
 FILESEXTRAPATHS_prepend := "${THISDIR}/xrt:"
 SRC_URI_append = " file://0001-Replace-boost-detail-endian.hpp-with-boost-predef-ot.patch"
 PV = "202020.2.8.0"
-SRCREV ?= "8cdaafacc3fd0f6f9e6386dd56297c36e1554995"
+SRCREV ?= "6d926b885778c446edacb433dcd71f28464deaff"
 
 S = "${WORKDIR}/git/src"
 
