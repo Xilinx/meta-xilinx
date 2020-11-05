@@ -10,7 +10,7 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '
 SRC_URI = "${REPO};${BRANCHARG}"
 
 PV = "202020.2.8.0"
-SRCREV ?= "8cdaafacc3fd0f6f9e6386dd56297c36e1554995"
+SRCREV ?= "6d926b885778c446edacb433dcd71f28464deaff"
 
 S = "${WORKDIR}/git/src/runtime_src/core/edge/drm/zocl"
 
