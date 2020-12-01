@@ -1,18 +1,20 @@
-From b35b582ef3f6575447097585174302fde1761078 Mon Sep 17 00:00:00 2001
+From fd624fc28cbca8863f4dd75f0bc08aba58f8455e Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Wed, 24 Apr 2019 23:29:21 +0530
-Subject: [PATCH 11/11] Removing the Assembly implementation of 64bit string
+Subject: [PATCH 10/11] Removing the Assembly implementation of 64bit string
  function. Revisit in next release and fix it
 
+Conflicts:
+	newlib/libc/machine/microblaze/strcmp.c
 ---
- newlib/libc/machine/microblaze/mb_endian.h |  4 ++
- newlib/libc/machine/microblaze/strcmp.c    | 93 ++++++++++--------------------
- newlib/libc/machine/microblaze/strcpy.c    | 82 ++++++++------------------
- newlib/libc/machine/microblaze/strlen.c    | 59 +++++++------------
- 4 files changed, 81 insertions(+), 157 deletions(-)
+ newlib/libc/machine/microblaze/mb_endian.h |  4 +
+ newlib/libc/machine/microblaze/strcmp.c    | 94 ++++++++--------------
+ newlib/libc/machine/microblaze/strcpy.c    | 82 ++++++-------------
+ newlib/libc/machine/microblaze/strlen.c    | 59 +++++---------
+ 4 files changed, 81 insertions(+), 158 deletions(-)
 
 diff --git a/newlib/libc/machine/microblaze/mb_endian.h b/newlib/libc/machine/microblaze/mb_endian.h
-index fb217ec..17772c8 100644
+index fb217ec85..17772c88f 100644
 --- a/newlib/libc/machine/microblaze/mb_endian.h
 +++ b/newlib/libc/machine/microblaze/mb_endian.h
 @@ -8,8 +8,12 @@
@@ -29,17 +31,19 @@ index fb217ec..17772c8 100644
  #endif
  #endif
 diff --git a/newlib/libc/machine/microblaze/strcmp.c b/newlib/libc/machine/microblaze/strcmp.c
-index acfe4cd..e34c64a 100644
+index 2cfef7388..007d9e1eb 100644
 --- a/newlib/libc/machine/microblaze/strcmp.c
 +++ b/newlib/libc/machine/microblaze/strcmp.c
-@@ -129,70 +129,42 @@ strcmp (const char *s1,
+@@ -129,70 +129,41 @@ strcmp (const char *s1,
    return (*(unsigned char *) s1) - (*(unsigned char *) s2);
  #endif /* not PREFER_SIZE_OVER_SPEED */
  
+-#else
 +#elif __arch64__
 +  unsigned int *a1;
 +  unsigned int *a2;
-+
+ 
+-#include "mb_endian.h"
 +  /* If s1 or s2 are unaligned, then compare bytes. */
 +  if (!UNALIGNED (s1, s2))
 +    {  
@@ -52,25 +56,6 @@ index acfe4cd..e34c64a 100644
 +	     then the strings must be equal, so return zero.  */
 +          if (DETECTNULL (*a1))
 +	    return 0;
-+
-+          a1++;
-+          a2++;
-+        }
-+
-+      /* A difference was detected in last few bytes of s1, so search bytewise */
-+      s1 = (char*)a1;
-+      s2 = (char*)a2;
-+    }
-+
-+  while (*s1 != '\0' && *s1 == *s2)
-+    {
-+      s1++;
-+      s2++;
-+    }
-+  return (*(unsigned char *) s1) - (*(unsigned char *) s2);
- #else
- 
- #include "mb_endian.h"
  
 -#ifdef __arch64__
 -    asm volatile ("                                          \n\
@@ -126,16 +111,33 @@ index acfe4cd..e34c64a 100644
 -        beaeqi    r3, end_cmp                                                     \n\
 -        addlik   r9, r9, 1                                                       \n\
 -        breaid    regular_strcmp                                                  \n\
--        nop                                                  \n\
+-        nop									\n\
 -end_cmp:                                                                        \n\
 -        orl       r3, r0, r7                                                       \n\
 -        rtsd    r15, 8                                                          \n\
 -        nop              /* Return strcmp result */");
--#else
++          a1++;
++          a2++;
++        }
++
++      /* A difference was detected in last few bytes of s1, so search bytewise */
++      s1 = (char*)a1;
++      s2 = (char*)a2;
++    }
++
++  while (*s1 != '\0' && *s1 == *s2)
++    {
++      s1++;
++      s2++;
++    }
++  return (*(unsigned char *) s1) - (*(unsigned char *) s2);
+ #else
++
++#include "mb_endian.h"
      asm volatile ("                                          \n\
          or      r9, r0, r0               /* Index register */\n\
  check_alignment:                                             \n\
-@@ -246,7 +218,6 @@ end_cmp:
+@@ -246,7 +217,6 @@ end_cmp:
          rtsd    r15, 8                                                          \n\
          or      r3, r0, r7              /* Return strcmp result */");
  
@@ -144,7 +146,7 @@ index acfe4cd..e34c64a 100644
  }
  
 diff --git a/newlib/libc/machine/microblaze/strcpy.c b/newlib/libc/machine/microblaze/strcpy.c
-index 6dbc60d..ddb6922 100644
+index 6dbc60d77..ddb69227e 100644
 --- a/newlib/libc/machine/microblaze/strcpy.c
 +++ b/newlib/libc/machine/microblaze/strcpy.c
 @@ -121,67 +121,36 @@ strcpy (char *__restrict dst0,
@@ -249,7 +251,7 @@ index 6dbc60d..ddb6922 100644
  }
  
 diff --git a/newlib/libc/machine/microblaze/strlen.c b/newlib/libc/machine/microblaze/strlen.c
-index b6f2d3c..9407539 100644
+index b6f2d3c13..940753996 100644
 --- a/newlib/libc/machine/microblaze/strlen.c
 +++ b/newlib/libc/machine/microblaze/strlen.c
 @@ -112,47 +112,29 @@ strlen (const char *str)
@@ -328,5 +330,5 @@ index b6f2d3c..9407539 100644
  #endif  /* ! HAVE_HW_PCMP */
  }
 -- 
-2.7.4
+2.17.1
 
