@@ -1,25 +1,26 @@
-From 19d7b2a34f3c69d62f570ac9d0f6bc3cd584b496 Mon Sep 17 00:00:00 2001
-From: Nagaraju <nmekala@xilinx.com>
-Date: Thu, 14 Mar 2019 18:16:32 +0530
-Subject: [PATCH 09/11] Added MB-64 support to strcmp/strcpy/strlen files
+From 6587a1cae28468f5a49659a39040f60e425827a7 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 17 Nov 2020 13:06:41 +0530
+Subject: [PATCH 09/11] [Patch,MicroBlaze] : Added MB-64 support to
+ strcmp/strcpy/strlen files Signed-off-by:Mahesh Bodapati<mbodapat@xilinx.com>
 
 ---
- newlib/libc/machine/microblaze/strcmp.c | 61 ++++++++++++++++++++++++++++++++-
- newlib/libc/machine/microblaze/strcpy.c | 57 ++++++++++++++++++++++++++++++
- newlib/libc/machine/microblaze/strlen.c | 38 ++++++++++++++++++++
- 3 files changed, 155 insertions(+), 1 deletion(-)
+ newlib/libc/machine/microblaze/strcmp.c | 63 ++++++++++++++++++++++++-
+ newlib/libc/machine/microblaze/strcpy.c | 57 ++++++++++++++++++++++
+ newlib/libc/machine/microblaze/strlen.c | 38 +++++++++++++++
+ 3 files changed, 157 insertions(+), 1 deletion(-)
 
 diff --git a/newlib/libc/machine/microblaze/strcmp.c b/newlib/libc/machine/microblaze/strcmp.c
-index 3119d82..dac64da 100644
+index 3119d82c5..2cfef7388 100644
 --- a/newlib/libc/machine/microblaze/strcmp.c
 +++ b/newlib/libc/machine/microblaze/strcmp.c
-@@ -133,6 +133,65 @@ strcmp (const char *s1,
+@@ -133,6 +133,66 @@ strcmp (const char *s1,
  
  #include "mb_endian.h"
  
 +#ifdef __arch64__
 +    asm volatile ("                                          \n\
-+        orl      r9, r0, r0               /* Index register */\n\
++        orl      r9, r0, r0               /* Index register */ \n\
 +check_alignment:                                             \n\
 +        andli    r3, r5, 3                                    \n\
 +        andli    r4, r6, 3                                    \n\
@@ -45,7 +46,7 @@ index 3119d82..dac64da 100644
 +        beaneid   r3, end_cmp_loop        /* If reached null on one string, terminate */  \n\
 +        nop					                              \n\
 +end_cmp_early:                                                                  \n\
-+        or   r3, r0, r7               /* delay slot */                        \n\
++        orl   r3, r0, r7               /* delay slot */                        \n\
 +        rtsd    r15, 8                                                          \n\
 +        nop		                                                         \n\
 +try_align_args:                                                                 \n\
@@ -55,7 +56,7 @@ index 3119d82..dac64da 100644
 +align_loop:                                                                     \n\
 +        lbu     r3, r5, r9                                                      \n\
 +        lbu     r4, r6, r9                                                      \n\
-+        cmpu    r7, r4, r3                                                      \n\
++        cmplu    r7, r4, r3                                                      \n\
 +        beanei    r7, end_cmp                                                     \n\
 +        beaeqi    r3, end_cmp                                                     \n\
 +        addlik   r10, r10, -1                                                    \n\
@@ -69,21 +70,23 @@ index 3119d82..dac64da 100644
 +        cmplu    r7, r4, r3                                                      \n\
 +        beanei    r7, end_cmp                                                     \n\
 +        beaeqi    r3, end_cmp                                                     \n\
-+        breaid    regular_strcmp                                                  \n\
 +        addlik   r9, r9, 1                                                       \n\
++        breaid    regular_strcmp                                                  \n\
++        nop									\n\
 +end_cmp:                                                                        \n\
-+        or       r3, r0, r7                                                       \n\
++        orl       r3, r0, r7                                                       \n\
 +        rtsd    r15, 8                                                          \n\
 +        nop              /* Return strcmp result */");
 +#else
      asm volatile ("                                          \n\
          or      r9, r0, r0               /* Index register */\n\
  check_alignment:                                             \n\
-@@ -181,11 +240,11 @@ regular_strcmp:
+@@ -181,11 +241,12 @@ regular_strcmp:
          bnei    r7, end_cmp                                                     \n\
          beqi    r3, end_cmp                                                     \n\
          brid    regular_strcmp                                                  \n\
 -        addik   r9, r9, 1                                                       \n\
++        addik	r9, r9, 1
  end_cmp:                                                                        \n\
          rtsd    r15, 8                                                          \n\
          or      r3, r0, r7              /* Return strcmp result */");
@@ -93,7 +96,7 @@ index 3119d82..dac64da 100644
  }
  
 diff --git a/newlib/libc/machine/microblaze/strcpy.c b/newlib/libc/machine/microblaze/strcpy.c
-index 62072fa..6dbc60d 100644
+index 62072fa28..6dbc60d77 100644
 --- a/newlib/libc/machine/microblaze/strcpy.c
 +++ b/newlib/libc/machine/microblaze/strcpy.c
 @@ -125,6 +125,62 @@ strcpy (char *__restrict dst0,
@@ -168,7 +171,7 @@ index 62072fa..6dbc60d 100644
  }
  
 diff --git a/newlib/libc/machine/microblaze/strlen.c b/newlib/libc/machine/microblaze/strlen.c
-index acb4464..c04fa4f 100644
+index acb4464bc..b6f2d3c13 100644
 --- a/newlib/libc/machine/microblaze/strlen.c
 +++ b/newlib/libc/machine/microblaze/strlen.c
 @@ -116,6 +116,43 @@ strlen (const char *str)
@@ -186,13 +189,13 @@ index acb4464..c04fa4f 100644
 +"                                                               \n\
 +        pcmplbf  r4, r3, r0                                      \n\
 +        beanei    r4, end_len                                     \n\
-+        addik   r9, r9, 4                                       \n\
++        addlik   r9, r9, 4                                       \n\
 +        breaid    len_loop                                        \n\
 +        nop		                                        \n\
 +end_len:                                                        \n\
 +        lbu     r3, r5, r9                                      \n\
 +        beaeqi    r3, done_len                                    \n\
-+        addik   r9, r9, 1                                       \n\
++        addlik   r9, r9, 1                                       \n\
 +        breaid    end_len                                         \n\
 +        nop		                                       \n\
 +done_len:                                                       \n\
@@ -223,5 +226,5 @@ index acb4464..c04fa4f 100644
  #endif  /* ! HAVE_HW_PCMP */
  }
 -- 
-2.7.4
+2.17.1
 
