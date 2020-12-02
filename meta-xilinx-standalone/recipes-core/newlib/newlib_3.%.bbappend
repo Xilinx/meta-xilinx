@@ -6,7 +6,6 @@ EXTRA_OECONF_append_xilinx-standalone = " \
 	--enable-newlib-io-long-long \
 	--enable-newlib-io-float \
 	--enable-newlib-io-long-double \
-	--disable-newlib-supplied-syscalls \
 "
 
 # Avoid trimmping CCARGS from CC by newlib configure
