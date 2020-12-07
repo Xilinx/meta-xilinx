@@ -53,6 +53,7 @@ SRC_URI_append = " \
      file://0050-opcodes-microblaze-dis.c-Fix-compile-warnings.patch \
      file://0051-gdb-microblaze-tdep.c-Remove-unused-functions.patch \
      file://0052-sim-Allow-microblaze-architecture.patch \
+     file://0053-gdb-Fix-microblaze-target-compilation.patch \
      "
 
 #
