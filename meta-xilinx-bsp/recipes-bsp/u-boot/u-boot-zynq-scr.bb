@@ -33,7 +33,6 @@ SKIP_APPEND_BASEADDR ?= "0"
 
 DDR_BASEADDR ?= "0x0"
 DDR_BASEADDR_microblaze ?= "0x80000000"
-PRE_BOOTENV ?= ""
 
 SRC_URI = " \
             file://boot.cmd.sd.zynq \
@@ -102,16 +101,16 @@ NAND_RAMDISK_SIZE ?= "0x3200000"
 ## For zynqMP
 ## Load boot.scr at 0x3E80000 -> 62MB of QSPI/NAND Memory
 QSPI_KERNEL_OFFSET ?= "0xF00000"
-QSPI_KERNEL_OFFSET_zynqmp-dr ?= "0x3F00000"
+QSPI_KERNEL_OFFSET_zynqmpdr ?= "0x3F00000"
 QSPI_RAMDISK_OFFSET ?= "0x4000000"
-QSPI_RAMDISK_OFFSET_zynqmp-dr ?= "0x5D00000"
+QSPI_RAMDISK_OFFSET_zynqmpdr ?= "0x5D00000"
 
 NAND_KERNEL_OFFSET_zynqmp ?= "0x4100000"
 NAND_RAMDISK_OFFSET_zynqmp ?= "0x7800000"
 
 QSPI_KERNEL_SIZE_zynqmp ?= "0x1D00000"
 QSPI_RAMDISK_SIZE ?= "0x4000000"
-QSPI_RAMDISK_SIZE_zynqmp-dr ?= "0x1D00000"
+QSPI_RAMDISK_SIZE_zynqmpdr ?= "0x1D00000"
 
 ## For versal
 ## Load boot.scr at 0x7F80000 -> 127MB of QSPI/NAND Memory
@@ -131,15 +130,13 @@ QSPI_KERNEL_IMAGE_versal ?= "image.ub"
 
 NAND_KERNEL_IMAGE ?= "image.ub"
 
-QSPI_FIT_IMAGE_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('QSPI_FIT_IMAGE_OFFSET'))}"
-QSPI_FIT_IMAGE_OFFSET ?= "0x10000000"
+QSPI_FIT_IMAGE_LOAD_ADDRESS ?= "${@append_baseaddr(d,"0x10000000")}"
 QSPI_FIT_IMAGE_SIZE ?= "0x6400000"
-QSPI_FIT_IMAGE_SIZE_zynqmp-dr ?= "0x3F00000"
+QSPI_FIT_IMAGE_SIZE_zynqmpdr ?= "0x3F00000"
 QSPI_FIT_IMAGE_SIZE_zynq ?= "0xF00000"
 QSPI_FIT_IMAGE_SIZE_microblaze ?= "0xF00000"
 
-NAND_FIT_IMAGE_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('NAND_FIT_IMAGE_OFFSET'))}"
-NAND_FIT_IMAGE_OFFSET ?= "0x10000000"
+NAND_FIT_IMAGE_LOAD_ADDRESS ?= "${@append_baseaddr(d,"0x10000000")}"
 NAND_FIT_IMAGE_SIZE ?= "0x6400000"
 
 SDBOOTDEV ?= "0"
@@ -152,7 +149,7 @@ do_install[noexec] = "1"
 python () {
     baseaddr = d.getVar('DDR_BASEADDR') or "0x0"
     if baseaddr == "0x0":
-        d.appendVar('PRE_BOOTENV','')
+        d.setVar('PRE_BOOTENV','')
     else:
         soc_family = d.getVar('SOC_FAMILY') or ""
         if soc_family == "zynqmp":
