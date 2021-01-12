@@ -5,7 +5,7 @@ LICENSE = "Apache-2.0"
 
 include ivas.inc
 
-DEPENDS = "glib-2.0 glib-2.0-native xrt libcap libxml2 bison-native flex-native jansson ivas-utils ivas-gst opencv vitis-ai-library-deploy vart-deploy"
+DEPENDS = "glib-2.0 glib-2.0-native xrt libcap libxml2 bison-native flex-native jansson ivas-utils ivas-gst opencv vitis-ai-library vart"
 
 inherit meson pkgconfig gettext
 
