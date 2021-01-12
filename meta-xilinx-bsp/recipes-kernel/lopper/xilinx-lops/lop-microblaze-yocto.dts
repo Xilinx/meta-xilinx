@@ -1,0 +1,274 @@
+/*
+ * Copyright (c) 2020 Xilinx Inc. All rights reserved.
+ *
+ * Author:
+ *       Bruce Ashfield <bruce.ashfield@xilinx.com>
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/dts-v1/;
+
+/ {
+        compatible = "system-device-tree-v1,lop";
+        lops {
+                compatible = "system-device-tree-v1,lop";
+                track_feature: track_feature {
+                        compatible = "system-device-tree-v1,lop,code-v1";
+                        noexec;
+                        code = "
+                            # print( 'track: lopper library routine: %s' % node )
+                            try:
+                                node.tunes[prop] = prop
+                            except:
+                                pass
+                        ";
+                };
+                lop_4 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                           };
+                      };
+                      true {
+                           compatible = "system-device-tree-v1,lop,code-v1";
+                           code = "
+                               # print( '---> microblaze version code for node: %s' % node )
+                               val = node['model'].value[0]
+                               version = val[val.find('microblaze,') + 11:]
+
+                               if version.startswith('8'):
+                                   # Strip 8.xx.y, to just 8.xx
+                                   v = version.split('.')
+                                   version = '.'.join(v[0:2])
+
+                               version = 'v' + version
+                               node.tunes = OrderedDict()
+                               node.tunes['microblaze'] = 'microblaze'
+                               node.tunes['version'] = version
+
+                               return True
+                               ";
+                      };
+                };
+                lop_4_1 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                               xlnx,endianness__not__ = <0x1>;
+                           };
+                      };
+                      true_track {
+                          compatible = "system-device-tree-v1,lop,exec-v1";
+                          options = "prop:bigendian";
+                          // sets:  node.tunes['bigendian'] = 'bigendian'
+                          exec = <&track_feature>;
+                      };
+                };
+                lop_4_3 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                               xlnx,data-size = <0x40>;
+                           };
+                      };
+                      true_track {
+                          compatible = "system-device-tree-v1,lop,exec-v1";
+                          options = "prop:64-bit";
+                          // sets:  node.tunes['64-bit'] = '64-bit'
+                          exec = <&track_feature>;
+                      };
+                };
+                lop_4_4 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                               xlnx,use-barrel = <0x01>;
+                           };
+                      };
+                      true_track {
+                          compatible = "system-device-tree-v1,lop,exec-v1";
+                          // sets: node.tunes['barrel-shift'] = 'barrel-shift'
+                          options = "prop:barrel-shift";
+                          exec = <&track_feature>;
+                      };
+                };
+                lop_4_5 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                               xlnx,use-pcmp-instr = <0x01>;
+                           };
+                      };
+                      true_track {
+                          compatible = "system-device-tree-v1,lop,exec-v1";
+                          // sets: node.tunes['pattern-compare'] = 'pattern-compare'
+                          options = "prop:pattern-compare";
+                          exec = <&track_feature>;
+                      };
+                };
+                lop_4_6 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                               xlnx,use-reorder-instr__not__ = <0x0>;
+                           };
+                      };
+                      true_track {
+                          compatible = "system-device-tree-v1,lop,exec-v1";
+                          // sets: node.tunes['reorder'] = 'reorder'
+                          options = "prop:reorder";
+                          exec = <&track_feature>;
+                      };
+                };
+                lop_4_7 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                               xlnx,area-optimized = <0x2>;
+                           };
+                      };
+                      true_track {
+                          compatible = "system-device-tree-v1,lop,exec-v1";
+                          // sets: node.tunes['frequency-optimized'] = 'frequency-optimized'
+                          options = "prop:frequency-optimized";
+                          exec = <&track_feature>;
+                      };
+                };
+                lop_4_8 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                               xlnx,use-hw-mul = <0x1>;
+                           };
+                      };
+                      true_track {
+                          compatible = "system-device-tree-v1,lop,exec-v1";
+                          // sets: node.tunes['multiply-low'] = 'multiply-low'
+                          options = "prop:multiply-low";
+                          exec = <&track_feature>;
+                      };
+                };
+                lop_4_9 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                               xlnx,use-hw-mul = <0x2>;
+                           };
+                      };
+                      true_track {
+                          compatible = "system-device-tree-v1,lop,exec-v1";
+                          // sets: node.tunes['multiply-high'] = 'multiply-high'
+                          options = "prop:multiply-high";
+                          exec = <&track_feature>;
+                      };
+                };
+                lop_4_10 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                               xlnx,use-div = <0x1>;
+                           };
+                      };
+                      true_track {
+                          compatible = "system-device-tree-v1,lop,exec-v1";
+                          // sets: node.tunes['divide-hard'] = 'divide-hard'
+                          options = "prop:divide-hard";
+                          exec = <&track_feature>;
+                      };
+                };
+                lop_4_11 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                               xlnx,use-fpu__not__ = <0x1 0x2>;
+                           };
+                      };
+                      true_track {
+                          compatible = "system-device-tree-v1,lop,exec-v1";
+                          // sets: node.tunes['fpu-soft'] = 'fpu-soft'
+                          options = "prop:fpu-soft";
+                          exec = <&track_feature>;
+                      };
+                };
+                lop_4_12 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                               xlnx,use-fpu = <0x1>;
+                           };
+                      };
+                      true_track {
+                          compatible = "system-device-tree-v1,lop,exec-v1";
+                          // sets: node.tunes['fpu-hard'] = 'fpu-hard'
+                          options = "prop:fpu-hard";
+                          exec = <&track_feature>;
+                      };
+                };
+                lop_4_13 {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                               xlnx,use-fpu = <0x2>;
+                           };
+                      };
+                      true_track {
+                          compatible = "system-device-tree-v1,lop,exec-v1";
+                          // sets: node.tunes['fpu-hard-extended'] = 'fpu-hard-extended'
+                          options = "prop:fpu-hard-extended";
+                          exec = <&track_feature>;
+                      };
+                };
+
+                lop_output_tunes {
+                      compatible = "system-device-tree-v1,lop,conditional-v1";
+                      cond_root = "cpus";
+                      cpus {
+                           cpu@.* {
+                               compatible = ".*microblaze.*";
+                           };
+                      };
+                      true {
+                           compatible = "system-device-tree-v1,lop,code-v1";
+                           code = "
+                               #print( '\\n\\nlop_5 true block\\n' )
+                               tname = re.sub( '@', '', n.name )
+                               print( 'AVAILTUNES += microblaze-%s' % tname )
+                               print( 'TUNE_FEATURES_tune-microblaze-%s =' % tname, end='' )
+                               for t in node.tunes.values():
+                                   print( ' %s' % t, end='' )
+                               print( '' )
+                               print( 'PACKAGE_EXTRA_ARCHS_tune-microblaze-%s = \“${TUNE_PKGARCH}\”' % tname )
+
+                               return True
+                               ";
+                      };
+                };
+        };
+};
