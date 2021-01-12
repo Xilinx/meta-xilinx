@@ -2,15 +2,26 @@ SUMMARY = "Device tree lopper"
 DESCRIPTION = "Tool to subset a system device tree"
 SECTION = "bootloader"
 LICENSE = "BSD-3-Clause"
-DEPENDS += "python3-dtc"
 
-RDEPENDS_${PN} += "python3-core python3-dtc"
+RDEPENDS_${PN} += " \
+    python3-core \
+    dtc \
+    python3-dtc \
+    python3-flask \
+    python3-flask-restful \
+    python3-six \
+    python3-pandas \
+    python3-ruamel-yaml \
+    python3-anytree \
+    python3-pyyaml \
+"
 
 SRC_URI = "git://github.com/devicetree-org/lopper.git"
 
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=8e5f5f691f01c9fdfa7a7f2d535be619"
 
-SRCREV = "f4389167a200c5d41ee276ff9ad67d01ef6f0aec"
+# "c6d2c1b6931e72ada02c714993443e953c2cd3f6"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
 
@@ -24,19 +35,22 @@ do_compile() {
 }
 
 do_install() {
-		datadirrelpath=${@os.path.relpath(d.getVar('datadir'), d.getVar('bindir'))}
+	datadirrelpath=${@os.path.relpath(d.getVar('datadir'), d.getVar('bindir'))}
 
-		mkdir -p ${D}/${bindir}
-		mkdir -p ${D}/${datadir}/lopper
+	mkdir -p ${D}/${bindir}
+	mkdir -p ${D}/${datadir}/lopper
 
-		cp -r ${S}/README* ${D}/${datadir}/lopper/.
-		cp -r ${S}/assists* ${D}/${datadir}/lopper/.
-		cp -r ${S}/lop* ${D}/${datadir}/lopper/.
-		cp -r ${S}/LICENSE* ${D}/${datadir}/lopper/.
-		cp -r ${S}/device-tree* ${D}/${datadir}/lopper/.
-		cp -r ${S}/.gitignore ${D}/${datadir}/lopper/.
+	cp -r ${S}/README* ${D}/${datadir}/lopper/.
+	cp -r ${S}/assists* ${D}/${datadir}/lopper/.
+	cp -r ${S}/lop* ${D}/${datadir}/lopper/.
+	cp -r ${S}/LICENSE* ${D}/${datadir}/lopper/.
+	cp -r ${S}/device-tree* ${D}/${datadir}/lopper/.
+	cp -r ${S}/.gitignore ${D}/${datadir}/lopper/.
+	if [ -f ${S}/*.dts ]; then
+		cp -rf ${S}/*.dts ${D}/${datadir}/lopper/.
+	fi
 
-        ln -s ${datadirrelpath}/lopper/lopper.py ${D}/${bindir}/.
+	ln -s ${datadirrelpath}/lopper/lopper.py ${D}/${bindir}/.
 }
 
 BBCLASSEXTEND = "native nativesdk"
