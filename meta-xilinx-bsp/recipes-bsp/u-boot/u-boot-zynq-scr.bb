@@ -33,6 +33,7 @@ SKIP_APPEND_BASEADDR ?= "0"
 
 DDR_BASEADDR ?= "0x0"
 DDR_BASEADDR_microblaze ?= "0x80000000"
+PRE_BOOTENV ?= ""
 
 SRC_URI = " \
             file://boot.cmd.sd.zynq \
@@ -130,13 +131,15 @@ QSPI_KERNEL_IMAGE_versal ?= "image.ub"
 
 NAND_KERNEL_IMAGE ?= "image.ub"
 
-QSPI_FIT_IMAGE_LOAD_ADDRESS ?= "${@append_baseaddr(d,"0x10000000")}"
+QSPI_FIT_IMAGE_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('QSPI_FIT_IMAGE_OFFSET'))}"
+QSPI_FIT_IMAGE_OFFSET ?= "0x10000000"
 QSPI_FIT_IMAGE_SIZE ?= "0x6400000"
 QSPI_FIT_IMAGE_SIZE_zynqmpdr ?= "0x3F00000"
 QSPI_FIT_IMAGE_SIZE_zynq ?= "0xF00000"
 QSPI_FIT_IMAGE_SIZE_microblaze ?= "0xF00000"
 
-NAND_FIT_IMAGE_LOAD_ADDRESS ?= "${@append_baseaddr(d,"0x10000000")}"
+NAND_FIT_IMAGE_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('NAND_FIT_IMAGE_OFFSET'))}"
+NAND_FIT_IMAGE_OFFSET ?= "0x10000000"
 NAND_FIT_IMAGE_SIZE ?= "0x6400000"
 
 SDBOOTDEV ?= "0"
@@ -149,7 +152,7 @@ do_install[noexec] = "1"
 python () {
     baseaddr = d.getVar('DDR_BASEADDR') or "0x0"
     if baseaddr == "0x0":
-        d.setVar('PRE_BOOTENV','')
+        d.appendVar('PRE_BOOTENV','')
     else:
         soc_family = d.getVar('SOC_FAMILY') or ""
         if soc_family == "zynqmp":
