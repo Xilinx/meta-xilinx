@@ -118,7 +118,10 @@ do_install() {
 
 # We need separate packages to provide multiple alternatives, at this point we install
 # everything on the default one but that can be split if necessary
-PACKAGES += "${PN}-x11 ${PN}-fbdev ${PN}-wayland ${PN}-headless"
+PACKAGES += "${@bb.utils.contains("DISTRO_FEATURES", "x11", "${PN}-x11", "", d)}"
+PACKAGES += "${@bb.utils.contains("DISTRO_FEATURES", "fbdev", "${PN}-fbdev", "", d)}"
+PACKAGES += "${@bb.utils.contains("DISTRO_FEATURES", "wayland", "${PN}-wayland", "", d)}"
+PACKAGES += "${PN}-headless"
 
 # This is default/common for all alternatives
 ALTERNATIVE_LINK_NAME[libmali-xlnx] = "${libdir}/${MONOLITHIC_LIBMALI}"
