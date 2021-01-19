@@ -1,3 +1,3 @@
 REPO = "git://gitenterprise.xilinx.com/IPS-SSW/ivas;protocol=https"
-BRANCH ?= "2020.2_vai_1.2"
-SRCREV ?= "594d449d99082c5f4df1ccbb2214078de87279ee"
+BRANCH ?= "2020.2_vai_1.3"
+SRCREV ?= "3d76fc2b44890b4231de9905e28f7dd7f35bb607"
