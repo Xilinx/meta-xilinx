@@ -1,7 +1,7 @@
 inherit deploy
 
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://../../../../license.txt;md5=39ab6ab638f4d1836ba994ec6852de94"
+LIC_FILES_CHKSUM = "file://license.txt;md5=39ab6ab638f4d1836ba994ec6852de94"
 
 SRCREV = "e8db5fb118229fdc621e0ec7848641a23bf60998"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
@@ -11,8 +11,8 @@ SRC_URI = "git://github.com/Xilinx/embeddedsw.git;protocol=https;nobranch=1"
 COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "versal-mb"
 
-
-S = "${WORKDIR}/git/lib/sw_apps/versal_plm/src"
+S = "${WORKDIR}/git"
+B = "${S}/lib/sw_apps/versal_plm/src"
 
 # The makefile does not handle parallelization
 PARALLEL_MAKE = ""
@@ -20,7 +20,7 @@ PARALLEL_MAKE = ""
 do_configure() {
     # manually do the copy_bsp step first, so as to be able to fix up use of
     # mb-* commands
-    ${S}/../misc/copy_bsp.sh
+    ${B}/../misc/copy_bsp.sh
 }
 
 COMPILER = "${CC}"
@@ -28,7 +28,7 @@ COMPILER_FLAGS = "-O2 -c"
 EXTRA_COMPILER_FLAGS = "-g -Wall -Wextra -Os -flto -ffat-lto-objects"
 ARCHIVER = "${AR}"
 
-BSP_DIR ?= "${S}/../misc/versal_plm_bsp"
+BSP_DIR ?= "${B}/../misc/versal_plm_bsp"
 BSP_TARGETS_DIR ?= "${BSP_DIR}/psv_pmc_0/libsrc"
 
 def bsp_make_vars(d):
@@ -36,7 +36,7 @@ def bsp_make_vars(d):
     return " ".join(["\"%s=%s\"" % (v, d.getVar(v)) for v in s])
 
 do_compile() {
-    # the Makefile in ${S}/../misc/Makefile, does not handle CC, AR, AS, etc
+    # the Makefile in ${B}/../misc/Makefile, does not handle CC, AR, AS, etc
     # properly. So do its job manually. Preparing the includes first, then libs.
     for i in $(ls ${BSP_TARGETS_DIR}/*/src/Makefile); do
         oe_runmake -C $(dirname $i) -s include ${@bsp_make_vars(d)}
