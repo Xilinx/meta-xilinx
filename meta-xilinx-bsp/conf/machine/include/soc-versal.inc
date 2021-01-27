@@ -2,11 +2,11 @@ DEFAULTTUNE ?= "cortexa72-cortexa53"
 SOC_FAMILY ?= "versal"
 
 # Available SOC_VARIANT's for versal:
-# "-prime"    - Versal deafult Prime Devices
-# "-ai-core"  - Versal AI-core Devices
-# "-premium"  - Versal Premium Devices
+# "prime"    - Versal deafult Prime Devices
+# "ai-core"  - Versal AI-core Devices
+# "premium"  - Versal Premium Devices
 
-SOC_VARIANT ?= "-prime"
+SOC_VARIANT ?= "prime"
 
 require soc-tune-include.inc
 require xilinx-soc-family.inc
