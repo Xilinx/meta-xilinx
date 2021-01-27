@@ -2,6 +2,7 @@ UBOOT_VERSION = "v2020.01"
 
 UBRANCH ?= "xlnx_rebase_v2020.01"
 
+SRC_URI_append = " file://0001-Remove-redundant-YYLOC-global-declaration.patch"
 SRCREV ?= "bb4660c33aa7ea64f78b2682bf0efd56765197d6"
 
 include u-boot-xlnx.inc
