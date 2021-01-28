@@ -1,0 +1,1 @@
+require psm-firmware.inc
