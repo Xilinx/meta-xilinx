@@ -4,16 +4,15 @@ LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://license.txt;md5=39ab6ab638f4d1836ba994ec6852de94"
 
 SRCREV = "e8db5fb118229fdc621e0ec7848641a23bf60998"
-PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
+PV = "2019.2+git${SRCPV}"
 
 SRC_URI = "git://github.com/Xilinx/embeddedsw.git;protocol=https;nobranch=1"
 
 COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "versal-mb"
 
-
 S = "${WORKDIR}/git"
-B = "${S}/lib/sw_apps/versal_psmfw/src"
+B = "${S}/lib/sw_apps/versal_plm/src"
 
 # The makefile does not handle parallelization
 PARALLEL_MAKE = ""
@@ -29,8 +28,8 @@ COMPILER_FLAGS = "-O2 -c"
 EXTRA_COMPILER_FLAGS = "-g -Wall -Wextra -Os -flto -ffat-lto-objects"
 ARCHIVER = "${AR}"
 
-BSP_DIR ?= "${B}/../misc/versal_psmfw_bsp"
-BSP_TARGETS_DIR ?= "${BSP_DIR}/psv_psm_0/libsrc"
+BSP_DIR ?= "${B}/../misc/versal_plm_bsp"
+BSP_TARGETS_DIR ?= "${BSP_DIR}/psv_pmc_0/libsrc"
 
 def bsp_make_vars(d):
     s = ["COMPILER", "CC", "COMPILER_FLAGS", "EXTRA_COMPILER_FLAGS", "ARCHIVER", "AR", "AS"]
@@ -55,15 +54,15 @@ do_install() {
     :
 }
 
-PSM_FIRMWARE_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
-PSM_FIRMWARE_BASE_NAME[vardepsexclude] = "DATETIME"
+PLM_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
+PLM_BASE_NAME[vardepsexclude] = "DATETIME"
 
 do_deploy() {
-    install -Dm 0644 ${B}/psmfw.elf ${DEPLOYDIR}/${PSM_FIRMWARE_BASE_NAME}.elf
-    ln -sf ${PSM_FIRMWARE_BASE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}.elf
-    ${OBJCOPY} -O binary ${B}/psmfw.elf ${B}/psmfw.bin
-    install -m 0644 ${B}/psmfw.bin ${DEPLOYDIR}/${PSM_FIRMWARE_BASE_NAME}.bin
-    ln -sf ${PSM_FIRMWARE_BASE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}.bin
+    install -Dm 0644 ${B}/plm.elf ${DEPLOYDIR}/${PLM_BASE_NAME}.elf
+    ln -sf ${PLM_BASE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}.elf
+    ${OBJCOPY} -O binary ${B}/plm.elf ${B}/plm.bin
+    install -m 0644 ${B}/plm.bin ${DEPLOYDIR}/${PLM_BASE_NAME}.bin
+    ln -sf ${PLM_BASE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}.bin
 }
 
 addtask deploy before do_build after do_install
