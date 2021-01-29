@@ -9,8 +9,8 @@ SOC_FAMILY ?= "zynqmp"
 
 SOC_VARIANT ?= "eg"
 
-MACHINEOVERRIDES_prepend_zynqmpeg = "mali400:"
-MACHINEOVERRIDES_prepend_zynqmpev = "mali400:vcu:"
+MACHINEOVERRIDES_prepend_zynqmp-eg = "mali400:"
+MACHINEOVERRIDES_prepend_zynqmp-ev = "mali400:vcu:"
 
 require soc-tune-include.inc
 require xilinx-soc-family.inc

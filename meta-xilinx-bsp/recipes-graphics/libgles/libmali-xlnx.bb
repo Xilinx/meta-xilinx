@@ -27,8 +27,8 @@ SRC_URI = " \
     "
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynqmpeg = "zynqmpeg"
-COMPATIBLE_MACHINE_zynqmpev = "zynqmpev"
+COMPATIBLE_MACHINE_zynqmp-eg = "zynqmp-eg"
+COMPATIBLE_MACHINE_zynqmp-ev = "zynqmp-ev"
 
 PACKAGE_ARCH = "${SOC_VARIANT_ARCH}"
 
