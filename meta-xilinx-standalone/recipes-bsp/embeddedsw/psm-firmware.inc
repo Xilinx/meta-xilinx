@@ -1,3 +1,8 @@
+ESCRIPTION = "PSM Firmware"
+SUMMARY = "PSM firmware for versal devices"
+
+PROVIDES = "virtual/psm-firmware"
+
 require embeddedsw.inc
 
 inherit deploy
