@@ -1,3 +1,8 @@
+DESCRIPTION = "Platform Loader and Manager"
+SUMMARY = "Platform Loader and Manager for Versal devices"
+
+PROVIDES = "virtual/plm"
+
 require embeddedsw.inc
 
 inherit deploy
