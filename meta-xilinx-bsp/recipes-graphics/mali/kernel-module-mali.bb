@@ -37,8 +37,8 @@ PARALLEL_MAKE = "-j 1"
 S = "${WORKDIR}/DX910-SW-99002-${PV}/driver/src/devicedrv/mali"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynqmpeg = "zynqmpeg"
-COMPATIBLE_MACHINE_zynqmpev = "zynqmpev"
+COMPATIBLE_MACHINE_zynqmp-eg = "zynqmp-eg"
+COMPATIBLE_MACHINE_zynqmp-ev = "zynqmp-ev"
 
 PACKAGE_ARCH = "${SOC_VARIANT_ARCH}"
 
