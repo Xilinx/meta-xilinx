@@ -1,0 +1,68 @@
+Fix issues related to copy_bsp.sh
+
+Fix the copy_bsp.sh script so that it will capture the items that need to
+be able to export the list of sequential makefiles for our processing.
+
+Adjust the default makefile to no longer call copy_bsp.sh during the build
+process, as this will reset any processing we do prior to this make call.
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+
+diff --git a/lib/sw_apps/zynqmp_pmufw/misc/copy_bsp.sh b/lib/sw_apps/zynqmp_pmufw/misc/copy_bsp.sh
+index c683e4f73d..c3eca3f092 100755
+--- a/lib/sw_apps/zynqmp_pmufw/misc/copy_bsp.sh
++++ b/lib/sw_apps/zynqmp_pmufw/misc/copy_bsp.sh
+@@ -52,14 +52,14 @@ cp -r $SERVICES_DIR/xilfpga/src/interface/zynqmp/xilfpga_pcap.c $BSP_DIR/libsrc/
+ cp -r $SERVICES_DIR/xilfpga/src/*.h $BSP_DIR/include/
+ cp -r $SERVICES_DIR/xilfpga/src/interface/zynqmp/*.h $BSP_DIR/include/
+ rm -r $BSP_DIR/libsrc/xilfpga/src/interface/
+-set BSP_SEQUENTIAL_MAKEFILES += $BSP_DIR/libsrc/xilfpga/src/Makefile
++BSP_SEQUENTIAL_MAKEFILES="$BSP_SEQUENTIAL_MAKEFILES $BSP_DIR/libsrc/xilfpga/src/Makefile"
+ mkdir -p $BSP_DIR/libsrc/xilsecure/src/
+ cp -r $SERVICES_DIR/xilsecure/src/Makefile $BSP_DIR/libsrc/xilsecure/src/
+ cp -r $SERVICES_DIR/xilsecure/src/common/* $BSP_DIR/libsrc/xilsecure/src/
+ cp -r $SERVICES_DIR/xilsecure/src/zynqmp/* $BSP_DIR/libsrc/xilsecure/src/
+ cp -r $SERVICES_DIR/xilsecure/src/common/*.h $BSP_DIR/include/
+ cp -r $SERVICES_DIR/xilsecure/src/zynqmp/*.h $BSP_DIR/include/
+-set BSP_SEQUENTIAL_MAKEFILES += $BSP_DIR/libsrc/xilsecure/src/Makefile
++BSP_SEQUENTIAL_MAKEFILES="$BSP_SEQUENTIAL_MAKEFILES $BSP_DIR/libsrc/xilsecure/src/Makefile"
+ cp -r $SERVICES_DIR/xilskey/ $BSP_DIR/libsrc/
+ 
+ # remove the xilskey library files which are not required for PMU
+@@ -81,10 +81,10 @@ rm -r $BSP_DIR/libsrc/xilskey/src/include/xilskey_bbram.h
+ # copy the xilskey library header files to include directory
+ cp -r $BSP_DIR/libsrc/xilskey/src/*.h $BSP_DIR/include/
+ cp -r $BSP_DIR/libsrc/xilskey/src/include/*.h $BSP_DIR/include/
+-set BSP_SEQUENTIAL_MAKEFILES += $BSP_DIR/libsrc/xilskey/src/Makefile
++BSP_SEQUENTIAL_MAKEFILES="$BSP_SEQUENTIAL_MAKEFILES $BSP_DIR/libsrc/xilskey/src/Makefile"
+ 
+ # copy bsp standalone code
+-cp  $STANDALONE_DIR/common/*  $BSP_DIR/libsrc/standalone/src/
++cp -r $STANDALONE_DIR/common/*  $BSP_DIR/libsrc/standalone/src/
+ cp  $STANDALONE_DIR/microblaze/*  $BSP_DIR/libsrc/standalone/src/
+ cp -r $STANDALONE_DIR/profile  $BSP_DIR/libsrc/standalone/src/
+ cp  $WORKING_DIR/bspconfig.h  $BSP_DIR/include
+@@ -108,7 +108,7 @@ do
+     cp -r $DRIVERS_DIR/$line/src/*.h $BSP_DIR/include/
+ # copy all the HSM generated driver files DRIVER_g.c
+ 	cp $WORKING_DIR/x"$line"_g.c $BSP_DIR/libsrc/$line/src/
+-	set BSP_SEQUENTIAL_MAKEFILES += $BSP_DIR/libsrc/$line/src/Makefile
++	BSP_SEQUENTIAL_MAKEFILES="$BSP_SEQUENTIAL_MAKEFILES $BSP_DIR/libsrc/$line/src/Makefile"
+ 
+ done < $DRIVERS_LIST
+ 
+diff --git a/lib/sw_apps/zynqmp_pmufw/src/Makefile b/lib/sw_apps/zynqmp_pmufw/src/Makefile
+index 1750c0a329..17f6a545ea 100644
+--- a/lib/sw_apps/zynqmp_pmufw/src/Makefile
++++ b/lib/sw_apps/zynqmp_pmufw/src/Makefile
+@@ -28,8 +28,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ 	$(CC) -o $@ $(OBJS) $(CC_FLAGS) $(CFLAGS) $(LN_FLAGS) $(LIBPATH) $(LSCRIPT)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../misc/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../misc/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../misc/zynqmp_pmufw_bsp
+ 

@@ -1,3 +1,10 @@
+Rework assert calls, as newlib now has assert as a macro
+
+Change assert to resetAssert in the zynqmp_pmufw to avoid the clash with the
+macro called 'assert' defined by the latest versions of newlib.
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+
 diff --git a/lib/sw_apps/zynqmp_pmufw/src/pm_reset.c b/lib/sw_apps/zynqmp_pmufw/src/pm_reset.c
 index 297c6c2ddc..bc295cf013 100644
 --- a/lib/sw_apps/zynqmp_pmufw/src/pm_reset.c
