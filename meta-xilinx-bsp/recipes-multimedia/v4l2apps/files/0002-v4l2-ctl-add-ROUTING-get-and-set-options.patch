@@ -1,0 +1,303 @@
+From f3f0d9d433894ce7a9ea1c615b978b0896e73daf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>
+Date: Tue, 12 Dec 2017 02:04:24 +0000
+Subject: [PATCH 2/3] v4l2-ctl: add ROUTING get and set options
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+---
+ utils/v4l2-ctl/Android.mk           |   2 +-
+ utils/v4l2-ctl/Makefile.am          |   2 +-
+ utils/v4l2-ctl/v4l2-ctl-routing.cpp | 154 ++++++++++++++++++++++++++++
+ utils/v4l2-ctl/v4l2-ctl.cpp         |  10 ++
+ utils/v4l2-ctl/v4l2-ctl.h           |   9 ++
+ 5 files changed, 175 insertions(+), 2 deletions(-)
+ create mode 100644 utils/v4l2-ctl/v4l2-ctl-routing.cpp
+
+diff --git a/utils/v4l2-ctl/Android.mk b/utils/v4l2-ctl/Android.mk
+index 1eab3cd2..2fef78af 100644
+--- a/utils/v4l2-ctl/Android.mk
++++ b/utils/v4l2-ctl/Android.mk
+@@ -22,5 +22,5 @@ LOCAL_SRC_FILES := \
+     v4l2-ctl-overlay.cpp v4l2-ctl-vbi.cpp v4l2-ctl-selection.cpp v4l2-ctl-misc.cpp \
+     v4l2-ctl-streaming.cpp v4l2-ctl-sdr.cpp v4l2-ctl-edid.cpp v4l2-ctl-modes.cpp \
+     v4l2-ctl-meta.cpp v4l2-ctl-subdev.cpp v4l2-info.cpp media-info.cpp \
+-    v4l2-tpg-colors.c v4l2-tpg-core.c v4l-stream.c codec-fwht.c
++    v4l2-tpg-colors.c v4l2-tpg-core.c v4l-stream.c codec-fwht.c v4l2-ctl-routing.cpp
+ include $(BUILD_EXECUTABLE)
+diff --git a/utils/v4l2-ctl/Makefile.am b/utils/v4l2-ctl/Makefile.am
+index f612e0ee..31746fcc 100644
+--- a/utils/v4l2-ctl/Makefile.am
++++ b/utils/v4l2-ctl/Makefile.am
+@@ -7,7 +7,7 @@ v4l2_ctl_SOURCES = v4l2-ctl.cpp v4l2-ctl.h v4l2-ctl-common.cpp v4l2-ctl-tuner.cp
+ 	v4l2-ctl-overlay.cpp v4l2-ctl-vbi.cpp v4l2-ctl-selection.cpp v4l2-ctl-misc.cpp \
+ 	v4l2-ctl-streaming.cpp v4l2-ctl-sdr.cpp v4l2-ctl-edid.cpp v4l2-ctl-modes.cpp \
+ 	v4l2-ctl-subdev.cpp v4l2-tpg-colors.c v4l2-tpg-core.c v4l-stream.c v4l2-ctl-meta.cpp \
+-	media-info.cpp v4l2-info.cpp codec-fwht.c codec-v4l2-fwht.c
++	media-info.cpp v4l2-info.cpp codec-fwht.c codec-v4l2-fwht.c v4l2-ctl-routing.cpp
+ v4l2_ctl_CPPFLAGS = -I$(top_srcdir)/utils/common
+ 
+ media-bus-format-names.h: ../../include/linux/media-bus-format.h
+diff --git a/utils/v4l2-ctl/v4l2-ctl-routing.cpp b/utils/v4l2-ctl/v4l2-ctl-routing.cpp
+new file mode 100644
+index 00000000..55a2e449
+--- /dev/null
++++ b/utils/v4l2-ctl/v4l2-ctl-routing.cpp
+@@ -0,0 +1,154 @@
++#include <unistd.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <inttypes.h>
++#include <fcntl.h>
++#include <ctype.h>
++#include <errno.h>
++#include <sys/ioctl.h>
++
++#include "v4l2-ctl.h"
++
++#include <linux/v4l2-subdev.h>
++
++/*
++ * The max value comes from a check in the kernel source code
++ * drivers/media/v4l2-core/v4l2-ioctl.c check_array_args()
++ */
++#define NUM_ROUTES_MAX 256
++
++#define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
++
++struct v4l2_subdev_routing routing;
++struct v4l2_subdev_route routes[NUM_ROUTES_MAX];
++
++struct flag_name {
++	__u32 flag;
++	const char *name;
++};
++
++static void print_flags(const struct flag_name *flag_names, unsigned int num_entries, __u32 flags)
++{
++	bool first = true;
++	unsigned int i;
++
++	for (i = 0; i < num_entries; i++) {
++		if (!(flags & flag_names[i].flag))
++			continue;
++		if (!first)
++			printf(",");
++		printf("%s", flag_names[i].name);
++		flags &= ~flag_names[i].flag;
++		first = false;
++	}
++
++	if (flags) {
++		if (!first)
++			printf(",");
++		printf("0x%x", flags);
++	}
++}
++
++static void print_routes(const struct v4l2_subdev_routing *r)
++{
++	unsigned int i;
++
++	static const struct flag_name route_flags[] = {
++		{ V4L2_SUBDEV_ROUTE_FL_ACTIVE, "ENABLED" },
++		{ V4L2_SUBDEV_ROUTE_FL_IMMUTABLE, "IMMUTABLE" },
++	};
++
++	for (i = 0; i < r->num_routes; i++) {
++		printf("%d/%d -> %d/%d [",
++		       r->routes[i].sink_pad, r->routes[i].sink_stream,
++		       r->routes[i].source_pad, r->routes[i].source_stream);
++		print_flags(route_flags, ARRAY_SIZE(route_flags), r->routes[i].flags);
++		printf("]\n");
++	}
++}
++
++void routing_usage(void)
++{
++	printf("\nRoute options:\n"
++	       "  --get-routing		Print the route topology\n"
++	       "  --set-routing routes	Comma-separated list of route descriptors to setup\n"
++	       "\n"
++	       "Routes are defined as\n"
++	       "	routes		= route { ',' route } ;\n"
++	       "	route		= sink '->' source '[' flags ']' ;\n"
++	       "	sink		= sink-pad '/' sink-stream ;\n"
++	       "	source		= source-pad '/' source-stream ;\n"
++	       "\n"
++	       "where the fields are\n"
++	       "	sink-pad	= Pad numeric identifier for sink\n"
++	       "	sink-stream	= Stream numeric identifier for sink\n"
++	       "	source-pad	= Pad numeric identifier for source\n"
++	       "	source-stream	= Stream numeric identifier for source\n"
++	       "	flags		= Route flags (0: inactive, 1: active)\n"
++	       );
++}
++
++/******************************************************/
++
++void routing_cmd(int ch, char *optarg)
++{
++	struct v4l2_subdev_route *r;
++	char *end, *ref, *tok;
++	unsigned int flags;
++
++	switch (ch) {
++	case OptSetRouting:
++		memset(&routing, 0, sizeof(routing));
++		memset(routes, 0, sizeof(routes[0]) * NUM_ROUTES_MAX);
++		routing.num_routes = 0;
++		routing.routes = routes;
++
++		if (!optarg)
++			break;
++
++		r = routing.routes;
++		ref = end = strdup(optarg);
++		while ((tok = strsep(&end, ",")) != NULL) {
++			if (sscanf(tok, "%u/%u -> %u/%u [%u]",
++				   &r->sink_pad, &r->sink_stream,
++				   &r->source_pad, &r->source_stream,
++				   &flags) != 5 || (flags != 0 && flags != 1)) {
++				free(ref);
++				fprintf(stderr, "Invalid route information specified\n");
++				routing_usage();
++				exit(1);
++			}
++
++			if (flags == 1)
++				r->flags = V4L2_SUBDEV_ROUTE_FL_ACTIVE;
++
++			r++;
++			routing.num_routes++;
++		}
++		free(ref);
++
++		break;
++	}
++}
++
++void routing_set(int fd)
++{
++	if (options[OptSetRouting]) {
++		if (doioctl(fd, VIDIOC_SUBDEV_S_ROUTING, &routing) == 0)
++			printf("Routing set\n");
++	}
++}
++
++void routing_get(int fd)
++{
++	if (options[OptGetRouting]) {
++		memset(&routing, 0, sizeof(routing));
++		memset(routes, 0, sizeof(routes[0]) * NUM_ROUTES_MAX);
++		routing.num_routes = NUM_ROUTES_MAX;
++		routing.routes = routes;
++
++		if (doioctl(fd, VIDIOC_SUBDEV_G_ROUTING, &routing) == 0)
++			print_routes(&routing);
++	}
++}
+diff --git a/utils/v4l2-ctl/v4l2-ctl.cpp b/utils/v4l2-ctl/v4l2-ctl.cpp
+index cbe31c84..8cc11d88 100644
+--- a/utils/v4l2-ctl/v4l2-ctl.cpp
++++ b/utils/v4l2-ctl/v4l2-ctl.cpp
+@@ -96,6 +96,7 @@ static struct option long_options[] = {
+ 	{"help-misc", no_argument, 0, OptHelpMisc},
+ 	{"help-streaming", no_argument, 0, OptHelpStreaming},
+ 	{"help-edid", no_argument, 0, OptHelpEdid},
++	{"help-routing", no_argument, 0, OptHelpRouting},
+ 	{"help-all", no_argument, 0, OptHelpAll},
+ #ifndef NO_LIBV4L2
+ 	{"wrapper", no_argument, 0, OptUseWrapper},
+@@ -236,6 +237,8 @@ static struct option long_options[] = {
+ 	{"get-edid", optional_argument, 0, OptGetEdid},
+ 	{"info-edid", optional_argument, 0, OptInfoEdid},
+ 	{"fix-edid-checksums", no_argument, 0, OptFixEdidChecksums},
++	{"set-routing", required_argument, 0, OptSetRouting},
++	{"get-routing", no_argument, 0, OptGetRouting},
+ 	{"tuner-index", required_argument, 0, OptTunerIndex},
+ 	{"list-buffers", no_argument, 0, OptListBuffers},
+ 	{"list-buffers-out", no_argument, 0, OptListBuffersOut},
+@@ -303,6 +306,7 @@ static void usage_all(void)
+        misc_usage();
+        streaming_usage();
+        edid_usage();
++       routing_usage();
+ }
+ 
+ int test_ioctl(int fd, int cmd, void *arg)
+@@ -1177,6 +1181,9 @@ int main(int argc, char **argv)
+ 		case OptHelpEdid:
+ 			edid_usage();
+ 			return 0;
++		case OptHelpRouting:
++			routing_usage();
++			return 0;
+ 		case OptHelpAll:
+ 			usage_all();
+ 			return 0;
+@@ -1236,6 +1243,7 @@ int main(int argc, char **argv)
+ 			misc_cmd(ch, optarg);
+ 			streaming_cmd(ch, optarg);
+ 			edid_cmd(ch, optarg);
++			routing_cmd(ch, optarg);
+ 			break;
+ 		}
+ 	}
+@@ -1429,6 +1437,7 @@ int main(int argc, char **argv)
+ 	selection_set(c_fd);
+ 	misc_set(c_fd);
+ 	edid_set(c_fd);
++	routing_set(fd);
+ 
+ 	/* Get options */
+ 
+@@ -1446,6 +1455,7 @@ int main(int argc, char **argv)
+ 	selection_get(c_fd);
+ 	misc_get(c_fd);
+ 	edid_get(c_fd);
++	routing_get(fd);
+ 
+ 	/* List options */
+ 
+diff --git a/utils/v4l2-ctl/v4l2-ctl.h b/utils/v4l2-ctl/v4l2-ctl.h
+index f4170e76..3df65fdb 100644
+--- a/utils/v4l2-ctl/v4l2-ctl.h
++++ b/utils/v4l2-ctl/v4l2-ctl.h
+@@ -197,6 +197,8 @@ enum Option {
+ 	OptGetEdid,
+ 	OptInfoEdid,
+ 	OptFixEdidChecksums,
++	OptSetRouting,
++	OptGetRouting,
+ 	OptFreqSeek,
+ 	OptEncoderCmd,
+ 	OptTryEncoderCmd,
+@@ -262,6 +264,7 @@ enum Option {
+ 	OptHelpMisc,
+ 	OptHelpStreaming,
+ 	OptHelpEdid,
++	OptHelpRouting,
+ 	OptHelpAll,
+ 	OptLast = 512
+ };
+@@ -428,6 +431,12 @@ void edid_cmd(int ch, char *optarg);
+ void edid_set(cv4l_fd &fd);
+ void edid_get(cv4l_fd &fd);
+ 
++// v4l2-ctl-routing.cpp
++void routing_usage(void);
++void routing_cmd(int ch, char *optarg);
++void routing_set(int fd);
++void routing_get(int fd);
++
+ /* v4l2-ctl-modes.cpp */
+ bool calc_cvt_modeline(int image_width, int image_height,
+ 		       int refresh_rate, int reduced_blanking,
+-- 
+2.30.0
+
