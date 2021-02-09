@@ -11,10 +11,7 @@ inherit meson pkgconfig gettext
 
 LIC_FILES_CHKSUM = "file://../LICENSE;md5=e6d9577dd6743c14fb3056b97887d4a4"
 
-S = "${WORKDIR}/git/ivas-accel-sw-libs"
-
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
-SRC_URI = "${REPO};${BRANCHARG}"
+S = "${WORKDIR}/ivas/ivas-accel-sw-libs"
 
 GIR_MESON_ENABLE_FLAG = "enabled"
 GIR_MESON_DISABLE_FLAG = "disabled"
