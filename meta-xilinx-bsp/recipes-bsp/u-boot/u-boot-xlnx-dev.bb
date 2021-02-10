@@ -24,5 +24,6 @@ HAS_PLATFORM_INIT ?= " \
 		zynq_zc702_config \
 		zynq_zc706_config \
 		zynq_zybo_config \
+		zynq_zybo_z7_config \
 		"
 
