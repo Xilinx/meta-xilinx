@@ -1,0 +1,37 @@
+From bc0f85271681532c7e394229f0155366d1de8779 Mon Sep 17 00:00:00 2001
+From: Dylan Yip <dylan.yip@xilinx.com>
+Date: Mon, 8 Feb 2021 23:47:01 -0800
+Subject: [PATCH 21/23] Use updated timekeeping functions in kernel 5.6
+
+As of commit 412c53a680a9 ("y2038: remove unused time32 interfaces"), 32
+bit timekeeping functions like getnstimeofday() have been removed. So
+use the 64 bit replacements.
+
+Signed-off-by: Dylan Yip <dylan.yip@xilinx.com>
+---
+ linux/mali_osk_time.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/linux/mali_osk_time.c b/linux/mali_osk_time.c
+index bfcbf7f..583d82b 100644
+--- a/linux/mali_osk_time.c
++++ b/linux/mali_osk_time.c
+@@ -46,9 +46,15 @@ void _mali_osk_time_ubusydelay(u32 usecs)
+ 
+ u64 _mali_osk_time_get_ns(void)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
++	struct timespec64 tsval;
++	ktime_get_real_ts64(&tsval);
++	return (u64)timespec64_to_ns(&tsval);
++#else
+ 	struct timespec tsval;
+ 	getnstimeofday(&tsval);
+ 	return (u64)timespec_to_ns(&tsval);
++#endif
+ }
+ 
+ u64 _mali_osk_boot_time_get_ns(void)
+-- 
+2.17.1
+

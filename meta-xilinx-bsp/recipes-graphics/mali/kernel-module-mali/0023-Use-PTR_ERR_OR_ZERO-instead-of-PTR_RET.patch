@@ -1,0 +1,33 @@
+From e2b52e358e0e030d3881ef80ef09de3662b41210 Mon Sep 17 00:00:00 2001
+From: Dylan Yip <dylan.yip@xilinx.com>
+Date: Tue, 9 Feb 2021 09:48:01 -0800
+Subject: [PATCH 23/23] Use PTR_ERR_OR_ZERO instead of PTR_RET
+
+As of commit fad7c9020948 ("err.h: remove deprecated PTR_RET for good")
+in kernel 5.7, PTR_RET has been removed and replaced with
+PTR_ERR_OR_ZERO. So use this API instead.
+
+Signed-off-by: Dylan Yip <dylan.yip@xilinx.com>
+---
+ linux/mali_memory_dma_buf.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/linux/mali_memory_dma_buf.c b/linux/mali_memory_dma_buf.c
+index 905cd8b..fcdcaac 100644
+--- a/linux/mali_memory_dma_buf.c
++++ b/linux/mali_memory_dma_buf.c
+@@ -281,7 +281,11 @@ int mali_dma_buf_get_size(struct mali_session_data *session, _mali_uk_dma_buf_ge
+ 	buf = dma_buf_get(fd);
+ 	if (IS_ERR_OR_NULL(buf)) {
+ 		MALI_DEBUG_PRINT_ERROR(("Failed to get dma-buf from fd: %d\n", fd));
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 7, 0)
++		return PTR_ERR_OR_ZERO(buf);
++#else
+ 		return PTR_RET(buf);
++#endif
+ 	}
+ 
+ 	if (0 != put_user(buf->size, &user_arg->size)) {
+-- 
+2.17.1
+

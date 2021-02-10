@@ -26,6 +26,10 @@ SRC_URI = " \
 	file://0017-Support-for-vm_insert_pfn-deprecated-from-kernel-4.2.patch \
 	file://0018-Change-return-type-to-vm_fault_t-for-fault-handler.patch \
 	file://0019-get_monotonic_boottime-ts-deprecated-from-kernel-4.2.patch \
+	file://0020-Fix-ioremap_nocache-deprecation-in-kernel-5.6.patch \
+	file://0021-Use-updated-timekeeping-functions-in-kernel-5.6.patch \
+	file://0022-Set-HAVE_UNLOCKED_IOCTL-default-to-true.patch \
+	file://0023-Use-PTR_ERR_OR_ZERO-instead-of-PTR_RET.patch \
 	"
 SRC_URI[md5sum] = "85ea110dd6675c70b7d01af87ec9633c"
 SRC_URI[sha256sum] = "7a67127341d17640c1fff5dad80258fb2a37c8a2121b81525fe2327e4532ce2b"
