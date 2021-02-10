@@ -1,0 +1,92 @@
+From cbc2351e8acf7ed38f6d965e5ea21620e45eda30 Mon Sep 17 00:00:00 2001
+From: Dylan Yip <dylan.yip@xilinx.com>
+Date: Tue, 9 Feb 2021 10:05:41 -0800
+Subject: [PATCH 20/23] Fix ioremap_nocache() deprecation in kernel 5.6
+
+As of commit 4bdc0d676a643140 ("remove ioremap_nocache and
+devm_ioremap_nocache") from kernel 5.6, ioremap_nocache has been
+removed because ioremap is already non-cached by default. So replace all
+calls with ioremap.
+
+Signed-off-by: Dylan Yip <dylan.yip@xilinx.com>
+---
+ linux/mali_memory_cow.c        |  4 ++++
+ linux/mali_osk_low_level_mem.c |  4 ++++
+ platform/arm/arm.c             | 12 ++++++++++++
+ 3 files changed, 20 insertions(+)
+
+diff --git a/linux/mali_memory_cow.c b/linux/mali_memory_cow.c
+index 1dae1d6..6fadd42 100644
+--- a/linux/mali_memory_cow.c
++++ b/linux/mali_memory_cow.c
+@@ -693,7 +693,11 @@ void _mali_mem_cow_copy_page(mali_page_node *src_node, mali_page_node *dst_node)
+ 		/*
+ 		* use ioremap to map src for BLOCK memory
+ 		*/
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
++		src = ioremap(_mali_page_node_get_dma_addr(src_node), _MALI_OSK_MALI_PAGE_SIZE);
++#else
+ 		src = ioremap_nocache(_mali_page_node_get_dma_addr(src_node), _MALI_OSK_MALI_PAGE_SIZE);
++#endif
+ 		memcpy(dst, src , _MALI_OSK_MALI_PAGE_SIZE);
+ 		iounmap(src);
+ 	}
+diff --git a/linux/mali_osk_low_level_mem.c b/linux/mali_osk_low_level_mem.c
+index 84f93d9..5a0a725 100644
+--- a/linux/mali_osk_low_level_mem.c
++++ b/linux/mali_osk_low_level_mem.c
+@@ -33,7 +33,11 @@ void _mali_osk_write_mem_barrier(void)
+ 
+ mali_io_address _mali_osk_mem_mapioregion(uintptr_t phys, u32 size, const char *description)
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
++	return (mali_io_address)ioremap(phys, size);
++#else
+ 	return (mali_io_address)ioremap_nocache(phys, size);
++#endif
+ }
+ 
+ void _mali_osk_mem_unmapioregion(uintptr_t phys, u32 size, mali_io_address virt)
+diff --git a/platform/arm/arm.c b/platform/arm/arm.c
+index b2fb746..e468263 100644
+--- a/platform/arm/arm.c
++++ b/platform/arm/arm.c
+@@ -98,7 +98,11 @@ static int mali_secure_mode_init_juno(void)
+ 
+ 	MALI_DEBUG_ASSERT(NULL == secure_mode_mapped_addr);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
++	secure_mode_mapped_addr = ioremap(phys_addr_page, map_size);
++#else
+ 	secure_mode_mapped_addr = ioremap_nocache(phys_addr_page, map_size);
++#endif
+ 	if (NULL != secure_mode_mapped_addr) {
+ 		return mali_gpu_reset_and_secure_mode_disable_juno();
+ 	}
+@@ -588,7 +592,11 @@ static u32 mali_read_phys(u32 phys_addr)
+ 	u32 phys_offset    = phys_addr & 0x00001FFF;
+ 	u32 map_size       = phys_offset + sizeof(u32);
+ 	u32 ret = 0xDEADBEEF;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
++	void *mem_mapped = ioremap(phys_addr_page, map_size);
++#else
+ 	void *mem_mapped = ioremap_nocache(phys_addr_page, map_size);
++#endif
+ 	if (NULL != mem_mapped) {
+ 		ret = (u32)ioread32(((u8 *)mem_mapped) + phys_offset);
+ 		iounmap(mem_mapped);
+@@ -604,7 +612,11 @@ static void mali_write_phys(u32 phys_addr, u32 value)
+ 	u32 phys_addr_page = phys_addr & 0xFFFFE000;
+ 	u32 phys_offset    = phys_addr & 0x00001FFF;
+ 	u32 map_size       = phys_offset + sizeof(u32);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
++	void *mem_mapped = ioremap(phys_addr_page, map_size);
++#else
+ 	void *mem_mapped = ioremap_nocache(phys_addr_page, map_size);
++#endif
+ 	if (NULL != mem_mapped) {
+ 		iowrite32(value, ((u8 *)mem_mapped) + phys_offset);
+ 		iounmap(mem_mapped);
+-- 
+2.17.1
+

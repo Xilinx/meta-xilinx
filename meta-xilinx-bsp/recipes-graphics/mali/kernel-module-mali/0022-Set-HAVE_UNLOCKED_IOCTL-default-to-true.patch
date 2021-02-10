@@ -1,0 +1,38 @@
+From d17933b6909cc29103befc2ef4e6cf413d9e8fb6 Mon Sep 17 00:00:00 2001
+From: Dylan Yip <dylan.yip@xilinx.com>
+Date: Tue, 9 Feb 2021 08:58:44 -0800
+Subject: [PATCH 22/23] Set HAVE_UNLOCKED_IOCTL default to true
+
+As of commit b19dd42faf41 ("bkl: Remove locked .ioctl file operation")
+of kernel 2.6, the ioctl operation has been replaced with
+unlocked_ioctl. Since this change has been around for almost 10 years,
+go ahead and set the default HAVE_UNLOCKED_IOCTL to be true.
+
+Signed-off-by: Dylan Yip <dylan.yip@xilinx.com>
+---
+ Kbuild | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Kbuild b/Kbuild
+index 02c3f3d..8c6e6e0 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -21,6 +21,7 @@ MALI_PP_SCHEDULER_KEEP_SUB_JOB_STARTS_ALIGNED ?= 0
+ MALI_PP_SCHEDULER_FORCE_NO_JOB_OVERLAP_BETWEEN_APPS ?= 0
+ MALI_UPPER_HALF_SCHEDULING ?= 1
+ MALI_ENABLE_CPU_CYCLES ?= 0
++HAVE_UNLOCKED_IOCTL ?= 1
+ 
+ # For customer releases the Linux Device Drivers will be provided as ARM proprietary and GPL releases:
+ # The ARM proprietary product will only include the license/proprietary directory
+@@ -179,6 +180,7 @@ ccflags-y += -DMALI_STATE_TRACKING=1
+ ccflags-y += -DMALI_OS_MEMORY_KERNEL_BUFFER_SIZE_IN_MB=$(OS_MEMORY_KERNEL_BUFFER_SIZE_IN_MB)
+ ccflags-y += -DUSING_GPU_UTILIZATION=$(USING_GPU_UTILIZATION)
+ ccflags-y += -DMALI_ENABLE_CPU_CYCLES=$(MALI_ENABLE_CPU_CYCLES)
++ccflags-y += -DHAVE_UNLOCKED_IOCTL=$(HAVE_UNLOCKED_IOCTL)
+ 
+ ifeq ($(MALI_UPPER_HALF_SCHEDULING),1)
+ 	ccflags-y += -DMALI_UPPER_HALF_SCHEDULING
+-- 
+2.17.1
+
