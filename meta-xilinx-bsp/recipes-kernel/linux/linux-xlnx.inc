@@ -51,6 +51,8 @@ KBUILD_DEFCONFIG_zynq = "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG_microblaze = "mmu_defconfig"
 KBUILD_DEFCONFIG_versal = "xilinx_defconfig"
 
+KERNEL_MODULE_AUTOLOAD_k26 += "usb5744"
+
 # Add meta-xilinx kmeta, used for MicroBlaze BSP fragments
 FILESEXTRAPATHS_prepend := "${THISDIR}:"
 SRC_URI_append = " file://xilinx-kmeta;type=kmeta;name=xilinx-kmeta;destsuffix=xilinx-kmeta"
