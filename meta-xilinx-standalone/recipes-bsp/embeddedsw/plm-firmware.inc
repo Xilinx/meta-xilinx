@@ -8,7 +8,7 @@ require embeddedsw.inc
 inherit deploy
 
 COMPATIBLE_HOST = "microblaze.*-elf"
-COMPATIBLE_MACHINE = "versal-mb"
+COMPATIBLE_MACHINE = "microblaze-plm"
 
 S = "${WORKDIR}/git"
 B = "${S}/lib/sw_apps/versal_plm/src"

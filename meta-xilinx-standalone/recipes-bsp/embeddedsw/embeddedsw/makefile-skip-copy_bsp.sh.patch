@@ -1,0 +1,54 @@
+Prevent makefile from calling copy_bsp.sh
+
+If we call copy_bsp.sh we will undo any manual compliation steps we
+have already done.  Avoid this.
+
+YP integration specific
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+
+diff --git a/lib/sw_apps/zynqmp_pmufw/src/Makefile b/lib/sw_apps/zynqmp_pmufw/src/Makefile
+index 1750c0a329..17f6a545ea 100644
+--- a/lib/sw_apps/zynqmp_pmufw/src/Makefile
++++ b/lib/sw_apps/zynqmp_pmufw/src/Makefile
+@@ -28,8 +28,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ 	$(CC) -o $@ $(OBJS) $(CC_FLAGS) $(CFLAGS) $(LN_FLAGS) $(LIBPATH) $(LSCRIPT)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../misc/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../misc/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../misc/zynqmp_pmufw_bsp
+ 
+diff --git a/lib/sw_apps/versal_plm/src/Makefile b/lib/sw_apps/versal_plm/src/Makefile
+index b4536e8584..a8643ecd47 100644
+--- a/lib/sw_apps/versal_plm/src/Makefile
++++ b/lib/sw_apps/versal_plm/src/Makefile
+@@ -30,8 +30,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ 	$(CC) -o $@ $(OBJS) $(CC_FLAGS) $(CFLAGS) $(LN_FLAGS) $(LIBPATH) $(LSCRIPT)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../misc/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../misc/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../misc/versal_plm_bsp
+ 
+diff --git a/lib/sw_apps/versal_psmfw/src/Makefile b/lib/sw_apps/versal_psmfw/src/Makefile
+index fdfee0a092..1ed664114b 100644
+--- a/lib/sw_apps/versal_psmfw/src/Makefile
++++ b/lib/sw_apps/versal_psmfw/src/Makefile
+@@ -29,8 +29,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ 	$(CC) -o $@ $(OBJS) $(CC_FLAGS) $(CFLAGS) $(LN_FLAGS) $(LIBPATH) $(LSCRIPT)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../misc/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../misc/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../misc/versal_psmfw_bsp
+ 

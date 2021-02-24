@@ -1,0 +1,56 @@
+From 79e17afd2c943c53978dceab2f8fd17cba8994ec Mon Sep 17 00:00:00 2001
+From: Rajan Vaja <rajan.vaja@xilinx.com>
+Date: Mon, 15 Feb 2021 22:53:37 -0800
+Subject: [PATCH] versal_psmfw: misc: Update makefile for version less build
+ with yocto
+
+Use COMPILER, ARCHIVER and ASSEMBLER variables in Makefile instead of
+hard coding them. This would help yocto flow as it does not use
+mb-gcc.
+
+Signed-off-by: Rajan Vaja <rajan.vaja@xilinx.com>
+Acked-by: Nicole Baze <nicole.baze@xilinx.com>
+---
+ lib/sw_apps/versal_psmfw/misc/Makefile | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/lib/sw_apps/versal_psmfw/misc/Makefile b/lib/sw_apps/versal_psmfw/misc/Makefile
+index 6374302f5c..2164c19f03 100644
+--- a/lib/sw_apps/versal_psmfw/misc/Makefile
++++ b/lib/sw_apps/versal_psmfw/misc/Makefile
+@@ -8,6 +8,9 @@ SUBDIRS := $(patsubst %/Makefile, %, $(BSP_MAKEFILES))
+ BSP_PARALLEL_MAKEFILES := $(filter-out $(BSP_SEQUENTIAL_MAKEFILES),$(BSP_MAKEFILES))
+ SEQ_SUBDIRS := $(patsubst %/Makefile, %, $(BSP_SEQUENTIAL_MAKEFILES))
+ PAR_SUBDIRS := $(patsubst %/Makefile, %, $(BSP_PARALLEL_MAKEFILES))
++COMPILER := mb-gcc
++ARCHIVER := mb-ar
++ASSEMBLER := mb-as
+ 
+ ifneq (,$(findstring win,$(RDI_PLATFORM)))
+  SHELL = CMD
+@@ -28,7 +31,7 @@ par_libs: $(addsuffix /make.libs,$(PAR_SUBDIRS))
+ 	@echo 'Finished building libraries parallelly.'
+ 
+ archive:
+-	mb-ar -r  $(LIBRARIES) $(wildcard $(PROCESSOR)/lib/*.o)
++	$(ARCHIVER) -r  $(LIBRARIES) $(wildcard $(PROCESSOR)/lib/*.o)
+ 
+ clean: $(addsuffix /make.clean,$(SUBDIRS))
+ 	rm -f ${PROCESSOR}/lib/libxil.a
+@@ -38,11 +41,11 @@ $(PROCESSOR)/lib/libxil.a: $(PROCESSOR)/lib/libxil_init.a
+ 
+ %/make.include: $(if $(wildcard $(PROCESSOR)/lib/libxil_init.a),$(PROCESSOR)/lib/libxil.a,)
+ 	@echo "Running Make include in $(subst /make.include,,$@)"
+-	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=mb-gcc" "ASSEMBLER=mb-as" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra"
++	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra"
+ 
+ %/make.libs: include
+ 	@echo "Running Make libs in $(subst /make.libs,,$@)"
+-	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=mb-gcc" "ASSEMBLER=mb-as" "ARCHIVER=mb-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=v -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra"
++	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra"
+ 
+ %/make.clean:
+ 	$(MAKE) -C $(subst /make.clean,,$@) -s clean
+-- 
+2.17.1
+
