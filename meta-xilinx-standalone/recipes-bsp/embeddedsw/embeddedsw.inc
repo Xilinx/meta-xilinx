@@ -28,3 +28,5 @@ LIC_FILES_CHKSUM ??= "file://license.txt;md5=${@d.getVarFlag('LIC_FILES_CHKSUM',
 
 SRC_URI = "${EMBEDDEDSW_SRCURI}"
 PV = "${ESW_VER}+git${SRCPV}"
+
+FILESPATH .= ":${FILE_DIRNAME}/embeddedsw"

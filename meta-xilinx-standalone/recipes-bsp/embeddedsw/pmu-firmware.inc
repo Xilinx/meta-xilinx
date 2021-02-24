@@ -4,8 +4,6 @@ PROVIDES = "virtual/pmu-firmware"
 
 require embeddedsw.inc
 
-SRC_URI += "file://fix-zynqmp-assert.patch"
-
 inherit deploy
 
 COMPATIBLE_HOST = "microblaze.*-elf"

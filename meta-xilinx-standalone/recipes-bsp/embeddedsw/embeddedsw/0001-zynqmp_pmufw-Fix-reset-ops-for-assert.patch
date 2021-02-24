@@ -1,8 +1,30 @@
+From 57a5a13ef730c5c46d9db159ed9b7a466cc70388 Mon Sep 17 00:00:00 2001
+From: Rajan Vaja <rajan.vaja@xilinx.com>
+Date: Wed, 27 Jan 2021 22:19:51 -0800
+Subject: [PATCH] zynqmp_pmufw: Fix reset ops for assert()
+
+New compiler toolchain treats "assert" as a macro always. So rename
+the existing "assert" variable to "resetAssert" in the codebase.
+
+Signed-off-by: Rajan Vaja <rajan.vaja@xilinx.com>
+Acked-by: Ravi Patel <ravi.patel@xilinx.com>
+Acked-by: Tejas Patel <tejas.patel@xilinx.com>
+---
+ lib/sw_apps/zynqmp_pmufw/src/pm_reset.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
 diff --git a/lib/sw_apps/zynqmp_pmufw/src/pm_reset.c b/lib/sw_apps/zynqmp_pmufw/src/pm_reset.c
-index 297c6c2ddc..bc295cf013 100644
+index c66aae4a0c..bcd8aa73db 100644
 --- a/lib/sw_apps/zynqmp_pmufw/src/pm_reset.c
 +++ b/lib/sw_apps/zynqmp_pmufw/src/pm_reset.c
-@@ -52,7 +52,7 @@
+@@ -1,5 +1,5 @@
+ /*
+-* Copyright (c) 2014 - 2020 Xilinx, Inc.  All rights reserved.
++* Copyright (c) 2014 - 2021 Xilinx, Inc.  All rights reserved.
+ * SPDX-License-Identifier: MIT
+  */
+ 
+@@ -34,7 +34,7 @@
   * @pulse	Function performing reset pulse operation
   */
  typedef struct PmResetOps {
@@ -11,7 +33,7 @@ index 297c6c2ddc..bc295cf013 100644
  	u32 (*const getStatus)(const PmReset* const s);
  	u32 (*const pulse)(const PmReset* const rst);
  } PmResetOps;
-@@ -415,37 +415,37 @@ static u32 PmResetPulsePl(const PmReset* const rst)
+@@ -399,37 +399,37 @@ static u32 PmResetPulsePl(const PmReset* const rst)
  }
  
  static const PmResetOps pmResetOpsGeneric = {
@@ -55,7 +77,7 @@ index 297c6c2ddc..bc295cf013 100644
  	.getStatus = PmResetGetStatusGpioBankIOs,
  	.pulse = PmResetPulseGpioBankIOs,
  };
-@@ -1901,8 +1901,8 @@ s32 PmResetDoAssert(const PmReset *reset, u32 action)
+@@ -1885,8 +1885,8 @@ s32 PmResetDoAssert(const PmReset *reset, u32 action)
  	switch (action) {
  	case PM_RESET_ACTION_RELEASE:
  	case PM_RESET_ACTION_ASSERT:
@@ -66,3 +88,6 @@ index 297c6c2ddc..bc295cf013 100644
  		} else {
  			status = XST_INVALID_PARAM;
  		}
+-- 
+2.17.1
+
