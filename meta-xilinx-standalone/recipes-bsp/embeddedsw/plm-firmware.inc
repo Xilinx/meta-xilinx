@@ -3,9 +3,7 @@ SUMMARY = "Platform Loader and Manager for Versal devices"
 
 PROVIDES = "virtual/plm"
 
-require embeddedsw.inc
-
-inherit deploy
+inherit xlnx-embeddedsw deploy
 
 COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "microblaze-plm"

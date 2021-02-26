@@ -2,9 +2,7 @@ DESCRIPTION = "PMU Firmware"
 
 PROVIDES = "virtual/pmu-firmware"
 
-require embeddedsw.inc
-
-inherit deploy
+inherit xlnx-embeddedsw deploy
 
 COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "microblaze-pmu"
