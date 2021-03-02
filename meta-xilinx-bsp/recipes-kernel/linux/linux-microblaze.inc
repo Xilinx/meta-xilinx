@@ -1,3 +1,5 @@
+SRC_URI += "file://mb-no-tree-loop-distribute-patterns.patch"
+
 # MicroBlaze is a uImage target, but its not called 'uImage' instead it is called 'linux.bin.ub'
 python () {
     if d.getVar('KERNEL_IMAGETYPE', True).endswith('.ub'):

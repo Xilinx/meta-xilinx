@@ -1,0 +1,47 @@
+Disable tree-loop-distribute-patterns CFLAG
+
+Issue: CR-1086247
+
+GCC 10.2.0 added -ftree-loop-distribute-patterns by default with -O2.  This
+is causing a condition where the kernel will no longer boot.
+
+This is a temporary workaround until we can identify the true cause of
+the boot failure.
+
+Symtoms:
+
+earlycon: uartlite_a0 at MMIO 0x40600000 (options '115200n8')
+printk: bootconsole [uartlite_a0] enabled
+cma: Reserved 16 MiB at 0xaec00000
+Linux version 5.10.0-xilinx-v2020.2 (oe-user@oe-host) (microblazeel-xilinx-linux-gcc (GCC) 10.2.0, GNU ld (GNU Binutils) 2.35.0.20200730) #1 Mon Mar 1 12:58:36 UTC 2021
+setup_memory: max_mapnr: 0x40000
+setup_memory: min_low_pfn: 0x80000
+setup_memory: max_low_pfn: 0xb0000
+setup_memory: max_pfn: 0xc0000
+Zone ranges:
+  DMA      [mem 0x0000000080000000-0x00000000afffffff]
+  Normal   empty
+  HighMem  [mem 0x00000000b0000000-0x00000000bfffffff]
+Movable zone start for each node
+Early memory node ranges
+  node   0: [mem 0x0000000080000000-0x00000000bfffffff]
+Initmem setup node 0 [mem 0x0000000080000000-0x00000000bfffffff]
+<hang>
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+
+diff --git a/arch/microblaze/Makefile b/arch/microblaze/Makefile
+index bb980891816d..e368c35ad21c 100644
+--- a/arch/microblaze/Makefile
++++ b/arch/microblaze/Makefile
+@@ -48,6 +48,10 @@ CPUFLAGS-1 += $(call cc-option,-mcpu=v$(CPU_VER))
+ # r31 holds current when in kernel mode
+ KBUILD_CFLAGS += -ffixed-r31 $(CPUFLAGS-y) $(CPUFLAGS-1) $(CPUFLAGS-2)
+ 
++# GCC 10.x now has -ftree-loop-distribute-patterns by default in -O2
++# This causes a boot failure, so disable it
++KBUILD_CFLAGS += -fno-tree-loop-distribute-patterns
++
+ head-y := arch/microblaze/kernel/head.o
+ libs-y += arch/microblaze/lib/
+ core-y += arch/microblaze/kernel/
