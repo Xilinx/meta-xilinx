@@ -23,26 +23,26 @@ do_compile() {
     # First process the sequential items
     for i in $(cat seq.mak); do
         echo Include Seq: $i
-        oe_runmake -C $(dirname $i) -s include ${@bsp_make_vars(d)}
+        oe_runmake -C $(dirname $i) -s include
     done
     for i in $(cat seq.mak); do
         echo Libs Seq: $i
-        oe_runmake -C $(dirname $i) -s libs ${@bsp_make_vars(d)}
+        oe_runmake -C $(dirname $i) -s libs
     done
 
     # the Makefile in ${B}/../misc/Makefile, does not handle CC, AR, AS, etc
     # properly. So do its job manually. Preparing the includes first, then libs.
     for i in $(ls ${BSP_TARGETS_DIR}/*/src/Makefile); do
         echo Include: $i
-        oe_runmake -C $(dirname $i) -s include ${@bsp_make_vars(d)}
+        oe_runmake -C $(dirname $i) -s include
     done
     for i in $(ls ${BSP_TARGETS_DIR}/*/src/Makefile); do
         echo Libs: $i
-        oe_runmake -C $(dirname $i) -s libs ${@bsp_make_vars(d)}
+        oe_runmake -C $(dirname $i) -s libs
     done
 
     # --build-id=none is required due to linker script not defining a location for it.
     # Again, recipe-systoot include is necessary
     echo Construct: executable
-    oe_runmake executable.elf ${@bsp_make_vars(d)} CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
+    oe_runmake executable.elf CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
 }

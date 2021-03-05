@@ -5,7 +5,8 @@ PROVIDES = "virtual/pmu-firmware"
 inherit xlnx-embeddedsw deploy
 
 COMPATIBLE_HOST = "microblaze.*-elf"
-COMPATIBLE_MACHINE = "microblaze-pmu"
+COMPATIBLE_MACHINE = "none"
+COMPATIBLE_MACHINE_zynqmp = ".*"
 
 S = "${WORKDIR}/git"
 B = "${S}/lib/sw_apps/zynqmp_pmufw/src"
@@ -31,19 +32,21 @@ def bsp_make_vars(d):
     s = ["COMPILER", "CC", "COMPILER_FLAGS", "EXTRA_COMPILER_FLAGS", "ARCHIVER", "AR", "AS"]
     return " ".join(["\"%s=%s\"" % (v, d.getVar(v)) for v in s])
 
+EXTRA_OEMAKE = "${@bsp_make_vars(d)}"
+
 do_compile() {
     # the Makefile in ${B}/../misc/Makefile, does not handle CC, AR, AS, etc
     # properly. So do its job manually. Preparing the includes first, then libs.
     for i in $(ls ${BSP_TARGETS_DIR}/*/src/Makefile); do
-        oe_runmake -C $(dirname $i) -s include ${@bsp_make_vars(d)}
+        oe_runmake -C $(dirname $i) -s include
     done
     for i in $(ls ${BSP_TARGETS_DIR}/*/src/Makefile); do
-        oe_runmake -C $(dirname $i) -s libs ${@bsp_make_vars(d)}
+        oe_runmake -C $(dirname $i) -s libs
     done
 
     # --build-id=none is required due to linker script not defining a location for it.
     # Again, recipe-systoot include is necessary
-    oe_runmake CC="${CC}" CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
+    oe_runmake CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
 }
 
 do_install() {
@@ -51,6 +54,7 @@ do_install() {
 }
 
 PMU_FIRMWARE_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+PMU_FIRMWARE_BASE_NAME[vardepsexclude] = "DATETIME"
 
 do_deploy() {
     install -Dm 0644 ${B}/executable.elf ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.elf
