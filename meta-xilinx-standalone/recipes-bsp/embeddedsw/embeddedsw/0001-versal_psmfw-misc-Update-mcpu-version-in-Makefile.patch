@@ -1,0 +1,35 @@
+From 7b5cd70e8d77f5df345a2f1a29e09a51af248040 Mon Sep 17 00:00:00 2001
+From: Rajan Vaja <rajan.vaja@xilinx.com>
+Date: Fri, 26 Feb 2021 02:30:28 -0800
+Subject: [PATCH] versal_psmfw: misc: Update mcpu version in Makefile
+
+Use -mcpu=v10.0 instead of -mcpu=v as -mcpu=v is not defined and
+PSM is using v10.0.
+
+Signed-off-by: Rajan Vaja <rajan.vaja@xilinx.com>
+Acked-by: Nicole Baze <nicole.baze@xilinx.com>
+---
+ lib/sw_apps/versal_psmfw/misc/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/sw_apps/versal_psmfw/misc/Makefile b/lib/sw_apps/versal_psmfw/misc/Makefile
+index 2164c19f03..02d85e492e 100644
+--- a/lib/sw_apps/versal_psmfw/misc/Makefile
++++ b/lib/sw_apps/versal_psmfw/misc/Makefile
+@@ -41,11 +41,11 @@ $(PROCESSOR)/lib/libxil.a: $(PROCESSOR)/lib/libxil_init.a
+ 
+ %/make.include: $(if $(wildcard $(PROCESSOR)/lib/libxil_init.a),$(PROCESSOR)/lib/libxil.a,)
+ 	@echo "Running Make include in $(subst /make.include,,$@)"
+-	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra"
++	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra"
+ 
+ %/make.libs: include
+ 	@echo "Running Make libs in $(subst /make.libs,,$@)"
+-	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra"
++	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra"
+ 
+ %/make.clean:
+ 	$(MAKE) -C $(subst /make.clean,,$@) -s clean
+-- 
+2.17.1
+
