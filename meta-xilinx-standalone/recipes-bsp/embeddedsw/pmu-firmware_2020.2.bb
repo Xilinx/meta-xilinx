@@ -45,4 +45,6 @@ do_compile() {
     # Again, recipe-systoot include is necessary
     echo Construct: executable
     oe_runmake executable.elf CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
+
+    ${MB_OBJCOPY} -O binary ${B}/executable.elf ${B}/executable.bin
 }

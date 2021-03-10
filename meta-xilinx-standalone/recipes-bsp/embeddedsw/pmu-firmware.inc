@@ -1,7 +1,5 @@
 DESCRIPTION = "PMU Firmware"
 
-PROVIDES = "virtual/pmu-firmware"
-
 inherit xlnx-embeddedsw deploy
 
 COMPATIBLE_HOST = "microblaze.*-elf"
@@ -19,6 +17,12 @@ do_configure() {
     # mb-* commands
     ${B}/../misc/copy_bsp.sh
 }
+
+# All do_compiles need this, even if it's overriden
+MB_OBJCOPY ??= "${OBJCOPY}"
+
+# Only add a dependency if we need to use OUR binutils
+DEPENDS .= "${@' virtual/${TARGET_PREFIX}binutils' if d.getVar('MB_OBJCOPY') == d.getVar('OBJCOPY') else ''}"
 
 COMPILER = "${CC}"
 COMPILER_FLAGS = "-O2 -c"
@@ -47,21 +51,27 @@ do_compile() {
     # --build-id=none is required due to linker script not defining a location for it.
     # Again, recipe-systoot include is necessary
     oe_runmake CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
+
+    ${MB_OBJCOPY} -O binary ${B}/executable.elf ${B}/executable.bin
 }
 
 do_install() {
     :
 }
 
-PMU_FIRMWARE_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+PACKAGES = ""
+
+# This is the default in most BSPs.  A MACHINE.conf can override this!
+PMU_FIRMWARE_IMAGE_NAME ??= "pmu-firmware-zynqmp-pmu"
+
+PMU_FIRMWARE_BASE_NAME ?= "${PMU_FIRMWARE_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 PMU_FIRMWARE_BASE_NAME[vardepsexclude] = "DATETIME"
 
 do_deploy() {
     install -Dm 0644 ${B}/executable.elf ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.elf
-    ln -sf ${PMU_FIRMWARE_BASE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}.elf
-    ${OBJCOPY} -O binary ${B}/executable.elf ${B}/executable.bin
+    ln -sf ${PMU_FIRMWARE_BASE_NAME}.elf ${DEPLOYDIR}/${PMU_FIRMWARE_IMAGE_NAME}.elf
     install -m 0644 ${B}/executable.bin ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.bin
-    ln -sf ${PMU_FIRMWARE_BASE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}.bin
+    ln -sf ${PMU_FIRMWARE_BASE_NAME}.bin ${DEPLOYDIR}/${PMU_FIRMWARE_IMAGE_NAME}.bin
 }
 
 addtask deploy before do_build after do_install

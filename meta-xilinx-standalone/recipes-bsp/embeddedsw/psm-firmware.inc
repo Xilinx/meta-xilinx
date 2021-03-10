@@ -1,8 +1,6 @@
 ESCRIPTION = "PSM Firmware"
 SUMMARY = "PSM firmware for versal devices"
 
-PROVIDES = "virtual/psm-firmware"
-
 inherit xlnx-embeddedsw deploy
 
 COMPATIBLE_HOST = "microblaze.*-elf"
@@ -50,19 +48,28 @@ do_compile() {
     oe_runmake CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
 }
 
+# All do compiles need this, even if the base is overriden
+do_compile_append() {
+    ${OBJCOPY} -O binary ${B}/psmfw.elf ${B}/psmfw.bin
+}
+
 do_install() {
     :
 }
 
-PSM_FIRMWARE_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
+PACKAGES = ""
+
+# This is the default in most BSPs.  A MACHINE.conf can override this!
+PSM_FIRMWARE_IMAGE_NAME ??= "psm-firmware-versal-mb"
+
+PSM_FIRMWARE_BASE_NAME ?= "${PSM_FIRMWARE_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
 PSM_FIRMWARE_BASE_NAME[vardepsexclude] = "DATETIME"
 
 do_deploy() {
     install -Dm 0644 ${B}/psmfw.elf ${DEPLOYDIR}/${PSM_FIRMWARE_BASE_NAME}.elf
-    ln -sf ${PSM_FIRMWARE_BASE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}.elf
-    ${OBJCOPY} -O binary ${B}/psmfw.elf ${B}/psmfw.bin
+    ln -sf ${PSM_FIRMWARE_BASE_NAME}.elf ${DEPLOYDIR}/${PSM_FIRMWARE_IMAGE_NAME}.elf
     install -m 0644 ${B}/psmfw.bin ${DEPLOYDIR}/${PSM_FIRMWARE_BASE_NAME}.bin
-    ln -sf ${PSM_FIRMWARE_BASE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}.bin
+    ln -sf ${PSM_FIRMWARE_BASE_NAME}.bin ${DEPLOYDIR}/${PSM_FIRMWARE_IMAGE_NAME}.bin
 }
 
 addtask deploy before do_build after do_install
