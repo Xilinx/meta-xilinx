@@ -1,8 +1,6 @@
 DESCRIPTION = "Platform Loader and Manager"
 SUMMARY = "Platform Loader and Manager for Versal devices"
 
-PROVIDES = "virtual/plm"
-
 inherit xlnx-embeddedsw deploy
 
 COMPATIBLE_HOST = "microblaze.*-elf"
@@ -50,20 +48,28 @@ do_compile() {
     oe_runmake CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
 }
 
+# All do_compiles need this, even if the base is overriden
+do_compile_append() {
+    ${OBJCOPY} -O binary ${B}/plm.elf ${B}/plm.bin
+}
+
 do_install() {
     :
 }
 
-PLM_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
+PACKAGES = ""
+
+# This is the default in most BSPs.  A MACHINE.conf can override this!
+PLM_IMAGE_NAME ??= "plm-versal-mb"
+
+PLM_BASE_NAME ?= "${PLM_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
 PLM_BASE_NAME[vardepsexclude] = "DATETIME"
 
 do_deploy() {
     install -Dm 0644 ${B}/plm.elf ${DEPLOYDIR}/${PLM_BASE_NAME}.elf
-    ln -sf ${PLM_BASE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}.elf
-    ${OBJCOPY} -O binary ${B}/plm.elf ${B}/plm.bin
+    ln -sf ${PLM_BASE_NAME}.elf ${DEPLOYDIR}/${PLM_IMAGE_NAME}.elf
     install -m 0644 ${B}/plm.bin ${DEPLOYDIR}/${PLM_BASE_NAME}.bin
-    ln -sf ${PLM_BASE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}.bin
+    ln -sf ${PLM_BASE_NAME}.bin ${DEPLOYDIR}/${PLM_IMAGE_NAME}.bin
 }
 
 addtask deploy before do_build after do_install
-
