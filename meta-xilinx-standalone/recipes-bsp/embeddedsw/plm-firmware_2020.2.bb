@@ -53,4 +53,6 @@ do_compile() {
     # Again, recipe-systoot include is necessary
     echo Construct: executable
     oe_runmake plm.elf ${@bsp_make_vars(d)} CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
+
+    ${MB_OBJCOPY} -O binary ${B}/plm.elf ${B}/plm.bin
 }

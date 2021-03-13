@@ -19,6 +19,12 @@ do_configure() {
     ${B}/../misc/copy_bsp.sh
 }
 
+# All do_compiles need this, even if it's overriden
+MB_OBJCOPY ??= "${OBJCOPY}"
+
+# Only add a dependency if we need to use OUR binutils
+DEPENDS .= "${@' virtual/${TARGET_PREFIX}binutils' if d.getVar('MB_OBJCOPY') == d.getVar('OBJCOPY') else ''}"
+
 COMPILER = "${CC}"
 COMPILER_FLAGS = "-O2 -c"
 EXTRA_COMPILER_FLAGS = "-g -Wall -Wextra -Os -flto -ffat-lto-objects"
@@ -46,11 +52,8 @@ do_compile() {
     # --build-id=none is required due to linker script not defining a location for it.
     # Again, recipe-systoot include is necessary
     oe_runmake CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
-}
 
-# All do compiles need this, even if the base is overriden
-do_compile_append() {
-    ${OBJCOPY} -O binary ${B}/psmfw.elf ${B}/psmfw.bin
+    ${MB_OBJCOPY} -O binary ${B}/psmfw.elf ${B}/psmfw.bin
 }
 
 do_install() {
