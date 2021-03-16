@@ -7,6 +7,7 @@ TOOLCHAIN_HOST_TASK ?= "\
     nativesdk-sdk-provides-dummy \
     nativesdk-lopper \
     nativesdk-xilinx-lops \
+    nativesdk-esw-conf \
     "
 
 MULTIMACH_TARGET_SYS = "${SDK_ARCH}-nativesdk${SDK_VENDOR}-${SDK_OS}"

@@ -1,3 +1,10 @@
-inherit esw_examples
+inherit features_check
 
-ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/clockps/examples/"
+REQUIRED_DISTRO_FEATURES = "clockps"
+
+inherit esw
+
+DEPENDS += "xilstandalone xilmem"
+
+ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/clockps/src/"
+ESW_COMPONENT_NAME = "libclockps.a"

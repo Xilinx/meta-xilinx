@@ -1,27 +1,31 @@
-inherit esw python3native
+inherit esw python3native features_check
+
+require conf/${ESW_MACHINE}-libxil.conf
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/"
 ESW_COMPONENT_NAME = "libxil.a"
 
-DEPENDS += "dtc-native python3-dtc-native python3-pyyaml-native xilstandalone xilmem device-tree"
+DEPENDS += "xilstandalone xilmem"
+REQUIRED_DISTRO_FEATURES = "${DISTRO_FEATURES}"
+PACKAGECONFIG ?= "${DISTRO_FEATURES} ${MACHINE_FEATURES}"
 
 do_configure_prepend() {
-    # This will generate CMakeLists.txt which contains
-    # drivers for the libxil 
-    cd ${S}
-    #TODO
-    # This call was initially used to get the list of drivers and libraries required
-    # by the design to the build system to use as dependencies to the application
-    # being built, at this point this is all done in a single cmake build bundling
-    # everything in libxil, which is undesired.
-    DRIVERS_LIST=$(nativepython3 ${S}/scripts/getdrvlist.py -d ${DTBFILE})
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py ${DTS_FILE} -- baremetal_xparameters_xlnx.py ${ESW_MACHINE} ${S}
+    install -m 0755 xparameters.h ${S}/${ESW_COMPONENT_SRC}/
 }
 
-do_generate_driver_data() {
-    # This script should also not rely on relative paths and such
-    cd ${S}
-    nativepython3 ${S}/scripts/generate_drvdata.py -d ${DTBFILE}
+do_compile() {
+   # Combines the .a archives produced by all of the dependent items
+   cd ${RECIPE_SYSROOT}/usr/lib/
+   echo create libxil.a > libxil.mri
+   for each in ${REQUIRED_DISTRO_FEATURES}; do
+     each=$(echo $each | sed 's/-/_/g')
+     if [ -e lib$each.a ]; then
+       echo addlib lib$each.a >> libxil.mri
+     fi
+   done
+   echo “save” >> libxil.mri
+   echo “end” >> libxil.mri
+   ${AR} -M <libxil.mri
+   cp libxil.a ${B}
 }
-
-addtask do_generate_driver_data before do_configure after do_prepare_recipe_sysroot
-do_prepare_recipe_sysroot[rdeptask] = "do_unpack"
