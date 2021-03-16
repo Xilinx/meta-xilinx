@@ -53,7 +53,7 @@ do_compile() {
     # Again, recipe-systoot include is necessary
     oe_runmake CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
 
-    ${MB_OBJCOPY} -O binary ${B}/plm.elf ${B}/plm.bin
+    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/plm.bin
 }
 
 do_install() {
@@ -69,8 +69,10 @@ inherit image-artifact-names
 
 PLM_BASE_NAME ?= "${PLM_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
+ESW_COMPONENT ??= "plm.elf"
+
 do_deploy() {
-    install -Dm 0644 ${B}/plm.elf ${DEPLOYDIR}/${PLM_BASE_NAME}.elf
+    install -Dm 0644 ${B}/${ESW_COMPONENT} ${DEPLOYDIR}/${PLM_BASE_NAME}.elf
     ln -sf ${PLM_BASE_NAME}.elf ${DEPLOYDIR}/${PLM_IMAGE_NAME}.elf
     install -m 0644 ${B}/plm.bin ${DEPLOYDIR}/${PLM_BASE_NAME}.bin
     ln -sf ${PLM_BASE_NAME}.bin ${DEPLOYDIR}/${PLM_IMAGE_NAME}.bin
