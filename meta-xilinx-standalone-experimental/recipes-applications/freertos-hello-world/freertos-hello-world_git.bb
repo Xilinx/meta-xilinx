@@ -1,12 +1,14 @@
-inherit esw deploy
+inherit esw deploy python3native
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/freertos_hello_world/src/"
 
-DEPENDS += "dtc-native python3-dtc-native libxil xilstandalone xiltimer freertos10-xilinx device-tree"
+DEPENDS += "libxil xilstandalone freertos10-xilinx xiltimer"
 
 do_configure_prepend() {
     cd ${S}
-    nativepython3 ${S}/scripts/linker_gen.py -d ${DTBFILE} -o ${OECMAKE_SOURCEPATH}
+    lopper.py ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
+    install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
+    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
 }
 
 do_install() {

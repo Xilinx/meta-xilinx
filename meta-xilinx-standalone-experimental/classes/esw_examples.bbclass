@@ -1,15 +1,18 @@
 inherit esw deploy python3native
 
-DEPENDS += "dtc-native python3-dtc-native python3-pyyaml-native xilstandalone libxil xiltimer device-tree"
+DEPENDS += "python3-dtc-native python3-pyyaml-native xilstandalone libxil xiltimer"
 
 do_configure_prepend() {
     cd ${S}
-    nativepython3 ${S}/scripts/linker_gen.py -d ${DTBFILE} -o ${OECMAKE_SOURCEPATH}
+    lopper.py ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
+    install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
+    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
 }
 
 do_generate_eglist () {
     cd ${S}
-    nativepython3 ${S}/scripts/example.py -d ${DTBFILE} -o ${OECMAKE_SOURCEPATH}
+    lopper.py ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} drvcmake_metadata
+    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
 }
 addtask generate_eglist before do_configure after do_prepare_recipe_sysroot
 do_prepare_recipe_sysroot[rdeptask] = "do_unpack"
@@ -20,7 +23,8 @@ do_install() {
 }
 
 do_deploy() {
-    install -Dm 0644 ${WORKDIR}/package/${base_libdir}/firmware/*.elf ${DEPLOYDIR}/
+    install -d ${DEPLOYDIR}/${MACHINE}-${BPN}/
+    install -Dm 0644 ${WORKDIR}/package/${base_libdir}/firmware/*.elf ${DEPLOYDIR}/${MACHINE}-${BPN}/
 }
 addtask deploy before do_build after do_package
 

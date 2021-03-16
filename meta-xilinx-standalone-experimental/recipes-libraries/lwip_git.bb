@@ -3,13 +3,22 @@ inherit esw python3native
 ESW_COMPONENT_SRC = "/ThirdParty/sw_services/lwip211/src/"
 ESW_COMPONENT_NAME = "liblwip211.a"
 
-DEPENDS += "dtc-native python3-dtc-native libxil python3-pyyaml-native"
+DEPENDS += "libxil"
 DEPENDS_append_xilinx-freertos = "freertos10-xilinx"
+
+EXTRA_OECMAKE += "-Dlwip_api_mode=RAW_API"
+EXTRA_OECMAKE += "-Dlwip_dhcp_does_arp_check=ON"
+EXTRA_OECMAKE += "-Dlwip_dhcp=ON"
+EXTRA_OECMAKE += "-Dlwip_pbuf_pool_size=2048"
+EXTRA_OECMAKE += "-Dlwip_ipv6_enable=OFF"
+EXTRA_OECMAKE_append_xilinx-freertos += "-Dlwip_api_mode=SOCKET_API"
 
 do_configure_prepend() {
     # This script should also not rely on relative paths and such
     cd ${S}
-    nativepython3 ${S}/scripts/lib_parser.py -d ${DTBFILE} -o ${OECMAKE_SOURCEPATH}
+    lopper.py ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${S}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
+    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+    install -m 0755 xtopology_g.c ${S}/${ESW_COMPONENT_SRC}/
 }
 
 do_install() {

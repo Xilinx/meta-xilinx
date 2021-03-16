@@ -1,0 +1,23 @@
+inherit features_check
+
+REQUIRED_DISTRO_FEATURES = "common"
+
+inherit esw python3native
+
+DEPENDS += "xilstandalone xilmem"
+
+PACKAGECONFIG ?= "${@bb.utils.contains("DISTRO_FEATURES", "clockps", "clockps", "", d)} \
+		  ${@bb.utils.contains("DISTRO_FEATURES", "scugic", "scugic", "", d)} \
+		  ${@bb.utils.contains("DISTRO_FEATURES", "intc", "intc", "", d)}"
+PACKAGECONFIG[clockps] = "${RECIPE_SYSROOT}/usr/lib/libclockps.a,,clockps,,"
+PACKAGECONFIG[scugic] = "${RECIPE_SYSROOT}/usr/lib/libscugic.a,,scugic,,"
+PACKAGECONFIG[intc] = "${RECIPE_SYSROOT}/usr/lib/libintc.a,,intc,,"
+
+ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/common/src/"
+ESW_COMPONENT_NAME = "libcommon.a"
+
+do_configure_prepend() {
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py ${DTS_FILE} -- baremetalconfig_xlnx.py ${ESW_MACHINE} ${S}/XilinxProcessorIPLib/drivers/intc/src/
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py ${DTS_FILE} -- baremetalconfig_xlnx.py ${ESW_MACHINE} ${S}/XilinxProcessorIPLib/drivers/scugic/src/
+    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+}

@@ -1,3 +1,13 @@
-inherit esw_examples
+inherit features_check
 
-ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/tmrctr/examples/"
+REQUIRED_DISTRO_FEATURES = "tmrctr"
+
+inherit esw python3native
+
+DEPENDS += "xilstandalone xilmem"
+
+ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/tmrctr/src/"
+ESW_COMPONENT_NAME = "libtmrctr.a"
+
+addtask do_generate_driver_data before do_configure after do_prepare_recipe_sysroot
+do_prepare_recipe_sysroot[rdeptask] = "do_unpack"

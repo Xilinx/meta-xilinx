@@ -1,17 +1,7 @@
-inherit pkgconfig cmake
-
-LICENSE = "Proprietary"
-LICFILENAME = "license.txt"
-LIC_FILES_CHKSUM = "file://${S}/${LICFILENAME};md5=39ab6ab638f4d1836ba994ec6852de94"
-
 # We should move to an actual SRCREV eventually
 include conf/xilinx/esw-srcrev.inc
 
-SRCREV ?= "${AUTOREV}"
-PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
-REPO ?= "git://github.com/xilinx/embeddedsw.git;protocol=https"
-BRANCH ?= "master"
-SRC_URI = "${REPO};branch=${BRANCH}"
+inherit xlnx-embeddedsw pkgconfig cmake
 
 SRCREV_FORMAT = "src_decouple"
 
@@ -23,6 +13,8 @@ SPECFILE_PATH_arm = "${S}/scripts/specs/arm/Xilinx.spec"
 SPECFILE_PATH_aarch64 = "${S}/scripts/specs/arm/Xilinx.spec"
 SPECFILE_PATH_microblaze = "${S}/scripts/specs/microblaze/Xilinx.spec"
 
+ESW_MACHINE ?= "${MACHINE}"
+
 ESW_CFLAGS += "-specs=${SPECFILE_PATH}"
 
 inherit ccmake
@@ -30,7 +22,14 @@ inherit ccmake
 COMPATIBLE_HOST = ".*-elf"
 COMPATIBLE_HOST_arm = "[^-]*-[^-]*-eabi"
 
-DTBFILE ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
+DTS_FILE = "${DEPLOY_DIR_IMAGE}/${ESW_MACHINE}-baremetal.dtb"
+
+DEPENDS += "python3-pyyaml-native lopper-native device-tree-lops python3-dtc-native"
+
+# We need the deployed output
+do_configure[depends] += "device-tree-lops:do_deploy"
+do_compile[depends] += "device-tree-lops:do_deploy"
+do_install[depends] += "device-tree-lops:do_deploy"
 
 def get_xlnx_cmake_machine(fam, d):
     cmake_machine = fam
@@ -62,7 +61,7 @@ def get_xlnx_cmake_processor(tune, machine, d):
     return cmake_processor
 
 XLNX_CMAKE_MACHINE = "${@get_xlnx_cmake_machine(d.getVar('SOC_FAMILY'), d)}"
-XLNX_CMAKE_PROCESSOR = "${@get_xlnx_cmake_processor(d.getVar('DEFAULTTUNE'), d.getVar('MACHINE'), d)}"
+XLNX_CMAKE_PROCESSOR = "${@get_xlnx_cmake_processor(d.getVar('DEFAULTTUNE'), d.getVar('ESW_MACHINE'), d)}"
 XLNX_CMAKE_SYSTEM_NAME ?= "Generic"
 
 cmake_do_generate_toolchain_file_append() {
@@ -103,4 +102,31 @@ python(){
                 return
             licpath=os.path.dirname(licpath)
         bb.error("Couldn't find license file: %s, within directory %s or his parent directories" % (d.getVar('LICFILENAME',True), externalsrc))
+}
+
+do_generate_driver_data[dirs] = "${B}"
+do_generate_driver_data[depends] += "device-tree-lops:do_deploy"
+python do_generate_driver_data() {
+    import glob, subprocess, os
+
+    system_dt = glob.glob(d.getVar('DTS_FILE'))
+    src_dir = glob.glob(d.getVar('OECMAKE_SOURCEPATH'))
+    machine = d.getVar('ESW_MACHINE')
+
+    driver_name = d.getVar('REQUIRED_DISTRO_FEATURES')
+
+    if len(system_dt) == 0:
+        bb.error("Couldn't find device tree %s" % d.getVar('DTS_FILE'))
+
+    if len(src_dir) == 0:
+        bb.error("Couldn't find source dir %s" % d.getVar('OECMAKE_SOURCEPATH'))
+
+    os.chdir(d.getVar('B'))
+    command = ["lopper.py"] + ["-f"] + [system_dt[0]] + ["--"] + ["baremetalconfig_xlnx.py"] + [machine] + [src_dir[0]]
+    subprocess.run(command, check = True)
+    src_file = str("x") + driver_name.replace('-', '_') + str("_g.c")
+    if os.path.exists(src_file):
+         bb.note("Generated config file for driver %s" % driver_name)
+         command = ["install"] + ["-m"] + ["0755"] + [src_file] + [src_dir[0]]
+         subprocess.run(command, check = True)
 }

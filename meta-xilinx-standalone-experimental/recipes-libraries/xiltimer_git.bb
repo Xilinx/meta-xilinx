@@ -3,10 +3,11 @@ inherit esw python3native
 ESW_COMPONENT_SRC = "/lib/sw_services/xiltimer/src/"
 ESW_COMPONENT_NAME = "libxiltimer.a"
 
-DEPENDS += "dtc-native python3-dtc-native python3-pyyaml-native libxil device-tree"
+DEPENDS += "libxil"
 
 do_configure_prepend() {
     # This script should also not rely on relative paths and such
     cd ${S}
-    nativepython3 ${S}/scripts/lib_parser.py -d ${DTBFILE} -o ${OECMAKE_SOURCEPATH}
+    lopper.py ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
+    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
 }
