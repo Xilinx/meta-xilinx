@@ -20,6 +20,8 @@ DEVICE_TREE_NAME ?= "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/dtb', 'dev
 RAMDISK_IMAGE ?= ""
 RAMDISK_IMAGE_zynq ?= "uramdisk.image.gz"
 
+PXERAMDISK_IMAGE ?= "${@'ramdisk.cpio.gz.u-boot' if d.getVar('INITRAMFS_IMAGE') and d.getVar('INITRAMFS_IMAGE').find('initramfs') > 0 else '${RAMDISK_IMAGE}'}"
+
 KERNEL_BOOTCMD_zynqmp ?= "booti"
 KERNEL_BOOTCMD_zynq ?= "bootm"
 KERNEL_BOOTCMD_versal ?= "booti"
@@ -223,7 +225,7 @@ do_compile() {
     mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
         -e 's/@@DEVICE_TREE_NAME@@/${DEVICE_TREE_NAME}/' \
-	-e 's/@@RAMDISK_IMAGE@@/${RAMDISK_IMAGE}/' \
+	-e 's/@@RAMDISK_IMAGE@@/${PXERAMDISK_IMAGE}/' \
 	"${WORKDIR}/pxeboot.pxe" > "pxeboot.pxe"
 }
 
