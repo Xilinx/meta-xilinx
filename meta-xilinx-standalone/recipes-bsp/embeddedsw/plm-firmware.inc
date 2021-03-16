@@ -11,7 +11,7 @@ S = "${WORKDIR}/git"
 B = "${S}/lib/sw_apps/versal_plm/src"
 
 # The makefile does not handle parallelization
-PARALLEL_MAKE = ""
+PARALLEL_MAKE = "-j1"
 
 do_configure() {
     # manually do the copy_bsp step first, so as to be able to fix up use of
