@@ -52,7 +52,7 @@ do_compile() {
     # Again, recipe-systoot include is necessary
     oe_runmake CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
 
-    ${MB_OBJCOPY} -O binary ${B}/executable.elf ${B}/executable.bin
+    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/executable.bin
 }
 
 do_install() {
@@ -68,8 +68,10 @@ inherit image-artifact-names
 
 PMU_FIRMWARE_BASE_NAME ?= "${PMU_FIRMWARE_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
+ESW_COMPONENT ??= "executable.elf"
+
 do_deploy() {
-    install -Dm 0644 ${B}/executable.elf ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.elf
+    install -Dm 0644 ${B}/${ESW_COMPONENT} ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.elf
     ln -sf ${PMU_FIRMWARE_BASE_NAME}.elf ${DEPLOYDIR}/${PMU_FIRMWARE_IMAGE_NAME}.elf
     install -m 0644 ${B}/executable.bin ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.bin
     ln -sf ${PMU_FIRMWARE_BASE_NAME}.bin ${DEPLOYDIR}/${PMU_FIRMWARE_IMAGE_NAME}.bin
