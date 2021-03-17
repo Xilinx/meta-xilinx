@@ -26,8 +26,8 @@
                 };
                 lop_4 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                            };
@@ -36,6 +36,19 @@
                            compatible = "system-device-tree-v1,lop,code-v1";
                            code = "
                                # print( '---> microblaze version code for node: %s' % node )
+                               val = node['compatible'].value[0]
+                               if val == 'pmu-microblaze':
+                                   node.tunes = OrderedDict()
+                                   node.tunes['microblaze'] = 'microblaze'
+                                   node.tunes['version'] = 'v9.2'
+                                   return True
+
+                               if val == 'pmc-microblaze' or val == 'psm-microblaze':
+                                   node.tunes = OrderedDict()
+                                   node.tunes['microblaze'] = 'microblaze'
+                                   node.tunes['version'] = 'v10.0'
+                                   return True
+
                                val = node['model'].value[0]
                                version = val[val.find('microblaze,') + 11:]
 
@@ -55,8 +68,8 @@
                 };
                 lop_4_1 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                                xlnx,endianness__not__ = <0x1>;
@@ -71,8 +84,8 @@
                 };
                 lop_4_3 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                                xlnx,data-size = <0x40>;
@@ -87,8 +100,8 @@
                 };
                 lop_4_4 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                                xlnx,use-barrel = <0x01>;
@@ -103,8 +116,8 @@
                 };
                 lop_4_5 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                                xlnx,use-pcmp-instr = <0x01>;
@@ -119,8 +132,8 @@
                 };
                 lop_4_6 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                                xlnx,use-reorder-instr__not__ = <0x0>;
@@ -135,8 +148,8 @@
                 };
                 lop_4_7 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                                xlnx,area-optimized = <0x2>;
@@ -151,8 +164,8 @@
                 };
                 lop_4_8 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                                xlnx,use-hw-mul = <0x1>;
@@ -167,8 +180,8 @@
                 };
                 lop_4_9 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                                xlnx,use-hw-mul = <0x2>;
@@ -183,8 +196,8 @@
                 };
                 lop_4_10 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                                xlnx,use-div = <0x1>;
@@ -199,8 +212,8 @@
                 };
                 lop_4_11 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                                xlnx,use-fpu__not__ = <0x1 0x2>;
@@ -215,8 +228,8 @@
                 };
                 lop_4_12 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                                xlnx,use-fpu = <0x1>;
@@ -231,8 +244,8 @@
                 };
                 lop_4_13 {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                                xlnx,use-fpu = <0x2>;
@@ -248,8 +261,8 @@
 
                 lop_output_tunes {
                       compatible = "system-device-tree-v1,lop,conditional-v1";
-                      cond_root = "cpus";
-                      cpus {
+                      cond_root = "cpus_microblaze";
+                      cpus_microblaze {
                            cpu@.* {
                                compatible = ".*microblaze.*";
                            };
@@ -259,12 +272,12 @@
                            code = "
                                #print( '\\n\\nlop_5 true block\\n' )
                                tname = re.sub( '@', '', n.name )
-                               print( 'AVAILTUNES += microblaze-%s' % tname )
-                               print( 'TUNE_FEATURES_tune-microblaze-%s =' % tname, end='' )
+                               print( 'AVAILTUNES += \"microblaze-%s\"' % tname )
+                               print( 'TUNE_FEATURES_tune-microblaze-%s = \"' % tname, end='' )
                                for t in node.tunes.values():
                                    print( ' %s' % t, end='' )
-                               print( '' )
-                               print( 'PACKAGE_EXTRA_ARCHS_tune-microblaze-%s = \“${TUNE_PKGARCH}\”' % tname )
+                               print( '\"' )
+                               print( 'PACKAGE_EXTRA_ARCHS_tune-microblaze-%s = \"${TUNE_PKGARCH}\"' % tname )
 
                                return True
                                ";
