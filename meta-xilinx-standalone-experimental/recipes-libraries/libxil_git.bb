@@ -1,6 +1,8 @@
 inherit esw python3native features_check
 
-require conf/${ESW_MACHINE}-libxil.conf
+LIBXIL_CONFIG ??= ""
+
+require ${LIBXIL_CONFIG}
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/"
 ESW_COMPONENT_NAME = "libxil.a"
