@@ -35,8 +35,8 @@ EXTRA_OECMAKE += " \
 PACKAGE_ARCH_versal-ai-core = "${SOC_VARIANT_ARCH}"
 EXTRA_OECMAKE_append_versal-ai-core += "-DXRT_AIE_BUILD=true"
 TARGET_CXXFLAGS_append_versal-ai-core += "-DXRT_ENABLE_AIE"
-DEPENDS_append_versal-ai-core += " libmetal libxaiengine"
-RDEPENDS_${PN}_append_versal-ai-core += " libxaiengine"
+DEPENDS_append_versal-ai-core += " libmetal libxaiengine aiefal"
+RDEPENDS_${PN}_append_versal-ai-core += " libxaiengine aiefal"
 
 FILES_SOLIBSDEV = ""
 FILES_${PN} += "\
