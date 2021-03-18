@@ -12,8 +12,8 @@ PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl virtual/libgbm"
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 REPO ?= "git://github.com/Xilinx/mali-userspace-binaries.git;protocol=https"
-BRANCH ?= "rel-v2020.2"
-SRCREV ?= "da73805e3e011382c4d014ac10037cd193aaa9a0"
+BRANCH ?= "rel-v2021.1"
+SRCREV ?= "a1a22c9f03b20d8cb70b91727fe51c1db7f4b061"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 
 PV = "r9p0-01rel0"
