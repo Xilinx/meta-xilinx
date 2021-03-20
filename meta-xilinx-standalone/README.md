@@ -2,14 +2,67 @@ meta-xilinx-standalone
 ======================
 
 This layer is meant to augment Yocto/OE functionality to provide a 
-Baremetal/Standalone Toolchain as well as the foundation for building
-the embeddedsw components that enable non-Linux software required for
-Xilinx based FPGA/SOCs.
+Baremetal/Standalone Toolchain as well as a generic version of various
+firmware that is required to boot a ZynqMP or Versal system.
 
-Note, the non-Linux software components are still in development and
-this should be considered to be a preview release only.  For instance,
-some components may not be buildable, expect APIs to change on various
-parts and pieces.
+For optimized versions of the firmware and additional components you must
+use the meta-xilinx-tools layer.
+
+Building
+--------
+The software in this layer may be used in either a standard single
+configuration build, or a multiconfig build.  A multiconfig build, along
+with the MACHINES defined in meta-xilinx-bsps will automate the generation
+of certain firmwares.
+
+To build standalone toolchains similar to those embedded with the
+Xilinx xsct tooling:
+
+Use one of the custom machines:
+  aarch32-tc - 32-bit ARM toolchains (various)
+  aarch64-tc - 64-bit ARM toolchains (various)
+  arm-rm-tc  - ARM Cortex-R (and various)
+  microblaze-tc - Microblaze toolchains (various)
+
+MACHINE=<machine> DISTRO=xilinx-standalone bitbake meta-toolchain
+
+
+To build the standalone firmware in a standard single configuration build:
+
+Select a machine:
+  cortexa53-zynqmp - ZynqMP based Cortex-A53 target
+  cortexa72-versal - Versal based Cortex-A72 target
+  cortexa9-zynq    - Zynq based cortex-A9 target
+  cortexr5-versal  - Versal based Cortex-R5 target
+  cortexr5-zynqmp  - ZynqMP based Cortex-R5 target
+  microblaze-versal-fw - Microblaze for Versal PSM/PLM firmware
+  microblaze-zyqmp-pmu - Microblaze for ZynqMP PMU firmware
+
+To build ZynqMP PMU Firmware:
+MACHINE=microblaze-zynqmp-pmu DISTRO=xilinx-standalone bitbake pmu-firmware
+
+To build Versal PLM and PSM Firwmare
+MACHINE=microblaze-versal-fw DISTRO=xilinx-standalone bitbake plm-firmware psm-firmware
+
+
+In a multiconfig build, add the following pre-defined multiconfigs to enable
+firmware building, and automatic packaging by the Linux side software.
+
+Edit the local.conf file, add:
+
+# For zynqmp
+BBMULTICONFIG += "zynqmp-pmufw"
+
+# For versal
+BBMULTICONFIG += "versal-fw"
+
+To build:
+
+# For zynqmp, select a zynqmp machine or the generic one
+MACHINE=zynqmp-generic bitbake pmufw
+
+# For versal, select a versal machine or the generic one
+MACHINE=versal-generic bitbake plmfw psmfw
 
 
 Maintainers, Mailing list, Patches
