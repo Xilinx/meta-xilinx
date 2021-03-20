@@ -44,13 +44,17 @@ do_install() {
     install -Dm 0644 ${PSM_FILE}${BINARY_EXT} ${D}/boot/${BINARY_NAME}-${BINARY_ID}${BINARY_EXT}
 }
 
+# If the item is already in OUR deploy_image_dir, nothing to deploy!
+SHOULD_DEPLOY = "${@'false' if (d.getVar('PSM_FILE')).startswith(d.getVar('DEPLOY_DIR_IMAGE')) else 'true'}"
 do_deploy() {
     # If the item is already in OUR deploy_image_dir, nothing to deploy!
-    if [ "x${@'' if d.getVar('PSM_FILE').startswith(d.getVar('DEPLOY_IMAGE_DIR')) else 'copy'}" != "x" ]; then
+    if ${SHOULD_DEPLOY}; then
         install -Dm 0644 ${PSM_FILE}.elf ${DEPLOYDIR}/${PSM_FIRMWARE_IMAGE_NAME}.elf
         install -Dm 0644 ${PSM_FILE}.bin ${DEPLOYDIR}/${PSM_FIRMWARE_IMAGE_NAME}.bin
     fi
 }
+
+addtask deploy before do_build after do_install
 
 ALTERNATIVE_${PN} = "psmfw"
 ALTERNATIVE_TARGET[psmfw] = "/boot/${BINARY_NAME}-${BINARY_ID}${BINARY_EXT}"

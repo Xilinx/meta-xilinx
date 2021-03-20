@@ -44,14 +44,17 @@ do_install() {
     install -Dm 0644 ${PLM_FILE}${BINARY_EXT} ${D}/boot/${BINARY_NAME}-${BINARY_ID}${BINARY_EXT}
 }
 
+# If the item is already in OUR deploy_image_dir, nothing to deploy!
+SHOULD_DEPLOY = "${@'false' if (d.getVar('PLM_FILE')).startswith(d.getVar('DEPLOY_DIR_IMAGE')) else 'true'}"
 do_deploy() {
     # If the item is already in OUR deploy_image_dir, nothing to deploy!
-    if [ "x${@'' if d.getVar('PLM_FILE').startswith(d.getVar('DEPLOY_IMAGE_DIR')) else 'copy'}" != "x" ]; then
+    if ${SHOULD_DEPLOY}; then
         install -Dm 0644 ${PLM_FILE}.elf ${DEPLOYDIR}/${PLM_IMAGE_NAME}.elf
         install -Dm 0644 ${PLM_FILE}.bin ${DEPLOYDIR}/${PLM_IMAGE_NAME}.bin
     fi
 }
 
+addtask deploy before do_build after do_install
 
 ALTERNATIVE_${PN} = "plmfw"
 ALTERNATIVE_TARGET[plmfw] = "/boot/${BINARY_NAME}-${BINARY_ID}${BINARY_EXT}"
