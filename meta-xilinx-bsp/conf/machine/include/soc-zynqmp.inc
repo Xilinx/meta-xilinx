@@ -35,5 +35,5 @@ PMU_ROM ?= "${DEPLOY_DIR_IMAGE}/pmu-rom.elf"
 PMU_DEPENDS ?= "${@bb.utils.contains('BBMULTICONFIG', 'zynqmp-pmufw', '', 'pmu-firmware:do_deploy', d)}"
 PMU_MCDEPENDS ?= "${@bb.utils.contains('BBMULTICONFIG', 'zynqmp-pmufw', 'mc::zynqmp-pmufw:pmu-firmware:do_deploy', '', d)}"
 PMU_FIRMWARE_DEPLOY_DIR ?= "${@bb.utils.contains('BBMULTICONFIG', 'zynqmp-pmufw', '${TOPDIR}/tmp-microblaze-zynqmp-pmufw/deploy/images/${MACHINE}', '${DEPLOY_DIR_IMAGE}', d)}"
-PMU_FIRMWARE_IMAGE_NAME ?= "${@bb.utils.contains('BBMULTICONFIG', 'zynqmp-pmufw', 'pmu-firmware-zynqmp-pmu', 'pmu-${MACHINE}', d)}"
+PMU_FIRMWARE_IMAGE_NAME ?= "${@bb.utils.contains('BBMULTICONFIG', 'zynqmp-pmufw', 'pmu-firmware-zynqmp-pmu', 'pmu-firmware-${MACHINE}', d)}"
 

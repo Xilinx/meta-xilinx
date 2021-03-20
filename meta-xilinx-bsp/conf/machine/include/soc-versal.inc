@@ -28,4 +28,4 @@ PLM_IMAGE_NAME ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', 'plm-versa
 PSM_DEPENDS ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', '', 'psm-firmware:do_deploy', d)}"
 PSM_MCDEPENDS ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', 'mc::versal-fw:psm-firmware:do_deploy', '', d)}"
 PSM_FIRMWARE_DEPLOY_DIR ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', '${TOPDIR}/tmp-microblaze-versal-fw/deploy/images/${MACHINE}', '${DEPLOY_DIR_IMAGE}', d)}"
-PSM_FIRMWARE_IMAGE_NAME ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', 'psm-firmware-versal-mb', 'psm-${MACHINE}', d)}"
+PSM_FIRMWARE_IMAGE_NAME ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', 'psm-firmware-versal-mb', 'psm-firmware-${MACHINE}', d)}"
