@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "dpdma"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem video-common avbuf"
+DEPENDS += "xilstandalone  video-common avbuf"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dpdma/src/"
 ESW_COMPONENT_NAME = "libdpdma.a"

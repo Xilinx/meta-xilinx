@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "canps"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/canps/src/"
 ESW_COMPONENT_NAME = "libcanps.a"

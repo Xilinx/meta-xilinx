@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "ipipsu"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/ipipsu/src/"
 ESW_COMPONENT_NAME = "libipipsu.a"

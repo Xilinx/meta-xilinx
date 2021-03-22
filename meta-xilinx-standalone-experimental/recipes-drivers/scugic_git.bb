@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "scugic"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/scugic/src/"
 ESW_COMPONENT_NAME = "libscugic.a"

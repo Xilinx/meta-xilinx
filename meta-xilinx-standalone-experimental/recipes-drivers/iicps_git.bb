@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "iicps"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/iicps/src/"
 ESW_COMPONENT_NAME = "libiicps.a"

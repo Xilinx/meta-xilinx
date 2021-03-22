@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "mcdma"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/mcdma/src/"
 ESW_COMPONENT_NAME = "libmcdma.a"

@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "v-hscaler"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem video-common"
+DEPENDS += "xilstandalone  video-common"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/v_hscaler/src/"
 ESW_COMPONENT_NAME = "libv_hscaler.a"

@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "spips"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/spips/src/"
 ESW_COMPONENT_NAME = "libspips.a"

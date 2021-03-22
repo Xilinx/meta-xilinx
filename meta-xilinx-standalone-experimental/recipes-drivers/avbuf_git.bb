@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "avbuf"
 
 inherit esw
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/avbuf/src/"
 ESW_COMPONENT_NAME = "libavbuf.a"

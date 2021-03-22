@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "axicdma"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/axicdma/src/"
 ESW_COMPONENT_NAME = "libaxicdma.a"

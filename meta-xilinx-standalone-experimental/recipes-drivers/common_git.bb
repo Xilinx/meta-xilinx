@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "common"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 PACKAGECONFIG ?= "${@bb.utils.contains("DISTRO_FEATURES", "clockps", "clockps", "", d)} \
 		  ${@bb.utils.contains("DISTRO_FEATURES", "scugic", "scugic", "", d)} \

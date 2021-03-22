@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "v-letterbox"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem video-common"
+DEPENDS += "xilstandalone  video-common"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/v_letterbox/src/"
 ESW_COMPONENT_NAME = "libv_letterbox.a"

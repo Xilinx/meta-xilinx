@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "video-common"
 
 inherit esw
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/video_common/src/"
 ESW_COMPONENT_NAME = "libvideo_common.a"

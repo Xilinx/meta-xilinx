@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "axiethernet"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/axiethernet/src/"
 ESW_COMPONENT_NAME = "libaxiethernet.a"

@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "vprocss"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem video-common gpio axis-switch axivdma v-csc v-deinterlacer v-hcresampler v-vcresampler v-hscaler v-vscaler v-letterbox"
+DEPENDS += "xilstandalone  video-common gpio axis-switch axivdma v-csc v-deinterlacer v-hcresampler v-vcresampler v-hscaler v-vscaler v-letterbox"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/vprocss/src/"
 ESW_COMPONENT_NAME = "libvprocss.a"

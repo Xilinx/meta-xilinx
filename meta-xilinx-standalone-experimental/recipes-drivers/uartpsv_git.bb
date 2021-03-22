@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "uartpsv"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/uartpsv/src/"
 ESW_COMPONENT_NAME = "libuartpsv.a"

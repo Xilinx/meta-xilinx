@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "rtcpsu"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/rtcpsu/src/"
 ESW_COMPONENT_NAME = "librtcpsu.a"

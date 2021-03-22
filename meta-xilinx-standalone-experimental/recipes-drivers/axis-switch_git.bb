@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "axis-switch"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/axis_switch/src/"
 ESW_COMPONENT_NAME = "libaxis_switch.a"

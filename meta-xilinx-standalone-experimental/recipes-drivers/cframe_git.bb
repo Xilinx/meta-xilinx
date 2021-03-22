@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "cframe"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/cframe/src/"
 ESW_COMPONENT_NAME = "libcframe.a"

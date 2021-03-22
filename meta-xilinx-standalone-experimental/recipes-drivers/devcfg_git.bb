@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "devcfg"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/devcfg/src/"
 ESW_COMPONENT_NAME = "libdevcfg.a"

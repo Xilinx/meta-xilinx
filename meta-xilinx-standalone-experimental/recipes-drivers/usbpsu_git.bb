@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "usbpsu"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/usbpsu/src/"
 ESW_COMPONENT_NAME = "libusbpsu.a"
