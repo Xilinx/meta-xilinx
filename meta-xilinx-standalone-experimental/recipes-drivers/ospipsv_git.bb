@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "ospipsv"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/ospipsv/src/"
 ESW_COMPONENT_NAME = "libospipsv.a"

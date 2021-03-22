@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "gpiops"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/gpiops/src/"
 ESW_COMPONENT_NAME = "libgpiops.a"

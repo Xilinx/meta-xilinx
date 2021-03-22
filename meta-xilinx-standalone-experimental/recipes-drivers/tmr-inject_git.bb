@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "tmr-inject"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/tmr_inject/src/"
 ESW_COMPONENT_NAME = "libtmr_inject.a"

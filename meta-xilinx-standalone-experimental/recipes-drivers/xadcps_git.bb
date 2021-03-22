@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "xadcps"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/xadcps/src/"
 ESW_COMPONENT_NAME = "libxadcps.a"

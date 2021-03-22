@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "csudma"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/csudma/src/"
 ESW_COMPONENT_NAME = "libcsudma.a"

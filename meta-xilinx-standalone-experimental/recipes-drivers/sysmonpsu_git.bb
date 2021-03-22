@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "sysmonpsu"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/sysmonpsu/src/"
 ESW_COMPONENT_NAME = "libsysmonpsu.a"

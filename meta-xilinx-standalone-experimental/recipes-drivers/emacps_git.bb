@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "emacps"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/emacps/src/"
 ESW_COMPONENT_NAME = "libemacps.a"

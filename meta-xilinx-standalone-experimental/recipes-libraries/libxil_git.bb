@@ -7,7 +7,7 @@ require ${LIBXIL_CONFIG}
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/"
 ESW_COMPONENT_NAME = "libxil.a"
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 REQUIRED_DISTRO_FEATURES = "${DISTRO_FEATURES}"
 PACKAGECONFIG ?= "${DISTRO_FEATURES} ${MACHINE_FEATURES}"
 

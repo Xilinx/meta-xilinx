@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "bram"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/bram/src/"
 ESW_COMPONENT_NAME = "libbram.a"

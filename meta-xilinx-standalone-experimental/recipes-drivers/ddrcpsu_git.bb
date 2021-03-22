@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "ddrcpsu"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/ddrcpsu/src/"
 ESW_COMPONENT_NAME = "libddrcpsu.a"

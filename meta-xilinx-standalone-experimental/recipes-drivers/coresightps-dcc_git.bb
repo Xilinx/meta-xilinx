@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "coresightps-dcc"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/coresightps_dcc/src/"
 ESW_COMPONENT_NAME = "libcoresightps_dcc.a"

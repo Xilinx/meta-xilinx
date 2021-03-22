@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "resetps"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/resetps/src/"
 ESW_COMPONENT_NAME = "libresetps.a"

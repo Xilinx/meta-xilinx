@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "tmr-manager"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/tmr_manager/src/"
 ESW_COMPONENT_NAME = "libtmr_manager.a"

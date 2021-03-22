@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "dppsu"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem video-common"
+DEPENDS += "xilstandalone  video-common"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dppsu/src/"
 ESW_COMPONENT_NAME = "libdppsu.a"

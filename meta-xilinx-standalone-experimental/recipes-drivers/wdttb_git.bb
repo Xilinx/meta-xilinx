@@ -4,7 +4,7 @@ REQUIRED_DISTRO_FEATURES = "wdttb"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone xilmem"
+DEPENDS += "xilstandalone "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/wdttb/src/"
 ESW_COMPONENT_NAME = "libwdttb.a"

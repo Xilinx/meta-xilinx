@@ -3,7 +3,7 @@ inherit esw python3native
 ESW_COMPONENT_SRC = "/ThirdParty/bsp/freertos10_xilinx/src/"
 ESW_COMPONENT_NAME = "libfreertos.a"
 
-DEPENDS += "libxil xilstandalone xilmem xiltimer"
+DEPENDS += "libxil xilstandalone  xiltimer"
 
 do_configure_prepend() {
     # This script should also not rely on relative paths and such
