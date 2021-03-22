@@ -1,7 +1,5 @@
 # Reset this
 SRC_URI = "${EMBEDDEDSW_SRCURI}"
-SRC_URI += "file://0001-zynqmp_pmufw-Fix-reset-ops-for-assert.patch"
-SRC_URI += "file://0001-zynqmp_pmufw-Correct-structure-header-of-PmResetOps.patch"
 
 inherit esw
 
