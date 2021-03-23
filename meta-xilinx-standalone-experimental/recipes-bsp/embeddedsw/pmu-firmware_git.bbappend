@@ -1,3 +1,6 @@
+# We WANT to default to this version when available 
+DEFAULT_PREFERENCE = "100"
+
 # Reset this
 SRC_URI = "${EMBEDDEDSW_SRCURI}"
 
