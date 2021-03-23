@@ -14,7 +14,7 @@ do_configure_prepend() {
 do_generate_app_data() {
     # This script should also not rely on relative paths and such
     cd ${S}
-    lopper.py ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${S}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
+    lopper.py ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
 }
 addtask do_generate_app_data before do_configure after do_prepare_recipe_sysroot
