@@ -65,8 +65,9 @@ PACKAGES = ""
 # This is the default in most BSPs.  A MACHINE.conf can override this!
 PLM_IMAGE_NAME ??= "plm-versal-mb"
 
-PLM_BASE_NAME ?= "${PLM_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
-PLM_BASE_NAME[vardepsexclude] = "DATETIME"
+inherit image-artifact-names
+
+PLM_BASE_NAME ?= "${PLM_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 do_deploy() {
     install -Dm 0644 ${B}/plm.elf ${DEPLOYDIR}/${PLM_BASE_NAME}.elf

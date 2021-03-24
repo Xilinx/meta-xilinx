@@ -25,6 +25,7 @@ PLM_DEPLOY_DIR ??= "${TOPDIR}/tmp-microblaze-versal-fw/deploy/images/${MACHINE}"
 
 # Default is for the multilib case (without the extension .elf/.bin)
 PLM_FILE ??= "${PLM_DEPLOY_DIR}/${PLM_IMAGE_NAME}"
+PLM_FILE[vardepsexclude] = "PLM_DEPLOY_DIR"
 
 do_fetch[depends] += "${PLM_DEPENDS}"
 do_fetch[mcdepends] += "${PLM_MCDEPENDS}"
