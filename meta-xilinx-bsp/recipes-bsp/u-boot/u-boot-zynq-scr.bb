@@ -48,6 +48,8 @@ SRC_URI = " \
             "
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+inherit image-artifact-names
+
 UBOOTSCR_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
 UBOOTPXE_CONFIG ?= "pxelinux.cfg"
 UBOOTPXE_CONFIG_NAME = "${UBOOTPXE_CONFIG}${IMAGE_VERSION_SUFFIX}"
