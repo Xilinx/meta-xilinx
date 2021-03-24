@@ -25,6 +25,7 @@ PSM_FIRMWARE_DEPLOY_DIR ??= "${TOPDIR}/tmp-microblaze-versal-fw/deploy/images/${
 
 # Default is for the multilib case (without the extension .elf/.bin)
 PSM_FILE ??= "${PSM_FIRMWARE_DEPLOY_DIR}/${PSM_FIRMWARE_IMAGE_NAME}"
+PSM_FILE[vardepsexclude] = "PSM_FIRMWARE_DEPLOY_DIR"
 
 do_fetch[depends] += "${PSM_DEPENDS}"
 do_fetch[mcdepends] += "${PSM_MCDEPENDS}"

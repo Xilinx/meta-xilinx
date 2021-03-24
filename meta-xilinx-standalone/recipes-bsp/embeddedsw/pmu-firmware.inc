@@ -64,8 +64,9 @@ PACKAGES = ""
 # This is the default in most BSPs.  A MACHINE.conf can override this!
 PMU_FIRMWARE_IMAGE_NAME ??= "pmu-firmware-zynqmp-pmu"
 
+inherit image-artifact-names
+
 PMU_FIRMWARE_BASE_NAME ?= "${PMU_FIRMWARE_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
-PMU_FIRMWARE_BASE_NAME[vardepsexclude] = "DATETIME"
 
 do_deploy() {
     install -Dm 0644 ${B}/executable.elf ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.elf

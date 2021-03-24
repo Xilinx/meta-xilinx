@@ -24,6 +24,7 @@ PMU_FIRMWARE_DEPLOY_DIR ??= "${TOPDIR}/tmp-microblaze-zynqmp-pmufw/deploy/images
 
 # Default is for the multilib case (without the extension .elf/.bin)
 PMU_FILE ??= "${PMU_FIRMWARE_DEPLOY_DIR}/${PMU_FIRMWARE_IMAGE_NAME}"
+PMU_FILE[vardepsexclude] = "PMU_FIRMWARE_DEPLOY_DIR"
 
 do_fetch[depends] += "${PMU_DEPENDS}"
 do_fetch[mcdepends] += "${PMU_MCDEPENDS}"

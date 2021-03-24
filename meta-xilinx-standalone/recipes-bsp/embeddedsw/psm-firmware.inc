@@ -65,8 +65,9 @@ PACKAGES = ""
 # This is the default in most BSPs.  A MACHINE.conf can override this!
 PSM_FIRMWARE_IMAGE_NAME ??= "psm-firmware-versal-mb"
 
-PSM_FIRMWARE_BASE_NAME ?= "${PSM_FIRMWARE_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
-PSM_FIRMWARE_BASE_NAME[vardepsexclude] = "DATETIME"
+inherit image-artifact-names
+
+PSM_FIRMWARE_BASE_NAME ?= "${PSM_FIRMWARE_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 do_deploy() {
     install -Dm 0644 ${B}/psmfw.elf ${DEPLOYDIR}/${PSM_FIRMWARE_BASE_NAME}.elf
