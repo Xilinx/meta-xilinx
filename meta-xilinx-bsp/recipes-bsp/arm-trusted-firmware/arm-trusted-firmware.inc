@@ -24,6 +24,8 @@ REPO ?= "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
+inherit image-artifact-names
+
 ATF_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
 
 COMPATIBLE_MACHINE ?= "^$"
