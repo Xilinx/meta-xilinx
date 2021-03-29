@@ -21,15 +21,6 @@ index 338f16eeee..cf84e0db4e 100644
  			       input_bfd);
  			    bfd_set_error (bfd_error_bad_value);
  			    return FALSE;
-@@ -2691,7 +2691,7 @@ microblaze_elf_check_relocs (bfd * abfd,
- 		/* If this is a global symbol, we count the number of
- 		   relocations we need for this symbol.  */
- 		if (h != NULL)
--		  head = &h->dyn_relocs;
-+		  head = &((struct elf64_mb_link_hash_entry *) h)->dyn_relocs;
- 		else
- 		  {
- 		    /* Track dynamic relocs needed for local syms too.
 @@ -2911,7 +2911,7 @@ microblaze_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
  
    /* If we didn't find any dynamic relocs in read-only sections, then
