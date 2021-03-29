@@ -1,0 +1,30 @@
+From 27d08d91eedb77c28e7776d0ccf6b92d79d3b6bb Mon Sep 17 00:00:00 2001
+From: Rajan Vaja <rajan.vaja@xilinx.com>
+Date: Mon, 15 Feb 2021 22:47:13 -0800
+Subject: [PATCH] zynqmp_pmufw: Correct structure header of PmResetOps
+
+Update structure header of PmResetOps for using resetAssert instead
+of assert.
+
+Signed-off-by: Rajan Vaja <rajan.vaja@xilinx.com>
+Acked-by: Mounika Akula <mounika.akula@xilinx.com>
+---
+ lib/sw_apps/zynqmp_pmufw/src/pm_reset.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/sw_apps/zynqmp_pmufw/src/pm_reset.c b/lib/sw_apps/zynqmp_pmufw/src/pm_reset.c
+index bcd8aa73db..a693eb4196 100644
+--- a/lib/sw_apps/zynqmp_pmufw/src/pm_reset.c
++++ b/lib/sw_apps/zynqmp_pmufw/src/pm_reset.c
+@@ -29,7 +29,7 @@
+ 
+ /**
+  * PmResetOps - Reset operations
+- * @assert	Assert or release reset line
++ * @resetAssert	Assert or release reset line
+  * @getStatus	Get current status of reset line
+  * @pulse	Function performing reset pulse operation
+  */
+-- 
+2.17.1
+
