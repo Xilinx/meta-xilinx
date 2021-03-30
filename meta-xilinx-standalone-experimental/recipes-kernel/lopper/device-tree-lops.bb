@@ -19,31 +19,31 @@ LOPS_DIR = "${RECIPE_SYSROOT_NATIVE}/usr/share/lopper/lops"
 
 # All microblaze
 do_compile_microblaze_xilinx-standalone() {
-    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f ${SYSTEM_DTFILE} ${B}/${DTS_FILE}
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f -O ${WORKDIR} ${SYSTEM_DTFILE} ${B}/${DTS_FILE}
 }
 
 # All Cortex R5
 do_compile_append_armrm_xilinx-standalone() {
-    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${LOPS_DIR}/lop-r5-imux.dts ${SYSTEM_DTFILE} ${B}/${DTS_FILE}
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${LOPS_DIR}/lop-r5-imux.dts -O ${WORKDIR} ${SYSTEM_DTFILE} ${B}/${DTS_FILE}
 }
 
 # Only ZynqMP & Cortex A53 (baremetal)
 do_compile_append_zynqmp_aarch64_xilinx-standalone() {
-    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${LOPS_DIR}/lop-a53-imux.dts ${SYSTEM_DTFILE} ${B}/${DTS_FILE}
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${LOPS_DIR}/lop-a53-imux.dts -O ${WORKDIR} ${SYSTEM_DTFILE} ${B}/${DTS_FILE}
 }
 
 # Only ZynqMP & Cortex A53 (Linux)
 do_compile_append_zynqmp_aarch64_linux() {
-    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${LOPS_DIR}/lop-a53-imux.dts -i ${LOPS_DIR}/lop-domain-linux-a53.dts ${SYSTEM_DTFILE} ${B}/${DTB_FILE}
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${LOPS_DIR}/lop-a53-imux.dts -i ${LOPS_DIR}/lop-domain-linux-a53.dts -O ${WORKDIR} ${SYSTEM_DTFILE} ${B}/${DTB_FILE}
 }
 
 # Only Versal and Cortex A72 (baremetal)
 do_compile_append_versal_aarch64_xilinx-standalone() {
-    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${LOPS_DIR}/lop-a72-imux.dts ${SYSTEM_DTFILE} ${B}/${DTS_FILE}
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${LOPS_DIR}/lop-a72-imux.dts -O ${WORKDIR} ${SYSTEM_DTFILE} ${B}/${DTS_FILE}
 }
 
 do_compile_append_versal_aarch64_linux() {
-    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${LOPS_DIR}/lop-a72-imux.dts -i ${LOPS_DIR}/lop-domain-a72.dts ${SYSTEM_DTFILE} ${B}/${DTB_FILE}
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${LOPS_DIR}/lop-a72-imux.dts -i ${LOPS_DIR}/lop-domain-a72.dts -O ${WORKDIR} ${SYSTEM_DTFILE} ${B}/${DTB_FILE}
 }
 
 do_install() {
