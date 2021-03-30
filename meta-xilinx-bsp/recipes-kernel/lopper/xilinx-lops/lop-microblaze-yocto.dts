@@ -232,7 +232,7 @@
                                        print( ' %s' % t, end='' )
                                    print( '\"' )
                                    print( 'PACKAGE_EXTRA_ARCHS_tune-microblaze-%s = \"${TUNE_PKGARCH}\"' % tname )
-                                   print( 'TUNE_FEATURES_tune-%s = ${TUNE_FEATURES_tune-microblaze-%s}\\n' % (n.tune_type,tname) )
+                                   print( 'TUNE_FEATURES_tune-%s = \"${TUNE_FEATURES_tune-microblaze-%s}\"\\n' % (n.tune_type,tname) )
 
                                ";
                       };
