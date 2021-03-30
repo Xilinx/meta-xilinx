@@ -14,9 +14,10 @@ RDEPENDS_${PN} += " \
     python3-ruamel-yaml \
     python3-anytree \
     python3-pyyaml \
+    python3-humanfriendly \
 "
 
-SRC_URI = "git://github.com/devicetree-org/lopper.git"
+SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master-next"
 
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=8e5f5f691f01c9fdfa7a7f2d535be619"
 
