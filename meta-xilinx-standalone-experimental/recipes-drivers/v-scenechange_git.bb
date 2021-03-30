@@ -1,10 +1,10 @@
-inherit distro_features_check
+inherit features_check
 
 REQUIRED_DISTRO_FEATURES = "v-scenechange"
 
 inherit esw python3native
 
-DEPENDS += "python3-pyyaml-native xilstandalone  lopper python3-dtc-native video-common"
+DEPENDS += "xilstandalone video-common"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/v_scenechange/src/"
 ESW_COMPONENT_NAME = "libv_scenechange.a"

@@ -1,4 +1,4 @@
-inherit esw_examples distro_features_check
+inherit esw_examples features_check
 
 REQUIRED_DISTRO_FEATURES = "v-frmbuf-rd"
 
