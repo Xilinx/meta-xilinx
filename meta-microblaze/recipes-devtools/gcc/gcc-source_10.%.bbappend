@@ -55,5 +55,6 @@ SRC_URI_append_microblaze = " \
     file://0051-Patch-microblaze-Fix-Compiler-crash-with-freg-struct.patch \
     file://0052-Patch-microblaze-Add-TARGET_OPTION_OPTIMIZATION-and-.patch \
     file://0053-Patch-microblaze-Reducing-Stack-space-for-arguments.patch \
+    file://0054-Patch-MicroBlaze-Typo-in-the-previous-commits.bsefi-.patch \
     file://microblaze-mulitlib-hack.patch \
 "
