@@ -1,0 +1,49 @@
+From 54aa2bf8d84820071de2670504d2e87cc8231c1e Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 31 Mar 2021 17:18:56 +0530
+Subject: [PATCH] [Patch,MicroBlaze] : Typo in the previous commits.bsefi/bsifi
+ should be generated only if mcpu is >= 10.0
+
+---
+ gcc/config/microblaze/microblaze.c  | 2 +-
+ gcc/config/microblaze/microblaze.md | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+index dac0596bc7d..d72eb7d5898 100644
+--- a/gcc/config/microblaze/microblaze.c
++++ b/gcc/config/microblaze/microblaze.c
+@@ -1850,7 +1850,7 @@ microblaze_option_override (void)
+ 		   "%<-mcpu=v8.30.a%>");
+         TARGET_REORDER = 0;
+     }
+-  ver = microblaze_version_to_int("v10.0");
++  ver = ver_int - microblaze_version_to_int("v10.0");
+   if (ver < 0)
+     {
+         if (TARGET_AREA_OPTIMIZED_2)
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 93de8d831fd..71ac46dfb6c 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -3598,7 +3598,7 @@ else
+ 	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
+ 			 (match_operand:SI 2 "immediate_operand" "I")
+ 			 (match_operand:SI 3 "immediate_operand" "I")))]
+- "TARGET_BARREL_SHIFT && (UINTVAL (operands[2]) > 0)
++ "TARGET_HAS_BITFIELD && (UINTVAL (operands[2]) > 0)
+    && ((UINTVAL (operands[2]) + UINTVAL (operands[3])) <= 32)"
+   "bsefi %0,%1,%2,%3"
+   [(set_attr "type" "bshift")
+@@ -3630,7 +3630,7 @@ else
+ 			 (match_operand:SI 1 "immediate_operand" "I")
+ 			 (match_operand:SI 2 "immediate_operand" "I"))
+ 	(match_operand:SI 3 "register_operand" "r"))]
+- "TARGET_BARREL_SHIFT && UINTVAL (operands[1]) > 0
++ "TARGET_HAS_BITFIELD && UINTVAL (operands[1]) > 0
+    && UINTVAL (operands[1]) + UINTVAL (operands[2]) <= 32"
+   "bsifi %0, %3, %1, %2"
+   [(set_attr "type" "bshift")
+-- 
+2.17.1
+
