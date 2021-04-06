@@ -48,7 +48,13 @@ SRC_URI = " \
             "
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-inherit image-artifact-names
+UENV_TEXTFILE ?= "uEnv.txt"
+UENV_MMC_OFFSET_zynqmp ?= "0x200000"
+UENV_MMC_OFFSET_zynq ?= "0x2080000"
+UENV_MMC_OFFSET_versal ?= "0x80000"
+UENV_MMC_OFFSET_microblaze ?= "0x0"
+
+UENV_MMC_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('UENV_MMC_OFFSET'))}"
 
 UBOOTSCR_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
 UBOOTPXE_CONFIG ?= "pxelinux.cfg"
@@ -222,6 +228,8 @@ do_compile() {
 	-e 's/@@NAND_FIT_IMAGE_SIZE@@/${NAND_FIT_IMAGE_SIZE}/' \
 	-e 's/@@FIT_IMAGE@@/${FIT_IMAGE}/' \
 	-e 's/@@PRE_BOOTENV@@/${PRE_BOOTENV}/' \
+	-e 's/@@UENV_MMC_LOAD_ADDRESS@@/${UENV_MMC_LOAD_ADDRESS}/' \
+	-e 's/@@UENV_TEXTFILE@@/${UENV_TEXTFILE}/' \
 	-e 's/@@RAMDISK_IMAGE1@@/${RAMDISK_IMAGE1}/' \
         "${WORKDIR}/boot.cmd.${BOOTMODE}${BOOTFILE_EXT}" > "${WORKDIR}/boot.cmd"
     mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr

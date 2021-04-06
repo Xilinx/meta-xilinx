@@ -7,10 +7,20 @@
 
 for boot_target in ${boot_targets};
 do
+	echo "Trying to load boot images from ${boot_target}"
 	if test "${boot_target}" = "jtag" ; then
 		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
 	fi
 	if test "${boot_target}" = "mmc0" || test "${boot_target}" = "mmc1" ; then
+		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@UENV_TEXTFILE@@; then
+			fatload ${devtype} ${devnum}:${distro_bootpart} @@UENV_MMC_LOAD_ADDRESS@@ @@UENV_TEXTFILE@@;
+			echo "Importing environment(@@UENV_TEXTFILE@@) from ${boot_target}..."
+			env import -t @@UENV_MMC_LOAD_ADDRESS@@ $filesize
+			if test -n $uenvcmd; then
+				echo Running uenvcmd ...;
+				run uenvcmd;
+			fi
+		fi
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@FIT_IMAGE@@; then
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@FIT_IMAGE_LOAD_ADDRESS@@ @@FIT_IMAGE@@;
 			bootm @@FIT_IMAGE_LOAD_ADDRESS@@;
