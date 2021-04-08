@@ -48,6 +48,7 @@ SRC_URI = " \
             "
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+inherit image-artifact-names
 UENV_TEXTFILE ?= "uEnv.txt"
 UENV_MMC_OFFSET_zynqmp ?= "0x200000"
 UENV_MMC_OFFSET_zynq ?= "0x2080000"
