@@ -17,7 +17,7 @@ do
 			echo "Importing environment(@@UENV_TEXTFILE@@) from ${boot_target}..."
 			env import -t @@UENV_MMC_LOAD_ADDRESS@@ $filesize
 			if test -n $uenvcmd; then
-				echo Running uenvcmd ...;
+				echo "Running uenvcmd ...";
 				run uenvcmd;
 			fi
 		fi
@@ -31,11 +31,11 @@ do
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /system.dtb; then
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_ADDRESS@@ system.dtb;
 		fi
-		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@RAMDISK_IMAGE1@@; then
+		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@RAMDISK_IMAGE1@@ && test "${skip_tinyramdisk}" != "yes"; then
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ @@RAMDISK_IMAGE1@@;
 			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
 		fi
-		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@RAMDISK_IMAGE@@; then
+		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@RAMDISK_IMAGE@@ && test "${skip_ramdisk}" != "yes"; then
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ @@RAMDISK_IMAGE@@;
 			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
 		fi
