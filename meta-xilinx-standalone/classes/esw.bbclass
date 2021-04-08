@@ -9,7 +9,7 @@ include conf/xilinx/esw-srcrev.inc
 
 SRCREV ?= "${AUTOREV}"
 PV = "${XILINX_RELEASE_VERSION}+git${SRCPV}"
-REPO ?= "git://github.com/xilinx/embeddedsw.git;protocol=https"
+REPO ?= "git://github.com/Xilinx/embeddedsw.git;protocol=https"
 BRANCH ?= "master"
 SRC_URI = "${REPO};branch=${BRANCH}"
 

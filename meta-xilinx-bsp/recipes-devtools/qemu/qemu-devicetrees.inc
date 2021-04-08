@@ -1,5 +1,5 @@
 SUMMARY = "Xilinx's hardware device trees required for QEMU"
-HOMEPAGE = "https://github.com/xilinx/qemu-devicetrees/"
+HOMEPAGE = "https://github.com/Xilinx/qemu-devicetrees/"
 LICENSE = "BSD"
 DEPENDS += "dtc-native"
 

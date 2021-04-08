@@ -7,7 +7,7 @@ XILINX_VCU_VERSION = "1.0.0"
 PV = "${XILINX_VCU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 BRANCH ?= "release-2020.2.2_k26"
-REPO   ?= "git://github.com/xilinx/vcu-ctrl-sw.git;protocol=https"
+REPO   ?= "git://github.com/Xilinx/vcu-ctrl-sw.git;protocol=https"
 SRCREV ?= "b82de3783fe66ee72f28b51313e8b42827d3f202"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
