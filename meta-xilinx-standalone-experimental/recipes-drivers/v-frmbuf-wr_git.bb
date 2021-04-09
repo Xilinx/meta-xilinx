@@ -9,5 +9,8 @@ DEPENDS += "xilstandalone video-common"
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/v_frmbuf_wr/src/"
 ESW_COMPONENT_NAME = "libv_frmbuf_wr.a"
 
-addtask do_generate_driver_data before do_configure after do_prepare_recipe_sysroot
-do_prepare_recipe_sysroot[rdeptask] = "do_unpack"
+do_configure_prepend() {
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py ${DTS_FILE} -- baremetalconfig_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
+    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+    install -m 0755 xv_frmbufwr_g.c ${S}/${ESW_COMPONENT_SRC}/
+}
