@@ -43,26 +43,24 @@ do
 	fi
 	if test "${boot_target}" = "xspi0" || test "${boot_target}" = "qspi" || test "${boot_target}" = "qspi0"; then
 		sf probe 0 0 0;
-		if test "@@QSPI_KERNEL_IMAGE@@" = "@@FIT_IMAGE@@"; then
-			sf read @@QSPI_FIT_IMAGE_LOAD_ADDRESS@@ @@QSPI_KERNEL_OFFSET@@ @@QSPI_FIT_IMAGE_SIZE@@;
-			bootm @@QSPI_FIT_IMAGE_LOAD_ADDRESS@@;
-		fi
-		if test "@@QSPI_KERNEL_IMAGE@@" = "@@KERNEL_IMAGE@@"; then
-			sf read @@KERNEL_LOAD_ADDRESS@@ @@QSPI_KERNEL_OFFSET@@ @@QSPI_KERNEL_SIZE@@;
-			sf read @@RAMDISK_IMAGE_ADDRESS@@ @@QSPI_RAMDISK_OFFSET@@ @@QSPI_RAMDISK_SIZE@@
-			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
-		fi
+		sf read @@FIT_IMAGE_LOAD_ADDRESS@@ @@QSPI_FIT_IMAGE_OFFSET@@ @@QSPI_FIT_IMAGE_SIZE@@
+		bootm @@FIT_IMAGE_LOAD_ADDRESS@@;
+		echo "Booting using Fit image failed"
+
+		sf read @@KERNEL_LOAD_ADDRESS@@ @@QSPI_KERNEL_OFFSET@@ @@QSPI_KERNEL_SIZE@@
+		sf read @@RAMDISK_IMAGE_ADDRESS@@ @@QSPI_RAMDISK_OFFSET@@ @@QSPI_RAMDISK_SIZE@@
+		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@;
+		echo "Booting using Separate images failed"
 	fi
 	if test "${boot_target}" = "nand" || test "${boot_target}" = "nand0"; then
-		nand info
-		if test "@@NAND_KERNEL_IMAGE@@" = "@@FIT_IMAGE@@"; then
-			nand read @@NAND_FIT_IMAGE_LOAD_ADDRESS@@ @@NAND_KERNEL_OFFSET@@ @@NAND_FIT_IMAGE_SIZE@@;
-			bootm @@NAND_FIT_IMAGE_LOAD_ADDRESS@@;
-		fi
-		if test "@@NAND_KERNEL_IMAGE@@" = "@@KERNEL_IMAGE@@"; then
-			nand read @@KERNEL_LOAD_ADDRESS@@ @@NAND_KERNEL_OFFSET@@ @@NAND_KERNEL_SIZE@@;
-			nand read @@RAMDISK_IMAGE_ADDRESS@@ @@NAND_RAMDISK_OFFSET@@  @@NAND_RAMDISK_SIZE@@;
-			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
-		fi
+		nand info;
+		nand read @@FIT_IMAGE_LOAD_ADDRESS@@ @@NAND_FIT_IMAGE_OFFSET@@ @@NAND_FIT_IMAGE_SIZE@@
+		bootm @@FIT_IMAGE_LOAD_ADDRESS@@;
+		echo "Booting using Fit image failed"
+
+		nand read @@KERNEL_LOAD_ADDRESS@@ @@NAND_KERNEL_OFFSET@@ @@NAND_KERNEL_SIZE@@
+		nand read @@RAMDISK_IMAGE_ADDRESS@@ @@NAND_RAMDISK_OFFSET@@ @@NAND_RAMDISK_SIZE@@
+		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@;
+		echo "Booting using Separate images failed"
 	fi
 done
