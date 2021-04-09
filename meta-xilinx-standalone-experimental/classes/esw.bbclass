@@ -8,6 +8,7 @@ SRCREV_FORMAT = "src_decouple"
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
+LICFILENAME = "license.txt"
 
 SPECFILE_PATH_arm = "${S}/scripts/specs/arm/Xilinx.spec"
 SPECFILE_PATH_aarch64 = "${S}/scripts/specs/arm/Xilinx.spec"
