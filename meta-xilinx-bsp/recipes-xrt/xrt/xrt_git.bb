@@ -14,7 +14,7 @@ REPO ?= "git://github.com/Xilinx/XRT.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-PV = "202020.2.8.0"
+PV = "202020.2.8.1"
 SRCREV ?= "b94857f15ba8c8251df446e8c51af7e0a7c9e061"
 
 S = "${WORKDIR}/git/src"
