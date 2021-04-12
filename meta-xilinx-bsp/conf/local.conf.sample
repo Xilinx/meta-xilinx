@@ -201,7 +201,7 @@ BB_DISKMON_DIRS = "\
 #file://.* http://someserver.tld/share/sstate/PATH;downloadfilename=PATH \n \
 #file://.* file:///some/local/dir/sstate/PATH"
 
-XILINX_VER_MAIN = "2020.2.2_SOM"
+XILINX_VER_MAIN = "2020.2.2"
 
 # Uncomment below lines to provide path for custom xsct trim
 # This is required for building Versal based devices, please fetch the
