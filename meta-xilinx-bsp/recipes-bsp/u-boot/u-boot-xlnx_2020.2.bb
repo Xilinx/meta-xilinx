@@ -1,6 +1,6 @@
 UBOOT_VERSION = "v2020.01"
 
-UBRANCH ?= "master-rel-2020.2.2-som"
+UBRANCH ?= "release-2020.2.2_k26"
 
 SRCREV ?= "e7cfed8cfa2e80ebd16bb5519de5f48cba387c70"
 
