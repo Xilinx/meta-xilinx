@@ -1,5 +1,5 @@
 LINUX_VERSION = "5.4"
-SRCREV ?= "cd8a119336cb83f35cf491016ed152e732ddfe6f"
+SRCREV ?= "4731ff5042ce76fc145bc2797faa2d91b090675e"
 
 include linux-xlnx.inc
 
