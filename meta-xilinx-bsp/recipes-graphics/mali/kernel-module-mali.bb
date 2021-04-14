@@ -44,8 +44,6 @@ COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynqmp-eg = "zynqmp-eg"
 COMPATIBLE_MACHINE_zynqmp-ev = "zynqmp-ev"
 
-PACKAGE_ARCH = "${SOC_VARIANT_ARCH}"
-
 EXTRA_OEMAKE = 'KDIR="${STAGING_KERNEL_DIR}" \
 		ARCH="${ARCH}" \
 		BUILD=release \
