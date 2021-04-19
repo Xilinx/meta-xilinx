@@ -54,11 +54,6 @@ SRC_URI_append = " \
      file://0051-gdb-microblaze-tdep.c-Remove-unused-functions.patch \
      file://0052-sim-Allow-microblaze-architecture.patch \
      file://0053-gdb-Fix-microblaze-target-compilation.patch \
+     file://0054-Patch-MicroBlaze.patch \
+     file://0055-Patch-MicroBlaze-these-changes-will-make-64-bit-vect.patch \
      "
-
-#
-##     file://0048-bfd-gas-Use-standard-method-to-set-the-machine-arch.patch \
-##     file://0052-opcodes-microblaze-opc.h-Expand-the-size-to-int-to-d.patch \
-##     file://0053-opcodes-microblaze-opc.h-MIN_IMML-is-too-large.patch \
-##     file://0054-gas-config-tc-microblaze.c-Resolve-numerous-compiler.patch \
-#
