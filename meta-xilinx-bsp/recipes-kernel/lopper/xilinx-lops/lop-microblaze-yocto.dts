@@ -224,8 +224,11 @@
                       lop_output_code {
                            compatible = "system-device-tree-v1,lop,code-v1";
                            code = "
+                               cpu_addr = 0
                                for n in __selected__:
-                                   tname = re.sub( '@', '', n.name )
+                                   tname = re.split('@', n.name)
+                                   tname = tname[0]+str(cpu_addr)
+                                   cpu_addr += 1
                                    print( 'AVAILTUNES += \"microblaze-%s\"' % tname )
                                    print( 'TUNE_FEATURES_tune-microblaze-%s = \"' % tname, end='' )
                                    for t in n.tunes.values():
