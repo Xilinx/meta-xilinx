@@ -43,7 +43,7 @@ Index: gdb-9.2/bfd/elf64-microblaze.c
  #define elf_backend_finish_dynamic_symbol       microblaze_elf_finish_dynamic_symbol
  #define elf_backend_size_dynamic_sections       microblaze_elf_size_dynamic_sections
  #define elf_backend_add_symbol_hook		microblaze_elf_add_symbol_hook
-+#define elf_backend_object_p			microblaze_elf64_object_p
++/* #define elf_backend_object_p			microblaze_elf64_object_p */
  
  #include "elf64-target.h"
 Index: gdb-9.2/gdb/features/microblaze-core.xml
