@@ -1,0 +1,230 @@
+Index: git/lib/sw_apps/zynqmp_fsbl/misc/makefile
+===================================================================
+--- git.orig/lib/sw_apps/zynqmp_fsbl/misc/makefile
++++ git/lib/sw_apps/zynqmp_fsbl/misc/makefile
+@@ -4,15 +4,46 @@ DRIVER_LIB_VERSION = 1.0
+ PROC ?= a53
+ A53_STATE ?= 64
+ 
++ifeq "${CROSS_COMP}" "armclang"
++LTO_FLAGS = -mfpu=fp-armv8 -Wall -Wextra -march=armv8-a --target=aarch64-arm-none-eabi -Oz
++else
++LTO_FLAGS = -Wall -Wextra -Os -flto -ffat-lto-objects
++endif
++
+ ifeq "${PROC}" "a53"
+ PROCESSOR = zynqmp_fsbl_bsp/psu_cortexa53_0
++ifeq "${A53_STATE}" "64"
++ifeq "${CROSS_COMP}" "armclang"
++CC      :=      armclang  --target=aarch64-arm-none-eabi
++AS      :=      armasm
++LINKER  :=      armlink
++ARCHIVER :=     armar
++EXTRA_COMPILER_FLAGS := -g $(LTO_FLAGS)
++else
++CC      :=      $(CROSS)aarch64-none-elf-gcc
++AS      :=      $(CROSS)aarch64-none-elf-gcc
++LINKER  :=      $(CROSS)aarch64-none-elf-gcc
++ARCHIVER :=     $(CROSS)aarch64-none-elf-ar
++EXTRA_COMPILER_FLAGS := -g $(LTO_FLAGS)
++endif
++endif
++ifeq "${A53_STATE}" "32"
++CC      :=      $(CROSS)arm-none-eabi-gcc
++AS      :=      $(CROSS)arm-none-eabi-gcc
++LINKER  :=      $(CROSS)arm-none-eabi-gcc
++ARCHIVER :=     $(CROSS)arm-none-eabi-ar
++EXTRA_COMPILER_FLAGS := -g -DARMA53_32 -mfpu=vfpv3 -mfloat-abi=hard -march=armv7-a $(LTO_FLAGS)
++endif
+ endif
+ ifeq "${PROC}" "r5"
+ PROCESSOR = zynqmp_fsbl_bsp/psu_cortexr5_0
++CC      :=      $(CROSS)armr5-none-eabi-gcc
++AS      :=      $(CROSS)armr5-none-eabi-gcc
++LINKER  :=      $(CROSS)armr5-none-eabi-gcc
++ARCHIVER :=     $(CROSS)armr5-none-eabi-ar
++EXTRA_COMPILER_FLAGS  := -g -DARMR5 -Wall -Wextra -mfloat-abi=hard -mfpu=vfpv3-d16 $(LTO_FLAGS)
+ endif
+-LTO_FLAGS = -Wall -Wextra -Os -flto -ffat-lto-objects
+ OTHER_FLAGS = -mfpu=vfpv3 -mfloat-abi=hard
+-LTO_ARMCLANG_FLAGS = -mfpu=fp-armv8 -Wall -Wextra -march=armv8-a --target=aarch64-arm-none-eabi -Oz
+ LIBRARIES = ${PROCESSOR}/lib/libxil.a
+ BSP_MAKEFILES := $(wildcard $(PROCESSOR)/libsrc/*/src/Makefile)
+ SUBDIRS := $(patsubst %/Makefile, %, $(BSP_MAKEFILES))
+@@ -44,46 +75,13 @@ $(PROCESSOR)/lib/libxil.a: $(PROCESSOR)/
+ 
+ %/make.include: $(if $(wildcard $(PROCESSOR)/lib/libxil_init.a),$(PROCESSOR)/lib/libxil.a,)
+ 	@echo "Running Make include in $(subst /make.include,,$@)"
+-ifeq "${PROC}" "a53"
+-ifeq "${A53_STATE}" "64"
+-ifeq "${CROSS_COMP}" "armclang"
+-	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=armclang" \
+-		"ARCHIVER=armar" "COMPILER_FLAGS=  -O2 -c" "EXTRA_COMPILER_FLAGS=-g $(LTO_ARMCLANG_FLAGS)"
+-else
+-	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=aarch64-none-elf-gcc" \
+-		"ARCHIVER=aarch64-none-elf-ar" "COMPILER_FLAGS=  -O2 -c" "EXTRA_COMPILER_FLAGS=-g $(LTO_FLAGS)"
+-endif
+-endif
+-ifeq "${A53_STATE}" "32"
+-	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=arm-none-eabi-gcc" \
+-		"ARCHIVER=arm-none-eabi-ar" "COMPILER_FLAGS=  -O2 -c" "EXTRA_COMPILER_FLAGS=-DARMA53_32 -mfpu=vfpv3 -mfloat-abi=hard -g -march=armv7-a $(LTO_FLAGS)"
+-endif
+-endif
+-ifeq "${PROC}" "r5"
+-	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=armr5-none-eabi-gcc" \
+-		"ARCHIVER=armr5-none-eabi-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=cortex-r5" "EXTRA_COMPILER_FLAGS=-g -DARMR5 -Wall -Wextra -mfloat-abi=hard -mfpu=vfpv3-d16 $(LTO_FLAGS)"
+-endif
++	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(CC)" \
++		"ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c" "EXTRA_COMPILER_FLAGS=$(EXTRA_COMPILER_FLAGS)"
+ 
+ %/make.libs: include
+ 	@echo "Running Make libs in $(subst /make.libs,,$@)"
+-ifeq "${PROC}" "a53"
+-ifeq "${A53_STATE}" "64"
+-ifeq "${CROSS_COMP}" "armclang"
+-	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=armclang" \
+-		"ARCHIVER=armar" "COMPILER_FLAGS=  -O2 -c" "EXTRA_COMPILER_FLAGS=-g $(LTO_ARMCLANG_FLAGS)"
+-else
+-	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=aarch64-none-elf-gcc" \
+-		"ARCHIVER=aarch64-none-elf-ar" "COMPILER_FLAGS=  -O2 -c" "EXTRA_COMPILER_FLAGS=-g $(LTO_FLAGS)"
+-endif
+-endif
+-ifeq "${A53_STATE}" "32"
+-	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=arm-none-eabi-gcc" \
+-		"ARCHIVER=arm-none-eabi-ar" "COMPILER_FLAGS=  -O2 -c" "EXTRA_COMPILER_FLAGS=-DARMA53_32 -mfpu=vfpv3 -mfloat-abi=hard -g -march=armv7-a $(LTO_FLAGS)"
+-endif
+-endif
+-ifeq "${PROC}" "r5"
+-	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=armr5-none-eabi-gcc" "ARCHIVER=armr5-none-eabi-ar" "COMPILER_FLAGS=  -O2 -c -mcpu=cortex-r5" "EXTRA_COMPILER_FLAGS=-g -DARMR5 -Wall -Wextra -mfloat-abi=hard -mfpu=vfpv3-d16 $(LTO_FLAGS)"
+-endif
++	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(CC)" \
++		"ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c" "EXTRA_COMPILER_FLAGS=$(EXTRA_COMPILER_FLAGS)"
+ 
+ clean:
+ 	rm -f ${PROCESSOR}/lib/libxil.a
+Index: git/lib/sw_apps/zynqmp_fsbl/src/Makefile
+===================================================================
+--- git.orig/lib/sw_apps/zynqmp_fsbl/src/Makefile
++++ git/lib/sw_apps/zynqmp_fsbl/src/Makefile
+@@ -49,6 +49,7 @@ ifeq '$(CROSS_COMP)' 'armclang'
+ CC      :=      armclang  --target=aarch64-arm-none-eabi
+ AS      :=      armasm
+ LINKER  :=      armlink
++ARCHIVER :=     armar
+ ECFLAGS = -DARMA53_64 -Wall -Oz -flto -c  -march=armv8-a -mcpu=cortex-a53
+ ASFLAGS = --cpu=8-A.64 --fpu=fp-armv8
+ LSCRIPT :=     --scatter=scatter_a53_64.scat
+@@ -59,8 +60,9 @@ else
+ CC      :=      $(CROSS)aarch64-none-elf-gcc
+ AS      :=      $(CROSS)aarch64-none-elf-gcc
+ LINKER  :=      $(CROSS)aarch64-none-elf-gcc
++ARCHIVER :=     $(CROSS)aarch64-none-elf-ar
+ DUMP    :=      $(CROSS)aarch64-none-elf-objdump -xSD
+-ECFLAGS = -march=armv8-a -DARMA53_$(A53_STATE) -Os -flto -ffat-lto-objects
++ECFLAGS := -march=armv8-a -DARMA53_$(A53_STATE) -Os -flto -ffat-lto-objects
+ LSCRIPT := 	-Tlscript_a53.ld
+ LDFLAGS := -Wl,--start-group,-lxil,-lxilffs,-lxilsecure,-lxilpm,-lgcc,-lc,--end-group -L$(LIBPATH) -L./ -Wl,--build-id=none
+ OBJS += $(patsubst %.S, %.o, $(S_SOURCES))
+@@ -69,6 +71,7 @@ else
+ CC      :=      $(CROSS)arm-none-eabi-gcc
+ AS      :=      $(CROSS)arm-none-eabi-gcc
+ LINKER  :=      $(CROSS)arm-none-eabi-gcc
++ARCHIVER :=     $(CROSS)arm-none-eabi-ar
+ DUMP    :=      $(CROSS)arm-none-eabi-objdump -xSD
+ ECFLAGS :=	-march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 -DARMA53_$(A53_STATE) -Os -flto -ffat-lto-objects
+ LSCRIPT :=	-Tlscript.ld
+@@ -80,6 +83,7 @@ endif
+ ifeq "$(CC)" "armcc"
+ AS=armasm
+ LINKER=armlink
++ARCHIVER=armar
+ CFLAGS += -c --c99 --wchar32
+ CC_FLAGS	+= --cpu=Cortex-A9 --fpu=VFPv3_FP16
+ LDFLAGS = --entry=_vector_table "$(LIBPATH)/libxil.a(*.o)" --no_search_dynamic_libraries --userlibpath=$(LIBPATH),. --library=xil
+@@ -106,7 +110,8 @@ $(LIBS):
+ 	echo "Copying BSP files"
+ 	../misc/copy_bsp.sh $(BOARD) $(PROC) $(A53_STATE) $(CROSS_COMP)
+ 	echo "Compiling bsp"
+-	make -C ../misc BOARD=$(BOARD) PROC=$(PROC) A53_STATE=$(A53_STATE) CROSS_COMP=$(CROSS_COMP)
++	make -C ../misc BOARD=$(BOARD) PROC=$(PROC) A53_STATE=$(A53_STATE) CROSS_COMP=$(CROSS_COMP) \
++		CROSS="$(CROSS)" CC="$(CC)" AS="$(AS)" LINKER="$(LINKER)" ARCHIVER="$(ARCHIVER)"
+ 
+ %.o:%.c
+ 	$(CC) $(CC_FLAGS) $(CFLAGS) $(ECFLAGS) -c $< -o $@ $(INCLUDEPATH)
+Index: git/lib/sw_apps/zynq_fsbl/src/Makefile
+===================================================================
+--- git.orig/lib/sw_apps/zynq_fsbl/src/Makefile
++++ git/lib/sw_apps/zynq_fsbl/src/Makefile
+@@ -31,21 +31,22 @@ INCLUDEPATH := -I$(BSP_DIR)/ps7_cortexa9
+ LIBPATH := $(BSP_DIR)/ps7_cortexa9_0/lib
+ 
+ 
+-ifeq "$(CC)" "arm-none-eabi-gcc"
+-AS=arm-none-eabi-gcc
+-CFLAGS=-Wall -O0 -g3 -c -fmessage-length=0
+-LINKER=arm-none-eabi-gcc
+-LDFLAGS = -Wl,--start-group,-lxil,-lgcc,-lc,--end-group -Wl,--start-group,-lxilffs,-lxil,-lgcc,-lc,--end-group -Wl,--start-group,-lrsa,-lxil,-lgcc,-lc,--end-group
+-LD1FLAGS = -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,-build-id=none -Wl,-T -Wl,lscript.ld -L$(LIBPATH) -specs=../misc/Xilinx.spec
+-ECFLAGS = -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard
+-endif 
+-ifeq "$(CC)" "armcc"
++ifeq "${CROSS_COMP}" "armclang"
+ AS=armasm
+ LINKER=armlink 
+ CFLAGS += -c --c99 --wchar32
++EC_FLAGS=--debug --wchar32
+ CC_FLAGS	+= --cpu=Cortex-A9 --fpu=VFPv3_FP16
+ LDFLAGS = --entry=_vector_table "$(LIBPATH)/libxil.a(*.o)" --no_search_dynamic_libraries --userlibpath=$(LIBPATH),. --library=xil,xilffs,rsa
+ LSCRIPT = --scatter="scatter.scat"
++else
++AS=arm-none-eabi-gcc
++CFLAGS=-Wall -O0 -g3 -c -fmessage-length=0
++EC_FLAGS=-g
++LINKER=arm-none-eabi-gcc
++LDFLAGS = -Wl,--start-group,-lxil,-lgcc,-lc,--end-group -Wl,--start-group,-lxilffs,-lxil,-lgcc,-lc,--end-group -Wl,--start-group,-lrsa,-lxil,-lgcc,-lc,--end-group
++LD1FLAGS = -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -Wl,-build-id=none -Wl,-T -Wl,lscript.ld -L$(LIBPATH) -specs=../misc/Xilinx.spec
++ECFLAGS = -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard
+ endif
+ 
+ all: $(EXEC)
+@@ -53,33 +54,23 @@ all: $(EXEC)
+ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ 	$(LINKER) $(LD1FLAGS)  -o $@ $(OBJS) $(LDFLAGS)
+ 	rm -rf $(OBJS)
+-	
+-	
+-$(LIBS): 
++
++$(LIBS):
+ 	echo "Copying BSP files"
+ 	$(BSP_DIR)/copy_bsp.sh $(BOARD) $(CC)
+ 	echo "Compiling bsp"
+-	if [ $(CC) == "arm-none-eabi-gcc" ]; then \
+-		make -C $(BSP_DIR) -k all "CC=arm-none-eabi-gcc" "AR=arm-none-eabi-ar" "C_FLAGS=-O2 -c" "EC_FLAGS=-g"; \
+-	elif [ $(CC) == "armcc" ]; then \
+-        make -C $(BSP_DIR) -k all "CC=armcc" "AR=armar" "C_FLAGS= -O2 -c" "EC_FLAGS=--debug --wchar32"; \
+-	fi;
++	make -C $(BSP_DIR) -k all "CC=$(CC)" "AR=$(AR)" "C_FLAGS=$(C_FLAGS)" "EC_FLAGS=$(EC_FLAGS)"
+ 
+ %.o:%.c
+ 	$(CC) $(CC_FLAGS) $(CFLAGS) $(ECFLAGS) -c $< -o $@ $(INCLUDEPATH)
+ 
++ifneq "$(CROSS_COMP)" "armclang"
+ %.o:%.S
+-	if [ $(CC) == "arm-none-eabi-gcc" ]; then \
+-		$(AS) $(CC_FLAGS) $(CFLAGS) $(ECFLAGS) -c $< -o $@ $(INCLUDEPATH); \
+-	elif [ $(CC) == "armcc" ]; then \
+-        $(CC) $(INCLUDEPATH) -E -o fsbl_handoff.s fsbl_handoff.S; \
+-		$(AS) $(CC_FLAGS) -c fsbl_handoff.s -o fsbl_handoff.o $(INCLUDEPATH); \
+-		rm fsbl_handoff.s; \
+-	fi;
+-	
+-	
++	$(AS) $(CC_FLAGS) $(CFLAGS) $(ECFLAGS) -c $< -o $@ $(INCLUDEPATH)
++
+ %.o:%.s
+ 	$(AS) $(CC_FLAGS) $(CFLAGS) $(ECFLAGS) -c $< -o $@ $(INCLUDEPATH)
++endif
+ 
+ clean:
+ 	rm -rf $(OBJS) $(BSP_DIR)/ps7_cortexa9_0 $(EXEC)
