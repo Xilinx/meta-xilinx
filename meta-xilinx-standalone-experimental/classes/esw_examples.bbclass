@@ -9,6 +9,9 @@ do_configure_prepend() {
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
 }
 
+ESW_CUSTOM_LINKER_FILE ?= "None"
+EXTRA_OECMAKE = "-DCUSTOM_LINKER_FILE=${@d.getVar('ESW_CUSTOM_LINKER_FILE')}"
+
 do_generate_eglist () {
     cd ${S}
     lopper.py ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} drvcmake_metadata
