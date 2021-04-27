@@ -1,3 +1,5 @@
+FILESEXTRAPATHS_prepend := "${THISDIR}/linux-xlnx:"
+
 require linux-microblaze.inc
 
 # Zynq default generic KMACHINE
