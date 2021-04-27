@@ -37,3 +37,9 @@ PMU_MCDEPENDS ?= "${@bb.utils.contains('BBMULTICONFIG', 'zynqmp-pmufw', 'mc::zyn
 PMU_FIRMWARE_DEPLOY_DIR ?= "${@bb.utils.contains('BBMULTICONFIG', 'zynqmp-pmufw', '${TOPDIR}/tmp-microblaze-zynqmp-pmufw/deploy/images/${MACHINE}', '${DEPLOY_DIR_IMAGE}', d)}"
 PMU_FIRMWARE_IMAGE_NAME ?= "${@bb.utils.contains('BBMULTICONFIG', 'zynqmp-pmufw', 'pmu-firmware-zynqmp-pmu', 'pmu-firmware-${MACHINE}', d)}"
 
+# Default, if multiconfig is off, the fsbl is in the regular deploydir, otherwise
+# it is located under a multiconfig specific deploydir
+FSBL_DEPENDS ?= "${@bb.utils.contains('BBMULTICONFIG', 'fsbl-fw', '', 'fsbl-firmware:do_deploy', d)}"
+FSBL_MCDEPENDS ?= "${@bb.utils.contains('BBMULTICONFIG', 'fsbl-fw', 'mc::fsbl-fw:fsbl-firmware:do_deploy', '', d)}"
+FSBL_DEPLOY_DIR ?= "${@bb.utils.contains('BBMULTICONFIG', 'fsbl-fw', '${TOPDIR}/tmp-fsbl-fw/deploy/images/${MACHINE}', '${DEPLOY_DIR_IMAGE}', d)}"
+FSBL_IMAGE_NAME ?= "fsbl"
