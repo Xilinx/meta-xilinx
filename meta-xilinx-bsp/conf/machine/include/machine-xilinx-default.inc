@@ -76,4 +76,4 @@ def get_default_image_boot_files(d):
 
 XSERVER_EXT ?= ""
 
-FPGA_MNGR_RECONFIG_ENABLE ?= "${@bb.utils.contains('IMAGE_FEATURES', 'fpga-manager', '1', '0', d)}"
+FPGA_MNGR_RECONFIG_ENABLE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'fpga-overlay', '1', '0', d)}"
