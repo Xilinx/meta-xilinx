@@ -56,4 +56,5 @@ SRC_URI_append = " \
      file://0053-gdb-Fix-microblaze-target-compilation.patch \
      file://0054-Patch-MicroBlaze.patch \
      file://0055-Patch-MicroBlaze-these-changes-will-make-64-bit-vect.patch \
+     file://0056-Patch-microblaze-Changing-the-long-to-long-long-as-i.patch \
      "
