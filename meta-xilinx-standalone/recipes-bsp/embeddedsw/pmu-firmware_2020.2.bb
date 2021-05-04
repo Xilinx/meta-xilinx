@@ -46,5 +46,5 @@ do_compile() {
     echo Construct: executable
     oe_runmake executable.elf CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
 
-    ${MB_OBJCOPY} -O binary ${B}/executable.elf ${B}/executable.bin
+    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
 }

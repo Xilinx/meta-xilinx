@@ -54,5 +54,5 @@ do_compile() {
     echo Construct: executable
     oe_runmake psmfw.elf ${@bsp_make_vars(d)} CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
 
-    ${MB_OBJCOPY} -O binary ${B}/psmfw.elf ${B}/psmfw.bin
+    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
 }
