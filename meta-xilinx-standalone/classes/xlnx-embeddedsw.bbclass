@@ -1,6 +1,7 @@
 # Automatically determnine the version from the bb file
 ESW_VER ?= "${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or 'master'}"
 
+require conf/embeddedsw.inc
 REPO ??= "git://github.com/Xilinx/embeddedsw.git;protocol=https"
 
 ESW_BRANCH[2019.1] = "release-2019.1"
