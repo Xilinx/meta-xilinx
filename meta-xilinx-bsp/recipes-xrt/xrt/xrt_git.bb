@@ -1,6 +1,8 @@
 SUMMARY  = "Xilinx Runtime(XRT) libraries"
 DESCRIPTION = "Xilinx Runtime User Space Libraries and headers"
 
+require xrt.inc
+
 LICENSE = "GPLv2 & Apache-2.0"
 LIC_FILES_CHKSUM = "file://../LICENSE;md5=da5408f748bce8a9851dac18e66f4bcf \
                     file://runtime_src/core/edge/drm/zocl/LICENSE;md5=7d040f51aae6ac6208de74e88a3795f8 \
@@ -8,14 +10,6 @@ LIC_FILES_CHKSUM = "file://../LICENSE;md5=da5408f748bce8a9851dac18e66f4bcf \
                     file://runtime_src/core/pcie/linux/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57 \
                     file://runtime_src/core/pcie/tools/xbutil/LICENSE;md5=d273d63619c9aeaf15cdaf76422c4f87 \
                     file://runtime_src/core/edge/tools/xbutil/LICENSE;md5=d273d63619c9aeaf15cdaf76422c4f87 "
-
-BRANCH ?= "2020.2"
-REPO ?= "git://github.com/Xilinx/XRT.git;protocol=https"
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
-SRC_URI = "${REPO};${BRANCHARG}"
-
-PV = "202020.2.8.0"
-SRCREV ?= "f19a872233fbfe2eb933f25fa3d9a780ced774e5"
 
 S = "${WORKDIR}/git/src"
 
