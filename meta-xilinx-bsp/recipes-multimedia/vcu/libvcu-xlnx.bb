@@ -6,9 +6,9 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=03a7aef7e6f6a76a59fd9b8ba450b493"
 XILINX_VCU_VERSION = "1.0.0"
 PV = "${XILINX_VCU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
-BRANCH ?= "release-2020.2"
-REPO   ?= "git://github.com/xilinx/vcu-ctrl-sw.git;protocol=https"
-SRCREV ?= "b82de3783fe66ee72f28b51313e8b42827d3f202"
+BRANCH ?= "master"
+REPO   ?= "git://github.com/Xilinx/vcu-ctrl-sw.git;protocol=https"
+SRCREV = "4cc53d229485e90ec8512ad1012b20d575821a78"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
