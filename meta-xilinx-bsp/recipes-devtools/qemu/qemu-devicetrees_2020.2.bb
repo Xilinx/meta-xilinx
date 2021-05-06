@@ -1,4 +1,4 @@
 require qemu-devicetrees.inc
 
-BRANCH ?= "branch/xilinx-v2020.2"
-SRCREV ?= "0097f0f651d67b3a8495693e9e17c443948d3c77"
+BRANCH ?= "master"
+SRCREV = "4f613eee54f47ab32cc1abb651007b850f6640b4"
