@@ -3,7 +3,9 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 INHIBIT_DEFAULT_DEPS = "1"
-PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"
+PACKAGE_ARCH = "${BOARDVARIANT_ARCH}"
 
 python () {
     # The device trees must be populated in the deploy directory to correctly
