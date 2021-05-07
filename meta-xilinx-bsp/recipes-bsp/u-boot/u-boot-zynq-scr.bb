@@ -46,7 +46,17 @@ SRC_URI = " \
 	    file://boot.cmd.ubifs \
             file://pxeboot.pxe \
             "
-PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+# We fall back to MACHINE_ARCH in most cases
+FALLBACK_ARCH = "${MACHINE_ARCH}"
+
+# Except on zynqmp-dr, where we need to fall back to SOC_VARIANT_ARCH, which
+# falls back to MACHINE_ARCH if necessary
+SOC_VARIANT_ARCH ??= "${MACHINE_ARCH}"
+FALLBACK_ARCH_zynqmp-dr = "${SOC_VARIANT_ARCH}"
+
+BOARDVARIANT_ARCH ??= "${FALLBACK_ARCH}"
+PACKAGE_ARCH = "${BOARDVARIANT_ARCH}"
 
 inherit image-artifact-names
 UENV_TEXTFILE ?= "uEnv.txt"
