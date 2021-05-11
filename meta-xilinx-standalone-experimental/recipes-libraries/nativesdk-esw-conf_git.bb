@@ -1,7 +1,8 @@
-include conf/xilinx/esw-srcrev.inc
-
 # Can't depend on esw since this is needed for setup!
 inherit xlnx-embeddedsw nativesdk
+
+# We need to override the inherit
+require conf/dtb-embeddedsw.inc
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
