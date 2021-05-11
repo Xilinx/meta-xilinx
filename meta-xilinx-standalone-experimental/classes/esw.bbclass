@@ -1,7 +1,7 @@
-# We should move to an actual SRCREV eventually
-include conf/xilinx/esw-srcrev.inc
-
 inherit xlnx-embeddedsw pkgconfig cmake
+
+# Override xlnx-embeddedsw with out version
+require conf/dtb-embeddedsw.inc
 
 SRCREV_FORMAT = "src_decouple"
 
