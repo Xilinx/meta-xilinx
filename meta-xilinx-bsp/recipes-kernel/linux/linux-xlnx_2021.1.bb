@@ -1,6 +1,6 @@
 LINUX_VERSION = "5.10"
 KBRANCH="master"
-SRCREV = "bea04171cb9e59f85602890504a91f4d1321df21"
+SRCREV = "1a71ed9b39795b53ebbdddf47f5ad646f0ef8747"
 
 include linux-xlnx.inc
 
