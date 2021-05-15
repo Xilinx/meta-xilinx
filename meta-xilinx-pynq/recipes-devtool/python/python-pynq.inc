@@ -27,11 +27,11 @@ RDEPENDS_${PN} += "\
 	pynq-overlay \
 	"
 
-inherit update-rc.d xilinx-pynq
+inherit xilinx-pynq
 
 DEPENDS += " libdrm boost libcma"
 
-SRC_URI += "file://pl_server_init \
+SRC_URI += " \
 	file://0001-Fix-3.6-ism-in-Xlnk-class.patch \
 	file://0002-Avoid-deleteing-notebooks.patch \
 	file://0003-Use-sysroot-for-Displayport-library.patch \
@@ -39,15 +39,6 @@ SRC_URI += "file://pl_server_init \
 
 FILESEXTRAPATHS_prepend := "${THISDIR}:"
 
-INITSCRIPT_PACKAGES = "${PN}"
-INITSCRIPT_NAME = "pl_server_init"
-INITSCRIPT_PARAMS = "start 99 S ."
-
 do_install_append() {
-	install -d ${D}${INIT_D_DIR}
-	install -m 755 ${WORKDIR}/pl_server_init ${D}${INIT_D_DIR}/pl_server_init
 	rm -rf ${D}${PYNQ_NOTEBOOK_DIR}_*
 }
-
-
-FILES_${PN} += " ${INIT_D_DIR}/pl_server_init "
