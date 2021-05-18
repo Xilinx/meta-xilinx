@@ -28,6 +28,10 @@ inherit image-artifact-names
 
 ATF_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
 
+# Specify a default in case boardvariant isn't available
+BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"
+PACKAGE_ARCH = "${BOARDVARIANT_ARCH}"
+
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE_zynqmp = ".*"
 COMPATIBLE_MACHINE_versal = ".*"
