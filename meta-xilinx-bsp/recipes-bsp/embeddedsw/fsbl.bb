@@ -10,8 +10,9 @@ COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE_zynq = "zynq"
 COMPATIBLE_MACHINE_zynqmp = "zynqmp"
 
-# This is really BOARD specific, but we'll set it MACHINE for now.
-PACKAGE_ARCH = "${MACHINE_ARCH}"
+# Specify a default in case boardvariant isn't available
+BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"
+PACKAGE_ARCH = "${BOARDVARIANT_ARCH}"
 
 # Default would be a multiconfig (versal) build
 # For this to work, BBMULTICONFIG += "fsbl-fw" must be in the user's local.conf!
