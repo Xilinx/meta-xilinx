@@ -7,8 +7,8 @@ SOC_FAMILY ?= "zynq"
 
 SOC_VARIANT ?= "7z"
 
-require soc-tune-include.inc
 require xilinx-soc-family.inc
+require soc-tune-include.inc
 
 # Linux Configuration
 KERNEL_IMAGETYPE ?= "uImage"

@@ -8,8 +8,8 @@ SOC_FAMILY ?= "versal"
 
 SOC_VARIANT ?= "prime"
 
-require soc-tune-include.inc
 require xilinx-soc-family.inc
+require soc-tune-include.inc
 
 # Linux Configuration
 KERNEL_IMAGETYPE ?= "Image"

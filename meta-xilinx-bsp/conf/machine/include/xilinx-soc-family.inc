@@ -1,7 +1,7 @@
-require conf/machine/include/soc-family.inc
-
 SOC_VARIANT ??= ""
 MACHINEOVERRIDES =. "${@['', '${SOC_FAMILY}-${SOC_VARIANT}:']['${SOC_VARIANT}' != '']}"
+
+require conf/machine/include/soc-family.inc
 
 SOC_FAMILY_ARCH ?= "${SOC_FAMILY}"
 SOC_VARIANT_ARCH ?= "${@['${SOC_FAMILY}-${SOC_VARIANT}','${SOC_FAMILY}'][d.getVar('SOC_VARIANT')=='']}"

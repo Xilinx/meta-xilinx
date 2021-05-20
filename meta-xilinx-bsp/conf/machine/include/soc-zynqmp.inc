@@ -9,11 +9,15 @@ SOC_FAMILY ?= "zynqmp"
 
 SOC_VARIANT ?= "eg"
 
-MACHINEOVERRIDES_prepend_zynqmp-eg = "mali400:"
-MACHINEOVERRIDES_prepend_zynqmp-ev = "mali400:vcu:"
+require xilinx-soc-family.inc
+
+GRAPHICSOVERRIDES = ""
+GRAPHICSOVERRIDES_zynqmp-eg = "mali400:"
+GRAPHICSOVERRIDES_zynqmp-ev = "mali400:vcu:"
+
+MACHINEOVERRIDES =. "${GRAPHICSOVERRIDES}"
 
 require soc-tune-include.inc
-require xilinx-soc-family.inc
 
 # Linux Configuration
 KERNEL_IMAGETYPE ?= "Image"
