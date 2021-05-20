@@ -8,8 +8,6 @@ include linux-xlnx.inc
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-DT_SEARCH_ARG="-name *.dtb"
-
 fitimage_assemble() {
 	kernelcount=1
 	dtbcount=""
