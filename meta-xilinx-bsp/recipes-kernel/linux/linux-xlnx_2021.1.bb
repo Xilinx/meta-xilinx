@@ -12,7 +12,6 @@ fitimage_assemble() {
 	kernelcount=1
 	dtbcount=""
 	DTBS=""
-	DT_SEARCH_ARG=""
 	ramdiskcount=${3}
 	setupcount=""
 	rm -f ${1} arch/${ARCH}/boot/${2}
@@ -50,11 +49,8 @@ fitimage_assemble() {
 	fi
 
 	if [ -n "${EXTERNAL_KERNEL_DEVICETREE}" ]; then
-		if [ -z "${DT_SEARCH_ARG}" ]; then
-			DT_SEARCH_ARG="-name *.dtb -o -name *.dtbo"
-		fi
 		dtbcount=1
-		for DTB in $(find "${EXTERNAL_KERNEL_DEVICETREE}" \( ${DT_SEARCH_ARG} \) -printf '%P\n' | sort); do
+		for DTB in $(find "${EXTERNAL_KERNEL_DEVICETREE}" \( -name '*.dtb' -o -name '*.dtbo' \) -printf '%P\n' | sort); do
 			DTB=$(echo "${DTB}" | tr '/' '_')
 			DTBS="${DTBS} ${DTB}"
 			fitimage_emit_section_dtb ${1} ${DTB} "${EXTERNAL_KERNEL_DEVICETREE}/${DTB}"
