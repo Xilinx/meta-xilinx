@@ -1,8 +1,8 @@
 BOARD ??= ""
 BOARD_VARIANT ??= ""
 
-MACHINEOVERRIDES .= "${@['', ':${BOARD}']['${BOARD}' != '']}"
-MACHINEOVERRIDES .= "${@['', ':${BOARD}-${BOARD_VARIANT}']['${BOARD_VARIANT}' != '']}"
+MACHINEOVERRIDES =. "${@['', '${BOARD}:']['${BOARD}' != '']}"
+MACHINEOVERRIDES =. "${@['', '${BOARD}-${BOARD_VARIANT}:']['${BOARD_VARIANT}' != '']}"
 
 
 BOARD_ARCH ?= "${BOARD}"
