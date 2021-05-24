@@ -11,6 +11,10 @@ LIC_FILES_CHKSUM = " \
 
 inherit devicetree
 
+# Device-trees are inherently board specific
+BOARD_ARCH ??= "${MACHINE_ARCH}"
+PACKAGE_ARCH = "${BOARD_ARCH}"
+
 DEPENDS += "python3-dtc-native"
 
 PROVIDES = "virtual/dtb"
