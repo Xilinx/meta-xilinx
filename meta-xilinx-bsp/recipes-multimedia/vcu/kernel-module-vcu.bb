@@ -9,7 +9,7 @@ PV = "${XILINX_VCU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-BRANCH = "master"
+BRANCH = "xlnx_rel_v2021.1"
 REPO = "git://github.com/Xilinx/vcu-modules.git;protocol=https"
 SRCREV = "b74f3fad9ba3ba3adf609cf4fff3570f3a1289ff"
 
