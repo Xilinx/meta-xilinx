@@ -11,7 +11,7 @@ ESW_COMPONENT_SRC = "/lib/sw_apps/versal_psmfw/src/"
 ESW_COMPONENT = "versal_psmfw.elf"
 
 do_compile_append() {
-    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/psmfw.bin
+    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
 }
 
 do_install() {

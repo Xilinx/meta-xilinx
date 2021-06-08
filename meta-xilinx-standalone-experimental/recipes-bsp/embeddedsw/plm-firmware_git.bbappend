@@ -11,7 +11,7 @@ ESW_COMPONENT_SRC = "/lib/sw_apps/versal_plm/src/"
 ESW_COMPONENT = "versal_plm.elf"
 
 do_compile_append() {
-    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/plm.bin
+    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
 }
 
 do_install() {
