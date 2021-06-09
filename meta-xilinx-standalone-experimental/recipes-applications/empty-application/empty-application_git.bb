@@ -16,6 +16,9 @@ do_configure_prepend() {
 
 CUSTOM_APP_IMAGE_NAME ??= "custom-application"
 
+ESW_CUSTOM_LINKER_FILE ?= "None"
+EXTRA_OECMAKE = "-DCUSTOM_LINKER_FILE=${@d.getVar('ESW_CUSTOM_LINKER_FILE')}"
+
 inherit image-artifact-names
 
 CUSTOM_APP_BASE_NAME ?= "${CUSTOM_APP_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
