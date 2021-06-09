@@ -22,6 +22,9 @@ do_install() {
 HELLO_WORLD_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
 HELLO_WORLD_BASE_NAME[vardepsexclude] = "DATETIME"
 
+ESW_CUSTOM_LINKER_FILE ?= "None"
+EXTRA_OECMAKE = "-DCUSTOM_LINKER_FILE=${@d.getVar('ESW_CUSTOM_LINKER_FILE')}"
+
 do_deploy() {
 
     # We need to deploy the stripped elf, hence why not doing it from ${D}
