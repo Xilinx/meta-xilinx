@@ -31,19 +31,15 @@ PLM_FILE[vardepsexclude] = "PLM_DEPLOY_DIR"
 do_fetch[depends] += "${PLM_DEPENDS}"
 do_fetch[mcdepends] += "${PLM_MCDEPENDS}"
 
-inherit update-alternatives deploy
-
-BINARY_NAME = "${PN}"
-BINARY_EXT = ".elf"
-BINARY_ID = "${@d.getVar('SRCPV') if d.getVar('SRCPV') else d.getVar('PR') }"
+inherit deploy
 
 do_install() {
-    if [ ! -e ${PLM_FILE}${BINARY_EXT} ]; then
-        echo "Unable to find PLM_FILE (${PLM_FILE}${BINARY_EXT})"
+    if [ ! -e ${PLM_FILE}.elf ]; then
+        echo "Unable to find PLM_FILE (${PLM_FILE}.elf)"
         exit 1
     fi
 
-    install -Dm 0644 ${PLM_FILE}${BINARY_EXT} ${D}/boot/${BINARY_NAME}-${BINARY_ID}${BINARY_EXT}
+    install -Dm 0644 ${PLM_FILE}.elf ${D}/boot/${PN}.elf
 }
 
 # If the item is already in OUR deploy_image_dir, nothing to deploy!
@@ -58,12 +54,8 @@ do_deploy() {
 
 addtask deploy before do_build after do_install
 
-ALTERNATIVE_${PN} = "plmfw"
-ALTERNATIVE_TARGET[plmfw] = "/boot/${BINARY_NAME}-${BINARY_ID}${BINARY_EXT}"
-ALTERNATIVE_LINK_NAME[plmfw] = "/boot/${BINARY_NAME}${BINARY_EXT}"
-
 INSANE_SKIP_${PN} = "arch"
 INSANE_SKIP_${PN}-dbg = "arch"
 
 SYSROOT_DIRS += "/boot"
-FILES_${PN} = "/boot/${BINARY_NAME}-${BINARY_ID}${BINARY_EXT}"
+FILES_${PN} = "/boot/${PN}.elf"

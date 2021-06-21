@@ -17,6 +17,11 @@ COMPATIBLE_HOST = "^.*"
 
 LOPS_DIR = "${RECIPE_SYSROOT_NATIVE}/usr/share/lopper/lops"
 
+python() {
+  if not d.getVar('SYSTEM_DTFILE'):
+      raise bb.parse.SkipRecipe("SYSTEM_DTFILE is not configured with the system device tree filename")
+}
+
 # All microblaze
 do_compile_microblaze_xilinx-standalone() {
     LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f -O ${WORKDIR} ${SYSTEM_DTFILE} ${B}/${DTS_FILE}

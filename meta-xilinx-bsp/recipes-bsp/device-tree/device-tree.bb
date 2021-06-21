@@ -11,6 +11,15 @@ LIC_FILES_CHKSUM = " \
 
 inherit devicetree
 
+#this way of going through SRC_URI is better but if dts is including other dtsis, need to add all of them to SRC_URI..
+#SRC_URI += "file://${SYSTEM_DTFILE}"
+#DT_FILES_PATH = "${@d.getVar('WORKDIR')+'/'+os.path.dirname(d.getVar('SYSTEM_DTFILE'))}"
+
+DT_FILES_PATH = "${@os.path.dirname(d.getVar('SYSTEM_DTFILE')) if d.getVar('SYSTEM_DTFILE') else d.getVar('S')}"
+
+COMPATIBLE_MACHINE_zynqmp = ".*"
+COMPATIBLE_MACHINE_versal = ".*"
+
 # Device-trees are inherently board specific
 BOARD_ARCH ??= "${MACHINE_ARCH}"
 PACKAGE_ARCH = "${BOARD_ARCH}"

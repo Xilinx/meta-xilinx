@@ -13,7 +13,7 @@ PROVIDES = "virtual/boot-bin"
 
 DEPENDS += "bootgen-native"
 
-do_configure[depends] += "${@get_bootbin_depends(d)}"
+DEPENDS += "${BIF_PARTITION_ATTR}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -26,19 +26,7 @@ SRC_URI += "${@('file://' + d.getVar("BIF_FILE_PATH")) if d.getVar("BIF_FILE_PAT
 
 BOOTGEN_EXTRA_ARGS ?= ""
 
-BIF_PARTITION_ATTR_zynqmp = "${@'fsbl pmu atf dtb u-boot' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else 'fsbl bitstream pmu atf dtb u-boot'}"
-
 do_patch[noexec] = "1"
-
-def get_bootbin_depends(d):
-    bootbindeps = ""
-    bifpartition = (d.getVar("BIF_PARTITION_ATTR") or "").split()
-    attrdepends = d.getVarFlags("BIF_PARTITION_DEPENDS") or {}
-    for cfg in bifpartition:
-        if cfg in attrdepends:
-            bootbindeps = bootbindeps + " " + attrdepends[cfg]
-
-    return bootbindeps
 
 def create_bif(config, attrflags, attrimage, ids, common_attr, biffd, d):
     import re, os
@@ -150,12 +138,6 @@ do_compile() {
     fi
 }
 
-do_compile_append_versal() {
-    dd if=/dev/zero bs=256M count=1  > ${B}/QEMU_qspi.bin
-    dd if=${B}/BOOT.bin of=${B}/QEMU_qspi.bin bs=1 seek=0 conv=notrunc
-    dd if=${DEPLOY_DIR_IMAGE}/boot.scr of=${B}/QEMU_qspi.bin bs=1 seek=66584576 conv=notrunc
-}
-
 do_install() {
     install -d ${D}/boot
     install -m 0644 ${B}/BOOT.bin ${D}/boot/BOOT.bin
@@ -178,13 +160,9 @@ do_deploy_append_versal () {
 
     install -m 0644 ${B}/BOOT_bh.bin ${DEPLOYDIR}/${BOOTBIN_BASE_NAME}_bh.bin
     ln -sf ${BOOTBIN_BASE_NAME}_bh.bin ${DEPLOYDIR}/BOOT-${MACHINE}_bh.bin
-
-    install -m 0644 ${B}/QEMU_qspi.bin ${DEPLOYDIR}/${QEMUQSPI_BASE_NAME}.bin
-    ln -sf ${QEMUQSPI_BASE_NAME}.bin ${DEPLOYDIR}/QEMU_qspi-${MACHINE}.bin
 }
 
 FILES_${PN} += "/boot/BOOT.bin"
 SYSROOT_DIRS += "/boot"
 
 addtask do_deploy before do_build after do_compile
-
