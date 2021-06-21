@@ -30,19 +30,15 @@ PMU_FILE[vardepsexclude] = "PMU_FIRMWARE_DEPLOY_DIR"
 do_fetch[depends] += "${PMU_DEPENDS}"
 do_fetch[mcdepends] += "${PMU_MCDEPENDS}"
 
-inherit deploy update-alternatives
-
-BINARY_NAME = "${PN}"
-BINARY_EXT = ".elf"
-BINARY_ID = "${@d.getVar('SRCPV') if d.getVar('SRCPV') else d.getVar('PR') }"
+inherit deploy
 
 do_install() {
-    if [ ! -e ${PMU_FILE}${BINARY_EXT} ]; then
-        echo "Unable to find PMU_FILE (${PMU_FILE}${BINARY_EXT})"
+    if [ ! -e ${PMU_FILE}.elf ]; then
+        echo "Unable to find PMU_FILE (${PMU_FILE}.elf)"
         exit 1
     fi
 
-    install -Dm 0644 ${PMU_FILE}${BINARY_EXT} ${D}/boot/${BINARY_NAME}-${BINARY_ID}${BINARY_EXT}
+    install -Dm 0644 ${PMU_FILE}.elf ${D}/boot/${PN}.elf
 }
 
 # If the item is already in OUR deploy_image_dir, nothing to deploy!
@@ -56,12 +52,8 @@ do_deploy() {
 
 addtask deploy before do_build after do_install
 
-ALTERNATIVE_${PN} = "pmufw"
-ALTERNATIVE_TARGET[pmufw] = "/boot/${BINARY_NAME}-${BINARY_ID}${BINARY_EXT}"
-ALTERNATIVE_LINK_NAME[pmufw] = "/boot/${BINARY_NAME}${BINARY_EXT}"
-
 INSANE_SKIP_${PN} = "arch"
 INSANE_SKIP_${PN}-dbg = "arch"
 
 SYSROOT_DIRS += "/boot"
-FILES_${PN} = "/boot/${BINARY_NAME}-${BINARY_ID}${BINARY_EXT}"
+FILES_${PN} = "/boot/${PN}.elf"

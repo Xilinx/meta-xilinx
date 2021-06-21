@@ -81,7 +81,7 @@ do_compile() {
 
 do_install() {
 	install -d ${D}/boot
-	install -Dm 0644 ${OUTPUT_DIR}/bl31/bl31.elf ${D}/boot/${PN}-${SRCPV}.elf
+	install -Dm 0644 ${OUTPUT_DIR}/bl31/bl31.elf ${D}/boot/${PN}.elf
 }
 
 do_deploy() {
@@ -100,4 +100,4 @@ do_deploy() {
 	ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/atf-uboot.ub
 }
 addtask deploy before do_build after do_compile
-FILES_${PN} += "/boot/${PN}-${SRCPV}.elf"
+FILES_${PN} += "/boot/${PN}.elf"
