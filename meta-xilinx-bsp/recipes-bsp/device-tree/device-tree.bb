@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = " \
 		file://${COMMON_LICENSE_DIR}/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6 \
 		"
 
-inherit devicetree
+inherit devicetree image-artifact-names
 
 #this way of going through SRC_URI is better but if dts is including other dtsis, need to add all of them to SRC_URI..
 #SRC_URI += "file://${SYSTEM_DTFILE}"
@@ -52,3 +52,18 @@ SRC_URI_append_kc705-microblazeel = " \
 		file://system-conf.dtsi \
 		"
 
+DTB_FILE_NAME = "${@os.path.basename(d.getVar('SYSTEM_DTFILE')).replace('.dts', '.dtb') if d.getVar('SYSTEM_DTFILE') else ''}"
+DTB_BASE_NAME ?= "${MACHINE}-system${IMAGE_VERSION_SUFFIX}"
+
+devicetree_do_deploy_append() {
+    if [ -n "${DTB_FILE_NAME}" ]; then
+        if [ -e "${DEPLOYDIR}/devicetree/${DTB_FILE_NAME}" ]; then
+            # We need the output to be system.dtb for WIC setup to match XSCT flow
+            ln -sf devicetree/${DTB_FILE_NAME} ${DEPLOYDIR}/${DTB_BASE_NAME}.dtb
+            ln -sf devicetree/${DTB_FILE_NAME} ${DEPLOYDIR}/${MACHINE}-system.dtb
+            ln -sf devicetree/${DTB_FILE_NAME} ${DEPLOYDIR}/system.dtb
+        else
+            bberror "Expected filename ${DTB_FILE_NAME} doesn't exist in ${DEPLOYDIR}/devicetree"
+        fi
+    fi
+}
