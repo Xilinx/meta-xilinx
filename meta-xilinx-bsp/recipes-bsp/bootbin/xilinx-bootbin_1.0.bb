@@ -13,7 +13,8 @@ PROVIDES = "virtual/boot-bin"
 
 DEPENDS += "bootgen-native"
 
-DEPENDS += "${BIF_PARTITION_ATTR}"
+# There is no bitstream recipe, so really depend on virtual/bitstream
+DEPENDS += "${@d.getVar('BIF_PARTITION_ATTR').replace('bitstream', 'virtual/bitstream')}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
