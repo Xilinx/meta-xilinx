@@ -9,9 +9,9 @@ PV = "${XLNX_DP_VERSION}"
 
 S = "${WORKDIR}/git"
 
-BRANCH ?= "rel-v2021.1"
+BRANCH ?= "master"
 REPO   ?= "git://github.com/xilinx/dp-modules.git;protocol=https"
-SRCREV ?= "3d9654043ddc6cb6391b46bc9a98e482c98364db"
+SRCREV ?= "a4403e1eeeba8d5029b0a9f256f24c5c782ac5bc"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
