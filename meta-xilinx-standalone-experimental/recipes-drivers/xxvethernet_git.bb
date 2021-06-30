@@ -1,13 +1,13 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "canps"
+REQUIRED_DISTRO_FEATURES = "xxvethernet"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone "
+DEPENDS += "xilstandalone"
 
-ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/canps/src/"
-ESW_COMPONENT_NAME = "libcanps.a"
+ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/xxvethernet/src/"
+ESW_COMPONENT_NAME = "libxxvethernet.a"
 
 addtask do_generate_driver_data before do_configure after do_prepare_recipe_sysroot
 do_prepare_recipe_sysroot[rdeptask] = "do_unpack"
