@@ -13,7 +13,7 @@ YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=met
 SRC_URI = "${KERNELURI};${SRCBRANCHARG} ${YOCTO_META}"
 
 SRCREV_machine ?= "${SRCREV}"
-SRCREV_meta ?= "cd049697e9b2d3e9118110d476075ff8f87202cc"
+SRCREV_meta ?= "20b185f6b5afbad309747a7901786e0231dc8195"
 SRCREV_FORMAT = "machine"
 
 require recipes-kernel/linux/linux-yocto.inc
