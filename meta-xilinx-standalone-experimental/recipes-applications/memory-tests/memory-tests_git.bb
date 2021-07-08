@@ -19,8 +19,9 @@ do_install() {
     install -m 0755  ${B}/memory_test* ${D}/${base_libdir}/firmware
 }
 
-MEMORY_TESTS_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
-MEMORY_TESTS_BASE_NAME[vardepsexclude] = "DATETIME"
+inherit image-artifact-names
+
+MEMORY_TESTS_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 do_deploy() {
 

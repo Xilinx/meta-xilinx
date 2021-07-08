@@ -26,8 +26,9 @@ do_install() {
     install -m 0755  ${B}/lwip_udp_perf_client* ${D}/${base_libdir}/firmware
 }
 
-LWIP_UDP_PERF_CLIENT_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
-LWIP_UDP_PERF_CLIENT_BASE_NAME[vardepsexclude] = "DATETIME"
+inherit image-artifact-names
+
+LWIP_UDP_PERF_CLIENT_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 do_deploy() {
 

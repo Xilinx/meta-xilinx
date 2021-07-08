@@ -17,8 +17,9 @@ do_install() {
     install -m 0755  ${B}/freertos_hello_world* ${D}/${base_libdir}/firmware
 }
 
-FREERTOS_HELLO_WORLD_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
-FREERTOS_HELLO_WORLD_BASE_NAME[vardepsexclude] = "DATETIME"
+inherit image-artifact-names
+
+FREERTOS_HELLO_WORLD_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 do_deploy() {
 

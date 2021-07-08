@@ -26,8 +26,9 @@ do_install() {
     install -m 0755  ${B}/lwip_tcp_perf_server* ${D}/${base_libdir}/firmware
 }
 
-LWIP_TCP_PERF_SERVER_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
-LWIP_TCP_PERF_SERVER_BASE_NAME[vardepsexclude] = "DATETIME"
+inherit image-artifact-names
+
+LWIP_TCP_PERF_SERVER_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 do_deploy() {
 
