@@ -26,8 +26,9 @@ do_install() {
     install -m 0755  ${B}/lwip_echo* ${D}/${base_libdir}/firmware
 }
 
-LWIP_ECHO_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
-LWIP_ECHO_BASE_NAME[vardepsexclude] = "DATETIME"
+inherit image-artifact-names
+
+LWIP_ECHO_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 do_deploy() {
 

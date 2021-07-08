@@ -26,8 +26,9 @@ do_install() {
     install -m 0755  ${B}/freertos_lwip_udp_perf_server* ${D}/${base_libdir}/firmware
 }
 
-FREERTOS_LWIP_UDP_PERF_SERVER_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
-FREERTOS_LWIP_UDP_PERF_SERVER_BASE_NAME[vardepsexclude] = "DATETIME"
+inherit image-artifact-names
+
+FREERTOS_LWIP_UDP_PERF_SERVER_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 do_deploy() {
 

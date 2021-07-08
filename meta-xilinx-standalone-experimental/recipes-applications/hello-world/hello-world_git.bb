@@ -19,8 +19,9 @@ do_install() {
     install -m 0755  ${B}/hello_world* ${D}/${base_libdir}/firmware
 }
 
-HELLO_WORLD_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
-HELLO_WORLD_BASE_NAME[vardepsexclude] = "DATETIME"
+inherit image-artifact-names
+
+HELLO_WORLD_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 ESW_CUSTOM_LINKER_FILE ?= "None"
 EXTRA_OECMAKE = "-DCUSTOM_LINKER_FILE=${@d.getVar('ESW_CUSTOM_LINKER_FILE')}"
