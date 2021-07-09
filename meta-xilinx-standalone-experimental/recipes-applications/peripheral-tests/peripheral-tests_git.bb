@@ -38,7 +38,7 @@ python do_generate_app_data() {
 addtask do_generate_app_data before do_configure after do_prepare_recipe_sysroot
 do_prepare_recipe_sysroot[rdeptask] = "do_unpack"
 
-PERIPHERAL_TEST_APP_IMAGE_NAME ??= "peripheral-tests"
+PERIPHERAL_TEST_APP_IMAGE_NAME ??= "${BPN}"
 
 inherit image-artifact-names
 
@@ -56,8 +56,8 @@ do_install() {
 
 do_deploy() {
     install -Dm 0644 ${B}/${ESW_COMPONENT} ${DEPLOYDIR}/${PERIPHERAL_TEST_BASE_NAME}.elf
-    ln -sf ${PERIPHERAL_TEST_BASE_NAME}.elf ${DEPLOYDIR}/${PERIPHERAL_TEST_APP_IMAGE_NAME}.elf
+    ln -sf ${PERIPHERAL_TEST_BASE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}.elf
     install -m 0644 ${B}/executable.bin ${DEPLOYDIR}/${PERIPHERAL_TEST_BASE_NAME}.bin
-    ln -sf ${PERIPHERAL_TEST_BASE_NAME}.bin ${DEPLOYDIR}/${PERIPHERAL_TEST_APP_IMAGE_NAME}.bin
+    ln -sf ${PERIPHERAL_TEST_BASE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}.bin
 }
 addtask deploy before do_build after do_install
