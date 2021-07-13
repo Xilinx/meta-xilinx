@@ -3,6 +3,10 @@
 # mkimage -c none -A arm -T script -d boot.cmd.default boot.scr
 #
 ################
+fitimage_name=@@FIT_IMAGE@@
+kernel_name=@@KERNEL_IMAGE@@
+ramdisk_name=@@RAMDISK_IMAGE1@@
+rootfs_name=@@RAMDISK_IMAGE@@
 @@PRE_BOOTENV@@
 
 for boot_target in ${boot_targets};
@@ -21,22 +25,22 @@ do
 				run uenvcmd;
 			fi
 		fi
-		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@FIT_IMAGE@@; then
-			fatload ${devtype} ${devnum}:${distro_bootpart} @@FIT_IMAGE_LOAD_ADDRESS@@ @@FIT_IMAGE@@;
+		if test -e ${devtype} ${devnum}:${distro_bootpart} /${fitimage_name}; then
+			fatload ${devtype} ${devnum}:${distro_bootpart} @@FIT_IMAGE_LOAD_ADDRESS@@ ${fitimage_name};
 			bootm @@FIT_IMAGE_LOAD_ADDRESS@@;
                 fi
-		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@KERNEL_IMAGE@@; then
-			fatload ${devtype} ${devnum}:${distro_bootpart} @@KERNEL_LOAD_ADDRESS@@ @@KERNEL_IMAGE@@;;
+		if test -e ${devtype} ${devnum}:${distro_bootpart} /${kernel_name}; then
+			fatload ${devtype} ${devnum}:${distro_bootpart} @@KERNEL_LOAD_ADDRESS@@ ${kernel_name};
 		fi
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /system.dtb; then
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_ADDRESS@@ system.dtb;
 		fi
-		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@RAMDISK_IMAGE1@@ && test "${skip_tinyramdisk}" != "yes"; then
-			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ @@RAMDISK_IMAGE1@@;
+		if test -e ${devtype} ${devnum}:${distro_bootpart} /${ramdisk_name} && test "${skip_tinyramdisk}" != "yes"; then
+			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${ramdisk_name};
 			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
 		fi
-		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@RAMDISK_IMAGE@@ && test "${skip_ramdisk}" != "yes"; then
-			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ @@RAMDISK_IMAGE@@;
+		if test -e ${devtype} ${devnum}:${distro_bootpart} /${rootfs_name} && test "${skip_ramdisk}" != "yes"; then
+			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${rootfs_name};
 			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
 		fi
 		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ - @@DEVICETREE_ADDRESS@@
