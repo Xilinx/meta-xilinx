@@ -37,6 +37,7 @@ DISABLE_STATIC_pn-${PN} = ""
 PTEST_ENABLED = ""
 
 EXTRA_OECONF_append = " --with-git=/bin/false --disable-git-update"
+EXTRA_OECONF_remove = " --with-suffix=${BPN} --with-git-submodules=ignore --meson=meson"
 
 do_install_append() {
 	# Prevent QA warnings about installed ${localstatedir}/run
