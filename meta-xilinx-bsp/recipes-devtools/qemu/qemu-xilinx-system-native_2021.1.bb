@@ -10,8 +10,8 @@ DEPENDS += "pixman-native qemu-xilinx-native"
 
 do_install_append() {
     # The following is also installed by qemu-native
-    rm -f ${D}${datadir}/${BPN}/trace-events-all
-    rm -rf ${D}${datadir}/${BPN}/keymaps
+    rm -f ${D}${datadir}/qemu/trace-events-all
+    rm -rf ${D}${datadir}/qemu/keymaps
     rm -rf ${D}${datadir}/icons
 }
 
