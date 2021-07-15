@@ -28,6 +28,7 @@ BBLAYERS ?= " \
     ##OEROOT##/../meta-openamp \
     ##OEROOT##/../meta-jupyter \
     ##OEROOT##/../meta-python2 \
+    ##OEROOT##/../meta-clang \
 "
 
 BBLAYERS_NON_REMOVABLE ?= " \
