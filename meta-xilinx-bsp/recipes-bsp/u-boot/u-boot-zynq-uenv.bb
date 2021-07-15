@@ -88,7 +88,7 @@ KERNEL_BOOTARGS_zynq = "earlyprintk console=ttyPS0,115200 root=/dev/mmcblk0p2 rw
 KERNEL_BOOTARGS_zynqmp = "earlycon clk_ignore_unused root=/dev/mmcblk${sdbootdev}p2 rw rootwait"
 
 KERNEL_LOAD_ADDRESS_zynq = "0x2080000"
-KERNEL_LOAD_ADDRESS_zynqmp = "0x80000"
+KERNEL_LOAD_ADDRESS_zynqmp = "0x200000"
 DEVICETREE_LOAD_ADDRESS_zynq = "0x2000000"
 DEVICETREE_LOAD_ADDRESS_zynqmp = "0x4000000"
 
