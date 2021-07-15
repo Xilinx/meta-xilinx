@@ -62,7 +62,7 @@ inherit image-artifact-names
 UENV_TEXTFILE ?= "uEnv.txt"
 UENV_MMC_OFFSET_zynqmp ?= "0x200000"
 UENV_MMC_OFFSET_zynq ?= "0x2080000"
-UENV_MMC_OFFSET_versal ?= "0x80000"
+UENV_MMC_OFFSET_versal ?= "0x200000"
 UENV_MMC_OFFSET_microblaze ?= "0x0"
 
 UENV_MMC_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('UENV_MMC_OFFSET'))}"
@@ -83,7 +83,7 @@ KERNEL_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('KERNEL_OFFSET'))}"
 KERNEL_OFFSET_microblaze ?= "0x0"
 KERNEL_OFFSET_zynqmp ?= "0x200000"
 KERNEL_OFFSET_zynq ?= "0x2080000"
-KERNEL_OFFSET_versal ?= "0x80000"
+KERNEL_OFFSET_versal ?= "0x200000"
 
 KERNEL_IMAGE ?= "${KERNEL_IMAGETYPE}"
 
