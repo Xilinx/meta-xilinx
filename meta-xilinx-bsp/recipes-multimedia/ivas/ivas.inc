@@ -1,2 +1,2 @@
-SRC_URI = "http://origin.petalinux.xilinx.com/sswreleases/rel-v2020.2.2/source-tarballs/ivas.tar.gz"
-SRC_URI[md5sum] = "c9fd457e256d75e5120934ce85c68c14"
+SRC_URI = "git://gitenterprise.xilinx.com/IPS-SSW/ivas.git;protocol=https;branch=master"
+SRCREV = "658169d1e971c15d9113768c80b81a66de8916e6"
