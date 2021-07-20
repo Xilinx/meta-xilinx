@@ -9,6 +9,8 @@ DEPENDS += "xilstandalone "
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/uartns550/src/"
 ESW_COMPONENT_NAME = "libuartns550.a"
 
-addtask do_generate_driver_data before do_configure after do_prepare_recipe_sysroot
-do_prepare_recipe_sysroot[rdeptask] = "do_unpack"
-
+do_configure_prepend() {
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py ${DTS_FILE} -- baremetalconfig_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} stdin
+    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}
+    install -m 0755 xuartns550_g.c ${S}/${ESW_COMPONENT_SRC}
+}
