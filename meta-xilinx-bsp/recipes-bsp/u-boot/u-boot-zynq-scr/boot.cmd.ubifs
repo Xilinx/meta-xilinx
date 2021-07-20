@@ -10,9 +10,8 @@ do
 	if test "${boot_target}" = "xspi0" || test "${boot_target}" = "qspi" || test "${boot_target}" = "qspi0"; then
 		ubifsls @@FIT_IMAGE@@
 		if test $? = 0; then
-			ubifsload @@QSPI_FIT_IMAGE_LOAD_ADDRESS@@ @@FIT_IMAGE@@;
-			bootm @@QSPI_FIT_IMAGE_LOAD_ADDRESS@@;
-			exit;
+			ubifsload @@FIT_IMAGE_LOAD_ADDRESS@@ @@FIT_IMAGE@@;
+			bootm @@FIT_IMAGE_LOAD_ADDRESS@@;
 		fi
 		ubifsls @@KERNEL_IMAGE@@
 		if test $? = 0; then
