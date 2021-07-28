@@ -168,27 +168,6 @@ BITSTREAM_LOAD_ADDRESS ?= "0x100000"
 do_configure[noexec] = "1"
 do_install[noexec] = "1"
 
-python () {
-    baseaddr = d.getVar('DDR_BASEADDR') or "0x0"
-    if baseaddr == "0x0":
-        d.appendVar('PRE_BOOTENV','')
-    else:
-        soc_family = d.getVar('SOC_FAMILY') or ""
-        if soc_family == "zynqmp":
-            fdt_high = "0x10000000"
-        elif soc_family == "zynq":
-            fdt_high = "0x20000000"
-        elif soc_family == "versal":
-            fdt_high = "0x70000000"
-        else:
-            fdt_high = ""
-
-        if fdt_high:
-            basefdt_high = append_baseaddr(d,fdt_high)
-            bootenv = "setenv fdt_high " + basefdt_high
-            d.appendVar('PRE_BOOTENV',bootenv)
-}
-
 def append_baseaddr(d,offset):
     skip_append = d.getVar('SKIP_APPEND_BASEADDR') or ""
     if skip_append == "1":
