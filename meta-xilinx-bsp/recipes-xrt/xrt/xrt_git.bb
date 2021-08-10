@@ -18,7 +18,7 @@ inherit cmake
 BBCLASSEXTEND = "native nativesdk"
 
 # util-linux is for libuuid-dev.
-DEPENDS = "libdrm opencl-headers ocl-icd opencl-clhpp boost util-linux git-replacement-native protobuf-native protobuf"
+DEPENDS = "libdrm opencl-headers ocl-icd opencl-clhpp boost util-linux git-replacement-native protobuf-native protobuf elfutils libffi"
 RDEPENDS_${PN} = "bash ocl-icd boost-system boost-filesystem zocl"
 
 EXTRA_OECMAKE += " \
