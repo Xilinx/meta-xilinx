@@ -16,8 +16,8 @@ inherit xilinx-fetch-restricted
 BSP_NAME = "xilinx-kc705"
 BSP_FILE = "${BSP_NAME}-v${PV}-final.bsp"
 SRC_URI = "https://www.xilinx.com/member/forms/download/xef.html?filename=${BSP_FILE};downloadfilename=${BSP_FILE}"
-SRC_URI[md5sum] = "5c0365a8a26cc27b4419aa1d7dd82351"
-SRC_URI[sha256sum] = "a909a91a37a9925ee2f972ccb10f986a26ff9785c1a71a483545a192783bf773"
+SRC_URI[md5sum] = "91f88474c2d492558bcabf3d73a66332"
+SRC_URI[sha256sum] = "880c38670b24a5bcce5de0cfdb176ffaf2cb260b6f03b239450a16cf0a6c2fc2"
 
 PROVIDES = "virtual/bitstream"
 
@@ -31,7 +31,7 @@ DEPENDS += "tar-native gzip-native"
 
 do_compile() {
 	# Extract the bitstream into workdir
-	tar -xf ${WORKDIR}/${BSP_FILE} ${BSP_NAME}-axi-full-${PV}/pre-built/linux/images/download.bit -C ${S}
+	tar -xf ${WORKDIR}/${BSP_FILE} ${BSP_NAME}-${PV}/pre-built/linux/images/download.bit -C ${S}
 	# move the bit file to ${S}/ as it is in a subdir in the tar file
 	for i in $(find -type f -name download.bit); do mv $i ${S}; done
 }
