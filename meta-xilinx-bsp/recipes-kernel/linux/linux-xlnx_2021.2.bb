@@ -1,6 +1,6 @@
 LINUX_VERSION = "5.10"
 KBRANCH="master"
-SRCREV = "6c52dbc03fbaf89bff90dde72accd06322bd54f4"
+SRCREV = "31be9028fac4ca0dd4c7cf182adfe666716fd64a"
 
 KCONF_AUDIT_LEVEL="0"
 
