@@ -57,6 +57,5 @@ SRC_URI_append_microblaze = " \
     file://0053-Patch-microblaze-Reducing-Stack-space-for-arguments.patch \
     file://0054-Patch-MicroBlaze-Typo-in-the-previous-commits.bsefi-.patch \
     file://0055-Patch-MicroBlaze.patch \
-    file://0056-Patch-MicroBlaze-Added-zero_extendqidi2-and-zero_ext.patch \
     file://microblaze-mulitlib-hack.patch \
 "
