@@ -6,6 +6,10 @@ COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "none"
 COMPATIBLE_MACHINE_zynqmp = ".*"
 
+# Specify a default in case boardvariant isn't available
+BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"
+PACKAGE_ARCH = "${BOARDVARIANT_ARCH}"
+
 S = "${WORKDIR}/git"
 B = "${S}/lib/sw_apps/zynqmp_pmufw/src"
 
