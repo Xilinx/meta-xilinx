@@ -18,3 +18,7 @@ B = "${WORKDIR}/build"
 FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot:"
 
 SYSROOT_DIRS += "/boot"
+
+# Specify a default in case boardvariant isn't available
+BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"
+PACKAGE_ARCH = "${BOARDVARIANT_ARCH}"
