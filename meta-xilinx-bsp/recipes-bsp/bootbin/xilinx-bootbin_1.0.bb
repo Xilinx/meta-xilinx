@@ -14,7 +14,7 @@ PROVIDES = "virtual/boot-bin"
 DEPENDS += "bootgen-native"
 
 # There is no bitstream recipe, so really depend on virtual/bitstream
-DEPENDS += "${@d.getVar('BIF_PARTITION_ATTR').replace('bitstream', 'virtual/bitstream')}"
+DEPENDS += "${@(d.getVar('BIF_PARTITION_ATTR') or "").replace('bitstream', 'virtual/bitstream')}"
 
 # Specify a default in case boardvariant isn't available
 BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"
