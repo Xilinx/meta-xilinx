@@ -23,14 +23,14 @@ inherit ccmake
 COMPATIBLE_HOST = ".*-elf"
 COMPATIBLE_HOST_arm = "[^-]*-[^-]*-eabi"
 
-DTS_FILE = "${DEPLOY_DIR_IMAGE}/${ESW_MACHINE}-baremetal.dtb"
+DTS_FILE = "${DEPLOY_DIR_IMAGE}/devicetree/${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 
-DEPENDS += "python3-pyyaml-native lopper-native device-tree-lops python3-dtc-native"
+DEPENDS += "python3-pyyaml-native lopper-native device-tree python3-dtc-native"
 
 # We need the deployed output
-do_configure[depends] += "device-tree-lops:do_deploy"
-do_compile[depends] += "device-tree-lops:do_deploy"
-do_install[depends] += "device-tree-lops:do_deploy"
+do_configure[depends] += "device-tree:do_deploy"
+do_compile[depends] += "device-tree:do_deploy"
+do_install[depends] += "device-tree:do_deploy"
 
 def get_xlnx_cmake_machine(fam, d):
     cmake_machine = fam
@@ -106,7 +106,7 @@ python(){
 }
 
 do_generate_driver_data[dirs] = "${B}"
-do_generate_driver_data[depends] += "device-tree-lops:do_deploy"
+do_generate_driver_data[depends] += "device-tree:do_deploy"
 python do_generate_driver_data() {
     import glob, subprocess, os
 

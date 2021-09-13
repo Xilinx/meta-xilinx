@@ -15,7 +15,7 @@ ESW_COMPONENT_SRC_zynqmp = "/lib/sw_apps/zynqmp_fsbl/src"
 
 DEPENDS += "xilstandalone xiltimer xilffs xilsecure xilpm"
 
-do_copy_psu_init[depends] += "device-tree-lops:do_deploy"
+do_copy_psu_init[depends] += "device-tree:do_deploy"
 python do_copy_psu_init() {
     import glob, subprocess, os
 
