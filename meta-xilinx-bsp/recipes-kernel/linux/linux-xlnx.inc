@@ -62,6 +62,4 @@ KERNEL_FEATURES_append_zynqmp = "${@' features/xilinx/overlay_of/overlay_of.scc'
 
 KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} features/xilinx/hdmi-module/hdmi-module.scc"
 
-KERNEL_FEATURES_append_ultra96 = " bsp/xilinx/ultra96-zynqmp/mipi-config-ultra96.scc"
-
 KERNEL_FEATURES_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' features/ocicontainer/ocicontainer.scc', '', d)}"

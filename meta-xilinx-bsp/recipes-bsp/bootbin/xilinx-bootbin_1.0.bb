@@ -16,7 +16,9 @@ DEPENDS += "bootgen-native"
 # There is no bitstream recipe, so really depend on virtual/bitstream
 DEPENDS += "${@d.getVar('BIF_PARTITION_ATTR').replace('bitstream', 'virtual/bitstream')}"
 
-PACKAGE_ARCH = "${MACHINE_ARCH}"
+# Specify a default in case boardvariant isn't available
+BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"
+PACKAGE_ARCH = "${BOARDVARIANT_ARCH}"
 
 BIF_FILE_PATH ?= "${B}/bootgen.bif"
 

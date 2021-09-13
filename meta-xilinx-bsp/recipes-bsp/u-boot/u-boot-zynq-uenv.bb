@@ -12,9 +12,6 @@ python () {
     # detect them and their names. This means that this recipe needs to depend
     # on those deployables just like the image recipe does.
     deploydeps = ["virtual/kernel"]
-    for i in (d.getVar("MACHINE_ESSENTIAL_EXTRA_RDEPENDS") or "").split():
-        if i != d.getVar("BPN"):
-            deploydeps.append(i)
     for i in (d.getVar("EXTRA_IMAGEDEPENDS") or "").split():
         if i != d.getVar("BPN"):
             deploydeps.append(i)

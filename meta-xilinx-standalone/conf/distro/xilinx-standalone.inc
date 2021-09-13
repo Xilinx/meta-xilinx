@@ -35,6 +35,7 @@ VIRTUAL-RUNTIME_init_manager_xilinx-standalone = ""
 PREFERRED_PROVIDER_virtual/kernel = "linux-dummy"
 
 PREFERRED_VERSION_libmetal = "${@'standalone' if 'xilinx-standalone-exp' in d.getVar('BBFILE_COLLECTIONS').split() else ''}"
+PREFERRED_VERSION_open-amp = "${@'standalone' if 'xilinx-standalone-exp' in d.getVar('BBFILE_COLLECTIONS').split() else ''}"
 
 # Hold this until it gets merged in core, we need libc.a and libgloss.a for cross-canadian
 LIBC_DEPENDENCIES_append = " newlib-staticdev libgloss-staticdev"
