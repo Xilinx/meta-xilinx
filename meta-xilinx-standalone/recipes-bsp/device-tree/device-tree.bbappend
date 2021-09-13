@@ -11,10 +11,3 @@ COMPATIBLE_MACHINE_cortexa9-zynq = ".*"
 # Enable @ flag on dtc which is required by libxil
 DTC_FLAGS_append_xilinx-standalone = " -@"
 DT_INCLUDE_append_xilinx-standalone = " ${WORKDIR}/git/device_tree/data/kernel_dtsi/${XILINX_RELEASE_VERSION}/include/"
-
-
-do_install_append_zynqmp_xilinx-standalone() {
-    install -d ${D}${includedir}/devicetree
-    install -m 0644 ${B}/${PN}/psu_init.c ${D}/${includedir}/devicetree/psu_init.c
-    install -m 0644 ${B}/${PN}/psu_init.h ${D}/${includedir}/devicetree/psu_init.h
-}
