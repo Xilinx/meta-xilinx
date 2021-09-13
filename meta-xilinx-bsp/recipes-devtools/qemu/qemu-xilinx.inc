@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = " \
 DEPENDS = "glib-2.0 zlib pixman"
 
 XILINX_QEMU_VERSION ?= "v5.1.0"
-BRANCH ?= "xlnx_rel_v2021.2"
+BRANCH ?= "master"
 SRCREV = "303b509ec23138c43be8a3712068347210df67fd"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
