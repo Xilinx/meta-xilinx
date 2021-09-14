@@ -1,0 +1,127 @@
+/*
+ * Copyright (c) 2019,2020 Xilinx Inc. All rights reserved.
+ *
+ * Author:
+ *       Bruce Ashfield <bruce.ashfield@xilinx.com>
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/dts-v1/;
+
+/ {
+        compatible = "system-device-tree-v1,lop";
+        lops {
+                compatible = "system-device-tree-v1,lop";
+                lop_0_1 {
+                      compatible = "system-device-tree-v1,lop,select-v1";
+                      select_1;
+                      select_2 = "/.*:os,type:.*";
+                      lop_0_2 {
+                              compatible = "system-device-tree-v1,lop,code-v1";
+                              inherit = "lopper_lib";
+                              code = "
+                                   for s in __selected__:
+                                       os_type = s['os,type'].value[0]
+                                       try:
+                                           domain_name = s.label
+                                       except:
+                                            domain_name = s.name
+                                       if not domain_name:
+                                            domain_name = s.name
+                                       try:
+                                           cpu = s['cpus']
+                                       except:
+                                           print( '[ERROR]: os,type node, has no cpu reference' )
+                                       try:
+                                           cpu_node = tree.pnode( cpu.value[0] )
+                                           cpu_mask = cpu[1]
+                                       except:
+                                           print( '[ERROR]: os,type node, has invalid cpu reference' )
+
+                                       cpu_output = {}
+                                       cpus_refd, cpus_unrefd = lopper_lib.cpu_refs( tree, cpu )
+                                       for c in cpus_refd:
+                                           cpu_type = c['compatible'].value[0]
+                                           cpu_output[cpu_type] = '{} {} {}'.format(cpu_type,domain_name,os_type)
+
+                                       # print the summary lines
+                                       for o in cpu_output.values():
+                                           print( '%s' % o )
+                        ";
+                      };
+                };
+                lop_0_3 {
+                      compatible = "system-device-tree-v1,lop,select-v1";
+                      select_1;
+                      select_2 = "/.*:compatible:openamp,domain-v1";
+                      select_3 = ":!os,type:";
+                      select_4 = ":compatible:!xilinx,subsystem-v1";
+                      lop_0_3_1 {
+                              compatible = "system-device-tree-v1,lop,code-v1";
+                              inherit = "lopper_lib";
+                              code = "
+                                   if __selected__:
+                                       print( '# global \\'all\\' domains' )
+                                   # __selected__ are domains with no os,type specificiation
+                                   # we'll dump them to a global 'all' domain
+                                   for s in __selected__:
+                                       os_type = 'linux'
+                                       try:
+                                           domain_name = s.label
+                                       except:
+                                            domain_name = s.name
+                                       if not domain_name:
+                                            domain_name = s.name
+                                       try:
+                                           cpu = s['cpus']
+                                       except:
+                                           print( '[ERROR]: os,type node, has no cpu reference' )
+                                       try:
+                                           cpu_node = tree.pnode( cpu.value[0] )
+                                           cpu_mask = cpu[1]
+                                       except:
+                                           print( '[ERROR]: os,type node, has invalid cpu reference' )
+
+                                       cpu_output = {}
+                                       cpus_refd, cpus_unrefd = lopper_lib.cpu_refs( tree, cpu )
+                                       for c in cpus_refd:
+                                           cpu_type = c['compatible'].value[0]
+                                           cpu_output[cpu_type] = '{} {} {}'.format(cpu_type,domain_name,os_type)
+
+                                       # print the summary lines
+                                       for o in cpu_output.values():
+                                           print( '%s' % o )
+                        ";
+                      };
+                };
+                lop_0_4 {
+                      compatible = "system-device-tree-v1,lop,select-v1";
+                      select_1;
+                      select_2 = "/.*:compatible:cpus,cluster";
+                      lop_0_3_1 {
+                              compatible = "system-device-tree-v1,lop,code-v1";
+                              inherit = "lopper_lib";
+                              code = "
+                                     cpu_output = {}
+                                     for c in __selected__:
+                                         for c_node in c.subnodes( children_only = True ):
+                                             try:
+                                                 cpu_node = c_node['device_type'].value[0]
+                                             except:
+                                                 cpu_node = None
+                                             if cpu_node:
+                                                 if c_node.ref == 0:
+                                                     cpu_type = c_node['compatible'].value[0]
+                                                     cpu_output[cpu_type] = '{} {} {}'.format(cpu_type,'None','None')
+
+                                     if cpu_output:
+                                         print( '# global no-domain cpus' )
+
+                                         for o in cpu_output.values():
+                                             print( '%s' % o )
+                                     ";
+                      };
+                };
+        };
+};
