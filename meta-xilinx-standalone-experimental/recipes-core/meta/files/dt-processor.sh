@@ -2,10 +2,12 @@
 
 if [ $# -lt 2 ]; then
   echo "Usage:"
-  echo "  $0 <conf_dir> <system_dtb> [<machine_type>]"
+  echo "  $0 <conf_dir> <system_dtb> [<overlay_dtb>] [<external_fpga>] [<machine_type>]"
   echo
   echo "  conf_dir - location for the build conf directory"
   echo "  system_dtb - Full patch to the system dtb"
+  echo "  overlay_dtb - To generate overlay dts"
+  echo "  external_fpga - Flag to apply partial overlay"
   echo "  machine_type - zynq, zynqmp or versal"
   echo
   exit 1
@@ -23,8 +25,22 @@ if [ ! -f $2 ]; then
 fi
 dtb=$2
 
-# We'll autodetect if blank (later)
-machine=$3
+# Default is no overlay
+overlay_dtb=false
+external_fpga=false
+if [ ! -f $3 ]; then
+  if [ ! -f $4 ]; then
+    overlay_dtb=true
+    external_fpga=true
+    machine=$5
+  else
+    overlay_dtb=true
+    machine=$4
+  fi
+else
+  # We'll autodetect if blank (later)
+  machine=$3
+fi
 
 lopper=$(which lopper.py)
 
@@ -69,7 +85,16 @@ cortex_a53_linux() {
   fi
 
   mkdir -p dtb
-  (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${lops_dir}/lop-a53-imux.dts -i ${lops_dir}/lop-domain-linux-a53.dts ${dtb} ${dtb_file} && rm -f lop-a53-imux.dts.dtb lop-domain-linux-a53.dts.dtb)
+  # Check if it is overlay dts otherwise just create linux dtb
+  if [ ${overlay_dtb} = "true" ]; then
+    if [ ${external_fpga} = "true" ]; then
+      (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f ${dtb} -- xlnx_overlay_dt ${machine} full; dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi && rm -f pl.dtsi)
+    else
+      (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py ${dtb} -- xlnx_overlay_dt ${machine} partial ; dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi && rm -f pl.dtsi)
+    fi
+  else
+   (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${lops_dir}/lop-a53-imux.dts -i ${lops_dir}/lop-domain-linux-a53.dts ${dtb} ${dtb_file} && rm -f lop-a53-imux.dts.dtb lop-domain-linux-a53.dts.dtb)
+  fi
 
   cat << EOF > ${conf_file}
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -186,7 +211,19 @@ cortex_a72_linux() {
   fi
 
   mkdir -p dtb
+  # Check if it is overlay dts otherwise just create linux dtb
+  if [ ${overlay_dtb} = "true" ]; then
+    # As there is no partial support on Versal, As per fpga manager implementatin there is a flag "external_fpga" which says
+    # apply overlay without loading the bit file.
+    if [ ${external_fpga} = "true" ]; then
+      (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f ${dtb} -- xlnx_overlay_dt ${machine} full external_fpga ; dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi && rm -f pl.dtsi)
+    else
+      # If there is no external_fpga flag, then the default is full
+      (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py ${dtb} -- xlnx_overlay_dt ${machine} full ; dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi && rm -f pl.dtsi)
+    fi
+  else
   (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${lops_dir}/lop-a72-imux.dts -i ${lops_dir}/lop-domain-a72.dts ${dtb} ${dtb_file} && rm -f lop-a72-imux.dts.dtb lop-domain-a72.dts.dtb)
+  fi
 
   cat << EOF > ${conf_file}
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
