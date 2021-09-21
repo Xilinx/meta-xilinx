@@ -4,8 +4,9 @@
 # Make it clear decoupling is 'experimental' in the version
 ESW_VER = "experimental"
 
-REPO = "git://gitenterprise.xilinx.com/decoupling/embeddedsw-experimental-dt-support.git;protocol=https"
+REPO = "git://github.com/Xilinx/embeddedsw-experimental-dt-support.git;protocol=https"
 
 ESW_BRANCH[experimental] = "master"
+ESW_REV[experimental] = "efa290d50a94a9197f09150d3da192c00989dc35"
 LIC_FILES_CHKSUM[master] = '7c92de7a21a6613265035c28f4a92f48'
 
