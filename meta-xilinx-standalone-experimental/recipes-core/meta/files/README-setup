@@ -36,7 +36,7 @@ however you may use any path you wish.
 . <build>/prestep/environment-setup-x86_64-petalinux-linux
 
 # Run the script from the same directory as this README
-<build>/prestep//dt-processor.sh <path_to_conf> <dtb>
+<build>/prestep/dt-processor.sh <path_to_conf> <dtb>
 
 # For example, zynqmp:
 # <build>/prestep/dt-processor.sh <build>/conf <device-tree>/zu-sep13-sdt/system-top.dts
