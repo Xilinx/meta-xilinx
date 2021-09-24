@@ -22,7 +22,7 @@ BBLAYERS ?= " \
     ##OEROOT##/../meta-xilinx/meta-xilinx-pynq \
     ##OEROOT##/../meta-xilinx/meta-xilinx-standalone \
     ##OEROOT##/../meta-xilinx/meta-xilinx-contrib \
-    ##OEROOT##/../meta-xilinx-tools \
+    ##OEROOT##/../meta-xilinx/meta-xilinx-standalone-experimental \
     ##OEROOT##/../meta-petalinux \
     ##OEROOT##/../meta-virtualization \
     ##OEROOT##/../meta-openamp \
