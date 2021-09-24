@@ -21,7 +21,7 @@ SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master"
 
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=8e5f5f691f01c9fdfa7a7f2d535be619"
 
-SRCREV = "91a9827248f49f6615b19d5e7d13dae3c27da1e2"
+SRCREV = "59d03b25eb86a841ecf33365e9bafde5876f4f1b"
 
 S = "${WORKDIR}/git"
 
