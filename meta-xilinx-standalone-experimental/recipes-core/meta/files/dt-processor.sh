@@ -315,21 +315,35 @@ require conf/${distro}
 EOF
 }
 
+r5_fsbl_done=0
 cortex_r5_baremetal() {
+  if [ $1 = "fsbl" -a $r5_fsbl_done != 0 ]; then
+    return
+  elif [ $1 = "fsbl" ] ; then
+    echo "Building R5 FSBL baremetal configuration"
+    r5_fsbl_done=1
+  fi
+
   if [ $1 = "None" ]; then
     dtb_file="cortexr5-${machine}-baremetal.dtb"
     multiconf="${multiconf} cortexr5-${machine}-baremetal"
     conf_file="multiconfig/cortexr5-${machine}-baremetal.conf"
     libxil="multiconfig/includes/cortexr5-${machine}-libxil.conf"
     distro="multiconfig/includes/cortexr5-${machine}-distro.conf"
+    yocto_distro="xilinx-standalone-nolto"
   else
     dtb_file="cortexr5-${machine}-${1}-baremetal.dtb"
     multiconf="${multiconf} cortexr5-${machine}-${1}-baremetal"
     conf_file="multiconfig/cortexr5-${machine}-${1}-baremetal.conf"
     libxil="multiconfig/includes/cortexr5-${machine}-${1}-libxil.conf"
     distro="multiconfig/includes/cortexr5-${machine}-${1}-distro.conf"
+    yocto_distro="xilinx-standalone"
   fi
 
+  if [ $1 = "fsbl" ]; then
+    r5fsbl_mcdepends="mc::${dtb_file%%.dtb}:fsbl-firmware:do_deploy"
+    r5fsbl_deploy_dir="\${TOPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
+  fi
   # Build device tree
   mkdir -p dtb
   (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${lops_dir}/lop-r5-imux.dts ${dtb} ${dtb_file} && rm -f lop-r5-imux.dts.dtb)
@@ -346,7 +360,7 @@ DEFAULTTUNE = "cortexr5f"
 
 TMPDIR = "\${TOPDIR}/tmp-${dtb_file%%.dtb}"
 
-DISTRO = "xilinx-standalone-nolto"
+DISTRO = "$yocto_distro"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
@@ -594,6 +608,10 @@ parse_cpus() {
         ;;
       arm,cortex-r5)
         if [ ${os_hint} == "None" ]; then
+            if [ "${machine}" = "zynqmp" ]; then
+                # We need a base cortex_r5_baremetal for the FSBL for ZynqMP platform
+                cortex_r5_baremetal fsbl
+	    fi
             echo "cortex-r5 for Baremetal"
             cortex_r5_baremetal ${domain}
             echo "cortex-r5 for Freertos"
@@ -694,6 +712,11 @@ if [ -n "${fsbl_mcdepends}" ]; then
   echo 'FSBL_DEPENDS = ""'
   echo 'FSBL_MCDEPENDS = "'${fsbl_mcdepends}'"'
   echo 'FSBL_DEPLOY_DIR = "'${fsbl_deploy_dir}'"'
+fi
+if [ -n "${r5fsbl_mcdepends}" ]; then
+  echo 'R5FSBL_DEPENDS = ""'
+  echo 'R5FSBL_MCDEPENDS = "'${r5fsbl_mcdepends}'"'
+  echo 'R5FSBL_DEPLOY_DIR = "'${r5fsbl_deploy_dir}'"'
 fi
 if [ -n "${pmu_mcdepends}" ]; then
   echo 'PMU_DEPENDS = ""'
