@@ -9,7 +9,7 @@ PV = "${XLNX_DP_VERSION}"
 
 S = "${WORKDIR}/git"
 
-BRANCH ?= "rel-v2021.2"
+BRANCH ?= "xlnx_rel_v2021.2"
 REPO   ?= "git://github.com/xilinx/dp-modules.git;protocol=https"
 SRCREV ?= "249a69434cef40308deda8460274d4d73a7e29f2"
 
