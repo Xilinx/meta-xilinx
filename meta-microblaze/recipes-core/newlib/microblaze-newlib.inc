@@ -14,3 +14,7 @@ SRC_URI_append_microblaze = " \
     file://0011-Fixed-the-bug-in-crtinit.s-for-MB-64.patch \
     file://0012-libc-machine-microblaze-strcmp.c-Fix-missing-end-of-.patch \
     "
+
+EXTRA_OECONF_append_xilinx-standalone_microblaze = " \
+    --disable-newlib-reent-check-verify \
+"

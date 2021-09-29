@@ -4,14 +4,14 @@ SECTION = "kernel/modules"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=b34277fe156508fd5a650609dc36d1fe"
 
-XLNX_HDMI_VERSION = "5.4.0"
+XLNX_HDMI_VERSION = "5.10.0"
 PV = "${XLNX_HDMI_VERSION}"
 
 S = "${WORKDIR}/git"
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/hdmi-modules.git;protocol=https"
-SRCREV = "41d38c895eae91fa12aa1b5c1841f55d6c8c5697"
+SRCREV = "7199973cb7fa91776335be58e38521b77231e9fe"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"

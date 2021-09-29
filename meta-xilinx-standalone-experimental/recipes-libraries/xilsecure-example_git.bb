@@ -1,8 +1,8 @@
 inherit esw deploy
 
-ESW_COMPONENT_SRC = "/lib/sw_services/xilffs/examples/"
+ESW_COMPONENT_SRC = "/lib/sw_services/xilsecure/examples/"
 
-DEPENDS += "xilffs xiltimer"
+DEPENDS += "xilsecure"
 
 do_configure_prepend() {
     cd ${S}

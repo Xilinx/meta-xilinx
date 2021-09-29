@@ -1,8 +1,8 @@
 inherit esw deploy
 
-ESW_COMPONENT_SRC = "/lib/sw_services/xilffs/examples/"
+ESW_COMPONENT_SRC = "/lib/sw_services/xilmailbox/examples/"
 
-DEPENDS += "xilffs xiltimer"
+DEPENDS += "xilmailbox"
 
 do_configure_prepend() {
     cd ${S}
@@ -13,6 +13,15 @@ do_configure_prepend() {
 
 ESW_CUSTOM_LINKER_FILE ?= "None"
 EXTRA_OECMAKE = "-DCUSTOM_LINKER_FILE=${@d.getVar('ESW_CUSTOM_LINKER_FILE')}"
+
+do_generate_eglist () {
+    cd ${S}
+    lopper.py ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
+    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+}
+
+addtask generate_eglist before do_configure after do_prepare_recipe_sysroot
+do_prepare_recipe_sysroot[rdeptask] = "do_unpack"
 
 do_install() {
     install -d ${D}/${base_libdir}/firmware
