@@ -167,8 +167,8 @@ do_configure[noexec] = "1"
 do_install[noexec] = "1"
 
 def append_baseaddr(d,offset):
-    skip:append = d.getVar('SKIP_APPEND_BASEADDR') or ""
-    if skip:append == "1":
+    skip_append = d.getVar('SKIP_APPEND_BASEADDR') or ""
+    if skip_append == "1":
         return offset
     import subprocess
     baseaddr = d.getVar('DDR_BASEADDR') or "0x0"
