@@ -34,5 +34,5 @@ do_install() {
 	done
 }
 
-FILES_${PN} += "${PLATFORM_INIT_DIR}/*"
+FILES:${PN} += "${PLATFORM_INIT_DIR}/*"
 

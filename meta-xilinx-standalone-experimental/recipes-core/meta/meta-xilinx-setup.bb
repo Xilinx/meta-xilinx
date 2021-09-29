@@ -45,7 +45,7 @@ do_populate_sdk[stamp-extra-info] = "${PACKAGE_ARCH}"
 
 REAL_MULTIMACH_TARGET_SYS = "none"
 
-create_sdk_files_append () {
+create_sdk_files:append () {
 	install -m 0644 ${WORKDIR}/README-setup ${SDK_OUTPUT}/${SDKPATH}/.
 	install -m 0755 ${WORKDIR}/dt-processor.sh ${SDK_OUTPUT}/${SDKPATH}/.
 

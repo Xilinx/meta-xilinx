@@ -7,11 +7,11 @@ SRC_URI = "${EMBEDDEDSW_SRCURI}"
 inherit esw
 
 # Not compatible with Zynq
-COMPATIBLE_MACHINE_zynq = "none"
+COMPATIBLE_MACHINE:zynq = "none"
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/undefined/src"
-ESW_COMPONENT_SRC_zynq = "/lib/sw_apps/zynq_fsbl/src"
-ESW_COMPONENT_SRC_zynqmp = "/lib/sw_apps/zynqmp_fsbl/src"
+ESW_COMPONENT_SRC:zynq = "/lib/sw_apps/zynq_fsbl/src"
+ESW_COMPONENT_SRC:zynqmp = "/lib/sw_apps/zynqmp_fsbl/src"
 
 DEPENDS += "xilstandalone xiltimer xilffs xilsecure xilpm"
 
@@ -40,8 +40,8 @@ do_install() {
 addtask deploy before do_build after do_package
 
 ESW_COMPONENT = "undefined"
-ESW_COMPONENT_zynq = "zynq_fsbl.elf"
-ESW_COMPONENT_zynqmp = "zynqmp_fsbl.elf"
+ESW_COMPONENT:zynq = "zynq_fsbl.elf"
+ESW_COMPONENT:zynqmp = "zynqmp_fsbl.elf"
 
-CFLAGS_append_aarch64 = " -DARMA53_64"
-CFLAGS_append_armrm = " -DARMR5"
+CFLAGS:append:aarch64 = " -DARMA53_64"
+CFLAGS:append:armrm = " -DARMR5"

@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b42e39ad2ddbad7e8ad47f3eee6feff5"
 SRC_URI[md5sum] = "9950894100c20293e921090b76ca9f17"
 SRC_URI[sha256sum] = "4f719e2753093d1e79931755c624d160cf342c03af49e027d09abe75bdc8e8c5"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
 	${PYTHON_PN}-core \
 	${PYTHON_PN}-asyncio \
 	${PYTHON_PN}-cffi \
@@ -37,8 +37,8 @@ SRC_URI += " \
 	file://0003-Use-sysroot-for-Displayport-library.patch \
 "
 
-FILESEXTRAPATHS_prepend := "${THISDIR}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}:"
 
-do_install_append() {
+do_install:append() {
 	rm -rf ${D}${PYNQ_NOTEBOOK_DIR}_*
 }

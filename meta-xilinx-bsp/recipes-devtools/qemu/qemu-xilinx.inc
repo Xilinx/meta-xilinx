@@ -14,7 +14,7 @@ XILINX_QEMU_VERSION ?= "v5.1.0"
 BRANCH ?= "xlnx_rel_v2021.2"
 SRCREV = "303b509ec23138c43be8a3712068347210df67fd"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 PV = "${XILINX_QEMU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 REPO ?= "gitsm://github.com/Xilinx/qemu.git;protocol=https"
@@ -22,24 +22,24 @@ REPO ?= "gitsm://github.com/Xilinx/qemu.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-SRC_URI_append = " file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch \
+SRC_URI:append = " file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch \
 		   file://0001-Add-enable-disable-udev.patch \
 "
 
 S = "${WORKDIR}/git"
 
 # Disable KVM completely
-PACKAGECONFIG_remove = "kvm"
-PACKAGECONFIG_append = " fdt gcrypt"
+PACKAGECONFIG:remove = "kvm"
+PACKAGECONFIG:append = " fdt gcrypt"
 
-DISABLE_STATIC_pn-${PN} = ""
+DISABLE_STATIC:pn-${PN} = ""
 
 PTEST_ENABLED = ""
 
-EXTRA_OECONF_append = " --with-git=/bin/false --disable-git-update"
-EXTRA_OECONF_remove = " --with-suffix=${BPN} --with-git-submodules=ignore --meson=meson"
+EXTRA_OECONF:append = " --with-git=/bin/false --disable-git-update"
+EXTRA_OECONF:remove = " --with-suffix=${BPN} --with-git-submodules=ignore --meson=meson"
 
-do_install_append() {
+do_install:append() {
 	# Prevent QA warnings about installed ${localstatedir}/run
 	if [ -d ${D}${localstatedir}/run ]; then rmdir ${D}${localstatedir}/run; fi
 }

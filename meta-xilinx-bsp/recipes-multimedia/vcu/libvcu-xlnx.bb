@@ -16,11 +16,11 @@ SRC_URI = "${REPO};${BRANCHARG}"
 S  = "${WORKDIR}/git"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynqmp = "zynqmp"
+COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 
 PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
 
-RDEPENDS_${PN} = "kernel-module-vcu"
+RDEPENDS:${PN} = "kernel-module-vcu"
 
 EXTRA_OEMAKE = "CC='${CC}' CXX='${CXX} ${CXXFLAGS}'"
 

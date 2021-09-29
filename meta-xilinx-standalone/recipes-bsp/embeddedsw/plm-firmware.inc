@@ -5,7 +5,7 @@ inherit xlnx-embeddedsw deploy
 
 COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "none"
-COMPATIBLE_MACHINE_versal = ".*"
+COMPATIBLE_MACHINE:versal = ".*"
 
 # Specify a default in case boardvariant isn't available
 BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"

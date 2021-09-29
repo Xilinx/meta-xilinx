@@ -1,6 +1,6 @@
-FILESEXTRAPATHS_append := ":${THISDIR}/binutils"
+FILESEXTRAPATHS:append := ":${THISDIR}/binutils"
 
-SRC_URI_append = " \
+SRC_URI:append = " \
      file://0001-Add-wdc.ext.clear-and-wdc.ext.flush-insns.patch \
      file://0002-Add-mlittle-endian-and-mbig-endian-flags.patch \
      file://0003-Disable-the-warning-message-for-eh_frame_hdr.patch \

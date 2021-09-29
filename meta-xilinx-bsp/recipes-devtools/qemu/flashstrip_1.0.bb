@@ -22,6 +22,6 @@ do_install() {
     install -Dm 0755 ${B}/* ${D}${bindir}/
 }
 
-FILES_${PN} = "${bindir}/*"
+FILES:${PN} = "${bindir}/*"
 
 BBCLASSEXTEND = "native nativesdk"

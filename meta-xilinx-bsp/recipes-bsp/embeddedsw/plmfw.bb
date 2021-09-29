@@ -8,7 +8,7 @@ PROVIDES = "virtual/plm"
 INHERIT_DEFAULT_DEPENDS = "1"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_versal = "versal"
+COMPATIBLE_MACHINE:versal = "versal"
 
 # Specify a default in case boardvariant isn't available
 BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"
@@ -54,8 +54,8 @@ do_deploy() {
 
 addtask deploy before do_build after do_install
 
-INSANE_SKIP_${PN} = "arch"
-INSANE_SKIP_${PN}-dbg = "arch"
+INSANE_SKIP:${PN} = "arch"
+INSANE_SKIP:${PN}-dbg = "arch"
 
 SYSROOT_DIRS += "/boot"
-FILES_${PN} = "/boot/${PN}.elf"
+FILES:${PN} = "/boot/${PN}.elf"

@@ -63,7 +63,7 @@ MACHINE ??= "qemuzynq"
 #
 #TMPDIR = "${TOPDIR}/tmp"
 #
-#TMPDIR_versal = "${TOPDIR}/tmp-versal"
+#TMPDIR:versal = "${TOPDIR}/tmp-versal"
 
 #
 # Default policy config
@@ -210,11 +210,11 @@ XILINX_VER_MAIN = "2021.2"
 
 # INHERIT += "externalsrc"
 # PREFERRED_PROVIDER_virtual/kernel = "linux-xlnx-dev"
-# EXTERNALSRC_pn-linux-xlnx-dev = "${BASE}/sources/linux"
+# EXTERNALSRC:pn-linux-xlnx-dev = "${BASE}/sources/linux"
 # RM_WORK_EXCLUDE += "linux-xlnx-dev"
 
 # PREFERRED_PROVIDER_virtual/bootloader = "u-boot-xlnx-dev"
-# EXTERNALSRC_pn-u-boot-xlnx-dev = "${BASE}/sources/u-boot"
+# EXTERNALSRC:pn-u-boot-xlnx-dev = "${BASE}/sources/u-boot"
 # RM_WORK_EXCLUDE += "u-boot-xlnx-dev"
 
 #Add below lines to use runqemu for ZU+ machines

@@ -2,8 +2,8 @@ SUMMARY = "Recompile libcma against pynqlib c"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b42e39ad2ddbad7e8ad47f3eee6feff5"
 
-CMA_ARCH_arm = "32"
-CMA_ARCH_aarch64 = "64"
+CMA_ARCH:arm = "32"
+CMA_ARCH:aarch64 = "64"
 
 PYNQBRANCH ?= "image_v2.4"
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${PYNQBRANCH}'][d.getVar('PYNQBRANCH', True) != '']}"
@@ -15,8 +15,8 @@ SRCREV ?= "3d659d374701b7c34fa702e7aa23f71f9113f826"
 
 S="${WORKDIR}/git"
 
-CMA_ARCH_arm = "32"
-CMA_ARCH_aarch64 = "64"
+CMA_ARCH:arm = "32"
+CMA_ARCH:aarch64 = "64"
 
 do_install() {
 
@@ -29,5 +29,5 @@ do_install() {
 
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""
-FILES_${PN} += "/usr/lib/libcma.so /usr/include"
+FILES:${PN} += "/usr/lib/libcma.so /usr/include"
 

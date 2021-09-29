@@ -1,12 +1,12 @@
 COMPATIBLE_HOST = "${HOST_SYS}"
 
 # Add MicroBlaze Patches (only when using MicroBlaze)
-FILESEXTRAPATHS_append_microblaze_xilinx-standalone := ":${THISDIR}/gcc-10"
-SRC_URI_append_microblaze_xilinx-standalone = " \
+FILESEXTRAPATHS:append:microblaze_xilinx-standalone := ":${THISDIR}/gcc-10"
+SRC_URI:append:microblaze_xilinx-standalone = " \
         file://additional-microblaze-multilibs.patch \
 "
 
-CHECK_FOR_MICROBLAZE_microblaze = "1"
+CHECK_FOR_MICROBLAZE:microblaze = "1"
 
 python() {
     if d.getVar('CHECK_FOR_MICROBLAZE') == '1':

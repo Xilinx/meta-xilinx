@@ -13,7 +13,7 @@ SRCREV = "32eed91994228d1042a16c692047dfe81e47d498"
 
 inherit xilinx-pynq
 
-RDEPENDS_${PN}-notebooks += "\
+RDEPENDS:${PN}-notebooks += "\
     python3-pynq \
     python3-pillow \
     libstdc++ \

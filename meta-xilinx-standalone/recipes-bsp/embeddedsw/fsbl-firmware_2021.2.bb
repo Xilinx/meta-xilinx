@@ -8,4 +8,4 @@ SRC_URI += " \
            "
 
 # This version does not build for zynq
-COMPATIBLE_MACHINE_zynq = "none"
+COMPATIBLE_MACHINE:zynq = "none"

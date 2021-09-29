@@ -10,7 +10,7 @@ DEPENDS = "bitstream-microblaze"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 COMPATIBLE_MACHINE ?= "^$"
-COMPATIBLE_MACHINE_microblaze = ".*"
+COMPATIBLE_MACHINE:microblaze = ".*"
 
 inherit deploy image-artifact-names
 

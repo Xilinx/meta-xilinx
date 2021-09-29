@@ -6,7 +6,7 @@ DEPENDS += "libxil xiltimer"
 
 inherit python3native
 
-do_configure_prepend() {
+do_configure:prepend() {
     cd ${S}
     lopper.py ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
     install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
@@ -25,7 +25,7 @@ CUSTOM_APP_BASE_NAME ?= "${CUSTOM_APP_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACH
 
 ESW_COMPONENT ??= "executable.elf"
 
-do_compile_append() {
+do_compile:append() {
     ${OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/executable.bin
 }
 

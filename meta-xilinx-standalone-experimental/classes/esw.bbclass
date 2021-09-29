@@ -10,9 +10,9 @@ B = "${WORKDIR}/build"
 OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
 LICFILENAME = "license.txt"
 
-SPECFILE_PATH_arm = "${S}/scripts/specs/arm/Xilinx.spec"
-SPECFILE_PATH_aarch64 = "${S}/scripts/specs/arm/Xilinx.spec"
-SPECFILE_PATH_microblaze = "${S}/scripts/specs/microblaze/Xilinx.spec"
+SPECFILE_PATH:arm = "${S}/scripts/specs/arm/Xilinx.spec"
+SPECFILE_PATH:aarch64 = "${S}/scripts/specs/arm/Xilinx.spec"
+SPECFILE_PATH:microblaze = "${S}/scripts/specs/microblaze/Xilinx.spec"
 
 ESW_MACHINE ?= "${MACHINE}"
 
@@ -21,7 +21,7 @@ ESW_CFLAGS += "-specs=${SPECFILE_PATH}"
 inherit ccmake
 
 COMPATIBLE_HOST = ".*-elf"
-COMPATIBLE_HOST_arm = "[^-]*-[^-]*-eabi"
+COMPATIBLE_HOST:arm = "[^-]*-[^-]*-eabi"
 
 DTS_FILE = "${DEPLOY_DIR_IMAGE}/devicetree/${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 
@@ -46,9 +46,9 @@ def get_xlnx_cmake_processor(tune, machine, d):
     cmake_processor = tune
     if tune.startswith('microblaze'):
         if (machine == 'microblaze-pmu'):
-            cmake_processor = 'pmu_microblaze'
+            cmake_processor = 'pmu:microblaze'
         elif (machine == 'microblaze-plm'):
-            cmake_processor = 'plm_microblaze'
+            cmake_processor = 'plm:microblaze'
         else:
             cmake_processor = 'microblaze'
     elif (tune in [ 'cortexr5', 'cortexr5f' ]):
@@ -85,7 +85,7 @@ do_install() {
     install -m 0644  ${B}/include/*.h ${D}${includedir}
 }
 
-CFLAGS_append = " ${ESW_CFLAGS}"
+CFLAGS:append = " ${ESW_CFLAGS}"
 
 # We need to find the license file, which vaires depending on the component
 # recurse a maximum of x times, could be fancier but it gets complicated since

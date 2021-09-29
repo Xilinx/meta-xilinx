@@ -37,9 +37,9 @@ sed -e 's,;, ,' |
       echo 'DEFAULTTUNE = "microblaze"'
       echo
       echo 'AVAILTUNES += "microblaze"'
-      echo 'BASE_LIB_tune-microblaze = "lib"'
-      echo 'TUNE_FEATURES_tune-microblaze = "microblaze bigendian"'
-      echo 'PACKAGE_EXTRA_ARCHS_tune-microblaze = "${TUNE_PKGARCH}"'
+      echo 'BASE_LIB:tune-microblaze = "lib"'
+      echo 'TUNE_FEATURES:tune-microblaze = "microblaze bigendian"'
+      echo 'PACKAGE_EXTRA_ARCHS:tune-microblaze = "${TUNE_PKGARCH}"'
       continue
     fi
 
@@ -51,10 +51,10 @@ sed -e 's,;, ,' |
     echo
     echo "# $mlib"
     echo "# CFLAGS:${cflags}"
-    echo "DEFAULTTUNE_virtclass-multilib-$multilib = \"$tune\""
+    echo "DEFAULTTUNE:virtclass-multilib-$multilib = \"$tune\""
     echo
     echo "AVAILTUNES += \"$tune\""
-    echo "BASE_LIB_tune-$tune = \"lib/$mlib\""
-    echo "TUNE_FEATURES_tune-$tune = \"${features}\""
-    echo "PACKAGE_EXTRA_ARCHS_tune-$tune = \"\${TUNE_PKGARCH}\""
+    echo "BASE_LIB:tune-$tune = \"lib/$mlib\""
+    echo "TUNE_FEATURES:tune-$tune = \"${features}\""
+    echo "PACKAGE_EXTRA_ARCHS:tune-$tune = \"\${TUNE_PKGARCH}\""
   done

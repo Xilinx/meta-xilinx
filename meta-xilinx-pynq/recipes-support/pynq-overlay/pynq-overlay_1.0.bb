@@ -19,11 +19,11 @@ SRC_URI = " \
 
 S="${WORKDIR}"
 
-PYNQ_DTSI ??= "pynq_zynqmp.dtsi"
-PYNQ_DTSI_zynqmp ?= "pynq_zynqmp.dtsi"
-PYNQ_DTSI_zynq ?= "pynq_zynq.dtsi"
-PYNQ_SYMBOL_DTSI_zynqmp ?= "pynq_zynqmp_symbols.dtsi"
-PYNQ_SYMBOL_DTSI_zynq ?= "pynq_zynq_symbols.dtsi"
+PYNQ_DTSI ??= "pynq:zynqmp.dtsi"
+PYNQ_DTSI:zynqmp ?= "pynq:zynqmp.dtsi"
+PYNQ_DTSI:zynq ?= "pynq:zynq.dtsi"
+PYNQ_SYMBOL_DTSI:zynqmp ?= "pynq:zynqmp_symbols.dtsi"
+PYNQ_SYMBOL_DTSI:zynq ?= "pynq:zynq_symbols.dtsi"
 PYNQ_DTBO ?= "pynq.dtbo"
 PYNQ_SYMBOL_DTBO ?= "pynq-symbols.dtbo"
 
@@ -51,4 +51,4 @@ do_install() {
 
 }
 
-FILES_${PN} += "/lib/firmware/pynq.dtbo /lib/firmware/pynq-symbols.dtbo ${sysconfdir}/modprobe.d/generic-uio.conf"
+FILES:${PN} += "/lib/firmware/pynq.dtbo /lib/firmware/pynq-symbols.dtbo ${sysconfdir}/modprobe.d/generic-uio.conf"

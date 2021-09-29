@@ -104,7 +104,7 @@ SYSTEM_DTFILE = "${CONFIG_DTFILE}"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE_${machine}-generic = ""
 # We need u-boot to use the one we passed in
-DEVICE_TREE_NAME_pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+DEVICE_TREE_NAME:pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 EOF
@@ -233,7 +233,7 @@ SYSTEM_DTFILE = "${CONFIG_DTFILE}"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE_${machine}-generic = ""
 # We need u-boot to use the one we passed in
-DEVICE_TREE_NAME_pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+DEVICE_TREE_NAME:pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 EOF
@@ -409,7 +409,7 @@ EOF
 microblaze_done=0
 # Generate microblaze tunings
 microblaze_done=0
-process_microblaze() {
+process:microblaze() {
   if [ ${microblaze_done} = 0 ]; then
     echo -n "Generating microblaze processor tunes..."
     # Process microblaze
@@ -446,7 +446,7 @@ ESW_MACHINE = "microblaze-pmu"
 
 require conf/microblaze.conf
 DEFAULTTUNE = "microblaze"
-TUNE_FEATURES_tune-microblaze_forcevariable = "\${TUNE_FEATURES_tune-pmu-microblaze}"
+TUNE_FEATURES:tune-microblaze:forcevariable = "\${TUNE_FEATURES_tune-pmu-microblaze}"
 
 TARGET_CFLAGS += "-DPSU_PMU=1U"
 
@@ -485,7 +485,7 @@ ESW_MACHINE = "microblaze-plm"
 
 require conf/microblaze.conf
 DEFAULTTUNE = "microblaze"
-TUNE_FEATURES_tune-microblaze_forcevariable = "\${TUNE_FEATURES_tune-pmc-microblaze}"
+TUNE_FEATURES:tune-microblaze:forcevariable = "\${TUNE_FEATURES_tune-pmc-microblaze}"
 
 TARGET_CFLAGS += "-DVERSAL_PLM=1"
 
@@ -524,7 +524,7 @@ ESW_MACHINE = "microblaze-psm"
 
 require conf/microblaze.conf
 DEFAULTTUNE = "microblaze"
-TUNE_FEATURES_tune-microblaze_forcevariable = "\${TUNE_FEATURES_tune-psm-microblaze}"
+TUNE_FEATURES:tune-microblaze:forcevariable = "\${TUNE_FEATURES_tune-psm-microblaze}"
 
 TARGET_CFLAGS += "-DVERSAL_psm=1"
 
@@ -634,7 +634,7 @@ parse_cpus() {
         fi
         ;;
       xlnx,microblaze)
-        process_microblaze
+        process:microblaze
         case ${os_hint} in
           None | baremetal*)
             echo "Warning: Microblaze for Baremetal ${domain} not yet implemented"
@@ -648,17 +648,17 @@ parse_cpus() {
         esac
         ;;
       pmu-microblaze)
-        process_microblaze
+        process:microblaze
         echo "Microblaze ZynqMP pmu"
         pmu-microblaze
         ;;
       pmc-microblaze)
-        process_microblaze
+        process:microblaze
         echo "Microblaze Versal pmc"
         pmc-microblaze
         ;;
       psm-microblaze)
-        process_microblaze
+        process:microblaze
         echo "Microblaze Versal psm"
         psm-microblaze
         ;;

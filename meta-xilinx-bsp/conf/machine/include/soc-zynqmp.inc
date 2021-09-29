@@ -12,8 +12,8 @@ SOC_VARIANT ?= "eg"
 require xilinx-soc-family.inc
 
 GRAPHICSOVERRIDES = ""
-GRAPHICSOVERRIDES_zynqmp-eg = "mali400:"
-GRAPHICSOVERRIDES_zynqmp-ev = "mali400:vcu:"
+GRAPHICSOVERRIDES:zynqmp-eg = "mali400:"
+GRAPHICSOVERRIDES:zynqmp-ev = "mali400:vcu:"
 
 MACHINEOVERRIDES =. "${GRAPHICSOVERRIDES}"
 
@@ -23,13 +23,13 @@ require soc-tune-include.inc
 KERNEL_IMAGETYPE ?= "Image"
 
 # Support multilib on zynqmp
-DEFAULTTUNE_virtclass-multilib-lib32 ?= "armv7vethf-neon-vfpv4"
+DEFAULTTUNE:virtclass-multilib-lib32 ?= "armv7vethf-neon-vfpv4"
 
 WIC_DEPENDS ?= "virtual/kernel virtual/bootloader virtual/boot-bin virtual/arm-trusted-firmware"
 
 UBOOT_SUFFIX ?= "bin"
 
-XSERVER_EXT_zynqmp ?= "xf86-video-armsoc"
+XSERVER_EXT:zynqmp ?= "xf86-video-armsoc"
 
 # Default PMU ROM
 PMU_ROM ?= "${DEPLOY_DIR_IMAGE}/pmu-rom.elf"

@@ -16,7 +16,7 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '
 SRC_URI   = "${REPO};${BRANCHARG}"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynqmp = "zynqmp"
+COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 
 PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
 
@@ -30,10 +30,10 @@ do_install() {
 # Inhibit warnings about files being stripped
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 INHIBIT_PACKAGE_STRIP = "1"
-FILES_${PN} = "/lib/firmware/*"
+FILES:${PN} = "/lib/firmware/*"
 
 # These libraries shouldn't get installed in world builds unless something
 # explicitly depends upon them.
 EXCLUDE_FROM_WORLD = "1"
 
-INSANE_SKIP_${PN} = "ldflags"
+INSANE_SKIP:${PN} = "ldflags"

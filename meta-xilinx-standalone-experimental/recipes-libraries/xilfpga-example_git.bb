@@ -4,7 +4,7 @@ ESW_COMPONENT_SRC = "/lib/sw_services/xilfpga/examples/"
 
 DEPENDS += "xilfpga"
 
-do_configure_prepend() {
+do_configure:prepend() {
     cd ${S}
     lopper.py ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
     install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
@@ -25,4 +25,4 @@ do_deploy() {
 }
 addtask deploy before do_build after do_package
 
-FILES_${PN} = "${base_libdir}/firmware/*.elf"
+FILES:${PN} = "${base_libdir}/firmware/*.elf"

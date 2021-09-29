@@ -6,7 +6,7 @@ PACKAGE_ARCH = "${TUNE_PKGARCH}"
 
 inherit packagegroup
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     libgcc-dev \
     libstdc++-dev \
     ${LIBC_DEPENDENCIES} \

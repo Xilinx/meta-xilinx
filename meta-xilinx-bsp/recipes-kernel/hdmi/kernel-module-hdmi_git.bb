@@ -20,5 +20,5 @@ inherit module
 
 EXTRA_OEMAKE += "O=${STAGING_KERNEL_BUILDDIR}"
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynqmp = "zynqmp"
-COMPATIBLE_MACHINE_versal = "versal"
+COMPATIBLE_MACHINE:zynqmp = "zynqmp"
+COMPATIBLE_MACHINE:versal = "versal"

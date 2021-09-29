@@ -6,4 +6,4 @@ KCONF_AUDIT_LEVEL="0"
 
 include linux-xlnx.inc
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"

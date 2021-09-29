@@ -1,10 +1,10 @@
 # MicroBlaze does not support LTTng UST
-LTTNGUST_microblaze = ""
+LTTNGUST:microblaze = ""
 
 # Add MicroBlaze patches
-FILESEXTRAPATHS_append := ":${THISDIR}/gdb"
+FILESEXTRAPATHS:append := ":${THISDIR}/gdb"
 
-SRC_URI_append_microblaze = " \
+SRC_URI:append:microblaze = " \
      file://0001-Add-wdc.ext.clear-and-wdc.ext.flush-insns.patch \
      file://0003-Disable-the-warning-message-for-eh_frame_hdr.patch \
      file://0004-LOCAL-Fix-relaxation-of-assembler-resolved-reference.patch \

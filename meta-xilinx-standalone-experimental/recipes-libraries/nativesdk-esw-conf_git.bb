@@ -10,7 +10,7 @@ B = "${WORKDIR}/build"
 # Don't need any specific dependencies for this
 DEPENDS = ""
 
-COMPATIBLE_HOST_forcevariable = ".*"
+COMPATIBLE_HOST:forcevariable = ".*"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/"
 
@@ -27,4 +27,4 @@ do_install() {
     done
 }
 
-FILES_${PN} += "${datadir}/embeddedsw"
+FILES:${PN} += "${datadir}/embeddedsw"

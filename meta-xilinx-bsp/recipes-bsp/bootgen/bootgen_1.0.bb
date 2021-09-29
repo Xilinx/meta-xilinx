@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=d526b6d0807bf263b97da1da876f39b1"
 S = "${WORKDIR}/git"
 
 DEPENDS += "openssl"
-RDEPENDS_${PN} += "openssl"
+RDEPENDS:${PN} += "openssl"
 
 REPO ?= "git://github.com/Xilinx/bootgen.git;protocol=https"
 BRANCH ?= "xlnx_rel_v2021.2"
@@ -17,7 +17,7 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '
 SRC_URI = "${REPO};${BRANCHARG}"
 
 EXTRA_OEMAKE += 'CROSS_COMPILER="${CXX}" -C ${S}'
-CXXFLAGS_append = " -std=c++0x"
+CXXFLAGS:append = " -std=c++0x"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
@@ -26,6 +26,6 @@ do_install() {
     install -Dm 0755 ${S}/bootgen ${D}${bindir}
 }
 
-FILES_${PN} = "${bindir}/bootgen"
+FILES:${PN} = "${bindir}/bootgen"
 
 BBCLASSEXTEND = "native nativesdk"

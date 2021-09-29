@@ -3,7 +3,7 @@ DESCRIPTION = "Tool to subset a system device tree"
 SECTION = "bootloader"
 LICENSE = "BSD-3-Clause"
 
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     python3-core \
     dtc \
     python3-dtc \

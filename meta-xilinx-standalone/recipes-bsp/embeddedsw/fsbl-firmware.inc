@@ -4,8 +4,8 @@ inherit xlnx-embeddedsw deploy
 
 COMPATIBLE_HOST = ".*-(elf|eabi)"
 COMPATIBLE_MACHINE = "none"
-COMPATIBLE_MACHINE_zynq = ".*"
-COMPATIBLE_MACHINE_zynqmp = ".*"
+COMPATIBLE_MACHINE:zynq = ".*"
+COMPATIBLE_MACHINE:zynqmp = ".*"
 
 # Specify a default in case boardvariant isn't available
 BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"
@@ -14,8 +14,8 @@ PACKAGE_ARCH = "${BOARDVARIANT_ARCH}"
 S = "${WORKDIR}/git"
 
 APP_DIR = "undefined"
-APP_DIR_zynq = "zynq_fsbl"
-APP_DIR_zynqmp = "zynqmp_fsbl"
+APP_DIR:zynq = "zynq_fsbl"
+APP_DIR:zynqmp = "zynqmp_fsbl"
 
 B = "${S}/lib/sw_apps/${APP_DIR}/src"
 
@@ -32,8 +32,8 @@ EXTRA_COMPILER_FLAGS = "-g -Wall -Wextra -Os -flto -ffat-lto-objects"
 ARCHIVER = "${AR}"
 
 BSP_DIR ?= "${B}/../misc/undefined"
-BSP_DIR_zynq   ?= "${B}/../misc/zynq_fsbl_bsp"
-BSP_DIR_zynqmp ?= "${B}/../misc/zynqmp_fsbl_bsp"
+BSP_DIR:zynq   ?= "${B}/../misc/zynq_fsbl_bsp"
+BSP_DIR:zynqmp ?= "${B}/../misc/zynqmp_fsbl_bsp"
 BSP_TARGETS_DIR ?= "${BSP_DIR}/psu_cortexa53_0/libsrc"
 
 # FSBL components expect AS to be CC.
@@ -47,7 +47,7 @@ def bsp_make_vars(d):
 
 EXTRA_OEMAKE = "${@bsp_make_vars(d)}"
 
-ARM_INSTRUCTION_SET_eabi_arm = "arm"
+ARM_INSTRUCTION_SET:eabi:arm = "arm"
 do_compile() {
     oe_runmake
 }

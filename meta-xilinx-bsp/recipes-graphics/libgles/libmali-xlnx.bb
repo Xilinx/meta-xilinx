@@ -9,7 +9,7 @@ ANY_OF_DISTRO_FEATURES = "x11 fbdev wayland"
 
 PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl virtual/libgbm"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 REPO ?= "git://github.com/Xilinx/mali-userspace-binaries.git;protocol=https"
 BRANCH ?= "rel-v2021.1"
@@ -27,8 +27,8 @@ SRC_URI = " \
     "
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynqmp-eg = "zynqmp-eg"
-COMPATIBLE_MACHINE_zynqmp-ev = "zynqmp-ev"
+COMPATIBLE_MACHINE:zynqmp-eg = "zynqmp-eg"
+COMPATIBLE_MACHINE:zynqmp-ev = "zynqmp-ev"
 
 PACKAGE_ARCH = "${SOC_VARIANT_ARCH}"
 
@@ -40,7 +40,7 @@ X11RDEPENDS = "libxdamage libxext libx11 libdrm libxfixes"
 X11DEPENDS = "libxdamage libxext virtual/libx11 libdrm libxfixes"
 
 # Don't install runtime dependencies for other backends unless the DISTRO supports it
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     kernel-module-mali \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', '${X11RDEPENDS}', '', d)} \
 "
@@ -129,16 +129,16 @@ ALTERNATIVE_LINK_NAME[libmali-xlnx] = "${libdir}/${MONOLITHIC_LIBMALI}"
 
 
 # Declare alternatives and corresponding library location
-ALTERNATIVE_${PN}-x11 = "libmali-xlnx"
+ALTERNATIVE:${PN}-x11 = "libmali-xlnx"
 ALTERNATIVE_TARGET_libmali-xlnx-x11[libmali-xlnx] = "${libdir}/x11/${MONOLITHIC_LIBMALI}"
 
-ALTERNATIVE_${PN}-fbdev = "libmali-xlnx"
+ALTERNATIVE:${PN}-fbdev = "libmali-xlnx"
 ALTERNATIVE_TARGET_libmali-xlnx-fbdev[libmali-xlnx] = "${libdir}/fbdev/${MONOLITHIC_LIBMALI}"
 
-ALTERNATIVE_${PN}-wayland = "libmali-xlnx"
+ALTERNATIVE:${PN}-wayland = "libmali-xlnx"
 ALTERNATIVE_TARGET_libmali-xlnx-wayland[libmali-xlnx] = "${libdir}/wayland/${MONOLITHIC_LIBMALI}"
 
-ALTERNATIVE_${PN}-headless = "libmali-xlnx"
+ALTERNATIVE:${PN}-headless = "libmali-xlnx"
 ALTERNATIVE_TARGET_libmali-xlnx-headless[libmali-xlnx] = "${libdir}/headless/${MONOLITHIC_LIBMALI}"
 
 # Set priorities according to what we prveiously defined
@@ -151,24 +151,24 @@ ALTERNATIVE_PRIORITY_libmali-xlnx-headless[libmali-xlnx] = "${@bb.utils.contains
 
 
 # Package gets renamed on the debian class, but we want to keep -xlnx
-DEBIAN_NOAUTONAME_libmali-xlnx = "1"
+DEBIAN_NOAUTONAME:libmali-xlnx = "1"
 
 # Update alternatives will actually have separate postinst scripts (one for each package)
 # This wont work for us, so we create a common postinst script and we pass that as the general
 # libmali-xlnx postinst script, but we defer execution to run on first boot (pkg_postinst_ontarget).
 # This will avoid ldconfig removing the symbolic links when creating the root filesystem.
-python populate_packages_updatealternatives_append () {
+python populate_packages_updatealternatives:append () {
     # We need to remove the 'fake' libmali-xlnx before creating any links
     libdir = d.getVar('libdir')
     common_postinst = "#!/bin/sh\nrm " + libdir + "/${MONOLITHIC_LIBMALI}\n"
     for pkg in (d.getVar('PACKAGES') or "").split():
         # Not all packages provide an alternative (e.g. ${PN}-lic)
-        postinst = d.getVar('pkg_postinst_%s' % pkg)
+        postinst = d.getVar('pkg_postinst:%s' % pkg)
         if postinst:
             old_postinst = postinst
             new_postinst = postinst.replace('#!/bin/sh','')
             common_postinst += new_postinst
-    d.setVar('pkg_postinst_ontarget_%s' % 'libmali-xlnx', common_postinst)
+    d.setVar('pkg_postinst_ontarget:%s' % 'libmali-xlnx', common_postinst)
 }
 
 
@@ -177,16 +177,16 @@ INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 INHIBIT_PACKAGE_STRIP = "1"
 INHIBIT_SYSROOT_STRIP = "1"
 
-RREPLACES_${PN} = "libegl libgles1 libglesv1-cm1 libgles2 libglesv2-2 libgbm"
-RPROVIDES_${PN} = "libegl libgles1 libglesv1-cm1 libgles2 libglesv2-2 libgbm"
-RCONFLICTS_${PN} = "libegl libgles1 libglesv1-cm1 libgles2 libglesv2-2 libgbm"
+RREPLACES:${PN} = "libegl libgles1 libglesv1-cm1 libgles2 libglesv2-2 libgbm"
+RPROVIDES:${PN} = "libegl libgles1 libglesv1-cm1 libgles2 libglesv2-2 libgbm"
+RCONFLICTS:${PN} = "libegl libgles1 libglesv1-cm1 libgles2 libglesv2-2 libgbm"
 
 # These libraries shouldn't get installed in world builds unless something
 # explicitly depends upon them.
 EXCLUDE_FROM_WORLD = "1"
-FILES_${PN} += "${libdir}/*"
+FILES:${PN} += "${libdir}/*"
 
-do_package_append() {
+do_package:append() {
 
     shlibswork_dir = d.getVar('SHLIBSWORKDIR')
     pkg_filename = d.getVar('PN') + ".list"

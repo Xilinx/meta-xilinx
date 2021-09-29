@@ -230,12 +230,12 @@
                                    tname = tname[0]+str(cpu_addr)
                                    cpu_addr += 1
                                    print( 'AVAILTUNES += \"microblaze-%s\"' % tname )
-                                   print( 'TUNE_FEATURES_tune-microblaze-%s = \"' % tname, end='' )
+                                   print( 'TUNE_FEATURES:tune-microblaze-%s = \"' % tname, end='' )
                                    for t in n.tunes.values():
                                        print( ' %s' % t, end='' )
                                    print( '\"' )
-                                   print( 'PACKAGE_EXTRA_ARCHS_tune-microblaze-%s = \"${TUNE_PKGARCH}\"' % tname )
-                                   print( 'TUNE_FEATURES_tune-%s = \"${TUNE_FEATURES_tune-microblaze-%s}\"\\n' % (n.tune_type,tname) )
+                                   print( 'PACKAGE_EXTRA_ARCHS:tune-microblaze-%s = \"${TUNE_PKGARCH}\"' % tname )
+                                   print( 'TUNE_FEATURES:tune-%s = \"${TUNE_FEATURES:tune-microblaze-%s}\"\\n' % (n.tune_type,tname) )
 
                                ";
                       };

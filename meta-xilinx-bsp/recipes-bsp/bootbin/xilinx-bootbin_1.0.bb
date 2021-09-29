@@ -58,7 +58,7 @@ def create_bif(config, attrflags, attrimage, ids, common_attr, biffd, d):
 
     return
 
-def create_versal_bif(config, attrflags, attrimage, ids, common_attr, biffd, d):
+def create:versal_bif(config, attrflags, attrimage, ids, common_attr, biffd, d):
     import re, os
     id_dict = {}
     for cfg in config:
@@ -104,7 +104,7 @@ python do_configure() {
     fp = d.getVar("BIF_FILE_PATH")
     if fp == (d.getVar('B') + '/bootgen.bif'):
         arch = d.getVar("SOC_FAMILY")
-        biffunc = {'versal':create_versal_bif, 'zynq':create_bif, 'zynqmp':create_bif}
+        biffunc = {'versal':create:versal_bif, 'zynq':create_bif, 'zynqmp':create_bif}
         biffd = open(fp, 'w')
         biffd.write("the_ROM_image:\n")
         biffd.write("{\n")
@@ -159,13 +159,13 @@ do_deploy() {
     ln -sf ${BOOTBIN_BASE_NAME}.bin ${DEPLOYDIR}/boot.bin
 }
 
-do_deploy_append_versal () {
+do_deploy:append:versal () {
 
     install -m 0644 ${B}/BOOT_bh.bin ${DEPLOYDIR}/${BOOTBIN_BASE_NAME}_bh.bin
     ln -sf ${BOOTBIN_BASE_NAME}_bh.bin ${DEPLOYDIR}/BOOT-${MACHINE}_bh.bin
 }
 
-FILES_${PN} += "/boot/BOOT.bin"
+FILES:${PN} += "/boot/BOOT.bin"
 SYSROOT_DIRS += "/boot"
 
 addtask do_deploy before do_build after do_compile

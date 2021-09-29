@@ -41,13 +41,13 @@ def qemu_target_binary(d):
         ta = "aarch64"
     return "qemu-system-%s" % ta
 
-def qemu_zynqmp_unhalt(d, multiarch):
+def qemu:zynqmp_unhalt(d, multiarch):
     if multiarch:
         return "-global xlnx,zynqmp-boot.cpu-num=0 -global xlnx,zynqmp-boot.use-pmufw=true"
     return "-device loader,addr=0xfd1a0104,data=0x8000000e,data-len=4 -device loader,addr=0xfd1a0104,data=0x8000000e,data-len=4"
 
 # For qemuboot, default setup across all machines in meta-xilinx
-QB_SYSTEM_NAME_aarch64 ?= "${@qemu_target_binary(d)}-multiarch"
+QB_SYSTEM_NAME:aarch64 ?= "${@qemu_target_binary(d)}-multiarch"
 QB_SYSTEM_NAME ?= "${@qemu_target_binary(d)}"
 QB_DEFAULT_FSTYPE ?= "cpio"
 QB_DTB ?= "${@qemu_default_dtb(d)}"

@@ -3,7 +3,7 @@ DESCRIPTION = "Xilinx specific lop files"
 SECTION = "bootloader"
 LICENSE = "BSD-3-Clause"
 
-RDEPENDS_${PN} += "lopper"
+RDEPENDS:${PN} += "lopper"
 
 SRC_URI = " \
 	file://lop-microblaze-yocto.dts \
@@ -23,5 +23,5 @@ do_install() {
 	cp ${S}/lop-xilinx-id-cpus.dts   ${D}/${datadir}/lopper/lops/.
 }
 
-FILES_${PN} += "${datadir}/lopper/lops"
+FILES:${PN} += "${datadir}/lopper/lops"
 BBCLASSEXTEND = "native nativesdk"

@@ -21,7 +21,7 @@ do_prep_simpleimage () {
     done
 }
 
-do_deploy_append () {
+do_deploy:append () {
     for type in ${KERNEL_IMAGETYPES} ; do
         if [ -z "${type##*simpleImage*}" ] && [ ${ARCH} = "microblaze" ]; then
             base_name=${type}-${KERNEL_IMAGE_NAME}

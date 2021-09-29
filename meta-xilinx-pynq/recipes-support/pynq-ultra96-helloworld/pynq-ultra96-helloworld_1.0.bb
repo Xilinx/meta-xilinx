@@ -3,7 +3,7 @@ LICENSE = "BSD"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f9990fcc34ccf1f82ccf1bc5a1cc3bfc"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
 	python3-pynq \
 	python3-pillow \
 	libstdc++ \

@@ -1,4 +1,4 @@
 MICROBLAZEPATCHES = ""
-MICROBLAZEPATCHES_microblaze = "gdb-microblaze.inc"
+MICROBLAZEPATCHES:microblaze = "gdb-microblaze.inc"
 
 require ${MICROBLAZEPATCHES}

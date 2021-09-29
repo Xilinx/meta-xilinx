@@ -8,17 +8,17 @@ python () {
 # include the existing qemu-helper-native
 require recipes-devtools/qemu/qemu-helper-native_1.0.bb
 # get the path to tunctl.c (from oe-core!)
-FILESEXTRAPATHS_prepend := "${COREBASE}/meta/recipes-devtools/qemu/qemu-helper:"
+FILESEXTRAPATHS:prepend := "${COREBASE}/meta/recipes-devtools/qemu/qemu-helper:"
 
 # provide it, to replace the existing
 PROVIDES += "qemu-helper-native"
 
 # replace qemu with qemu-xilinx
-DEPENDS_remove = "qemu-system-native"
-DEPENDS_append = " \
+DEPENDS:remove = "qemu-system-native"
+DEPENDS:append = " \
 		qemu-xilinx-system-native \
 		qemu-xilinx-multiarch-helper-native \
 		"
 
-RDEPENDS_${PN}_remove = "qemu-system-native"
-RDEPENDS_${PN}_append = " qemu-xilinx-system-native"
+RDEPENDS:${PN}:remove = "qemu-system-native"
+RDEPENDS:${PN}:append = " qemu-xilinx-system-native"

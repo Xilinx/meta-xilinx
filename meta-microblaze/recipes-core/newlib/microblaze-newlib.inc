@@ -1,6 +1,6 @@
 # Add MicroBlaze Patches
-FILESEXTRAPATHS_append_microblaze := ":${THISDIR}/files"
-SRC_URI_append_microblaze = " \
+FILESEXTRAPATHS:append:microblaze := ":${THISDIR}/files"
+SRC_URI:append:microblaze = " \
     file://0001-Patch-microblaze-Add-config-microblaze.mt-for-target.patch \
     file://0002-Patch-microblaze-Modified-_exceptional_handler.patch \
     file://0003-LOCAL-Add-missing-declarations-for-xil_printf-to-std.patch \

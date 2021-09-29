@@ -22,8 +22,8 @@ python () {
 }
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynq = ".*"
-COMPATIBLE_MACHINE_zynqmp = ".*"
+COMPATIBLE_MACHINE:zynq = ".*"
+COMPATIBLE_MACHINE:zynqmp = ".*"
 
 inherit deploy image-wic-utils
 
@@ -81,13 +81,13 @@ def uenv_populate(d):
     return env
 
 # bootargs, default to booting with the rootfs device being partition 2
-KERNEL_BOOTARGS_zynq = "earlyprintk console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootwait"
-KERNEL_BOOTARGS_zynqmp = "earlycon clk_ignore_unused root=/dev/mmcblk${sdbootdev}p2 rw rootwait"
+KERNEL_BOOTARGS:zynq = "earlyprintk console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootwait"
+KERNEL_BOOTARGS:zynqmp = "earlycon clk_ignore_unused root=/dev/mmcblk${sdbootdev}p2 rw rootwait"
 
-KERNEL_LOAD_ADDRESS_zynq = "0x2080000"
-KERNEL_LOAD_ADDRESS_zynqmp = "0x200000"
-DEVICETREE_LOAD_ADDRESS_zynq = "0x2000000"
-DEVICETREE_LOAD_ADDRESS_zynqmp = "0x4000000"
+KERNEL_LOAD_ADDRESS:zynq = "0x2080000"
+KERNEL_LOAD_ADDRESS:zynqmp = "0x200000"
+DEVICETREE_LOAD_ADDRESS:zynq = "0x2000000"
+DEVICETREE_LOAD_ADDRESS:zynqmp = "0x4000000"
 
 python do_compile() {
     env = uenv_populate(d)
@@ -96,7 +96,7 @@ python do_compile() {
             f.write("{0}={1}\n".format(k, v))
 }
 
-FILES_${PN} += "/boot/uEnv.txt"
+FILES:${PN} += "/boot/uEnv.txt"
 
 do_install() {
 	install -Dm 0644 ${WORKDIR}/uEnv.txt ${D}/boot/uEnv.txt
