@@ -6,7 +6,7 @@ PLATFORM_BOARD_DIR ?= ""
 PLATFORM_BOARD_DIR:zynq = "board/xilinx/zynq"
 PLATFORM_BOARD_DIR:zynqmp = "board/xilinx/zynqmp"
 
-do:zynq_platform_init() {
+do_zynq_platform_init() {
 	for f in ${PLATFORM_INIT_FILES}; do
 		if [ -d "${S}/${PLATFORM_BOARD_DIR}/custom_hw_platform" ]; then
 			cp ${PLATFORM_INIT_STAGE_DIR}/$f ${S}/${PLATFORM_BOARD_DIR}/custom_hw_platform/
@@ -48,7 +48,7 @@ python () {
             # force the dependency on a recipe that provides the platform init files
             d.appendVar("DEPENDS", " virtual/xilinx-platform-init")
             # setup task to modify platform init after unpack and prepare_recipe_sysroot, and before configure
-            bb.build.addtask("do:zynq_platform_init", "do_configure", "do_unpack do_prepare_recipe_sysroot", d)
+            bb.build.addtask("do_zynq_platform_init", "do_configure", "do_unpack do_prepare_recipe_sysroot", d)
 
     if "boot.bin" not in d.getVar("SPL_BINARY"):
         # not deploying the boot.bin, just building SPL
