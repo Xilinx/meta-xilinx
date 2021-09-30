@@ -100,13 +100,15 @@ cortex_a53_linux() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 MACHINE = "${machine}-generic"
 # Override the SYSTEM_DTFILE for Linux builds
-SYSTEM_DTFILE = "${CONFIG_DTFILE}"
+SYSTEM_DTFILE_linux = "\${CONFIG_DTFILE}"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE_${machine}-generic = ""
 # We need u-boot to use the one we passed in
 DEVICE_TREE_NAME:pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+# Remap boot files to ensure the right device tree is listed first
+IMAGE_BOOT_FILES = "devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))} \${@get_default_image_boot_files(d)}"
 EOF
 }
 
@@ -229,13 +231,15 @@ cortex_a72_linux() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 MACHINE = "${machine}-generic"
 # Override the SYSTEM_DTFILE for Linux builds
-SYSTEM_DTFILE = "${CONFIG_DTFILE}"
+SYSTEM_DTFILE_linux = "\${CONFIG_DTFILE}"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE_${machine}-generic = ""
 # We need u-boot to use the one we passed in
 DEVICE_TREE_NAME:pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+# Remap boot files to ensure the right device tree is listed first
+IMAGE_BOOT_FILES = "devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))} \${@get_default_image_boot_files(d)}"
 EOF
 }
 
