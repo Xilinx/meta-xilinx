@@ -46,18 +46,20 @@ however you may use any path you wish.
 
 To enable this, add the following to your local.conf:
 
+# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere
+BASE_TMPDIR = "${TOPDIR}"
 require conf/cortexa53-zynqmp-linux.conf
 SYSTEM_DTFILE = "/proj/yocto/zu_sdt/system-top.dts"
 BBMULTICONFIG += " cortexa53-zynqmp-fsbl-baremetal cortexa53-zynqmp-baremetal cortexa53-zynqmp-freertos cortexr5-zynqmp-fsbl-baremetal cortexr5-zynqmp-baremetal cortexr5-zynqmp-freertos microblaze-pmu"
 FSBL_DEPENDS = ""
 FSBL_MCDEPENDS = "mc::cortexa53-zynqmp-fsbl-baremetal:fsbl-firmware:do_deploy"
-FSBL_DEPLOY_DIR = "${TOPDIR}/tmp-cortexa53-zynqmp-fsbl-baremetal/deploy/images/${MACHINE}"
+FSBL_DEPLOY_DIR = "${BASE_TMPDIR}/tmp-cortexa53-zynqmp-fsbl-baremetal/deploy/images/${MACHINE}"
 R5FSBL_DEPENDS = ""
 R5FSBL_MCDEPENDS = "mc::cortexr5-zynqmp-fsbl-baremetal:fsbl-firmware:do_deploy"
-R5FSBL_DEPLOY_DIR = "${TOPDIR}/tmp-cortexr5-zynqmp-fsbl-baremetal/deploy/images/${MACHINE}"
+R5FSBL_DEPLOY_DIR = "${BASE_TMPDIR}/tmp-cortexr5-zynqmp-fsbl-baremetal/deploy/images/${MACHINE}"
 PMU_DEPENDS = ""
 PMU_MCDEPENDS = "mc::microblaze-pmu:pmu-firmware:do_deploy"
-PMU_FIRMWARE_DEPLOY_DIR = "${TOPDIR}/tmp-microblaze-pmu/deploy/images/${MACHINE}"
+PMU_FIRMWARE_DEPLOY_DIR = "${BASE_TMPDIR}/tmp-microblaze-pmu/deploy/images/${MACHINE}"
 
 #
 # OR
@@ -70,15 +72,17 @@ PMU_FIRMWARE_DEPLOY_DIR = "${TOPDIR}/tmp-microblaze-pmu/deploy/images/${MACHINE}
 
 To enable this, add the following to your local.conf:
 
+# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere
+BASE_TMPDIR = "${TOPDIR}"
 require conf/cortexa72-versal-linux.conf
 SYSTEM_DTFILE = "/proj/yocto/mhatle/DTB-FLOW/testing/vck190-sdt/system-top.dts"
 BBMULTICONFIG += " cortexa72-versal-baremetal cortexa72-versal-freertos microblaze-pmc microblaze-psm cortexr5-versal-baremetal cortexr5-versal-freertos"
 PLM_DEPENDS = ""
 PLM_MCDEPENDS = "mc::microblaze-pmc:plm-firmware:do_deploy"
-PLM_DEPLOY_DIR = "${TOPDIR}/tmp-microblaze-pmc/deploy/images/${MACHINE}"
+PLM_DEPLOY_DIR = "${BASE_TMPDIR}/tmp-microblaze-pmc/deploy/images/${MACHINE}"
 PSM_DEPENDS = ""
 PSM_MCDEPENDS = "mc::microblaze-psm:psm-firmware:do_deploy"
-PSM_FIRMWARE_DEPLOY_DIR = "${TOPDIR}/tmp-microblaze-psm/deploy/images/${MACHINE}"
+PSM_FIRMWARE_DEPLOY_DIR = "${BASE_TMPDIR}/tmp-microblaze-psm/deploy/images/${MACHINE}"
 PDI_PATH = "__PATH TO PDI FILE HERE__"
 
 # NOTE: On versal, you MUST specify the PDI file as directed by the instructions.
