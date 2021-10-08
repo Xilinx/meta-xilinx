@@ -25,6 +25,8 @@ SRC_URI = "${REPO};${BRANCHARG}"
 SRC_URI:append = " file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch \
 		   file://0001-Add-enable-disable-udev.patch \
 "
+SRC_URI:remove:class-target = " file://cross.patch"
+SRC_URI:remove:class-nativesdk = " file://cross.patch"
 
 S = "${WORKDIR}/git"
 
