@@ -47,7 +47,7 @@ COMPATIBLE_MACHINE:versal = ".*"
 # Use DEFCONFIGs for configuring linux-xlnx kernels
 KCONFIG_MODE ?= "alldefconfig"
 KBUILD_DEFCONFIG:zynqmp ?= "xilinx_defconfig"
-KBUILD_DEFCONFIG:zynq ?= "xilinx:zynq_defconfig"
+KBUILD_DEFCONFIG:zynq ?= "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG:microblaze ?= "mmu_defconfig"
 KBUILD_DEFCONFIG:versal ?= "xilinx_defconfig"
 
