@@ -2,7 +2,7 @@ UBOOT_VERSION = "v2021.01"
 
 UBRANCH ?= "xlnx_rebase_v2021.01"
 
-SRCREV = "e63e7576653d7ac4b9b6794e56ff6f3dd2fbfb8a"
+SRCREV = "63b6d260dbe64a005407439e2caeb32da9025954"
 
 include u-boot-xlnx.inc
 include u-boot-spl-zynq-init.inc
