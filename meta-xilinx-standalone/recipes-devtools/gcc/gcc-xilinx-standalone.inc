@@ -1,4 +1,4 @@
-EXTRA_OECONF:append_xilinx-standalone = " \
+EXTRA_OECONF:append:xilinx-standalone = " \
 	--disable-libstdcxx-pch \
 	--with-newlib \
 	--disable-threads \
@@ -7,7 +7,7 @@ EXTRA_OECONF:append_xilinx-standalone = " \
 	--disable-libitm \
 "
 
-EXTRA_OECONF:append_xilinx-standalone:aarch64 = " \
+EXTRA_OECONF:append:xilinx-standalone:aarch64 = " \
 	--disable-multiarch \
 	--with-arch=armv8-a \
 	"
@@ -16,16 +16,16 @@ EXTRA_OECONF:append_xilinx-standalone:aarch64 = " \
 # So only set rmprofile if armrm is defined.
 ARM_PROFILE = "aprofile"
 ARM_PROFILE:armrm = "rmprofile"
-EXTRA_OECONF:append_xilinx-standalone:arm = " \
+EXTRA_OECONF:append:xilinx-standalone:arm = " \
 	--with-multilib-list=${ARM_PROFILE} \
 	"
 
-EXTRA_OECONF:append_xilinx-standalone:armrm = " \
+EXTRA_OECONF:append:xilinx-standalone:armrm = " \
 	--disable-tls \
 	--disable-decimal-float \
 	"
 
-EXTRA_OECONF:append_xilinx-standalone:microblaze = " \
+EXTRA_OECONF:append:xilinx-standalone:microblaze = " \
 	--enable-target-optspace \
 	--without-long-double-128 \
 	"

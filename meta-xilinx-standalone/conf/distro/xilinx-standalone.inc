@@ -29,8 +29,8 @@ COMPATOS:class-target = ".*-linux${LIBCEXTENSION}${ABIEXTENSION}"
 COMPATIBLE_HOST ?= "${COMPATOS}"
 
 # Clear defaults
-DISTRO_FEATURES_BACKFILL_xilinx-standalone = ""
-VIRTUAL-RUNTIME_init_manager_xilinx-standalone = ""
+DISTRO_FEATURES_BACKFILL:xilinx-standalone = ""
+VIRTUAL-RUNTIME_init_manager:xilinx-standalone = ""
 
 PREFERRED_PROVIDER_virtual/kernel = "linux-dummy"
 

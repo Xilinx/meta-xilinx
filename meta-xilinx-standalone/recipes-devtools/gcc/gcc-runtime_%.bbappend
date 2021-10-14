@@ -2,7 +2,7 @@ require gcc-configure-xilinx-standalone.inc
 
 COMPATIBLE_HOST = "${HOST_SYS}"
 
-EXTRA_OECONF:append_xilinx-standalone:class-target = " \
+EXTRA_OECONF:append:xilinx-standalone:class-target = " \
 	--disable-libstdcxx-pch \
 	--with-newlib \
 	--disable-threads \
@@ -11,7 +11,7 @@ EXTRA_OECONF:append_xilinx-standalone:class-target = " \
 	--disable-libitm \
 "
 
-EXTRA_OECONF:append_xilinx-standalone:aarch64:class-target = " \
+EXTRA_OECONF:append:xilinx-standalone:aarch64:class-target = " \
 	--disable-multiarch \
 	--with-arch=armv8-a \
 	"
@@ -21,16 +21,16 @@ EXTRA_OECONF:append_xilinx-standalone:aarch64:class-target = " \
 ARM_PROFILE = "aprofile"
 ARM_PROFILE:armrm = "rmprofile"
 
-EXTRA_OECONF:append_xilinx-standalone:arm:class-target = " \
+EXTRA_OECONF:append:xilinx-standalone:arm:class-target = " \
 	--with-multilib-list=${ARM_PROFILE} \
 	"
 
-EXTRA_OECONF:append_xilinx-standalone:armrm:class-target = " \
+EXTRA_OECONF:append:xilinx-standalone:armrm:class-target = " \
 	--disable-tls \
 	--disable-decimal-float \
 	"
 
-EXTRA_OECONF:append_xilinx-standalone:microblaze:class-target = " \
+EXTRA_OECONF:append:xilinx-standalone:microblaze:class-target = " \
 	--enable-target-optspace \
 	--without-long-double-128 \
 	"
@@ -38,9 +38,9 @@ EXTRA_OECONF:append_xilinx-standalone:microblaze:class-target = " \
 # Changes local to gcc-runtime...
 
 # Dont build libitm, etc.
-RUNTIMETARGET_xilinx-standalone:class-target = "libstdc++-v3"
+RUNTIMETARGET:xilinx-standalone:class-target = "libstdc++-v3"
 
-do_install:append_xilinx-standalone:class-target() {
+do_install:append:xilinx-standalone:class-target() {
 	# Fixup what gcc-runtime normally would do, we don't want linux directories!
 	rm -rf ${D}${includedir}/c++/${BINV}/${TARGET_ARCH}${TARGET_VENDOR}-linux
 
@@ -69,6 +69,6 @@ do_install:append_xilinx-standalone:class-target() {
 	fi
 }
 
-FILES:${PN}-dbg:append_xilinx-standalone:class-target = "\
+FILES:${PN}-dbg:append:xilinx-standalone:class-target = "\
     ${libdir}/libstdc++.a-gdb.py \
 "

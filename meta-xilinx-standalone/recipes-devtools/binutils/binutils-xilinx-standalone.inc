@@ -1,7 +1,7 @@
-LDGOLD_xilinx-standalone = ""
-LDGOLD_ALTS_xilinx-standalone = ""
+LDGOLD:xilinx-standalone = ""
+LDGOLD_ALTS:xilinx-standalone = ""
 
-EXTRA_OECONF:append_xilinx-standalone = " \
+EXTRA_OECONF:append:xilinx-standalone = " \
 	--disable-gprof \
 	--disable-shared \
 	--enable-lto \
@@ -10,10 +10,10 @@ EXTRA_OECONF:append_xilinx-standalone = " \
 "
 
 # CortexR5 and 32-bit arm are both "arm"
-EXTRA_OECONF:append_xilinx-standalone:arm = " \
+EXTRA_OECONF:append:xilinx-standalone:arm = " \
 	--enable-interwork \
 "
 
-EXTRA_OECONF:append_xilinx-standalone:microblaze = " \
+EXTRA_OECONF:append:xilinx-standalone:microblaze = " \
 	--disable-initfini-array \
 "
