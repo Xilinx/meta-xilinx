@@ -46,9 +46,9 @@ def get_xlnx_cmake_processor(tune, machine, d):
     cmake_processor = tune
     if tune.startswith('microblaze'):
         if (machine == 'microblaze-pmu'):
-            cmake_processor = 'pmu:microblaze'
+            cmake_processor = 'pmu_microblaze'
         elif (machine == 'microblaze-plm'):
-            cmake_processor = 'plm:microblaze'
+            cmake_processor = 'plm_microblaze'
         else:
             cmake_processor = 'microblaze'
     elif (tune in [ 'cortexr5', 'cortexr5f' ]):
@@ -65,7 +65,7 @@ XLNX_CMAKE_MACHINE = "${@get_xlnx_cmake_machine(d.getVar('SOC_FAMILY'), d)}"
 XLNX_CMAKE_PROCESSOR = "${@get_xlnx_cmake_processor(d.getVar('DEFAULTTUNE'), d.getVar('ESW_MACHINE'), d)}"
 XLNX_CMAKE_SYSTEM_NAME ?= "Generic"
 
-cmake_do_generate_toolchain_file_append() {
+cmake_do_generate_toolchain_file:append() {
     cat >> ${WORKDIR}/toolchain.cmake <<EOF
     include(CMakeForceCompiler)
     CMAKE_FORCE_C_COMPILER("${OECMAKE_C_COMPILER}" GNU)

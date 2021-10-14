@@ -4,14 +4,14 @@ ESW_COMPONENT_SRC = "/ThirdParty/sw_services/lwip211/src/"
 ESW_COMPONENT_NAME = "liblwip211.a"
 
 DEPENDS += "libxil"
-DEPENDS:append_xilinx-freertos = "freertos10-xilinx"
+DEPENDS:append:xilinx-freertos = "freertos10-xilinx"
 
 EXTRA_OECMAKE += "-Dlwip_api_mode=RAW_API"
 EXTRA_OECMAKE += "-Dlwip_dhcp_does_arp_check=ON"
 EXTRA_OECMAKE += "-Dlwip_dhcp=ON"
 EXTRA_OECMAKE += "-Dlwip_pbuf_pool_size=2048"
 EXTRA_OECMAKE += "-Dlwip_ipv6_enable=OFF"
-EXTRA_OECMAKE:append_xilinx-freertos += "-Dlwip_api_mode=SOCKET_API"
+EXTRA_OECMAKE:append:xilinx-freertos += "-Dlwip_api_mode=SOCKET_API"
 
 do_configure:prepend() {
     # This script should also not rely on relative paths and such
