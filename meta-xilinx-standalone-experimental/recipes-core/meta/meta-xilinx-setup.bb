@@ -45,6 +45,9 @@ do_populate_sdk[stamp-extra-info] = "${PACKAGE_ARCH}"
 
 REAL_MULTIMACH_TARGET_SYS = "none"
 
+# Needed to ensure README-setup and dt-processor.sh are available
+addtask do_populate_sdk after do_unpack
+
 create_sdk_files_append () {
 	install -m 0644 ${WORKDIR}/README-setup ${SDK_OUTPUT}/${SDKPATH}/.
 	install -m 0755 ${WORKDIR}/dt-processor.sh ${SDK_OUTPUT}/${SDKPATH}/.

@@ -17,11 +17,11 @@ RDEPENDS_${PN} += " \
     python3-humanfriendly \
 "
 
-SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master"
+SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=v0.2021.x"
 
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=8e5f5f691f01c9fdfa7a7f2d535be619"
 
-SRCREV = "d2fedbb72c7e54bfb1f823cb17b28b69970b2808"
+SRCREV = "b17818f1e5f979fa1fee4452085139b15d65074d"
 
 S = "${WORKDIR}/git"
 

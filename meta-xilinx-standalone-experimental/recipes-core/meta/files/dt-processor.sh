@@ -100,13 +100,15 @@ cortex_a53_linux() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 MACHINE = "${machine}-generic"
 # Override the SYSTEM_DTFILE for Linux builds
-SYSTEM_DTFILE = "${CONFIG_DTFILE}"
+SYSTEM_DTFILE_linux = "\${CONFIG_DTFILE}"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE_${machine}-generic = ""
 # We need u-boot to use the one we passed in
 DEVICE_TREE_NAME_pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+# Remap boot files to ensure the right device tree is listed first
+IMAGE_BOOT_FILES = "devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))} \${@get_default_image_boot_files(d)}"
 EOF
 }
 
@@ -135,7 +137,7 @@ cortex_a53_baremetal() {
   fi
   if [ $1 = "fsbl" ]; then
     fsbl_mcdepends="mc::${dtb_file%%.dtb}:fsbl-firmware:do_deploy"
-    fsbl_deploy_dir="\${TOPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
+    fsbl_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
   fi
 
   # Build device tree
@@ -152,7 +154,7 @@ CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexa53-${machine}"
 DEFAULTTUNE = "cortexa53"
 
-TMPDIR = "\${TOPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 
 DISTRO = "$yocto_distro"
 
@@ -190,7 +192,7 @@ CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexa53-${machine}"
 DEFAULTTUNE = "cortexa53"
 
-TMPDIR = "\${TOPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 
 DISTRO = "xilinx-freertos"
 
@@ -229,13 +231,15 @@ cortex_a72_linux() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 MACHINE = "${machine}-generic"
 # Override the SYSTEM_DTFILE for Linux builds
-SYSTEM_DTFILE = "${CONFIG_DTFILE}"
+SYSTEM_DTFILE_linux = "\${CONFIG_DTFILE}"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE_${machine}-generic = ""
 # We need u-boot to use the one we passed in
 DEVICE_TREE_NAME_pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+# Remap boot files to ensure the right device tree is listed first
+IMAGE_BOOT_FILES = "devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))} \${@get_default_image_boot_files(d)}"
 EOF
 }
 
@@ -268,7 +272,7 @@ CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexa72-${machine}"
 DEFAULTTUNE = "cortexa72"
 
-TMPDIR = "\${TOPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 
 DISTRO = "xilinx-standalone-nolto"
 
@@ -306,7 +310,7 @@ CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexa72-${machine}"
 DEFAULTTUNE = "cortexa72"
 
-TMPDIR = "\${TOPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 
 DISTRO = "xilinx-freertos"
 
@@ -342,7 +346,7 @@ cortex_r5_baremetal() {
 
   if [ $1 = "fsbl" ]; then
     r5fsbl_mcdepends="mc::${dtb_file%%.dtb}:fsbl-firmware:do_deploy"
-    r5fsbl_deploy_dir="\${TOPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
+    r5fsbl_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
   fi
   # Build device tree
   mkdir -p dtb
@@ -358,7 +362,7 @@ CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexr5-${machine}"
 DEFAULTTUNE = "cortexr5f"
 
-TMPDIR = "\${TOPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 
 DISTRO = "$yocto_distro"
 
@@ -396,7 +400,7 @@ CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexr5-${machine}"
 DEFAULTTUNE = "cortexr5f"
 
-TMPDIR = "\${TOPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 
 DISTRO = "xilinx-freertos"
 
@@ -429,7 +433,7 @@ pmu-microblaze() {
   distro="multiconfig/includes/microblaze-pmu-distro.conf"
 
   pmu_mcdepends="mc::${dtb_file%%.dtb}:pmu-firmware:do_deploy"
-  pmu_firmware_deploy_dir="\${TOPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
+  pmu_firmware_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
 
   # Build device tree
   mkdir -p dtb
@@ -450,7 +454,7 @@ TUNE_FEATURES_tune-microblaze_forcevariable = "\${TUNE_FEATURES_tune-pmu-microbl
 
 TARGET_CFLAGS += "-DPSU_PMU=1U"
 
-TMPDIR = "\${TOPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 
 DISTRO = "xilinx-standalone"
 
@@ -468,7 +472,7 @@ pmc-microblaze() {
   distro="multiconfig/includes/microblaze-pmc-distro.conf"
 
   plm_mcdepends="mc::${dtb_file%%.dtb}:plm-firmware:do_deploy"
-  plm_deploy_dir="\${TOPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
+  plm_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
 
   # Build device tree
   mkdir -p dtb
@@ -489,7 +493,7 @@ TUNE_FEATURES_tune-microblaze_forcevariable = "\${TUNE_FEATURES_tune-pmc-microbl
 
 TARGET_CFLAGS += "-DVERSAL_PLM=1"
 
-TMPDIR = "\${TOPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 
 DISTRO = "xilinx-standalone"
 
@@ -507,7 +511,7 @@ psm-microblaze() {
   distro="multiconfig/includes/microblaze-psm-distro.conf"
 
   psm_mcdepends="mc::${dtb_file%%.dtb}:psm-firmware:do_deploy"
-  psm_firmware_deploy_dir="\${TOPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
+  psm_firmware_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
 
   # Build device tree
   mkdir -p dtb
@@ -528,7 +532,7 @@ TUNE_FEATURES_tune-microblaze_forcevariable = "\${TUNE_FEATURES_tune-psm-microbl
 
 TARGET_CFLAGS += "-DVERSAL_psm=1"
 
-TMPDIR = "\${TOPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 
 DISTRO = "xilinx-standalone"
 
@@ -703,6 +707,8 @@ rm cpu-list.tmp
 
 echo "To enable this, add the following to your local.conf:"
 echo
+echo '# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere'
+echo 'BASE_TMPDIR = "${TOPDIR}"'
 if [ -n "${system_conf}" ]; then
   echo "require ${system_conf}"
 fi
