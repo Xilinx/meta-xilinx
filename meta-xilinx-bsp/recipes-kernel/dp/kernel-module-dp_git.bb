@@ -11,7 +11,7 @@ S = "${WORKDIR}/git"
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/xilinx/dp-modules.git;protocol=https"
-SRCREV ?= "46d4790c3d37ad4b878c5a1704df26edb56314f5"
+SRCREV ?= "a2e918016fa22902d58c862afe4a76efe09c6610"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
