@@ -1,102 +1,132 @@
 #! /bin/bash
 
-if [ $# -lt 2 ]; then
-  echo "Usage:"
-  echo "  $0 <conf_dir> <system_dtb> [<overlay_dtb>] [<external_fpga>] [<machine_type>]"
-  echo
-  echo "  conf_dir - location for the build conf directory"
-  echo "  system_dtb - Full patch to the system dtb"
-  echo "  overlay_dtb - To generate overlay dts"
-  echo "  external_fpga - Flag to apply partial overlay"
-  echo "  machine_type - zynq, zynqmp or versal"
-  echo
-  exit 1
-fi
+# Copyright (c) 2021 Xilinx Inc
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
 
-if [ ! -f $1/local.conf ]; then
-  echo "$1 does not look like a conf directory."
-  exit 1
-fi
-conf_dir=$1
+# This script configures the Yocto Project build system for use with the System
+# Device Tree workflow when building for a Xilinx FPGA, such as the ZynqMP or
+# Versal.
 
-if [ ! -f $2 ]; then
-  echo "Unable to find $2." >&2
-  exit 1
-fi
-dtb=$2
+error() { echo "ERROR: $1" >&2; exit 1; }
 
-# Default is no overlay
-overlay_dtb=false
-external_fpga=false
-if [ ! -f $3 ]; then
-  if [ ! -f $4 ]; then
-    overlay_dtb=true
-    external_fpga=true
-    machine=$5
-  else
-    overlay_dtb=true
-    machine=$4
-  fi
-else
-  # We'll autodetect if blank (later)
-  machine=$3
-fi
+warn() { echo "WARNING: $1"; }
 
-lopper=$(which lopper.py)
+info() { echo "INFO: $1"; }
 
-if [ -z "$lopper" ]; then
-  echo "Unable to find lopper.py, did you source the prestep environment file?" >&2
-  exit 1
-fi
+usage() {
+  cat <<EOF
+$0
+    -c <config_dir>         Location of the build conf directory
+    -s <system_dtb>         Full path to system DTB
+    -d <domain_file>        Full path to domain file (.yml/.dts)
+    [-o <overlay_dtb>]      Generate overlay dts
+    [-e <external_fpga>]    Apply a partial overlay
+    [-m <machine>]          zynqmp or versal
 
-lops_dir=$(dirname $(dirname $lopper))/share/lopper/lops
-embeddedsw=$(dirname $(dirname $lopper))/share/embeddedsw
+EOF
+  exit
+}
 
-system_conf=""
-multiconf=""
+parse_args() {
+  [ $# -eq 0 ] && usage
+
+  while getopts ":c:s:d:o:e:m:h" opt; do
+    case ${opt} in
+      c) config_dir=$OPTARG ;;
+      s) system_dtb=$OPTARG ;;
+      o) overlay_dtb=$OPTARG ;;
+      d) domain_file=$OPTARG ;;
+      e) external_fpga=$OPTARG ;;
+      m) machine=$OPTARG ;;
+      h) usage ;;
+      :) error "Missing argument for -$OPTARG" ;;
+      \?) error "Invalid option -$OPTARG"
+    esac
+  done
+
+  [ -f "${config_dir}/local.conf" ] || error "Invalid config dir: ${config_dir}"
+  [ -f "${system_dtb}" ] || error "Unable to find: ${system_dtb}"
+}
 
 detect_machine() {
-  # Lets identify the system type first.  We can use PSM/PMC/PMU for this...
-  while read cpu domain os_hint ; do
-    case ${cpu} in
-      pmu-microblaze)
-        machine="zynqmp"
-        return
-        ;;
-      pmc-microblaze | psm-microblaze)
-        machine="versal"
-        return
-        ;;
-    esac
-  done < cpu-list.tmp
-  echo "ERROR: Unable to auto-detect the machine type."
-  exit 1
+  if [ -z "${machine}" ]; then
+    # Identify the system type first using PSM/PMC/PMU
+    while read -r cpu domain os_hint; do
+      case ${cpu} in
+        pmu-microblaze)
+          machine="zynqmp" ;;
+        pmc-microblaze | psm-microblaze)
+          machine="versal" ;;
+      esac
+    done <cpu-list.tmp
+  fi
+
+  # Machine not provided and we cannot identify..
+  [ -z ${machine} ] && \
+    error "Unable to autodetect machine type, use -m to specify the machine."
+
+  case ${machine} in
+    zynqmp | versal) : ;;
+    *) error "Invalid machine type ${machine}; please choose zynqmp or versal"
+  esac
 }
 
 cortex_a53_linux() {
-  if [ $1 = "None" ]; then
+  info "coretex-a53 for Linux [ $1 ]"
+
+  if [ "$1" = "None" ]; then
     dtb_file="cortexa53-${machine}-linux.dtb"
     system_conf=conf/cortexa53-${machine}-linux.conf
     conf_file=cortexa53-${machine}-linux.conf
   else
-    dtb_file="cortexa53-${machine}-${1}-linux.dtb"
+    dtb_file="cortexa53-${machine}-$1-linux.dtb"
     multiconf="${multiconf} cortexa53-${machine}-linux"
-    conf_file=multiconfig/cortexa53-${machine}-${1}-linux.conf
+    conf_file=multiconfig/cortexa53-${machine}-$1-linux.conf
   fi
 
-  mkdir -p dtb
   # Check if it is overlay dts otherwise just create linux dtb
-  if [ ${overlay_dtb} = "true" ]; then
-    if [ ${external_fpga} = "true" ]; then
-      (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f ${dtb} -- xlnx_overlay_dt ${machine} full; dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi && rm -f pl.dtsi)
+  (
+    cd dtb || error "Unable to cd to dtb dir"
+    if [ "${overlay_dtb}" = "true" ]; then
+      if [ "${external_fpga}" = "true" ]; then
+        LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- xlnx_overlay_dt ${machine} full \
+          || error "lopper.py failed"
+      else
+        LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dtb}" -- xlnx_overlay_dt ${machine} partial \
+          || error "lopper.py failed"
+      fi
+      dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi || error "dtc failed"
+    elif [ -n "${domain_file}" ]; then
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+        -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" \
+        -i "${lops_dir}/lop-domain-linux-a53.dts" "${system_dtb}" "${dtb_file}" \
+        || error "lopper.py failed"
     else
-      (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py ${dtb} -- xlnx_overlay_dt ${machine} partial ; dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi && rm -f pl.dtsi)
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
+        -i "${lops_dir}/lop-domain-linux-a53.dts" "${system_dtb}" "${dtb_file}" \
+        || error "lopper.py failed"
     fi
-  else
-   (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${lops_dir}/lop-a53-imux.dts -i ${lops_dir}/lop-domain-linux-a53.dts ${dtb} ${dtb_file} && rm -f lop-a53-imux.dts.dtb lop-domain-linux-a53.dts.dtb)
-  fi
+    rm -f pl.dtsi lop-a53-imux.dts.dtb lop-domain-linux-a53.dts.dtb
+  )
 
-  cat << EOF > ${conf_file}
+  cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 MACHINE = "${machine}-generic"
 # Override the SYSTEM_DTFILE for Linux builds
@@ -112,51 +142,67 @@ IMAGE_BOOT_FILES = "devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))} 
 EOF
 }
 
-fsbl_done=0
+a53_fsbl_done=0
 cortex_a53_baremetal() {
-  if [ $1 = "fsbl" -a $fsbl_done != 0 ]; then
-    return
-  elif [ $1 = "fsbl" ] ; then
-    echo "Building FSBL baremetal configuration"
-    fsbl_done=1
-  fi
-  if [ $1 = "None" ]; then
-    dtb_file="cortexa53-${machine}-baremetal.dtb"
-    multiconf="${multiconf} cortexa53-${machine}-baremetal"
-    conf_file="multiconfig/cortexa53-${machine}-baremetal.conf"
-    libxil="multiconfig/includes/cortexa53-${machine}-libxil.conf"
-    distro="multiconfig/includes/cortexa53-${machine}-distro.conf"
-    yocto_distro="xilinx-standalone-nolto"
+  if [ "$1" = "fsbl" ]; then
+    [ ${a53_fsbl_done} = 1 ] && return
+    info "coretex-a53 FSBL baremetal configuration"
   else
-    dtb_file="cortexa53-${machine}-${1}-baremetal.dtb"
-    multiconf="${multiconf} cortexa53-${machine}-${1}-baremetal"
-    conf_file="multiconfig/cortexa53-${machine}-${1}-baremetal.conf"
-    libxil="multiconfig/includes/cortexa53-${machine}-${1}-libxil.conf"
-    distro="multiconfig/includes/cortexa53-${machine}-${1}-distro.conf"
-    yocto_distro="xilinx-standalone"
+    info "coretex-a53 for baremetal [ $1 ]"
   fi
-  if [ $1 = "fsbl" ]; then
+
+  suffix=""; lto="-nolto"
+  if [ "$1" != "None" ]; then
+    suffix="-$1"; lto=""
+  fi
+
+  dtb_file="cortexa53-${machine}${suffix}-baremetal.dtb"
+  multiconf="${multiconf} cortexa53-${machine}${suffix}-baremetal"
+  conf_file="multiconfig/cortexa53-${machine}${suffix}-baremetal.conf"
+  libxil="multiconfig/includes/cortexa53-${machine}${suffix}-libxil.conf"
+  distro="multiconfig/includes/cortexa53-${machine}${suffix}-distro.conf"
+  yocto_distro="xilinx-standalone${lto}"
+  if [ "$1" = "fsbl" ]; then
     fsbl_mcdepends="mc::${dtb_file%%.dtb}:fsbl-firmware:do_deploy"
     fsbl_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
+    a53_fsbl_done=1
   fi
 
   # Build device tree
-  mkdir -p dtb
-  (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${lops_dir}/lop-a53-imux.dts ${dtb} ${dtb_file} && rm -f lop-a53-imux.dts.dtb)
+  (
+    cd dtb || error "Unable to cd to dtb dir"
+    if [ -n "${domain_file}" ]; then
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+        -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" "${system_dtb}" "${dtb_file}" \
+        || error "lopper.py failed"
+    else
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
+        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    fi
+    rm -f lop-a53-imux.dts.dtb
+  )
 
   # Build baremetal multiconfig
-  mkdir -p multiconfig/includes
-  lopper.py -f ${dtb} -- baremetaldrvlist_xlnx cortexa53-${machine} $embeddedsw
-  mv libxil.conf ${libxil}
-  mv distro.conf ${distro}
-  cat << EOF > ${conf_file}
+  if [ -n "${domain_file}" ]; then
+    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" \
+      || error "lopper.py failed"
+  else
+    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" \
+      || error "lopper.py failed"
+  fi
+
+  mv libxil.conf "${libxil}"
+  mv distro.conf "${distro}"
+
+  cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexa53-${machine}"
 DEFAULTTUNE = "cortexa53"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 
-DISTRO = "$yocto_distro"
+DISTRO = "${yocto_distro}"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
@@ -164,30 +210,44 @@ EOF
 }
 
 cortex_a53_freertos() {
-  if [ $1 = "None" ]; then
-    dtb_file="cortexa53-${machine}-freertos.dtb"
-    multiconf="${multiconf} cortexa53-${machine}-freertos"
-    conf_file="multiconfig/cortexa53-${machine}-freertos.conf"
-    libxil="multiconfig/includes/cortexa53-${machine}-libxil.conf"
-    distro="multiconfig/includes/cortexa53-${machine}-distro.conf"
-  else
-    dtb_file="cortexa53-${machine}-${1}-freertos.dtb"
-    multiconf="${multiconf} cortexa53-${machine}-${1}-freertos"
-    conf_file="multiconfig/cortexa53-${machine}-${1}-freertos.conf"
-    libxil="multiconfig/includes/cortexa53-${machine}-${1}-libxil.conf"
-    distro="multiconfig/includes/cortexa53-${machine}-${1}-distro.conf"
-  fi
+  info "coretex-a53 for FreeRTOS [ $1 ]"
+
+  suffix=""
+  [ "$1" != "None" ] && suffix="-$1"
+
+  dtb_file="cortexa53-${machine}${suffix}-freertos.dtb"
+  multiconf="${multiconf} cortexa53-${machine}${suffix}-freertos"
+  conf_file="multiconfig/cortexa53-${machine}${suffix}-freertos.conf"
+  libxil="multiconfig/includes/cortexa53-${machine}${suffix}-libxil.conf"
+  distro="multiconfig/includes/cortexa53-${machine}${suffix}-distro.conf"
 
   # Build device tree
-  mkdir -p dtb
-  (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${lops_dir}/lop-a53-imux.dts ${dtb} ${dtb_file} && rm -f lop-a53-imux.dts.dtb)
+  (
+    cd dtb || error "Unable to cd to dtb dir"
+    if [ -n "${domain_file}" ]; then
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+        -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" "${system_dtb}" "${dtb_file}" \
+        || error "lopper.py failed"
+    else
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
+        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    fi
+    rm -f lop-a53-imux.dts.dtb
+  )
 
   # Build baremetal multiconfig
-  mkdir -p multiconfig/includes
-  lopper.py -f ${dtb} -- baremetaldrvlist_xlnx cortexa53-${machine} $embeddedsw
-  mv libxil.conf ${libxil}
-  mv distro.conf ${distro}
-  cat << EOF > ${conf_file}
+  if [ -n "${domain_file}" ]; then
+    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" || error "lopper.py failed"
+  else
+    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" \
+      || error "lopper.py failed"
+  fi
+
+  mv libxil.conf "${libxil}"
+  mv distro.conf "${distro}"
+
+  cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexa53-${machine}"
 DEFAULTTUNE = "cortexa53"
@@ -202,32 +262,46 @@ EOF
 }
 
 cortex_a72_linux() {
-  if [ $1 = "None" ]; then
+  info "coretex-a72 for Linux [ $1 ]"
+
+  if [ "$1" = "None" ]; then
     dtb_file="cortexa72-${machine}-linux.dtb"
     system_conf=conf/cortexa72-${machine}-linux.conf
     conf_file=cortexa72-${machine}-linux.conf
   else
-    dtb_file="cortexa72-${machine}-${1}-linux.dtb"
+    dtb_file="cortexa72-${machine}-$1-linux.dtb"
     multiconf="${multiconf} cortexa72-${machine}-linux"
-    conf_file=multiconfig/cortexa72-${machine}-${1}-linux.conf
+    conf_file=multiconfig/cortexa72-${machine}-$1-linux.conf
   fi
 
-  mkdir -p dtb
-  # Check if it is overlay dts otherwise just create linux dtb
-  if [ ${overlay_dtb} = "true" ]; then
-    # As there is no partial support on Versal, As per fpga manager implementatin there is a flag "external_fpga" which says
-    # apply overlay without loading the bit file.
-    if [ ${external_fpga} = "true" ]; then
-      (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f ${dtb} -- xlnx_overlay_dt ${machine} full external_fpga ; dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi && rm -f pl.dtsi)
+  (
+    cd dtb || error "Unable to cd to dtb dir"
+    # Check if it is overlay dts otherwise just create linux dtb
+    if [ "${overlay_dtb}" = "true" ]; then
+      # As there is no partial support on Versal, As per fpga manager implementatin there is
+      # a flag "external_fpga" which says apply overlay without loading the bit file.
+      if [ "${external_fpga}" = "true" ]; then
+        LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- xlnx_overlay_dt \
+          ${machine} full external_fpga || error "lopper.py failed"
+      else
+        # If there is no external_fpga flag, then the default is full
+        LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dtb}" -- xlnx_overlay_dt \
+          ${machine} full || error "lopper.py failed"
+      fi
+      dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi || error "dtc failed"
+    elif [ -n "${domain_file}" ]; then
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+        -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" \
+        -i "${lops_dir}/lop-domain-a72.dts" "${system_dtb}" "${dtb_file}" \
+        || error "lopper.py failed"
     else
-      # If there is no external_fpga flag, then the default is full
-      (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py ${dtb} -- xlnx_overlay_dt ${machine} full ; dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi && rm -f pl.dtsi)
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a72-imux.dts" \
+        -i "${lops_dir}/lop-domain-a72.dts" "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
     fi
-  else
-  (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${lops_dir}/lop-a72-imux.dts -i ${lops_dir}/lop-domain-a72.dts ${dtb} ${dtb_file} && rm -f lop-a72-imux.dts.dtb lop-domain-a72.dts.dtb)
-  fi
+    rm -f pl.dtsi lop-a72-imux.dts.dtb lop-domain-a72.dts.dtb
+  )
 
-  cat << EOF > ${conf_file}
+  cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 MACHINE = "${machine}-generic"
 # Override the SYSTEM_DTFILE for Linux builds
@@ -244,30 +318,44 @@ EOF
 }
 
 cortex_a72_baremetal() {
-  if [ $1 = "None" ]; then
-    dtb_file="cortexa72-${machine}-baremetal.dtb"
-    multiconf="${multiconf} cortexa72-${machine}-baremetal"
-    conf_file="multiconfig/cortexa72-${machine}-baremetal.conf"
-    libxil="multiconfig/includes/cortexa72-${machine}-libxil.conf"
-    distro="multiconfig/includes/cortexa72-${machine}-distro.conf"
-  else
-    dtb_file="cortexa72-${machine}-${1}-baremetal.dtb"
-    multiconf="${multiconf} cortexa72-${machine}-${1}-baremetal"
-    conf_file="multiconfig/cortexa72-${machine}-${1}-baremetal.conf"
-    libxil="multiconfig/includes/cortexa72-${machine}-${1}-libxil.conf"
-    distro="multiconfig/includes/cortexa72-${machine}-${1}-distro.conf"
-  fi
+  info "coretex-a72 for baremetal [ $1 ]"
+
+  suffix=""
+  [ "$1" != "None" ] && suffix="-$1"
+
+  dtb_file="cortexa72-${machine}${suffix}-baremetal.dtb"
+  multiconf="${multiconf} cortexa72-${machine}${suffix}-baremetal"
+  conf_file="multiconfig/cortexa72-${machine}${suffix}-baremetal.conf"
+  libxil="multiconfig/includes/cortexa72-${machine}${suffix}-libxil.conf"
+  distro="multiconfig/includes/cortexa72-${machine}${suffix}-distro.conf"
 
   # Build device tree
-  mkdir -p dtb
-  (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${lops_dir}/lop-a72-imux.dts ${dtb} ${dtb_file} && rm -f lop-a72-imux.dts.dtb)
+  (
+    cd dtb || error "Unable to cd to dtb dir"
+    if [ -n "${domain_file}" ]; then
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --permissive --enhanced -x '*.yaml' \
+        -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" "${system_dtb}" "${dtb_file}" \
+        || error "lopper.py failed"
+    else
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a72-imux.dts" \
+        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    fi
+    rm -f lop-a72-imux.dts.dtb
+  )
 
   # Build baremetal multiconfig
-  mkdir -p multiconfig/includes
-  lopper.py -f ${dtb} -- baremetaldrvlist_xlnx cortexa72-${machine} $embeddedsw
-  mv libxil.conf ${libxil}
-  mv distro.conf ${distro}
-  cat << EOF > ${conf_file}
+  if [ -n "${domain_file}" ]; then
+    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" || error "lopper.py failed"
+  else
+    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" \
+      || error "lopper.py failed"
+  fi
+
+  mv libxil.conf "${libxil}"
+  mv distro.conf "${distro}"
+
+  cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexa72-${machine}"
 DEFAULTTUNE = "cortexa72"
@@ -282,30 +370,44 @@ EOF
 }
 
 cortex_a72_freertos() {
-  if [ $1 = "None" ]; then
-    dtb_file="cortexa72-${machine}-freertos.dtb"
-    multiconf="${multiconf} cortexa72-${machine}-freertos"
-    conf_file="multiconfig/cortexa72-${machine}-freertos.conf"
-    libxil="multiconfig/includes/cortexa72-${machine}-libxil.conf"
-    distro="multiconfig/includes/cortexa72-${machine}-distro.conf"
-  else
-    dtb_file="cortexa72-${machine}-${1}-freertos.dtb"
-    multiconf="${multiconf} cortexa72-${machine}-${1}-freertos"
-    conf_file="multiconfig/cortexa72-${machine}-${1}-freertos.conf"
-    libxil="multiconfig/includes/cortexa72-${machine}-${1}-libxil.conf"
-    distro="multiconfig/includes/cortexa72-${machine}-${1}-distro.conf"
-  fi
+  info "coretex-a72 for FreeRTOS [ $1 ]"
+
+  suffix=""
+  [ "$1" != "None" ] && suffix="-$1"
+
+  dtb_file="cortexa72-${machine}${suffix}-freertos.dtb"
+  multiconf="${multiconf} cortexa72-${machine}${suffix}-freertos"
+  conf_file="multiconfig/cortexa72-${machine}${suffix}-freertos.conf"
+  libxil="multiconfig/includes/cortexa72-${machine}${suffix}-libxil.conf"
+  distro="multiconfig/includes/cortexa72-${machine}${suffix}-distro.conf"
 
   # Build device tree
-  mkdir -p dtb
-  (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${lops_dir}/lop-a72-imux.dts ${dtb} ${dtb_file} && rm -f lop-a72-imux.dts.dtb)
+  (
+    cd dtb || error "Unable to cd to dtb dir"
+    if [ -n "${domain_file}" ]; then
+      LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f  --permissive --enhanced -x '*.yaml' \
+        -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" "${system_dtb}" "${dtb_file}" \
+        || error "lopper.py failed"
+    else
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a72-imux.dts" \
+        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    fi
+    rm -f lop-a72-imux.dts.dtb
+  )
 
   # Build baremetal multiconfig
-  mkdir -p multiconfig/includes
-  lopper.py -f ${dtb} -- baremetaldrvlist_xlnx cortexa72-${machine} $embeddedsw
-  mv libxil.conf ${libxil}
-  mv distro.conf ${distro}
-  cat << EOF > ${conf_file}
+  if [ -n "${domain_file}" ]; then
+    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" || error "lopper.py failed"
+  else
+    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" \
+      || error "lopper.py failed"
+  fi
+
+  mv libxil.conf "${libxil}"
+  mv distro.conf "${distro}"
+
+  cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexa72-${machine}"
 DEFAULTTUNE = "cortexa72"
@@ -321,43 +423,47 @@ EOF
 
 r5_fsbl_done=0
 cortex_r5_baremetal() {
-  if [ $1 = "fsbl" -a $r5_fsbl_done != 0 ]; then
-    return
-  elif [ $1 = "fsbl" ] ; then
-    echo "Building R5 FSBL baremetal configuration"
+  if [ "$1" = "fsbl" ]; then
+    [ ${r5_fsbl_done} = 1 ] && return
+    info "coretex-r5 FSBL baremetal configuration"
+  else
+    info "coretex-r5 for baremetal [ $1 ]"
+  fi
+
+  suffix=""; lto="-nolto"
+  if [ "$1" != "None" ]; then
+    suffix="-$1"; lto=""
+  fi
+
+  dtb_file="cortexr5-${machine}${suffix}-baremetal.dtb"
+  multiconf="${multiconf} cortexr5-${machine}${suffix}-baremetal"
+  conf_file="multiconfig/cortexr5-${machine}${suffix}-baremetal.conf"
+  libxil="multiconfig/includes/cortexr5-${machine}${suffix}-libxil.conf"
+  distro="multiconfig/includes/cortexr5-${machine}${suffix}-distro.conf"
+  yocto_distro="xilinx-standalone${lto}"
+
+  if [ "$1" = "fsbl" ]; then
+    r5fsbl_mcdepends="mc::${dtb_file%%.dtb}:fsbl-firmware:do_deploy"
+    r5fsbl_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
     r5_fsbl_done=1
   fi
 
-  if [ $1 = "None" ]; then
-    dtb_file="cortexr5-${machine}-baremetal.dtb"
-    multiconf="${multiconf} cortexr5-${machine}-baremetal"
-    conf_file="multiconfig/cortexr5-${machine}-baremetal.conf"
-    libxil="multiconfig/includes/cortexr5-${machine}-libxil.conf"
-    distro="multiconfig/includes/cortexr5-${machine}-distro.conf"
-    yocto_distro="xilinx-standalone-nolto"
-  else
-    dtb_file="cortexr5-${machine}-${1}-baremetal.dtb"
-    multiconf="${multiconf} cortexr5-${machine}-${1}-baremetal"
-    conf_file="multiconfig/cortexr5-${machine}-${1}-baremetal.conf"
-    libxil="multiconfig/includes/cortexr5-${machine}-${1}-libxil.conf"
-    distro="multiconfig/includes/cortexr5-${machine}-${1}-distro.conf"
-    yocto_distro="xilinx-standalone"
-  fi
-
-  if [ $1 = "fsbl" ]; then
-    r5fsbl_mcdepends="mc::${dtb_file%%.dtb}:fsbl-firmware:do_deploy"
-    r5fsbl_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
-  fi
   # Build device tree
-  mkdir -p dtb
-  (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${lops_dir}/lop-r5-imux.dts ${dtb} ${dtb_file} && rm -f lop-r5-imux.dts.dtb)
+  (
+    cd dtb || error "Unable to cd to dtb dir"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-r5-imux.dts" \
+      "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    rm -f lop-r5-imux.dts.dtb
+  )
 
   # Build baremetal multiconfig
-  mkdir -p multiconfig/includes
-  lopper.py -f ${dtb} -- baremetaldrvlist_xlnx cortexr5-${machine} $embeddedsw
-  mv libxil.conf ${libxil}
-  mv distro.conf ${distro}
-  cat << EOF > ${conf_file}
+  ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
+    || error "lopper.py failed"
+
+  mv libxil.conf "${libxil}"
+  mv distro.conf "${distro}"
+
+  cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexr5-${machine}"
 DEFAULTTUNE = "cortexr5f"
@@ -372,30 +478,44 @@ EOF
 }
 
 cortex_r5_freertos() {
-  if [ $1 = "None" ]; then
-    dtb_file="cortexr5-${machine}-freertos.dtb"
-    multiconf="${multiconf} cortexr5-${machine}-freertos"
-    conf_file="multiconfig/cortexr5-${machine}-freertos.conf"
-    libxil="multiconfig/includes/cortexr5-${machine}-libxil.conf"
-    distro="multiconfig/includes/cortexr5-${machine}-distro.conf"
-  else
-    dtb_file="cortexr5-${machine}-${1}-freertos.dtb"
-    multiconf="${multiconf} cortexr5-${machine}-${1}-freertos"
-    conf_file="multiconfig/cortexr5-${machine}-${1}-freertos.conf"
-    libxil="multiconfig/includes/cortexr5-${machine}-${1}-libxil.conf"
-    distro="multiconfig/includes/cortexr5-${machine}-${1}-distro.conf"
-  fi
+  info "coretex-r5 for FreeRTOS [ $1 ]"
+
+  suffix=""
+  [ "$1" != "None" ] && suffix="-$1"
+
+  dtb_file="cortexr5-${machine}${suffix}-freertos.dtb"
+  multiconf="${multiconf} cortexr5-${machine}${suffix}-freertos"
+  conf_file="multiconfig/cortexr5-${machine}${suffix}-freertos.conf"
+  libxil="multiconfig/includes/cortexr5-${machine}${suffix}-libxil.conf"
+  distro="multiconfig/includes/cortexr5-${machine}${suffix}-distro.conf"
 
   # Build device tree
-  mkdir -p dtb
-  (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f --enhanced -i ${lops_dir}/lop-r5-imux.dts ${dtb} ${dtb_file} && rm -f lop-r5-imux.dts.dtb)
+  (
+    cd dtb || error "Unable to cd to dtb dir"
+    if [ -n "$domain_file" ]; then
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+        -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dtb}" "${dtb_file}" \
+        || error "lopper.py failed"
+    else
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-r5-imux.dts" \
+        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    fi
+    rm -f lop-r5-imux.dts.dtb
+  )
 
   # Build baremetal multiconfig
-  mkdir -p multiconfig/includes
-  lopper.py -f ${dtb} -- baremetaldrvlist_xlnx cortexr5-${machine} $embeddedsw
-  mv libxil.conf ${libxil}
-  mv distro.conf ${distro}
-  cat << EOF > ${conf_file}
+  if [ -n "${domain_file}" ]; then
+    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx coretexr5-${machine} "${embeddedsw}" || error "lopper.py failed"
+  else
+    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
+      || error "lopper.py failed"
+  fi
+
+  mv libxil.conf "${libxil}"
+  mv distro.conf "${distro}"
+
+  cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexr5-${machine}"
 DEFAULTTUNE = "cortexr5f"
@@ -411,21 +531,27 @@ EOF
 
 # Generate microblaze tunings
 microblaze_done=0
-# Generate microblaze tunings
-microblaze_done=0
 process_microblaze() {
-  if [ ${microblaze_done} = 0 ]; then
-    echo -n "Generating microblaze processor tunes..."
-    # Process microblaze
-    mkdir -p dtb
-    (cd dtb ; lopper.py -f --enhanced -i ${lops_dir}/lop-microblaze-yocto.dts ${dtb} && rm -f lop-microblaze-yocto.dts.dtb) > microblaze.conf
-    microblaze_done=1
-    echo "...done"
-  fi
+  [ ${microblaze_done} = 1 ] && return
+
+  info "Generating microblaze processor tunes"
+
+  (
+    cd dtb || error "Unable to cd to dtb dir"
+    ${lopper} -f --enhanced -i "${lops_dir}/lop-microblaze-yocto.dts" "${system_dtb}" \
+      || error "lopper.py failed"
+    rm -f lop-microblaze-yocto.dts.dtb
+  ) >microblaze.conf
+
+  microblaze_done=1
 }
 
 # pmu-microblaze is ALWAYS baremetal, no domain
 pmu-microblaze() {
+  info "Microblaze ZynqMP PMU"
+
+  process_microblaze
+
   dtb_file="microblaze-pmu.dtb"
   multiconf="${multiconf} microblaze-pmu"
   conf_file="multiconfig/microblaze-pmu.conf"
@@ -436,15 +562,24 @@ pmu-microblaze() {
   pmu_firmware_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
 
   # Build device tree
-  mkdir -p dtb
-  (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f ${dtb} ${dtb_file})
+  (
+    cd dtb || error "Unable to cd to dtb dir"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+  )
 
   # Build baremetal multiconfig
-  mkdir -p multiconfig/includes
-  lopper.py -f ${dtb} -- baremetaldrvlist_xlnx microblaze-pmu $embeddedsw
-  mv libxil.conf ${libxil}
-  mv distro.conf ${distro}
-  cat << EOF > ${conf_file}
+  if [ -n "${domain_file}" ]; then
+    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx microblaze-pmu "${embeddedsw}" || error "lopper.py failed"
+  else
+    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx microblaze-pmu "${embeddedsw}" \
+      || error "lopper.py failed"
+  fi
+
+  mv libxil.conf "${libxil}"
+  mv distro.conf "${distro}"
+
+  cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "microblaze-pmu"
 
@@ -465,6 +600,10 @@ EOF
 
 # pmc-microblaze is ALWAYS baremetal, no domain
 pmc-microblaze() {
+  info "Microblaze Versal PMC"
+
+  process_microblaze
+
   dtb_file="microblaze-pmc.dtb"
   multiconf="${multiconf} microblaze-pmc"
   conf_file="multiconfig/microblaze-pmc.conf"
@@ -475,15 +614,24 @@ pmc-microblaze() {
   plm_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
 
   # Build device tree
-  mkdir -p dtb
-  (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f ${dtb} ${dtb_file})
+  (
+    cd dtb || error "Unable to cd to dtb dir"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+  )
 
   # Build baremetal multiconfig
-  mkdir -p multiconfig/includes
-  lopper.py -f ${dtb} -- baremetaldrvlist_xlnx microblaze-plm $embeddedsw
-  mv libxil.conf ${libxil}
-  mv distro.conf ${distro}
-  cat << EOF > ${conf_file}
+  if [ -n "${domain_file}" ]; then
+    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx microblaze-plm "${embeddedsw}" || error "lopper.py failed"
+  else
+    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx microblaze-plm "${embeddedsw}" \
+      || error "lopper.py failed"
+  fi
+
+  mv libxil.conf "${libxil}"
+  mv distro.conf "${distro}"
+
+  cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "microblaze-plm"
 
@@ -504,6 +652,10 @@ EOF
 
 # psm-microblaze is ALWAYS baremetal, no domain
 psm-microblaze() {
+  info "Microblaze Versal PSM"
+
+  process_microblaze
+
   dtb_file="microblaze-psm.dtb"
   multiconf="${multiconf} microblaze-psm"
   conf_file="multiconfig/microblaze-psm.conf"
@@ -514,15 +666,24 @@ psm-microblaze() {
   psm_firmware_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
 
   # Build device tree
-  mkdir -p dtb
-  (cd dtb ; LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f ${dtb} ${dtb_file})
+  (
+    cd dtb || error "Unable to cd to dtb dir"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+  )
 
   # Build baremetal multiconfig
-  mkdir -p multiconfig/includes
-  lopper.py -f ${dtb} -- baremetaldrvlist_xlnx microblaze-psm $embeddedsw
-  mv libxil.conf ${libxil}
-  mv distro.conf ${distro}
-  cat << EOF > ${conf_file}
+  if [ -n "${domain_file}" ]; then
+    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx microblaze-psm "${embeddedsw}" || error "lopper.py failed"
+  else
+    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx microblaze-psm "${embeddedsw}" \
+      || error "lopper.py failed"
+  fi
+
+  mv libxil.conf "${libxil}"
+  mv distro.conf "${distro}"
+
+  cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "microblaze-psm"
 
@@ -542,204 +703,170 @@ EOF
 }
 
 parse_cpus() {
-  while read cpu domain os_hint ; do
+  info "Generating configuration..."
+
+  while read -r cpu domain os_hint; do
+
+    # Skip commented lines and WARNINGs
     case ${cpu} in
       \#* | \[WARNING\]:) continue ;;
     esac
-    if [ ${domain} != "None" ]; then
-      echo "Warning: Domains are not yet supported, the generated DTB may be incorrect. ${domain}"
-    fi
+
     case ${cpu} in
+
       arm,cortex-a53)
-        # We need a base cortex_a53_baremetl for the FSBL
+        # We need a base cortex_a53_baremetal for the FSBL
         cortex_a53_baremetal fsbl
-        if [ ${os_hint} == "None" ]; then
-          echo "cortex-a53 for Linux"
-          cortex_a53_linux ${domain}
-          echo "cortex-a53 for Baremetal"
-          cortex_a53_baremetal ${domain}
-          echo "cortex-a53 for Freertos"
-          cortex_a53_freertos ${domain}
+        if [ "${os_hint}" == "None" ]; then
+          cortex_a53_linux "${domain}"
+          cortex_a53_baremetal "${domain}"
+          cortex_a53_freertos "${domain}"
         else
-          case ${os_hint} in
+          case "${os_hint}" in
             linux*)
-              echo "cortex-a53 for Linux ${domain}"
-              cortex_a53_linux ${domain}
-              ;;
+              cortex_a53_linux "${domain}" ;;
             baremetal*)
-              echo "cortex-a53 for Baremetal ${domain}"
-              cortex_a53_baremetal ${domain}
-              ;;
+              cortex_a53_baremetal "${domain}" ;;
             freertos*)
-              echo "cortex-a53 for Freertos ${domain}"
-              cortex_a53_freertos ${domain}
-              ;;
+              cortex_a53_freertos "${domain}" ;;
             *)
-              echo "Warning: cortex-a53 for unknown OS (${os_hint}), parsing baremetal. ${domain}"
-              cortex_a53_baremetal ${domain}
-              ;;
+              warn "cortex-a53 for unknown OS (${os_hint}), parsing baremetal. ${domain}"
+              cortex_a53_baremetal "${domain}"
           esac
         fi
         ;;
+
       arm,cortex-a72)
-        if [ ${os_hint} == "None" ]; then
-          echo "cortex-a72 for Linux"
-          cortex_a72_linux ${domain}
-          echo "cortex-a72 for Baremetal"
-          cortex_a72_baremetal ${domain}
-          echo "cortex-a72 for Freertos"
-          cortex_a72_freertos ${domain}
+        if [ "${os_hint}" == "None" ]; then
+          cortex_a72_linux "${domain}"
+          cortex_a72_baremetal "${domain}"
+          cortex_a72_freertos "${domain}"
         else
-          case ${os_hint} in
+          case "${os_hint}" in
             linux*)
-              echo "cortex-a72 for Linux ${domain}"
-              cortex_a72_linux ${domain}
-              ;;
+              cortex_a72_linux "${domain}" ;;
             baremetal*)
-              echo "cortex-a72 for Baremetal ${domain}"
-              cortex_a72_baremetal ${domain}
-              ;;
+              cortex_a72_baremetal "${domain}" ;;
             freertos*)
-              echo "cortex-a72 for Freertos ${domain}"
-              cortex_a72_freertos ${domain}
-              ;;
+              cortex_a72_freertos "${domain}" ;;
             *)
-              echo "Warning: cortex-a72 for unknown OS (${os_hint}), parsing baremetal. ${domain}"
-              cortex_a72_baremetal ${domain}
-              ;;
+              warn "cortex-a72 for unknown OS (${os_hint}), parsing baremetal. ${domain}"
+              cortex_a72_baremetal "${domain}"
           esac
         fi
         ;;
+
       arm,cortex-r5)
-        if [ ${os_hint} == "None" ]; then
-            if [ "${machine}" = "zynqmp" ]; then
-                # We need a base cortex_r5_baremetal for the FSBL for ZynqMP platform
-                cortex_r5_baremetal fsbl
-	    fi
-            echo "cortex-r5 for Baremetal"
-            cortex_r5_baremetal ${domain}
-            echo "cortex-r5 for Freertos"
-            cortex_r5_freertos ${domain}
-	else
-          case ${os_hint} in
+        if [ "${os_hint}" == "None" ]; then
+          # We need a base cortex_r5_baremetal for the FSBL for ZynqMP platform
+          [ "${machine}" = "zynqmp" ] && cortex_r5_baremetal fsbl
+          cortex_r5_baremetal "${domain}"
+          cortex_r5_freertos "${domain}"
+        else
+          case "${os_hint}" in
             baremetal*)
-              echo "cortex-r5 for Baremetal ${domain}"
-              cortex_r5_baremetal ${domain}
-              ;;
+              cortex_r5_baremetal "${domain}" ;;
             freertos*)
-              echo "cortex-r5 for Freertos ${domain}"
-              cortex_r5_freertos ${domain}
-              ;;
+              cortex_r5_freertos "${domain}" ;;
             *)
-              echo "Warning: cortex-r5 for unknown OS (${os_hint}), parsing baremetal. ${domain}"
-              cortex_r5_baremetal ${domain}
-              ;;
+              warn "cortex-r5 for unknown OS (${os_hint}), parsing baremetal. ${domain}"
+              cortex_r5_baremetal "${domain}"
           esac
         fi
         ;;
+
       xlnx,microblaze)
         process_microblaze
-        case ${os_hint} in
+        case "${os_hint}" in
           None | baremetal*)
-            echo "Warning: Microblaze for Baremetal ${domain} not yet implemented"
-            ;;
+            warn "Microblaze for Baremetal ${domain} not yet implemented" ;;
           Linux)
-            echo "Warning: Microblaze for Linux ${domain} not yet implemented"
-            ;;
+            warn "Microblaze for Linux ${domain} not yet implemented" ;;
           *)
-            echo "Warning: Microblaze for unknown OS (${os_hint}), not yet implemented. ${domain}"
-            ;;
+            warn "Microblaze for unknown OS (${os_hint}), not yet implemented. ${domain}" ;;
         esac
         ;;
+
       pmu-microblaze)
-        process_microblaze
-        echo "Microblaze ZynqMP pmu"
-        pmu-microblaze
-        ;;
+        pmu-microblaze ;;
+
       pmc-microblaze)
-        process_microblaze
-        echo "Microblaze Versal pmc"
-        pmc-microblaze
-        ;;
+        pmc-microblaze ;;
+
       psm-microblaze)
-        process_microblaze
-        echo "Microblaze Versal psm"
-        psm-microblaze
-        ;;
+        psm-microblaze ;;
+
       *)
-        echo "Unknown CPU ${cpu}"
-        ;;
+        warn "Unknown CPU ${cpu}"
+
     esac
-  done < cpu-list.tmp
+  done <cpu-list.tmp
 }
 
+gen_local_conf() {
+  echo
+  echo "To enable this, add the following to your local.conf:"
+  echo
+  echo "# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere"
+  echo "BASE_TMPDIR = \"${TOPDIR}\""
+  [ -n "${system_conf}" ] && echo "require ${system_conf}"
+  echo "SYSTEM_DTFILE = \"${system_dtb}\""
+  echo "BBMULTICONFIG += \"${multiconf}\""
+  if [ -n "${fsbl_mcdepends}" ]; then
+    echo "FSBL_DEPENDS = \"\""
+    echo "FSBL_MCDEPENDS = \"${fsbl_mcdepends}\""
+    echo "FSBL_DEPLOY_DIR = \"${fsbl_deploy_dir}\""
+  fi
+  if [ -n "${r5fsbl_mcdepends}" ]; then
+    echo "R5FSBL_DEPENDS = \"\""
+    echo "R5FSBL_MCDEPENDS = \"${r5fsbl_mcdepends}\""
+    echo "R5FSBL_DEPLOY_DIR = \"${r5fsbl_deploy_dir}\""
+  fi
+  if [ -n "${pmu_mcdepends}" ]; then
+    echo "PMU_DEPENDS = \"\""
+    echo "PMU_MCDEPENDS = \"${pmu_mcdepends}\""
+    echo "PMU_FIRMWARE_DEPLOY_DIR = \"${pmu_firmware_deploy_dir}\""
+  fi
+  if [ -n "${plm_mcdepends}" ]; then
+    echo "PLM_DEPENDS = \"\""
+    echo "PLM_MCDEPENDS = \"${plm_mcdepends}\""
+    echo "PLM_DEPLOY_DIR = \"${plm_deploy_dir}\""
+  fi
+  if [ -n "${psm_mcdepends}" ]; then
+    echo "PSM_DEPENDS = \"\""
+    echo "PSM_MCDEPENDS = \"${psm_mcdepends}\""
+    echo "PSM_FIRMWARE_DEPLOY_DIR = \"${psm_firmware_deploy_dir}\""
+  fi
+  [ "${machine}" = "versal" ] && echo "PDI_PATH = \"__PATH TO PDI FILE HERE__\""
+  echo
+}
+
+parse_args "$@"
+
+lopper=$(command -v lopper.py)
+lopper_dir=$(dirname "${lopper}")
+lops_dir=$(dirname "${lopper_dir}")/share/lopper/lops
+embeddedsw=$(dirname "${lopper_dir}")/share/embeddedsw
+system_conf=""
+multiconf=""
+
+[ -z "${lopper}" ] && error "Unable to find lopper.py, please source the prestep environment"
+
 # Generate CPU list
-cd ${conf_dir}
-mkdir -p dtb
-(cd dtb ; lopper.py -f --enhanced -i ${lops_dir}/lop-xilinx-id-cpus.dts ${dtb} /dev/null && rm -f lop-xilinx-id-cpus.dts.dtb) > cpu-list.tmp
+cd "${config_dir}" || exit
+mkdir -p dtb multiconfig/includes
+(
+  cd dtb || error "Unable to cd to dtb dir"
+  ${lopper} -f --enhanced -i "${lops_dir}/lop-xilinx-id-cpus.dts" "${system_dtb}" \
+    /dev/null >"../cpu-list.tmp" || error "lopper.py failed"
+  rm -f "lop-xilinx-id-cpus.dts.dtb"
+)
 
-if [ -z ${machine} ]; then
-  detect_machine
-  echo "Autodetected machine ${machine}"
-else
-  echo "Machine ${machine}"
-fi
-
-case ${machine} in
-  zynqmp | versal) : ;;
-  *)
-    echo "ERROR: Unknown machine type ${machine}"
-    exit 1
-    ;;
-esac
-
-echo
-echo "Generating configuration..."
+detect_machine
 
 parse_cpus
 
-echo "...done"
-echo
-echo
+gen_local_conf
 
 # Cleanup our temp file
 rm cpu-list.tmp
-
-echo "To enable this, add the following to your local.conf:"
-echo
-echo '# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere'
-echo 'BASE_TMPDIR = "${TOPDIR}"'
-if [ -n "${system_conf}" ]; then
-  echo "require ${system_conf}"
-fi
-echo 'SYSTEM_DTFILE = "'${dtb}'"'
-echo 'BBMULTICONFIG += "'${multiconf}'"'
-if [ -n "${fsbl_mcdepends}" ]; then
-  echo 'FSBL_DEPENDS = ""'
-  echo 'FSBL_MCDEPENDS = "'${fsbl_mcdepends}'"'
-  echo 'FSBL_DEPLOY_DIR = "'${fsbl_deploy_dir}'"'
-fi
-if [ -n "${r5fsbl_mcdepends}" ]; then
-  echo 'R5FSBL_DEPENDS = ""'
-  echo 'R5FSBL_MCDEPENDS = "'${r5fsbl_mcdepends}'"'
-  echo 'R5FSBL_DEPLOY_DIR = "'${r5fsbl_deploy_dir}'"'
-fi
-if [ -n "${pmu_mcdepends}" ]; then
-  echo 'PMU_DEPENDS = ""'
-  echo 'PMU_MCDEPENDS = "'${pmu_mcdepends}'"'
-  echo 'PMU_FIRMWARE_DEPLOY_DIR = "'${pmu_firmware_deploy_dir}'"'
-fi
-if [ -n "${plm_mcdepends}" ]; then
-  echo 'PLM_DEPENDS = ""'
-  echo 'PLM_MCDEPENDS = "'${plm_mcdepends}'"'
-  echo 'PLM_DEPLOY_DIR = "'${plm_deploy_dir}'"'
-fi
-if [ -n "${psm_mcdepends}" ]; then
-  echo 'PSM_DEPENDS = ""'
-  echo 'PSM_MCDEPENDS = "'${psm_mcdepends}'"'
-  echo 'PSM_FIRMWARE_DEPLOY_DIR = "'${psm_firmware_deploy_dir}'"'
-fi
-if [ "${machine}" = "versal" ]; then
-  echo 'PDI_PATH = "__PATH TO PDI FILE HERE__"'
-fi
-echo
