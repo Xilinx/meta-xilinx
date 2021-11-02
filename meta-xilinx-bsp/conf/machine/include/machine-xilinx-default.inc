@@ -22,11 +22,11 @@ UBOOT_ELF ?= "u-boot"
 UBOOT_ELF:aarch64 ?= "u-boot.elf"
 
 #Hardware accelaration
-PREFERRED_PROVIDER_virtual/libgles1_mali400 = "libmali-xlnx"
-PREFERRED_PROVIDER_virtual/libgles2_mali400 = "libmali-xlnx"
-PREFERRED_PROVIDER_virtual/egl_mali400 = "libmali-xlnx"
-PREFERRED_PROVIDER_virtual/libgl_mali400 = "mesa-gl"
-PREFERRED_PROVIDER_virtual/mesa_mali400 = "mesa-gl"
+PREFERRED_PROVIDER_virtual/libgles1:mali400 = "libmali-xlnx"
+PREFERRED_PROVIDER_virtual/libgles2:mali400 = "libmali-xlnx"
+PREFERRED_PROVIDER_virtual/egl:mali400 = "libmali-xlnx"
+PREFERRED_PROVIDER_virtual/libgl:mali400 = "mesa-gl"
+PREFERRED_PROVIDER_virtual/mesa:mali400 = "mesa-gl"
 
 # microblaze does not get on with pie for reasons not looked into as yet
 GCCPIE:microblaze = ""
