@@ -808,7 +808,7 @@ gen_local_conf() {
   echo "To enable this, add the following to your local.conf:"
   echo
   echo "# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere"
-  echo "BASE_TMPDIR = \"${TOPDIR}\""
+  echo "BASE_TMPDIR = \"\${TOPDIR}\""
   [ -n "${system_conf}" ] && echo "require ${system_conf}"
   echo "SYSTEM_DTFILE = \"${system_dtb}\""
   echo "BBMULTICONFIG += \"${multiconf}\""
