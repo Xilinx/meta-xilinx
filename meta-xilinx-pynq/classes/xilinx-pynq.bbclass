@@ -14,7 +14,7 @@ INSANE_SKIP:${PN} += "staticdev dev-so"
 inherit python3-dir
 
 # Used for setup.py on PYNQ
-BOARD_NAME_ultra96 = "Ultra96"
+BOARD_NAME:ultra96 = "Ultra96"
 BOARD_NAME_zcu104-zynqmp = "ZCU104"
 
 do_compile:prepend() {

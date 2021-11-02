@@ -98,9 +98,9 @@ fakeroot python do_multilib_install() {
 
 
     for ml in multilibs.split():
-        tune = d.getVar('DEFAULTTUNE_virtclass-multilib-' + ml)
+        tune = d.getVar('DEFAULTTUNE:virtclass-multilib-' + ml)
         if not tune:
-            bb.warn('DEFAULTTUNE_virtclass-multilib-%s is not defined. Skipping...' % ml)
+            bb.warn('DEFAULTTUNE:virtclass-multilib-%s is not defined. Skipping...' % ml)
             continue
 
         tune_parameters = get_tune_parameters(tune, d)

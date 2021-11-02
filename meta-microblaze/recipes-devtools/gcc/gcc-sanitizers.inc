@@ -107,7 +107,7 @@ FILES:liblsan-dev += "\
 FILES:liblsan-staticdev += "${libdir}/liblsan.a"
 
 FILES:libtsan += "${libdir}/libtsan.so.*"
-FILES_libtsan-dev += "\
+FILES:libtsan-dev += "\
     ${libdir}/libtsan.so \
     ${libdir}/libtsan.la \
     ${libdir}/libtsan_*.o \

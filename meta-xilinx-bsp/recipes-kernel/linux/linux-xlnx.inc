@@ -51,7 +51,7 @@ KBUILD_DEFCONFIG:zynq ?= "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG:microblaze ?= "mmu_defconfig"
 KBUILD_DEFCONFIG:versal ?= "xilinx_defconfig"
 
-KERNEL_MODULE_AUTOLOAD_k26 += "usb5744"
+KERNEL_MODULE_AUTOLOAD:k26 += "usb5744"
 
 # MicroBlaze BSP fragments
 KERNEL_FEATURES:append_kc705-microblazeel = " bsp/xilinx/kc705-microblazeel-features/kc705-microblazeel-features.scc"

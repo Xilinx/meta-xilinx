@@ -22,7 +22,7 @@ RDEPENDS:${PN}-notebooks += "\
 "
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_ultra96 = "${MACHINE}"
+COMPATIBLE_MACHINE:ultra96 = "${MACHINE}"
 
 S = "${WORKDIR}/git"
 
@@ -55,4 +55,4 @@ do_install () {
     cp -r ${S}/notebooks/* ${JUPYTER_NOTEBOOKS}/bnn_examples/
 }
 
-PACKAGE_ARCH_ultra96 = "${BOARD_ARCH}"
+PACKAGE_ARCH:ultra96 = "${BOARD_ARCH}"
