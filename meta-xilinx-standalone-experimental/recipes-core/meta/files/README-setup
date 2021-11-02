@@ -1,4 +1,4 @@
-Document Version: 20210930
+Document Version: 20211102
 
 The Yocto Project setup for the new workflow is as follows.  Be sure to read
 everything below, as the steps will be updated in the future if the
@@ -36,10 +36,10 @@ however you may use any path you wish.
 . <build>/prestep/environment-setup-x86_64-petalinux-linux
 
 # Run the script from the same directory as this README
-<build>/prestep/dt-processor.sh <path_to_conf> <dtb>
+<build>/prestep/dt-processor.sh -c <conf> -s <dtb>
 
 # For example, zynqmp:
-# <build>/prestep/dt-processor.sh <build>/conf <device-tree>/zu-sdt/system-top.dts
+# <build>/prestep/dt-processor.sh -c <build>/conf -s <device-tree>/zu-sdt/system-top.dts
 #
 # Follow the instructions returned by the script!
 # Such as:
@@ -65,7 +65,7 @@ PMU_FIRMWARE_DEPLOY_DIR = "${BASE_TMPDIR}/tmp-microblaze-pmu/deploy/images/${MAC
 # OR
 #
 # Versal:
-# <build>/prestep/dt-processor.sh <build>/conf <device-tree>/vck190-sdt/system-top.dts
+# <build>/prestep/dt-processor.sh -c <build>/conf -s <device-tree>/vck190-sdt/system-top.dts
 #
 # Follow the instructions returned by the script!
 # Such as:
