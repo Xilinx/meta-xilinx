@@ -451,14 +451,25 @@ cortex_r5_baremetal() {
   # Build device tree
   (
     cd dtb || error "Unable to cd to dtb dir"
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-r5-imux.dts" \
-      "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    if [ -n "$domain_file" ]; then
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+        -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dtb}" "${dtb_file}" \
+        || error "lopper.py failed"
+    else
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-r5-imux.dts" \
+        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    fi
     rm -f lop-r5-imux.dts.dtb
   )
 
   # Build baremetal multiconfig
-  ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
-    || error "lopper.py failed"
+  if [ -n "${domain_file}" ]; then
+    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" || error "lopper.py failed"
+  else
+    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
+      || error "lopper.py failed"
+  fi
 
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
@@ -506,7 +517,7 @@ cortex_r5_freertos() {
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
     ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx coretexr5-${machine} "${embeddedsw}" || error "lopper.py failed"
+      -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" || error "lopper.py failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
       || error "lopper.py failed"
