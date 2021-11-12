@@ -206,11 +206,11 @@ BB_DISKMON_DIRS ??= "\
 #file://.* http://someserver.tld/share/sstate/PATH;downloadfilename=PATH \n \
 #file://.* file:///some/local/dir/sstate/PATH"
 
-XILINX_VER_MAIN = "2021.2"
+XILINX_VER_MAIN = "2022.1"
 
 # Uncomment below lines to provide path for custom xsct trim
 #
-#EXTERNAL_XSCT_TARBALL = "/proj/yocto/xsct-trim/2021.2_xsct_daily_latest"
+#EXTERNAL_XSCT_TARBALL = "/proj/yocto/xsct-trim/2022.1_xsct_daily_latest"
 #VALIDATE_XSCT_CHECKSUM = '0'
 
 #
