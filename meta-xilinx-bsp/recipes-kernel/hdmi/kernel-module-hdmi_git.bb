@@ -9,9 +9,9 @@ PV = "${XLNX_HDMI_VERSION}"
 
 S = "${WORKDIR}/git"
 
-BRANCH ?= "xlnx_rel_v2021.2"
+BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/hdmi-modules.git;protocol=https"
-SRCREV = "aeb9f2c9a50c5e8dd4245454116c47f841f78825"
+SRCREV = "7199973cb7fa91776335be58e38521b77231e9fe"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
