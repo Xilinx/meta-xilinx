@@ -11,16 +11,24 @@
 # the option is a question of removing the # character and making any change to the
 # variable as required.
 
-# BASE = "${COREBASE}/../.."
-
 #
 # Machine Selection
 #
 # You need to select a specific machine to target the build with. There are a selection
 # of emulated machines available which can boot and run in the QEMU emulator:
 #
-# This sets the default machine if no other machine is selected:
-MACHINE ??= "qemuzynq"
+#MACHINE ?= "microblazeel-v11.0-bs-cmp-mh-div-generic.conf"
+#MACHINE ?= "zynq-generic"
+#MACHINE ?= "zynqmp-generic"
+#MACHINE ?= "versal-generic"
+#
+# There are also the following hardware board target machines included for 
+# demonstration purposes:
+#
+#MACHINE ?= "ultra96-zynqmp"
+#
+# This sets the default machine to be qemux86-64 if no other machine is selected:
+MACHINE ??= "zynqmp-generic"
 
 #
 # Where to place downloads
@@ -33,7 +41,7 @@ MACHINE ??= "qemuzynq"
 #
 # The default is a downloads directory under TOPDIR which is the build directory.
 #
-# DL_DIR ?= "${BASE}/downloads"
+#DL_DIR ?= "${TOPDIR}/downloads"
 
 #
 # Where to place shared-state files
@@ -49,7 +57,7 @@ MACHINE ??= "qemuzynq"
 #
 # The default is a sstate-cache directory under TOPDIR.
 #
-# SSTATE_DIR ?= "${BASE}/sstate-cache"
+#SSTATE_DIR ?= "${TOPDIR}/sstate-cache"
 
 #
 # Where to place the build output
@@ -62,15 +70,13 @@ MACHINE ??= "qemuzynq"
 # The default is a tmp directory under TOPDIR.
 #
 #TMPDIR = "${TOPDIR}/tmp"
-#
-#TMPDIR:versal = "${TOPDIR}/tmp-versal"
 
 #
 # Default policy config
 #
 # The distribution setting controls which policy settings are used as defaults.
 # The default value is fine for general Yocto project use, at least initially.
-# Ultimately when creating custom policy, people will likely end up subclassing
+# Ultimately when creating custom policy, people will likely end up subclassing 
 # these defaults.
 #
 DISTRO ?= "petalinux"
@@ -90,12 +96,12 @@ DISTRO ?= "petalinux"
 PACKAGE_CLASSES ?= "package_rpm"
 
 #
-# SDK/ADT target architecture
+# SDK target architecture
 #
-# This variable specifies the architecture to build SDK/ADT items for and means
+# This variable specifies the architecture to build SDK items for and means
 # you can build the SDK packages for architectures other than the machine you are
 # running the build on (i.e. building i686 packages on an x86_64 host).
-# Supported values are i686 and x86_64
+# Supported values are i686, x86_64, aarch64
 #SDKMACHINE ?= "i686"
 
 #
@@ -106,6 +112,8 @@ PACKAGE_CLASSES ?= "package_rpm"
 # variable can contain the following options:
 #  "dbg-pkgs"       - add -dbg packages for all installed packages
 #                     (adds symbol information for debugging/profiling)
+#  "src-pkgs"       - add -src packages for all installed packages
+#                     (adds source code for debugging)
 #  "dev-pkgs"       - add -dev packages for all installed packages
 #                     (useful if you want to develop against libs in the image)
 #  "ptest-pkgs"     - add -ptest packages for all ptest-enabled packages
@@ -113,14 +121,14 @@ PACKAGE_CLASSES ?= "package_rpm"
 #  "tools-sdk"      - add development tools (gcc, make, pkgconfig etc.)
 #  "tools-debug"    - add debugging tools (gdb, strace)
 #  "eclipse-debug"  - add Eclipse remote debugging support
-#  "tools-profile"  - add profiling tools (oprofile, exmap, lttng, valgrind)
+#  "tools-profile"  - add profiling tools (oprofile, lttng, valgrind)
 #  "tools-testapps" - add useful testing tools (ts_print, aplay, arecord etc.)
 #  "debug-tweaks"   - make an image suitable for development
 #                     e.g. ssh root access has a blank password
 # There are other application targets that can be used here too, see
 # meta/classes/image.bbclass and meta/classes/core-image.bbclass for more details.
 # We default to enabling the debugging tweaks.
-EXTRA_IMAGE_FEATURES = "debug-tweaks"
+EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
 
 #
 # Additional image features
@@ -135,10 +143,12 @@ USER_CLASSES ?= "buildstats"
 # Runtime testing of images
 #
 # The build system can test booting virtual machine images under qemu (an emulator)
-# after any root filesystems are created and run tests against those images. To
-# enable this uncomment this line. See classes/testimage(-auto).bbclass for
-# further details.
-#TEST_IMAGE = "1"
+# after any root filesystems are created and run tests against those images. It can also
+# run tests against any SDK that are built. To enable this uncomment these lines.
+# See classes/test{image,sdk}.bbclass for further details.
+#IMAGE_CLASSES += "testimage testsdk"
+#TESTIMAGE_AUTO:qemuall = "1"
+
 #
 # Interactive shell configuration
 #
@@ -163,12 +173,12 @@ PATCHRESOLVE = "noop"
 #
 # Monitor the disk space during the build. If there is less that 1GB of space or less
 # than 100K inodes in any key build location (TMPDIR, DL_DIR, SSTATE_DIR), gracefully
-# shutdown the build. If there is less that 100MB or 1K inodes, perform a hard abort
+# shutdown the build. If there is less than 100MB or 1K inodes, perform a hard abort
 # of the build. The reason for this is that running completely out of space can corrupt
 # files and damages the build in ways which may not be easily recoverable.
-# It's necesary to monitor /tmp, if there is no space left the build will fail
+# It's necessary to monitor /tmp, if there is no space left the build will fail
 # with very exotic errors.
-BB_DISKMON_DIRS = "\
+BB_DISKMON_DIRS ??= "\
     STOPTASKS,${TMPDIR},1G,100K \
     STOPTASKS,${DL_DIR},1G,100K \
     STOPTASKS,${SSTATE_DIR},1G,100K \
@@ -181,7 +191,7 @@ BB_DISKMON_DIRS = "\
 #
 # Shared-state files from other locations
 #
-# As mentioned above, shared state files are prebuilt cache data objects which can
+# As mentioned above, shared state files are prebuilt cache data objects which can be
 # used to accelerate build time. This variable can be used to configure the system
 # to search other mirror locations for these objects before it builds the data itself.
 #
@@ -196,35 +206,73 @@ BB_DISKMON_DIRS = "\
 #file://.* http://someserver.tld/share/sstate/PATH;downloadfilename=PATH \n \
 #file://.* file:///some/local/dir/sstate/PATH"
 
-XILINX_VER_MAIN = "2022.1"
+XILINX_VER_MAIN = "2021.2"
 
 # Uncomment below lines to provide path for custom xsct trim
-# This is required for building Versal based devices, please fetch the
-# xsct-trim from Xilinx lounge area
 #
 #EXTERNAL_XSCT_TARBALL = "/proj/yocto/xsct-trim/2021.2_xsct_daily_latest"
 #VALIDATE_XSCT_CHECKSUM = '0'
 
-# XILINX_VIVADO_DESIGN_SUIT should point to the Vivado installation directly if you are using xilinx-mcs recipe in meta-xilinx-tools
-#XILINX_VIVADO_DESIGN_SUIT = "/proj/xbuilds/2018.3_daily_latest/installs/lin64/Vivado/2018.3"
+#
+# Yocto Project SState Mirror
+#
+# The Yocto Project has prebuilt artefacts available for its releases, you can enable
+# use of these by uncommenting the following lines. This will mean the build uses
+# the network to check for artefacts at the start of builds, which does slow it down
+# equally, it will also speed up the builds by not having to build things if they are
+# present in the cache. It assumes you can download something faster than you can build it
+# which will depend on your network.
+# Note: For this to work you also need hash-equivalence passthrough to the matching server
+#
+#BB_HASHSERVE_UPSTREAM = "typhoon.yocto.io:8687"
+#SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/3.4/PATH;downloadfilename=PATH"
 
-# INHERIT += "externalsrc"
-# PREFERRED_PROVIDER_virtual/kernel = "linux-xlnx-dev"
-# EXTERNALSRC:pn-linux-xlnx-dev = "${BASE}/sources/linux"
-# RM_WORK_EXCLUDE += "linux-xlnx-dev"
+#
+# Qemu configuration
+#
+# By default native qemu will build with a builtin VNC server where graphical output can be
+# seen. The line below enables the SDL UI frontend too.
+PACKAGECONFIG:append:pn-qemu-system-native = " sdl"
+# By default libsdl2-native will be built, if you want to use your host's libSDL instead of 
+# the minimal libsdl built by libsdl2-native then uncomment the ASSUME_PROVIDED line below.
+#ASSUME_PROVIDED += "libsdl2-native"
 
-# PREFERRED_PROVIDER_virtual/bootloader = "u-boot-xlnx-dev"
-# EXTERNALSRC:pn-u-boot-xlnx-dev = "${BASE}/sources/u-boot"
-# RM_WORK_EXCLUDE += "u-boot-xlnx-dev"
+# You can also enable the Gtk UI frontend, which takes somewhat longer to build, but adds
+# a handy set of menus for controlling the emulator.
+#PACKAGECONFIG:append:pn-qemu-system-native = " gtk+"
 
 #Add below lines to use runqemu for ZU+ machines
 PMU_FIRMWARE_DEPLOY_DIR ??= "${DEPLOY_DIR_IMAGE}"
 PMU_FIRMWARE_IMAGE_NAME ??= "pmu-firmware-${MACHINE}"
 
+#Enable the below line to use pmu-rom.elf from a specific path
+#PMU_ROM = "/proj/yocto/pmu-rom/pmu-rom.elf"
+
+#
+# Hash Equivalence
+#
+# Enable support for automatically running a local hash equivalence server and
+# instruct bitbake to use a hash equivalence aware signature generator. Hash
+# equivalence improves reuse of sstate by detecting when a given sstate
+# artifact can be reused as equivalent, even if the current task hash doesn't
+# match the one that generated the artifact.
+#
+# A shared hash equivalent server can be set with "<HOSTNAME>:<PORT>" format
+#
+#BB_HASHSERVE = "auto"
+#BB_SIGNATURE_HANDLER = "OEEquivHash"
+
+#
+# Memory Resident Bitbake
+#
+# Bitbake's server component can stay in memory after the UI for the current command
+# has completed. This means subsequent commands can run faster since there is no need
+# for bitbake to reload cache files and so on. Number is in seconds, after which the
+# server will shut down.
+#
+#BB_SERVER_TIMEOUT = "60"
+
 # CONF_VERSION is increased each time build/conf/ changes incompatibly and is used to
 # track the version of this file when it was generated. This can safely be ignored if
 # this doesn't mean anything to you.
-CONF_VERSION = "1"
-
-#Enable the below line to use pmu-rom.elf from a specific path
-#PMU_ROM = "/proj/yocto/pmu-rom/pmu-rom.elf"
+CONF_VERSION = "2"
