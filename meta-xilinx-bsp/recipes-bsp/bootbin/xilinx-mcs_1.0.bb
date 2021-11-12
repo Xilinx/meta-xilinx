@@ -19,7 +19,7 @@ do_unpack[noexec] = "1"
 do_patch[noexec] = "1"
 
 PROC ??= "kc705_i/microblaze_0"
-PROC_kc705 = "kc705_i/microblaze_0"
+PROC:kc705 = "kc705_i/microblaze_0"
 
 FLASH_SIZE ??= "0x80"
 FLASH_INTERFACE ??= "BPIx16"

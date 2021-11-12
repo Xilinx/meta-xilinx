@@ -1,5 +1,5 @@
 
-SRC_URI:append_minized-zynq7 = " \
+SRC_URI:append:minized-zynq7 = " \
        git://github.com/murata-wireless/cyw-fmac-nvram;protocol=git;branch=orga;destsuffix=cyw-fmac-nvram;name=cyw-fmac-nvram \
        git://github.com/murata-wireless/cyw-bt-patch;protocol=git;branch=morty-orga;destsuffix=cyw-bt-patch;name=cyw-bt-patch \
        git://github.com/murata-wireless/cyw-fmac-utils-imx32;protocol=git;branch=orga;destsuffix=cyw-fmac-utils-imx32;name=cyw-fmac-utils-imx32 \
@@ -10,7 +10,7 @@ SRCREV_cyw-bt-patch = "9216e0d9f778009b5667d032886dfd49174c4b3a"
 SRCREV_cyw-fmac-utils-imx32 = "060688dfe76df98751207c8146268ce7fd80b6ab"
 SRCREV_FORMAT = "default+cyw-fmac-nvram+cyw-bt-patch+cyw-fmac-utils-imx32"
 
-do_install:append_minized-zynq7() {
+do_install:append:minized-zynq7() {
 
        install -d ${D}${bindir}
 
@@ -19,16 +19,16 @@ do_install:append_minized-zynq7() {
        install -m 0644 ${WORKDIR}/cyw-fmac-utils-imx32/wl ${D}${bindir}
 }
 
-PACKAGES:prepend_minized-zynq7 = "\
+PACKAGES:prepend:minized-zynq7 = "\
     ${PN}-bcm43430a1-hcd \
     ${PN}-mfgtest \
 "
 
-FILES:${PN}-mfgtest_minized-zynq7 = " \
+FILES:${PN}-mfgtest:minized-zynq7 = " \
        ${bindir}/wl \
 "
 
-FILES:${PN}-bcm43430:append_minized-zynq7 = " \
+FILES:${PN}-bcm43430:append:minized-zynq7 = " \
        ${nonarch_base_libdir}/firmware/brcm/ brcmfmac43430-sdio.txt \
 "
 

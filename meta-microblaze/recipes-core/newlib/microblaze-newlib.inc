@@ -15,6 +15,6 @@ SRC_URI:append:microblaze = " \
     file://0012-libc-machine-microblaze-strcmp.c-Fix-missing-end-of-.patch \
     "
 
-EXTRA_OECONF:append_xilinx-standalone:microblaze = " \
+EXTRA_OECONF:append:xilinx-standalone:microblaze = " \
     --disable-newlib-reent-check-verify \
 "
