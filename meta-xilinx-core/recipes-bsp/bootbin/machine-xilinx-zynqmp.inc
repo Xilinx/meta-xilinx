@@ -2,7 +2,25 @@
 BIF_COMMON_ATTR ?= ""
 
 # specify BIF partition attributes required for BOOT.bin
-BIF_PARTITION_ATTR = "fsbl pmufw arm-trusted-firmware device-tree u-boot-xlnx"
+# For details on ordering, see:
+#   https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18842019/Zynq+UltraScale+FSBL#ZynqUltraScale%2BFSBL-IsthereanyorderinwhichIhavetospecifybitstreaminBIFfile(forbootimagecreation)%3F
+#
+# The loading rules:
+# From the 2017.1 release, bistreams should be loaded bfore ATF...
+# ...preferably immediately after the FSBL and PMUFW.
+#
+# While the first few components must be fsbl and pmufw per:
+# https://www.xilinx.com/support/documentation/sw_manuals/xilinx2021_2/ug1283-bootgen-user-guide.pdf
+#
+# This combination restricts the boot order to be:
+# FSBL & PMUFW -> Bitstream (if available) -> ATF -> Device Tree (if available) -> Second Stage Bootloader
+#
+BIF_FSBL_ATTR ?= "fsbl pmufw"
+BIF_BITSTREAM_ATTR ?= ""
+BIF_ATF_ATTR ?= "arm-trusted-firmware"
+BIF_DEVICETREE_ATTR ?= "device-tree"
+BIF_SSBL_ATTR ?= "u-boot-xlnx"
+BIF_PARTITION_ATTR ?= "${BIF_FSBL_ATTR} ${BIF_BITSTREAM_ATTR} ${BIF_ATF_ATTR} ${BIF_DEVICETREE_ATTR} ${BIF_SSBL_ATTR}"
 
 # specify BIF partition attributes for FSBL
 # bootloader is FSBL. Location where FSBL binary is present and dependency to build FSBL
