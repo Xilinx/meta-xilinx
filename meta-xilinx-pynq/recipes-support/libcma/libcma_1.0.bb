@@ -24,7 +24,7 @@ do_install() {
   install -d ${D}/usr/include/
 
   cd ${S}/sdbuild/packages/libsds/libcma
-  CMA_ARCH=${CMA_ARCH_${TARGET_ARCH}} make install DESTDIR=${D}
+  CMA_ARCH=${CMA_ARCH:${TARGET_ARCH}} make install DESTDIR=${D}
 }
 
 SOLIBS = ".so"
