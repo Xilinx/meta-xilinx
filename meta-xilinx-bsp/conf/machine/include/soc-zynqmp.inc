@@ -12,8 +12,8 @@ SOC_VARIANT ?= "eg"
 require xilinx-soc-family.inc
 
 GRAPHICSOVERRIDES = ""
-GRAPHICSOVERRIDES:zynqmp-eg = "mali400:"
-GRAPHICSOVERRIDES:zynqmp-ev = "mali400:vcu:"
+#GRAPHICSOVERRIDES:zynqmp-eg = "mali400:"
+#GRAPHICSOVERRIDES:zynqmp-ev = "mali400:vcu:"
 
 MACHINEOVERRIDES =. "${GRAPHICSOVERRIDES}"
 
