@@ -47,3 +47,4 @@ do_install:append() {
 }
 
 FILES:${PN} += "${datadir}/qemu/"
+FILES:${PN}:append:class-nativesdk:mingw32 = " ${SDKPATHNATIVE}"
