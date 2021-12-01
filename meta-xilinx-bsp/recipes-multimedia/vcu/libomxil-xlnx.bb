@@ -16,12 +16,12 @@ SRC_URI = "${REPO};${BRANCHARG}"
 S  = "${WORKDIR}/git"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynqmp = "zynqmp"
+COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 
 PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
 
 DEPENDS = "libvcu-xlnx"
-RDEPENDS_${PN} = "kernel-module-vcu libvcu-xlnx"
+RDEPENDS:${PN} = "kernel-module-vcu libvcu-xlnx"
 
 EXTERNAL_INCLUDE="${STAGING_INCDIR}/vcu-ctrl-sw/include"
 

@@ -16,7 +16,7 @@ PACKAGECONFIG[intc] = "${RECIPE_SYSROOT}/usr/lib/libintc.a,,intc,,"
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/common/src/"
 ESW_COMPONENT_NAME = "libcommon.a"
 
-do_configure_prepend() {
+do_configure:prepend() {
     LOPPER_DTC_FLAGS="-b 0 -@" lopper.py ${DTS_FILE} -- baremetalconfig_xlnx.py ${ESW_MACHINE} ${S}/XilinxProcessorIPLib/drivers/intc/src/
     LOPPER_DTC_FLAGS="-b 0 -@" lopper.py ${DTS_FILE} -- baremetalconfig_xlnx.py ${ESW_MACHINE} ${S}/XilinxProcessorIPLib/drivers/scugic/src/
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/

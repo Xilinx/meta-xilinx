@@ -20,9 +20,9 @@ inherit module
 
 EXTRA_OEMAKE += "O=${STAGING_KERNEL_BUILDDIR}"
 
-RDEPENDS_${PN} = "vcu-firmware"
+RDEPENDS:${PN} = "vcu-firmware"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynqmp = "zynqmp"
+COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 
 KERNEL_MODULE_AUTOLOAD += "dmaproxy"

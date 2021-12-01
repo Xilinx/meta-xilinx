@@ -10,7 +10,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit xilinx-platform-init
 
 COMPATIBLE_MACHINE = "$^"
-COMPATIBLE_MACHINE_picozed-zynq7 = "picozed-zynq7"
+COMPATIBLE_MACHINE:picozed-zynq7 = "picozed-zynq7"
 
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
@@ -34,5 +34,5 @@ do_install() {
 	done
 }
 
-FILES_${PN} += "${PLATFORM_INIT_DIR}/*"
+FILES:${PN} += "${PLATFORM_INIT_DIR}/*"
 

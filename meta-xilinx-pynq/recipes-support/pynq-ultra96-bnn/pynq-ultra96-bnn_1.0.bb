@@ -13,7 +13,7 @@ SRCREV = "32eed91994228d1042a16c692047dfe81e47d498"
 
 inherit xilinx-pynq
 
-RDEPENDS_${PN}-notebooks += "\
+RDEPENDS:${PN}-notebooks += "\
     python3-pynq \
     python3-pillow \
     libstdc++ \
@@ -22,7 +22,7 @@ RDEPENDS_${PN}-notebooks += "\
 "
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_ultra96 = "${MACHINE}"
+COMPATIBLE_MACHINE:ultra96 = "${MACHINE}"
 
 S = "${WORKDIR}/git"
 
@@ -55,4 +55,4 @@ do_install () {
     cp -r ${S}/notebooks/* ${JUPYTER_NOTEBOOKS}/bnn_examples/
 }
 
-PACKAGE_ARCH_ultra96 = "${BOARD_ARCH}"
+PACKAGE_ARCH:ultra96 = "${BOARD_ARCH}"

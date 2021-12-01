@@ -5,7 +5,7 @@ LICENSE = "CLOSED"
 PROVIDES = "virtual/base-pdi"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_versal = "versal"
+COMPATIBLE_MACHINE:versal = "versal"
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
@@ -32,4 +32,4 @@ do_install() {
 }
 SYSROOT_DIRS += "/boot"
 
-FILES_${PN} += "/boot/*"
+FILES:${PN} += "/boot/*"

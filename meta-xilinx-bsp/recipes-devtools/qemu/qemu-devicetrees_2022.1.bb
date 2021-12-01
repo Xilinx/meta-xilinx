@@ -1,3 +1,4 @@
+
 require qemu-devicetrees.inc
 
 BRANCH ?= "master"

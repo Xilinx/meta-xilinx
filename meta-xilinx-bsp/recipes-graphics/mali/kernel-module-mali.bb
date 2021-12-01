@@ -41,8 +41,8 @@ PARALLEL_MAKE = "-j 1"
 S = "${WORKDIR}/DX910-SW-99002-${PV}/driver/src/devicedrv/mali"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_zynqmp-eg = "zynqmp-eg"
-COMPATIBLE_MACHINE_zynqmp-ev = "zynqmp-ev"
+COMPATIBLE_MACHINE:zynqmp-eg = "zynqmp-eg"
+COMPATIBLE_MACHINE:zynqmp-ev = "zynqmp-ev"
 
 EXTRA_OEMAKE = 'KDIR="${STAGING_KERNEL_DIR}" \
 		ARCH="${ARCH}" \

@@ -3,8 +3,8 @@ inherit xilinx-platform-init
 FORCE_PLATFORM_INIT[doc] = "This variable is used to force the overriding of all platform init files in u-boot source."
 
 PLATFORM_BOARD_DIR ?= ""
-PLATFORM_BOARD_DIR_zynq = "board/xilinx/zynq"
-PLATFORM_BOARD_DIR_zynqmp = "board/xilinx/zynqmp"
+PLATFORM_BOARD_DIR:zynq = "board/xilinx/zynq"
+PLATFORM_BOARD_DIR:zynqmp = "board/xilinx/zynqmp"
 
 do_zynq_platform_init() {
 	for f in ${PLATFORM_INIT_FILES}; do

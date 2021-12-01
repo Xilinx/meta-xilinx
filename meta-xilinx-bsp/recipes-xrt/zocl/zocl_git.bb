@@ -11,7 +11,7 @@ S = "${WORKDIR}/git/src/runtime_src/core/edge/drm/zocl"
 
 inherit module
 
-pkg_postinst_ontarget_${PN}() {
+pkg_postinst_ontarget:${PN}() {
   #!/bin/sh
   echo "Unloading old XRT Linux kernel modules"
   ( rmmod zocl || true ) > /dev/null 2>&1

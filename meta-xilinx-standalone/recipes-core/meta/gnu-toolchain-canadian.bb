@@ -19,7 +19,7 @@ do_install () {
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-ALLOW_EMPTY_${PN} = "1"
-FILES_${PN} = "${bindir}"
+ALLOW_EMPTY:${PN} = "1"
+FILES:${PN} = "${bindir}"
 
 PACKAGES = "${PN}"

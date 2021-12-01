@@ -26,9 +26,9 @@ S ?= "${WORKDIR}/${MACHINE}"
 
 PROVIDES = "virtual/bitstream virtual/xilinx-platform-init"
 
-FILES_${PN}-platform-init += "${PLATFORM_INIT_DIR}/*"
+FILES:${PN}-platform-init += "${PLATFORM_INIT_DIR}/*"
 
-FILES_${PN}-bitstream += " \
+FILES:${PN}-bitstream += " \
 		download.bit \
 		"
 

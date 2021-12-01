@@ -1,3 +1,3 @@
-do_install_append_zynqmp () {
+do_install:append:zynqmp () {
     rm -rf ${D}${includedir}/KHR/*
 }

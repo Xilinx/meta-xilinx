@@ -133,8 +133,8 @@ def MicroblazeConfig(dtbfile, out):
                 TUNE_FEATURES = processProperties(fdt, node)
 
                 out.write('AVAILTUNES += "microblaze-cpu%s"\n' % (cpu))
-                out.write('TUNE_FEATURES_tune-microblaze-cpu%s = "%s"\n' % (cpu, ' '.join(TUNE_FEATURES)))
-                out.write('PACKAGE_EXTRA_ARCHS_tune-microblaze-cpu%s = "${TUNE_PKGARCH}"\n' % (cpu))
+                out.write('TUNE_FEATURES:tune-microblaze-cpu%s = "%s"\n' % (cpu, ' '.join(TUNE_FEATURES)))
+                out.write('PACKAGE_EXTRA_ARCHS:tune-microblaze-cpu%s = "${TUNE_PKGARCH}"\n' % (cpu))
 
             except Exception as e:
                 sys.stderr.write("Exception looking at properties: %s\n" % e)

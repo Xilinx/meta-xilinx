@@ -15,7 +15,7 @@ SRC_URI = "${UBOOTURI};${UBRANCHARG}"
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/u-boot:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/u-boot:"
 
 SYSROOT_DIRS += "/boot"
 

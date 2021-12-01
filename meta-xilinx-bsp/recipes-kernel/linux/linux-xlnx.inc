@@ -7,7 +7,7 @@ PV = "${LINUX_VERSION}+git${SRCPV}"
 KBRANCH ?= "xlnx_rebase_v5.10"
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
 
-FILESOVERRIDES_append = ":${XILINX_RELEASE_VERSION}"
+FILESOVERRIDES:append = ":${XILINX_RELEASE_VERSION}"
 KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https;name=machine"
 YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.10;destsuffix=yocto-kmeta"
 SRC_URI = "${KERNELURI};${SRCBRANCHARG} ${YOCTO_META}"
@@ -25,11 +25,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 EXTKERNELSRC = "${@'1' if d.getVar('EXTERNALSRC') else ''}"
 
 # Force the use of the KBUILD_DEFCONFIG even if some other defconfig was generated in the ${WORKDIR}
-do_kernel_metadata_prepend () {
+do_kernel_metadata:prepend () {
 	[ -n "${KBUILD_DEFCONFIG}" ] && [ -e ${WORKDIR}/defconfig ] && rm ${WORKDIR}/defconfig
 }
 
-do_configure_prepend () {
+do_configure:prepend () {
 	if [ -n "${KBUILD_DEFCONFIG}" ] && [ -n "${EXTKERNELSRC}" ]; then
 		cp ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
 	fi
@@ -39,27 +39,27 @@ inherit kernel-simpleimage
 
 # Default to be only compatible with specific machines or soc families
 COMPATIBLE_MACHINE ?= "^$"
-COMPATIBLE_MACHINE_zynq = ".*"
-COMPATIBLE_MACHINE_zynqmp = ".*"
-COMPATIBLE_MACHINE_microblaze = ".*"
-COMPATIBLE_MACHINE_versal = ".*"
+COMPATIBLE_MACHINE:zynq = ".*"
+COMPATIBLE_MACHINE:zynqmp = ".*"
+COMPATIBLE_MACHINE:microblaze = ".*"
+COMPATIBLE_MACHINE:versal = ".*"
 
 # Use DEFCONFIGs for configuring linux-xlnx kernels
 KCONFIG_MODE ?= "alldefconfig"
-KBUILD_DEFCONFIG_zynqmp ?= "xilinx_defconfig"
-KBUILD_DEFCONFIG_zynq ?= "xilinx_zynq_defconfig"
-KBUILD_DEFCONFIG_microblaze ?= "mmu_defconfig"
-KBUILD_DEFCONFIG_versal ?= "xilinx_defconfig"
+KBUILD_DEFCONFIG:zynqmp ?= "xilinx_defconfig"
+KBUILD_DEFCONFIG:zynq ?= "xilinx_zynq_defconfig"
+KBUILD_DEFCONFIG:microblaze ?= "mmu_defconfig"
+KBUILD_DEFCONFIG:versal ?= "xilinx_defconfig"
 
-KERNEL_MODULE_AUTOLOAD_k26 += "usb5744"
+KERNEL_MODULE_AUTOLOAD:k26 += "usb5744"
 
 # MicroBlaze BSP fragments
-KERNEL_FEATURES_append_kc705-microblazeel = " bsp/xilinx/kc705-microblazeel-features/kc705-microblazeel-features.scc"
+KERNEL_FEATURES:append:kc705-microblazeel = " bsp/xilinx/kc705-microblazeel-features/kc705-microblazeel-features.scc"
 
-KERNEL_FEATURES_append_zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
+KERNEL_FEATURES:append:zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
 
-KERNEL_FEATURES_append_zynqmp = "${@' features/xilinx/overlay_of/overlay_of.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
+KERNEL_FEATURES:append:zynqmp = "${@' features/xilinx/overlay_of/overlay_of.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
 
-KERNEL_FEATURES_append_versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} features/xilinx/hdmi-module/hdmi-module.scc"
+KERNEL_FEATURES:append:versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} features/xilinx/hdmi-module/hdmi-module.scc"
 
-KERNEL_FEATURES_append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' features/ocicontainer/ocicontainer.scc', '', d)}"
+KERNEL_FEATURES:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' features/ocicontainer/ocicontainer.scc', '', d)}"

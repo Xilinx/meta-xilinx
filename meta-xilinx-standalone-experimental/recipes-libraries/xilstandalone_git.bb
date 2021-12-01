@@ -5,7 +5,7 @@ ESW_COMPONENT_NAME = "libxilstandalone.a"
 
 DEPENDS += "libgloss"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # This script should also not rely on relative paths and such
     cd ${S}
     lopper.py ${DTS_FILE} -- baremetal_bspconfig_xlnx ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}

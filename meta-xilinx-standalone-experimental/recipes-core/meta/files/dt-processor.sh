@@ -130,11 +130,11 @@ cortex_a53_linux() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 MACHINE = "${machine}-generic"
 # Override the SYSTEM_DTFILE for Linux builds
-SYSTEM_DTFILE_linux = "\${CONFIG_DTFILE}"
+SYSTEM_DTFILE:linux = "\${CONFIG_DTFILE}"
 # We don't want the kernel to build us a device-tree
-KERNEL_DEVICETREE_${machine}-generic = ""
+KERNEL_DEVICETREE:${machine}-generic = ""
 # We need u-boot to use the one we passed in
-DEVICE_TREE_NAME_pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+DEVICE_TREE_NAME:pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Remap boot files to ensure the right device tree is listed first
@@ -305,11 +305,11 @@ cortex_a72_linux() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 MACHINE = "${machine}-generic"
 # Override the SYSTEM_DTFILE for Linux builds
-SYSTEM_DTFILE_linux = "\${CONFIG_DTFILE}"
+SYSTEM_DTFILE:linux = "\${CONFIG_DTFILE}"
 # We don't want the kernel to build us a device-tree
-KERNEL_DEVICETREE_${machine}-generic = ""
+KERNEL_DEVICETREE:${machine}-generic = ""
 # We need u-boot to use the one we passed in
-DEVICE_TREE_NAME_pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+DEVICE_TREE_NAME:pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Remap boot files to ensure the right device tree is listed first
@@ -596,7 +596,7 @@ ESW_MACHINE = "microblaze-pmu"
 
 require conf/microblaze.conf
 DEFAULTTUNE = "microblaze"
-TUNE_FEATURES_tune-microblaze_forcevariable = "\${TUNE_FEATURES_tune-pmu-microblaze}"
+TUNE_FEATURES:tune-microblaze:forcevariable = "\${TUNE_FEATURES:tune-pmu-microblaze}"
 
 TARGET_CFLAGS += "-DPSU_PMU=1U"
 
@@ -648,7 +648,7 @@ ESW_MACHINE = "microblaze-plm"
 
 require conf/microblaze.conf
 DEFAULTTUNE = "microblaze"
-TUNE_FEATURES_tune-microblaze_forcevariable = "\${TUNE_FEATURES_tune-pmc-microblaze}"
+TUNE_FEATURES:tune-microblaze:forcevariable = "\${TUNE_FEATURES:tune-pmc-microblaze}"
 
 TARGET_CFLAGS += "-DVERSAL_PLM=1"
 
@@ -700,7 +700,7 @@ ESW_MACHINE = "microblaze-psm"
 
 require conf/microblaze.conf
 DEFAULTTUNE = "microblaze"
-TUNE_FEATURES_tune-microblaze_forcevariable = "\${TUNE_FEATURES_tune-psm-microblaze}"
+TUNE_FEATURES:tune-microblaze:forcevariable = "\${TUNE_FEATURES:tune-psm-microblaze}"
 
 TARGET_CFLAGS += "-DVERSAL_psm=1"
 

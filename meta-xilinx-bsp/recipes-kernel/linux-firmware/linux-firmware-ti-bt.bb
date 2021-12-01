@@ -53,13 +53,13 @@ do_install() {
 #  11.8.32   =   WL180x, WL183x, WL185x PG2.1 or PG2.2, 8.32 ROM Version
 PACKAGES =+ "${PN}-wl180x ${PN}-license"
 
-FILES_${PN}-license = "${nonarch_base_libdir}/firmware/License.ti-bt"
+FILES:${PN}-license = "${nonarch_base_libdir}/firmware/License.ti-bt"
 
-FILES_${PN}-wl180x = "${nonarch_base_libdir}/firmware/TIInit_11.8.32.bts \
+FILES:${PN}-wl180x = "${nonarch_base_libdir}/firmware/TIInit_11.8.32.bts \
                       ${nonarch_base_libdir}/firmware/ti-connectivity/TIInit_11.8.32.bts"
 
-RDEPENDS_${PN}-wl180x = "${PN}-license linux-firmware-wl18xx"
+RDEPENDS:${PN}-wl180x = "${PN}-license linux-firmware-wl18xx"
 
-LICENSE_${PN}-wl180x = "Firmware-ti-bt"
+LICENSE:${PN}-wl180x = "Firmware-ti-bt"
 
 INSANE_SKIP = "arch"

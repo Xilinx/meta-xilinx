@@ -21,7 +21,7 @@ SRC_URI[sha256sum] = "a909a91a37a9925ee2f972ccb10f986a26ff9785c1a71a483545a19278
 
 PROVIDES = "virtual/bitstream"
 
-FILES_${PN} += "/boot/download.bit"
+FILES:${PN} += "/boot/download.bit"
 
 INHIBIT_DEFAULT_DEPS = "1"
 PACKAGE_ARCH = "${MACHINE_ARCH}"

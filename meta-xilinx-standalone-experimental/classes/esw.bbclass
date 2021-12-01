@@ -10,9 +10,9 @@ B = "${WORKDIR}/build"
 OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
 LICFILENAME = "license.txt"
 
-SPECFILE_PATH_arm = "${S}/scripts/specs/arm/Xilinx.spec"
-SPECFILE_PATH_aarch64 = "${S}/scripts/specs/arm/Xilinx.spec"
-SPECFILE_PATH_microblaze = "${S}/scripts/specs/microblaze/Xilinx.spec"
+SPECFILE_PATH:arm = "${S}/scripts/specs/arm/Xilinx.spec"
+SPECFILE_PATH:aarch64 = "${S}/scripts/specs/arm/Xilinx.spec"
+SPECFILE_PATH:microblaze = "${S}/scripts/specs/microblaze/Xilinx.spec"
 
 ESW_MACHINE ?= "${MACHINE}"
 
@@ -21,7 +21,7 @@ ESW_CFLAGS += "-specs=${SPECFILE_PATH}"
 inherit ccmake
 
 COMPATIBLE_HOST = ".*-elf"
-COMPATIBLE_HOST_arm = "[^-]*-[^-]*-eabi"
+COMPATIBLE_HOST:arm = "[^-]*-[^-]*-eabi"
 
 DTS_FILE = "${DEPLOY_DIR_IMAGE}/devicetree/${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 
@@ -65,7 +65,7 @@ XLNX_CMAKE_MACHINE = "${@get_xlnx_cmake_machine(d.getVar('SOC_FAMILY'), d)}"
 XLNX_CMAKE_PROCESSOR = "${@get_xlnx_cmake_processor(d.getVar('DEFAULTTUNE'), d.getVar('ESW_MACHINE'), d)}"
 XLNX_CMAKE_SYSTEM_NAME ?= "Generic"
 
-cmake_do_generate_toolchain_file_append() {
+cmake_do_generate_toolchain_file:append() {
     cat >> ${WORKDIR}/toolchain.cmake <<EOF
     include(CMakeForceCompiler)
     CMAKE_FORCE_C_COMPILER("${OECMAKE_C_COMPILER}" GNU)
@@ -85,7 +85,7 @@ do_install() {
     install -m 0644  ${B}/include/*.h ${D}${includedir}
 }
 
-CFLAGS_append = " ${ESW_CFLAGS}"
+CFLAGS:append = " ${ESW_CFLAGS}"
 
 # We need to find the license file, which vaires depending on the component
 # recurse a maximum of x times, could be fancier but it gets complicated since

@@ -11,7 +11,7 @@ DEPENDS += "bootgen-native"
 do_compile[depends] += "virtual/boot-bin:do_deploy"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_versal = "versal"
+COMPATIBLE_MACHINE:versal = "versal"
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 

@@ -19,7 +19,7 @@ DEPENDS += "libyaml dtc"
 
 inherit distutils3
 
-do_configure_prepend() {
+do_configure:prepend() {
     (cd ${S}/../ ; make version_gen.h )
 }
 

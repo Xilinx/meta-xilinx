@@ -2,7 +2,7 @@ require gcc-configure-xilinx-standalone.inc
 
 COMPATIBLE_HOST = "${HOST_SYS}"
 
-python do_multilib_install_xilinx-standalone_class-target () {
+python do_multilib_install:xilinx-standalone:class-target () {
     pass
 }
 
@@ -19,11 +19,11 @@ standalone_fixup () {
 }
 
 FIXUP_FUNCTION = ""
-FIXUP_FUNCTION_xilinx-standalone_class-target = " standalone_fixup"
+FIXUP_FUNCTION:xilinx-standalone:class-target = " standalone_fixup"
 
 do_install[postfuncs] .= "${FIXUP_FUNCTION}"
 
-FILES_${PN}-dev_append_xilinx-standalone_class-target = " \
+FILES:${PN}-dev:append:xilinx-standalone:class-target = " \
 	${libdir}/*.a \
 	${libdir}/*.o \
 "

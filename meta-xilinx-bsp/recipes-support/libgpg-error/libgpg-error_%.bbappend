@@ -1,8 +1,8 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI_append_microblaze = " file://lock-obj-pub.microblazeel-unknown-linux-gnu.h"
+SRC_URI:append:microblaze = " file://lock-obj-pub.microblazeel-unknown-linux-gnu.h"
 
-do_configure_append_microblaze () {
+do_configure:append:microblaze () {
 	cp ${WORKDIR}/lock-obj-pub.microblazeel-unknown-linux-gnu.h ${S}/src/syscfg/
 }
 

@@ -6,7 +6,7 @@ DEPENDS += "libxil xiltimer"
 
 inherit python3native
 
-do_configure_prepend() {
+do_configure:prepend() {
     cd ${S}
     lopper.py ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} memtest
     install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
@@ -35,4 +35,4 @@ do_deploy() {
 
 addtask deploy before do_build after do_package
 
-FILES_${PN} = "${base_libdir}/firmware/memory_test*"
+FILES:${PN} = "${base_libdir}/firmware/memory_test*"

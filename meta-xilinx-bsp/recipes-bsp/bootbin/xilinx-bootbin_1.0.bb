@@ -159,13 +159,13 @@ do_deploy() {
     ln -sf ${BOOTBIN_BASE_NAME}.bin ${DEPLOYDIR}/boot.bin
 }
 
-do_deploy_append_versal () {
+do_deploy:append:versal () {
 
     install -m 0644 ${B}/BOOT_bh.bin ${DEPLOYDIR}/${BOOTBIN_BASE_NAME}_bh.bin
     ln -sf ${BOOTBIN_BASE_NAME}_bh.bin ${DEPLOYDIR}/BOOT-${MACHINE}_bh.bin
 }
 
-FILES_${PN} += "/boot/BOOT.bin"
+FILES:${PN} += "/boot/BOOT.bin"
 SYSROOT_DIRS += "/boot"
 
 addtask do_deploy before do_build after do_compile

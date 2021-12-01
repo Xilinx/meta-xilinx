@@ -3,7 +3,7 @@ LICENSE = "BSD"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f9990fcc34ccf1f82ccf1bc5a1cc3bfc"
 
-RDEPENDS_${PN} += "\
+RDEPENDS:${PN} += "\
 	python3-pynq \
 	python3-pillow \
 	libstdc++ \
@@ -15,7 +15,7 @@ SRC_URI = "git://github.com/Xilinx/PYNQ-HelloWorld.git;protocol=https \
 "
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE_ultra96 = "${MACHINE}"
+COMPATIBLE_MACHINE:ultra96 = "${MACHINE}"
 
 SRC_URI[md5sum] = "ac1bfe94a18301b26ae5110ea26ca596"
 SRC_URI[sha256sum] = "f522c54c9418d1b1fdb6098cd7139439d47b041900000812c51200482d423460"
@@ -37,4 +37,4 @@ do_install() {
 
 }
 
-PACKAGE_ARCH_ultra96 = "${BOARD_ARCH}"
+PACKAGE_ARCH:ultra96 = "${BOARD_ARCH}"

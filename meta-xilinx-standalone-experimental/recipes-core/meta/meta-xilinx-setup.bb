@@ -33,7 +33,6 @@ RDEPENDS = "${TOOLCHAIN_HOST_TASK}"
 
 EXCLUDE_FROM_WORLD = "1"
 
-inherit meta
 inherit populate_sdk
 inherit toolchain-scripts-base
 inherit nopackages
@@ -48,7 +47,8 @@ REAL_MULTIMACH_TARGET_SYS = "none"
 # Needed to ensure README-setup and dt-processor.sh are available
 addtask do_populate_sdk after do_unpack
 
-create_sdk_files_append () {
+create_sdk_files:append () {
+
 	install -m 0644 ${WORKDIR}/README-setup ${SDK_OUTPUT}/${SDKPATH}/.
 	install -m 0755 ${WORKDIR}/dt-processor.sh ${SDK_OUTPUT}/${SDKPATH}/.
 

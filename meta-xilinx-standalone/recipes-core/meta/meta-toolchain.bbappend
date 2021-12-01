@@ -8,5 +8,5 @@ HOST_DEPENDS = " \
    nativesdk-sdk-provides-dummy \
 "
 
-TOOLCHAIN_HOST_TASK_xilinx-standalone = "${HOST_DEPENDS} packagegroup-cross-canadian-${MACHINE}"
-TOOLCHAIN_TARGET_TASK_xilinx-standalone = "${@multilib_pkg_extend(d, 'packagegroup-newlib-standalone-sdk-target')}"
+TOOLCHAIN_HOST_TASK:xilinx-standalone = "${HOST_DEPENDS} packagegroup-cross-canadian-${MACHINE}"
+TOOLCHAIN_TARGET_TASK:xilinx-standalone = "${@multilib_pkg_extend(d, 'packagegroup-newlib-standalone-sdk-target')}"

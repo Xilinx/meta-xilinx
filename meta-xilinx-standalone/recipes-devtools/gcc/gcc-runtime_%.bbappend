@@ -2,7 +2,7 @@ require gcc-configure-xilinx-standalone.inc
 
 COMPATIBLE_HOST = "${HOST_SYS}"
 
-EXTRA_OECONF_append_xilinx-standalone_class-target = " \
+EXTRA_OECONF:append:xilinx-standalone:class-target = " \
 	--disable-libstdcxx-pch \
 	--with-newlib \
 	--disable-threads \
@@ -11,7 +11,7 @@ EXTRA_OECONF_append_xilinx-standalone_class-target = " \
 	--disable-libitm \
 "
 
-EXTRA_OECONF_append_xilinx-standalone_aarch64_class-target = " \
+EXTRA_OECONF:append:xilinx-standalone:aarch64:class-target = " \
 	--disable-multiarch \
 	--with-arch=armv8-a \
 	"
@@ -19,18 +19,18 @@ EXTRA_OECONF_append_xilinx-standalone_aarch64_class-target = " \
 # Both arm and armrm overrides are set w/ cortex r5
 # So only set rmprofile if armrm is defined.
 ARM_PROFILE = "aprofile"
-ARM_PROFILE_armrm = "rmprofile"
+ARM_PROFILE:armrm = "rmprofile"
 
-EXTRA_OECONF_append_xilinx-standalone_arm_class-target = " \
+EXTRA_OECONF:append:xilinx-standalone:arm:class-target = " \
 	--with-multilib-list=${ARM_PROFILE} \
 	"
 
-EXTRA_OECONF_append_xilinx-standalone_armrm_class-target = " \
+EXTRA_OECONF:append:xilinx-standalone:armrm:class-target = " \
 	--disable-tls \
 	--disable-decimal-float \
 	"
 
-EXTRA_OECONF_append_xilinx-standalone_microblaze_class-target = " \
+EXTRA_OECONF:append:xilinx-standalone:microblaze:class-target = " \
 	--enable-target-optspace \
 	--without-long-double-128 \
 	"
@@ -38,9 +38,9 @@ EXTRA_OECONF_append_xilinx-standalone_microblaze_class-target = " \
 # Changes local to gcc-runtime...
 
 # Dont build libitm, etc.
-RUNTIMETARGET_xilinx-standalone_class-target = "libstdc++-v3"
+RUNTIMETARGET:xilinx-standalone:class-target = "libstdc++-v3"
 
-do_install_append_xilinx-standalone_class-target() {
+do_install:append:xilinx-standalone:class-target() {
 	# Fixup what gcc-runtime normally would do, we don't want linux directories!
 	rm -rf ${D}${includedir}/c++/${BINV}/${TARGET_ARCH}${TARGET_VENDOR}-linux
 
@@ -69,6 +69,6 @@ do_install_append_xilinx-standalone_class-target() {
 	fi
 }
 
-FILES_${PN}-dbg_append_xilinx-standalone_class-target = "\
+FILES:${PN}-dbg:append:xilinx-standalone:class-target = "\
     ${libdir}/libstdc++.a-gdb.py \
 "
