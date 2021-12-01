@@ -46,7 +46,4 @@ SRC_URI = "\
      file://CVE-2020-35448.patch \
      file://0001-gold-ensure-file_counts_lock-is-initialized-before-u.patch \
 "
-
-require binutils-microblaze.inc
-
 S  = "${WORKDIR}/git"
