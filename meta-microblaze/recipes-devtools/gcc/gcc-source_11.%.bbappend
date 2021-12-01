@@ -1,3 +1,6 @@
+# Add MicroBlaze Patches (only when using MicroBlaze)
+FILESEXTRAPATHS:append:microblaze := ":${THISDIR}/gcc-10"
+
 SRC_URI:append:microblaze = " \
     file://0001-LOCAL-Testsuite-builtins-tests-require-fpic.patch \
     file://0002-LOCAL-Quick-fail-g-.dg-opt-memcpy1.C.patch \
