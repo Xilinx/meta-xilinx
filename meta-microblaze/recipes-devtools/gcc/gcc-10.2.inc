@@ -73,8 +73,6 @@ SRC_URI = "\
 "
 SRC_URI[sha256sum] = "b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c"
 
-require gcc-10.2-microblaze.inc
-
 S = "${TMPDIR}/work-shared/gcc-${PV}-${PR}/gcc-${PV}"
 # For dev release snapshotting
 #S = "${TMPDIR}/work-shared/gcc-${PV}-${PR}/gcc-${RELEASE}"
