@@ -1,22 +1,21 @@
-From bf3c50c95c4dcca6c5c07a3c082bdd9d687f1496 Mon Sep 17 00:00:00 2001
+From 41b0d54fa00ce765e9a2ce09136938b72b2b96d7 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 17 Feb 2017 14:09:40 +0530
-Subject: [PATCH 40/52] Fixing the issues related to GDB-7.12 added all the
- required function which are new in 7.12 and removed few deprecated functions
- from 7.6
+Subject: [PATCH 06/10] Fixing the issues related to GDB-7.12
 
+added all the required function which are new in 7.12 and removed
+few deprecated functions from 7.6
 ---
  gdb/config/microblaze/linux.mh       |  4 +-
- gdb/gdbserver/configure.srv          |  3 +-
  gdb/gdbserver/linux-microblaze-low.c | 97 ++++++++++++++++++++++++----
- gdb/microblaze-linux-tdep.c          | 68 +++++++++++++++++--
  gdb/microblaze-tdep.h                |  1 +
- 5 files changed, 153 insertions(+), 20 deletions(-)
+ gdbserver/configure.srv              |  3 +-
+ 4 files changed, 89 insertions(+), 16 deletions(-)
 
-Index: gdb-9.2/gdb/config/microblaze/linux.mh
-===================================================================
---- gdb-9.2.orig/gdb/config/microblaze/linux.mh
-+++ gdb-9.2/gdb/config/microblaze/linux.mh
+diff --git a/gdb/config/microblaze/linux.mh b/gdb/config/microblaze/linux.mh
+index a4eaf540e1d..74a53b854a4 100644
+--- a/gdb/config/microblaze/linux.mh
++++ b/gdb/config/microblaze/linux.mh
 @@ -1,9 +1,11 @@
  # Host: Microblaze, running Linux
  
@@ -30,24 +29,10 @@ Index: gdb-9.2/gdb/config/microblaze/linux.mh
  NAT_CDEPS = $(srcdir)/proc-service.list
  
  LOADLIBES = -ldl $(RDYNAMIC)
-Index: gdb-9.2/gdb/gdbserver/configure.srv
-===================================================================
---- gdb-9.2.orig/gdb/gdbserver/configure.srv
-+++ gdb-9.2/gdb/gdbserver/configure.srv
-@@ -185,8 +185,7 @@ case "${target}" in
- 			srv_linux_thread_db=yes
- 			;;
-   microblaze*-*-linux*)	srv_regobj=microblaze-linux.o
--			srv_tgtobj="linux-low.o linux-osdata.o linux-microblaze-low.o "
--			srv_tgtobj="${srv_tgtobj} linux-procfs.o linux-ptrace.o"
-+			srv_tgtobj="$srv_linux_obj linux-microblaze-low.o "
- 			srv_linux_regsets=yes
- 			srv_linux_usrregs=yes
- 			srv_linux_thread_db=yes
-Index: gdb-9.2/gdb/gdbserver/linux-microblaze-low.c
-===================================================================
---- gdb-9.2.orig/gdb/gdbserver/linux-microblaze-low.c
-+++ gdb-9.2/gdb/gdbserver/linux-microblaze-low.c
+diff --git a/gdb/gdbserver/linux-microblaze-low.c b/gdb/gdbserver/linux-microblaze-low.c
+index cba5d6fc585..a2733f3c21c 100644
+--- a/gdb/gdbserver/linux-microblaze-low.c
++++ b/gdb/gdbserver/linux-microblaze-low.c
 @@ -39,10 +39,11 @@ static int microblaze_regmap[] =
    PT_FSR
    };
@@ -61,7 +46,7 @@ Index: gdb-9.2/gdb/gdbserver/linux-microblaze-low.c
  
  static int
  microblaze_cannot_store_register (int regno)
-@@ -81,6 +82,15 @@ microblaze_set_pc (struct regcache *regc
+@@ -81,6 +82,15 @@ microblaze_set_pc (struct regcache *regcache, CORE_ADDR pc)
  static const unsigned long microblaze_breakpoint = 0xba0c0018;
  #define microblaze_breakpoint_len 4
  
@@ -77,7 +62,7 @@ Index: gdb-9.2/gdb/gdbserver/linux-microblaze-low.c
  static int
  microblaze_breakpoint_at (CORE_ADDR where)
  {
-@@ -107,7 +117,7 @@ microblaze_reinsert_addr (struct regcach
+@@ -107,7 +117,7 @@ microblaze_reinsert_addr (struct regcache *regcache)
  static void
  microblaze_collect_ptrace_register (struct regcache *regcache, int regno, char *buf)
  {
@@ -95,7 +80,7 @@ Index: gdb-9.2/gdb/gdbserver/linux-microblaze-low.c
  
    if (regno == 0) {
      unsigned long regbuf_0 = 0;
-@@ -157,33 +167,94 @@ microblaze_store_gregset (struct regcach
+@@ -157,33 +167,94 @@ microblaze_store_gregset (struct regcache *regcache, const void *buf)
  
  #endif /* HAVE_PTRACE_GETREGS */
  
@@ -200,102 +185,10 @@ Index: gdb-9.2/gdb/gdbserver/linux-microblaze-low.c
 +{
 +  init_registers_microblaze ();
 +}
-Index: gdb-9.2/gdb/microblaze-linux-tdep.c
-===================================================================
---- gdb-9.2.orig/gdb/microblaze-linux-tdep.c
-+++ gdb-9.2/gdb/microblaze-linux-tdep.c
-@@ -29,13 +29,76 @@
- #include "regcache.h"
- #include "value.h"
- #include "osabi.h"
--#include "regset.h"
- #include "solib-svr4.h"
- #include "microblaze-tdep.h"
- #include "trad-frame.h"
- #include "frame-unwind.h"
- #include "tramp-frame.h"
- #include "linux-tdep.h"
-+#include "glibc-tdep.h"
-+
-+#include "gdb_assert.h"
-+
-+#ifndef REGSET_H
-+#define REGSET_H 1
-+
-+struct gdbarch;
-+struct regcache;
-+
-+/* Data structure for the supported register notes in a core file.  */
-+struct core_regset_section
-+{
-+  const char *sect_name;
-+  int size;
-+  const char *human_name;
-+};
-+
-+/* Data structure describing a register set.  */
-+
-+typedef void (supply_regset_ftype) (const struct regset *, struct regcache *,
-+                                    int, const void *, size_t);
-+typedef void (collect_regset_ftype) (const struct regset *,
-+                                     const struct regcache *,
-+                                     int, void *, size_t);
-+
-+struct regset
-+{
-+  /* Data pointer for private use by the methods below, presumably
-+     providing some sort of description of the register set.  */
-+  const void *descr;
-+
-+  /* Function supplying values in a register set to a register cache.  */
-+  supply_regset_ftype *supply_regset;
-+
-+  /* Function collecting values in a register set from a register cache.  */
-+  collect_regset_ftype *collect_regset;
-+
-+  /* Architecture associated with the register set.  */
-+  struct gdbarch *arch;
-+};
-+
-+#endif
-+
-+/* Allocate a fresh 'struct regset' whose supply_regset function is
-+   SUPPLY_REGSET, and whose collect_regset function is COLLECT_REGSET.
-+   If the regset has no collect_regset function, pass NULL for
-+   COLLECT_REGSET.
-+
-+   The object returned is allocated on ARCH's obstack.  */
-+
-+struct regset *
-+regset_alloc (struct gdbarch *arch,
-+              supply_regset_ftype *supply_regset,
-+              collect_regset_ftype *collect_regset)
-+{
-+  struct regset *regset = GDBARCH_OBSTACK_ZALLOC (arch, struct regset);
-+
-+  regset->arch = arch;
-+  regset->supply_regset = supply_regset;
-+  regset->collect_regset = collect_regset;
-+
-+  return regset;
-+}
- 
- static int microblaze_debug_flag = 0;
- 
-@@ -207,9 +270,6 @@ microblaze_linux_init_abi (struct gdbarc
-   set_gdbarch_skip_trampoline_code (gdbarch, find_solib_trampoline_target);
-   set_gdbarch_skip_solib_resolver (gdbarch, glibc_skip_solib_resolver);
- 
--  set_gdbarch_regset_from_core_section (gdbarch,
--					microblaze_regset_from_core_section);
--
-   /* Enable TLS support.  */
-   set_gdbarch_fetch_tls_load_module_address (gdbarch,
-                                              svr4_fetch_objfile_link_map);
-Index: gdb-9.2/gdb/microblaze-tdep.h
-===================================================================
---- gdb-9.2.orig/gdb/microblaze-tdep.h
-+++ gdb-9.2/gdb/microblaze-tdep.h
+diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
+index e91991b8dba..872a3931f20 100644
+--- a/gdb/microblaze-tdep.h
++++ b/gdb/microblaze-tdep.h
 @@ -24,6 +24,7 @@
  /* Microblaze architecture-specific information.  */
  struct microblaze_gregset
@@ -304,3 +197,20 @@ Index: gdb-9.2/gdb/microblaze-tdep.h
     unsigned int gregs[32];
     unsigned int fpregs[32];
     unsigned int pregs[16];
+diff --git a/gdbserver/configure.srv b/gdbserver/configure.srv
+index 9d68c24a92d..af10cb05683 100644
+--- a/gdbserver/configure.srv
++++ b/gdbserver/configure.srv
+@@ -167,8 +167,7 @@ case "${gdbserver_host}" in
+ 			srv_linux_thread_db=yes
+ 			;;
+   microblaze*-*-linux*)	srv_regobj="microblaze-linux.o"
+-			srv_tgtobj="linux-low.o linux-osdata.o linux-microblaze-low.o "
+-			srv_tgtobj="${srv_tgtobj} linux-procfs.o linux-ptrace.o"
++			srv_tgtobj="$srv_linux_obj linux-microblaze-low.o "
+ 			srv_xmlfiles="microblaze-linux.xml"
+ 			srv_linux_regsets=yes
+ 			srv_linux_usrregs=yes
+-- 
+2.17.1
+

@@ -1,18 +1,18 @@
-From c6da374fbce33b35b060a07ee446aaf1803b1e1d Mon Sep 17 00:00:00 2001
+From 80c56ef8463c23f51759f5c64ce0165e259a4071 Mon Sep 17 00:00:00 2001
 From: Nathan Rossi <nathan.rossi@petalogix.com>
 Date: Tue, 8 May 2012 18:11:17 +1000
-Subject: [PATCH 35/52] Fix debug message when register is unavailable
+Subject: [PATCH 03/10] Fix debug message when register is unavailable
 
 Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
 ---
  gdb/frame.c | 13 ++++++++++---
  1 file changed, 10 insertions(+), 3 deletions(-)
 
-Index: gdb-9.2/gdb/frame.c
-===================================================================
---- gdb-9.2.orig/gdb/frame.c
-+++ gdb-9.2/gdb/frame.c
-@@ -1255,12 +1255,19 @@ frame_unwind_register_value (frame_info
+diff --git a/gdb/frame.c b/gdb/frame.c
+index c1eba5848af..fe4a0dc0dd0 100644
+--- a/gdb/frame.c
++++ b/gdb/frame.c
+@@ -1305,12 +1305,19 @@ frame_unwind_register_value (frame_info *next_frame, int regnum)
  	  else
  	    {
  	      int i;
@@ -35,3 +35,6 @@ Index: gdb-9.2/gdb/frame.c
  	      fprintf_unfiltered (gdb_stdlog, "]");
  	    }
  	}
+-- 
+2.17.1
+

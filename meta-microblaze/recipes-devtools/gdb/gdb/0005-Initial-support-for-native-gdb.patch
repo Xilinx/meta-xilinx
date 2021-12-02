@@ -1,15 +1,12 @@
-From db3c0a8a59b292eea6ed1f532f4097c40cafd7df Mon Sep 17 00:00:00 2001
+From bac086097dfa813fcc0b978dc32eb9ae469bf4a8 Mon Sep 17 00:00:00 2001
 From: David Holsgrove <david.holsgrove@petalogix.com>
 Date: Fri, 20 Jul 2012 15:18:35 +1000
-Subject: [PATCH 39/52] Initial support for native gdb
+Subject: [PATCH 05/10] Initial support for native gdb
 
 microblaze: Follow PPC method of getting setting registers
 using PTRACE PEEK/POKE
 
 Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
-
-Conflicts:
-	gdb/Makefile.in
 ---
  gdb/Makefile.in                |   2 +
  gdb/config/microblaze/linux.mh |   9 +
@@ -18,11 +15,11 @@ Conflicts:
  create mode 100644 gdb/config/microblaze/linux.mh
  create mode 100644 gdb/microblaze-linux-nat.c
 
-Index: gdb-9.2/gdb/Makefile.in
-===================================================================
---- gdb-9.2.orig/gdb/Makefile.in
-+++ gdb-9.2/gdb/Makefile.in
-@@ -1337,6 +1337,7 @@ HFILES_NO_SRCDIR = \
+diff --git a/gdb/Makefile.in b/gdb/Makefile.in
+index ec371fc7e52..2e8d4cfe82e 100644
+--- a/gdb/Makefile.in
++++ b/gdb/Makefile.in
+@@ -1336,6 +1336,7 @@ HFILES_NO_SRCDIR = \
  	memory-map.h \
  	memrange.h \
  	microblaze-tdep.h \
@@ -30,7 +27,7 @@ Index: gdb-9.2/gdb/Makefile.in
  	mips-linux-tdep.h \
  	mips-nbsd-tdep.h \
  	mips-tdep.h \
-@@ -2261,6 +2262,7 @@ ALLDEPFILES = \
+@@ -2216,6 +2217,7 @@ ALLDEPFILES = \
  	m68k-tdep.c \
  	microblaze-linux-tdep.c \
  	microblaze-tdep.c \
@@ -38,10 +35,11 @@ Index: gdb-9.2/gdb/Makefile.in
  	mingw-hdep.c \
  	mips-fbsd-nat.c \
  	mips-fbsd-tdep.c \
-Index: gdb-9.2/gdb/config/microblaze/linux.mh
-===================================================================
+diff --git a/gdb/config/microblaze/linux.mh b/gdb/config/microblaze/linux.mh
+new file mode 100644
+index 00000000000..a4eaf540e1d
 --- /dev/null
-+++ gdb-9.2/gdb/config/microblaze/linux.mh
++++ b/gdb/config/microblaze/linux.mh
 @@ -0,0 +1,9 @@
 +# Host: Microblaze, running Linux
 +
@@ -52,10 +50,11 @@ Index: gdb-9.2/gdb/config/microblaze/linux.mh
 +NAT_CDEPS = $(srcdir)/proc-service.list
 +
 +LOADLIBES = -ldl $(RDYNAMIC)
-Index: gdb-9.2/gdb/microblaze-linux-nat.c
-===================================================================
+diff --git a/gdb/microblaze-linux-nat.c b/gdb/microblaze-linux-nat.c
+new file mode 100644
+index 00000000000..e9b8c9c5221
 --- /dev/null
-+++ gdb-9.2/gdb/microblaze-linux-nat.c
++++ b/gdb/microblaze-linux-nat.c
 @@ -0,0 +1,431 @@
 +/* Microblaze GNU/Linux native support.
 +
@@ -488,3 +487,6 @@ Index: gdb-9.2/gdb/microblaze-linux-nat.c
 +  /* Register the target.  */
 +  linux_nat_add_target (t);
 +}
+-- 
+2.17.1
+
