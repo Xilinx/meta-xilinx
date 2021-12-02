@@ -1,7 +1,7 @@
-From af01da22797795408d45dcf03076dc8153c7029e Mon Sep 17 00:00:00 2001
+From 1c93b2ce88766f74f1f6d7e0235ffff0b7ca7b81 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 9 Nov 2020 21:14:54 +0530
-Subject: [PATCH 21/54] [Patch, microblaze]: Correct the const high double
+Subject: [PATCH 21/53] [Patch, microblaze]: Correct the const high double
  immediate value with this patch the loading of the DI mode immediate values
  will be using REAL_VALUE_FROM_CONST_DOUBLE and REAL_VALUE_TO_TARGET_DOUBLE
  functions, as CONST_DOUBLE_HIGH was returning the sign extension value even
@@ -16,7 +16,7 @@ Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
  create mode 100644 gcc/testsuite/gcc.target/microblaze/others/long.c
 
 diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 0dc96e481b7..5d395f047f7 100644
+index c730faa9814..3b1e992fa28 100644
 --- a/gcc/config/microblaze/microblaze.c
 +++ b/gcc/config/microblaze/microblaze.c
 @@ -2452,14 +2452,16 @@ print_operand (FILE * file, rtx op, int letter)

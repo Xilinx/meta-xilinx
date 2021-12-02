@@ -1,7 +1,7 @@
-From 051d744c06ed3f11f603e37768eece57784c2583 Mon Sep 17 00:00:00 2001
+From 844daa118a8f376e5a53040fc953c86e70d34140 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 26 Nov 2019 17:26:15 +0530
-Subject: [PATCH 35/54] Fixed below issues:
+Subject: [PATCH 33/53] Fixed below issues:
 
 - Floating point print issues in 64bit mode
 - Dejagnu Jump related issues
@@ -18,7 +18,7 @@ Conflicts:
  5 files changed, 125 insertions(+), 17 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 498c8ca191f..e32de46fa62 100644
+index 64b948d6cfc..b2cd89a310a 100644
 --- a/gcc/config/microblaze/microblaze.c
 +++ b/gcc/config/microblaze/microblaze.c
 @@ -2473,7 +2473,12 @@ print_operand (FILE * file, rtx op, int letter)
@@ -48,7 +48,7 @@ index 498c8ca191f..e32de46fa62 100644
    LABEL_NUSES (div_end_label) = 1; 
    emit_barrier ();
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index f6ad4d9fc21..60c552958b8 100644
+index 94ac736221c..17bf470c95b 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -888,10 +888,17 @@ do {									 \
@@ -70,7 +70,7 @@ index f6ad4d9fc21..60c552958b8 100644
  /* We need to group -lm as well, since some Newlib math functions 
     reference __errno!  */
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index e7c7cf3e8b5..74bb30cb9e8 100644
+index b154d15c34c..7d6cf263eb6 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -527,6 +527,15 @@
@@ -89,7 +89,7 @@ index e7c7cf3e8b5..74bb30cb9e8 100644
  (define_insn "fix_truncsfsi2"
    [(set (match_operand:SI 0 "register_operand" "=d")
          (fix:SI (match_operand:SF 1 "register_operand" "d")))]
-@@ -1301,7 +1310,7 @@
+@@ -1299,7 +1308,7 @@
  (define_insn "movdi_long_int"
    [(set (match_operand:DI 0 "nonimmediate_operand" "=d")
  	(match_operand:DI 1 "general_operand"      "i"))]
@@ -98,7 +98,7 @@ index e7c7cf3e8b5..74bb30cb9e8 100644
    "addlik\t%0,r0,%h1\n\tbsllli\t%0,%0,32\n\taddlik\t%0,%0,%j1 #li => la";
    [(set_attr "type"	"no_delay_arith")
    (set_attr "mode"	"DI")
-@@ -1584,7 +1593,7 @@
+@@ -1582,7 +1591,7 @@
            return "ll%i1\t%0,%1";
        case 3:
        {
@@ -107,7 +107,7 @@ index e7c7cf3e8b5..74bb30cb9e8 100644
        }
        case 5:
  	return "sl%i0\t%1,%0";
-@@ -2374,9 +2383,9 @@ else
+@@ -2371,9 +2380,9 @@ else
  
  (define_insn "long_branch_compare"
    [(set (pc)
@@ -120,7 +120,7 @@ index e7c7cf3e8b5..74bb30cb9e8 100644
                                           ])
                        (label_ref (match_operand 3))
                        (pc)))
-@@ -2498,6 +2507,20 @@ else
+@@ -2495,6 +2504,20 @@ else
  ;;----------------------------------------------------------------
  ;; Unconditional branches
  ;;----------------------------------------------------------------
@@ -141,7 +141,7 @@ index e7c7cf3e8b5..74bb30cb9e8 100644
  (define_insn "jump"
    [(set (pc)
  	(label_ref (match_operand 0 "" "")))]
-@@ -2543,17 +2566,25 @@ else
+@@ -2540,17 +2563,25 @@ else
    {
      //gcc_assert (GET_MODE (operands[0]) == Pmode);
  
@@ -172,7 +172,7 @@ index e7c7cf3e8b5..74bb30cb9e8 100644
    (use (label_ref (match_operand 1 "" "")))]
    ""
    "bra%?\t%0 "
-@@ -2561,11 +2592,21 @@ else
+@@ -2558,11 +2589,21 @@ else
    (set_attr "mode"	"none")
    (set_attr "length"	"4")])
  
@@ -197,7 +197,7 @@ index e7c7cf3e8b5..74bb30cb9e8 100644
    ""
    ""
  )
-@@ -2596,6 +2637,23 @@ else
+@@ -2593,6 +2634,23 @@ else
    ""
  )
  
@@ -221,7 +221,7 @@ index e7c7cf3e8b5..74bb30cb9e8 100644
  ;;----------------------------------------------------------------
  ;; Function prologue/epilogue and stack allocation
  ;;----------------------------------------------------------------
-@@ -3102,7 +3160,7 @@ else
+@@ -3099,7 +3157,7 @@ else
  ;; The insn to set GOT. The hardcoded number "8" accounts for $pc difference
  ;; between "mfs" and "addik" instructions.
  (define_insn "set_got"
@@ -231,7 +231,7 @@ index e7c7cf3e8b5..74bb30cb9e8 100644
    ""
    "mfs\t%0,rpc\n\taddik\t%0,%0,_GLOBAL_OFFSET_TABLE_+8"
 diff --git a/libgcc/config/microblaze/crti.S b/libgcc/config/microblaze/crti.S
-index 005825f1ec5..b7436c7131f 100644
+index bc69d890370..7400eeb2e3b 100644
 --- a/libgcc/config/microblaze/crti.S
 +++ b/libgcc/config/microblaze/crti.S
 @@ -33,11 +33,32 @@
@@ -274,7 +274,7 @@ index 005825f1ec5..b7436c7131f 100644
      sw      r15, r0, r1
 +#endif
 diff --git a/libgcc/config/microblaze/crtn.S b/libgcc/config/microblaze/crtn.S
-index 5705eff9a4a..f1148ffebe4 100644
+index 1a1f0a8e0f3..14d9a084e3e 100644
 --- a/libgcc/config/microblaze/crtn.S
 +++ b/libgcc/config/microblaze/crtn.S
 @@ -29,7 +29,19 @@

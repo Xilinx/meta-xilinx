@@ -1,7 +1,7 @@
-From bfdb38133201f7df01d09dc7e7ee3043a35c1d3e Mon Sep 17 00:00:00 2001
+From 39d009f82d0fc316b633a717f173b6195316c8ed Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 9 Nov 2020 19:54:39 +0530
-Subject: [PATCH 20/54] [Patch, microblaze]: 8-stage pipeline for microblaze
+Subject: [PATCH 20/53] [Patch, microblaze]: 8-stage pipeline for microblaze
 
 This patch adds the support for the 8-stage pipeline. The new 8-stage
 pipeline reduces the latencies of float & integer division drastically
@@ -15,7 +15,7 @@ Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
  4 files changed, 94 insertions(+), 3 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 0a4619eec0c..0dc96e481b7 100644
+index 16f3120e415..c730faa9814 100644
 --- a/gcc/config/microblaze/microblaze.c
 +++ b/gcc/config/microblaze/microblaze.c
 @@ -1840,6 +1840,17 @@ microblaze_option_override (void)
@@ -37,7 +37,7 @@ index 0a4619eec0c..0dc96e481b7 100644
    if (TARGET_MULTIPLY_HIGH && TARGET_SOFT_MUL)
      error ("%<-mxl-multiply-high%> requires %<-mno-xl-soft-mul%>");
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index 8aa3f155790..8a668278337 100644
+index e32ce7dbb51..21560ec1618 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -27,7 +27,8 @@
@@ -51,7 +51,7 @@ index 8aa3f155790..8a668278337 100644
  
  #define MICROBLAZE_MASK_NO_UNSAFE_DELAY         0x00000001
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index be8bbda2bfb..c407a81c51e 100644
+index 986c78f592a..ce72acb9ee0 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -35,6 +35,7 @@
@@ -162,7 +162,7 @@ index be8bbda2bfb..c407a81c51e 100644
    (set_attr "length"    "4")])
  
 diff --git a/gcc/config/microblaze/microblaze.opt b/gcc/config/microblaze/microblaze.opt
-index 725c2fab52a..a29c6f8df90 100644
+index 8dfb134b315..2a72566372b 100644
 --- a/gcc/config/microblaze/microblaze.opt
 +++ b/gcc/config/microblaze/microblaze.opt
 @@ -133,3 +133,7 @@ Data referenced by offset from start of text instead of GOT (with -fPIC/-fPIE).

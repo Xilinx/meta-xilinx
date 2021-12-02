@@ -1,7 +1,7 @@
-From 444a09859149f8d21777a1c859ef2305ff86b211 Mon Sep 17 00:00:00 2001
+From b26f11b38406605f1601626f9ee8267f85b4857c Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Fri, 29 Mar 2019 12:08:39 +0530
-Subject: [PATCH 46/54] [Patch,Microblaze] : We will check the possibility of
+Subject: [PATCH 44/53] [Patch,Microblaze] : We will check the possibility of
  peephole2 optimization,if we can then we will fix the compiler issue.
 
 ---
@@ -9,7 +9,7 @@ Subject: [PATCH 46/54] [Patch,Microblaze] : We will check the possibility of
  1 file changed, 38 insertions(+), 25 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 207d2bf1b55..9b88666c0a6 100644
+index fed6f5e0234..1490a522a4c 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -882,31 +882,44 @@

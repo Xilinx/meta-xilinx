@@ -1,7 +1,7 @@
-From 2b2c6e96c3aefc86c880be05d93685a4ce97c9f1 Mon Sep 17 00:00:00 2001
+From c03a994475d8894ae0913dd3534e72bfb389aa28 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Tue, 11 Sep 2018 14:58:00 +0530
-Subject: [PATCH 34/54] Fixed issues like: 1 Interrupt alignment issue 2 Sign
+Subject: [PATCH 32/53] Fixed issues like: 1 Interrupt alignment issue 2 Sign
  extension issue
 
 ---
@@ -10,7 +10,7 @@ Subject: [PATCH 34/54] Fixed issues like: 1 Interrupt alignment issue 2 Sign
  2 files changed, 11 insertions(+), 7 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 046bfd05558..498c8ca191f 100644
+index e33e1bc1482..64b948d6cfc 100644
 --- a/gcc/config/microblaze/microblaze.c
 +++ b/gcc/config/microblaze/microblaze.c
 @@ -2177,9 +2177,14 @@ compute_frame_size (HOST_WIDE_INT size)
@@ -53,7 +53,7 @@ index 046bfd05558..498c8ca191f 100644
    else if (code == CONST_DOUBLE)
      {
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 592757baf2f..e7c7cf3e8b5 100644
+index 87158066562..b154d15c34c 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -1096,7 +1096,7 @@

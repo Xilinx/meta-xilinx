@@ -1,7 +1,7 @@
-From 3a9ee185eb462f880ceb4ddd125d4a98e0759873 Mon Sep 17 00:00:00 2001
+From abef7f4d2ad2869c37c4fb2666b52ed700384877 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 18:18:41 +0530
-Subject: [PATCH 19/54] [Patch, microblaze]: Update ashlsi3 & movsf patterns
+Subject: [PATCH 19/53] [Patch, microblaze]: Update ashlsi3 & movsf patterns
  This patch removes the use of HOST_WIDE_INT_PRINT_HEX macro in print_operand
  of ashlsi3_with_mul_nodelay,ashlsi3_with_mul_delay and movsf_internal
  patterns beacuse HOST_WIDE_INT_PRINT_HEX is generating 64-bit value which our
@@ -27,7 +27,7 @@ ChangeLog:
  2 files changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 9eae5515c60..0a4619eec0c 100644
+index 62630aab64e..16f3120e415 100644
 --- a/gcc/config/microblaze/microblaze.c
 +++ b/gcc/config/microblaze/microblaze.c
 @@ -2468,7 +2468,7 @@ print_operand (FILE * file, rtx op, int letter)
@@ -40,7 +40,7 @@ index 9eae5515c60..0a4619eec0c 100644
        else
  	{
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index efd2c34e0b7..be8bbda2bfb 100644
+index d86a049355a..986c78f592a 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -1368,7 +1368,10 @@

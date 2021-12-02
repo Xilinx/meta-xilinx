@@ -1,7 +1,7 @@
-From 67d89be9ace8f658354fb1378e986451ef435d60 Mon Sep 17 00:00:00 2001
+From 5b31cd986c75c5f479967b8f9c1b4ac1fc322b1a Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 3 Aug 2018 15:41:39 +0530
-Subject: [PATCH 31/54] re-arrangement of the compare branches
+Subject: [PATCH 29/53] re-arrangement of the compare branches
 
 ---
  gcc/config/microblaze/microblaze.c  |  28 ++----
@@ -9,7 +9,7 @@ Subject: [PATCH 31/54] re-arrangement of the compare branches
  2 files changed, 73 insertions(+), 96 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 3c815444574..046bfd05558 100644
+index f59a71ac072..e33e1bc1482 100644
 --- a/gcc/config/microblaze/microblaze.c
 +++ b/gcc/config/microblaze/microblaze.c
 @@ -3697,11 +3697,7 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
@@ -83,10 +83,10 @@ index 3c815444574..046bfd05558 100644
  
  /* Implement TARGET_FRAME_POINTER_REQUIRED.  */
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 33a8b12ef3b..cfe9e5312d1 100644
+index 7bc91602ca2..ddf01505bd8 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
-@@ -2271,7 +2271,27 @@ else
+@@ -2268,7 +2268,27 @@ else
  		      (label_ref (match_operand 1))
  		      (pc)))])
  
@@ -115,7 +115,7 @@ index 33a8b12ef3b..cfe9e5312d1 100644
    [(set (pc)
  	(if_then_else (match_operator 0 "ordered_comparison_operator"
    				 [(match_operand 1 "register_operand" "d")
-@@ -2282,9 +2302,9 @@ else
+@@ -2279,9 +2299,9 @@ else
    "TARGET_MB_64"
    {
      if (operands[3] == pc_rtx) 
@@ -127,7 +127,7 @@ index 33a8b12ef3b..cfe9e5312d1 100644
    }
    [(set_attr "type"	"branch")
     (set_attr "mode"	"none")
-@@ -2313,9 +2333,9 @@ else
+@@ -2310,9 +2330,9 @@ else
  
  (define_insn "branch_compare64"
    [(set (pc)
@@ -140,7 +140,7 @@ index 33a8b12ef3b..cfe9e5312d1 100644
                                           ])
                        (label_ref (match_operand 3))
                        (pc)))
-@@ -2352,6 +2372,47 @@ else
+@@ -2349,6 +2369,47 @@ else
     (set_attr "length"   "12")]
  )
  
@@ -188,7 +188,7 @@ index 33a8b12ef3b..cfe9e5312d1 100644
  (define_insn "branch_compare"
    [(set (pc)
          (if_then_else (match_operator:SI 0 "cmp_op"
-@@ -2434,74 +2495,6 @@ else
+@@ -2431,74 +2492,6 @@ else
  
  })
  

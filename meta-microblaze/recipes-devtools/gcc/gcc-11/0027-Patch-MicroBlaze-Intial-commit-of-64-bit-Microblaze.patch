@@ -1,20 +1,22 @@
-From 1a7fda96cb247bad0a4df61cd8fd3e65c0e6f35d Mon Sep 17 00:00:00 2001
+From dba8e9e148812774d94f584cdff7b6e0293081b5 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 10 Nov 2020 12:52:54 +0530
-Subject: [PATCH 29/54] [Patch,MicroBlaze]: Intial commit of 64-bit Microblaze
+Subject: [PATCH 27/53] [Patch,MicroBlaze]: Intial commit of 64-bit Microblaze
 
+Conflicts:
+	gcc/config/microblaze/microblaze.md
 ---
  gcc/config/microblaze/constraints.md      |   6 +
  gcc/config/microblaze/microblaze-protos.h |   1 +
- gcc/config/microblaze/microblaze.c        | 109 ++++--
+ gcc/config/microblaze/microblaze.c        | 109 +++++--
  gcc/config/microblaze/microblaze.h        |   4 +-
- gcc/config/microblaze/microblaze.md       | 395 +++++++++++++++++++++-
+ gcc/config/microblaze/microblaze.md       | 352 +++++++++++++++++++++-
  gcc/config/microblaze/microblaze.opt      |   7 +-
  gcc/config/microblaze/t-microblaze        |   7 +-
- 7 files changed, 492 insertions(+), 37 deletions(-)
+ 7 files changed, 456 insertions(+), 30 deletions(-)
 
 diff --git a/gcc/config/microblaze/constraints.md b/gcc/config/microblaze/constraints.md
-index b9fc6e3fae2..123395717e0 100644
+index b4d7ee329b8..95b21d58f88 100644
 --- a/gcc/config/microblaze/constraints.md
 +++ b/gcc/config/microblaze/constraints.md
 @@ -52,6 +52,12 @@
@@ -31,7 +33,7 @@ index b9fc6e3fae2..123395717e0 100644
  
  (define_constraint "G"
 diff --git a/gcc/config/microblaze/microblaze-protos.h b/gcc/config/microblaze/microblaze-protos.h
-index c2f88813a8d..460feac4ac5 100644
+index 3a5f439703c..302f6bbda2e 100644
 --- a/gcc/config/microblaze/microblaze-protos.h
 +++ b/gcc/config/microblaze/microblaze-protos.h
 @@ -36,6 +36,7 @@ extern void microblaze_expand_divide (rtx *);
@@ -43,7 +45,7 @@ index c2f88813a8d..460feac4ac5 100644
  extern void print_operand (FILE *, rtx, int);
  extern void print_operand_address (FILE *, rtx);
 diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 451db9c79b0..99a1cd5c0be 100644
+index 9f94d015597..58d7397945e 100644
 --- a/gcc/config/microblaze/microblaze.c
 +++ b/gcc/config/microblaze/microblaze.c
 @@ -3432,11 +3432,11 @@ microblaze_expand_move (machine_mode mode, rtx operands[])
@@ -234,7 +236,7 @@ index 451db9c79b0..99a1cd5c0be 100644
  
  static bool
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index 857cb1cd9d0..c0358603380 100644
+index 6aac8a6cc2a..22fc3509319 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -102,6 +102,7 @@ extern enum pipeline_type microblaze_pipe;
@@ -263,7 +265,7 @@ index 857cb1cd9d0..c0358603380 100644
  #define FLOAT_TYPE_SIZE         32
  #define DOUBLE_TYPE_SIZE        64
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 7695b105baa..4d8429d9a90 100644
+index 9dd12d1011b..3834725eec1 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -497,7 +497,6 @@
@@ -456,7 +458,7 @@ index 7695b105baa..4d8429d9a90 100644
  ;; Those for integer source operand are ordered
  ;; widest source type first.
  
-@@ -1011,6 +1122,32 @@
+@@ -1009,6 +1120,32 @@
  )
  
  
@@ -489,7 +491,7 @@ index 7695b105baa..4d8429d9a90 100644
  
  (define_insn "*movdi_internal"
    [(set (match_operand:DI 0 "nonimmediate_operand" "=d,d,d,d,d,R,o")
-@@ -1423,6 +1560,36 @@
+@@ -1421,6 +1558,36 @@
    (set_attr "length"	"4,4")]
  )
  
@@ -526,7 +528,7 @@ index 7695b105baa..4d8429d9a90 100644
  ;; The following patterns apply when there is no barrel shifter present
  
  (define_insn "*ashlsi3_with_mul_delay"
-@@ -1548,6 +1715,36 @@
+@@ -1546,6 +1713,36 @@
  ;;----------------------------------------------------------------
  ;; 32-bit right shifts
  ;;----------------------------------------------------------------
@@ -563,7 +565,7 @@ index 7695b105baa..4d8429d9a90 100644
  (define_expand "ashrsi3"
    [(set (match_operand:SI 0 "register_operand" "=&d")
  	(ashiftrt:SI (match_operand:SI 1 "register_operand" "d")
-@@ -1657,6 +1854,36 @@
+@@ -1655,6 +1852,36 @@
  ;;----------------------------------------------------------------
  ;; 32-bit right shifts (logical)
  ;;----------------------------------------------------------------
@@ -600,7 +602,7 @@ index 7695b105baa..4d8429d9a90 100644
  
  (define_expand "lshrsi3"
    [(set (match_operand:SI 0 "register_operand" "=&d")
-@@ -1803,6 +2030,8 @@
+@@ -1800,6 +2027,8 @@
    (set_attr "length"	"4")]
  )              
  
@@ -609,7 +611,7 @@ index 7695b105baa..4d8429d9a90 100644
  ;;----------------------------------------------------------------
  ;; Setting a register from an floating point comparison. 
  ;;----------------------------------------------------------------
-@@ -1818,6 +2047,18 @@
+@@ -1815,6 +2044,18 @@
     (set_attr "length"    "4")]
  )
  
@@ -628,7 +630,7 @@ index 7695b105baa..4d8429d9a90 100644
  ;;----------------------------------------------------------------
  ;; Conditional branches
  ;;----------------------------------------------------------------
-@@ -1930,6 +2171,115 @@
+@@ -1927,6 +2168,115 @@
     (set_attr "length"   "12")]
  )
  
@@ -744,71 +746,8 @@ index 7695b105baa..4d8429d9a90 100644
  ;;----------------------------------------------------------------
  ;; Unconditional branches
  ;;----------------------------------------------------------------
-@@ -2478,17 +2828,33 @@
-   DONE;
- }")
- 
--(define_expand "extzvsi"
-+(define_expand "extvsi"
-   [(set (match_operand:SI 0 "register_operand" "r")
- 	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
- 			 (match_operand:SI 2 "immediate_operand" "I")
- 			 (match_operand:SI 3 "immediate_operand" "I")))]
- "TARGET_HAS_BITFIELD"
--""
--)
--
-+"
-+{
-+  unsigned HOST_WIDE_INT len = UINTVAL (operands[2]);
-+  unsigned HOST_WIDE_INT pos = UINTVAL (operands[3]);
-+
-+  if ((len == 0) || (pos + len > 32) )
-+    FAIL;
-+
-+  ;;if (!register_operand (operands[1], VOIDmode))
-+  ;;  FAIL;
-+  if (operands[0] == operands[1])
-+  FAIL;
-+  if (GET_CODE (operands[1]) == ASHIFT)
-+  FAIL;
-+;;  operands[2] = GEN_INT(INTVAL(operands[2])+1 );
-+ emit_insn (gen_extv_32 (operands[0], operands[1],
-+			  operands[2], operands[3]));
-+  DONE;
-+}")
- 
--(define_insn "extzv_32"
-+(define_insn "extv_32"
-   [(set (match_operand:SI 0 "register_operand" "=r")
- 	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
- 			 (match_operand:SI 2 "immediate_operand" "I")
-@@ -2505,8 +2871,21 @@
- 			 (match_operand:SI 2 "immediate_operand" "I"))
- 	(match_operand:SI 3 "register_operand" "r"))]
-  "TARGET_HAS_BITFIELD"
--""
--)
-+  "
-+{
-+  unsigned HOST_WIDE_INT len = UINTVAL (operands[1]);
-+  unsigned HOST_WIDE_INT pos = UINTVAL (operands[2]);
-+
-+  if (len <= 0 || pos + len > 32)
-+    FAIL;
-+
-+  ;;if (!register_operand (operands[0], VOIDmode))
-+  ;;  FAIL;
-+
-+  emit_insn (gen_insv_32 (operands[0], operands[1],
-+			  operands[2], operands[3]));
-+  DONE;
-+}")
- 
- (define_insn "insv_32"
-   [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
 diff --git a/gcc/config/microblaze/microblaze.opt b/gcc/config/microblaze/microblaze.opt
-index a29c6f8df90..bbe48b06da6 100644
+index 2a72566372b..206899c0384 100644
 --- a/gcc/config/microblaze/microblaze.opt
 +++ b/gcc/config/microblaze/microblaze.opt
 @@ -136,4 +136,9 @@ Target
