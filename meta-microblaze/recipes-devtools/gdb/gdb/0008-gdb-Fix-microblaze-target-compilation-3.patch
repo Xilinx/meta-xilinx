@@ -1,7 +1,7 @@
-From e770e163e918c6065fc437687839bfbbd0137cff Mon Sep 17 00:00:00 2001
-From: Mark Hatle <mark.hatle@kernel.crashing.org>
-Date: Mon, 7 Dec 2020 12:03:25 -0600
-Subject: [PATCH] gdb: Fix microblaze target compilation
+From 306ca46b3f330ee39601b9aede6b53c9cdbe9f86 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@xilinx.com>
+Date: Wed, 9 Dec 2020 23:35:35 -0600
+Subject: [PATCH 08/10] gdb: Fix microblaze target compilation (#3)
 
 Add microblaze-linux-nat.c to configure.nat
 
@@ -15,7 +15,7 @@ Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
  3 files changed, 43 insertions(+), 61 deletions(-)
 
 diff --git a/gdb/configure.nat b/gdb/configure.nat
-index fb4522f579..2b6873f9d6 100644
+index bb70e303384..d8548a6b666 100644
 --- a/gdb/configure.nat
 +++ b/gdb/configure.nat
 @@ -261,6 +261,11 @@ case ${gdb_host} in
@@ -31,7 +31,7 @@ index fb4522f579..2b6873f9d6 100644
  		# Host: Linux/MIPS
  		NATDEPFILES="${NATDEPFILES} linux-nat-trad.o \
 diff --git a/gdb/microblaze-linux-nat.c b/gdb/microblaze-linux-nat.c
-index e9b8c9c522..bac4697e1e 100644
+index e9b8c9c5221..bac4697e1e6 100644
 --- a/gdb/microblaze-linux-nat.c
 +++ b/gdb/microblaze-linux-nat.c
 @@ -36,13 +36,14 @@
@@ -270,7 +270,7 @@ index e9b8c9c522..bac4697e1e 100644
 +  add_inf_child_target (&the_microblaze_linux_nat_target);
  }
 diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
-index c0fc900733..c777d93a95 100644
+index dc1d4686914..a5c12c10e0b 100644
 --- a/gdb/microblaze-tdep.h
 +++ b/gdb/microblaze-tdep.h
 @@ -106,6 +106,9 @@ enum microblaze_regnum
