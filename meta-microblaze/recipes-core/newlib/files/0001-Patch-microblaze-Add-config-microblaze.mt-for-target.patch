@@ -1,4 +1,4 @@
-From 3be7340059deb6fd74873978ee4e435c84a15b8b Mon Sep 17 00:00:00 2001
+From 6ab9f7d24447a18a30c18c914be082fe520f0ded Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 23 Jan 2017 15:27:25 +0530
 Subject: [PATCH 01/11] [Patch, microblaze]: Add config/microblaze.mt for
