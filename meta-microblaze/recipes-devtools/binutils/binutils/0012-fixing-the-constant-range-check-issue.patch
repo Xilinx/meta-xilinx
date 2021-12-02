@@ -1,7 +1,7 @@
-From e1cb5c37efd76b44a878574ee3baad4c7a882e3b Mon Sep 17 00:00:00 2001
+From 5d4d7383a152bfc87ac7fdf5fcaef7eaca500836 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Mon, 16 Oct 2017 15:44:23 +0530
-Subject: [PATCH 12/52] fixing the constant range check issue sample error: not
+Subject: [PATCH 12/38] fixing the constant range check issue sample error: not
  in range ffffffff80000000..7fffffff, not ffffffff70000000
 
 ---
@@ -9,7 +9,7 @@ Subject: [PATCH 12/52] fixing the constant range check issue sample error: not
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 765abfb388..5810a74a5f 100644
+index aa58a18f05c..98d0c259246 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -757,7 +757,7 @@ parse_imm (char * s, expressionS * e, offsetT min, offsetT max)

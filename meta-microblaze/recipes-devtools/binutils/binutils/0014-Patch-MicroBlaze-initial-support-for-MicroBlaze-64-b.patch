@@ -1,27 +1,26 @@
-From d25d934f076297615cb0287488449fb32b9c46e8 Mon Sep 17 00:00:00 2001
-From: Nagaraju Mekala <nmekala@xilix.com>
-Date: Sun, 30 Sep 2018 16:28:28 +0530
-Subject: [PATCH 14/52] intial commit of MB 64-bit
+From b53570b1b4eb3e57b21e44515c202dc710b438ce Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 1 Nov 2021 19:06:53 +0530
+Subject: [PATCH 14/38] [Patch,MicroBlaze] : initial support for MicroBlaze 64
+ bit [-m64]
 
-Conflicts:
-	bfd/configure
-	bfd/configure.ac
-	bfd/cpu-microblaze.c
-	ld/Makefile.am
-	ld/Makefile.in
-	opcodes/microblaze-dis.c
 ---
  bfd/Makefile.am                    |    2 +
  bfd/Makefile.in                    |    3 +
+ bfd/bfd-in2.h                      |   10 +
  bfd/config.bfd                     |    4 +
  bfd/configure                      |    2 +
  bfd/configure.ac                   |    2 +
  bfd/cpu-microblaze.c               |   53 +-
- bfd/elf64-microblaze.c             | 3610 ++++++++++++++++++++++++++++
+ bfd/elf32-microblaze.c             |   65 +-
+ bfd/elf64-microblaze.c             | 3577 ++++++++++++++++++++++++++++
+ bfd/libbfd.h                       |    2 +
+ bfd/reloc.c                        |   12 +
  bfd/targets.c                      |    6 +
- gas/config/tc-microblaze.c         |  274 ++-
+ gas/config/tc-microblaze.c         |  419 +++-
  gas/config/tc-microblaze.h         |    4 +-
  include/elf/common.h               |    1 +
+ include/elf/microblaze.h           |    2 +
  ld/Makefile.am                     |    4 +
  ld/Makefile.in                     |    6 +
  ld/configure.tgt                   |    3 +
@@ -29,17 +28,17 @@ Conflicts:
  ld/emulparams/elf64microblazeel.sh |   23 +
  opcodes/microblaze-dis.c           |   35 +-
  opcodes/microblaze-opc.h           |  162 +-
- opcodes/microblaze-opcm.h          |   20 +-
- 19 files changed, 4197 insertions(+), 40 deletions(-)
+ opcodes/microblaze-opcm.h          |   24 +-
+ 24 files changed, 4375 insertions(+), 69 deletions(-)
  create mode 100644 bfd/elf64-microblaze.c
  create mode 100644 ld/emulparams/elf64microblaze.sh
  create mode 100644 ld/emulparams/elf64microblazeel.sh
 
 diff --git a/bfd/Makefile.am b/bfd/Makefile.am
-index c88c448000..d86f1c5697 100644
+index ed2f701805d..0dc77afa8ad 100644
 --- a/bfd/Makefile.am
 +++ b/bfd/Makefile.am
-@@ -562,6 +562,7 @@ BFD64_BACKENDS = \
+@@ -558,6 +558,7 @@ BFD64_BACKENDS = \
  	elf64-riscv.lo \
  	elfxx-riscv.lo \
  	elf64-s390.lo \
@@ -47,7 +46,7 @@ index c88c448000..d86f1c5697 100644
  	elf64-sparc.lo \
  	elf64-tilegx.lo \
  	elf64-x86-64.lo \
-@@ -596,6 +597,7 @@ BFD64_BACKENDS_CFILES = \
+@@ -592,6 +593,7 @@ BFD64_BACKENDS_CFILES = \
  	elf64-nfp.c \
  	elf64-ppc.c \
  	elf64-s390.c \
@@ -56,10 +55,10 @@ index c88c448000..d86f1c5697 100644
  	elf64-tilegx.c \
  	elf64-x86-64.c \
 diff --git a/bfd/Makefile.in b/bfd/Makefile.in
-index d0d14c6ab3..a54abeca48 100644
+index 12807d99760..01ac4805eb8 100644
 --- a/bfd/Makefile.in
 +++ b/bfd/Makefile.in
-@@ -988,6 +988,7 @@ BFD64_BACKENDS = \
+@@ -985,6 +985,7 @@ BFD64_BACKENDS = \
  	elf64-riscv.lo \
  	elfxx-riscv.lo \
  	elf64-s390.lo \
@@ -67,7 +66,7 @@ index d0d14c6ab3..a54abeca48 100644
  	elf64-sparc.lo \
  	elf64-tilegx.lo \
  	elf64-x86-64.lo \
-@@ -1022,6 +1023,7 @@ BFD64_BACKENDS_CFILES = \
+@@ -1019,6 +1020,7 @@ BFD64_BACKENDS_CFILES = \
  	elf64-nfp.c \
  	elf64-ppc.c \
  	elf64-s390.c \
@@ -75,7 +74,7 @@ index d0d14c6ab3..a54abeca48 100644
  	elf64-sparc.c \
  	elf64-tilegx.c \
  	elf64-x86-64.c \
-@@ -1501,6 +1503,7 @@ distclean-compile:
+@@ -1498,6 +1500,7 @@ distclean-compile:
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-ppc.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-riscv.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-s390.Plo@am__quote@
@@ -83,11 +82,37 @@ index d0d14c6ab3..a54abeca48 100644
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-sparc.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-tilegx.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-x86-64.Plo@am__quote@
+diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
+index 943bc2e914c..2a1d7563643 100644
+--- a/bfd/bfd-in2.h
++++ b/bfd/bfd-in2.h
+@@ -5433,11 +5433,21 @@ value in two words (with an imm instruction).  No relocation is
+ done here - only used for relaxing  */
+   BFD_RELOC_MICROBLAZE_64_NONE,
+ 
++/* This is a 64 bit reloc that stores the 32 bit pc relative
++ *  +value in two words (with an imml instruction).  No relocation is
++ *   +done here - only used for relaxing  */
++    BFD_RELOC_MICROBLAZE_64,
++
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imm instruction).  The relocation is
+ PC-relative GOT offset  */
+   BFD_RELOC_MICROBLAZE_64_GOTPC,
+ 
++/* This is a 64 bit reloc that stores the 32 bit pc relative
++value in two words (with an imml instruction).  The relocation is
++PC-relative GOT offset  */
++  BFD_RELOC_MICROBLAZE_64_GPC,
++
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imm instruction).  The relocation is
+ GOT offset  */
 diff --git a/bfd/config.bfd b/bfd/config.bfd
-index 14523caf0c..437c03bb9d 100644
+index 30087e3b8f8..108b77ac9c1 100644
 --- a/bfd/config.bfd
 +++ b/bfd/config.bfd
-@@ -825,11 +825,15 @@ case "${targ}" in
+@@ -822,11 +822,15 @@ case "${targ}" in
    microblazeel*-*)
      targ_defvec=microblaze_elf32_le_vec
      targ_selvecs=microblaze_elf32_vec
@@ -104,10 +129,10 @@ index 14523caf0c..437c03bb9d 100644
  
  #ifdef BFD64
 diff --git a/bfd/configure b/bfd/configure
-index 0340ed541b..ff5ae4706c 100755
+index 41586f00f93..ffcd8ad4be0 100755
 --- a/bfd/configure
 +++ b/bfd/configure
-@@ -14903,6 +14903,8 @@ do
+@@ -13445,6 +13445,8 @@ do
      s390_elf64_vec)		 tb="$tb elf64-s390.lo elf64.lo $elf"; target_size=64 ;;
      score_elf32_be_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo elf64.lo $elf"; want64=true; target_size=64 ;;
      score_elf32_le_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo elf64.lo $elf"; want64=true; target_size=64 ;;
@@ -117,10 +142,10 @@ index 0340ed541b..ff5ae4706c 100755
      sh_coff_le_vec)		 tb="$tb coff-sh.lo $coff" ;;
      sh_coff_small_vec)		 tb="$tb coff-sh.lo $coff" ;;
 diff --git a/bfd/configure.ac b/bfd/configure.ac
-index 8e86f8399c..408092d3be 100644
+index fec067b2135..9a7df353285 100644
 --- a/bfd/configure.ac
 +++ b/bfd/configure.ac
-@@ -639,6 +639,8 @@ do
+@@ -625,6 +625,8 @@ do
      s390_elf64_vec)		 tb="$tb elf64-s390.lo elf64.lo $elf"; target_size=64 ;;
      score_elf32_be_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo elf64.lo $elf"; want64=true; target_size=64 ;;
      score_elf32_le_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo elf64.lo $elf"; want64=true; target_size=64 ;;
@@ -130,7 +155,7 @@ index 8e86f8399c..408092d3be 100644
      sh_coff_le_vec)		 tb="$tb coff-sh.lo $coff" ;;
      sh_coff_small_vec)		 tb="$tb coff-sh.lo $coff" ;;
 diff --git a/bfd/cpu-microblaze.c b/bfd/cpu-microblaze.c
-index 05a3f767e2..194920b20b 100644
+index d461d01e08f..ec94cc13595 100644
 --- a/bfd/cpu-microblaze.c
 +++ b/bfd/cpu-microblaze.c
 @@ -23,7 +23,24 @@
@@ -150,7 +175,7 @@ index 05a3f767e2..194920b20b 100644
 +  "microblaze",	  		/* Architecture name.  */
 +  "MicroBlaze",	  		/* Printable name.  */
 +  3,		  		/* Section align power.  */
-+  FALSE,		  		/* Is this the default architecture ?  */
++  false,		  		/* Is this the default architecture ?  */
 +  bfd_default_compatible,	/* Architecture comparison function.  */
 +  bfd_default_scan,	   	/* String to architecture conversion.  */
 +  bfd_arch_default_fill,	/* Default fill.  */
@@ -174,7 +199,7 @@ index 05a3f767e2..194920b20b 100644
 +  "microblaze",	  		/* Architecture name.  */
 +  "MicroBlaze",	  		/* Printable name.  */
 +  3,		  		/* Section align power.  */
-+  TRUE,		  		/* Is this the default architecture ?  */
++  true,		  		/* Is this the default architecture ?  */
 +  bfd_default_compatible,	/* Architecture comparison function.  */
 +  bfd_default_scan,	   	/* String to architecture conversion.  */
 +  bfd_arch_default_fill,	/* Default fill.  */
@@ -189,7 +214,7 @@ index 05a3f767e2..194920b20b 100644
 +  "microblaze",	  		/* Architecture name.  */
 +  "MicroBlaze",	  		/* Printable name.  */
 +  3,		  		/* Section align power.  */
-+  FALSE,		  		/* Is this the default architecture ?  */
++  false,		  		/* Is this the default architecture ?  */
 +  bfd_default_compatible,	/* Architecture comparison function.  */
 +  bfd_default_scan,	   	/* String to architecture conversion.  */
 +  bfd_arch_default_fill,	/* Default fill.  */
@@ -198,15 +223,135 @@ index 05a3f767e2..194920b20b 100644
 +}
 +#endif
  };
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index e378542b902..2f2e1ef7f41 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -114,6 +114,20 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
+ 	  0x0000ffff,		/* Dest Mask.  */
+ 	  true),		/* PC relative offset?  */
+ 
++   HOWTO (R_MICROBLAZE_IMML_64,     	/* Type.  */
++          0,			/* Rightshift.  */
++          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
++          16,			/* Bitsize.  */
++          true,		/* PC_relative.  */
++          0,			/* Bitpos.  */
++          complain_overflow_dont, /* Complain on overflow.  */
++          bfd_elf_generic_reloc,/* Special Function.  */
++          "R_MICROBLAZE_IMML_64",   	/* Name.  */
++          false,		/* Partial Inplace.  */
++          0,			/* Source Mask.  */
++          0x0000ffff,		/* Dest Mask.  */
++          false), 		/* PC relative offset?  */
++
+    /* A 64 bit relocation.  Table entry not really used.  */
+    HOWTO (R_MICROBLAZE_64,	/* Type.  */
+ 	  0,			/* Rightshift.  */
+@@ -179,15 +193,15 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
+           0,			/* Rightshift.  */
+           2,			/* Size (0 = byte, 1 = short, 2 = long).  */
+           32,			/* Bitsize.  */
+-          TRUE,			/* PC_relative.  */
++          false,			/* PC_relative.  */
+           0,			/* Bitpos.  */
+           complain_overflow_bitfield,  /* Complain on overflow.  */
+           NULL,                  /* Special Function.  */
+           "R_MICROBLAZE_32_NONE",/* Name.  */
+-          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
+           0,			/* Source Mask.  */
+           0,			/* Dest Mask.  */
+-          FALSE),		/* PC relative offset?  */
++          false),		/* PC relative offset?  */
+ 
+    HOWTO (R_MICROBLAZE_64_NONE,	/* Type.  */
+ 	  0,			/* Rightshift.  */
+@@ -278,6 +292,21 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
+ 	  0x0000ffff,		/* Dest Mask.  */
+ 	  true),		/* PC relative offset?  */
+ 
++   /* A 64 bit GOTPC relocation.  Table-entry not really used.  */
++   HOWTO (R_MICROBLAZE_GPC_64,   	/* Type.  */
++          0,			/* Rightshift.  */
++          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
++          16,			/* Bitsize.  */
++          true,			/* PC_relative.  */
++          0,			/* Bitpos.  */
++          complain_overflow_dont, /* Complain on overflow.  */
++          bfd_elf_generic_reloc,	/* Special Function.  */
++          "R_MICROBLAZE_GPC_64", 	/* Name.  */
++          false,		/* Partial Inplace.  */
++          0,			/* Source Mask.  */
++          0x0000ffff,		/* Dest Mask.  */
++          true), 		/* PC relative offset?  */
++
+    /* A 64 bit GOT relocation.  Table-entry not really used.  */
+    HOWTO (R_MICROBLAZE_GOT_64,  /* Type.  */
+ 	  0,			/* Rightshift.  */
+@@ -617,9 +646,15 @@ microblaze_elf_reloc_type_lookup (bfd * abfd ATTRIBUTE_UNUSED,
+     case BFD_RELOC_VTABLE_ENTRY:
+       microblaze_reloc = R_MICROBLAZE_GNU_VTENTRY;
+       break;
++    case BFD_RELOC_MICROBLAZE_64:
++      microblaze_reloc = R_MICROBLAZE_IMML_64;
++      break;
+     case BFD_RELOC_MICROBLAZE_64_GOTPC:
+       microblaze_reloc = R_MICROBLAZE_GOTPC_64;
+       break;
++    case BFD_RELOC_MICROBLAZE_64_GPC:
++      microblaze_reloc = R_MICROBLAZE_GPC_64;
++      break;
+     case BFD_RELOC_MICROBLAZE_64_GOT:
+       microblaze_reloc = R_MICROBLAZE_GOT_64;
+       break;
+@@ -1459,7 +1494,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 		if (r_symndx == STN_UNDEF || (input_section->flags & SEC_ALLOC) == 0)
+ 		  {
+ 		    relocation += addend;
+-		    if (r_type == R_MICROBLAZE_32)
++		    if (r_type == R_MICROBLAZE_32)// || r_type == R_MICROBLAZE_IMML_64)
+ 		      bfd_put_32 (input_bfd, relocation, contents + offset);
+ 		    else
+ 		      {
+@@ -1925,6 +1960,28 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		    irel->r_addend -= calc_fixup (irel->r_addend, 0, sec);
+ 		}
+ 	      break;
++	    case R_MICROBLAZE_IMML_64:
++	      {
++	        /* This was a PC-relative instruction that was
++ 		   completely resolved.  */
++	        int sfix, efix;
++            unsigned int val;
++	        bfd_vma target_address;
++	        target_address = irel->r_addend + irel->r_offset;
++	        sfix = calc_fixup (irel->r_offset, 0, sec);
++	        efix = calc_fixup (target_address, 0, sec);
++
++            /* Validate the in-band val.  */
++            val = bfd_get_32 (abfd, contents + irel->r_offset);
++            if (val != irel->r_addend && ELF64_R_TYPE (irel->r_info) == R_MICROBLAZE_32_NONE) {
++               fprintf(stderr, "%d: CORRUPT relax reloc %x %lx\n", __LINE__, val, irel->r_addend);
++            }
++	        irel->r_addend -= (efix - sfix);
++	        /* Should use HOWTO.  */
++	        microblaze_bfd_write_imm_value_64 (abfd, contents + irel->r_offset,
++	                                           irel->r_addend);
++	      }
++	      break;
+ 	    case R_MICROBLAZE_NONE:
+ 	    case R_MICROBLAZE_32_NONE:
+ 	      {
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
 new file mode 100644
-index 0000000000..a357388115
+index 00000000000..46c4aba46f1
 --- /dev/null
 +++ b/bfd/elf64-microblaze.c
-@@ -0,0 +1,3610 @@
+@@ -0,0 +1,3577 @@
 +/* Xilinx MicroBlaze-specific support for 32-bit ELF
 +
-+   Copyright (C) 2009-2016 Free Software Foundation, Inc.
++   Copyright (C) 2009-2021 Free Software Foundation, Inc.
 +
 +   This file is part of BFD, the Binary File Descriptor library.
 +
@@ -225,8 +370,6 @@ index 0000000000..a357388115
 +   Free Software Foundation, Inc., 51 Franklin Street - Fifth Floor,
 +   Boston, MA 02110-1301, USA.  */
 +
-+
-+int dbg1 = 0;
 +
 +#include "sysdep.h"
 +#include "bfd.h"
@@ -252,387 +395,448 @@ index 0000000000..a357388115
 +          0,			/* Rightshift.  */
 +          3,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          0,			/* Bitsize.  */
-+          FALSE,		/* PC_relative.  */
++          false,		/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont,  /* Complain on overflow.  */
 +          NULL,                  /* Special Function.  */
 +          "R_MICROBLAZE_NONE", 	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0,			/* Dest Mask.  */
-+          FALSE),		/* PC relative offset?  */
++          false),		/* PC relative offset?  */
 +
 +   /* A standard 32 bit relocation.  */
 +   HOWTO (R_MICROBLAZE_32,     	/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          32,			/* Bitsize.  */
-+          FALSE,		/* PC_relative.  */
++          false,		/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_bitfield, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_32",   	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0xffffffff,		/* Dest Mask.  */
-+          FALSE), 		/* PC relative offset?  */
++          false), 		/* PC relative offset?  */
 +
 +   /* A standard PCREL 32 bit relocation.  */
 +   HOWTO (R_MICROBLAZE_32_PCREL,/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          32,			/* Bitsize.  */
-+          TRUE,			/* PC_relative.  */
++          true,			/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_bitfield, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_32_PCREL",   	/* Name.  */
-+          TRUE,			/* Partial Inplace.  */
++          true,			/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0xffffffff,		/* Dest Mask.  */
-+          TRUE), 		/* PC relative offset?  */
++          true), 		/* PC relative offset?  */
 +
 +   /* A 64 bit PCREL relocation.  Table-entry not really used.  */
 +   HOWTO (R_MICROBLAZE_64_PCREL,/* Type.  */
 +          0,			/* Rightshift.  */
 +          4,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          64,			/* Bitsize.  */
-+          TRUE,			/* PC_relative.  */
++          true,			/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_64_PCREL", 	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          TRUE), 		/* PC relative offset?  */
++          true), 		/* PC relative offset?  */
 +
 +   /* The low half of a PCREL 32 bit relocation.  */
 +   HOWTO (R_MICROBLAZE_32_PCREL_LO,   	/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          TRUE,			/* PC_relative.  */
++          true,			/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_signed, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,	/* Special Function.  */
 +          "R_MICROBLAZE_32_PCREL_LO", 	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          TRUE), 		/* PC relative offset?  */
++          true), 		/* PC relative offset?  */
++
++   /* A 64 bit relocation.  Table entry not really used.  */
++   HOWTO (R_MICROBLAZE_IMML_64,     	/* Type.  */
++          0,			/* Rightshift.  */
++          4,			/* Size (0 = byte, 1 = short, 2 = long).  */
++          64,			/* Bitsize.  */
++          true,		/* PC_relative.  */
++          0,			/* Bitpos.  */
++          complain_overflow_dont, /* Complain on overflow.  */
++          bfd_elf_generic_reloc,/* Special Function.  */
++          "R_MICROBLAZE_IMML_64",   	/* Name.  */
++          false,		/* Partial Inplace.  */
++          0,			/* Source Mask.  */
++          0x0000ffff,		/* Dest Mask.  */
++          true), 		/* PC relative offset?  */
 +
 +   /* A 64 bit relocation.  Table entry not really used.  */
 +   HOWTO (R_MICROBLAZE_64,     	/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          FALSE,		/* PC_relative.  */
++          false,		/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_64",   	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          FALSE), 		/* PC relative offset?  */
++          false), 		/* PC relative offset?  */
 +
 +   /* The low half of a 32 bit relocation.  */
 +   HOWTO (R_MICROBLAZE_32_LO,   /* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          FALSE,		/* PC_relative.  */
++          false,		/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_signed, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_32_LO", /* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          FALSE), 		/* PC relative offset?  */
++          false), 		/* PC relative offset?  */
 +
 +   /* Read-only small data section relocation.  */
 +   HOWTO (R_MICROBLAZE_SRO32,   /* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          FALSE,		/* PC_relative.  */
++          false,		/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_bitfield, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_SRO32", /* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          FALSE), 		/* PC relative offset?  */
++          false), 		/* PC relative offset?  */
 +
 +   /* Read-write small data area relocation.  */
 +   HOWTO (R_MICROBLAZE_SRW32,   /* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          FALSE,		/* PC_relative.  */
++          false,		/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_bitfield, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_SRW32", /* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          FALSE), 		/* PC relative offset?  */
++          false), 		/* PC relative offset?  */
 +
 +   HOWTO (R_MICROBLAZE_32_NONE,   /* Type.  */
 +          0,         /* Rightshift.  */
 +          2,            /* Size (0 = byte, 1 = short, 2 = long).  */
 +          32,           /* Bitsize.  */
-+          TRUE,         /* PC_relative.  */
++          true,         /* PC_relative.  */
 +          0,           /* Bitpos.  */
 +          complain_overflow_bitfield,  /* Complain on overflow.  */
 +          NULL,                  /* Special Function.  */
 +          "R_MICROBLAZE_32_NONE",/* Name.  */
-+          FALSE,       /* Partial Inplace.  */
++          false,       /* Partial Inplace.  */
 +          0,          /* Source Mask.  */
 +          0,         /* Dest Mask.  */
-+          FALSE),       /* PC relative offset?  */
++          false),       /* PC relative offset?  */
 +
 +   /* This reloc does nothing.  Used for relaxation.  */
 +   HOWTO (R_MICROBLAZE_64_NONE,	/* Type.  */
 +          0,			/* Rightshift.  */
 +          3,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          0,			/* Bitsize.  */
-+          TRUE,			/* PC_relative.  */
++          true,			/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont, /* Complain on overflow.  */
 +          NULL,                  /* Special Function.  */
 +          "R_MICROBLAZE_64_NONE",/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0,			/* Dest Mask.  */
-+          FALSE),		/* PC relative offset?  */
++          false),		/* PC relative offset?  */
 +
 +   /* Symbol Op Symbol relocation.  */
 +   HOWTO (R_MICROBLAZE_32_SYM_OP_SYM,     	/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          32,			/* Bitsize.  */
-+          FALSE,		/* PC_relative.  */
++          false,		/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_bitfield, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_32_SYM_OP_SYM",   	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0xffffffff,		/* Dest Mask.  */
-+          FALSE), 		/* PC relative offset?  */
++          false), 		/* PC relative offset?  */
 +
 +   /* GNU extension to record C++ vtable hierarchy.  */
 +   HOWTO (R_MICROBLAZE_GNU_VTINHERIT, /* Type.  */
 +          0,                     /* Rightshift.  */
 +          2,                     /* Size (0 = byte, 1 = short, 2 = long).  */
 +          0,                     /* Bitsize.  */
-+          FALSE,                 /* PC_relative.  */
++          false,                 /* PC_relative.  */
 +          0,                     /* Bitpos.  */
 +          complain_overflow_dont,/* Complain on overflow.  */
 +          NULL,                  /* Special Function.  */
 +          "R_MICROBLAZE_GNU_VTINHERIT", /* Name.  */
-+          FALSE,                 /* Partial Inplace.  */
++          false,                 /* Partial Inplace.  */
 +          0,                     /* Source Mask.  */
-+          0,                     /* Dest Mask.  */
-+          FALSE),                /* PC relative offset?  */
++          0,                
++		       /* Dest Mask.  */
++          false),                /* PC relative offset?  */
 +
 +   /* GNU extension to record C++ vtable member usage.  */
 +   HOWTO (R_MICROBLAZE_GNU_VTENTRY,   /* Type.  */
 +          0,                     /* Rightshift.  */
 +          2,                     /* Size (0 = byte, 1 = short, 2 = long).  */
 +          0,                     /* Bitsize.  */
-+          FALSE,                 /* PC_relative.  */
++          false,                 /* PC_relative.  */
 +          0,                     /* Bitpos.  */
 +          complain_overflow_dont,/* Complain on overflow.  */
 +          _bfd_elf_rel_vtable_reloc_fn,  /* Special Function.  */
 +          "R_MICROBLAZE_GNU_VTENTRY", /* Name.  */
-+          FALSE,                 /* Partial Inplace.  */
++          false,                 /* Partial Inplace.  */
 +          0,                     /* Source Mask.  */
 +          0,                     /* Dest Mask.  */
-+          FALSE),                /* PC relative offset?  */
++          false),                /* PC relative offset?  */
 +
 +   /* A 64 bit GOTPC relocation.  Table-entry not really used.  */
 +   HOWTO (R_MICROBLAZE_GOTPC_64,   	/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          TRUE,			/* PC_relative.  */
++          true,			/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,	/* Special Function.  */
 +          "R_MICROBLAZE_GOTPC_64", 	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          TRUE), 		/* PC relative offset?  */
++          true), 		/* PC relative offset?  */
 +
-+   /* A 64 bit GOT relocation.  Table-entry not really used.  */
-+   HOWTO (R_MICROBLAZE_GOT_64,  /* Type.  */
++     /* A 64 bit TEXTPCREL relocation.  Table-entry not really used.  */
++   HOWTO (R_MICROBLAZE_TEXTPCREL_64,	/* Type.  */
++	  0,			/* Rightshift.  */
++	  2,			/* Size (0 = byte, 1 = short, 2 = long).  */
++	  16,			/* Bitsize.  */
++	  true,			/* PC_relative.  */
++	  0,			/* Bitpos.  */
++	  complain_overflow_dont, /* Complain on overflow.  */
++	  bfd_elf_generic_reloc,	/* Special Function.  */
++	  "R_MICROBLAZE_TEXTPCREL_64",	/* Name.  */
++	  false,		/* Partial Inplace.  */
++	  0,			/* Source Mask.  */
++	  0x0000ffff,		/* Dest Mask.  */
++	  true),		/* PC relative offset?  */
++
++   /* A 64 bit GOTPC relocation.  Table-entry not really used.  */
++   HOWTO (R_MICROBLAZE_GPC_64,   	/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          FALSE,		/* PC_relative.  */
++          true,			/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont, /* Complain on overflow.  */
-+          bfd_elf_generic_reloc,/* Special Function.  */
-+          "R_MICROBLAZE_GOT_64",/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          bfd_elf_generic_reloc,	/* Special Function.  */
++          "R_MICROBLAZE_GPC_64", 	/* Name.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          FALSE), 		/* PC relative offset?  */
++          true), 		/* PC relative offset?  */
++
++   /* A 64 bit GOT relocation.  Table-entry not really used.  */
++   HOWTO (R_MICROBLAZE_GOT_64,  /* Type.  */
++	  0,			/* Rightshift.  */
++	  2,			/* Size (0 = byte, 1 = short, 2 = long).  */
++	  16,			/* Bitsize.  */
++	  false,		/* PC_relative.  */
++	  0,			/* Bitpos.  */
++	  complain_overflow_dont, /* Complain on overflow.  */
++	  bfd_elf_generic_reloc,/* Special Function.  */
++	  "R_MICROBLAZE_GOT_64",/* Name.  */
++	  false,		/* Partial Inplace.  */
++	  0,			/* Source Mask.  */
++	  0x0000ffff,		/* Dest Mask.  */
++	  false),		/* PC relative offset?  */
++
++    /* A 64 bit TEXTREL relocation.  Table-entry not really used.  */
++   HOWTO (R_MICROBLAZE_TEXTREL_64,  /* Type.  */
++	  0,			/* Rightshift.  */
++	  2,			/* Size (0 = byte, 1 = short, 2 = long).  */
++	  16,			/* Bitsize.  */
++	  false,		/* PC_relative.  */
++	  0,			/* Bitpos.  */
++	  complain_overflow_dont, /* Complain on overflow.  */
++	  bfd_elf_generic_reloc,/* Special Function.  */
++	  "R_MICROBLAZE_TEXTREL_64",/* Name.  */
++	  false,		/* Partial Inplace.  */
++	  0,			/* Source Mask.  */
++	  0x0000ffff,		/* Dest Mask.  */
++	  false),		/* PC relative offset?  */
 +
 +   /* A 64 bit PLT relocation.  Table-entry not really used.  */
 +   HOWTO (R_MICROBLAZE_PLT_64,  /* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          TRUE,			/* PC_relative.  */
++          true,			/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_PLT_64",/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          TRUE), 		/* PC relative offset?  */
++          true), 		/* PC relative offset?  */
 +
 +   /*  Table-entry not really used.  */
 +   HOWTO (R_MICROBLAZE_REL,   	/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          TRUE,			/* PC_relative.  */
++          true,			/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_REL", 	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          TRUE), 		/* PC relative offset?  */
++          true), 		/* PC relative offset?  */
 +
 +   /*  Table-entry not really used.  */
 +   HOWTO (R_MICROBLAZE_JUMP_SLOT,/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          TRUE,			/* PC_relative.  */
++          true,			/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_JUMP_SLOT", 	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          TRUE), 		/* PC relative offset?  */
++          true), 		/* PC relative offset?  */
 +
 +   /*  Table-entry not really used.  */
 +   HOWTO (R_MICROBLAZE_GLOB_DAT,/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          TRUE,			/* PC_relative.  */
++          true,			/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_GLOB_DAT", 	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          TRUE), 		/* PC relative offset?  */
++          true), 		/* PC relative offset?  */
 +
 +   /* A 64 bit GOT relative relocation.  Table-entry not really used.  */
 +   HOWTO (R_MICROBLAZE_GOTOFF_64,   	/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          FALSE,		/* PC_relative.  */
++          false,		/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_GOTOFF_64", 	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          FALSE), 		/* PC relative offset?  */
++          false), 		/* PC relative offset?  */
 +
 +   /* A 32 bit GOT relative relocation.  Table-entry not really used.  */
 +   HOWTO (R_MICROBLAZE_GOTOFF_32,   	/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          FALSE,		/* PC_relative.  */
++          false,		/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,	/* Special Function.  */
 +          "R_MICROBLAZE_GOTOFF_32", 	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          FALSE), 		/* PC relative offset?  */
++          false), 		/* PC relative offset?  */
 +
 +   /* COPY relocation.  Table-entry not really used.  */
 +   HOWTO (R_MICROBLAZE_COPY,   	/* Type.  */
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          16,			/* Bitsize.  */
-+          FALSE,		/* PC_relative.  */
++          false,		/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_dont, /* Complain on overflow.  */
 +          bfd_elf_generic_reloc,/* Special Function.  */
 +          "R_MICROBLAZE_COPY", 	/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0x0000ffff,		/* Dest Mask.  */
-+          FALSE), 		/* PC relative offset?  */
++          false), 		/* PC relative offset?  */
 +
 +   /* Marker relocs for TLS.  */
 +   HOWTO (R_MICROBLAZE_TLS,
 +	 0,			/* rightshift */
 +	 2,			/* size (0 = byte, 1 = short, 2 = long) */
 +	 32,			/* bitsize */
-+	 FALSE,			/* pc_relative */
++	 false,			/* pc_relative */
 +	 0,			/* bitpos */
 +	 complain_overflow_dont, /* complain_on_overflow */
 +	 bfd_elf_generic_reloc,	/* special_function */
 +	 "R_MICROBLAZE_TLS",		/* name */
-+	 FALSE,			/* partial_inplace */
++	 false,			/* partial_inplace */
 +	 0,			/* src_mask */
 +	 0x0000ffff,			/* dst_mask */
-+	 FALSE),		/* pcrel_offset */
++	 false),		/* pcrel_offset */
 +
 +   HOWTO (R_MICROBLAZE_TLSGD,
 +	 0,			/* rightshift */
 +	 2,			/* size (0 = byte, 1 = short, 2 = long) */
 +	 32,			/* bitsize */
-+	 FALSE,			/* pc_relative */
++	 false,			/* pc_relative */
 +	 0,			/* bitpos */
 +	 complain_overflow_dont, /* complain_on_overflow */
 +	 bfd_elf_generic_reloc, /* special_function */
 +	 "R_MICROBLAZE_TLSGD",		/* name */
-+	 FALSE,			/* partial_inplace */
++	 false,			/* partial_inplace */
 +	 0,			/* src_mask */
 +	 0x0000ffff,			/* dst_mask */
-+	 FALSE),		/* pcrel_offset */
++	 false),		/* pcrel_offset */
 +
 +   HOWTO (R_MICROBLAZE_TLSLD,
 +	 0,			/* rightshift */
 +	 2,			/* size (0 = byte, 1 = short, 2 = long) */
 +	 32,			/* bitsize */
-+	 FALSE,			/* pc_relative */
++	 false,			/* pc_relative */
 +	 0,			/* bitpos */
 +	 complain_overflow_dont, /* complain_on_overflow */
 +	 bfd_elf_generic_reloc, /* special_function */
 +	 "R_MICROBLAZE_TLSLD",		/* name */
-+	 FALSE,			/* partial_inplace */
++	 false,			/* partial_inplace */
 +	 0,			/* src_mask */
 +	 0x0000ffff,		/* dst_mask */
-+	 FALSE),		/* pcrel_offset */
++	 false),		/* pcrel_offset */
 +
 +   /* Computes the load module index of the load module that contains the
 +      definition of its TLS sym.  */
@@ -640,15 +844,15 @@ index 0000000000..a357388115
 +	 0,			/* rightshift */
 +	 2,			/* size (0 = byte, 1 = short, 2 = long) */
 +	 32,			/* bitsize */
-+	 FALSE,			/* pc_relative */
++	 false,			/* pc_relative */
 +	 0,			/* bitpos */
 +	 complain_overflow_dont, /* complain_on_overflow */
 +	 bfd_elf_generic_reloc, /* special_function */
 +	 "R_MICROBLAZE_TLSDTPMOD32",	/* name */
-+	 FALSE,			/* partial_inplace */
++	 false,			/* partial_inplace */
 +	 0,			/* src_mask */
 +	 0x0000ffff,		/* dst_mask */
-+	 FALSE),		/* pcrel_offset */
++	 false),		/* pcrel_offset */
 +
 +   /* Computes a dtv-relative displacement, the difference between the value
 +      of sym+add and the base address of the thread-local storage block that
@@ -657,15 +861,15 @@ index 0000000000..a357388115
 +	 0,			/* rightshift */
 +	 2,			/* size (0 = byte, 1 = short, 2 = long) */
 +	 32,			/* bitsize */
-+	 FALSE,			/* pc_relative */
++	 false,			/* pc_relative */
 +	 0,			/* bitpos */
 +	 complain_overflow_dont, /* complain_on_overflow */
 +	 bfd_elf_generic_reloc, /* special_function */
 +	 "R_MICROBLAZE_TLSDTPREL32",	/* name */
-+	 FALSE,			/* partial_inplace */
++	 false,			/* partial_inplace */
 +	 0,			/* src_mask */
 +	 0x0000ffff,		/* dst_mask */
-+	 FALSE),		/* pcrel_offset */
++	 false),		/* pcrel_offset */
 +
 +   /* Computes a dtv-relative displacement, the difference between the value
 +      of sym+add and the base address of the thread-local storage block that
@@ -674,15 +878,15 @@ index 0000000000..a357388115
 +	 0,			/* rightshift */
 +	 2,			/* size (0 = byte, 1 = short, 2 = long) */
 +	 32,			/* bitsize */
-+	 FALSE,			/* pc_relative */
++	 false,			/* pc_relative */
 +	 0,			/* bitpos */
 +	 complain_overflow_dont, /* complain_on_overflow */
 +	 bfd_elf_generic_reloc, /* special_function */
 +	 "R_MICROBLAZE_TLSDTPREL64",	/* name */
-+	 FALSE,			/* partial_inplace */
++	 false,			/* partial_inplace */
 +	 0,			/* src_mask */
 +	 0x0000ffff,		/* dst_mask */
-+	 FALSE),		/* pcrel_offset */
++	 false),		/* pcrel_offset */
 +
 +   /* Computes a tp-relative displacement, the difference between the value of
 +      sym+add and the value of the thread pointer (r13).  */
@@ -690,15 +894,15 @@ index 0000000000..a357388115
 +	 0,			/* rightshift */
 +	 2,			/* size (0 = byte, 1 = short, 2 = long) */
 +	 32,			/* bitsize */
-+	 FALSE,			/* pc_relative */
++	 false,			/* pc_relative */
 +	 0,			/* bitpos */
 +	 complain_overflow_dont, /* complain_on_overflow */
 +	 bfd_elf_generic_reloc, /* special_function */
 +	 "R_MICROBLAZE_TLSGOTTPREL32",	/* name */
-+	 FALSE,			/* partial_inplace */
++	 false,			/* partial_inplace */
 +	 0,			/* src_mask */
 +	 0x0000ffff,		/* dst_mask */
-+	 FALSE),		/* pcrel_offset */
++	 false),		/* pcrel_offset */
 +
 +   /* Computes a tp-relative displacement, the difference between the value of
 +      sym+add and the value of the thread pointer (r13).  */
@@ -706,15 +910,15 @@ index 0000000000..a357388115
 +	 0,			/* rightshift */
 +	 2,			/* size (0 = byte, 1 = short, 2 = long) */
 +	 32,			/* bitsize */
-+	 FALSE,			/* pc_relative */
++	 false,			/* pc_relative */
 +	 0,			/* bitpos */
 +	 complain_overflow_dont, /* complain_on_overflow */
 +	 bfd_elf_generic_reloc, /* special_function */
 +	 "R_MICROBLAZE_TLSTPREL32",	/* name */
-+	 FALSE,			/* partial_inplace */
++	 false,			/* partial_inplace */
 +	 0,			/* src_mask */
 +	 0x0000ffff,		/* dst_mask */
-+	 FALSE),		/* pcrel_offset */
++	 false),		/* pcrel_offset */
 +
 +};
 +
@@ -795,11 +999,23 @@ index 0000000000..a357388115
 +    case BFD_RELOC_VTABLE_ENTRY:
 +      microblaze_reloc = R_MICROBLAZE_GNU_VTENTRY;
 +      break;
++    case BFD_RELOC_MICROBLAZE_64:
++      microblaze_reloc = R_MICROBLAZE_IMML_64;
++      break;
 +    case BFD_RELOC_MICROBLAZE_64_GOTPC:
 +      microblaze_reloc = R_MICROBLAZE_GOTPC_64;
 +      break;
++    case BFD_RELOC_MICROBLAZE_64_GPC:
++      microblaze_reloc = R_MICROBLAZE_GPC_64;
++      break;
 +    case BFD_RELOC_MICROBLAZE_64_GOT:
 +      microblaze_reloc = R_MICROBLAZE_GOT_64;
++      break;
++    case BFD_RELOC_MICROBLAZE_64_TEXTPCREL:
++      microblaze_reloc = R_MICROBLAZE_TEXTPCREL_64;
++      break;
++    case BFD_RELOC_MICROBLAZE_64_TEXTREL:
++      microblaze_reloc = R_MICROBLAZE_TEXTREL_64;
 +      break;
 +    case BFD_RELOC_MICROBLAZE_64_PLT:
 +      microblaze_reloc = R_MICROBLAZE_PLT_64;
@@ -861,7 +1077,7 @@ index 0000000000..a357388115
 +
 +/* Set the howto pointer for a RCE ELF reloc.  */
 +
-+static bfd_boolean
++static bool
 +microblaze_elf_info_to_howto (bfd * abfd,
 +			      arelent * cache_ptr,
 +			      Elf_Internal_Rela * dst)
@@ -879,57 +1095,34 @@ index 0000000000..a357388115
 +      _bfd_error_handler (_("%pB: unsupported relocation type %#x"),
 +			  abfd, r_type);
 +      bfd_set_error (bfd_error_bad_value);
-+      return FALSE;
++      return false;
 +    }
 +
 +  cache_ptr->howto = microblaze_elf_howto_table [r_type];
-+  return TRUE;
++  return true;
 +}
 +
 +/* Microblaze ELF local labels start with 'L.' or '$L', not '.L'.  */
 +
-+static bfd_boolean
++static bool
 +microblaze_elf_is_local_label_name (bfd *abfd, const char *name)
 +{
 +  if (name[0] == 'L' && name[1] == '.')
-+    return TRUE;
++    return true;
 +
 +  if (name[0] == '$' && name[1] == 'L')
-+    return TRUE;
++    return true;
 +
 +  /* With gcc, the labels go back to starting with '.', so we accept
 +     the generic ELF local label syntax as well.  */
 +  return _bfd_elf_is_local_label_name (abfd, name);
 +}
 +
-+/* The microblaze linker (like many others) needs to keep track of
-+   the number of relocs that it decides to copy as dynamic relocs in
-+   check_relocs for each symbol. This is so that it can later discard
-+   them if they are found to be unnecessary.  We store the information
-+   in a field extending the regular ELF linker hash table.  */
-+
-+struct elf64_mb_dyn_relocs
-+{
-+  struct elf64_mb_dyn_relocs *next;
-+
-+  /* The input section of the reloc.  */
-+  asection *sec;
-+
-+  /* Total number of relocs copied for the input section.  */
-+  bfd_size_type count;
-+
-+  /* Number of pc-relative relocs copied for the input section.  */
-+  bfd_size_type pc_count;
-+};
-+
 +/* ELF linker hash entry.  */
 +
 +struct elf64_mb_link_hash_entry
 +{
 +  struct elf_link_hash_entry elf;
-+
-+  /* Track dynamic relocs copied for this symbol.  */
-+  struct elf64_mb_dyn_relocs *dyn_relocs;
 +
 +  /* TLS Reference Types for the symbol; Updated by check_relocs */
 +#define TLS_GD     1  /* GD reloc. */
@@ -954,18 +1147,6 @@ index 0000000000..a357388115
 +{
 +  struct elf_link_hash_table elf;
 +
-+  /* Short-cuts to get to dynamic linker sections.  */
-+  asection *sgot;
-+  asection *sgotplt;
-+  asection *srelgot;
-+  asection *splt;
-+  asection *srelplt;
-+  asection *sdynbss;
-+  asection *srelbss;
-+
-+  /* Small local sym to section mapping cache.  */
-+  struct sym_cache sym_sec;
-+
 +  /* TLS Local Dynamic GOT Entry */
 +  union {
 +    bfd_signed_vma refcount;
@@ -978,9 +1159,10 @@ index 0000000000..a357388115
 +
 +/* Get the ELF linker hash table from a link_info structure.  */
 +
-+#define elf64_mb_hash_table(p)				\
-+  (elf_hash_table_id ((struct elf_link_hash_table *) ((p)->hash)) \
-+  == MICROBLAZE_ELF_DATA ? ((struct elf64_mb_link_hash_table *) ((p)->hash)) : NULL)
++#define elf64_mb_hash_table(p) \
++  ((is_elf_hash_table ((p)->hash)					\
++    && elf_hash_table_id (elf_hash_table (p)) == MICROBLAZE_ELF_DATA)	\
++   ? (struct elf64_mb_link_hash_table *) (p)->hash : NULL)
 +
 +/* Create an entry in a microblaze ELF linker hash table.  */
 +
@@ -1042,14 +1224,14 @@ index 0000000000..a357388115
 +{
 +  struct bfd_link_hash_entry *h;
 +
-+  h = bfd_link_hash_lookup (info->hash, RO_SDA_ANCHOR_NAME, FALSE, FALSE, TRUE);
++  h = bfd_link_hash_lookup (info->hash, RO_SDA_ANCHOR_NAME, false, false, true);
 +  if (h != (struct bfd_link_hash_entry *) NULL
 +      && h->type == bfd_link_hash_defined)
 +    ro_small_data_pointer = (h->u.def.value
 +                             + h->u.def.section->output_section->vma
 +                             + h->u.def.section->output_offset);
 +
-+  h = bfd_link_hash_lookup (info->hash, RW_SDA_ANCHOR_NAME, FALSE, FALSE, TRUE);
++  h = bfd_link_hash_lookup (info->hash, RW_SDA_ANCHOR_NAME, false, false, true);
 +  if (h != (struct bfd_link_hash_entry *) NULL
 +      && h->type == bfd_link_hash_defined)
 +    rw_small_data_pointer = (h->u.def.value
@@ -1125,7 +1307,7 @@ index 0000000000..a357388115
 +   section, which means that the addend must be adjusted
 +   accordingly.  */
 +
-+static bfd_boolean
++static int
 +microblaze_elf_relocate_section (bfd *output_bfd,
 +			         struct bfd_link_info *info,
 +			         bfd *input_bfd,
@@ -1141,7 +1323,7 @@ index 0000000000..a357388115
 +  Elf_Internal_Rela *rel, *relend;
 +  int endian = (bfd_little_endian (output_bfd)) ? 0 : 2;
 +  /* Assume success.  */
-+  bfd_boolean ret = TRUE;
++  bool ret = true;
 +  asection *sreloc;
 +  bfd_vma *local_got_offsets;
 +  unsigned int tls_type;
@@ -1151,7 +1333,7 @@ index 0000000000..a357388115
 +
 +  htab = elf64_mb_hash_table (info);
 +  if (htab == NULL)
-+    return FALSE;
++    return false;
 +
 +  local_got_offsets = elf_local_got_offsets (input_bfd);
 +
@@ -1172,7 +1354,7 @@ index 0000000000..a357388115
 +      const char *sym_name;
 +      bfd_reloc_status_type r = bfd_reloc_ok;
 +      const char *errmsg = NULL;
-+      bfd_boolean unresolved_reloc = FALSE;
++      bool unresolved_reloc = false;
 +
 +      h = NULL;
 +      r_type = ELF64_R_TYPE (rel->r_info);
@@ -1180,10 +1362,11 @@ index 0000000000..a357388115
 +
 +      if (r_type < 0 || r_type >= (int) R_MICROBLAZE_max)
 +	{
-+	  (*_bfd_error_handler) (_("%s: unknown relocation type %d"),
-+				 bfd_get_filename (input_bfd), (int) r_type);
++	  /* xgettext:c-format */
++	  _bfd_error_handler (_("%pB: unsupported relocation type %#x"),
++			      input_bfd, (int) r_type);
 +	  bfd_set_error (bfd_error_bad_value);
-+	  ret = FALSE;
++	  ret = false;
 +	  continue;
 +	}
 +
@@ -1233,12 +1416,12 @@ index 0000000000..a357388115
 +      else
 +	{
 +	  bfd_vma relocation;
-+	  bfd_boolean resolved_to_zero;
++	  bool resolved_to_zero;
 +
 +	  /* This is a final link.  */
 +	  sym = NULL;
 +	  sec = NULL;
-+	  unresolved_reloc = FALSE;
++	  unresolved_reloc = false;
 +
 +	  if (r_symndx < symtab_hdr->sh_info)
 +	    {
@@ -1256,8 +1439,8 @@ index 0000000000..a357388115
 +	  else
 +	    {
 +	      /* External symbol.  */
-+	      bfd_boolean warned ATTRIBUTE_UNUSED;
-+	      bfd_boolean ignored ATTRIBUTE_UNUSED;
++	      bool warned ATTRIBUTE_UNUSED;
++	      bool ignored ATTRIBUTE_UNUSED;
 +
 +	      RELOC_FOR_GLOBAL_SYMBOL (info, input_bfd, input_section, rel,
 +				       r_symndx, symtab_hdr, sym_hashes,
@@ -1294,7 +1477,7 @@ index 0000000000..a357388115
 +			  microblaze_elf_final_sdp (info);
 +			if (ro_small_data_pointer == 0)
 +			  {
-+			    ret = FALSE;
++			    ret = false;
 +			    r = bfd_reloc_undefined;
 +			    goto check_reloc;
 +			  }
@@ -1319,7 +1502,7 @@ index 0000000000..a357388115
 +			   microblaze_elf_howto_table[(int) r_type]->name,
 +			   sec);
 +			/*bfd_set_error (bfd_error_bad_value); ??? why? */
-+			ret = FALSE;
++			ret = false;
 +			continue;
 +		      }
 +		  }
@@ -1342,7 +1525,7 @@ index 0000000000..a357388115
 +			  microblaze_elf_final_sdp (info);
 +			if (rw_small_data_pointer == 0)
 +			  {
-+			    ret = FALSE;
++			    ret = false;
 +			    r = bfd_reloc_undefined;
 +			    goto check_reloc;
 +			  }
@@ -1367,7 +1550,7 @@ index 0000000000..a357388115
 +			   microblaze_elf_howto_table[(int) r_type]->name,
 +			   sec);
 +			/*bfd_set_error (bfd_error_bad_value); ??? why? */
-+			ret = FALSE;
++			ret = false;
 +			continue;
 +		      }
 +		  }
@@ -1378,8 +1561,20 @@ index 0000000000..a357388115
 +	      break; /* Do nothing.  */
 +
 +	    case (int) R_MICROBLAZE_GOTPC_64:
-+	      relocation = htab->sgotplt->output_section->vma
-+		+ htab->sgotplt->output_offset;
++	      relocation = (htab->elf.sgotplt->output_section->vma
++			    + htab->elf.sgotplt->output_offset);
++	      relocation -= (input_section->output_section->vma
++			     + input_section->output_offset
++			     + offset + INST_WORD_SIZE);
++	      relocation += addend;
++	      bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
++			  contents + offset + endian);
++	      bfd_put_16 (input_bfd, relocation & 0xffff,
++			  contents + offset + endian + INST_WORD_SIZE);
++	      break;
++
++	    case (int) R_MICROBLAZE_TEXTPCREL_64:
++	      relocation = input_section->output_section->vma;
 +	      relocation -= (input_section->output_section->vma
 +			     + input_section->output_offset
 +			     + offset + INST_WORD_SIZE);
@@ -1393,13 +1588,13 @@ index 0000000000..a357388115
 +	    case (int) R_MICROBLAZE_PLT_64:
 +	      {
 +		bfd_vma immediate;
-+		if (htab->splt != NULL && h != NULL
++		if (htab->elf.splt != NULL && h != NULL
 +		    && h->plt.offset != (bfd_vma) -1)
 +		  {
-+		    relocation = (htab->splt->output_section->vma
-+				  + htab->splt->output_offset
++		    relocation = (htab->elf.splt->output_section->vma
++				  + htab->elf.splt->output_offset
 +				  + h->plt.offset);
-+		    unresolved_reloc = FALSE;
++		    unresolved_reloc = false;
 +		    immediate = relocation - (input_section->output_section->vma
 +					      + input_section->output_offset
 +					      + offset + INST_WORD_SIZE);
@@ -1435,8 +1630,8 @@ index 0000000000..a357388115
 +		unsigned long indx;
 +		bfd_vma static_value;
 +
-+		bfd_boolean need_relocs = FALSE;
-+		if (htab->sgot == NULL)
++		bool need_relocs = false;
++		if (htab->elf.sgot == NULL)
 +		  abort ();
 +
 +		indx = 0;
@@ -1452,8 +1647,9 @@ index 0000000000..a357388115
 +		  offp = &htab->tlsld_got.offset;
 +		else if (h != NULL)
 +		  {
-+		    if (htab->sgotplt != NULL && h->got.offset != (bfd_vma) -1)
-+			offp = &h->got.offset;
++		    if (htab->elf.sgotplt != NULL
++			&& h->got.offset != (bfd_vma) -1)
++		      offp = &h->got.offset;
 +		    else
 +			abort ();
 +		  }
@@ -1476,7 +1672,7 @@ index 0000000000..a357388115
 +		/* Symbol index to use for relocs */
 +		if (h != NULL)
 +		  {
-+		    bfd_boolean dyn =
++		    bool dyn =
 +			elf_hash_table (info)->dynamic_sections_created;
 +
 +		    if (WILL_CALL_FINISH_DYNAMIC_SYMBOL (dyn,
@@ -1493,7 +1689,7 @@ index 0000000000..a357388115
 +		    || (ELF_ST_VISIBILITY (h->other) == STV_DEFAULT
 +			&& !resolved_to_zero)
 +		    || h->root.type != bfd_link_hash_undefweak))
-+		  need_relocs = TRUE;
++		  need_relocs = true;
 +
 +		/* 2. Compute/Emit Static value of r-expression */
 +		static_value = relocation + addend;
@@ -1503,53 +1699,51 @@ index 0000000000..a357388115
 +		  {
 +		    bfd_vma got_offset;
 +
-+		    got_offset = (htab->sgot->output_section->vma
-+				  + htab->sgot->output_offset
++		    got_offset = (htab->elf.sgot->output_section->vma
++				  + htab->elf.sgot->output_offset
 +				  + off);
 +
 +		    /* Process module-id */
 +		    if (IS_TLS_LD(tls_type))
 +		      {
 +			if (! bfd_link_pic (info))
-+			  {
-+			    bfd_put_32 (output_bfd, 1, htab->sgot->contents + off);
-+			  }
++			  bfd_put_32 (output_bfd, 1,
++				      htab->elf.sgot->contents + off);
 +			else
-+			  {
-+			    microblaze_elf_output_dynamic_relocation (output_bfd,
-+			      htab->srelgot, htab->srelgot->reloc_count++,
-+			      /* symindex= */ 0, R_MICROBLAZE_TLSDTPMOD32,
-+			      got_offset, 0);
-+			  }
++			  microblaze_elf_output_dynamic_relocation
++			    (output_bfd,
++			     htab->elf.srelgot,
++			     htab->elf.srelgot->reloc_count++,
++			     /* symindex= */ 0, R_MICROBLAZE_TLSDTPMOD32,
++			     got_offset, 0);
 +		      }
 +		    else if (IS_TLS_GD(tls_type))
 +		      {
-+		        if (! need_relocs)
-+			  {
-+			    bfd_put_32 (output_bfd, 1, htab->sgot->contents + off);
-+			  }
-+		        else
-+			  {
-+			    microblaze_elf_output_dynamic_relocation (output_bfd,
-+			      htab->srelgot,
-+			      htab->srelgot->reloc_count++,
-+			      /* symindex= */ indx, R_MICROBLAZE_TLSDTPMOD32,
-+			      got_offset, indx ? 0 : static_value);
-+			  }
++			if (! need_relocs)
++			  bfd_put_32 (output_bfd, 1,
++				      htab->elf.sgot->contents + off);
++			else
++			  microblaze_elf_output_dynamic_relocation
++			    (output_bfd,
++			     htab->elf.srelgot,
++			     htab->elf.srelgot->reloc_count++,
++			     /* symindex= */ indx, R_MICROBLAZE_TLSDTPMOD32,
++			     got_offset, indx ? 0 : static_value);
 +		      }
 +
 +		    /* Process Offset */
-+		    if (htab->srelgot == NULL)
++		    if (htab->elf.srelgot == NULL)
 +		      abort ();
 +
-+		    got_offset = (htab->sgot->output_section->vma
-+				  + htab->sgot->output_offset
++		    got_offset = (htab->elf.sgot->output_section->vma
++				  + htab->elf.sgot->output_offset
 +				  + off2);
 +		    if (IS_TLS_LD(tls_type))
 +		      {
-+		        /* For LD, offset should be 0 */
-+		        *offp |= 1;
-+		        bfd_put_32 (output_bfd, 0, htab->sgot->contents + off2);
++			/* For LD, offset should be 0 */
++			*offp |= 1;
++			bfd_put_32 (output_bfd, 0,
++				    htab->elf.sgot->contents + off2);
 +		      }
 +		    else if (IS_TLS_GD(tls_type))
 +		      {
@@ -1601,7 +1795,7 @@ index 0000000000..a357388115
 +		bfd_put_16 (input_bfd, relocation & 0xffff,
 +		            contents + offset + endian + INST_WORD_SIZE);
 +
-+		unresolved_reloc = FALSE;
++		unresolved_reloc = false;
 +		break;
 +	      }
 +
@@ -1617,7 +1811,8 @@ index 0000000000..a357388115
 +		lo = immediate & 0x0000ffff;
 +		high = (immediate >> 16) & 0x0000ffff;
 +		bfd_put_16 (input_bfd, high, contents + offset + endian);
-+		bfd_put_16 (input_bfd, lo, contents + offset + INST_WORD_SIZE + endian);
++		bfd_put_16 (input_bfd, lo,
++			    contents + offset + INST_WORD_SIZE + endian);
 +		break;
 +	      }
 +
@@ -1639,6 +1834,8 @@ index 0000000000..a357388115
 +	      bfd_put_16 (input_bfd, relocation & 0xffff,
 +			  contents + offset + endian + INST_WORD_SIZE);
 +	      break;
++	    case (int) R_MICROBLAZE_TEXTREL_64:
++	    case (int) R_MICROBLAZE_TEXTREL_32_LO:
 +	    case (int) R_MICROBLAZE_64_PCREL :
 +	    case (int) R_MICROBLAZE_64:
 +	    case (int) R_MICROBLAZE_32:
@@ -1649,7 +1846,7 @@ index 0000000000..a357388115
 +		if (r_symndx == STN_UNDEF || (input_section->flags & SEC_ALLOC) == 0)
 +		  {
 +		    relocation += addend;
-+		    if (r_type == R_MICROBLAZE_32)
++		    if (r_type == R_MICROBLAZE_32)// || r_type == R_MICROBLAZE_IMML_64)
 +		      bfd_put_32 (input_bfd, relocation, contents + offset);
 +		    else
 +		      {
@@ -1657,11 +1854,22 @@ index 0000000000..a357388115
 +			  relocation -= (input_section->output_section->vma
 +					 + input_section->output_offset
 +					 + offset + INST_WORD_SIZE);
-+			bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
-+			            contents + offset + endian);
-+			bfd_put_16 (input_bfd, relocation & 0xffff,
-+			            contents + offset + endian + INST_WORD_SIZE);
++			else if (r_type == R_MICROBLAZE_TEXTREL_64
++				 || r_type == R_MICROBLAZE_TEXTREL_32_LO)
++			  relocation -= input_section->output_section->vma;
++
++			if (r_type == R_MICROBLAZE_TEXTREL_32_LO)
++			  bfd_put_16 (input_bfd, relocation & 0xffff,
++				      contents + offset + endian);
++
++			else
++			  {
++			    bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
++				    contents + offset + endian);
++			    bfd_put_16 (input_bfd, relocation & 0xffff,
++				    contents + offset + endian + INST_WORD_SIZE);
 +		      }
++		    }
 +		    break;
 +		  }
 +
@@ -1686,7 +1894,7 @@ index 0000000000..a357388115
 +		  {
 +		    Elf_Internal_Rela outrel;
 +		    bfd_byte *loc;
-+		    bfd_boolean skip;
++		    bool skip;
 +
 +		    /* When generating a shared object, these relocations
 +		       are copied into the output file to be resolved at run
@@ -1694,15 +1902,15 @@ index 0000000000..a357388115
 +
 +		    BFD_ASSERT (sreloc != NULL);
 +
-+		    skip = FALSE;
++		    skip = false;
 +
 +		    outrel.r_offset =
 +		      _bfd_elf_section_offset (output_bfd, info, input_section,
 +					       rel->r_offset);
 +		    if (outrel.r_offset == (bfd_vma) -1)
-+		      skip = TRUE;
++		      skip = true;
 +		    else if (outrel.r_offset == (bfd_vma) -2)
-+		      skip = TRUE;
++		      skip = true;
 +		    outrel.r_offset += (input_section->output_section->vma
 +					+ input_section->output_offset);
 +
@@ -1728,11 +1936,11 @@ index 0000000000..a357388115
 +			else
 +			  {
 +			    BFD_FAIL ();
-+			    (*_bfd_error_handler)
-+			      (_("%B: probably compiled without -fPIC?"),
++			    _bfd_error_handler
++			      (_("%pB: probably compiled without -fPIC?"),
 +			       input_bfd);
 +			    bfd_set_error (bfd_error_bad_value);
-+			    return FALSE;
++			    return false;
 +			  }
 +		      }
 +
@@ -1752,11 +1960,24 @@ index 0000000000..a357388115
 +			  relocation -= (input_section->output_section->vma
 +					 + input_section->output_offset
 +					 + offset + INST_WORD_SIZE);
-+			bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
-+			            contents + offset + endian);
-+			bfd_put_16 (input_bfd, relocation & 0xffff,
-+			            contents + offset + endian + INST_WORD_SIZE);
-+		      }
++			else if (r_type == R_MICROBLAZE_TEXTREL_64
++				 || r_type == R_MICROBLAZE_TEXTREL_32_LO)
++			  relocation -= input_section->output_section->vma;
++
++			if (r_type == R_MICROBLAZE_TEXTREL_32_LO)
++			  {
++			     bfd_put_16 (input_bfd, relocation & 0xffff,
++					 contents + offset + endian);
++			  }
++			else
++			  {
++			    bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
++				        contents + offset + endian);
++			    bfd_put_16 (input_bfd, relocation & 0xffff,
++					contents + offset + endian
++					+ INST_WORD_SIZE);
++			  }
++		    }
 +		    break;
 +		  }
 +	      }
@@ -1799,7 +2020,7 @@ index 0000000000..a357388115
 +
 +	    case bfd_reloc_undefined:
 +	      (*info->callbacks->undefined_symbol)
-+		(info, name, input_bfd, input_section, offset, TRUE);
++		(info, name, input_bfd, input_section, offset, true);
 +	      break;
 +
 +	    case bfd_reloc_outofrange:
@@ -1827,21 +2048,6 @@ index 0000000000..a357388115
 +
 +  return ret;
 +}
-+
-+/* Merge backend specific data from an object file to the output
-+   object file when linking.
-+
-+   Note: We only use this hook to catch endian mismatches.  */
-+static bfd_boolean
-+microblaze_elf_merge_private_bfd_data (bfd * ibfd, bfd * obfd)
-+{
-+  /* Check if we have the same endianess.  */
-+  if (! _bfd_generic_verify_endian_match (ibfd, obfd))
-+    return FALSE;
-+
-+  return TRUE;
-+}
-+
 +
 +/* Calculate fixup value for reference.  */
 +
@@ -1896,11 +2102,11 @@ index 0000000000..a357388115
 +    bfd_put_32 (abfd, instr_lo, bfd_addr + INST_WORD_SIZE);
 +}
 +
-+static bfd_boolean
++static bool
 +microblaze_elf_relax_section (bfd *abfd,
 +			      asection *sec,
 +			      struct bfd_link_info *link_info,
-+			      bfd_boolean *again)
++			      bool *again)
 +{
 +  Elf_Internal_Shdr *symtab_hdr;
 +  Elf_Internal_Rela *internal_relocs;
@@ -1921,14 +2127,14 @@ index 0000000000..a357388115
 +
 +  /* We only do this once per section.  We may be able to delete some code
 +     by running multiple passes, but it is not worth it.  */
-+  *again = FALSE;
++  *again = false;
 +
 +  /* Only do this for a text section.  */
 +  if (bfd_link_relocatable (link_info)
 +      || (sec->flags & SEC_RELOC) == 0
 +      || (sec->reloc_count == 0)
 +      || (sec->flags & SEC_CODE) == 0)
-+    return TRUE;
++    return true;
 +
 +  BFD_ASSERT ((sec->size > 0) || (sec->rawsize > 0));
 +
@@ -1964,7 +2170,8 @@ index 0000000000..a357388115
 +    {
 +      bfd_vma symval;
 +      if ((ELF64_R_TYPE (irel->r_info) != (int) R_MICROBLAZE_64_PCREL)
-+	  && (ELF64_R_TYPE (irel->r_info) != (int) R_MICROBLAZE_64 ))
++	  && (ELF64_R_TYPE (irel->r_info) != (int) R_MICROBLAZE_64 )
++&& (ELF64_R_TYPE (irel->r_info) != (int) R_MICROBLAZE_TEXTREL_64))
 +	continue; /* Can't delete this reloc.  */
 +
 +      /* Get the section contents.  */
@@ -2034,6 +2241,10 @@ index 0000000000..a357388115
 +	       + sec->output_section->vma
 +	       + sec->output_offset);
 +        }
++      else if (ELF64_R_TYPE (irel->r_info) == (int) R_MICROBLAZE_TEXTREL_64)
++	{
++	  symval = symval + irel->r_addend - (sec->output_section->vma);
++	}
 +      else
 +	symval += irel->r_addend;
 +
@@ -2055,9 +2266,13 @@ index 0000000000..a357388115
 +              irel->r_info = ELF64_R_INFO (ELF64_R_SYM (irel->r_info),
 +                                           (int) R_MICROBLAZE_32_LO);
 +	      break;
++	    case R_MICROBLAZE_TEXTREL_64:
++	      irel->r_info = ELF64_R_INFO (ELF64_R_SYM (irel->r_info),
++					   (int) R_MICROBLAZE_TEXTREL_32_LO);
++	      break;
 +	    default:
 +	      /* Cannot happen.  */
-+	      BFD_ASSERT (FALSE);
++	      BFD_ASSERT (false);
 +            }
 +        }
 +    } /* Loop through all relocations.  */
@@ -2094,6 +2309,28 @@ index 0000000000..a357388115
 +		      && ELF64_ST_TYPE (isym->st_info) == STT_SECTION)
 +		    irel->r_addend -= calc_fixup (irel->r_addend, 0, sec);
 +	        }
++	      break;
++	    case R_MICROBLAZE_IMML_64:
++	      {
++	        /* This was a PC-relative instruction that was
++ 		   completely resolved.  */
++	        int sfix, efix;
++            unsigned int val;
++	        bfd_vma target_address;
++	        target_address = irel->r_addend + irel->r_offset;
++	        sfix = calc_fixup (irel->r_offset, 0, sec);
++	        efix = calc_fixup (target_address, 0, sec);
++
++            /* Validate the in-band val.  */
++            val = bfd_get_32 (abfd, contents + irel->r_offset);
++            if (val != irel->r_addend && ELF64_R_TYPE (irel->r_info) == R_MICROBLAZE_32_NONE) {
++               fprintf(stderr, "%d: CORRUPT relax reloc %x %lx\n", __LINE__, val, irel->r_addend);
++            }
++	        irel->r_addend -= (efix - sfix);
++	        /* Should use HOWTO.  */
++	        microblaze_bfd_write_imm_value_64 (abfd, contents + irel->r_offset,
++	                                           irel->r_addend);
++	      }
 +	      break;
 +	    case R_MICROBLAZE_NONE:
 +	    case R_MICROBLAZE_32_NONE:
@@ -2149,9 +2386,9 @@ index 0000000000..a357388115
 +            continue;
 +
 +          /* We always cache the relocs.  Perhaps, if info->keep_memory is
-+             FALSE, we should free them, if we are permitted to.  */
++             false, we should free them, if we are permitted to.  */
 +
-+          irelocs = _bfd_elf_link_read_relocs (abfd, o, NULL, NULL, TRUE);
++          irelocs = _bfd_elf_link_read_relocs (abfd, o, NULL, NULL, true);
 +          if (irelocs == NULL)
 +            goto error_return;
 +
@@ -2177,7 +2414,7 @@ index 0000000000..a357388115
 +		      else
 +		        {
 +		          /* We always cache the section contents.
-+			     Perhaps, if info->keep_memory is FALSE, we
++			     Perhaps, if info->keep_memory is false, we
 +			     should free them, if we are permitted to.  */
 +
 +		          if (o->rawsize == 0)
@@ -2216,7 +2453,7 @@ index 0000000000..a357388115
 +                          else
 +                            {
 +                              /* We always cache the section contents.
-+                                 Perhaps, if info->keep_memory is FALSE, we
++                                 Perhaps, if info->keep_memory is false, we
 +                                 should free them, if we are permitted to.  */
 +		              if (o->rawsize == 0)
 +			        o->rawsize = o->size;
@@ -2245,7 +2482,7 @@ index 0000000000..a357388115
 +			  else
 +			    {
 +			      /* We always cache the section contents.
-+				 Perhaps, if info->keep_memory is FALSE, we
++				 Perhaps, if info->keep_memory is false, we
 +				 should free them, if we are permitted to.  */
 +
 +			      if (o->rawsize == 0)
@@ -2267,7 +2504,8 @@ index 0000000000..a357388115
 +		    }
 +		}
 +	      else if ((ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_PCREL_LO)
-+		       || (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_LO))
++		       || (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_LO)
++               || (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_TEXTREL_32_LO))
 +		{
 +		  isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
 +
@@ -2285,7 +2523,7 @@ index 0000000000..a357388115
 +			  else
 +			    {
 +			      /* We always cache the section contents.
-+				 Perhaps, if info->keep_memory is FALSE, we
++				 Perhaps, if info->keep_memory is false, we
 +				 should free them, if we are permitted to.  */
 +			      if (o->rawsize == 0)
 +				o->rawsize = o->size;
@@ -2311,7 +2549,8 @@ index 0000000000..a357388115
 +		    }
 +		}
 +
-+	      if (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_64)
++	      if (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_64
++          || (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_TEXTREL_64))
 +		{
 +		  isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
 +
@@ -2328,7 +2567,7 @@ index 0000000000..a357388115
 +			  else
 +			    {
 +			      /* We always cache the section contents.
-+				 Perhaps, if info->keep_memory is FALSE, we
++				 Perhaps, if info->keep_memory is false, we
 +				 should free them, if we are permitted to.  */
 +
 +			      if (o->rawsize == 0)
@@ -2373,7 +2612,7 @@ index 0000000000..a357388115
 +			  else
 +			    {
 +			      /* We always cache the section contents.
-+				 Perhaps, if info->keep_memory is FALSE, we
++				 Perhaps, if info->keep_memory is false, we
 +				 should free them, if we are permitted to.  */
 +			      if (o->rawsize == 0)
 +				o->rawsize = o->size;
@@ -2457,11 +2696,8 @@ index 0000000000..a357388115
 +      symtab_hdr->contents = (bfd_byte *) isymbuf;
 +    }
 +
-+  if (free_relocs != NULL)
-+    {
-+      free (free_relocs);
-+      free_relocs = NULL;
-+    }
++  free (free_relocs);
++  free_relocs = NULL;
 +
 +  if (free_contents != NULL)
 +    {
@@ -2475,26 +2711,21 @@ index 0000000000..a357388115
 +
 +  if (sec->relax_count == 0)
 +    {
-+      *again = FALSE;
++      *again = false;
 +      free (sec->relax);
 +      sec->relax = NULL;
 +    }
 +  else
-+    *again = TRUE;
-+  return TRUE;
++    *again = true;
++  return true;
 +
 + error_return:
-+  if (free_relocs != NULL)
-+    free (free_relocs);
-+  if (free_contents != NULL)
-+    free (free_contents);
-+  if (sec->relax != NULL)
-+    {
-+      free (sec->relax);
-+      sec->relax = NULL;
-+      sec->relax_count = 0;
-+    }
-+  return FALSE;
++  free (free_relocs);
++  free (free_contents);
++  free (sec->relax);
++  sec->relax = NULL;
++  sec->relax_count = 0;
++  return false;
 +}
 +
 +/* Return the section that should be marked against GC for a given
@@ -2518,17 +2749,6 @@ index 0000000000..a357388115
 +  return _bfd_elf_gc_mark_hook (sec, info, rel, h, sym);
 +}
 +
-+/* Update the got entry reference counts for the section being removed.  */
-+
-+static bfd_boolean
-+microblaze_elf_gc_sweep_hook (bfd * abfd ATTRIBUTE_UNUSED,
-+     			      struct bfd_link_info * info ATTRIBUTE_UNUSED,
-+     			      asection * sec ATTRIBUTE_UNUSED,
-+     			      const Elf_Internal_Rela * relocs ATTRIBUTE_UNUSED)
-+{
-+  return TRUE;
-+}
-+
 +/* PIC support.  */
 +
 +#define PLT_ENTRY_SIZE 16
@@ -2542,37 +2762,7 @@ index 0000000000..a357388115
 +/* Create .got, .gotplt, and .rela.got sections in DYNOBJ, and set up
 +   shortcuts to them in our hash table.  */
 +
-+static bfd_boolean
-+create_got_section (bfd *dynobj, struct bfd_link_info *info)
-+{
-+  struct elf64_mb_link_hash_table *htab;
-+
-+  if (! _bfd_elf_create_got_section (dynobj, info))
-+    return FALSE;
-+  htab = elf64_mb_hash_table (info);
-+  if (htab == NULL)
-+    return FALSE;
-+
-+  htab->sgot = bfd_get_linker_section (dynobj, ".got");
-+  htab->sgotplt = bfd_get_linker_section (dynobj, ".got.plt");
-+  if (!htab->sgot || !htab->sgotplt)
-+    return FALSE;
-+
-+  if ((htab->srelgot = bfd_get_linker_section (dynobj, ".rela.got")) == NULL)
-+    htab->srelgot = bfd_make_section_anyway (dynobj, ".rela.got");
-+  if (htab->srelgot == NULL
-+      || ! bfd_set_section_flags (htab->srelgot, SEC_ALLOC
-+                                  | SEC_LOAD
-+                                  | SEC_HAS_CONTENTS
-+                                  | SEC_IN_MEMORY
-+                                  | SEC_LINKER_CREATED
-+                                  | SEC_READONLY)
-+      || ! bfd_set_section_alignment (htab->srelgot, 2))
-+    return FALSE;
-+  return TRUE;
-+}
-+
-+static bfd_boolean
++static bool
 +update_local_sym_info (bfd *abfd,
 +		       Elf_Internal_Shdr *symtab_hdr,
 +		       unsigned long r_symndx,
@@ -2588,7 +2778,7 @@ index 0000000000..a357388115
 +      size *= (sizeof (*local_got_refcounts) + sizeof (*local_got_tls_masks));
 +      local_got_refcounts = bfd_zalloc (abfd, size);
 +      if (local_got_refcounts == NULL)
-+        return FALSE;
++        return false;
 +      elf_local_got_refcounts (abfd) = local_got_refcounts;
 +    }
 +
@@ -2597,11 +2787,11 @@ index 0000000000..a357388115
 +  local_got_tls_masks[r_symndx] |= tls_type;
 +  local_got_refcounts[r_symndx] += 1;
 +
-+  return TRUE;
++  return true;
 +}
 +/* Look through the relocs for a section during the first phase.  */
 +
-+static bfd_boolean
++static bool
 +microblaze_elf_check_relocs (bfd * abfd,
 +			     struct bfd_link_info * info,
 +     			     asection * sec,
@@ -2616,11 +2806,11 @@ index 0000000000..a357388115
 +  asection *sreloc = NULL;
 +
 +  if (bfd_link_relocatable (info))
-+    return TRUE;
++    return true;
 +
 +  htab = elf64_mb_hash_table (info);
 +  if (htab == NULL)
-+    return FALSE;
++    return false;
 +
 +  symtab_hdr = & elf_tdata (abfd)->symtab_hdr;
 +  sym_hashes = elf_sym_hashes (abfd);
@@ -2656,14 +2846,14 @@ index 0000000000..a357388115
 +	     Reconstruct it for later use during GC.  */
 +        case R_MICROBLAZE_GNU_VTINHERIT:
 +          if (!bfd_elf_gc_record_vtinherit (abfd, sec, h, rel->r_offset))
-+            return FALSE;
++            return false;
 +          break;
 +
 +	  /* This relocation describes which C++ vtable entries are actually
 +	     used.  Record for later use during GC.  */
 +        case R_MICROBLAZE_GNU_VTENTRY:
 +          if (!bfd_elf_gc_record_vtentry (abfd, sec, h, rel->r_addend))
-+            return FALSE;
++            return false;
 +          break;
 +
 +	  /* This relocation requires .plt entry.  */
@@ -2676,22 +2866,24 @@ index 0000000000..a357388115
 +          break;
 +
 +	  /* This relocation requires .got entry.  */
-+        case R_MICROBLAZE_TLSGD:
-+          tls_type |= (TLS_TLS | TLS_GD);
-+          goto dogottls;
-+        case R_MICROBLAZE_TLSLD:
-+          tls_type |= (TLS_TLS | TLS_LD);
-+        dogottls:
-+          sec->has_tls_reloc = 1;
-+        case R_MICROBLAZE_GOT_64:
-+          if (htab->sgot == NULL)
-+            {
-+              if (htab->elf.dynobj == NULL)
-+                htab->elf.dynobj = abfd;
-+              if (!create_got_section (htab->elf.dynobj, info))
-+                return FALSE;
-+            }
-+          if (h != NULL)
++	case R_MICROBLAZE_TLSGD:
++	  tls_type |= (TLS_TLS | TLS_GD);
++	  goto dogottls;
++	case R_MICROBLAZE_TLSLD:
++	  tls_type |= (TLS_TLS | TLS_LD);
++	  /* Fall through.  */
++	dogottls:
++	  sec->has_tls_reloc = 1;
++	  /* Fall through.  */
++	case R_MICROBLAZE_GOT_64:
++	  if (htab->elf.sgot == NULL)
++	    {
++	      if (htab->elf.dynobj == NULL)
++		htab->elf.dynobj = abfd;
++	      if (!_bfd_elf_create_got_section (htab->elf.dynobj, info))
++		return false;
++	    }
++	  if (h != NULL)
 +	    {
 +	      h->got.refcount += 1;
 +	      elf64_mb_hash_entry (h)->tls_mask |= tls_type;
@@ -2699,7 +2891,18 @@ index 0000000000..a357388115
 +          else
 +	    {
 +	      if (! update_local_sym_info(abfd, symtab_hdr, r_symndx, tls_type) )
-+		return FALSE;
++		return false;
++	    }
++	  break;
++
++	case R_MICROBLAZE_GOTOFF_64:
++	case R_MICROBLAZE_GOTOFF_32:
++	  if (htab->elf.sgot == NULL)
++	    {
++	      if (htab->elf.dynobj == NULL)
++		htab->elf.dynobj = abfd;
++	      if (!_bfd_elf_create_got_section (htab->elf.dynobj, info))
++		return false;
 +	    }
 +          break;
 +
@@ -2748,14 +2951,14 @@ index 0000000000..a357388115
 +			 && (! info->symbolic
 +			     || h->root.type == bfd_link_hash_defweak
 +			     || !h->def_regular))))
-+                || (!bfd_link_pic (info)
-+                    && (sec->flags & SEC_ALLOC) != 0
-+                    && h != NULL
-+                    && (h->root.type == bfd_link_hash_defweak
-+                        || !h->def_regular)))
-+              {
-+                struct elf64_mb_dyn_relocs *p;
-+                struct elf64_mb_dyn_relocs **head;
++		|| (!bfd_link_pic (info)
++		    && (sec->flags & SEC_ALLOC) != 0
++		    && h != NULL
++		    && (h->root.type == bfd_link_hash_defweak
++			|| !h->def_regular)))
++	      {
++		struct elf_dyn_relocs *p;
++		struct elf_dyn_relocs **head;
 +
 +                /* When creating a shared object, we must copy these
 +                   relocs into the output file.  We create a reloc
@@ -2772,7 +2975,7 @@ index 0000000000..a357388115
 +		    sreloc = _bfd_elf_make_dynamic_reloc_section (sec, dynobj,
 +								  2, abfd, 1);
 +		    if (sreloc == NULL)
-+		      return FALSE;
++		      return false;
 +		  }
 +
 +		/* If this is a global symbol, we count the number of
@@ -2789,27 +2992,27 @@ index 0000000000..a357388115
 +		    Elf_Internal_Sym *isym;
 +		    void *vpp;
 +
-+		    isym = bfd_sym_from_r_symndx (&htab->sym_sec,
++		    isym = bfd_sym_from_r_symndx (&htab->elf.sym_cache,
 +						  abfd, r_symndx);
 +		    if (isym == NULL)
-+		      return FALSE;
++		      return false;
 +
 +		    s = bfd_section_from_elf_index (abfd, isym->st_shndx);
 +		    if (s == NULL)
-+		      return FALSE;
++		      return false;
 +
 +		    vpp = &elf_section_data (s)->local_dynrel;
-+		    head = (struct elf64_mb_dyn_relocs **) vpp;
++		    head = (struct elf_dyn_relocs **) vpp;
 +		  }
 +
 +		p = *head;
 +		if (p == NULL || p->sec != sec)
 +		  {
 +		    size_t amt = sizeof *p;
-+		    p = ((struct elf64_mb_dyn_relocs *)
++		    p = ((struct elf_dyn_relocs *)
 +			 bfd_alloc (htab->elf.dynobj, amt));
 +		    if (p == NULL)
-+		      return FALSE;
++		      return false;
 +		    p->next = *head;
 +		    *head = p;
 +		    p->sec = sec;
@@ -2826,35 +3029,7 @@ index 0000000000..a357388115
 +        }
 +    }
 +
-+  return TRUE;
-+}
-+
-+static bfd_boolean
-+microblaze_elf_create_dynamic_sections (bfd *dynobj, struct bfd_link_info *info)
-+{
-+  struct elf64_mb_link_hash_table *htab;
-+
-+  htab = elf64_mb_hash_table (info);
-+  if (htab == NULL)
-+    return FALSE;
-+
-+  if (!htab->sgot && !create_got_section (dynobj, info))
-+    return FALSE;
-+
-+  if (!_bfd_elf_create_dynamic_sections (dynobj, info))
-+    return FALSE;
-+
-+  htab->splt = bfd_get_linker_section (dynobj, ".plt");
-+  htab->srelplt = bfd_get_linker_section (dynobj, ".rela.plt");
-+  htab->sdynbss = bfd_get_linker_section (dynobj, ".dynbss");
-+  if (!bfd_link_pic (info))
-+    htab->srelbss = bfd_get_linker_section (dynobj, ".rela.bss");
-+
-+  if (!htab->splt || !htab->srelplt || !htab->sdynbss
-+      || (!bfd_link_pic (info) && !htab->srelbss))
-+    abort ();
-+
-+  return TRUE;
++  return true;
 +}
 +
 +/* Copy the extra info we tack onto an elf_link_hash_entry.  */
@@ -2869,46 +3044,12 @@ index 0000000000..a357388115
 +  edir = (struct elf64_mb_link_hash_entry *) dir;
 +  eind = (struct elf64_mb_link_hash_entry *) ind;
 +
-+  if (eind->dyn_relocs != NULL)
-+    {
-+      if (edir->dyn_relocs != NULL)
-+	{
-+	  struct elf64_mb_dyn_relocs **pp;
-+	  struct elf64_mb_dyn_relocs *p;
-+
-+	  if (ind->root.type == bfd_link_hash_indirect)
-+	    abort ();
-+
-+	  /* Add reloc counts against the weak sym to the strong sym
-+	     list.  Merge any entries against the same section.  */
-+	  for (pp = &eind->dyn_relocs; (p = *pp) != NULL; )
-+	    {
-+	      struct elf64_mb_dyn_relocs *q;
-+
-+	      for (q = edir->dyn_relocs; q != NULL; q = q->next)
-+		if (q->sec == p->sec)
-+		  {
-+		    q->pc_count += p->pc_count;
-+		    q->count += p->count;
-+		    *pp = p->next;
-+		    break;
-+		  }
-+	      if (q == NULL)
-+		pp = &p->next;
-+	    }
-+	  *pp = edir->dyn_relocs;
-+	}
-+
-+      edir->dyn_relocs = eind->dyn_relocs;
-+      eind->dyn_relocs = NULL;
-+    }
-+
 +  edir->tls_mask |= eind->tls_mask;
 +
 +  _bfd_elf_link_hash_copy_indirect (info, dir, ind);
 +}
 +
-+static bfd_boolean
++static bool
 +microblaze_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
 +				      struct elf_link_hash_entry *h)
 +{
@@ -2922,7 +3063,7 @@ index 0000000000..a357388115
 +
 +  htab = elf64_mb_hash_table (info);
 +  if (htab == NULL)
-+    return FALSE;
++    return false;
 +
 +  /* If this is a function, put it in the procedure linkage table.  We
 +     will fill in the contents of the procedure linkage table later,
@@ -2944,7 +3085,7 @@ index 0000000000..a357388115
 +	  h->needs_plt = 0;
 +	}
 +
-+      return TRUE;
++      return true;
 +    }
 +  else
 +    /* It's possible that we incorrectly decided a .plt reloc was
@@ -2963,7 +3104,7 @@ index 0000000000..a357388115
 +      BFD_ASSERT (def->root.type == bfd_link_hash_defined);
 +      h->root.u.def.section = def->root.u.def.section;
 +      h->root.u.def.value = def->root.u.def.value;
-+      return TRUE;
++      return true;
 +    }
 +
 +  /* This is a reference to a symbol defined by a dynamic object which
@@ -2974,34 +3115,26 @@ index 0000000000..a357388115
 +     For such cases we need not do anything here; the relocations will
 +     be handled correctly by relocate_section.  */
 +  if (bfd_link_pic (info))
-+    return TRUE;
++    return true;
 +
 +  /* If there are no references to this symbol that do not use the
 +     GOT, we don't need to generate a copy reloc.  */
 +  if (!h->non_got_ref)
-+    return TRUE;
++    return true;
 +
 +  /* If -z nocopyreloc was given, we won't generate them either.  */
 +  if (info->nocopyreloc)
 +    {
 +      h->non_got_ref = 0;
-+      return TRUE;
++      return true;
 +    }
 +
-+  eh = (struct elf64_mb_link_hash_entry *) h;
-+  for (p = eh->dyn_relocs; p != NULL; p = p->next)
-+    {
-+      s = p->sec->output_section;
-+      if (s != NULL && (s->flags & SEC_READONLY) != 0)
-+	break;
-+    }
-+
-+  /* If we didn't find any dynamic relocs in read-only sections, then
++  /* If we don't find any dynamic relocs in read-only sections, then
 +     we'll be keeping the dynamic relocs and avoiding the copy reloc.  */
 +  if (!_bfd_elf_readonly_dynrelocs (h))
 +    {
 +      h->non_got_ref = 0;
-+      return TRUE;
++      return true;
 +    }
 +
 +  /* We must allocate the symbol in our .dynbss section, which will
@@ -3044,7 +3177,7 @@ index 0000000000..a357388115
 +  if (power_of_two > s->alignment_power)
 +    {
 +      if (!bfd_set_section_alignment (s, power_of_two))
-+	return FALSE;
++	return false;
 +    }
 +
 +  /* Define the symbol as being at this point in the section.  */
@@ -3053,27 +3186,27 @@ index 0000000000..a357388115
 +
 +  /* Increment the section size to make room for the symbol.  */
 +  s->size += h->size;
-+  return TRUE;
++  return true;
 +}
 +
 +/* Allocate space in .plt, .got and associated reloc sections for
 +   dynamic relocs.  */
 +
-+static bfd_boolean
++static bool
 +allocate_dynrelocs (struct elf_link_hash_entry *h, void * dat)
 +{
 +  struct bfd_link_info *info;
 +  struct elf64_mb_link_hash_table *htab;
 +  struct elf64_mb_link_hash_entry *eh;
-+  struct elf64_mb_dyn_relocs *p;
++  struct elf_dyn_relocs *p;
 +
 +  if (h->root.type == bfd_link_hash_indirect)
-+    return TRUE;
++    return true;
 +
 +  info = (struct bfd_link_info *) dat;
 +  htab = elf64_mb_hash_table (info);
 +  if (htab == NULL)
-+    return FALSE;
++    return false;
 +
 +  if (htab->elf.dynamic_sections_created
 +      && h->plt.refcount > 0)
@@ -3084,12 +3217,12 @@ index 0000000000..a357388115
 +          && !h->forced_local)
 +        {
 +          if (! bfd_elf_link_record_dynamic_symbol (info, h))
-+            return FALSE;
++            return false;
 +        }
 +
 +      if (WILL_CALL_FINISH_DYNAMIC_SYMBOL (1, bfd_link_pic (info), h))
-+        {
-+          asection *s = htab->splt;
++	{
++	  asection *s = htab->elf.splt;
 +
 +          /* The first entry in .plt is reserved.  */
 +          if (s->size == 0)
@@ -3143,7 +3276,7 @@ index 0000000000..a357388115
 +          && !h->forced_local)
 +        {
 +          if (! bfd_elf_link_record_dynamic_symbol (info, h))
-+            return FALSE;
++            return false;
 +        }
 +
 +      need = 0;
@@ -3184,7 +3317,7 @@ index 0000000000..a357388115
 +    h->got.offset = (bfd_vma) -1;
 +
 +  if (h->dyn_relocs == NULL)
-+    return TRUE;
++    return true;
 +
 +  /* In the shared -Bsymbolic case, discard space allocated for
 +     dynamic pc-relative relocs against symbols which turn out to be
@@ -3198,7 +3331,7 @@ index 0000000000..a357388115
 +	  && (h->forced_local
 +	      || info->symbolic))
 +	{
-+	  struct elf64_mb_dyn_relocs **pp;
++	  struct elf_dyn_relocs **pp;
 +
 +	  for (pp = &h->dyn_relocs; (p = *pp) != NULL; )
 +	    {
@@ -3232,7 +3365,7 @@ index 0000000000..a357388115
 +	      && !h->forced_local)
 +	    {
 +	      if (! bfd_elf_link_record_dynamic_symbol (info, h))
-+		return FALSE;
++		return false;
 +	    }
 +
 +	  /* If that succeeded, we know we'll be keeping all the
@@ -3253,12 +3386,12 @@ index 0000000000..a357388115
 +      sreloc->size += p->count * sizeof (Elf64_External_Rela);
 +    }
 +
-+  return TRUE;
++  return true;
 +}
 +
 +/* Set the sizes of the dynamic sections.  */
 +
-+static bfd_boolean
++static bool
 +microblaze_elf_size_dynamic_sections (bfd *output_bfd ATTRIBUTE_UNUSED,
 +				      struct bfd_link_info *info)
 +{
@@ -3269,7 +3402,7 @@ index 0000000000..a357388115
 +
 +  htab = elf64_mb_hash_table (info);
 +  if (htab == NULL)
-+    return FALSE;
++    return false;
 +
 +  dynobj = htab->elf.dynobj;
 +  BFD_ASSERT (dynobj != NULL);
@@ -3290,9 +3423,9 @@ index 0000000000..a357388115
 +
 +      for (s = ibfd->sections; s != NULL; s = s->next)
 +	{
-+	  struct elf64_mb_dyn_relocs *p;
++	  struct elf_dyn_relocs *p;
 +
-+	  for (p = ((struct elf64_mb_dyn_relocs *)
++	  for (p = ((struct elf_dyn_relocs *)
 +		    elf_section_data (s)->local_dynrel);
 +	       p != NULL;
 +	       p = p->next)
@@ -3385,7 +3518,7 @@ index 0000000000..a357388115
 +  for (s = dynobj->sections; s != NULL; s = s->next)
 +    {
 +      const char *name;
-+      bfd_boolean strip = FALSE;
++      bool strip = false;
 +
 +      if ((s->flags & SEC_LINKER_CREATED) == 0)
 +        continue;
@@ -3394,7 +3527,7 @@ index 0000000000..a357388115
 +	 of the dynobj section names depend upon the input files.  */
 +      name = bfd_section_name (s);
 +
-+      if (strncmp (name, ".rela", 5) == 0)
++      if (startswith (name, ".rela"))
 +	{
 +	  if (s->size == 0)
 +	    {
@@ -3407,7 +3540,7 @@ index 0000000000..a357388115
 +		 adjust_dynamic_symbol is called, and it is that
 +		 function which decides whether anything needs to go
 +		 into these sections.  */
-+	      strip = TRUE;
++	      strip = true;
 +	    }
 +	  else
 +	    {
@@ -3427,67 +3560,31 @@ index 0000000000..a357388115
 +	}
 +
 +      if (strip)
-+        {
-+          s->flags |= SEC_EXCLUDE;
-+          continue;
-+        }
++	{
++	  s->flags |= SEC_EXCLUDE;
++	  continue;
++	}
 +
 +      /* Allocate memory for the section contents.  */
 +      /* FIXME: This should be a call to bfd_alloc not bfd_zalloc.
-+         Unused entries should be reclaimed before the section's contents
-+         are written out, but at the moment this does not happen.  Thus in
-+         order to prevent writing out garbage, we initialise the section's
-+         contents to zero.  */
++	 Unused entries should be reclaimed before the section's contents
++	 are written out, but at the moment this does not happen.  Thus in
++	 order to prevent writing out garbage, we initialise the section's
++	 contents to zero.  */
 +      s->contents = (bfd_byte *) bfd_zalloc (dynobj, s->size);
 +      if (s->contents == NULL && s->size != 0)
-+        return FALSE;
++	return false;
 +    }
 +
-+  if (elf_hash_table (info)->dynamic_sections_created)
-+    {
-+      /* Add some entries to the .dynamic section.  We fill in the
-+	 values later, in microblaze_elf_finish_dynamic_sections, but we
-+	 must add the entries now so that we get the correct size for
-+	 the .dynamic section.  The DT_DEBUG entry is filled in by the
-+	 dynamic linker and used by the debugger.  */
-+#define add_dynamic_entry(TAG, VAL)			\
-+      _bfd_elf_add_dynamic_entry (info, TAG, VAL)
-+
-+      if (bfd_link_executable (info))
-+        {
-+          if (!add_dynamic_entry (DT_DEBUG, 0))
-+            return FALSE;
-+        }
-+
-+      if (!add_dynamic_entry (DT_RELA, 0)
-+          || !add_dynamic_entry (DT_RELASZ, 0)
-+          || !add_dynamic_entry (DT_RELAENT, sizeof (Elf64_External_Rela)))
-+	return FALSE;
-+
-+      if (htab->splt->size != 0)
-+        {
-+          if (!add_dynamic_entry (DT_PLTGOT, 0)
-+              || !add_dynamic_entry (DT_PLTRELSZ, 0)
-+              || !add_dynamic_entry (DT_PLTREL, DT_RELA)
-+              || !add_dynamic_entry (DT_JMPREL, 0)
-+              || !add_dynamic_entry (DT_BIND_NOW, 1))
-+            return FALSE;
-+        }
-+
-+      if (info->flags & DF_TEXTREL)
-+        {
-+          if (!add_dynamic_entry (DT_TEXTREL, 0))
-+            return FALSE;
-+        }
-+    }
-+#undef add_dynamic_entry
-+  return TRUE;
++  /* ??? Force DF_BIND_NOW?  */
++  info->flags |= DF_BIND_NOW;
++  return _bfd_elf_add_dynamic_tags (output_bfd, info, true);
 +}
 +
 +/* Finish up dynamic symbol handling.  We set the contents of various
 +   dynamic sections here.  */
 +
-+static bfd_boolean
++static bool
 +microblaze_elf_finish_dynamic_symbol (bfd *output_bfd,
 +				      struct bfd_link_info *info,
 +				      struct elf_link_hash_entry *h,
@@ -3498,7 +3595,7 @@ index 0000000000..a357388115
 +
 +  htab = elf64_mb_hash_table (info);
 +  if (htab == NULL)
-+    return FALSE;
++    return false;
 +
 +  if (h->plt.offset != (bfd_vma) -1)
 +    {
@@ -3515,9 +3612,9 @@ index 0000000000..a357388115
 +         it up.  */
 +      BFD_ASSERT (h->dynindx != -1);
 +
-+      splt = htab->splt;
-+      srela = htab->srelplt;
-+      sgotplt = htab->sgotplt;
++      splt = htab->elf.splt;
++      srela = htab->elf.srelplt;
++      sgotplt = htab->elf.sgotplt;
 +      BFD_ASSERT (splt != NULL && srela != NULL && sgotplt != NULL);
 +
 +      plt_index = h->plt.offset / PLT_ENTRY_SIZE - 1; /* first entry reserved.  */
@@ -3593,16 +3690,23 @@ index 0000000000..a357388115
 +      if (bfd_link_pic (info)
 +          && ((info->symbolic && h->def_regular)
 +	      || h->dynindx == -1))
-+        {
-+          asection *sec = h->root.u.def.section;
-+          microblaze_elf_output_dynamic_relocation (output_bfd,
-+                                                    srela, srela->reloc_count++,
-+                                                    /* symindex= */ 0,
-+                                                    R_MICROBLAZE_REL, offset,
-+                                                    h->root.u.def.value
-+                                                    + sec->output_section->vma
-+                                                    + sec->output_offset);
-+        }
++	{
++	  asection *sec = h->root.u.def.section;
++	  bfd_vma value;
++
++	  value = h->root.u.def.value;
++	  if (sec->output_section != NULL)
++	    /* PR 21180: If the output section is NULL, then the symbol is no
++	       longer needed, and in theory the GOT entry is redundant.  But
++	       it is too late to change our minds now...  */
++	    value += sec->output_section->vma + sec->output_offset;
++
++	  microblaze_elf_output_dynamic_relocation (output_bfd,
++						    srela, srela->reloc_count++,
++						    /* symindex= */ 0,
++						    R_MICROBLAZE_REL, offset,
++						    value);
++	}
 +      else
 +        {
 +          microblaze_elf_output_dynamic_relocation (output_bfd,
@@ -3626,16 +3730,17 @@ index 0000000000..a357388115
 +
 +      BFD_ASSERT (h->dynindx != -1);
 +
-+      s = bfd_get_linker_section (htab->elf.dynobj, ".rela.bss");
-+      BFD_ASSERT (s != NULL);
-+
 +      rela.r_offset = (h->root.u.def.value
 +                       + h->root.u.def.section->output_section->vma
 +                       + h->root.u.def.section->output_offset);
 +      rela.r_info = ELF64_R_INFO (h->dynindx, R_MICROBLAZE_COPY);
 +      rela.r_addend = 0;
-+      loc = s->contents + s->reloc_count++ * sizeof (Elf64_External_Rela);
-+      bfd_elf64_swap_reloca_out (output_bfd, &rela, loc);
++      if (h->root.u.def.section == htab->elf.sdynrelro)
++	s = htab->elf.sreldynrelro;
++      else
++	s = htab->elf.srelbss;
++      loc = s->contents + s->reloc_count++ * sizeof (Elf32_External_Rela);
++      bfd_elf32_swap_reloca_out (output_bfd, &rela, loc);
 +    }
 +
 +  /* Mark some specially defined symbols as absolute.  */
@@ -3644,13 +3749,13 @@ index 0000000000..a357388115
 +      || h == htab->elf.hplt)
 +    sym->st_shndx = SHN_ABS;
 +
-+  return TRUE;
++  return true;
 +}
 +
 +
 +/* Finish up the dynamic sections.  */
 +
-+static bfd_boolean
++static bool
 +microblaze_elf_finish_dynamic_sections (bfd *output_bfd,
 +					struct bfd_link_info *info)
 +{
@@ -3660,7 +3765,7 @@ index 0000000000..a357388115
 +
 +  htab = elf64_mb_hash_table (info);
 +  if (htab == NULL)
-+    return FALSE;
++    return false;
 +
 +  dynobj = htab->elf.dynobj;
 +
@@ -3671,57 +3776,63 @@ index 0000000000..a357388115
 +      asection *splt;
 +      Elf64_External_Dyn *dyncon, *dynconend;
 +
-+      splt = bfd_get_linker_section (dynobj, ".plt");
-+      BFD_ASSERT (splt != NULL && sdyn != NULL);
-+
-+      dyncon = (Elf64_External_Dyn *) sdyn->contents;
-+      dynconend = (Elf64_External_Dyn *) (sdyn->contents + sdyn->size);
++      dyncon = (Elf32_External_Dyn *) sdyn->contents;
++      dynconend = (Elf32_External_Dyn *) (sdyn->contents + sdyn->size);
 +      for (; dyncon < dynconend; dyncon++)
-+        {
-+          Elf_Internal_Dyn dyn;
-+          const char *name;
-+          bfd_boolean size;
++	{
++	  Elf_Internal_Dyn dyn;
++	  asection *s;
++	  bool size;
 +
 +          bfd_elf64_swap_dyn_in (dynobj, dyncon, &dyn);
 +
-+          switch (dyn.d_tag)
-+            {
-+            case DT_PLTGOT:   name = ".got.plt"; size = FALSE; break;
-+            case DT_PLTRELSZ: name = ".rela.plt"; size = TRUE; break;
-+            case DT_JMPREL:   name = ".rela.plt"; size = FALSE; break;
-+            case DT_RELA:     name = ".rela.dyn"; size = FALSE; break;
-+            case DT_RELASZ:   name = ".rela.dyn"; size = TRUE; break;
-+            default:	  name = NULL; size = FALSE; break;
-+            }
++	  switch (dyn.d_tag)
++	    {
++	    case DT_PLTGOT:
++	      s = htab->elf.sgotplt;
++	      size = false;
++	      break;
 +
-+          if (name != NULL)
-+            {
-+              asection *s;
++	    case DT_PLTRELSZ:
++	      s = htab->elf.srelplt;
++	      size = true;
++	      break;
 +
-+              s = bfd_get_section_by_name (output_bfd, name);
-+              if (s == NULL)
-+                dyn.d_un.d_val = 0;
-+              else
-+                {
-+                  if (! size)
-+                    dyn.d_un.d_ptr = s->vma;
-+                  else
-+                    dyn.d_un.d_val = s->size;
-+                }
-+              bfd_elf64_swap_dyn_out (output_bfd, &dyn, dyncon);
-+            }
-+        }
++	    case DT_JMPREL:
++	      s = htab->elf.srelplt;
++	      size = false;
++	      break;
++
++	    default:
++	      continue;
++	    }
++
++	  if (s == NULL)
++	    dyn.d_un.d_val = 0;
++	  else
++	    {
++	      if (!size)
++		dyn.d_un.d_ptr = s->output_section->vma + s->output_offset;
++	      else
++		dyn.d_un.d_val = s->size;
++	    }
++	  bfd_elf64_swap_dyn_out (output_bfd, &dyn, dyncon);
++	}
++
++      splt = htab->elf.splt;
++      BFD_ASSERT (splt != NULL && sdyn != NULL);
 +
 +      /* Clear the first entry in the procedure linkage table,
 +	 and put a nop in the last four bytes.  */
 +      if (splt->size > 0)
-+        {
-+          memset (splt->contents, 0, PLT_ENTRY_SIZE);
-+          bfd_put_32 (output_bfd, (bfd_vma) 0x80000000 /* nop.  */,
-+                      splt->contents + splt->size - 4);
-+        }
++	{
++	  memset (splt->contents, 0, PLT_ENTRY_SIZE);
++	  bfd_put_32 (output_bfd, (bfd_vma) 0x80000000 /* nop.  */,
++		      splt->contents + splt->size - 4);
 +
-+      elf_section_data (splt->output_section)->this_hdr.sh_entsize = 4;
++	  if (splt->output_section != bfd_abs_section_ptr)
++	    elf_section_data (splt->output_section)->this_hdr.sh_entsize = 4;
++	}
 +    }
 +
 +  /* Set the first entry in the global offset table to the address of
@@ -3741,13 +3852,13 @@ index 0000000000..a357388115
 +  if (htab->elf.sgot && htab->elf.sgot->size > 0)
 +    elf_section_data (htab->elf.sgot->output_section)->this_hdr.sh_entsize = 4;
 +
-+  return TRUE;
++  return true;
 +}
 +
 +/* Hook called by the linker routine which adds symbols from an object
 +   file.  We use it to put .comm items in .sbss, and not .bss.  */
 +
-+static bfd_boolean
++static bool
 +microblaze_elf_add_symbol_hook (bfd *abfd,
 +			        struct bfd_link_info *info,
 +			        Elf_Internal_Sym *sym,
@@ -3764,13 +3875,13 @@ index 0000000000..a357388115
 +	 put into .sbss.  */
 +      *secp = bfd_make_section_old_way (abfd, ".sbss");
 +      if (*secp == NULL
-+	  || !bfd_set_section_flags (*secp, SEC_IS_COMMON))
-+	return FALSE;
++	  || !bfd_set_section_flags (*secp, SEC_IS_COMMON | SEC_SMALL_DATA))
++	return false;
 +
 +      *valp = sym->st_size;
 +    }
 +
-+  return TRUE;
++  return true;
 +}
 +
 +#define TARGET_LITTLE_SYM      microblaze_elf64_le_vec
@@ -3791,34 +3902,78 @@ index 0000000000..a357388115
 +#define bfd_elf64_bfd_is_local_label_name       microblaze_elf_is_local_label_name
 +#define elf_backend_relocate_section		microblaze_elf_relocate_section
 +#define bfd_elf64_bfd_relax_section             microblaze_elf_relax_section
-+#define bfd_elf64_bfd_merge_private_bfd_data    microblaze_elf_merge_private_bfd_data
++#define bfd_elf64_bfd_merge_private_bfd_data    _bfd_generic_verify_endian_match
 +#define bfd_elf64_bfd_reloc_name_lookup		microblaze_elf_reloc_name_lookup
 +
 +#define elf_backend_gc_mark_hook		microblaze_elf_gc_mark_hook
-+#define elf_backend_gc_sweep_hook		microblaze_elf_gc_sweep_hook
-+#define elf_backend_check_relocs                microblaze_elf_check_relocs
-+#define elf_backend_copy_indirect_symbol        microblaze_elf_copy_indirect_symbol
-+#define bfd_elf64_bfd_link_hash_table_create    microblaze_elf_link_hash_table_create
++#define elf_backend_check_relocs		microblaze_elf_check_relocs
++#define elf_backend_copy_indirect_symbol	microblaze_elf_copy_indirect_symbol
++#define bfd_elf32_bfd_link_hash_table_create	microblaze_elf_link_hash_table_create
 +#define elf_backend_can_gc_sections		1
-+#define elf_backend_can_refcount    		1
-+#define elf_backend_want_got_plt    		1
-+#define elf_backend_plt_readonly    		1
-+#define elf_backend_got_header_size 		12
-+#define elf_backend_rela_normal     		1
++#define elf_backend_can_refcount		1
++#define elf_backend_want_got_plt		1
++#define elf_backend_plt_readonly		1
++#define elf_backend_got_header_size		12
++#define elf_backend_want_dynrelro		1
++#define elf_backend_rela_normal			1
++#define elf_backend_dtrel_excludes_plt		1
 +
-+#define elf_backend_adjust_dynamic_symbol       microblaze_elf_adjust_dynamic_symbol
-+#define elf_backend_create_dynamic_sections     microblaze_elf_create_dynamic_sections
-+#define elf_backend_finish_dynamic_sections     microblaze_elf_finish_dynamic_sections
-+#define elf_backend_finish_dynamic_symbol       microblaze_elf_finish_dynamic_symbol
-+#define elf_backend_size_dynamic_sections       microblaze_elf_size_dynamic_sections
++#define elf_backend_adjust_dynamic_symbol	microblaze_elf_adjust_dynamic_symbol
++#define elf_backend_create_dynamic_sections	_bfd_elf_create_dynamic_sections
++#define elf_backend_finish_dynamic_sections	microblaze_elf_finish_dynamic_sections
++#define elf_backend_finish_dynamic_symbol	microblaze_elf_finish_dynamic_symbol
++#define elf_backend_size_dynamic_sections	microblaze_elf_size_dynamic_sections
 +#define elf_backend_add_symbol_hook		microblaze_elf_add_symbol_hook
 +
 +#include "elf64-target.h"
+diff --git a/bfd/libbfd.h b/bfd/libbfd.h
+index 4153b94564d..2caaf27bcd7 100644
+--- a/bfd/libbfd.h
++++ b/bfd/libbfd.h
+@@ -2990,7 +2990,9 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
+   "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
+   "BFD_RELOC_MICROBLAZE_32_NONE",
+   "BFD_RELOC_MICROBLAZE_64_NONE",
++  "BFD_RELOC_MICROBLAZE_64",
+   "BFD_RELOC_MICROBLAZE_64_GOTPC",
++  "BFD_RELOC_MICROBLAZE_64_GPC",
+   "BFD_RELOC_MICROBLAZE_64_GOT",
+   "BFD_RELOC_MICROBLAZE_64_PLT",
+   "BFD_RELOC_MICROBLAZE_64_GOTOFF",
+diff --git a/bfd/reloc.c b/bfd/reloc.c
+index 3a08f7a8a42..288a5026d27 100644
+--- a/bfd/reloc.c
++++ b/bfd/reloc.c
+@@ -6904,12 +6904,24 @@ ENUMDOC
+   done here - only used for relaxing
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_NONE
++ENUMDOC
++  This is a 32 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing
++ENUM
++  BFD_RELOC_MICROBLAZE_64
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  No relocation is
+   done here - only used for relaxing
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_GOTPC
++ENUMDOC
++  This is a 64 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing
++ENUM
++  BFD_RELOC_MICROBLAZE_64_GPC
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  The relocation is
 diff --git a/bfd/targets.c b/bfd/targets.c
-index 0732c5e429..1ec226b2f4 100644
+index 89b49e721b4..22543016ffb 100644
 --- a/bfd/targets.c
 +++ b/bfd/targets.c
-@@ -782,6 +782,8 @@ extern const bfd_target mep_elf32_le_vec;
+@@ -791,6 +791,8 @@ extern const bfd_target mep_elf32_le_vec;
  extern const bfd_target metag_elf32_vec;
  extern const bfd_target microblaze_elf32_vec;
  extern const bfd_target microblaze_elf32_le_vec;
@@ -3827,7 +3982,7 @@ index 0732c5e429..1ec226b2f4 100644
  extern const bfd_target mips_ecoff_be_vec;
  extern const bfd_target mips_ecoff_le_vec;
  extern const bfd_target mips_ecoff_bele_vec;
-@@ -1150,6 +1152,10 @@ static const bfd_target * const _bfd_target_vector[] =
+@@ -1156,6 +1158,10 @@ static const bfd_target * const _bfd_target_vector[] =
  
  	&metag_elf32_vec,
  
@@ -3839,7 +3994,7 @@ index 0732c5e429..1ec226b2f4 100644
  
  	&mips_ecoff_be_vec,
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 5810a74a5f..ffbb843d33 100644
+index 98d0c259246..378fb882f13 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -35,10 +35,13 @@
@@ -3855,8 +4010,45 @@ index 5810a74a5f..ffbb843d33 100644
 +#define OPTION_M64 (OPTION_MD_BASE + 4)
  
  void microblaze_generate_symbol (char *sym);
- static bfd_boolean check_spl_reg (unsigned *);
-@@ -773,6 +776,74 @@ parse_imm (char * s, expressionS * e, offsetT min, offsetT max)
+ static bool check_spl_reg (unsigned *);
+@@ -91,6 +94,7 @@ const char FLT_CHARS[] = "rRsSfFdDxXpP";
+ #define TLSTPREL_OFFSET      16
+ #define TEXT_OFFSET	     17
+ #define TEXT_PC_OFFSET       18
++#define DEFINED_64_OFFSET   19
+ 
+ /* Initialize the relax table.  */
+ const relax_typeS md_relax_table[] =
+@@ -113,7 +117,9 @@ const relax_typeS md_relax_table[] =
+   { 0x7fffffff, 0x80000000, INST_WORD_SIZE*2, 0 },  /* 15: TLSGOTTPREL_OFFSET.  */
+   { 0x7fffffff, 0x80000000, INST_WORD_SIZE*2, 0 },  /* 16: TLSTPREL_OFFSET.  */
+   { 0x7fffffff, 0x80000000, INST_WORD_SIZE*2, 0 },  /* 17: TEXT_OFFSET.  */
+-  { 0x7fffffff, 0x80000000, INST_WORD_SIZE*2, 0 }   /* 18: TEXT_PC_OFFSET.  */
++  { 0x7fffffff, 0x80000000, INST_WORD_SIZE*2, 0 },   /* 18: TEXT_PC_OFFSET.  */
++//  { 0x7fffffff, 0x80000000, INST_WORD_SIZE*2, 0 }   /* 16: TLSTPREL_OFFSET.  */
++  { 0x7fffffffffffffff, 0x8000000000000000, INST_WORD_SIZE, 0 }   /* 17: DEFINED_64_OFFSET.  */
+ };
+ 
+ static htab_t  opcode_hash_control;	/* Opcode mnemonics.  */
+@@ -393,7 +399,8 @@ const pseudo_typeS md_pseudo_table[] =
+   {"data32", cons, 4},     /* Same as word.  */
+   {"ent", s_func, 0}, /* Treat ent as function entry point.  */
+   {"end", microblaze_s_func, 1}, /* Treat end as function end point.  */
+-  {"gpword", s_rva, 4}, /* gpword label => store resolved label address in data section.  */
++  {"gpword", s_rva, 8}, /* gpword label => store resolved label address in data section.  */
++  {"gpdword", s_rva, 8}, /* gpword label => store resolved label address in data section.  */
+   {"weakext", microblaze_s_weakext, 0},
+   {"rodata", microblaze_s_rdata, 0},
+   {"sdata2", microblaze_s_rdata, 1},
+@@ -402,6 +409,7 @@ const pseudo_typeS md_pseudo_table[] =
+   {"sbss", microblaze_s_bss, 1},
+   {"text", microblaze_s_text, 0},
+   {"word", cons, 4},
++  {"dword", cons, 8},
+   {"frame", s_ignore, 0},
+   {"mask", s_ignore, 0}, /* Emitted by gcc.  */
+   {NULL, NULL, 0}
+@@ -773,6 +781,74 @@ parse_imm (char * s, expressionS * e, offsetT min, offsetT max)
    return new_pointer;
  }
  
@@ -3931,7 +4123,24 @@ index 5810a74a5f..ffbb843d33 100644
  static char *
  check_got (int * got_type, int * got_len)
  {
-@@ -920,6 +991,7 @@ md_assemble (char * str)
+@@ -827,7 +903,7 @@ check_got (int * got_type, int * got_len)
+ extern bfd_reloc_code_real_type
+ parse_cons_expression_microblaze (expressionS *exp, int size)
+ {
+-  if (size == 4)
++  if (size == 4 || (microblaze_arch_size == 64 && size == 8))
+     {
+       /* Handle @GOTOFF et.al.  */
+       char *save, *gotfree_copy;
+@@ -859,6 +935,7 @@ parse_cons_expression_microblaze (expressionS *exp, int size)
+ 
+ static const char * str_microblaze_ro_anchor = "RO";
+ static const char * str_microblaze_rw_anchor = "RW";
++static const char * str_microblaze_64 = "64";
+ 
+ static bool
+ check_spl_reg (unsigned * reg)
+@@ -920,6 +997,7 @@ md_assemble (char * str)
    unsigned int immed, immed2, temp;
    expressionS exp;
    char name[20];
@@ -3939,7 +4148,41 @@ index 5810a74a5f..ffbb843d33 100644
  
    /* Drop leading whitespace.  */
    while (ISSPACE (* str))
-@@ -1129,7 +1201,7 @@ md_assemble (char * str)
+@@ -1106,6 +1184,33 @@ md_assemble (char * str)
+               inst |= (immed << IMM_LOW) & IMM_MASK;
+             }
+ 	}
++#if 0 //revisit
++      else if (streq (name, "lli") || streq (name, "sli"))
++	{
++          temp = immed & 0xFFFFFFFFFFFF8000;
++          if ((temp != 0) && (temp != 0xFFFFFFFFFFFF8000))
++	    {
++              /* Needs an immediate inst.  */
++              opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imml");
++              if (opcode1 == NULL)
++                {
++                  as_bad (_("unknown opcode \"%s\""), "imml");
++                  return;
++                }
++
++              inst1 = opcode1->bit_sequence;
++	      inst1 |= ((immedl & 0xFFFFFFFFFFFF0000L) >> 16) & IMML_MASK;
++              output[0] = INST_BYTE0 (inst1);
++              output[1] = INST_BYTE1 (inst1);
++              output[2] = INST_BYTE2 (inst1);
++              output[3] = INST_BYTE3 (inst1);
++              output = frag_more (isize);
++	    }
++	  inst |= (reg1 << RD_LOW) & RD_MASK;
++	  inst |= (reg2 << RA_LOW) & RA_MASK;
++	  inst |= (immed << IMM_LOW) & IMM_MASK;
++        }
++#endif
+       else
+ 	{
+           temp = immed & 0xFFFF8000;
+@@ -1135,7 +1240,7 @@ md_assemble (char * str)
  	}
        break;
  
@@ -3948,7 +4191,7 @@ index 5810a74a5f..ffbb843d33 100644
        if (strcmp (op_end, ""))
          op_end = parse_reg (op_end + 1, &reg1);  /* Get rd.  */
        else
-@@ -1163,16 +1235,22 @@ md_assemble (char * str)
+@@ -1169,16 +1274,22 @@ md_assemble (char * str)
            immed = exp.X_add_number;
          }
  
@@ -3974,7 +4217,7 @@ index 5810a74a5f..ffbb843d33 100644
        if (strcmp (op_end, ""))
          op_end = parse_reg (op_end + 1, &reg1);  /* Get rd.  */
        else
-@@ -1196,7 +1274,7 @@ md_assemble (char * str)
+@@ -1202,7 +1313,7 @@ md_assemble (char * str)
  
        /* Width immediate value.  */
        if (strcmp (op_end, ""))
@@ -3983,7 +4226,7 @@ index 5810a74a5f..ffbb843d33 100644
        else
          as_fatal (_("Error in statement syntax"));
        if (exp.X_op != O_constant)
-@@ -1208,6 +1286,8 @@ md_assemble (char * str)
+@@ -1214,6 +1325,8 @@ md_assemble (char * str)
          immed = exp.X_add_number;
        if (opcode->instr == bsefi && immed > 31)
          as_fatal (_("Width value must be less than 32"));
@@ -3992,7 +4235,7 @@ index 5810a74a5f..ffbb843d33 100644
  
        /* Shift immediate value.  */
        if (strcmp (op_end, ""))
-@@ -1215,32 +1295,40 @@ md_assemble (char * str)
+@@ -1221,32 +1334,40 @@ md_assemble (char * str)
        else
          as_fatal (_("Error in statement syntax"));
        if (exp.X_op != O_constant)
@@ -4044,7 +4287,7 @@ index 5810a74a5f..ffbb843d33 100644
        break;
      case INST_TYPE_R1_R2:
        if (strcmp (op_end, ""))
-@@ -1808,6 +1896,142 @@ md_assemble (char * str)
+@@ -1820,6 +1941,143 @@ md_assemble (char * str)
        }
        inst |= (immed << IMM_MBAR);
        break;
@@ -4078,6 +4321,7 @@ index 5810a74a5f..ffbb843d33 100644
 +      if (exp.X_op != O_constant)
 +	{
 +	  char *opc = NULL;
++	  //char *opc = str_microblaze_64;
 +	  relax_substateT subtype;
 +
 +	  if (exp.X_md != 0)
@@ -4091,7 +4335,7 @@ index 5810a74a5f..ffbb843d33 100644
 +			     subtype,   /* PC-relative or not.  */
 +			     exp.X_add_symbol,
 +			     exp.X_add_number,
-+			     opc);
++			     (char *) opc);
 +	  immedl = 0L;
 +        }
 +      else
@@ -4099,7 +4343,7 @@ index 5810a74a5f..ffbb843d33 100644
 +	  output = frag_more (isize);
 +	  immedl = exp.X_add_number;
 +
-+	  opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imml");
++	  opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imml");
 +	  if (opcode1 == NULL)
 +	    {
 +	      as_bad (_("unknown opcode \"%s\""), "imml");
@@ -4129,7 +4373,7 @@ index 5810a74a5f..ffbb843d33 100644
 +          reg1 = 0;
 +        }
 +      if (strcmp (op_end, ""))
-+        op_end = parse_imml (op_end + 1, & exp, MIN_IMM, MAX_IMM);
++        op_end = parse_imml (op_end + 1, & exp, MIN_IMML, MAX_IMML);
 +      else
 +        as_fatal (_("Error in statement syntax"));
 +
@@ -4139,7 +4383,8 @@ index 5810a74a5f..ffbb843d33 100644
 +
 +      if (exp.X_op != O_constant)
 +	{
-+          char *opc = NULL;
++	  //char *opc = NULL;
++          char *opc = str_microblaze_64;
 +          relax_substateT subtype;
 +
 +	  if (exp.X_md != 0)
@@ -4153,15 +4398,14 @@ index 5810a74a5f..ffbb843d33 100644
 +			     subtype,   /* PC-relative or not.  */
 +			     exp.X_add_symbol,
 +			     exp.X_add_number,
-+			     opc);
++			     (char *) opc);
 +	  immedl = 0L;
 +	}
 +      else
 +	{
 +          output = frag_more (isize);
 +          immedl = exp.X_add_number;
-+
-+	  opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imml");
++	  opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imml");
 +	  if (opcode1 == NULL)
 +	    {
 +	      as_bad (_("unknown opcode \"%s\""), "imml");
@@ -4187,7 +4431,7 @@ index 5810a74a5f..ffbb843d33 100644
  
      default:
        as_fatal (_("unimplemented opcode \"%s\""), name);
-@@ -1915,6 +2139,7 @@ struct option md_longopts[] =
+@@ -1927,6 +2185,7 @@ struct option md_longopts[] =
    {"EL", no_argument, NULL, OPTION_EL},
    {"mlittle-endian", no_argument, NULL, OPTION_LITTLE},
    {"mbig-endian", no_argument, NULL, OPTION_BIG},
@@ -4195,7 +4439,190 @@ index 5810a74a5f..ffbb843d33 100644
    { NULL,          no_argument, NULL, 0}
  };
  
-@@ -2565,6 +2790,18 @@ tc_gen_reloc (asection * section ATTRIBUTE_UNUSED, fixS * fixp)
+@@ -1971,13 +2230,23 @@ md_convert_frag (bfd * abfd ATTRIBUTE_UNUSED,
+       fragP->fr_fix += INST_WORD_SIZE * 2;
+       fragP->fr_var = 0;
+       break;
++    case DEFINED_64_OFFSET:
++      if (fragP->fr_symbol == GOT_symbol)
++        fix_new (fragP, fragP->fr_fix, INST_WORD_SIZE, fragP->fr_symbol,
++	         fragP->fr_offset, true, BFD_RELOC_MICROBLAZE_64_GPC);
++      else
++        fix_new (fragP, fragP->fr_fix, INST_WORD_SIZE, fragP->fr_symbol,
++	         fragP->fr_offset, true, BFD_RELOC_MICROBLAZE_64);
++      fragP->fr_fix += INST_WORD_SIZE * 2;
++      fragP->fr_var = 0;
++      break;
+     case DEFINED_ABS_SEGMENT:
+       if (fragP->fr_symbol == GOT_symbol)
+         fix_new (fragP, fragP->fr_fix, INST_WORD_SIZE * 2, fragP->fr_symbol,
+ 	         fragP->fr_offset, true, BFD_RELOC_MICROBLAZE_64_GOTPC);
+       else
+         fix_new (fragP, fragP->fr_fix, INST_WORD_SIZE * 2, fragP->fr_symbol,
+-	         fragP->fr_offset, false, BFD_RELOC_64);
++	         fragP->fr_offset, true, BFD_RELOC_64);
+       fragP->fr_fix += INST_WORD_SIZE * 2;
+       fragP->fr_var = 0;
+       break;
+@@ -2198,23 +2467,38 @@ md_apply_fix (fixS *   fixP,
+     case BFD_RELOC_64_PCREL:
+     case BFD_RELOC_64:
+     case BFD_RELOC_MICROBLAZE_64_TEXTREL:
++    case BFD_RELOC_MICROBLAZE_64:
+       /* Add an imm instruction.  First save the current instruction.  */
+       for (i = 0; i < INST_WORD_SIZE; i++)
+ 	buf[i + INST_WORD_SIZE] = buf[i];
++      if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64)
++        {
++          /* Generate the imm instruction.  */
++          opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imml");
++          if (opcode1 == NULL)
++	    {
++	      as_bad (_("unknown opcode \"%s\""), "imml");
++	      return;
++	    }
+ 
+-      /* Generate the imm instruction.  */
+-      opcode1
+-	= (struct op_code_struct *) str_hash_find (opcode_hash_control, "imm");
+-      if (opcode1 == NULL)
+-	{
+-	  as_bad (_("unknown opcode \"%s\""), "imm");
+-	  return;
+-	}
+-
+-      inst1 = opcode1->bit_sequence;
+-      if (fixP->fx_addsy == NULL || S_IS_DEFINED (fixP->fx_addsy))
+-	inst1 |= ((val & 0xFFFF0000) >> 16) & IMM_MASK;
+-
++           inst1 = opcode1->bit_sequence;
++           if (fixP->fx_addsy == NULL || S_IS_DEFINED (fixP->fx_addsy))
++	     inst1 |= ((val & 0xFFFFFFFFFFFF0000L) >> 16) & IMML_MASK;
++         }
++      else
++        {
++          /* Generate the imm instruction.  */
++          opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imm");
++          if (opcode1 == NULL)
++	    {
++	      as_bad (_("unknown opcode \"%s\""), "imm");
++	      return;
++	    }
++     
++          inst1 = opcode1->bit_sequence;
++          if (fixP->fx_addsy == NULL || S_IS_DEFINED (fixP->fx_addsy))
++	    inst1 |= ((val & 0xFFFF0000) >> 16) & IMM_MASK;
++         }
+       buf[0] = INST_BYTE0 (inst1);
+       buf[1] = INST_BYTE1 (inst1);
+       buf[2] = INST_BYTE2 (inst1);
+@@ -2243,6 +2527,7 @@ md_apply_fix (fixS *   fixP,
+       /* Fall through.  */
+ 
+     case BFD_RELOC_MICROBLAZE_64_GOTPC:
++    case BFD_RELOC_MICROBLAZE_64_GPC:
+     case BFD_RELOC_MICROBLAZE_64_GOT:
+     case BFD_RELOC_MICROBLAZE_64_PLT:
+     case BFD_RELOC_MICROBLAZE_64_GOTOFF:
+@@ -2250,13 +2535,17 @@ md_apply_fix (fixS *   fixP,
+       /* Add an imm instruction.  First save the current instruction.  */
+       for (i = 0; i < INST_WORD_SIZE; i++)
+ 	buf[i + INST_WORD_SIZE] = buf[i];
+-
+       /* Generate the imm instruction.  */
+-      opcode1
+-	= (struct op_code_struct *) str_hash_find (opcode_hash_control, "imm");
++      if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_GPC)
++        opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imml");
++      else
++        opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imm");
+       if (opcode1 == NULL)
+ 	{
+-	  as_bad (_("unknown opcode \"%s\""), "imm");
++      	  if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_GPC)
++	    as_bad (_("unknown opcode \"%s\""), "imml");
++          else
++	    as_bad (_("unknown opcode \"%s\""), "imm");
+ 	  return;
+ 	}
+ 
+@@ -2280,6 +2569,8 @@ md_apply_fix (fixS *   fixP,
+ 	 moves code around due to relaxing.  */
+       if (fixP->fx_r_type == BFD_RELOC_64_PCREL)
+ 	fixP->fx_r_type = BFD_RELOC_MICROBLAZE_64_NONE;
++      if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64)
++	    fixP->fx_r_type = BFD_RELOC_MICROBLAZE_64_NONE;
+       else if (fixP->fx_r_type == BFD_RELOC_32)
+ 	fixP->fx_r_type = BFD_RELOC_MICROBLAZE_32_NONE;
+       else
+@@ -2323,6 +2614,32 @@ md_estimate_size_before_relax (fragS * fragP,
+           as_bad (_("Absolute PC-relative value in relaxation code.  Assembler error....."));
+           abort ();
+         }
++      else if (S_GET_SEGMENT (fragP->fr_symbol) == segment_type
++               && !S_IS_WEAK (fragP->fr_symbol))
++        {
++           if (fragP->fr_opcode != NULL) {
++	     if(streq (fragP->fr_opcode, str_microblaze_64)) 
++             {
++               /* Used as an absolute value.  */
++              fragP->fr_subtype = DEFINED_64_OFFSET;
++               /* Variable part does not change.  */
++              fragP->fr_var = INST_WORD_SIZE;
++	     }
++	   else
++	     {
++               fragP->fr_subtype = DEFINED_PC_OFFSET;
++      	       /* Don't know now whether we need an imm instruction.  */
++               fragP->fr_var = INST_WORD_SIZE;
++	     }
++	   }  
++	   else
++	     {
++               fragP->fr_subtype = DEFINED_PC_OFFSET;
++      	       /* Don't know now whether we need an imm instruction.  */
++               fragP->fr_var = INST_WORD_SIZE;
++	     }
++        }
++    #if 0
+       else if (S_GET_SEGMENT (fragP->fr_symbol) == segment_type &&
+                !S_IS_WEAK (fragP->fr_symbol))
+         {
+@@ -2330,6 +2647,7 @@ md_estimate_size_before_relax (fragS * fragP,
+           /* Don't know now whether we need an imm instruction.  */
+           fragP->fr_var = INST_WORD_SIZE;
+         }
++#endif
+       else if (S_IS_DEFINED (fragP->fr_symbol)
+ 	       && (((S_GET_SEGMENT (fragP->fr_symbol))->flags & SEC_CODE) == 0))
+         {
+@@ -2432,6 +2750,7 @@ md_estimate_size_before_relax (fragS * fragP,
+     case TLSLD_OFFSET:
+     case TLSTPREL_OFFSET:
+     case TLSDTPREL_OFFSET:
++    case DEFINED_64_OFFSET:
+       fragP->fr_var = INST_WORD_SIZE*2;
+       break;
+     case DEFINED_RO_SEGMENT:
+@@ -2485,7 +2804,7 @@ md_pcrel_from_section (fixS * fixp, segT sec ATTRIBUTE_UNUSED)
+   else
+     {
+       /* The case where we are going to resolve things... */
+-      if (fixp->fx_r_type == BFD_RELOC_64_PCREL)
++      if (fixp->fx_r_type == BFD_RELOC_64_PCREL ||fixp->fx_r_type == BFD_RELOC_MICROBLAZE_64)
+         return  fixp->fx_where + fixp->fx_frag->fr_address + INST_WORD_SIZE;
+       else
+         return  fixp->fx_where + fixp->fx_frag->fr_address;
+@@ -2518,6 +2837,8 @@ tc_gen_reloc (asection * section ATTRIBUTE_UNUSED, fixS * fixp)
+     case BFD_RELOC_MICROBLAZE_32_RWSDA:
+     case BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM:
+     case BFD_RELOC_MICROBLAZE_64_GOTPC:
++    case BFD_RELOC_MICROBLAZE_64_GPC:
++    case BFD_RELOC_MICROBLAZE_64:
+     case BFD_RELOC_MICROBLAZE_64_GOT:
+     case BFD_RELOC_MICROBLAZE_64_PLT:
+     case BFD_RELOC_MICROBLAZE_64_GOTOFF:
+@@ -2578,6 +2899,18 @@ tc_gen_reloc (asection * section ATTRIBUTE_UNUSED, fixS * fixp)
    return rel;
  }
  
@@ -4214,7 +4641,7 @@ index 5810a74a5f..ffbb843d33 100644
  int
  md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
  {
-@@ -2578,6 +2815,10 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
+@@ -2591,6 +2924,10 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
      case OPTION_LITTLE:
        target_big_endian = 0;
        break;
@@ -4225,7 +4652,7 @@ index 5810a74a5f..ffbb843d33 100644
      default:
        return 0;
      }
-@@ -2593,6 +2834,7 @@ md_show_usage (FILE * stream ATTRIBUTE_UNUSED)
+@@ -2606,6 +2943,7 @@ md_show_usage (FILE * stream ATTRIBUTE_UNUSED)
    fprintf (stream, _(" MicroBlaze specific assembler options:\n"));
    fprintf (stream, "  -%-23s%s\n", "mbig-endian", N_("assemble for a big endian cpu"));
    fprintf (stream, "  -%-23s%s\n", "mlittle-endian", N_("assemble for a little endian cpu"));
@@ -4233,8 +4660,20 @@ index 5810a74a5f..ffbb843d33 100644
  }
  
  
+@@ -2643,7 +2981,10 @@ cons_fix_new_microblaze (fragS * frag,
+           r = BFD_RELOC_32;
+           break;
+         case 8:
+-          r = BFD_RELOC_64;
++          if (microblaze_arch_size == 64)
++            r = BFD_RELOC_32;
++          else
++            r = BFD_RELOC_64;
+           break;
+         default:
+           as_bad (_("unsupported BFD relocation size %u"), size);
 diff --git a/gas/config/tc-microblaze.h b/gas/config/tc-microblaze.h
-index 01cb3e894f..7435a70ef5 100644
+index c6d33f873c4..34aa1174ed2 100644
 --- a/gas/config/tc-microblaze.h
 +++ b/gas/config/tc-microblaze.h
 @@ -78,7 +78,9 @@ extern const struct relax_type md_relax_table[];
@@ -4249,31 +4688,44 @@ index 01cb3e894f..7435a70ef5 100644
  #define ELF_TC_SPECIAL_SECTIONS \
    { ".sdata",		SHT_PROGBITS,	SHF_ALLOC + SHF_WRITE }, \
 diff --git a/include/elf/common.h b/include/elf/common.h
-index 4d94c4fd5b..f709a01816 100644
+index 0cca28673dd..a650d624e3c 100644
 --- a/include/elf/common.h
 +++ b/include/elf/common.h
-@@ -340,6 +340,7 @@
- #define EM_RISCV 	243 	/* RISC-V */
- #define EM_LANAI	244	/* Lanai 32-bit processor.  */
- #define EM_BPF		247	/* Linux BPF – in-kernel virtual machine.  */
-+#define EM_MB_64	248	/* Xilinx MicroBlaze 32-bit RISC soft processor core */
- #define EM_NFP		250	/* Netronome Flow Processor.  */
- #define EM_CSKY		252	/* C-SKY processor family.  */
+@@ -354,6 +354,7 @@
+ #define EM_65816	257	/* WDC 65816/65C816 */
+ #define EM_LOONGARCH	258	/* LoongArch */
+ #define EM_KF32		259	/* ChipON KungFu32 */
++#define EM_MB_64	260	/* Xilinx MicroBlaze 32-bit RISC soft processor core */
+ 
+ /* If it is necessary to assign new unofficial EM_* values, please pick large
+    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
+diff --git a/include/elf/microblaze.h b/include/elf/microblaze.h
+index 936ef484289..1f958724e5f 100644
+--- a/include/elf/microblaze.h
++++ b/include/elf/microblaze.h
+@@ -62,6 +62,8 @@ START_RELOC_NUMBERS (elf_microblaze_reloc_type)
+   RELOC_NUMBER (R_MICROBLAZE_TEXTREL_64, 31)    /* TEXT Entry offset 64-bit.  */
+   RELOC_NUMBER (R_MICROBLAZE_TEXTREL_32_LO, 32) /* TEXT Entry offset 32-bit.  */
+   RELOC_NUMBER (R_MICROBLAZE_32_NONE, 33)
++  RELOC_NUMBER (R_MICROBLAZE_IMML_64, 34)
++  RELOC_NUMBER (R_MICROBLAZE_GPC_64, 35)    /* GOT entry offset.  */
+    
+ END_RELOC_NUMBERS (R_MICROBLAZE_max)
  
 diff --git a/ld/Makefile.am b/ld/Makefile.am
-index 02c4fc1639..d063e2d32c 100644
+index f8e99325361..8d263078750 100644
 --- a/ld/Makefile.am
 +++ b/ld/Makefile.am
-@@ -416,6 +416,8 @@ ALL_64_EMULATION_SOURCES = \
+@@ -410,6 +410,8 @@ ALL_64_EMULATION_SOURCES = \
  	eelf32ltsmipn32.c \
  	eelf32ltsmipn32_fbsd.c \
  	eelf32mipswindiss.c \
-+	eelf64microblazeel.c \
-+	eelf64microblaze.c \
- 	eelf64_aix.c \
- 	eelf64bpf.c \
- 	eelf64_ia64.c \
-@@ -898,6 +900,8 @@ $(ALL_EMULATION_SOURCES) $(ALL_64_EMULATION_SOURCES): $(GEN_DEPENDS)
++        eelf64microblazeel.c \
++        eelf64microblaze.c \
+ 	eelf32lriscv.c \
+ 	eelf32lriscv_ilp32f.c \
+ 	eelf32lriscv_ilp32.c \
+@@ -902,6 +904,8 @@ $(ALL_EMULATION_SOURCES) $(ALL_64_EMULATION_SOURCES): $(GEN_DEPENDS)
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32ltsmipn32.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32ltsmipn32_fbsd.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32mipswindiss.Pc@am__quote@
@@ -4283,19 +4735,19 @@ index 02c4fc1639..d063e2d32c 100644
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64bpf.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_ia64.Pc@am__quote@
 diff --git a/ld/Makefile.in b/ld/Makefile.in
-index 2fe12e14f6..797212859f 100644
+index ef2e99e08da..f7e845b9274 100644
 --- a/ld/Makefile.in
 +++ b/ld/Makefile.in
-@@ -898,6 +898,8 @@ ALL_64_EMULATION_SOURCES = \
+@@ -899,6 +899,8 @@ ALL_64_EMULATION_SOURCES = \
  	eelf32ltsmipn32.c \
  	eelf32ltsmipn32_fbsd.c \
  	eelf32mipswindiss.c \
 +	eelf64microblazeel.c \
 +	eelf64microblaze.c \
- 	eelf64_aix.c \
- 	eelf64bpf.c \
- 	eelf64_ia64.c \
-@@ -1338,6 +1340,8 @@ distclean-compile:
+ 	eelf32lriscv.c \
+ 	eelf32lriscv_ilp32f.c \
+ 	eelf32lriscv_ilp32.c \
+@@ -1398,6 +1400,8 @@ distclean-compile:
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32xstormy16.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32xtensa.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32z80.Po@am__quote@
@@ -4304,7 +4756,7 @@ index 2fe12e14f6..797212859f 100644
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_aix.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_ia64.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_ia64_fbsd.Po@am__quote@
-@@ -2493,6 +2497,8 @@ $(ALL_EMULATION_SOURCES) $(ALL_64_EMULATION_SOURCES): $(GEN_DEPENDS)
+@@ -2560,6 +2564,8 @@ $(ALL_EMULATION_SOURCES) $(ALL_64_EMULATION_SOURCES): $(GEN_DEPENDS)
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32ltsmipn32.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32ltsmipn32_fbsd.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32mipswindiss.Pc@am__quote@
@@ -4314,10 +4766,10 @@ index 2fe12e14f6..797212859f 100644
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64bpf.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_ia64.Pc@am__quote@
 diff --git a/ld/configure.tgt b/ld/configure.tgt
-index 87c7d9a4ca..801d27c9e3 100644
+index 6205d7c9872..3e97dbb311c 100644
 --- a/ld/configure.tgt
 +++ b/ld/configure.tgt
-@@ -469,6 +469,9 @@ microblaze*-linux*)	targ_emul="elf32mb_linux"
+@@ -468,6 +468,9 @@ microblaze*-linux*)	targ_emul="elf32mb_linux"
  microblazeel*)		targ_emul=elf32microblazeel
  			targ_extra_emuls=elf32microblaze
  			;;
@@ -4329,7 +4781,7 @@ index 87c7d9a4ca..801d27c9e3 100644
  			;;
 diff --git a/ld/emulparams/elf64microblaze.sh b/ld/emulparams/elf64microblaze.sh
 new file mode 100644
-index 0000000000..9c7b0eb708
+index 00000000000..9c7b0eb7080
 --- /dev/null
 +++ b/ld/emulparams/elf64microblaze.sh
 @@ -0,0 +1,23 @@
@@ -4358,7 +4810,7 @@ index 0000000000..9c7b0eb708
 +#GENERATE_SHLIB_SCRIPT=yes
 diff --git a/ld/emulparams/elf64microblazeel.sh b/ld/emulparams/elf64microblazeel.sh
 new file mode 100644
-index 0000000000..9c7b0eb708
+index 00000000000..9c7b0eb7080
 --- /dev/null
 +++ b/ld/emulparams/elf64microblazeel.sh
 @@ -0,0 +1,23 @@
@@ -4386,7 +4838,7 @@ index 0000000000..9c7b0eb708
 +TEMPLATE_NAME=elf32
 +#GENERATE_SHLIB_SCRIPT=yes
 diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
-index 315c6e9350..f643f2600d 100644
+index 1fe8da2e51b..fc15d210fe0 100644
 --- a/opcodes/microblaze-dis.c
 +++ b/opcodes/microblaze-dis.c
 @@ -33,6 +33,7 @@
@@ -4476,7 +4928,7 @@ index 315c6e9350..f643f2600d 100644
  	/* For tuqula instruction */
  	case INST_TYPE_RD:
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index f61f4ef66d..61eaa39b3e 100644
+index 6fcded04b49..4a1545d8920 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -40,7 +40,7 @@
@@ -4528,17 +4980,17 @@ index f61f4ef66d..61eaa39b3e 100644
 -#define MAX_OPCODES 301
 +#define MAX_OPCODES 412
  
- struct op_code_struct
+ const struct op_code_struct
  {
-@@ -125,6 +132,7 @@ struct op_code_struct
+@@ -125,6 +132,7 @@ const struct op_code_struct
    /* More info about output format here.  */
- } opcodes[MAX_OPCODES] =
+ } microblaze_opcodes[MAX_OPCODES] =
  {
 +  /* 32-bit instructions */
    {"add",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x00000000, OPCODE_MASK_H4, add, arithmetic_inst },
    {"rsub",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x04000000, OPCODE_MASK_H4, rsub, arithmetic_inst },
    {"addc",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x08000000, OPCODE_MASK_H4, addc, arithmetic_inst },
-@@ -161,11 +169,11 @@ struct op_code_struct
+@@ -161,11 +169,11 @@ const struct op_code_struct
    {"ncget", INST_TYPE_RD_RFSL, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x6C006000, OPCODE_MASK_H32, ncget, anyware_inst },
    {"ncput", INST_TYPE_R1_RFSL, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x6C00E000, OPCODE_MASK_H32, ncput, anyware_inst },
    {"muli",  INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x60000000, OPCODE_MASK_H, muli, mult_inst },
@@ -4555,7 +5007,7 @@ index f61f4ef66d..61eaa39b3e 100644
    {"or",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x80000000, OPCODE_MASK_H4, microblaze_or, logical_inst },
    {"and",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x84000000, OPCODE_MASK_H4, microblaze_and, logical_inst },
    {"xor",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x88000000, OPCODE_MASK_H4, microblaze_xor, logical_inst },
-@@ -425,6 +433,129 @@ struct op_code_struct
+@@ -425,6 +433,129 @@ const struct op_code_struct
    {"suspend",   INST_TYPE_NONE,  INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBB020004, OPCODE_MASK_HN,   invalid_inst, special_inst }, /* translates to mbar 24.  */
    {"swapb",     INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x900001E0, OPCODE_MASK_H4,   swapb,     arithmetic_inst },
    {"swaph",     INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x900001E2, OPCODE_MASK_H4,   swaph,     arithmetic_inst },
@@ -4664,8 +5116,8 @@ index f61f4ef66d..61eaa39b3e 100644
 +  {"llr",     INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC8000300, OPCODE_MASK_H4, llr, memory_load_inst },
 +  {"sl",      INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD8000100, OPCODE_MASK_H4, sl, memory_store_inst },
 +  {"slr",     INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD8000300, OPCODE_MASK_H4, slr, memory_store_inst },
-+  {"lli",     INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xE8000000, OPCODE_MASK_H, invalid_inst, memory_load_inst },  /* Identical to 32-bit */
-+  {"sli",     INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xF8000000, OPCODE_MASK_H, invalid_inst, memory_store_inst }, /* Identical to 32-bit */
++  {"lli",     INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xEC000000, OPCODE_MASK_H, invalid_inst, memory_load_inst },  /* Identical to 32-bit */
++  {"sli",     INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xFC000000, OPCODE_MASK_H, invalid_inst, memory_store_inst }, /* Identical to 32-bit */
 +  {"lla",     INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x30000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* lla translates to addlik */
 +  {"dadd",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000400, OPCODE_MASK_H4, dadd, arithmetic_inst },
 +  {"drsub",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000480, OPCODE_MASK_H4, drsub, arithmetic_inst },
@@ -4704,7 +5156,7 @@ index f61f4ef66d..61eaa39b3e 100644
  #endif /* MICROBLAZE_OPC */
  
 diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
-index fa921c90c9..1dcd3dca3d 100644
+index 78a2ac44960..70e351f6f4e 100644
 --- a/opcodes/microblaze-opcm.h
 +++ b/opcodes/microblaze-opcm.h
 @@ -25,6 +25,7 @@
@@ -4715,6 +5167,17 @@ index fa921c90c9..1dcd3dca3d 100644
    add, rsub, addc, rsubc, addk, rsubk, addkc, rsubkc, clz, cmp, cmpu,
    addi, rsubi, addic, rsubic, addik, rsubik, addikc, rsubikc, mul,
    mulh, mulhu, mulhsu,swapb,swaph,
+@@ -39,8 +40,8 @@ enum microblaze_instr
+   imm, rtsd, rtid, rtbd, rted, bri, brid, brlid, brai, braid, bralid,
+   brki, beqi, beqid, bnei, bneid, blti, bltid, blei, bleid, bgti,
+   bgtid, bgei, bgeid, lbu, lbuea, lbur, lhu, lhuea, lhur, lw, lwea, lwr, lwx,
+-  sb, sbea, sbr, sh, shea, shr, sw, swea, swr, swx, lbui, lhui, lwi,
+-  sbi, shi, swi, msrset, msrclr, tuqula, mbi_fadd, frsub, mbi_fmul, mbi_fdiv,
++  sb, sbea, sbr, sh, shea, shr, sw, swea, swr, swx, lbui, lhui, lwi, lli,
++  sbi, shi, swi, sli, msrset, msrclr, tuqula, mbi_fadd, frsub, mbi_fmul, mbi_fdiv,
+   fcmp_lt, fcmp_eq, fcmp_le, fcmp_gt, fcmp_ne, fcmp_ge, fcmp_un, flt,
+   fint, fsqrt,
+   tget, tcget, tnget, tncget, tput, tcput, tnput, tncput,
 @@ -58,6 +59,18 @@ enum microblaze_instr
    aputd, taputd, caputd, tcaputd, naputd, tnaputd, ncaputd, tncaputd,
    eagetd, teagetd, ecagetd, tecagetd, neagetd, tneagetd, necagetd, tnecagetd,

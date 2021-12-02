@@ -1,39 +1,43 @@
-From b29e6a15c9f65837dbb560aa6c41c49e591915e9 Mon Sep 17 00:00:00 2001
+From e6c2ad33d4a668107e4828feb174ee08053e8c7e Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Fri, 23 Aug 2019 16:18:43 +0530
-Subject: [PATCH 26/52] Added support to new arithmetic single register
+Subject: [PATCH 25/38] Added support to new arithmetic single register
  instructions
 
 Conflicts:
 	opcodes/microblaze-dis.c
+
+Conflicts:
+	gas/config/tc-microblaze.c
+	opcodes/microblaze-dis.c
 ---
  gas/config/tc-microblaze.c | 147 ++++++++++++++++++++++++++++++++++++-
- opcodes/microblaze-dis.c   |  13 +++-
+ opcodes/microblaze-dis.c   |  11 +++
  opcodes/microblaze-opc.h   |  43 ++++++++++-
  opcodes/microblaze-opcm.h  |   5 +-
- 4 files changed, 201 insertions(+), 7 deletions(-)
+ 4 files changed, 200 insertions(+), 6 deletions(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index b00b759893..eca060b262 100644
+index 52058d94f98..1a543c328f2 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -423,12 +423,33 @@ void
  md_begin (void)
  {
-   struct op_code_struct * opcode;
+   const struct op_code_struct * opcode;
 +  const char *prev_name = "";
  
-   opcode_hash_control = hash_new ();
+   opcode_hash_control = str_htab_create ();
  
    /* Insert unique names into hash table.  */
--  for (opcode = opcodes; opcode->name; opcode ++)
--    hash_insert (opcode_hash_control, opcode->name, (char *) opcode);
-+  for (opcode = (struct opcodes *)opcodes; opcode->name; opcode ++)
+-  for (opcode = microblaze_opcodes; opcode->name; opcode ++)
+-    str_hash_insert (opcode_hash_control, opcode->name, opcode, 0);
++  for (opcode = (struct microblaze_opcodes *)microblaze_opcodes; opcode->name; opcode ++)
 +    {
 +      if (strcmp (prev_name, opcode->name))
 +	{
 +	  prev_name = (char *) opcode->name;
-+          hash_insert (opcode_hash_control, opcode->name, (char *) opcode);
++          str_hash_insert (opcode_hash_control, opcode->name, opcode, 0);
 +        }
 +    }
 +}
@@ -153,7 +157,7 @@ index b00b759893..eca060b262 100644
    inst = opcode->bit_sequence;
    isize = 4;
  
-@@ -1480,6 +1574,51 @@ md_assemble (char * str)
+@@ -1486,6 +1580,51 @@ md_assemble (char * str)
        inst |= (immed << IMM_LOW) & IMM15_MASK;
        break;
  
@@ -206,10 +210,10 @@ index b00b759893..eca060b262 100644
        if (strcmp (op_end, ""))
          op_end = parse_reg (op_end + 1, &reg1);  /* Get r1.  */
 diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
-index 1dc11a2653..90d2328659 100644
+index 143a0a9d59e..d945d144c44 100644
 --- a/opcodes/microblaze-dis.c
 +++ b/opcodes/microblaze-dis.c
-@@ -130,9 +130,17 @@ get_field_imm15 (struct string_buf *buf, long instr)
+@@ -130,6 +130,14 @@ get_field_imm15 (struct string_buf *buf, long instr)
    return p;
  }
  
@@ -223,11 +227,7 @@ index 1dc11a2653..90d2328659 100644
 +
  static char *
  get_field_special (struct string_buf *buf, long instr,
--		   struct op_code_struct *op)
-+                   struct op_code_struct *op)
- {
-   char *p = strbuf (buf);
-   char *spr;
+ 		   const struct op_code_struct *op)
 @@ -456,6 +464,9 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
  	  /* For mbar 16 or sleep insn.  */
  	case INST_TYPE_NONE:
@@ -239,7 +239,7 @@ index 1dc11a2653..90d2328659 100644
  	case INST_TYPE_RD_R1_IMMW_IMMS:
            print_func (stream, "\t%s, %s, %s, %s", get_field_rd (&buf, inst),get_field_r1(&buf, inst),get_field_immw (&buf, inst), get_field_imms (&buf, inst));
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index 77d74c17f3..c1b453c95e 100644
+index fff7520ae81..c25383f2de9 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -69,6 +69,7 @@
@@ -299,9 +299,9 @@ index 77d74c17f3..c1b453c95e 100644
 -#define MAX_OPCODES 412
 +#define MAX_OPCODES 424
  
- struct op_code_struct
+ const struct op_code_struct
  {
-@@ -444,13 +473,21 @@ struct op_code_struct
+@@ -444,13 +473,21 @@ const struct op_code_struct
    {"cmpl",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x14000101, OPCODE_MASK_H4, cmpl, arithmetic_inst },
    {"cmplu",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x14000103, OPCODE_MASK_H4, cmplu, arithmetic_inst },
    {"addli",   INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x20000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
@@ -323,7 +323,7 @@ index 77d74c17f3..c1b453c95e 100644
    {"mull",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x40000100, OPCODE_MASK_H4, mull, mult_inst },
    {"bslll",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x44000500, OPCODE_MASK_H3, bslll, barrel_shift_inst },
    {"bslra",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x44000300, OPCODE_MASK_H3, bslra, barrel_shift_inst },
-@@ -501,9 +538,13 @@ struct op_code_struct
+@@ -501,9 +538,13 @@ const struct op_code_struct
    {"beaged",  INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9FA00000, OPCODE_MASK_H14, beaged, branch_inst },
    {"bealged", INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9FA00100, OPCODE_MASK_H14, bealged, branch_inst },
    {"orli",    INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xA0000000, OPCODE_MASK_H, invalid_inst, logical_inst },      /* Identical to 32-bit */
@@ -338,7 +338,7 @@ index 77d74c17f3..c1b453c95e 100644
    {"breai",   INST_TYPE_IMM, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB8010000, OPCODE_MASK_H12, breai, branch_inst },
    {"breaid",  INST_TYPE_IMM, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB8110000, OPCODE_MASK_H12, breaid, branch_inst },
 diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
-index fcf259a362..eca247c63b 100644
+index 70e351f6f4e..cf7512d6a87 100644
 --- a/opcodes/microblaze-opcm.h
 +++ b/opcodes/microblaze-opcm.h
 @@ -61,7 +61,9 @@ enum microblaze_instr

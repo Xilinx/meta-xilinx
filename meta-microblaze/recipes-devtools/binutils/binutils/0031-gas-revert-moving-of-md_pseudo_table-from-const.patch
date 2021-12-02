@@ -1,7 +1,7 @@
-From c45a69deeb210ebdb80cf055cef9e62bd0bda053 Mon Sep 17 00:00:00 2001
-From: Mark Hatle <mark.hatle@kernel.crashing.org>
-Date: Thu, 16 Jul 2020 12:38:11 -0500
-Subject: [PATCH 31/52] gas: revert moving of md_pseudo_table from const
+From 2a8a925c35909543738ccacafcdc7000525a27c6 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 8 Nov 2021 21:57:13 +0530
+Subject: [PATCH 31/38] gas: revert moving of md_pseudo_table from const
 
 The base system expect md_pseudo_table to be constant, Changing the
 definition will break other architectures when compiled with a
@@ -18,7 +18,7 @@ Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
  2 files changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index e565b2a99d..c6ca913f8b 100644
+index 84f60c029c1..dfcd0ab1569 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -385,6 +385,17 @@ microblaze_s_weakext (int ignore ATTRIBUTE_UNUSED)
@@ -57,7 +57,7 @@ index e565b2a99d..c6ca913f8b 100644
    {"weakext", microblaze_s_weakext, 0},
    {"rodata", microblaze_s_rdata, 0},
    {"sdata2", microblaze_s_rdata, 1},
-@@ -3448,7 +3459,6 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
+@@ -3456,7 +3467,6 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
      case OPTION_M64:
        //if (arg != NULL && strcmp (arg, "64") == 0)
        microblaze_arch_size = 64;
@@ -66,7 +66,7 @@ index e565b2a99d..c6ca913f8b 100644
      default:
        return 0;
 diff --git a/gas/tc.h b/gas/tc.h
-index 5bdfe5c347..da1738d67a 100644
+index f1fa7495e29..c9722307dea 100644
 --- a/gas/tc.h
 +++ b/gas/tc.h
 @@ -22,7 +22,7 @@

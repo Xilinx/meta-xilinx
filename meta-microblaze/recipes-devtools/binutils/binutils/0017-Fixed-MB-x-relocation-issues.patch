@@ -1,72 +1,53 @@
-From 5b1793fe6dfb16755f584821023145bdfc4b55d7 Mon Sep 17 00:00:00 2001
+From 835389f0f82b69f923aad7148717c48372a28828 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 28 Sep 2018 12:04:55 +0530
-Subject: [PATCH 18/52] -Fixed MB-x relocation issues -Added imml for required
+Subject: [PATCH 17/38] -Fixed MB-x relocation issues -Added imml for required
  MB-x instructions
 
+Conflicts:
+	bfd/elf64-microblaze.c
+	gas/config/tc-microblaze.c
 ---
- bfd/elf64-microblaze.c     |  68 ++++++++++++++---
- gas/config/tc-microblaze.c | 152 +++++++++++++++++++++++++++----------
+ bfd/elf64-microblaze.c     |  48 ++++++++++--
+ gas/config/tc-microblaze.c | 155 ++++++++++++++++++++++++++-----------
  gas/tc.h                   |   2 +-
- 3 files changed, 167 insertions(+), 55 deletions(-)
+ 3 files changed, 152 insertions(+), 53 deletions(-)
 
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index 6b1f47d00d..6676d9f93d 100644
+index 46c4aba46f1..010ee1d15b4 100644
 --- a/bfd/elf64-microblaze.c
 +++ b/bfd/elf64-microblaze.c
-@@ -1488,8 +1488,17 @@ microblaze_elf_relocate_section (bfd *output_bfd,
- 			  relocation -= (input_section->output_section->vma
- 					 + input_section->output_offset
- 					 + offset + INST_WORD_SIZE);
--			bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
+@@ -1511,6 +1511,14 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 			  bfd_put_16 (input_bfd, relocation & 0xffff,
+ 				      contents + offset + endian);
+ 
++                        unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
++                        if (insn == 0xb2000000 || insn == 0xb2ffffff)
++                          {
++                            insn &= ~0x00ffffff;
++                            insn |= (relocation >> 16) & 0xffffff;
++                            bfd_put_32 (input_bfd, insn,
++                                    contents + offset + endian);
++                          }
+ 			else
+ 			  {
+ 			    bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
+@@ -1618,6 +1626,14 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 			     bfd_put_16 (input_bfd, relocation & 0xffff,
+ 					 contents + offset + endian);
+ 			  }
 +			unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
-+    			if (insn == 0xb2000000 || insn == 0xb2ffffff)
-+			  {
-+        		    insn &= ~0x00ffffff;
-+			    insn |= (relocation >> 16) & 0xffffff;
-+			    bfd_put_32 (input_bfd, insn,
- 			            contents + offset + endian);
-+			  }
-+			else
-+			  bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
-+			              contents + offset + endian);
- 			bfd_put_16 (input_bfd, relocation & 0xffff,
- 			            contents + offset + endian + INST_WORD_SIZE);
- 		      }
-@@ -1580,11 +1589,28 @@ microblaze_elf_relocate_section (bfd *output_bfd,
- 		    else
- 		      {
- 			if (r_type == R_MICROBLAZE_64_PCREL)
--			  relocation -= (input_section->output_section->vma
--					 + input_section->output_offset
--					 + offset + INST_WORD_SIZE);
--			bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
-+			  {
-+			    if (!input_section->output_section->vma &&
-+				 !input_section->output_offset && !offset)	
-+			      relocation -= (input_section->output_section->vma
-+			                     + input_section->output_offset
-+					     + offset);
-+			    else
-+			      relocation -= (input_section->output_section->vma
-+			                     + input_section->output_offset
-+					     + offset + INST_WORD_SIZE);
-+			  }
-+			unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
-+    			if (insn == 0xb2000000 || insn == 0xb2ffffff)
-+			  {
-+        		    insn &= ~0x00ffffff;
-+			    insn |= (relocation >> 16) & 0xffffff;
-+			    bfd_put_32 (input_bfd, insn,
- 			            contents + offset + endian);
-+			  }
-+			else
-+			  bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
-+			              contents + offset + endian);
- 			bfd_put_16 (input_bfd, relocation & 0xffff,
- 			            contents + offset + endian + INST_WORD_SIZE);
- 		      }
-@@ -1703,9 +1729,19 @@ static void
++                        if (insn == 0xb2000000 || insn == 0xb2ffffff)
++                          {
++                            insn &= ~0x00ffffff;
++                            insn |= (relocation >> 16) & 0xffffff;
++                            bfd_put_32 (input_bfd, insn,
++                                    contents + offset + endian);
++                          }
+ 			else
+ 			  {
+ 			    bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
+@@ -1727,9 +1743,19 @@ static void
  microblaze_bfd_write_imm_value_32 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
  {
      unsigned long instr = bfd_get_32 (abfd, bfd_addr);
@@ -89,7 +70,7 @@ index 6b1f47d00d..6676d9f93d 100644
  }
  
  /* Read-modify-write into the bfd, an immediate value into appropriate fields of
-@@ -1717,10 +1753,18 @@ microblaze_bfd_write_imm_value_64 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
+@@ -1741,10 +1767,18 @@ microblaze_bfd_write_imm_value_64 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
      unsigned long instr_lo;
  
      instr_hi = bfd_get_32 (abfd, bfd_addr);
@@ -113,7 +94,7 @@ index 6b1f47d00d..6676d9f93d 100644
      instr_lo &= ~0x0000ffff;
      instr_lo |= (val & 0x0000ffff);
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 5e11a77e70..48f306ef41 100644
+index 685a6e93f2b..9b311ed1450 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -392,7 +392,7 @@ microblaze_s_weakext (int ignore ATTRIBUTE_UNUSED)
@@ -155,7 +136,7 @@ index 5e11a77e70..48f306ef41 100644
  	    opc = str_microblaze_ro_anchor;
  	  else if (reg2 == REG_RWSDP)
  	    opc = str_microblaze_rw_anchor;
-@@ -1182,31 +1183,55 @@ md_assemble (char * str)
+@@ -1186,33 +1187,57 @@ md_assemble (char * str)
                inst |= (immed << IMM_LOW) & IMM_MASK;
              }
  	}
@@ -170,8 +151,10 @@ index 5e11a77e70..48f306ef41 100644
 +          if (temp != 0 && temp != 0xFFFFFF8000)
 +            {
                /* Needs an immediate inst.  */
--              opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imm");
-+              opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imml");
+ 	      opcode1
+ 		= (struct op_code_struct *) str_hash_find (opcode_hash_control,
+-							   "imm");
++							   "imml");
                if (opcode1 == NULL)
                  {
 -                  as_bad (_("unknown opcode \"%s\""), "imm");
@@ -203,7 +186,7 @@ index 5e11a77e70..48f306ef41 100644
 +           if ((temp != 0) && (temp != 0xFFFF8000))
 +	     {
 +               /* Needs an immediate inst.  */
-+               opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imm");
++               opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imm");
 +               if (opcode1 == NULL)
 +                 {
 +                   as_bad (_("unknown opcode \"%s\""), "imm");
@@ -225,7 +208,7 @@ index 5e11a77e70..48f306ef41 100644
        break;
  
      case INST_TYPE_RD_R1_IMMS:
-@@ -1832,12 +1857,20 @@ md_assemble (char * str)
+@@ -1842,12 +1867,20 @@ md_assemble (char * str)
      case INST_TYPE_IMM:
        if (streq (name, "imm"))
          as_fatal (_("An IMM instruction should not be present in the .s file"));
@@ -249,10 +232,22 @@ index 5e11a77e70..48f306ef41 100644
            relax_substateT subtype;
  
  	  if (exp.X_md != 0)
-@@ -1860,27 +1893,54 @@ md_assemble (char * str)
+@@ -1870,29 +1903,53 @@ md_assemble (char * str)
            immed = exp.X_add_number;
          }
  
+-
+-      temp = immed & 0xFFFF8000;
+-      if ((temp != 0) && (temp != 0xFFFF8000))
+-	{
+-          /* Needs an immediate inst.  */
+-          opcode1
+-	    = (struct op_code_struct *) str_hash_find (opcode_hash_control,
+-						       "imm");
+-          if (opcode1 == NULL)
+-            {
+-              as_bad (_("unknown opcode \"%s\""), "imm");
+-              return;
 +      if (microblaze_arch_size == 64 && (streq (name, "breai") || 
 +            streq (name, "breaid") || 
 +	    streq (name, "brai") || streq (name, "braid")))
@@ -261,22 +256,12 @@ index 5e11a77e70..48f306ef41 100644
 +          if (temp != 0)
 +	    {
 +              /* Needs an immediate inst.  */
-+              opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imml");
++              opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imml");
 +              if (opcode1 == NULL)
 +                {
 +                  as_bad (_("unknown opcode \"%s\""), "imml");
 +                  return;
 +                }
- 
--      temp = immed & 0xFFFF8000;
--      if ((temp != 0) && (temp != 0xFFFF8000))
--	{
--          /* Needs an immediate inst.  */
--          opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imm");
--          if (opcode1 == NULL)
--            {
--              as_bad (_("unknown opcode \"%s\""), "imm");
--              return;
 +              inst1 = opcode1->bit_sequence;
 +              inst1 |= ((immed & 0xFFFFFFFFFFFF0000L) >> 16) & IMML_MASK;
 +              output[0] = INST_BYTE0 (inst1);
@@ -293,7 +278,7 @@ index 5e11a77e70..48f306ef41 100644
 +          if ((temp != 0) && (temp != 0xFFFF8000))
 +	    {
 +              /* Needs an immediate inst.  */
-+              opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imm");
++              opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imm");
 +              if (opcode1 == NULL)
 +                {
 +                  as_bad (_("unknown opcode \"%s\""), "imm");
@@ -322,7 +307,7 @@ index 5e11a77e70..48f306ef41 100644
        break;
  
      case INST_TYPE_NONE:
-@@ -2456,7 +2516,7 @@ md_apply_fix (fixS *   fixP,
+@@ -2467,7 +2524,7 @@ md_apply_fix (fixS *   fixP,
  
             inst1 = opcode1->bit_sequence;
             if (fixP->fx_addsy == NULL || S_IS_DEFINED (fixP->fx_addsy))
@@ -331,7 +316,7 @@ index 5e11a77e70..48f306ef41 100644
             if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64)
               fixP->fx_r_type = BFD_RELOC_64; 
             if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_PCREL)
-@@ -2624,7 +2684,14 @@ md_estimate_size_before_relax (fragS * fragP,
+@@ -2636,7 +2693,14 @@ md_estimate_size_before_relax (fragS * fragP,
          }
        else
  	{
@@ -347,7 +332,7 @@ index 5e11a77e70..48f306ef41 100644
  	  fragP->fr_var = INST_WORD_SIZE*2;
  	}
        break;
-@@ -2901,6 +2968,7 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
+@@ -2913,6 +2977,7 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
      case OPTION_M64:
        //if (arg != NULL && strcmp (arg, "64") == 0)
        microblaze_arch_size = 64;
@@ -356,7 +341,7 @@ index 5e11a77e70..48f306ef41 100644
      default:
        return 0;
 diff --git a/gas/tc.h b/gas/tc.h
-index da1738d67a..5bdfe5c347 100644
+index c9722307dea..f1fa7495e29 100644
 --- a/gas/tc.h
 +++ b/gas/tc.h
 @@ -22,7 +22,7 @@

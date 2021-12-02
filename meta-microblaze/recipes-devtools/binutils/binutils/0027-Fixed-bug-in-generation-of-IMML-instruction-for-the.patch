@@ -1,18 +1,18 @@
-From 2c051a6d5326e34cb4a3170073cda17e7269055d Mon Sep 17 00:00:00 2001
-From: Nagaraju <nmekala@xilinx.com>
-Date: Wed, 22 Jan 2020 16:31:12 +0530
-Subject: [PATCH 28/52] Fixed bug in generation of IMML instruction for the new
- MB-64 instructions with single register.
+From 6b6b0332aa2dcb4fa86911031cafd1cc5442b17f Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 3 Nov 2021 12:13:32 +0530
+Subject: [PATCH 27/38] Fixed bug in generation of IMML instruction for the
 
+new MB-64 instructions with single register.
 ---
  gas/config/tc-microblaze.c | 50 +++++++++++++++++++++++++++++++++++---
  1 file changed, 47 insertions(+), 3 deletions(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index aef54ad83f..647cfb6869 100644
+index 18dd8524949..68f19c965ef 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
-@@ -1639,12 +1639,56 @@ md_assemble (char * str)
+@@ -1643,12 +1643,56 @@ md_assemble (char * str)
                               exp.X_add_symbol,
                               exp.X_add_number,
                               (char *) opc);
@@ -29,7 +29,7 @@ index aef54ad83f..647cfb6869 100644
 +              /* Needs an immediate inst.  */
 +           if (((long long)immed) > (long long)-549755813888 && ((long long)immed) < (long long)549755813887)
 +	    {
-+            opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imml");
++            opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imml");
 +              if (opcode1 == NULL)
 +                {
 +                  as_bad (_("unknown opcode \"%s\""), "imml");
@@ -44,8 +44,8 @@ index aef54ad83f..647cfb6869 100644
 +              output = frag_more (isize);
 +            }
 +          else {
-+           opcode2 = (struct op_code_struct *) hash_find (opcode_hash_control, "imml");
-+           opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imml");
++           opcode2 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imml");
++           opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imml");
 +              if (opcode1 == NULL || opcode2 == NULL)
 +                {
 +                  as_bad (_("unknown opcode \"%s\""), "imml");
@@ -70,7 +70,7 @@ index aef54ad83f..647cfb6869 100644
          }
        inst |= (reg1 << RD_LOW) & RD_MASK;
        inst |= (immed << IMM_LOW) & IMM16_MASK;
-@@ -2138,8 +2182,8 @@ md_assemble (char * str)
+@@ -2146,8 +2190,8 @@ md_assemble (char * str)
              streq (name, "breaid") || 
  	    streq (name, "brai") || streq (name, "braid")))
          {
