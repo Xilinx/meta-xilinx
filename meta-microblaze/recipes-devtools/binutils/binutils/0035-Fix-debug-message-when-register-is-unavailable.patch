@@ -1,18 +1,21 @@
-From bc2b702d7f73a231bd67c60465137fe37f67479a Mon Sep 17 00:00:00 2001
+From 59fd18d5155ffe8924ed24283def8ef434067909 Mon Sep 17 00:00:00 2001
 From: Nathan Rossi <nathan.rossi@petalogix.com>
 Date: Tue, 8 May 2012 18:11:17 +1000
-Subject: [PATCH 35/52] Fix debug message when register is unavailable
+Subject: [PATCH 35/38] Fix debug message when register is unavailable
 
 Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
+
+Conflicts:
+	gdb/frame.c
 ---
- gdb/frame.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ gdb/frame.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/gdb/frame.c b/gdb/frame.c
-index ff27b9f00e..bf931b370c 100644
+index 3f2d2700541..d557a093f63 100644
 --- a/gdb/frame.c
 +++ b/gdb/frame.c
-@@ -1263,12 +1263,19 @@ frame_unwind_register_value (frame_info *next_frame, int regnum)
+@@ -1261,12 +1261,19 @@ frame_unwind_register_value (frame_info *next_frame, int regnum)
  	  else
  	    {
  	      int i;
@@ -22,17 +25,15 @@ index ff27b9f00e..bf931b370c 100644
 +	        buf = value_contents (value);
 +	      }
  
- 	      fprintf_unfiltered (gdb_stdlog, " bytes=");
- 	      fprintf_unfiltered (gdb_stdlog, "[");
--	      for (i = 0; i < register_size (gdbarch, regnum); i++)
--		fprintf_unfiltered (gdb_stdlog, "%02x", buf[i]);
+ 	      fprintf_unfiltered (&debug_file, " bytes=");
+ 	      fprintf_unfiltered (&debug_file, "[");
 +	      if (buf != NULL) {
-+	        for (i = 0; i < register_size (gdbarch, regnum); i++)
-+		  fprintf_unfiltered (gdb_stdlog, "%02x", buf[i]);
+ 	      for (i = 0; i < register_size (gdbarch, regnum); i++)
+ 		fprintf_unfiltered (&debug_file, "%02x", buf[i]);
 +	      } else {
-+	        fprintf_unfiltered (gdb_stdlog, "unavailable");
++	        fprintf_unfiltered (&debug_file, "unavailable");
 +	      }
- 	      fprintf_unfiltered (gdb_stdlog, "]");
+ 	      fprintf_unfiltered (&debug_file, "]");
  	    }
  	}
 -- 

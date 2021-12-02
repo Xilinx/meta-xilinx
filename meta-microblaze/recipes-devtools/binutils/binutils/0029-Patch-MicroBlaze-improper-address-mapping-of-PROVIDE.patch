@@ -1,7 +1,7 @@
-From 2a43e06f14cac633d87f5b213a6bacd16085967f Mon Sep 17 00:00:00 2001
+From aa1705bc097efd5003e5d818e1e2d12ff5fc0c94 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 17 Jun 2020 21:20:26 +0530
-Subject: [PATCH 30/52] [Patch,MicroBlaze] : improper address mapping of
+Subject: [PATCH 29/38] [Patch,MicroBlaze] : improper address mapping of
  PROVIDE directive symbols[DTOR_END] are causing runtime loops and we don't
  need to override PROVIDE symbols if symbols are defined in libraries and
  linker so I am disabling override for PROVIDE symbols.
@@ -11,7 +11,7 @@ Subject: [PATCH 30/52] [Patch,MicroBlaze] : improper address mapping of
  1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/ld/ldlang.c b/ld/ldlang.c
-index 9977195074..a2c44cf719 100644
+index 37b64c89ee1..5b179daf8f1 100644
 --- a/ld/ldlang.c
 +++ b/ld/ldlang.c
 @@ -3657,10 +3657,16 @@ open_input_bfds (lang_statement_union_type *s, enum open_bfd_mode mode)

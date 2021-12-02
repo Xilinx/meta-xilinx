@@ -1,35 +1,51 @@
-From e7b6ab1b28fc3ca13ed25687d5e851795ed6e1a3 Mon Sep 17 00:00:00 2001
+From 1131a31133a45553259b3fdb930daae468709bda Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Wed, 24 Oct 2018 12:34:37 +0530
-Subject: [PATCH 22/52] fixing the .bss relocation issue
+Subject: [PATCH 21/38] fixing the .bss relocation issue
 
+Conflicts:
+	bfd/elf64-microblaze.c
 ---
- bfd/elf64-microblaze.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ bfd/elf64-microblaze.c | 32 +++++++++++++++++++-------------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
 
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index ddcb5baf74..861420789b 100644
+index 55c01b44d29..6fb88959357 100644
 --- a/bfd/elf64-microblaze.c
 +++ b/bfd/elf64-microblaze.c
-@@ -1492,7 +1492,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
- 					 + input_section->output_offset
- 					 + offset + INST_WORD_SIZE);
- 			unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
--    			if (insn == 0xb2000000 || insn == 0xb2ffffff)
+@@ -1514,14 +1514,14 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 			  bfd_put_16 (input_bfd, relocation & 0xffff,
+ 				      contents + offset + endian);
+ 
+-                        unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
+-                        if (insn == 0xb2000000 || insn == 0xb2ffffff)
+-                          {
+-                            insn &= ~0x00ffffff;
+-                            insn |= (relocation >> 16) & 0xffffff;
+-                            bfd_put_32 (input_bfd, insn,
+-                                    contents + offset + endian);
+-                          }
++			unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
 +			if ((insn & 0xff000000) == 0xb2000000)
++			  {
++        		    insn &= ~0x00ffffff;
++			    insn |= (relocation >> 16) & 0xffffff;
++			    bfd_put_32 (input_bfd, insn,
++			            contents + offset + endian);
++			  }
+ 			else
  			  {
-         		    insn &= ~0x00ffffff;
- 			    insn |= (relocation >> 16) & 0xffffff;
-@@ -1606,7 +1606,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
- 					     + offset + INST_WORD_SIZE);
+ 			    bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
+@@ -1632,7 +1632,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 					 contents + offset + endian);
  			  }
  			unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
--    			if (insn == 0xb2000000 || insn == 0xb2ffffff)
+-                        if (insn == 0xb2000000 || insn == 0xb2ffffff)
 +			if ((insn & 0xff000000) == 0xb2000000)
- 			  {
-         		    insn &= ~0x00ffffff;
- 			    insn |= (relocation >> 16) & 0xffffff;
-@@ -1735,7 +1735,7 @@ microblaze_bfd_write_imm_value_32 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
+                           {
+                             insn &= ~0x00ffffff;
+                             insn |= (relocation >> 16) & 0xffffff;
+@@ -1749,7 +1749,7 @@ microblaze_bfd_write_imm_value_32 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
  {
      unsigned long instr = bfd_get_32 (abfd, bfd_addr);
  
@@ -38,7 +54,7 @@ index ddcb5baf74..861420789b 100644
        {
          instr &= ~0x00ffffff;
          instr |= (val & 0xffffff);
-@@ -1758,7 +1758,7 @@ microblaze_bfd_write_imm_value_64 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
+@@ -1772,7 +1772,7 @@ microblaze_bfd_write_imm_value_64 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
      unsigned long instr_lo;
  
      instr_hi = bfd_get_32 (abfd, bfd_addr);
@@ -47,7 +63,7 @@ index ddcb5baf74..861420789b 100644
        {
          instr_hi &= ~0x00ffffff;
          instr_hi |= (val >> 16) & 0xffffff;
-@@ -2251,7 +2251,10 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2276,7 +2276,10 @@ microblaze_elf_relax_section (bfd *abfd,
            unsigned long instr_lo =  bfd_get_32 (abfd, ocontents
                                                  + irelscan->r_offset
                                                  + INST_WORD_SIZE);
@@ -59,7 +75,7 @@ index ddcb5baf74..861420789b 100644
            immediate |= (instr_lo & 0x0000ffff);
  		      offset = calc_fixup (irelscan->r_addend, 0, sec);
  		      immediate -= offset;
-@@ -2295,7 +2298,10 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2320,7 +2323,10 @@ microblaze_elf_relax_section (bfd *abfd,
            unsigned long instr_lo =  bfd_get_32 (abfd, ocontents
                                                  + irelscan->r_offset
                                                  + INST_WORD_SIZE);

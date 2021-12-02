@@ -1,7 +1,8 @@
-From 9880b06269a176c0b5c4f0ecb9e3784f630a76be Mon Sep 17 00:00:00 2001
-From: Nagaraju Mekala <nmekala@xilix.com>
-Date: Sat, 13 Oct 2018 21:17:01 +0530
-Subject: [PATCH 21/52] Adding new relocation to support 64bit rodata
+From e49fe1aee519af464c873425212914c56fa683bc Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 2 Nov 2021 17:28:24 +0530
+Subject: [PATCH 20/38] [Patch,MicroBlaze : Adding new relocation to support
+ 64bit rodata.
 
 ---
  bfd/elf64-microblaze.c     | 11 +++++++--
@@ -9,10 +10,10 @@ Subject: [PATCH 21/52] Adding new relocation to support 64bit rodata
  2 files changed, 54 insertions(+), 6 deletions(-)
 
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index f42d7f429b..ddcb5baf74 100644
+index 2ae1f2b118a..55c01b44d29 100644
 --- a/bfd/elf64-microblaze.c
 +++ b/bfd/elf64-microblaze.c
-@@ -1473,6 +1473,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1488,6 +1488,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  	    case (int) R_MICROBLAZE_64_PCREL :
  	    case (int) R_MICROBLAZE_64:
  	    case (int) R_MICROBLAZE_32:
@@ -20,7 +21,7 @@ index f42d7f429b..ddcb5baf74 100644
  	      {
  		/* r_symndx will be STN_UNDEF (zero) only for relocs against symbols
  		   from removed linkonce sections, or sections discarded by
-@@ -1482,6 +1483,8 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1497,6 +1498,8 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  		    relocation += addend;
  		    if (r_type == R_MICROBLAZE_32)// || r_type == R_MICROBLAZE_IMML_64)
  		      bfd_put_32 (input_bfd, relocation, contents + offset);
@@ -29,7 +30,7 @@ index f42d7f429b..ddcb5baf74 100644
  		    else
  		      {
  			if (r_type == R_MICROBLAZE_64_PCREL)
-@@ -1560,7 +1563,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1585,7 +1588,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  		      }
  		    else
  		      {
@@ -38,7 +39,7 @@ index f42d7f429b..ddcb5baf74 100644
  			  {
  			    outrel.r_info = ELF64_R_INFO (0, R_MICROBLAZE_REL);
  			    outrel.r_addend = relocation + addend;
-@@ -1586,6 +1589,8 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1611,6 +1614,8 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  		    relocation += addend;
  		    if (r_type == R_MICROBLAZE_32)
  		      bfd_put_32 (input_bfd, relocation, contents + offset);
@@ -47,7 +48,7 @@ index f42d7f429b..ddcb5baf74 100644
  		    else
  		      {
  			if (r_type == R_MICROBLAZE_64_PCREL)
-@@ -2098,7 +2103,8 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2121,7 +2126,8 @@ microblaze_elf_relax_section (bfd *abfd,
                    microblaze_bfd_write_imm_value_32 (abfd, ocontents + irelscan->r_offset,
                                                       irelscan->r_addend);
                }
@@ -57,7 +58,7 @@ index f42d7f429b..ddcb5baf74 100644
                  {
  	          isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
  
-@@ -2606,6 +2612,7 @@ microblaze_elf_check_relocs (bfd * abfd,
+@@ -2595,6 +2601,7 @@ microblaze_elf_check_relocs (bfd * abfd,
          case R_MICROBLAZE_64:
          case R_MICROBLAZE_64_PCREL:
          case R_MICROBLAZE_32:
@@ -66,7 +67,7 @@ index f42d7f429b..ddcb5baf74 100644
              if (h != NULL && !bfd_link_pic (info))
  	      {
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index bfb3104720..532a26eaa5 100644
+index 542c68a0857..6902a1518a6 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -1119,6 +1119,13 @@ md_assemble (char * str)
@@ -83,7 +84,7 @@ index bfb3104720..532a26eaa5 100644
  	  else if (reg2 == REG_ROSDP)
  	    opc = str_microblaze_ro_anchor;
  	  else if (reg2 == REG_RWSDP)
-@@ -1182,7 +1189,10 @@ md_assemble (char * str)
+@@ -1186,7 +1193,10 @@ md_assemble (char * str)
                inst |= (immed << IMM_LOW) & IMM_MASK;
              }
  	}
@@ -95,7 +96,7 @@ index bfb3104720..532a26eaa5 100644
          {
            temp = immed & 0xFFFFFF8000;
            if (temp != 0 && temp != 0xFFFFFF8000)
-@@ -1794,6 +1804,11 @@ md_assemble (char * str)
+@@ -1802,6 +1812,11 @@ md_assemble (char * str)
  
  	  if (exp.X_md != 0)
  	    subtype = get_imm_otype(exp.X_md);
@@ -107,7 +108,7 @@ index bfb3104720..532a26eaa5 100644
  	  else
  	    subtype = opcode->inst_offset_type;
  
-@@ -1811,6 +1826,31 @@ md_assemble (char * str)
+@@ -1819,6 +1834,31 @@ md_assemble (char * str)
            output = frag_more (isize);
            immed = exp.X_add_number;
          }
@@ -117,7 +118,7 @@ index bfb3104720..532a26eaa5 100644
 +          if (temp != 0 && temp != 0xFFFFFF8000)
 +            {
 +              /* Needs an immediate inst.  */
-+              opcode1 = (struct op_code_struct *) hash_find (opcode_hash_control, "imml");
++              opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imml");
 +              if (opcode1 == NULL)
 +                {
 +                  as_bad (_("unknown opcode \"%s\""), "imml");
@@ -139,7 +140,7 @@ index bfb3104720..532a26eaa5 100644
  
        temp = immed & 0xFFFF8000;
        if ((temp != 0) && (temp != 0xFFFF8000))
-@@ -1834,6 +1874,7 @@ md_assemble (char * str)
+@@ -1844,6 +1884,7 @@ md_assemble (char * str)
  
        inst |= (reg1 << RD_LOW) & RD_MASK;
        inst |= (immed << IMM_LOW) & IMM_MASK;
@@ -147,7 +148,7 @@ index bfb3104720..532a26eaa5 100644
        break;
  
      case INST_TYPE_R2:
-@@ -3081,10 +3122,10 @@ cons_fix_new_microblaze (fragS * frag,
+@@ -3090,10 +3131,10 @@ cons_fix_new_microblaze (fragS * frag,
            r = BFD_RELOC_32;
            break;
          case 8:

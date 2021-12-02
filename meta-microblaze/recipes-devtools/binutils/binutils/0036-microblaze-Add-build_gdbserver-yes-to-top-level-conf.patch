@@ -1,7 +1,7 @@
-From 463a2d331ab68484913a2957614e852eac793583 Mon Sep 17 00:00:00 2001
+From 112d69b1bcebf14e37049a9795ce7128e98c1a23 Mon Sep 17 00:00:00 2001
 From: David Holsgrove <david.holsgrove@xilinx.com>
 Date: Mon, 16 Dec 2013 16:37:32 +1000
-Subject: [PATCH 38/52] microblaze: Add build_gdbserver=yes to top level
+Subject: [PATCH 36/38] microblaze: Add build_gdbserver=yes to top level
  configure.tgt
 
 For Microblaze linux toolchains, set the build_gdbserver=yes
@@ -16,10 +16,10 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/gdb/configure.tgt b/gdb/configure.tgt
-index 2938fddfe8..ac2d35a991 100644
+index 95095e98706..47497ac3d39 100644
 --- a/gdb/configure.tgt
 +++ b/gdb/configure.tgt
-@@ -397,6 +397,7 @@ microblaze*-*-*)
+@@ -407,6 +407,7 @@ microblaze*-*-*)
  	# Target: Xilinx MicroBlaze running standalone
  	gdb_target_obs="microblaze-tdep.o"
  	gdb_sim=../sim/microblaze/libsim.a
