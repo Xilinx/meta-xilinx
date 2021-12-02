@@ -1,7 +1,7 @@
-From 697db2e2c2519f27011fbd1960cd8860133aaa84 Mon Sep 17 00:00:00 2001
+From 2673e0dc2d75769c7cc36ca94e4e07caa28b8ef7 Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Thu, 9 Jan 2020 12:30:41 +0530
-Subject: [PATCH 51/54] [Patch, microblaze]: Fix Compiler crash with
+Subject: [PATCH 49/53] [Patch, microblaze]: Fix Compiler crash with
  -freg-struct-return This patch fixes a bug in MB GCC regarding the passing
  struct values in registers. Currently we are only handling SImode With this
  patch all other modes are handled properly
@@ -23,7 +23,7 @@ ChangeLog:
  2 files changed, 10 insertions(+), 20 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 7b48c011550..1bba77dab6d 100644
+index d1257032bfb..5afac2ba8d1 100644
 --- a/gcc/config/microblaze/microblaze.c
 +++ b/gcc/config/microblaze/microblaze.c
 @@ -3908,7 +3908,16 @@ microblaze_function_value (const_tree valtype,
@@ -45,7 +45,7 @@ index 7b48c011550..1bba77dab6d 100644
  
  /* Implement TARGET_SCHED_ADJUST_COST.  */
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index bfa7bc9a01c..d467a7ee65d 100644
+index c6c3a9baa5a..2581d52d17a 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -266,13 +266,6 @@ extern enum pipeline_type microblaze_pipe;

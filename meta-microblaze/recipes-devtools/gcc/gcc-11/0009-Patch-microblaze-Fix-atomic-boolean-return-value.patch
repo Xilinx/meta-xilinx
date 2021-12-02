@@ -1,7 +1,7 @@
-From d3d065c9645d795e03dab6db827c08231e011a1f Mon Sep 17 00:00:00 2001
+From 0aa9647936673e3ff1ac0082144b196309916ddb Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 16:45:45 +0530
-Subject: [PATCH 09/54] [Patch, microblaze]: Fix atomic boolean return value.
+Subject: [PATCH 09/53] [Patch, microblaze]: Fix atomic boolean return value.
  In atomic_compare_and_swapsi, fix boolean return value. Previously, it
  contained zero if successful and non-zero if unsuccessful.
 
@@ -12,7 +12,7 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
  1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/gcc/config/microblaze/sync.md b/gcc/config/microblaze/sync.md
-index 24cd67e1fdb..76c3616c992 100644
+index 3b0fba1d3cf..d08400af4bb 100644
 --- a/gcc/config/microblaze/sync.md
 +++ b/gcc/config/microblaze/sync.md
 @@ -34,15 +34,16 @@

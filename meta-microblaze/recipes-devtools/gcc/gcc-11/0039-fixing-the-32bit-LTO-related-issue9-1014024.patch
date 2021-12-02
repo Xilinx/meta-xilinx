@@ -1,14 +1,14 @@
-From b1eb7b1f6c33246ded3501364279a5f002cd8de0 Mon Sep 17 00:00:00 2001
+From cc2c7e5255edc97064d29880f156d603d3ec740a Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Wed, 17 Oct 2018 16:56:14 +0530
-Subject: [PATCH 41/54] fixing the 32bit LTO related issue9(1014024)
+Subject: [PATCH 39/53] fixing the 32bit LTO related issue9(1014024)
 
 ---
  gcc/config/microblaze/microblaze.h | 24 ++++++++++++++----------
  1 file changed, 14 insertions(+), 10 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index 747adcc7a70..bfa7bc9a01c 100644
+index b0c44c4fd50..c6c3a9baa5a 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -265,12 +265,14 @@ extern enum pipeline_type microblaze_pipe;

@@ -1,7 +1,7 @@
-From b9a9e8f9d0994c76819ec605a0b7cd113f3b2cf0 Mon Sep 17 00:00:00 2001
+From a9abf680767f4294177d716cd95a9bec5c7916a7 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 14:41:58 +0530
-Subject: [PATCH 14/54] [Patch, microblaze]: Add INIT_PRIORITY support Added
+Subject: [PATCH 14/53] [Patch, microblaze]: Add INIT_PRIORITY support Added
  TARGET_ASM_CONSTRUCTOR and TARGET_ASM_DESTRUCTOR macros.
 
 These macros allows users to control the order of initialization
@@ -26,7 +26,7 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
  1 file changed, 53 insertions(+)
 
 diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 0186171c04c..9eae5515c60 100644
+index 45405fa2160..62630aab64e 100644
 --- a/gcc/config/microblaze/microblaze.c
 +++ b/gcc/config/microblaze/microblaze.c
 @@ -2634,6 +2634,53 @@ print_operand_address (FILE * file, rtx addr)

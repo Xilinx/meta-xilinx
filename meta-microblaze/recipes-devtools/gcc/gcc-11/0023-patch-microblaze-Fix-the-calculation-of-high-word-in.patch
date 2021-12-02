@@ -1,7 +1,7 @@
-From ad3d0a29a4895351008ce959138c13b8f5924464 Mon Sep 17 00:00:00 2001
+From e6f5b2ba1c03ac3d0521291beb64d64a125e1481 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 18 Jan 2017 12:03:39 +0530
-Subject: [PATCH 23/54] [patch,microblaze]: Fix the calculation of high word in
+Subject: [PATCH 23/53] [patch,microblaze]: Fix the calculation of high word in
  a long long 6. .4-bit
 
 This patch will change the calculation of high word in a long long 64-bit.
@@ -27,7 +27,7 @@ ChangeLog:
  1 file changed, 3 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 29b2f6b016b..4710def18cf 100644
+index 94aaeaa3a67..84e17fc4520 100644
 --- a/gcc/config/microblaze/microblaze.c
 +++ b/gcc/config/microblaze/microblaze.c
 @@ -2468,9 +2468,6 @@ print_operand (FILE * file, rtx op, int letter)

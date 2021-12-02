@@ -1,10 +1,13 @@
-From 5de3888c460a341667150d569548b3309188e7e8 Mon Sep 17 00:00:00 2001
+From a5b58621655fa306c37157dfe3092547adce0aab Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 17:36:16 +0530
-Subject: [PATCH 13/54] [Patch, microblaze]: Removed moddi3 routinue Using the
+Subject: [PATCH 13/53] [Patch, microblaze]: Removed moddi3 routinue Using the
  default moddi3 function as the existing implementation has many bugs
 
 Signed-off-by:Nagaraju <nmekala@xilix.com>
+
+Conflicts:
+	libgcc/config/microblaze/moddi3.S
 ---
  libgcc/config/microblaze/moddi3.S     | 121 --------------------------
  libgcc/config/microblaze/t-microblaze |   3 +-
@@ -13,13 +16,13 @@ Signed-off-by:Nagaraju <nmekala@xilix.com>
 
 diff --git a/libgcc/config/microblaze/moddi3.S b/libgcc/config/microblaze/moddi3.S
 deleted file mode 100644
-index d0e24fdb89d..00000000000
+index 4bac960107e..00000000000
 --- a/libgcc/config/microblaze/moddi3.S
 +++ /dev/null
 @@ -1,121 +0,0 @@
 -###################################
 -# 
--#  Copyright (C) 2009-2020 Free Software Foundation, Inc.
+-#  Copyright (C) 2009-2021 Free Software Foundation, Inc.
 -#
 -#  Contributed by Michael Eager <eager@eagercon.com>.
 -#

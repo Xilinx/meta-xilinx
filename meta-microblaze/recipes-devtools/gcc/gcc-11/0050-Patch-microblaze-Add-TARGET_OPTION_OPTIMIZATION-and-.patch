@@ -1,7 +1,7 @@
-From d7d6835bd839150e864cbb0d9c9c7a497e93bbb8 Mon Sep 17 00:00:00 2001
+From 009fc9cbb72f50ac73b7f58153d0d90db46b48b8 Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Wed, 8 May 2019 14:12:03 +0530
-Subject: [PATCH 52/54] [Patch, microblaze]: Add TARGET_OPTION_OPTIMIZATION and
+Subject: [PATCH 50/53] [Patch, microblaze]: Add TARGET_OPTION_OPTIMIZATION and
  disable fivopts by default
 
 Added TARGET_OPTION_OPTIMIZATIONS and Turn off ivopts by default.
@@ -18,7 +18,7 @@ Conflicts:
  1 file changed, 11 insertions(+)
 
 diff --git a/gcc/common/config/microblaze/microblaze-common.c b/gcc/common/config/microblaze/microblaze-common.c
-index 4391f939626..cf2db8afe36 100644
+index 1e4abb34027..d3a74fcc99e 100644
 --- a/gcc/common/config/microblaze/microblaze-common.c
 +++ b/gcc/common/config/microblaze/microblaze-common.c
 @@ -24,7 +24,18 @@

@@ -1,7 +1,7 @@
-From b6298861681965533c9b6dac5e26fbd62b52839d Mon Sep 17 00:00:00 2001
+From 2c68b0e5e0307019207e54d1f2d1565053f2e50f Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 17:11:04 +0530
-Subject: [PATCH 17/54] [Patch,microblaze]: Inline Expansion of fsqrt builtin.
+Subject: [PATCH 17/53] [Patch,microblaze]: Inline Expansion of fsqrt builtin.
  The changes are made in the patch for the inline expansion of the fsqrt
  builtin with fqrt instruction. The sqrt math function takes double as
  argument and return double as argument. The pattern is selected while
@@ -29,7 +29,7 @@ Signed-off-by:Ajit Agarwal ajitkum@xilinx.com
  1 file changed, 14 insertions(+)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 8f9baec826b..986d9c3aa25 100644
+index f85d8fcac8a..254221482af 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -451,6 +451,20 @@

@@ -1,7 +1,7 @@
-From 2bb5cef1a85d63ebf155bcb0070492b0ad298dd8 Mon Sep 17 00:00:00 2001
+From 93874549e864b39689060edda456c897ea0fac4e Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Tue, 9 Oct 2018 10:07:08 +0530
-Subject: [PATCH 36/54] -Added double arith instructions -Fixed prologue stack
+Subject: [PATCH 34/53] -Added double arith instructions -Fixed prologue stack
  pointer decrement issue
 
 ---
@@ -10,7 +10,7 @@ Subject: [PATCH 36/54] -Added double arith instructions -Fixed prologue stack
  2 files changed, 76 insertions(+), 9 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 74bb30cb9e8..1401d6b77ff 100644
+index 7d6cf263eb6..943037336f1 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -527,6 +527,66 @@

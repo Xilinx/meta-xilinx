@@ -1,7 +1,7 @@
-From a8c6c13cc322ecc300bb2cdf22e3d6f1680e56be Mon Sep 17 00:00:00 2001
+From 9eb2e41cedc278eb16e20383b6c8caad2ce22138 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 18:07:24 +0530
-Subject: [PATCH 18/54] [PATCH] microblaze.md: Improve 'adddi3' and 'subdi3'
+Subject: [PATCH 18/53] [PATCH] microblaze.md: Improve 'adddi3' and 'subdi3'
  insn definitions Change adddi3 to handle DI immediates as the second operand,
  this requires modification to the output template however reduces the need to
  specify seperate templates for 16-bit positive/negative immediate operands.
@@ -23,7 +23,7 @@ Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
  1 file changed, 6 insertions(+), 7 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 986d9c3aa25..efd2c34e0b7 100644
+index 254221482af..d86a049355a 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -502,17 +502,16 @@

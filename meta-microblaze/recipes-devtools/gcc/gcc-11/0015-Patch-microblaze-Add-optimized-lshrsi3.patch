@@ -1,7 +1,7 @@
-From f448485f5e0507a7ab8be7f83c08f807200a3501 Mon Sep 17 00:00:00 2001
+From fe3572f4b0cc033db305b0d67abb88632bf13887 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 15:23:57 +0530
-Subject: [PATCH 15/54] [Patch, microblaze]: Add optimized lshrsi3 When barrel
+Subject: [PATCH 15/53] [Patch, microblaze]: Add optimized lshrsi3 When barrel
  shifter is not present, the immediate value is greater than #5 and
  optimization is -OS, the compiler will generate shift operation using loop.
 
@@ -26,7 +26,7 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
  create mode 100644 gcc/testsuite/gcc.target/microblaze/others/lshrsi_Os_1.c
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 187ad522dcc..8f9baec826b 100644
+index 55477fd0a69..f85d8fcac8a 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -1618,6 +1618,27 @@

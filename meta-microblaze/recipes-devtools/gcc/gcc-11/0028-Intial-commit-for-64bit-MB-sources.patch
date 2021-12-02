@@ -1,7 +1,7 @@
-From 53799d63bd26a04265a55f68ca57e3462ed6eeb7 Mon Sep 17 00:00:00 2001
+From 211cfd6be4b47e1fecf95d1becb713772fd71091 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 27 Jul 2018 15:23:41 +0530
-Subject: [PATCH 30/54] Intial commit for 64bit-MB sources. Need to cleanup the
+Subject: [PATCH 28/53] Intial commit for 64bit-MB sources. Need to cleanup the
  code later.
 
 ---
@@ -9,7 +9,7 @@ Subject: [PATCH 30/54] Intial commit for 64bit-MB sources. Need to cleanup the
  gcc/config/microblaze/microblaze-c.c    |   6 +
  gcc/config/microblaze/microblaze.c      | 218 ++++++---
  gcc/config/microblaze/microblaze.h      |  63 ++-
- gcc/config/microblaze/microblaze.md     | 606 ++++++++++++++++++------
+ gcc/config/microblaze/microblaze.md     | 605 ++++++++++++++++++------
  gcc/config/microblaze/t-microblaze      |   3 +-
  libgcc/config/microblaze/crti.S         |   4 +-
  libgcc/config/microblaze/crtn.S         |   4 +-
@@ -20,7 +20,7 @@ Subject: [PATCH 30/54] Intial commit for 64bit-MB sources. Need to cleanup the
  libgcc/config/microblaze/t-microblaze   |  11 +-
  libgcc/config/microblaze/udivdi3.S      | 107 +++++
  libgcc/config/microblaze/umoddi3.S      | 110 +++++
- 15 files changed, 1230 insertions(+), 234 deletions(-)
+ 15 files changed, 1230 insertions(+), 233 deletions(-)
  create mode 100644 libgcc/config/microblaze/divdi3.S
  create mode 100644 libgcc/config/microblaze/divdi3_table.c
  create mode 100644 libgcc/config/microblaze/moddi3.S
@@ -29,7 +29,7 @@ Subject: [PATCH 30/54] Intial commit for 64bit-MB sources. Need to cleanup the
  create mode 100644 libgcc/config/microblaze/umoddi3.S
 
 diff --git a/gcc/config/microblaze/constraints.md b/gcc/config/microblaze/constraints.md
-index 123395717e0..b8ef1650f92 100644
+index 95b21d58f88..0a4d5269314 100644
 --- a/gcc/config/microblaze/constraints.md
 +++ b/gcc/config/microblaze/constraints.md
 @@ -55,7 +55,7 @@
@@ -42,7 +42,7 @@ index 123395717e0..b8ef1650f92 100644
  
  ;; Define floating point constraints
 diff --git a/gcc/config/microblaze/microblaze-c.c b/gcc/config/microblaze/microblaze-c.c
-index d8c88e510e5..dbcd21fc6ee 100644
+index e0b29bcb0b0..2dcb879992c 100644
 --- a/gcc/config/microblaze/microblaze-c.c
 +++ b/gcc/config/microblaze/microblaze-c.c
 @@ -100,4 +100,10 @@ microblaze_cpp_define (cpp_reader *pfile)
@@ -57,7 +57,7 @@ index d8c88e510e5..dbcd21fc6ee 100644
 +    }
  }  
 diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 99a1cd5c0be..3c815444574 100644
+index 58d7397945e..f59a71ac072 100644
 --- a/gcc/config/microblaze/microblaze.c
 +++ b/gcc/config/microblaze/microblaze.c
 @@ -383,10 +383,10 @@ simple_memory_operand (rtx op, machine_mode mode ATTRIBUTE_UNUSED)
@@ -575,7 +575,7 @@ index 99a1cd5c0be..3c815444574 100644
  #define TARGET_PROMOTE_FUNCTION_MODE 	default_promote_function_mode_always_promote
  
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index c0358603380..f6ad4d9fc21 100644
+index 22fc3509319..94ac736221c 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -173,7 +173,6 @@ extern enum pipeline_type microblaze_pipe;
@@ -744,7 +744,7 @@ index c0358603380..f6ad4d9fc21 100644
  /* Default to -G 8 */
  #ifndef MICROBLAZE_DEFAULT_GVALUE
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 4d8429d9a90..33a8b12ef3b 100644
+index 3834725eec1..7bc91602ca2 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -26,6 +26,7 @@
@@ -1054,7 +1054,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
  (define_insn "extendsidi2"
    [(set (match_operand:DI 0 "register_operand" "=d,d,d")
  	(sign_extend:DI (match_operand:SI 1 "nonimmediate_operand" "d,R,m")))]
-@@ -1090,69 +1135,118 @@
+@@ -1088,69 +1133,118 @@
  ;; Unlike most other insns, the move insns can't be split with
  ;; different predicates, because register spilling and other parts of
  ;; the compiler, have memoized the insn number already.
@@ -1209,7 +1209,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    { 
      switch (which_alternative)
      {
-@@ -1184,7 +1278,8 @@
+@@ -1182,7 +1276,8 @@
    "reload_completed 
     && GET_CODE (operands[0]) == REG && GP_REG_P (REGNO (operands[0]))
     && GET_CODE (operands[1]) == REG && GP_REG_P (REGNO (operands[1])) 
@@ -1219,7 +1219,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
  
    [(set (subreg:SI (match_dup 0) 4) (subreg:SI (match_dup 1) 4))
    (set (subreg:SI (match_dup 0) 0) (subreg:SI (match_dup 1) 0))]
-@@ -1196,12 +1291,22 @@
+@@ -1194,12 +1289,22 @@
    "reload_completed 
     && GET_CODE (operands[0]) == REG && GP_REG_P (REGNO (operands[0]))
     && GET_CODE (operands[1]) == REG && GP_REG_P (REGNO (operands[1])) 
@@ -1243,7 +1243,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
  ;; Unlike most other insns, the move insns can't be split with
  ;; different predicates, because register spilling and other parts of
  ;; the compiler, have memoized the insn number already.
-@@ -1273,6 +1378,8 @@
+@@ -1271,6 +1376,8 @@
    (set_attr "length"	"4,4,8,4,8,4,8")])
  
  
@@ -1252,7 +1252,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
  ;; 16-bit Integer moves
  
  ;; Unlike most other insns, the move insns can't be split with
-@@ -1305,8 +1412,8 @@
+@@ -1303,8 +1410,8 @@
    "@
     addik\t%0,r0,%1\t# %X1
     addk\t%0,%1,r0
@@ -1263,7 +1263,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
     sh%i0\t%z1,%0
     sh%i0\t%z1,%0"
    [(set_attr "type"	"arith,move,load,no_delay_load,store,no_delay_store")
-@@ -1349,7 +1456,7 @@
+@@ -1347,7 +1454,7 @@
     lbu%i1\t%0,%1
     lbu%i1\t%0,%1
     sb%i0\t%z1,%0
@@ -1272,7 +1272,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    [(set_attr "type"	"arith,arith,move,load,no_delay_load,store,no_delay_store")
    (set_attr "mode"	"QI")
    (set_attr "length"	"4,4,8,4,8,4,8")])
-@@ -1422,7 +1529,7 @@
+@@ -1420,7 +1527,7 @@
     addik\t%0,r0,%F1
     lw%i1\t%0,%1
     sw%i0\t%z1,%0
@@ -1281,7 +1281,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    [(set_attr "type"     "move,no_delay_load,load,no_delay_load,no_delay_load,store,no_delay_store")
    (set_attr "mode"      "SF")
    (set_attr "length"    "4,4,4,4,4,4,4")])
-@@ -1461,6 +1568,33 @@
+@@ -1459,6 +1566,33 @@
  ;; movdf_internal
  ;; Applies to both TARGET_SOFT_FLOAT and TARGET_HARD_FLOAT
  ;;
@@ -1315,7 +1315,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
  (define_insn "*movdf_internal"
    [(set (match_operand:DF 0 "nonimmediate_operand" "=d,d,d,d,o")
          (match_operand:DF 1 "general_operand" "dG,o,F,T,d"))]
-@@ -1495,7 +1629,8 @@
+@@ -1493,7 +1627,8 @@
    "reload_completed
     && GET_CODE (operands[0]) == REG && GP_REG_P (REGNO (operands[0]))
     && GET_CODE (operands[1]) == REG && GP_REG_P (REGNO (operands[1]))
@@ -1325,7 +1325,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    [(set (subreg:SI (match_dup 0) 4) (subreg:SI (match_dup 1) 4))
    (set (subreg:SI (match_dup 0) 0) (subreg:SI (match_dup 1) 0))]
    "")
-@@ -1506,7 +1641,8 @@
+@@ -1504,7 +1639,8 @@
    "reload_completed
     && GET_CODE (operands[0]) == REG && GP_REG_P (REGNO (operands[0]))
     && GET_CODE (operands[1]) == REG && GP_REG_P (REGNO (operands[1]))
@@ -1335,7 +1335,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    [(set (subreg:SI (match_dup 0) 0) (subreg:SI (match_dup 1) 0))
    (set (subreg:SI (match_dup 0) 4) (subreg:SI (match_dup 1) 4))]
    "")
-@@ -2006,6 +2142,31 @@ else
+@@ -2003,6 +2139,31 @@ else
    "
  )
  
@@ -1367,7 +1367,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
  (define_insn "seq_internal_pat" 
    [(set (match_operand:SI 0 "register_operand" "=d")
  	(eq:SI 
-@@ -2066,8 +2227,8 @@ else
+@@ -2063,8 +2224,8 @@ else
  (define_expand "cbranchsi4"
    [(set (pc)
          (if_then_else (match_operator 0 "ordered_comparison_operator"
@@ -1378,7 +1378,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
                        (label_ref (match_operand 3 ""))
                        (pc)))]
    ""
-@@ -2079,13 +2240,13 @@ else
+@@ -2076,13 +2237,13 @@ else
  (define_expand "cbranchsi4_reg"
    [(set (pc)
          (if_then_else (match_operator 0 "ordered_comparison_operator"
@@ -1395,7 +1395,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    DONE;
  })
  
-@@ -2110,6 +2271,26 @@ else
+@@ -2107,6 +2268,26 @@ else
  		      (label_ref (match_operand 1))
  		      (pc)))])
  
@@ -1422,7 +1422,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
  (define_insn "branch_zero"
    [(set (pc)
  	(if_then_else (match_operator:SI 0 "ordered_comparison_operator"
-@@ -2130,6 +2311,47 @@ else
+@@ -2127,6 +2308,47 @@ else
     (set_attr "length"	"4")]
  )
  
@@ -1470,7 +1470,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
  (define_insn "branch_compare"
    [(set (pc)
          (if_then_else (match_operator:SI 0 "cmp_op"
-@@ -2313,7 +2535,7 @@ else
+@@ -2310,7 +2532,7 @@ else
  ;; Indirect jumps. Jump to register values. Assuming absolute jumps
  
  (define_insn "indirect_jump_internal1"
@@ -1479,7 +1479,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    ""
    "bra%?\t%0"
    [(set_attr "type"	"jump")
-@@ -2326,7 +2548,7 @@ else
+@@ -2323,7 +2545,7 @@ else
    (use (label_ref (match_operand 1 "" "")))]
    ""
    {
@@ -1488,7 +1488,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
  
      if (!flag_pic || TARGET_PIC_DATA_TEXT_REL)
        emit_jump_insn (gen_tablejump_internal1 (operands[0], operands[1]));
-@@ -2338,7 +2560,7 @@ else
+@@ -2335,7 +2557,7 @@ else
  
  (define_insn "tablejump_internal1"
    [(set (pc)
@@ -1497,7 +1497,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    (use (label_ref (match_operand 1 "" "")))]
    ""
    "bra%?\t%0 "
-@@ -2348,9 +2570,9 @@ else
+@@ -2345,9 +2567,9 @@ else
  
  (define_expand "tablejump_internal3"
    [(parallel [(set (pc)
@@ -1510,7 +1510,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    ""
    ""
  )
-@@ -2411,7 +2633,7 @@ else
+@@ -2408,7 +2630,7 @@ else
  	(minus (reg 1) (match_operand 1 "register_operand" "")))
     (set (reg 1)
  	(minus (reg 1) (match_dup 1)))]
@@ -1519,7 +1519,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    { 
      rtx retaddr = gen_rtx_MEM (Pmode, stack_pointer_rtx);
      rtx reg = gen_reg_rtx (Pmode);
-@@ -2436,7 +2658,7 @@ else
+@@ -2433,7 +2655,7 @@ else
  (define_expand "save_stack_block"
    [(match_operand 0 "register_operand" "")
     (match_operand 1 "register_operand" "")]
@@ -1528,7 +1528,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    {
      emit_move_insn (operands[0], operands[1]);
      DONE;
-@@ -2446,7 +2668,7 @@ else
+@@ -2443,7 +2665,7 @@ else
  (define_expand "restore_stack_block"
    [(match_operand 0 "register_operand" "")
     (match_operand 1 "register_operand" "")]
@@ -1537,7 +1537,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    {
      rtx retaddr = gen_rtx_MEM (Pmode, stack_pointer_rtx);
      rtx rtmp    = gen_rtx_REG (SImode, R_TMP);
-@@ -2493,7 +2715,7 @@ else
+@@ -2490,7 +2712,7 @@ else
  
  (define_insn "<optab>_internal"
    [(any_return)
@@ -1546,7 +1546,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    ""
    {
      if (microblaze_is_break_handler ())
-@@ -2526,7 +2748,7 @@ else
+@@ -2523,7 +2745,7 @@ else
  (define_expand "call"
    [(parallel [(call (match_operand 0 "memory_operand" "m")
  		    (match_operand 1 "" "i"))
@@ -1555,7 +1555,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
               (use (match_operand 2 "" ""))
               (use (match_operand 3 "" ""))])]
    ""
-@@ -2547,12 +2769,12 @@ else
+@@ -2544,12 +2766,12 @@ else
  
      if (GET_CODE (XEXP (operands[0], 0)) == UNSPEC)
        emit_call_insn (gen_call_internal_plt0 (operands[0], operands[1],
@@ -1570,7 +1570,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
  				     GP_REG_FIRST + MB_ABI_SUB_RETURN_ADDR_REGNUM)));
  
          DONE;
-@@ -2562,7 +2784,7 @@ else
+@@ -2559,7 +2781,7 @@ else
  (define_expand "call_internal0"
    [(parallel [(call (match_operand 0 "" "")
  		    (match_operand 1 "" ""))
@@ -1579,7 +1579,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    ""
    {
    }
-@@ -2571,18 +2793,34 @@ else
+@@ -2568,18 +2790,34 @@ else
  (define_expand "call_internal_plt0"
    [(parallel [(call (match_operand 0 "" "")
  		    (match_operand 1 "" ""))
@@ -1620,7 +1620,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    "flag_pic"
    {
      register rtx target2 = gen_rtx_REG (Pmode, 
-@@ -2594,10 +2832,41 @@ else
+@@ -2591,10 +2829,41 @@ else
    (set_attr "mode"	"none")
    (set_attr "length"	"4")])
  
@@ -1664,7 +1664,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    ""
    {
      register rtx target = operands[0];
-@@ -2631,7 +2900,7 @@ else
+@@ -2628,7 +2897,7 @@ else
    [(parallel [(set (match_operand 0 "register_operand" "=d")
  		   (call (match_operand 1 "memory_operand" "m")
  			 (match_operand 2 "" "i")))
@@ -1673,7 +1673,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
               (use (match_operand 3 "" ""))])] ;; next_arg_reg
    ""
    {
-@@ -2652,13 +2921,13 @@ else
+@@ -2649,13 +2918,13 @@ else
      if (GET_CODE (XEXP (operands[1], 0)) == UNSPEC)
        emit_call_insn (gen_call_value_intern_plt0 (operands[0], operands[1], 
  			operands[2],
@@ -1689,7 +1689,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
  				     GP_REG_FIRST + MB_ABI_SUB_RETURN_ADDR_REGNUM)));
  
      DONE;
-@@ -2670,7 +2939,7 @@ else
+@@ -2667,7 +2936,7 @@ else
    [(parallel [(set (match_operand 0 "" "")
  		   (call (match_operand 1 "" "")
  			 (match_operand 2 "" "")))
@@ -1698,7 +1698,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
               ])]
    ""
    {}
-@@ -2680,18 +2949,35 @@ else
+@@ -2677,18 +2946,35 @@ else
    [(parallel[(set (match_operand 0 "" "")
                    (call (match_operand 1 "" "")
                          (match_operand 2 "" "")))
@@ -1740,7 +1740,7 @@ index 4d8429d9a90..33a8b12ef3b 100644
    "flag_pic"
    { 
      register rtx target2=gen_rtx_REG (Pmode,GP_REG_FIRST + MB_ABI_SUB_RETURN_ADDR_REGNUM);
-@@ -2703,11 +2989,46 @@ else
+@@ -2700,11 +2986,46 @@ else
    (set_attr "mode"	"none")
    (set_attr "length"	"4")])
  
@@ -1789,14 +1789,6 @@ index 4d8429d9a90..33a8b12ef3b 100644
    ""
    { 
      register rtx target = operands[1];
-@@ -2881,7 +3202,6 @@ else
- 
-   ;;if (!register_operand (operands[0], VOIDmode))
-   ;;  FAIL;
--
-   emit_insn (gen_insv_32 (operands[0], operands[1],
- 			  operands[2], operands[3]));
-   DONE;
 diff --git a/gcc/config/microblaze/t-microblaze b/gcc/config/microblaze/t-microblaze
 index e9a1921ae26..9fc80b142ce 100644
 --- a/gcc/config/microblaze/t-microblaze
@@ -1812,7 +1804,7 @@ index e9a1921ae26..9fc80b142ce 100644
  MULTILIB_EXCEPTIONS += mxl-multiply-high/m64
  MULTILIB_EXCEPTIONS += *mxl-multiply-high/mlittle-endian/m64
 diff --git a/libgcc/config/microblaze/crti.S b/libgcc/config/microblaze/crti.S
-index d0146083db6..005825f1ec5 100644
+index f9bafaf3aa5..bc69d890370 100644
 --- a/libgcc/config/microblaze/crti.S
 +++ b/libgcc/config/microblaze/crti.S
 @@ -40,7 +40,7 @@
@@ -1832,7 +1824,7 @@ index d0146083db6..005825f1ec5 100644
 +    addik   r1, r1, -16
      sw      r15, r0, r1
 diff --git a/libgcc/config/microblaze/crtn.S b/libgcc/config/microblaze/crtn.S
-index 2fff5ac04c7..5705eff9a4a 100644
+index 0260e432371..1a1f0a8e0f3 100644
 --- a/libgcc/config/microblaze/crtn.S
 +++ b/libgcc/config/microblaze/crtn.S
 @@ -33,9 +33,9 @@

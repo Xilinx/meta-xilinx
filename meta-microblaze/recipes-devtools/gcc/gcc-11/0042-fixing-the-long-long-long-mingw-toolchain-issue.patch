@@ -1,7 +1,7 @@
-From eed2bf4db9bdfc0da1c3f77ce746fb5bfa460b3c Mon Sep 17 00:00:00 2001
+From b2d05f4ad5c66fb8cec37064a77d21194db9dd32 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Thu, 29 Nov 2018 17:55:08 +0530
-Subject: [PATCH 44/54] fixing the long & long long mingw toolchain issue
+Subject: [PATCH 42/53] fixing the long & long long mingw toolchain issue
 
 ---
  gcc/config/microblaze/constraints.md | 2 +-
@@ -9,7 +9,7 @@ Subject: [PATCH 44/54] fixing the long & long long mingw toolchain issue
  2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/gcc/config/microblaze/constraints.md b/gcc/config/microblaze/constraints.md
-index b8ef1650f92..89db511c453 100644
+index 0a4d5269314..e3f89491fb4 100644
 --- a/gcc/config/microblaze/constraints.md
 +++ b/gcc/config/microblaze/constraints.md
 @@ -55,7 +55,7 @@
@@ -22,7 +22,7 @@ index b8ef1650f92..89db511c453 100644
  
  ;; Define floating point constraints
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 19801f8edcc..8f0ae901b77 100644
+index f62ad28130b..74be0728e75 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -648,8 +648,8 @@
@@ -36,7 +36,7 @@ index 19801f8edcc..8f0ae901b77 100644
        FAIL;
     }
  })
-@@ -1266,7 +1266,7 @@
+@@ -1264,7 +1264,7 @@
  	(match_operand:DI 1 "immediate_operand" "J,I,Mnis"))]
    "TARGET_MB_64 && (register_operand (operands[0], DImode) && 
             (GET_CODE (operands[1]) == CONST_INT && 
@@ -45,7 +45,7 @@ index 19801f8edcc..8f0ae901b77 100644
    "@
     addlk\t%0,r0,r0\t
     addlik\t%0,r0,%1\t #N1 %X1
-@@ -1300,7 +1300,7 @@
+@@ -1298,7 +1298,7 @@
       case 1:
       case 2:
          if (GET_CODE (operands[1]) == CONST_INT && 
