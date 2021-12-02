@@ -1,0 +1,28 @@
+Microblaze does not support stack-protector:
+
+| cc1: warning: '-fstack-protector' not supported for this target
+| ninja: build stopped: subcommand failed.
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+
+diff --git a/meson.build b/meson.build
+index 738879eb21..06ea3e389a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -371,7 +371,6 @@ endif
+ possible_link_flags = [
+         '-Wl,-z,relro',
+         '-Wl,-z,now',
+-        '-fstack-protector',
+ ]
+ 
+ if cc.get_id() == 'clang'
+@@ -388,8 +387,6 @@ possible_cc_flags = possible_common_cc_flags + [
+         '-ffast-math',
+         '-fno-common',
+         '-fno-strict-aliasing',
+-        '-fstack-protector',
+-        '-fstack-protector-strong',
+         '-fvisibility=hidden',
+         '--param=ssp-buffer-size=4',
+ ]

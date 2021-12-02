@@ -1,0 +1,44 @@
+For microblaze, replace the ONCE macro
+
+For some reason the systemd developers decided that needed to hardcode
+the usage of __sync_bool_compare_and_swap, however not all architectures
+define this.  Microblaze is one such architecture, so we fall back to
+a less 'safe' way of doing the work.  However a quick inspection of
+the ONCE users shows that even if we end up with a race condition the
+worst expected behavior could be multiple log messages.
+
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+
+diff --git a/src/fundamental/macro-fundamental.h b/src/fundamental/macro-fundamental.h
+index 967518600d..44785e516b 100644
+--- a/src/fundamental/macro-fundamental.h
++++ b/src/fundamental/macro-fundamental.h
+@@ -55,11 +55,28 @@
+  * on this macro will run concurrently to all other code conditionalized
+  * the same way, there's no ordering or completion enforced. */
+ #define ONCE __ONCE(UNIQ_T(_once_, UNIQ))
++#if !defined (__microblaze__)
+ #define __ONCE(o)                                                       \
+         ({                                                              \
+                 static bool (o) = false;                                \
+                 __sync_bool_compare_and_swap(&(o), false, true);        \
+         })
++#else
++  /* Microblaze does not contain __sync_bool_compare_and_swap, so we do it
++   * the old fashioned way.  Note, it's possible that ONCE may run more
++   * then ONCE due to possible races, however it is not expected to cause
++   * an issue. */
++#define __ONCE(o)                                                       \
++        ({                                                              \
++                static bool (o) = false;                                \
++                bool rc = false;                                        \
++                if ((o) == false) {                                     \
++                        (o) = true;                                     \
++                        rc = true;                                      \
++                }                                                       \
++                rc;                                                     \
++        })
++#endif
+ 
+ #undef MAX
+ #define MAX(a, b) __MAX(UNIQ, (a), UNIQ, (b))
