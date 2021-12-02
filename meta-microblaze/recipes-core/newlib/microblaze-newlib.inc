@@ -10,9 +10,8 @@ SRC_URI:append:microblaze = " \
     file://0007-Patch-Microblaze-newlib-port-for-microblaze-m64-flag.patch \
     file://0008-fixing-the-bug-in-crt-files-added-addlik-instead-of-.patch \
     file://0009-Patch-MicroBlaze-Added-MB-64-support-to-strcmp-strcp.patch \
-    file://0010-Removing-the-Assembly-implementation-of-64bit-string.patch \
+    file://0010-Patch-MicroBlaze-Removing-the-Assembly-implementatio.patch \
     file://0011-Fixed-the-bug-in-crtinit.s-for-MB-64.patch \
-    file://0012-libc-machine-microblaze-strcmp.c-Fix-missing-end-of-.patch \
     "
 
 EXTRA_OECONF:append:xilinx-standalone:microblaze = " \

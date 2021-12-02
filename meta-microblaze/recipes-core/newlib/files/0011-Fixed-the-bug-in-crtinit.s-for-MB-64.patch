@@ -1,4 +1,4 @@
-From e0e6f5367eede4292d31c3dd901425bcd251595a Mon Sep 17 00:00:00 2001
+From 8c312a38bae2a32ebad15e258e71e82781638f19 Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Tue, 14 Jan 2020 22:32:30 +0530
 Subject: [PATCH 11/11] Fixed the bug in crtinit.s for MB-64
