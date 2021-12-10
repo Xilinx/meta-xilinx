@@ -1,4 +1,4 @@
-Document Version: 20211102
+Document Version: 20211209
 
 The Yocto Project setup for the new workflow is as follows.  Be sure to read
 everything below, as the steps will be updated in the future if the
@@ -12,10 +12,6 @@ The steps in this document expect that you have already built the setup
 The following items should be in your conf/local.conf.  This ensures that
 the correct configurations are available, and the correct firmware version
 is selected for this workflow.
-
-# Add to the end of conf/local.conf:
-include conf/distro/include/yocto-uninative.inc
-INHERIT += "uninative"
 
 # Instruct the system to use the decoupling firmware sources,
 # add the following to the conf/local.conf:
