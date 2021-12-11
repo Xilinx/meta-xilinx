@@ -59,8 +59,8 @@ EXTRA_OEMAKE:append = " ${@bb.utils.contains('DEBUG_ATF', '1', ' DEBUG=${DEBUG_A
 
 OUTPUT_DIR = "${@bb.utils.contains('DEBUG_ATF', '1', '${B}/${PLATFORM}/debug', '${B}/${PLATFORM}/release', d)}"
 
-ATF_MEM_BASE ?= "0x1000"
-ATF_MEM_SIZE ?= "0x7ffff"
+ATF_MEM_BASE ?= ""
+ATF_MEM_SIZE ?= ""
 
 EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
 EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
