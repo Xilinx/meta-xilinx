@@ -8,11 +8,11 @@ LIC_FILES_CHKSUM = " \
 		file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
 		file://COPYING.LIB;endline=24;md5=8c5efda6cf1e1b03dcfd0e6c0d271c7f \
 		"
-DEPENDS = "glib-2.0 zlib pixman"
+DEPENDS = "glib-2.0 zlib pixman bison-native ninja-native meson-native"
 
-XILINX_QEMU_VERSION ?= "v5.1.0"
+XILINX_QEMU_VERSION ?= "v6.1.0"
 BRANCH ?= "master"
-SRCREV = "303b509ec23138c43be8a3712068347210df67fd"
+SRCREV = "8dd1b8cabff3e3e5b965d7a60472278ca4e27ceb"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
@@ -22,24 +22,22 @@ REPO ?= "gitsm://github.com/Xilinx/qemu.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-SRC_URI:append = " file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch \
-		   file://0001-Add-enable-disable-udev.patch \
-"
-SRC_URI:remove:class-target = " file://cross.patch"
-SRC_URI:remove:class-nativesdk = " file://cross.patch"
+SRC_URI:append = " file://0010-configure-Add-pkg-config-handling-for-libgcrypt.patch"
 
 S = "${WORKDIR}/git"
 
 # Disable KVM completely
 PACKAGECONFIG:remove = "kvm"
-PACKAGECONFIG:append = " fdt gcrypt"
+PACKAGECONFIG:append = " fdt sdl gcrypt pie"
+
+PACKAGECONFIG[gcrypt] = "--enable-gcrypt,--disable-gcrypt,libgcrypt,"
+PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,libsdl2"
+PACKAGECONFIG[pie] = "--enable-pie,--disable-pie,,"
 
 DISABLE_STATIC:pn-${PN} = ""
+EXTRA_OECONF:remove = " --with-git=/bin/false --with-git-submodules=ignore"
 
 PTEST_ENABLED = ""
-
-EXTRA_OECONF:append = " --with-git=/bin/false --disable-git-update"
-EXTRA_OECONF:remove = " --with-suffix=${BPN} --with-git-submodules=ignore --meson=meson"
 
 do_install:append() {
 	# Prevent QA warnings about installed ${localstatedir}/run
