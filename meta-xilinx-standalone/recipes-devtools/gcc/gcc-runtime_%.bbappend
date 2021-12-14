@@ -52,7 +52,7 @@ do_install:append:xilinx-standalone:class-target() {
 	# link the C++ header into the place that multilib gcc expects
 	# C++ compiler looks at usr/include/c++/version/canonical-arch/mlib
 	if [ "${TARGET_SYS_MULTILIB_ORIGINAL}" != "" -a "${TARGET_SYS_MULTILIB_ORIGINAL}" != "${TARGET_SYS}" ]; then
-		mlib=${BASE_LIB_tune-${DEFAULTTUNE}}
+		mlib=${BASE_LIB:tune-${DEFAULTTUNE}}
                 mlib=${mlib##lib/}
 
 		link_name=${D}${includedir}/c++/${BINV}/${TARGET_SYS_MULTILIB_ORIGINAL}/${mlib}
