@@ -51,11 +51,6 @@ KBUILD_DEFCONFIG:zynq ?= "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG:microblaze ?= "mmu_defconfig"
 KBUILD_DEFCONFIG:versal ?= "xilinx_defconfig"
 
-KERNEL_MODULE_AUTOLOAD:k26 += "usb5744"
-
-# MicroBlaze BSP fragments
-KERNEL_FEATURES:append:kc705-microblazeel = " bsp/xilinx/kc705-microblazeel-features/kc705-microblazeel-features.scc"
-
 KERNEL_FEATURES:append:zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
 
 KERNEL_FEATURES:append:zynqmp = "${@' features/xilinx/overlay_of/overlay_of.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
