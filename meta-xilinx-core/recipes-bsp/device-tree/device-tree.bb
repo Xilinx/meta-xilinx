@@ -31,27 +31,6 @@ PROVIDES = "virtual/dtb"
 # common zynq include
 SRC_URI:append:zynq = " file://zynq-7000-qspi-dummy.dtsi"
 
-# device tree sources for the various machines
-COMPATIBLE_MACHINE:picozed-zynq7 = ".*"
-SRC_URI:append:picozed-zynq7 = " file://picozed-zynq7.dts"
-
-COMPATIBLE_MACHINE:qemu-zynq7 = ".*"
-SRC_URI:append:qemu-zynq7 = " file://qemu-zynq7.dts"
-
-COMPATIBLE_MACHINE:zybo-linux-bd-zynq7 = ".*"
-SRC_URI:append:zybo-linux-bd-zynq7 = " \
-		file://zybo-linux-bd-zynq7.dts \
-		file://pcw.dtsi \
-		file://pl.dtsi \
-		"
-
-COMPATIBLE_MACHINE:kc705-microblazeel = ".*"
-SRC_URI:append:kc705-microblazeel = " \
-		file://kc705-microblazeel.dts \
-		file://pl.dtsi \
-		file://system-conf.dtsi \
-		"
-
 DTB_FILE_NAME = "${@os.path.basename(d.getVar('SYSTEM_DTFILE')).replace('.dts', '.dtb') if d.getVar('SYSTEM_DTFILE') else ''}"
 DTB_BASE_NAME ?= "${MACHINE}-system${IMAGE_VERSION_SUFFIX}"
 
