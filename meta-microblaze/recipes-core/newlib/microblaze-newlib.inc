@@ -14,6 +14,6 @@ SRC_URI:append:microblaze = " \
     file://0011-Fixed-the-bug-in-crtinit.s-for-MB-64.patch \
     "
 
-EXTRA_OECONF:append_xilinx-standalone:microblaze = " \
+EXTRA_OECONF:append:xilinx-standalone:microblaze = " \
     --disable-newlib-reent-check-verify \
 "

@@ -89,7 +89,7 @@ detect_machine() {
 }
 
 cortex_a53_linux() {
-  info "coretex-a53 for Linux [ $1 ]"
+  info "cortex-a53 for Linux [ $1 ]"
 
   if [ "$1" = "None" ]; then
     dtb_file="cortexa53-${machine}-linux.dtb"
@@ -130,11 +130,11 @@ cortex_a53_linux() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 MACHINE = "${machine}-generic"
 # Override the SYSTEM_DTFILE for Linux builds
-SYSTEM_DTFILE_linux = "\${CONFIG_DTFILE}"
+SYSTEM_DTFILE:linux = "\${CONFIG_DTFILE}"
 # We don't want the kernel to build us a device-tree
-KERNEL_DEVICETREE_${machine}-generic = ""
+KERNEL_DEVICETREE:${machine}-generic = ""
 # We need u-boot to use the one we passed in
-DEVICE_TREE_NAME_pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+DEVICE_TREE_NAME:pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Remap boot files to ensure the right device tree is listed first
@@ -146,9 +146,9 @@ a53_fsbl_done=0
 cortex_a53_baremetal() {
   if [ "$1" = "fsbl" ]; then
     [ ${a53_fsbl_done} = 1 ] && return
-    info "coretex-a53 FSBL baremetal configuration"
+    info "cortex-a53 FSBL baremetal configuration"
   else
-    info "coretex-a53 for baremetal [ $1 ]"
+    info "cortex-a53 for baremetal [ $1 ]"
   fi
 
   suffix=""; lto="-nolto"
@@ -210,7 +210,7 @@ EOF
 }
 
 cortex_a53_freertos() {
-  info "coretex-a53 for FreeRTOS [ $1 ]"
+  info "cortex-a53 for FreeRTOS [ $1 ]"
 
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
@@ -262,7 +262,7 @@ EOF
 }
 
 cortex_a72_linux() {
-  info "coretex-a72 for Linux [ $1 ]"
+  info "cortex-a72 for Linux [ $1 ]"
 
   if [ "$1" = "None" ]; then
     dtb_file="cortexa72-${machine}-linux.dtb"
@@ -305,11 +305,11 @@ cortex_a72_linux() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 MACHINE = "${machine}-generic"
 # Override the SYSTEM_DTFILE for Linux builds
-SYSTEM_DTFILE_linux = "\${CONFIG_DTFILE}"
+SYSTEM_DTFILE:linux = "\${CONFIG_DTFILE}"
 # We don't want the kernel to build us a device-tree
-KERNEL_DEVICETREE_${machine}-generic = ""
+KERNEL_DEVICETREE:${machine}-generic = ""
 # We need u-boot to use the one we passed in
-DEVICE_TREE_NAME_pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+DEVICE_TREE_NAME:pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Remap boot files to ensure the right device tree is listed first
@@ -318,7 +318,7 @@ EOF
 }
 
 cortex_a72_baremetal() {
-  info "coretex-a72 for baremetal [ $1 ]"
+  info "cortex-a72 for baremetal [ $1 ]"
 
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
@@ -370,7 +370,7 @@ EOF
 }
 
 cortex_a72_freertos() {
-  info "coretex-a72 for FreeRTOS [ $1 ]"
+  info "cortex-a72 for FreeRTOS [ $1 ]"
 
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
@@ -425,9 +425,9 @@ r5_fsbl_done=0
 cortex_r5_baremetal() {
   if [ "$1" = "fsbl" ]; then
     [ ${r5_fsbl_done} = 1 ] && return
-    info "coretex-r5 FSBL baremetal configuration"
+    info "cortex-r5 FSBL baremetal configuration"
   else
-    info "coretex-r5 for baremetal [ $1 ]"
+    info "cortex-r5 for baremetal [ $1 ]"
   fi
 
   suffix=""; lto="-nolto"
@@ -451,14 +451,25 @@ cortex_r5_baremetal() {
   # Build device tree
   (
     cd dtb || error "Unable to cd to dtb dir"
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-r5-imux.dts" \
-      "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    if [ -n "$domain_file" ]; then
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+        -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dtb}" "${dtb_file}" \
+        || error "lopper.py failed"
+    else
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-r5-imux.dts" \
+        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    fi
     rm -f lop-r5-imux.dts.dtb
   )
 
   # Build baremetal multiconfig
-  ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
-    || error "lopper.py failed"
+  if [ -n "${domain_file}" ]; then
+    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" || error "lopper.py failed"
+  else
+    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
+      || error "lopper.py failed"
+  fi
 
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
@@ -478,7 +489,7 @@ EOF
 }
 
 cortex_r5_freertos() {
-  info "coretex-r5 for FreeRTOS [ $1 ]"
+  info "cortex-r5 for FreeRTOS [ $1 ]"
 
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
@@ -506,7 +517,7 @@ cortex_r5_freertos() {
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
     ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx coretexr5-${machine} "${embeddedsw}" || error "lopper.py failed"
+      -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" || error "lopper.py failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
       || error "lopper.py failed"
@@ -585,7 +596,7 @@ ESW_MACHINE = "microblaze-pmu"
 
 require conf/microblaze.conf
 DEFAULTTUNE = "microblaze"
-TUNE_FEATURES_tune-microblaze_forcevariable = "\${TUNE_FEATURES_tune-pmu-microblaze}"
+TUNE_FEATURES:tune-microblaze:forcevariable = "\${TUNE_FEATURES:tune-pmu-microblaze}"
 
 TARGET_CFLAGS += "-DPSU_PMU=1U"
 
@@ -637,7 +648,7 @@ ESW_MACHINE = "microblaze-plm"
 
 require conf/microblaze.conf
 DEFAULTTUNE = "microblaze"
-TUNE_FEATURES_tune-microblaze_forcevariable = "\${TUNE_FEATURES_tune-pmc-microblaze}"
+TUNE_FEATURES:tune-microblaze:forcevariable = "\${TUNE_FEATURES:tune-pmc-microblaze}"
 
 TARGET_CFLAGS += "-DVERSAL_PLM=1"
 
@@ -689,7 +700,7 @@ ESW_MACHINE = "microblaze-psm"
 
 require conf/microblaze.conf
 DEFAULTTUNE = "microblaze"
-TUNE_FEATURES_tune-microblaze_forcevariable = "\${TUNE_FEATURES_tune-psm-microblaze}"
+TUNE_FEATURES:tune-microblaze:forcevariable = "\${TUNE_FEATURES:tune-psm-microblaze}"
 
 TARGET_CFLAGS += "-DVERSAL_psm=1"
 
@@ -808,7 +819,7 @@ gen_local_conf() {
   echo "To enable this, add the following to your local.conf:"
   echo
   echo "# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere"
-  echo "BASE_TMPDIR = \"${TOPDIR}\""
+  echo "BASE_TMPDIR = \"\${TOPDIR}\""
   [ -n "${system_conf}" ] && echo "require ${system_conf}"
   echo "SYSTEM_DTFILE = \"${system_dtb}\""
   echo "BBMULTICONFIG += \"${multiconf}\""

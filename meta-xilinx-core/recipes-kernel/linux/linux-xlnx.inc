@@ -1,0 +1,65 @@
+# This version extension should match CONFIG_LOCALVERSION in defconfig
+XILINX_RELEASE_VERSION ?= ""
+LINUX_VERSION_EXTENSION ?= "-xilinx-${XILINX_RELEASE_VERSION}"
+PV = "${LINUX_VERSION}+git${SRCPV}"
+
+# Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
+KBRANCH ?= "xlnx_rebase_v5.10"
+SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
+
+FILESOVERRIDES:append = ":${XILINX_RELEASE_VERSION}"
+KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https;name=machine"
+YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.10;destsuffix=yocto-kmeta"
+SRC_URI = "${KERNELURI};${SRCBRANCHARG} ${YOCTO_META}"
+
+SRCREV_machine ?= "${SRCREV}"
+SRCREV_meta ?= "20b185f6b5afbad309747a7901786e0231dc8195"
+SRCREV_FORMAT = "machine"
+
+require recipes-kernel/linux/linux-yocto.inc
+require linux-microblaze.inc
+
+DESCRIPTION = "Xilinx Kernel"
+LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
+
+EXTKERNELSRC = "${@'1' if d.getVar('EXTERNALSRC') else ''}"
+
+# Force the use of the KBUILD_DEFCONFIG even if some other defconfig was generated in the ${WORKDIR}
+do_kernel_metadata:prepend () {
+	[ -n "${KBUILD_DEFCONFIG}" ] && [ -e ${WORKDIR}/defconfig ] && rm ${WORKDIR}/defconfig
+}
+
+do_configure:prepend () {
+	if [ -n "${KBUILD_DEFCONFIG}" ] && [ -n "${EXTKERNELSRC}" ]; then
+		cp ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
+	fi
+}
+
+inherit kernel-simpleimage
+
+# Default to be only compatible with specific machines or soc families
+COMPATIBLE_MACHINE ?= "^$"
+COMPATIBLE_MACHINE:zynq = ".*"
+COMPATIBLE_MACHINE:zynqmp = ".*"
+COMPATIBLE_MACHINE:microblaze = ".*"
+COMPATIBLE_MACHINE:versal = ".*"
+
+# Use DEFCONFIGs for configuring linux-xlnx kernels
+KCONFIG_MODE ?= "alldefconfig"
+KBUILD_DEFCONFIG:zynqmp ?= "xilinx_defconfig"
+KBUILD_DEFCONFIG:zynq ?= "xilinx_zynq_defconfig"
+KBUILD_DEFCONFIG:microblaze ?= "mmu_defconfig"
+KBUILD_DEFCONFIG:versal ?= "xilinx_defconfig"
+
+KERNEL_MODULE_AUTOLOAD:k26 += "usb5744"
+
+# MicroBlaze BSP fragments
+KERNEL_FEATURES:append:kc705-microblazeel = " bsp/xilinx/kc705-microblazeel-features/kc705-microblazeel-features.scc"
+
+KERNEL_FEATURES:append:zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
+
+KERNEL_FEATURES:append:zynqmp = "${@' features/xilinx/overlay_of/overlay_of.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
+
+KERNEL_FEATURES:append:versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} features/xilinx/hdmi-module/hdmi-module.scc"
+
+KERNEL_FEATURES:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' features/ocicontainer/ocicontainer.scc', '', d)}"
