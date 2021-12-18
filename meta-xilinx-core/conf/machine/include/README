@@ -29,6 +29,4 @@ machine-xilinx-default - Set Xilinx FPGA wide defaults, all machines
 
 machine-xilinx-qemu    - Settings required for qemu-xilinx support.
 
-xilinx-board.inc       - enabled BOARD and BOARD_VARIANT.  This allows you to
-                         use only generic machines, and simply set which BOARD
-                         and optionally BOARD_VARIANT in the local.conf.
+xilinx-board-*.inc       - DEPRECATED - enabled BOARD and BOARD_VARIANT
