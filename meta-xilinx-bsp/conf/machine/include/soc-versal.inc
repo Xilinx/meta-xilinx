@@ -3,8 +3,10 @@ SOC_FAMILY ?= "versal"
 
 # Available SOC_VARIANT's for versal:
 # "prime"    - Versal deafult Prime Devices
-# "ai-core"  - Versal AI-core Devices
 # "premium"  - Versal Premium Devices
+# "hbm"      - Versal HMB Devices
+# "ai-core"  - Versal AI-core Devices
+# "ai-edge"  - Versal AI-Edge Devices
 
 SOC_VARIANT ?= "prime"
 
