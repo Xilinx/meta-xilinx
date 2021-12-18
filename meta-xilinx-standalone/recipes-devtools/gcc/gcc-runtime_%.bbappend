@@ -16,16 +16,22 @@ EXTRA_OECONF:append:xilinx-standalone:aarch64:class-target = " \
 	--with-arch=armv8-a \
 	"
 
-# Both arm and armrm overrides are set w/ cortex r5
-# So only set rmprofile if armrm is defined.
+# Both arm and armv7r/armv8r overrides are set w/ cortex r5
+# So only set rmprofile if armv*r is defined.
 ARM_PROFILE = "aprofile"
-ARM_PROFILE:armrm = "rmprofile"
+ARM_PROFILE:armv7r = "rmprofile"
+ARM_PROFILE:armv8r = "rmprofile"
 
 EXTRA_OECONF:append:xilinx-standalone:arm:class-target = " \
 	--with-multilib-list=${ARM_PROFILE} \
 	"
 
-EXTRA_OECONF:append:xilinx-standalone:armrm:class-target = " \
+EXTRA_OECONF:append:xilinx-standalone:armv7r:class-target = " \
+	--disable-tls \
+	--disable-decimal-float \
+	"
+
+EXTRA_OECONF:append:xilinx-standalone:armv8r:class-target = " \
 	--disable-tls \
 	--disable-decimal-float \
 	"

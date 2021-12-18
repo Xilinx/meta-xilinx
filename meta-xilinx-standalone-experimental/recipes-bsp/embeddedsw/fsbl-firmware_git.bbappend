@@ -44,4 +44,4 @@ ESW_COMPONENT:zynq = "zynq_fsbl.elf"
 ESW_COMPONENT:zynqmp = "zynqmp_fsbl.elf"
 
 CFLAGS:append:aarch64 = " -DARMA53_64"
-CFLAGS:append:armrm = " -DARMR5"
+CFLAGS:append:armv7r = " -DARMR5"
