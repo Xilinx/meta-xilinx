@@ -1,3 +1,5 @@
+INHERIT += "xilinx-deprecated"
+
 # Default Xilinx BSP Machine settings
 
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc"

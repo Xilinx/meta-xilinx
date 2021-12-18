@@ -1,0 +1,81 @@
+Xilinx Machines
+===============
+
+Xilinx uses an inheritence model to define defaults in a heirarchical
+model.  This allows for machines to include other machines and then
+override defaults.
+
+For example, a carrier board with a system on module using a zynqmp ev
+can be implements as:
+
+k26_kv -> k26 -> zynqmp-ev-generic -> zynqmp-generic
+
+The above needs to result MACHINEOVERRIDES and PACKAGE_ARCHS that include
+all 4 machines.  To accomplish this, each machine.conf file should contain
+the following preamble and postamble.
+
+#### Preamble
+MACHINEOVERRIDES =. "${@['', '<machine>:']['<machine>' != '${MACHINE}']}"
+#### Regular settings follow
+
+
+#### No additional settings should be after the Postamble
+#### Postamble
+PACKAGE_EXTRA_ARCHS:append = "${@['', ' <machine_arch>']['<machine>' != "${MACHINE}"]}"
+
+
+Typically the first thing after the preamble will be a requires of the machine
+configuration that we depend on.  After the machine would be changes to various
+defaults.  The exception is when a different microblaze tune and/or defaulttune
+is desired; these must be set before require of the inherited machine.
+
+Typical case example (my-example.conf):
+
+#### Preamble
+MACHINEOVERRIDES =. "${@['', 'my-example:']['my-example' != '${MACHINE}']}"
+#### Regular settings follow
+
+require conf/machine/zynqmp-ev-generic.conf
+
+HDF_MACHINE = "zcu102-zynqmp"
+MACHINE_FEATURES += "pci"
+
+#### No additional settings should be after the Postamble
+#### Postamble
+PACKAGE_EXTRA_ARCHS:append = "${@['', ' my_example']['my-example' != "${MACHINE}"]}"
+
+
+Example of defaulttune override:
+
+#### Preamble
+MACHINEOVERRIDES =. "${@['', 'my-example:']['my-example' != '${MACHINE}']}"
+#### Regular settings follow
+
+DEFAULTTUNE = "aarch64"
+
+require conf/machine/zynqmp-ev-generic.conf
+
+HDF_MACHINE = "zcu102-zynqmp"
+MACHINE_FEATURES += "pci"
+
+#### No additional settings should be after the Postamble
+#### Postamble
+PACKAGE_EXTRA_ARCHS:append = "${@['', ' my_example']['my-example' != "${MACHINE}"]}"
+
+
+Example of microblaze tune override:
+
+#### Preamble
+MACHINEOVERRIDES =. "${@['', 'my-example:']['my-example' != '${MACHINE}']}"
+#### Regular settings follow
+
+TUNE_FEATURES:tune-microblaze ?= "microblaze v8.50 barrel-shift reorder pattern-compare divide-hard multiply-high fpu-hard"
+
+require conf/machine/microblaze-generic.conf
+
+HDF_MACHINE = "ml605"
+SERIAL_CONSOLE = "115200,ttyUL0"
+
+#### No additional settings should be after the Postamble
+#### Postamble
+PACKAGE_EXTRA_ARCHS:append = "${@['', ' my_example']['my-example' != "${MACHINE}"]}"
