@@ -20,10 +20,6 @@ DT_FILES_PATH = "${@os.path.dirname(d.getVar('SYSTEM_DTFILE')) if d.getVar('SYST
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 
-# Device-trees are inherently board specific
-BOARD_ARCH ??= "${MACHINE_ARCH}"
-PACKAGE_ARCH = "${BOARD_ARCH}"
-
 DEPENDS += "python3-dtc-native"
 
 PROVIDES = "virtual/dtb"

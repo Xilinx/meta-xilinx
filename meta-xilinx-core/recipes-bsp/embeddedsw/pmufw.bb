@@ -9,9 +9,7 @@ INHERIT_DEFAULT_DEPENDS = "1"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 
-# Specify a default in case boardvariant isn't available
-BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"
-PACKAGE_ARCH = "${BOARDVARIANT_ARCH}"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # Default would be a multiconfig (zynqmp-pmufw) build
 # For this to work, BBMULTICONFIG += "zynqmp-pmufw" must be in the user's local.conf!

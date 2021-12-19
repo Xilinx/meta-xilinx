@@ -37,4 +37,4 @@ do_install() {
 
 }
 
-PACKAGE_ARCH:ultra96 = "${BOARD_ARCH}"
+PACKAGE_ARCH:ultra96 = "${MACHINE_ARCH}"
