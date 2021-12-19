@@ -28,14 +28,6 @@ PREFERRED_PROVIDER_virtual/egl:mali400 = "libmali-xlnx"
 PREFERRED_PROVIDER_virtual/libgl:mali400 = "mesa-gl"
 PREFERRED_PROVIDER_virtual/mesa:mali400 = "mesa-gl"
 
-# microblaze does not get on with pie for reasons not looked into as yet
-GCCPIE:microblaze = ""
-GLIBCPIE:microblaze = ""
-SECURITY_CFLAGS:microblaze = ""
-SECURITY_LDFLAGS:microblaze = ""
-# Microblaze does not support gnu hash style
-LINKER_HASH_STYLE:microblaze = "sysv"
-
 XSERVER ?= " \
 	xserver-xorg \
 	xf86-input-evdev \
