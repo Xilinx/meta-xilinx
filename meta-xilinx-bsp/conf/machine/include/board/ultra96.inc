@@ -1,5 +1,4 @@
 # Ultra96 items that need to be configured from zynqmp-generic
-PACKAGE_ARCH:pn-linux-xlnx:ultra96 = "${BOARDVARIANT_ARCH}"
 KERNEL_DEVICETREE:ultra96 = "xilinx/zynqmp-zcu100-revC.dtb"
 
 # Affects meta-xilinx-tools xsctyaml.bbclass related items

@@ -47,14 +47,8 @@ SRC_URI = " \
             file://pxeboot.pxe \
             "
 
-# Specify a default in case boardvariant isn't available
-BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"
-PACKAGE_ARCH = "${BOARDVARIANT_ARCH}"
-
-# On zynqmp-dr, we know we're different so if BOARD is not defined, fall back
-# to the SOC_VARIANT_ARCH instead
-SOC_VARIANT_ARCH ??= "${MACHINE_ARCH}"
-PACKAGE_ARCH:zynqmp-dr = "${@['${BOARDVARIANT_ARCH}', '${SOC_VARIANT_ARCH}'][d.getVar('BOARDVARIANT_ARCH')==d.getVar('MACHINE_ARCH')]}"
+# Even thought we don't create a package, make sure this is unique to the machine
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit image-artifact-names
 UENV_TEXTFILE ?= "uEnv.txt"

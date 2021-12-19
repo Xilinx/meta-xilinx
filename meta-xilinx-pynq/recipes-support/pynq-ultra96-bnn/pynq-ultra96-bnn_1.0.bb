@@ -55,4 +55,4 @@ do_install () {
     cp -r ${S}/notebooks/* ${JUPYTER_NOTEBOOKS}/bnn_examples/
 }
 
-PACKAGE_ARCH:ultra96 = "${BOARD_ARCH}"
+PACKAGE_ARCH:ultra96 = "${MACHINE_ARCH}"

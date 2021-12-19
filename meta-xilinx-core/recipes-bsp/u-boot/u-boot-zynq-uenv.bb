@@ -4,9 +4,6 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-BOARDVARIANT_ARCH ??= "${MACHINE_ARCH}"
-PACKAGE_ARCH = "${BOARDVARIANT_ARCH}"
-
 python () {
     # The device trees must be populated in the deploy directory to correctly
     # detect them and their names. This means that this recipe needs to depend
@@ -24,6 +21,8 @@ python () {
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynq = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit deploy image-wic-utils
 
