@@ -1,0 +1,34 @@
+The files in this directory make up the infrastructure that defines
+a Xilinx FPGA based system.
+
+A machine.conf is expected to require the soc-<soc>.inc or
+soc-tune-include.inc file, followed by machine-xilinx-default.inc.
+Additionally, machine-xilinx-qemu.inc should be required if the
+machine supports QEMU.  Each of the 'generic' machines include
+these files.
+
+Doing the above, will ensure that someone can use the machine.conf
+in a multiconf setting by simply adjusting DEFAULTTUNE and/or
+other basic parameters.
+
+soc-tune-include.inc   - Load the correct tune file based on DEFAULTTUNE
+
+xilinx-microblaze.inc  - Microblaze architecture settings, loaded by
+                        soc-tune-include.inc
+
+soc-versal.inc         - Set the defaults for Versal, includes soc-tune-include
+
+soc-zynq.inc           - Set the defaults for Zynq, includes soc-tune-include
+
+soc-zynqmp.inc         - Set the defaults for ZynqMP, includes soc-tune-include
+
+machine-xilinx-default - Set Xilinx FPGA wide defaults, all machines
+                         should require this file.  It defines correct
+                         PREFERRED_PROVIDER for various components, as well as
+                         other settings.
+
+machine-xilinx-qemu    - Settings required for qemu-xilinx support.
+
+xilinx-board.inc       - enabled BOARD and BOARD_VARIANT.  This allows you to
+                         use only generic machines, and simply set which BOARD
+                         and optionally BOARD_VARIANT in the local.conf.
