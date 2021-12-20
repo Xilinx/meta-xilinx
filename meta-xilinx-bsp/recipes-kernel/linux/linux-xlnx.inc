@@ -4,16 +4,16 @@ LINUX_VERSION_EXTENSION ?= "-xilinx-${XILINX_RELEASE_VERSION}"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
 # Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
-KBRANCH ?= "xlnx_rebase_v5.10"
+KBRANCH ?= "xlnx_rebase_v5.15"
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
 
 FILESOVERRIDES:append = ":${XILINX_RELEASE_VERSION}"
 KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https;name=machine"
-YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.10;destsuffix=yocto-kmeta"
+YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.15;destsuffix=yocto-kmeta"
 SRC_URI = "${KERNELURI};${SRCBRANCHARG} ${YOCTO_META}"
 
 SRCREV_machine ?= "${SRCREV}"
-SRCREV_meta ?= "20b185f6b5afbad309747a7901786e0231dc8195"
+SRCREV_meta ?= "eeb5d0c9dd5e2928835c633644426ee357fbce12"
 SRCREV_FORMAT = "machine"
 
 require recipes-kernel/linux/linux-yocto.inc
