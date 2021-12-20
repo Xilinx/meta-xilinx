@@ -477,7 +477,7 @@ cortex_r5_baremetal() {
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexr5-${machine}"
-DEFAULTTUNE = "cortexr5f"
+DEFAULTTUNE = "cortexr5"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 
@@ -529,7 +529,7 @@ cortex_r5_freertos() {
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexr5-${machine}"
-DEFAULTTUNE = "cortexr5f"
+DEFAULTTUNE = "cortexr5"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 
