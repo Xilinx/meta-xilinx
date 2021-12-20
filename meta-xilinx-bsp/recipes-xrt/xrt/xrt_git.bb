@@ -19,7 +19,8 @@ BBCLASSEXTEND = "native nativesdk"
 
 # util-linux is for libuuid-dev.
 DEPENDS = "libdrm opencl-headers ocl-icd opencl-clhpp boost util-linux git-replacement-native protobuf-native protobuf elfutils libffi"
-RDEPENDS:${PN} = "bash ocl-icd boost-system boost-filesystem zocl"
+#RDEPENDS:${PN} = "bash ocl-icd boost-system boost-filesystem zocl"
+RDEPENDS:${PN} = "bash ocl-icd boost-system boost-filesystem"
 
 EXTRA_OECMAKE += " \
 		-DCMAKE_BUILD_TYPE=Release \
