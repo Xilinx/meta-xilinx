@@ -1,4 +1,4 @@
-inherit xlnx-embeddedsw pkgconfig cmake
+inherit python3native xlnx-embeddedsw pkgconfig cmake
 
 # Override xlnx-embeddedsw with out version
 require conf/dtb-embeddedsw.inc
