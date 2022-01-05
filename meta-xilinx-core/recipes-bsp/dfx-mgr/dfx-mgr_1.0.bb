@@ -16,7 +16,7 @@ SOVERSION = "${SOMAJOR}.${SOMINOR}"
 
 S = "${WORKDIR}/git"
 
-inherit cmake update-rc.d
+inherit cmake update-rc.d systemd
 
 #DEPENDS += " libwebsockets inotify-tools libdfx xrt zocl libdrm"
 DEPENDS += " libwebsockets inotify-tools libdfx xrt libdrm"
@@ -26,11 +26,16 @@ EXTRA_OECMAKE += " \
 INITSCRIPT_NAME = "dfx-mgr.sh"
 INITSCRIPT_PARAMS = "start 99 S ."
 
+SRC_URI:append = " file://dfx-mgr.service"
+SYSTEMD_PACKAGES="${PN}"
+SYSTEMD_SERVICE_${PN}="dfx-mgr.service"
+SYSTEMD_AUTO_ENABLE_${PN}="enable"
+
+
 do_install(){
 	install -d ${D}${bindir}
 	install -d ${D}${libdir}
 	install -d ${D}${includedir}
-	install -d ${D}${sysconfdir}/init.d/
 	install -d ${D}${base_libdir}/firmware/xilinx
 	install -d ${D}${sysconfdir}/dfx-mgrd
 
@@ -38,18 +43,28 @@ do_install(){
 	cp ${B}/example/sys/linux/dfx-mgr-client-static ${D}${bindir}/dfx-mgr-client
 	chrpath -d ${D}${bindir}/dfx-mgrd
 	chrpath -d ${D}${bindir}/dfx-mgr-client
-	install -m 0755 ${S}/src/dfx-mgr.sh ${D}${sysconfdir}/init.d/
-	install -m 0755 ${S}/src/daemon.conf ${D}${sysconfdir}/dfx-mgrd/
 	install -m 0644 ${S}/src/dfxmgr_client.h ${D}${includedir}
-
-	oe_soinstall ${B}/src/libdfx-mgr.so.${SOVERSION} ${D}${libdir}
+	
+       	oe_soinstall ${B}/src/libdfx-mgr.so.${SOVERSION} ${D}${libdir}
 
 	install -m 0644 ${S}/opendfx-graph/include/graph_api.h ${D}${includedir}
 	oe_soinstall ${B}/opendfx-graph/libdfxgraph.so.${SOVERSION} ${D}${libdir}
+	
+	install -m 0755 ${S}/src/daemon.conf ${D}${sysconfdir}/dfx-mgrd/
+
+ 	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
+		install -d ${D}${sysconfdir}/init.d/
+		install -m 0755 ${S}/src/dfx-mgr.sh ${D}${sysconfdir}/init.d/
+	fi
+
+	install -m 0755 ${S}/src/dfx-mgr.sh ${D}${bindir}/
+	install -d ${D}${systemd_system_unitdir} 
+	install -m 0755 ${WORKDIR}/dfx-mgr.service ${D}${systemd_system_unitdir}
 }
 
 PACKAGES =+ "libdfx-mgr libdfxgraph"
 
 FILES:${PN} += "${base_libdir}/firmware/xilinx"
+FILES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES','sysvinit','${sysconfdir}/init.d/dfx-mgr.sh', '', d)} ${systemd_system_unitdir}"
 FILES:libdfx-mgr = "${libdir}/libdfx-mgr.so.${SOVERSION} ${libdir}/libdfx-mgr.so.${SOMAJOR}"
 FILES:libdfxgraph = "${libdir}/libdfxgraph.so.${SOVERSION} ${libdir}/libdfxgraph.so.${SOMAJOR}"

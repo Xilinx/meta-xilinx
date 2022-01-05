@@ -1,0 +1,8 @@
+[Unit]
+Description=dfx-mgr
+
+[Service]
+ExecStart=/usr/bin/dfx-mgr.sh &
+
+[Install]
+WantedBy=multi-user.target
