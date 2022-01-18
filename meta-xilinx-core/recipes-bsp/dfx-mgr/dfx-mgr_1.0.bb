@@ -27,8 +27,8 @@ INITSCRIPT_PARAMS = "start 99 S ."
 
 SRC_URI:append = " file://dfx-mgr.service"
 SYSTEMD_PACKAGES="${PN}"
-SYSTEMD_SERVICE_${PN}="dfx-mgr.service"
-SYSTEMD_AUTO_ENABLE_${PN}="enable"
+SYSTEMD_SERVICE:${PN}="dfx-mgr.service"
+SYSTEMD_AUTO_ENABLE:${PN}="enable"
 
 
 do_install(){
