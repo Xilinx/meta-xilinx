@@ -17,7 +17,10 @@ SRCREV_meta ?= "20b185f6b5afbad309747a7901786e0231dc8195"
 SRCREV_FORMAT = "machine"
 
 require recipes-kernel/linux/linux-yocto.inc
-require linux-microblaze.inc
+
+LINUX_MB_INC = ""
+LINUX_MB_INC:microblaze = "linux-microblaze.inc"
+require ${LINUX_MB_INC}
 
 DESCRIPTION = "Xilinx Kernel"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
