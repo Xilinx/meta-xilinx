@@ -1,25 +1,27 @@
 DESCRIPTION = "PMU Firmware"
 
-LICENSE = "MIT"
+LICENSE = "CLOSED"
 
 PROVIDES = "virtual/pmu-firmware"
 
 INHERIT_DEFAULT_DEPENDS = "1"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:zynqmp = "zynqmp"
+COMPATIBLE_MACHINE:zynqmp = ".*"
+
+# Since we're just copying, we can run any config
+COMPATIBLE_HOST = ".*"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-# Default would be a multiconfig (zynqmp-pmufw) build
-# For this to work, BBMULTICONFIG += "zynqmp-pmufw" must be in the user's local.conf!
+# Default expects the user to provide the pmu-firmware in the deploy
+# directory, named "pmu-firmware-${MACHINE}.elf" and "pmu-firmware-${MACHINE}.bin"
+# A machine, multiconfig, or local.conf should override this
 PMU_DEPENDS ??= ""
-PMU_MCDEPENDS ??= "mc::zynqmp-pmufw:pmu-firmware:do_deploy"
-
-# This must be defined to the file output by whatever is providing the pmu-firmware
-# The following sets the default, but the BSP may select a different name
-PMU_FIRMWARE_IMAGE_NAME ??= "pmu-firmware-zynqmp-pmu"
-PMU_FIRMWARE_DEPLOY_DIR ??= "${TOPDIR}/tmp-microblaze-zynqmp-pmufw/deploy/images/${MACHINE}"
+PMU_MCDEPENDS ??= ""
+PMU_FIRMWARE_DEPLOY_DIR ??= "${DEPLOY_DIR_IMAGE}"
+PMU_FIRMWARE_DEPLOY_DIR[vardepsexclude] += "TOPDIR"
+PMU_FIRMWARE_IMAGE_NAME ??= "pmu-firmware-${MACHINE}"
 
 # Default is for the multilib case (without the extension .elf/.bin)
 PMU_FILE ??= "${PMU_FIRMWARE_DEPLOY_DIR}/${PMU_FIRMWARE_IMAGE_NAME}"
@@ -55,3 +57,31 @@ INSANE_SKIP:${PN}-dbg = "arch"
 
 SYSROOT_DIRS += "/boot"
 FILES:${PN} = "/boot/${PN}.elf"
+
+def check_pmu_vars(d):
+    # If both are blank, the user MUST pass in the path to the firmware!
+    if not d.getVar('PMU_FIRMWARE_DEPENDS') and not d.getVar('PMU_FIRMWARE_MCDEPENDS'):
+        # Don't cache this, as the items on disk can change!
+        d.setVar('BB_DONT_CACHE', '1')
+
+        msg = ""
+        fail = False
+        if not os.path.exists(d.getVar('PMU_FILE') + ".elf"):
+            msg = msg + "The expected file %s.elf is not available.  " % d.getVar('PMU_FILE')
+            fail = True
+        if not os.path.exists(d.getVar('PMU_FILE') + ".bin"):
+            msg = msg + "The expected file %s.bin is not available.  " % d.getVar('PMU_FILE')
+            fail = True
+        if fail:
+            raise bb.parse.SkipRecipe("%s  See the meta-xilinx-core README." % msg)
+        else:
+            # We found the file, so be sure to track it
+            d.setVar('SRC_URI', 'file://${PMU_FILE}.elf file://${PMU_FILE}.bin')
+            d.setVarFlag('do_install', 'file-checksums', '${PMU_FILE}.elf:True')
+            d.setVarFlag('do_deploy', 'file-checksums', '${PMU_FILE}.elf:True ${PMU_FILE}.bin:True')
+
+
+python() {
+    # Need to allow bbappends to change the check
+    check_pmu_vars(d)
+}

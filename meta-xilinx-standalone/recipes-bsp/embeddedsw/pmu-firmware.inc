@@ -64,7 +64,7 @@ do_install() {
 PACKAGES = ""
 
 # This is the default in most BSPs.  A MACHINE.conf can override this!
-PMU_FIRMWARE_IMAGE_NAME ??= "pmu-firmware-zynqmp-pmu"
+PMU_FIRMWARE_IMAGE_NAME ??= "pmu-firmware-${MACHINE}"
 
 inherit image-artifact-names
 

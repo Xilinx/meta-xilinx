@@ -65,7 +65,7 @@ do_install() {
 PACKAGES = ""
 
 # This is the default in most BSPs.  A MACHINE.conf can override this!
-PSM_FIRMWARE_IMAGE_NAME ??= "psm-firmware-versal-mb"
+PSM_FIRMWARE_IMAGE_NAME ??= "psm-firmware-${MACHINE}"
 
 inherit image-artifact-names
 

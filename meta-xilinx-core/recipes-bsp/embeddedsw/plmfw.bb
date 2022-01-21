@@ -1,26 +1,28 @@
 DESCRIPTION = "Platform Loader and Manager"
 SUMMARY = "Platform Loader and Manager for Versal devices"
 
-LICENSE = "MIT"
+LICENSE = "CLOSED"
 
 PROVIDES = "virtual/plm"
 
 INHERIT_DEFAULT_DEPENDS = "1"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:versal = "versal"
+COMPATIBLE_MACHINE:versal = ".*"
+
+# Since we're just copying, we can run any config
+COMPATIBLE_HOST = ".*"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-# Default would be a multiconfig (versal) build
-# For this to work, BBMULTICONFIG += "versal-fw" must be in the user's local.conf!
+# Default expects the user to provide the plm-firmware in the deploy
+# directory, named "plm-${MACHINE}.elf" and "plm-${MACHINE}.bin"
+# A machine, multiconfig, or local.conf should override this
 PLM_DEPENDS ??= ""
-PLM_MCDEPENDS ??= "mc::versal-fw:plm-firmware:do_deploy"
-
-# This must be defined to the file output by whatever is providing the plm-firmware
-# The following sets the default, but the BSP may select a different name
-PLM_IMAGE_NAME ??= "plm-versal-mb"
-PLM_DEPLOY_DIR ??= "${TOPDIR}/tmp-microblaze-versal-fw/deploy/images/${MACHINE}"
+PLM_MCDEPENDS ??= ""
+PLM_DEPLOY_DIR ??= "${DEPLOY_DIR_IMAGE}"
+PLM_DEPLOY_DIR[vardepsexclude] += "TOPDIR"
+PLM_IMAGE_NAME ??= "plm-${MACHINE}"
 
 # Default is for the multilib case (without the extension .elf/.bin)
 PLM_FILE ??= "${PLM_DEPLOY_DIR}/${PLM_IMAGE_NAME}"
@@ -57,3 +59,31 @@ INSANE_SKIP:${PN}-dbg = "arch"
 
 SYSROOT_DIRS += "/boot"
 FILES:${PN} = "/boot/${PN}.elf"
+
+def check_plm_vars(d):
+    # If both are blank, the user MUST pass in the path to the firmware!
+    if not d.getVar('PLM_DEPENDS') and not d.getVar('PLM_MCDEPENDS'):
+        # Don't cache this, as the items on disk can change!
+        d.setVar('BB_DONT_CACHE', '1')
+
+        msg = ""
+        fail = False
+        if not os.path.exists(d.getVar('PLM_FILE') + ".elf"):
+            msg = msg + "The expected file %s.elf is not available.  " % d.getVar('PLM_FILE')
+            fail = True
+        if not os.path.exists(d.getVar('PLM_FILE') + ".bin"):
+            msg = msg + "The expected file %s.bin is not available.  " % d.getVar('PLM_FILE')
+            fail = True
+        if fail:
+            raise bb.parse.SkipRecipe("%s\nSee the meta-xilinx-core README." % msg)
+        else:
+            # We found the file, so be sure to track it
+            d.setVar('SRC_URI', 'file://${PLM_FILE}.elf file://${PLM_FILE}.bin')
+            d.setVarFlag('do_install', 'file-checksums', '${PLM_FILE}.elf:True')
+            d.setVarFlag('do_deploy', 'file-checksums', '${PLM_FILE}.elf:True ${PLM_FILE}.bin:True')
+
+python() {
+    # Need to allow bbappends to change the check
+    check_plm_vars(d)
+}
+

@@ -22,14 +22,14 @@ UBOOT_ELF ?= "u-boot.elf"
 
 # Default, if multiconfig is off, call plm/psm-firmware directly, otherwise call the versal-fw multiconfig version
 # The Linux compatible plm/psm-firmware though requires meta-xilinx-tools
-PLM_DEPENDS ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', '', 'plm-firmware:do_deploy', d)}"
-PLM_MCDEPENDS ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', 'mc::versal-fw:plm-firmware:do_deploy', '', d)}"
-PLM_DEPLOY_DIR ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', '${TOPDIR}/tmp-microblaze-versal-fw/deploy/images/${MACHINE}', '${DEPLOY_DIR_IMAGE}', d)}"
+PLM_DEPENDS ??= ""
+PLM_MCDEPENDS ??= ""
+PLM_DEPLOY_DIR ??= "${DEPLOY_DIR_IMAGE}"
+PLM_IMAGE_NAME ??= "plm-${MACHINE}"
 PLM_DEPLOY_DIR[vardepsexclude] += "TOPDIR"
-PLM_IMAGE_NAME ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', 'plm-versal-mb', 'plm-${MACHINE}', d)}"
 
-PSM_DEPENDS ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', '', 'psm-firmware:do_deploy', d)}"
-PSM_MCDEPENDS ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', 'mc::versal-fw:psm-firmware:do_deploy', '', d)}"
-PSM_FIRMWARE_DEPLOY_DIR ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', '${TOPDIR}/tmp-microblaze-versal-fw/deploy/images/${MACHINE}', '${DEPLOY_DIR_IMAGE}', d)}"
+PSM_DEPENDS ??= ""
+PSM_MCDEPENDS ??= ""
+PSM_FIRMWARE_DEPLOY_DIR ??= "${DEPLOY_DIR_IMAGE}"
+PSM_FIRMWARE_IMAGE_NAME ??= "psm-firmware-${MACHINE}"
 PSM_DEPLOY_DIR[vardepsexclude] += "TOPDIR"
-PSM_FIRMWARE_IMAGE_NAME ?= "${@bb.utils.contains('BBMULTICONFIG', 'versal-fw', 'psm-firmware-versal-mb', 'psm-firmware-${MACHINE}', d)}"
