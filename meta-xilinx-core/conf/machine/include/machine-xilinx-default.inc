@@ -12,12 +12,11 @@ PREFERRED_PROVIDER_virtual/kernel ??= "linux-xlnx"
 
 # U-Boot Configuration
 PREFERRED_PROVIDER_virtual/bootloader ??= "u-boot-xlnx"
-PREFERRED_PROVIDER_virtual/boot-bin ??= "${PREFERRED_PROVIDER_virtual/bootloader}"
+PREFERRED_PROVIDER_virtual/boot-bin ??= "xilinx-bootbin"
 
 do_image_wic[depends] += "${@' '.join('%s:do_deploy' % r for r in (d.getVar('WIC_DEPENDS') or "").split())}"
 
-UBOOT_SUFFIX ?= "img"
-UBOOT_SUFFIX:microblaze ?= "bin"
+UBOOT_SUFFIX ?= "bin"
 
 UBOOT_BINARY ?= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_ELF ?= "u-boot"
