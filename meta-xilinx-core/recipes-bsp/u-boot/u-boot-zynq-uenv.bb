@@ -4,19 +4,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-python () {
-    # The device trees must be populated in the deploy directory to correctly
-    # detect them and their names. This means that this recipe needs to depend
-    # on those deployables just like the image recipe does.
-    deploydeps = ["virtual/kernel"]
-    for i in (d.getVar("EXTRA_IMAGEDEPENDS") or "").split():
-        if i != d.getVar("BPN"):
-            deploydeps.append(i)
-
-    # add as DEPENDS since the targets might not have do_deploy tasks
-    if len(deploydeps) != 0:
-        d.appendVar("DEPENDS", " " + " ".join(deploydeps))
-}
+DEPENDS:append := "virtual/kernel ${@oe.utils.str_filter_out(d.getVar("BPN"), d.getVar("EXTRA_IMAGEDEPENDS"), d)}"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynq = ".*"
