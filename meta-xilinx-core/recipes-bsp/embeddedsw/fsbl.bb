@@ -1,6 +1,6 @@
 DESCRIPTION = "Xilinx First Stage Boot Loader"
 
-LICENSE = "MIT"
+LICENSE = "CLOSED"
 
 PROVIDES = "virtual/fsbl"
 
@@ -10,19 +10,21 @@ COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynq = "zynq"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 
+# Since we're just copying, we can run any config
+COMPATIBLE_HOST = ".*"
+
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-# Default would be a multiconfig (versal) build
-# For this to work, BBMULTICONFIG += "fsbl-fw" must be in the user's local.conf!
+# Default expects the user to provide the fsbl in the deploy
+# directory, named "fsbl.elf"
+# A machine, multiconfig, or local.conf should override this
 FSBL_DEPENDS ??= ""
-FSBL_MCDEPENDS ??= "mc::fsbl-fw:fsbl-firmware:do_deploy"
+FSBL_MCDEPENDS ??= ""
+FSBL_DEPLOY_DIR ??= "${DEPLOY_DIR_IMAGE}"
+FSBL_DEPLOY_DIR[vardepsexclude] += "TOPDIR"
+FSBL_IMAGE_NAME ??= "fsbl-${MACHINE}"
 
-# This must be defined to the file output by whatever is providing the fsbl-firmware
-# The following sets the default, but the BSP may select a different name
-FSBL_IMAGE_NAME ??= "fsbl"
-FSBL_DEPLOY_DIR ??= "${TOPDIR}/tmp-fsbl-fw/deploy/images/${MACHINE}"
-
-# Default is for the multilib case (without the extension .elf/.bin)
+# Default is for the multilib case (without the extension .elf)
 FSBL_FILE ??= "${FSBL_DEPLOY_DIR}/${FSBL_IMAGE_NAME}"
 FSBL_FILE[vardepsexclude] = "FSBL_DEPLOY_DIR"
 
@@ -56,3 +58,22 @@ INSANE_SKIP:${PN}-dbg = "arch"
 
 SYSROOT_DIRS += "/boot"
 FILES:${PN} = "/boot/${PN}.elf"
+
+def check_fsbl_variables(d):
+    # If both are blank, the user MUST pass in the path to the firmware!
+    if not d.getVar('FSBL_DEPENDS') and not d.getVar('FSBL_MCDEPENDS'):
+        # Don't cache this, as the items on disk can change!
+        d.setVar('BB_DONT_CACHE', '1')
+
+        if not os.path.exists(d.getVar('FSBL_FILE') + ".elf"):
+            raise bb.parse.SkipRecipe("The expect file %s.elf is not available.\nSet FSBL_FILE to the path with a precompiled FSBL binary. See the meta-xilinx-core README for more information." % d.getVar('FSBL_FILE'))
+        else:
+            # We found the file, so be sure to track it
+            d.setVar('SRC_URI', 'file://${FSBL_FILE}.elf')
+            d.setVarFlag('do_install', 'file-checksums', '${FSBL_FILE}.elf:True')
+            d.setVarFlag('do_deploy', 'file-checksums', '${FSBL_FILE}.elf:True')
+
+python() {
+    # Need to allow bbappends to change the check
+    check_fsbl_variables(d)
+}

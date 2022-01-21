@@ -65,7 +65,7 @@ do_install() {
 PACKAGES = ""
 
 # This is the default in most BSPs.  A MACHINE.conf can override this!
-PLM_IMAGE_NAME ??= "plm-versal-mb"
+PLM_IMAGE_NAME ??= "plm-${MACHINE}"
 
 inherit image-artifact-names
 
