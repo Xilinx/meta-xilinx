@@ -12,11 +12,18 @@ LIC_FILES_CHKSUM = " \
 inherit devicetree image-artifact-names
 
 #this way of going through SRC_URI is better but if dts is including other dtsis, need to add all of them to SRC_URI..
-#SRC_URI += "file://${SYSTEM_DTFILE}"
-#DT_FILES_PATH = "${@d.getVar('WORKDIR')+'/'+os.path.dirname(d.getVar('SYSTEM_DTFILE'))}"
+#SRC_URI += "file://${CONFIG_DTFILE}"
+#DT_FILES_PATH = "${@d.getVar('WORKDIR')+'/'+os.path.dirname(d.getVar('CONFIG_DTFILE'))}"
 
-DT_FILES_PATH = "${@os.path.dirname(d.getVar('SYSTEM_DTFILE')) if d.getVar('SYSTEM_DTFILE') else d.getVar('S')}"
+# Fall back to SYSTEM_DTFILE if specified...
+# CONFIG_DTFILE is intended to hold a specific configuration's (multiconfig)
+# device tree, while SYSTEM_DTFILE is used for the full heterogenous
+# system.
+SYSTEM_DTFILE ??= ""
+CONFIG_DTFILE ??= "${SYSTEM_DTFILE}"
+DT_FILES_PATH = "${@os.path.dirname(d.getVar('CONFIG_DTFILE')) if d.getVar('CONFIG_DTFILE') else d.getVar('S')}"
 
+COMPATIBLE_MACHINE:zynq   = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 
@@ -27,10 +34,21 @@ PROVIDES = "virtual/dtb"
 # common zynq include
 SRC_URI:append:zynq = " file://zynq-7000-qspi-dummy.dtsi"
 
-DTB_FILE_NAME = "${@os.path.basename(d.getVar('SYSTEM_DTFILE')).replace('.dts', '.dtb') if d.getVar('SYSTEM_DTFILE') else ''}"
+DTB_FILE_NAME = "${@os.path.basename(d.getVar('CONFIG_DTFILE')).replace('.dts', '.dtb') if d.getVar('CONFIG_DTFILE') else ''}"
+
 DTB_BASE_NAME ?= "${MACHINE}-system${IMAGE_VERSION_SUFFIX}"
 
+do_install:prepend() {
+    for DTB_FILE in ${CONFIG_DTFILE}; do
+        install -Dm 0644 ${DTB_FILE} ${D}/boot/devicetree/$(basename ${DTB_FILE})
+    done
+}
+
 devicetree_do_deploy:append() {
+    for DTB_FILE in ${CONFIG_DTFILE}; do
+        install -Dm 0644 ${DTB_FILE} ${DEPLOYDIR}/devicetree/$(basename ${DTB_FILE})
+    done
+
     if [ -n "${DTB_FILE_NAME}" ]; then
         if [ -e "${DEPLOYDIR}/devicetree/${DTB_FILE_NAME}" ]; then
             # We need the output to be system.dtb for WIC setup to match XSCT flow
@@ -41,4 +59,22 @@ devicetree_do_deploy:append() {
             bberror "Expected filename ${DTB_FILE_NAME} doesn't exist in ${DEPLOYDIR}/devicetree"
         fi
     fi
+}
+
+def check_devicetree_variables(d):
+    if not d.getVar('CONFIG_DTFILE'):
+        d.setVar('BB_DONT_CACHE', '1')
+        raise bb.parse.SkipRecipe("CONFIG_DTFILE or SYSTEM_DTFILE is not defined.")
+    else:
+        if not os.path.exists(d.getVar('CONFIG_DTFILE')):
+            d.setVar('BB_DONT_CACHE', '1')
+            raise bb.parse.SkipRecipe("The device tree %s is not available." % d.getVar('CONFIG_DTFILE'))
+        else:
+            d.appendVar('SRC_URI', ' file://${CONFIG_DTFILE}')
+            d.setVarFlag('do_install', 'file-checksums', '${CONFIG_DTFILE}:True')
+            d.setVarFlag('do_deploy', 'file-checksums', '${CONFIG_DTFILE}:True')
+
+python() {
+    # Need to allow bbappends to change the check
+    check_devicetree_variables(d)
 }
