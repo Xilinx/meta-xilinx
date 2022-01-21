@@ -5,7 +5,7 @@ LICENSE = "CLOSED"
 PROVIDES = "virtual/base-pdi"
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:versal = "versal"
+COMPATIBLE_MACHINE:versal = ".*"
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
