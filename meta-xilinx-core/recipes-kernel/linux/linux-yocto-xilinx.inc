@@ -1,6 +1,8 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/linux-xlnx:"
 
-require linux-microblaze.inc
+LINUX_MB_INC = ""
+LINUX_MB_INC:microblaze = "linux-microblaze.inc"
+require ${LINUX_MB_INC}
 
 # Zynq default generic KMACHINE
 COMPATIBLE_MACHINE:zynq = "zynq"
