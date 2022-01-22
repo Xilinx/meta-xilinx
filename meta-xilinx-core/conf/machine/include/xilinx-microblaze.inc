@@ -1,3 +1,6 @@
+# Verify meta-microblaze is part of the config!
+INHERIT += "xilinx-microblaze"
+
 # To avoid the require overriding previous defaults we use the override to make this the default
 TUNE_FEATURES_save := "${TUNE_FEATURES:tune-microblaze}"
 
