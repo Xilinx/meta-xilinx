@@ -89,7 +89,7 @@ detect_machine() {
 }
 
 cortex_a53_linux() {
-  info "coretex-a53 for Linux [ $1 ]"
+  info "cortex-a53 for Linux [ $1 ]"
 
   if [ "$1" = "None" ]; then
     dtb_file="cortexa53-${machine}-linux.dtb"
@@ -146,9 +146,9 @@ a53_fsbl_done=0
 cortex_a53_baremetal() {
   if [ "$1" = "fsbl" ]; then
     [ ${a53_fsbl_done} = 1 ] && return
-    info "coretex-a53 FSBL baremetal configuration"
+    info "cortex-a53 FSBL baremetal configuration"
   else
-    info "coretex-a53 for baremetal [ $1 ]"
+    info "cortex-a53 for baremetal [ $1 ]"
   fi
 
   suffix=""; lto="-nolto"
@@ -210,7 +210,7 @@ EOF
 }
 
 cortex_a53_freertos() {
-  info "coretex-a53 for FreeRTOS [ $1 ]"
+  info "cortex-a53 for FreeRTOS [ $1 ]"
 
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
@@ -262,7 +262,7 @@ EOF
 }
 
 cortex_a72_linux() {
-  info "coretex-a72 for Linux [ $1 ]"
+  info "cortex-a72 for Linux [ $1 ]"
 
   if [ "$1" = "None" ]; then
     dtb_file="cortexa72-${machine}-linux.dtb"
@@ -318,7 +318,7 @@ EOF
 }
 
 cortex_a72_baremetal() {
-  info "coretex-a72 for baremetal [ $1 ]"
+  info "cortex-a72 for baremetal [ $1 ]"
 
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
@@ -370,7 +370,7 @@ EOF
 }
 
 cortex_a72_freertos() {
-  info "coretex-a72 for FreeRTOS [ $1 ]"
+  info "cortex-a72 for FreeRTOS [ $1 ]"
 
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
@@ -425,9 +425,9 @@ r5_fsbl_done=0
 cortex_r5_baremetal() {
   if [ "$1" = "fsbl" ]; then
     [ ${r5_fsbl_done} = 1 ] && return
-    info "coretex-r5 FSBL baremetal configuration"
+    info "cortex-r5 FSBL baremetal configuration"
   else
-    info "coretex-r5 for baremetal [ $1 ]"
+    info "cortex-r5 for baremetal [ $1 ]"
   fi
 
   suffix=""; lto="-nolto"
@@ -489,7 +489,7 @@ EOF
 }
 
 cortex_r5_freertos() {
-  info "coretex-r5 for FreeRTOS [ $1 ]"
+  info "cortex-r5 for FreeRTOS [ $1 ]"
 
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
