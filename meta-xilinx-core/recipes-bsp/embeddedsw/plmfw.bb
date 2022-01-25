@@ -75,7 +75,8 @@ def check_plm_vars(d):
             msg = msg + "The expected file %s.bin is not available.  " % d.getVar('PLM_FILE')
             fail = True
         if fail:
-            raise bb.parse.SkipRecipe("%s\nSee the meta-xilinx-core README." % msg)
+            if not d.getVar('WITHIN_EXT_SDK'):
+                raise bb.parse.SkipRecipe("%s\nSee the meta-xilinx-core README." % msg)
         else:
             # We found the file, so be sure to track it
             d.setVar('SRC_URI', 'file://${PLM_FILE}.elf file://${PLM_FILE}.bin')

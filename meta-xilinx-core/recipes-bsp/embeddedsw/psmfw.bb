@@ -76,7 +76,8 @@ def check_psm_vars(d):
             fail = True
 
         if fail:
-            raise bb.parse.SkipRecipe("%s\nSee the meta-xilinx-core README." % msg)
+            if not d.getVar('WITHIN_EXT_SDK'):
+                raise bb.parse.SkipRecipe("%s\nSee the meta-xilinx-core README." % msg)
         else:
             # We found the file, so be sure to track it
             d.setVar('SRC_URI', 'file://${PSM_FILE}.elf file://${PSM_FILE}.bin')
