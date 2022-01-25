@@ -73,7 +73,8 @@ def check_pmu_vars(d):
             msg = msg + "The expected file %s.bin is not available.  " % d.getVar('PMU_FILE')
             fail = True
         if fail:
-            raise bb.parse.SkipRecipe("%s  See the meta-xilinx-core README." % msg)
+            if not d.getVar('WITHIN_EXT_SDK'):
+                raise bb.parse.SkipRecipe("%s  See the meta-xilinx-core README." % msg)
         else:
             # We found the file, so be sure to track it
             d.setVar('SRC_URI', 'file://${PMU_FILE}.elf file://${PMU_FILE}.bin')

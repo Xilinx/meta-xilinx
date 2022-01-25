@@ -62,13 +62,15 @@ devicetree_do_deploy:append() {
 }
 
 def check_devicetree_variables(d):
+    # Don't cache this, as the items on disk can change!
+    d.setVar('BB_DONT_CACHE', '1')
+
     if not d.getVar('CONFIG_DTFILE'):
-        d.setVar('BB_DONT_CACHE', '1')
         raise bb.parse.SkipRecipe("CONFIG_DTFILE or SYSTEM_DTFILE is not defined.")
     else:
         if not os.path.exists(d.getVar('CONFIG_DTFILE')):
-            d.setVar('BB_DONT_CACHE', '1')
-            raise bb.parse.SkipRecipe("The device tree %s is not available." % d.getVar('CONFIG_DTFILE'))
+            if not d.getVar('WITHIN_EXT_SDK'):
+                raise bb.parse.SkipRecipe("The device tree %s is not available." % d.getVar('CONFIG_DTFILE'))
         else:
             d.appendVar('SRC_URI', ' file://${CONFIG_DTFILE}')
             d.setVarFlag('do_install', 'file-checksums', '${CONFIG_DTFILE}:True')
