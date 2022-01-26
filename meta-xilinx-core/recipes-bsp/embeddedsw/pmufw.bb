@@ -60,7 +60,7 @@ FILES:${PN} = "/boot/${PN}.elf"
 
 def check_pmu_vars(d):
     # If both are blank, the user MUST pass in the path to the firmware!
-    if not d.getVar('PMU_FIRMWARE_DEPENDS') and not d.getVar('PMU_FIRMWARE_MCDEPENDS'):
+    if not d.getVar('PMU_DEPENDS') and not d.getVar('PMU_MCDEPENDS'):
         # Don't cache this, as the items on disk can change!
         d.setVar('BB_DONT_CACHE', '1')
 
