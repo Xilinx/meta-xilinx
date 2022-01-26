@@ -14,6 +14,10 @@ SOMAJOR = "1"
 SOMINOR = "0"
 SOVERSION = "${SOMAJOR}.${SOMINOR}"
 
+COMPATIBLE_MACHINE = "^$"
+COMPATIBLE_MACHINE:zynqmp = "zynqmp"
+COMPATIBLE_MACHINE:versal = "versal"
+
 S = "${WORKDIR}/git"
 
 inherit cmake update-rc.d systemd
