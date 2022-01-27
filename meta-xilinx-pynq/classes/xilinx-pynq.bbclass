@@ -15,7 +15,7 @@ inherit python3-dir
 
 # Used for setup.py on PYNQ
 BOARD_NAME:ultra96 = "Ultra96"
-BOARD_NAME_zcu104-zynqmp = "ZCU104"
+BOARD_NAME:zcu104-zynqmp = "ZCU104"
 
 do_compile:prepend() {
   export BOARD=${BOARD_NAME}
