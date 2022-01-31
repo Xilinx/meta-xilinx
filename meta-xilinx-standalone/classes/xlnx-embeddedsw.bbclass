@@ -19,7 +19,7 @@ ESW_REV[2020.1] = "338150ab3628a1ea6b06e964b16e712b131882dd"
 ESW_REV[2020.2] = "2516d5ed8161e16c2813b0e8e4ceac693f23de5c"
 ESW_REV[2021.1] = "d37a0e8824182597abf31ac3f1087a5321b33ad7"
 ESW_REV[2021.2] = "49c6694fc3cab6b87dd564da58a83bb8656a7c03"
-ESW_REV[2022.1] = "52df4e141d47ea07e40bb50af6d2dc7edca1f785"
+ESW_REV[2022.1] = "456aec9b4a8e8dfd609daf1cc8e18ace41a3602c"
 ESW_REV[git]    = "7ec60e1c0e25bfa9c5e8c77d6d063876f6670770"
 SRCREV ??= "${@d.getVarFlag('ESW_REV', d.getVar('ESW_VER')) or '${AUTOREV}'}"
 
@@ -33,7 +33,7 @@ LIC_FILES_CHKSUM[release-2020.1]    = '8b565227e1264d677db8f841c2948cba'
 LIC_FILES_CHKSUM[master-rel-2020.2] = '3a6e22aebf6516f0f74a82e1183f74f8'
 LIC_FILES_CHKSUM[xlnx_rel_v2021.1]  = "73e8997d53c2137fdeea4331a73f40fa"
 LIC_FILES_CHKSUM[xlnx_rel_v2021.2]  = 'ba23909a4bcaf754a2e1ba996f1ca1b0'
-LIC_FILES_CHKSUM[master-next]       = 'ba23909a4bcaf754a2e1ba996f1ca1b0'
+LIC_FILES_CHKSUM[master-next]       = '87cee16dbcd2c2f7ceef30163838056e'
 LIC_FILES_CHKSUM[master]            = '593ba3fb8be51271097ddaa4b9c65cde'
 LIC_FILES_CHKSUM ??= "file://license.txt;md5=${@d.getVarFlag('LIC_FILES_CHKSUM', d.getVar('BRANCH')) or '0'}"
 
