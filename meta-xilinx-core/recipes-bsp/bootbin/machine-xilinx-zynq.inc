@@ -1,9 +1,9 @@
 #specify BIF partition attributes required for BOOT.bin
-BIF_FSBL_ATTR ?= "fsbl"
-BIF_BITSTREAM_ATTR ?= ""
-BIF_DEVICETREE_ATTR ?= "device-tree"
-BIF_SSBL_ATTR ?= "u-boot-xlnx"
-BIF_PARTITION_ATTR ?= "${BIF_FSBL_ATTR} ${BIF_BITSTREAM_ATTR} ${BIF_SSBL_ATTR} ${BIF_DEVICETREE_ATTR}"
+BIF_FSBL_ATTR       ??= "fsbl"
+BIF_BITSTREAM_ATTR  ??= ""
+BIF_DEVICETREE_ATTR ??= "device-tree"
+BIF_SSBL_ATTR       ??= "u-boot-xlnx"
+BIF_PARTITION_ATTR  ??= "${BIF_FSBL_ATTR} ${BIF_BITSTREAM_ATTR} ${BIF_SSBL_ATTR} ${BIF_DEVICETREE_ATTR}"
 
 #specify BIF partition attributes for FSBL
 #bootloader is FSBL. Location where FSBL binary is present and dependency to build FSBL

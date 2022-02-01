@@ -15,12 +15,12 @@ BIF_COMMON_ATTR ?= ""
 # This combination restricts the boot order to be:
 # FSBL & PMUFW -> Bitstream (if available) -> ATF -> Device Tree (if available) -> Second Stage Bootloader
 #
-BIF_FSBL_ATTR ?= "fsbl pmufw"
-BIF_BITSTREAM_ATTR ?= ""
-BIF_ATF_ATTR ?= "arm-trusted-firmware"
-BIF_DEVICETREE_ATTR ?= "device-tree"
-BIF_SSBL_ATTR ?= "u-boot-xlnx"
-BIF_PARTITION_ATTR ?= "${BIF_FSBL_ATTR} ${BIF_BITSTREAM_ATTR} ${BIF_ATF_ATTR} ${BIF_DEVICETREE_ATTR} ${BIF_SSBL_ATTR}"
+BIF_FSBL_ATTR       ??= "fsbl pmufw"
+BIF_BITSTREAM_ATTR  ??= ""
+BIF_ATF_ATTR        ??= "arm-trusted-firmware"
+BIF_DEVICETREE_ATTR ??= "device-tree"
+BIF_SSBL_ATTR       ??= "u-boot-xlnx"
+BIF_PARTITION_ATTR  ??= "${BIF_FSBL_ATTR} ${BIF_BITSTREAM_ATTR} ${BIF_ATF_ATTR} ${BIF_DEVICETREE_ATTR} ${BIF_SSBL_ATTR}"
 
 # specify BIF partition attributes for FSBL
 # bootloader is FSBL. Location where FSBL binary is present and dependency to build FSBL
