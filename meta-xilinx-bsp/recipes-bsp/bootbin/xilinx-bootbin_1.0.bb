@@ -128,6 +128,7 @@ python do_configure() {
 }
 
 do_configure[vardeps] += "BIF_PARTITION_ATTR BIF_PARTITION_IMAGE BIF_COMMON_ATTR"
+do_configure[vardeps] += "BIF_FSBL_ATTR BIF_BITSTREAM_ATTR BIF_ATF_ATTR BIF_DEVICETREE_ATTR BIF_SSBL_ATTR"
 
 do_compile() {
     cd ${WORKDIR}
