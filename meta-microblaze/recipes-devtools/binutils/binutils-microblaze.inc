@@ -39,4 +39,7 @@ SRC_URI:append = " \
      file://0036-microblaze-Add-build_gdbserver-yes-to-top-level-conf.patch \
      file://0037-Fixing-the-issues-related-to-GDB-7.12.patch \
      file://0038-Patch-MB-MB-binutils-Upstream-port-issues.patch \
+     file://0039-Patch-MicroBlaze-Double-free-with-ld-no-keep-memory.patch \
+     file://0040-Patch-MicroBlaze-Fixing-the-imm-imml-generation-for-.patch \
+     file://0041-Patch-MicroBlaze-Invalid-data-offsets-pointer-after-.patch \
      "
