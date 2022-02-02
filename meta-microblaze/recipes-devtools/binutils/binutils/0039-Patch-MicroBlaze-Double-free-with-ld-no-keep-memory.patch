@@ -1,0 +1,196 @@
+From 64b96c071b051cb4eb7471ee016e12c50a00c9d0 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 24 Jan 2022 16:59:19 +0530
+Subject: [PATCH] [Patch,MicroBlaze] : Double free with ld --no-keep-memory.
+ Proposed patches from the community member (dednev@rambler.ru) for 2021.1.
+ [CR-1115233]
+
+---
+ bfd/elf32-microblaze.c | 39 ++++++++++++++++++++------------------
+ bfd/elf64-microblaze.c | 43 ++++++++++++++++++++----------------------
+ 2 files changed, 41 insertions(+), 41 deletions(-)
+
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index 290e70e0f4..cbbedddd1a 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -1839,10 +1839,8 @@ microblaze_elf_relax_section (bfd *abfd,
+ {
+   Elf_Internal_Shdr *symtab_hdr;
+   Elf_Internal_Rela *internal_relocs;
+-  Elf_Internal_Rela *free_relocs = NULL;
+   Elf_Internal_Rela *irel, *irelend;
+   bfd_byte *contents = NULL;
+-  bfd_byte *free_contents = NULL;
+   int rel_count;
+   unsigned int shndx;
+   int i, sym_index;
+@@ -1884,8 +1882,6 @@ microblaze_elf_relax_section (bfd *abfd,
+   internal_relocs = _bfd_elf_link_read_relocs (abfd, sec, NULL, NULL, link_info->keep_memory);
+   if (internal_relocs == NULL)
+     goto error_return;
+-  if (! link_info->keep_memory)
+-    free_relocs = internal_relocs;
+ 
+   sec->relax = (struct relax_table *) bfd_malloc ((sec->reloc_count + 1)
+ 						  * sizeof (struct relax_table));
+@@ -1913,7 +1909,6 @@ microblaze_elf_relax_section (bfd *abfd,
+ 	      contents = (bfd_byte *) bfd_malloc (sec->size);
+ 	      if (contents == NULL)
+ 		goto error_return;
+-	      free_contents = contents;
+ 
+ 	      if (!bfd_get_section_contents (abfd, sec, contents,
+ 					     (file_ptr) 0, sec->size))
+@@ -2445,25 +2440,26 @@ microblaze_elf_relax_section (bfd *abfd,
+ 	}
+ 
+       elf_section_data (sec)->relocs = internal_relocs;
+-      free_relocs = NULL;
+ 
+       elf_section_data (sec)->this_hdr.contents = contents;
+-      free_contents = NULL;
+ 
+       symtab_hdr->contents = (bfd_byte *) isymbuf;
+     }
+ 
+-  free (free_relocs);
+-  free_relocs = NULL;
++  if (internal_relocs != NULL
++      && elf_section_data (sec)->relocs != internal_relocs)
++    free (internal_relocs);
+ 
+-  if (free_contents != NULL)
+-    {
+-      if (!link_info->keep_memory)
+-	free (free_contents);
++  if (contents != NULL
++      && elf_section_data (sec)->this_hdr.contents != contents)
++   {
++      if (! link_info->keep_memory)
++	free (contents);
+       else
+-	/* Cache the section contents for elf_link_input_bfd.  */
+-	elf_section_data (sec)->this_hdr.contents = contents;
+-      free_contents = NULL;
++	{
++	  /* Cache the section contents for elf_link_input_bfd.  */
++	  elf_section_data (sec)->this_hdr.contents = contents;
++	}
+     }
+ 
+   if (sec->relax_count == 0)
+@@ -2477,8 +2473,15 @@ microblaze_elf_relax_section (bfd *abfd,
+   return true;
+ 
+  error_return:
+-  free (free_relocs);
+-  free (free_contents);
++  if (isymbuf != NULL
++      && symtab_hdr->contents != (unsigned char *) isymbuf)
++    free (isymbuf);
++  if (internal_relocs != NULL
++      && elf_section_data (sec)->relocs != internal_relocs)
++    free (internal_relocs);
++  if (contents != NULL
++      && elf_section_data (sec)->this_hdr.contents != contents)
++    free (contents);
+   free (sec->relax);
+   sec->relax = NULL;
+   sec->relax_count = 0;
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index 7bad93e706..677499e672 100644
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -1849,10 +1849,8 @@ microblaze_elf_relax_section (bfd *abfd,
+ {
+   Elf_Internal_Shdr *symtab_hdr;
+   Elf_Internal_Rela *internal_relocs;
+-  Elf_Internal_Rela *free_relocs = NULL;
+   Elf_Internal_Rela *irel, *irelend;
+   bfd_byte *contents = NULL;
+-  bfd_byte *free_contents = NULL;
+   int rel_count;
+   unsigned int shndx;
+   int i, sym_index;
+@@ -1894,8 +1892,6 @@ microblaze_elf_relax_section (bfd *abfd,
+   internal_relocs = _bfd_elf_link_read_relocs (abfd, sec, NULL, NULL, link_info->keep_memory);
+   if (internal_relocs == NULL)
+     goto error_return;
+-  if (! link_info->keep_memory)
+-    free_relocs = internal_relocs;
+ 
+   sec->relax = (struct relax_table *) bfd_malloc ((sec->reloc_count + 1)
+ 						  * sizeof (struct relax_table));
+@@ -1923,8 +1919,6 @@ microblaze_elf_relax_section (bfd *abfd,
+ 	      contents = (bfd_byte *) bfd_malloc (sec->size);
+ 	      if (contents == NULL)
+ 		goto error_return;
+-	      free_contents = contents;
+-
+ 	      if (!bfd_get_section_contents (abfd, sec, contents,
+ 					     (file_ptr) 0, sec->size))
+ 		goto error_return;
+@@ -2454,28 +2448,26 @@ microblaze_elf_relax_section (bfd *abfd,
+         }
+ 
+       elf_section_data (sec)->relocs = internal_relocs;
+-      free_relocs = NULL;
+ 
+       elf_section_data (sec)->this_hdr.contents = contents;
+-      free_contents = NULL;
+ 
+       symtab_hdr->contents = (bfd_byte *) isymbuf;
+     }
+ 
+-  if (free_relocs != NULL)
+-    {
+-      free (free_relocs);
+-      free_relocs = NULL;
+-    }
++  if (internal_relocs != NULL
++      && elf_section_data (sec)->relocs != internal_relocs)
++    free (internal_relocs);
+ 
+-  if (free_contents != NULL)
++  if (contents != NULL
++      && elf_section_data (sec)->this_hdr.contents != contents)
+     {
+-      if (!link_info->keep_memory)
+-	free (free_contents);
++      if (! link_info->keep_memory)
++	free (contents);
+       else
+-	/* Cache the section contents for elf_link_input_bfd.  */
+-	elf_section_data (sec)->this_hdr.contents = contents;
+-      free_contents = NULL;
++	{
++	  /* Cache the section contents for elf_link_input_bfd.  */
++	  elf_section_data (sec)->this_hdr.contents = contents;
++	}
+     }
+ 
+   if (sec->relax_count == 0)
+@@ -2489,10 +2481,15 @@ microblaze_elf_relax_section (bfd *abfd,
+   return true;
+ 
+  error_return:
+-  if (free_relocs != NULL)
+-    free (free_relocs);
+-  if (free_contents != NULL)
+-    free (free_contents);
++  if (isymbuf != NULL
++      && symtab_hdr->contents != (unsigned char *) isymbuf)
++    free (isymbuf);
++  if (internal_relocs != NULL
++      && elf_section_data (sec)->relocs != internal_relocs)
++    free (internal_relocs);
++  if (contents != NULL
++      && elf_section_data (sec)->this_hdr.contents != contents)
++    free (contents);
+   if (sec->relax != NULL)
+     {
+       free (sec->relax);
+-- 
+2.17.1
+
