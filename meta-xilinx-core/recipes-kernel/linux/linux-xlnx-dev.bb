@@ -11,7 +11,7 @@ SRCREV ?= '${@oe.utils.conditional("PREFERRED_PROVIDER_virtual/kernel", "linux-x
 # skip version sanity, because the version moves with AUTOREV
 KERNEL_VERSION_SANITY_SKIP = "1"
 
-LINUX_VERSION ?= "4.9+"
+LINUX_VERSION ?= "5.15+"
 LINUX_VERSION_EXTENSION ?= "-xilinx-dev"
 
 include linux-xlnx.inc
