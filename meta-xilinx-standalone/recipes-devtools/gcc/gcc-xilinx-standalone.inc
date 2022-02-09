@@ -32,6 +32,5 @@ EXTRA_OECONF:append:xilinx-standalone:armv8r = " \
 	"
 
 EXTRA_OECONF:append:xilinx-standalone:microblaze = " \
-	--enable-target-optspace \
 	--without-long-double-128 \
 	"
