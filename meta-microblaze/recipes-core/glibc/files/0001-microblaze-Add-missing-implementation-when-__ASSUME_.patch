@@ -1,0 +1,61 @@
+From c75aa9246a8cfc814d99cf5f58229177bd69fc4f Mon Sep 17 00:00:00 2001
+From: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Date: Tue, 28 Dec 2021 09:09:49 -0300
+Subject: [PATCH] microblaze: Add missing implementation when
+ !__ASSUME_TIME64_SYSCALLS
+
+In commit a92f4e6299fe0e3cb6f77e79de00817aece501ce ("linux: Add time64
+pselect support"), a Microblaze specific implementation of
+__pselect32() was added to cover the case of kernels < 3.15 which lack
+the pselect6 system call.
+
+This new file sysdeps/unix/sysv/linux/microblaze/pselect32.c takes
+precedence over the default implementation
+sysdeps/unix/sysv/linux/pselect32.c.
+
+However sysdeps/unix/sysv/linux/pselect32.c provides an implementation
+of __pselect32() which is needed when __ASSUME_TIME64_SYSCALLS is not
+defined. On Microblaze, which is a 32-bit architecture,
+__ASSUME_TIME64_SYSCALLS is only true for kernels >= 5.1.
+
+Due to sysdeps/unix/sysv/linux/microblaze/pselect32.c taking
+precedence over sysdeps/unix/sysv/linux/pselect32.c, it means that
+when we are with a kernel >= 3.15 but < 5.1, we need a __pselect32()
+implementation, but sysdeps/unix/sysv/linux/microblaze/pselect32.c
+doesn't provide it, and sysdeps/unix/sysv/linux/pselect32.c which
+would provide it is not compiled in.
+
+This causes the following build failure on Microblaze with for example
+Linux kernel headers 4.9:
+
+[...]/build/libc_pic.os: in function `__pselect64':
+(.text+0x120b44): undefined reference to `__pselect32'
+collect2: error: ld returned 1 exit status
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=glibc.git;a=commit;h=c75aa9246a8cfc814d99cf5f58229177bd69fc4f]
+
+Signed-off-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Reviewed-by: Adhemerval Zanella  <adhemerval.zanella@linaro.org>
+Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+---
+ sysdeps/unix/sysv/linux/microblaze/pselect32.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/sysdeps/unix/sysv/linux/microblaze/pselect32.c b/sysdeps/unix/sysv/linux/microblaze/pselect32.c
+index 70b7b52a48..dd9d56ba29 100644
+--- a/sysdeps/unix/sysv/linux/microblaze/pselect32.c
++++ b/sysdeps/unix/sysv/linux/microblaze/pselect32.c
+@@ -22,7 +22,9 @@
+ #include <sys/poll.h>
+ #include <sysdep-cancel.h>
+ 
+-#ifndef __ASSUME_PSELECT
++#ifndef __ASSUME_TIME64_SYSCALL
++#include <sysdeps/unix/sysv/linux/pselect32.c>
++#elif !defined __ASSUME_PSELECT
+ int
+ __pselect32 (int nfds, fd_set *readfds, fd_set *writefds,
+ 	     fd_set *exceptfds, const struct __timespec64 *timeout,
+-- 
+2.17.1
+
