@@ -4,7 +4,7 @@ LINUX_VERSION_EXTENSION ?= "-xilinx-${XILINX_RELEASE_VERSION}"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
 # Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
-KBRANCH ?= "xlnx_rebase_v5.15"
+KBRANCH ?= "xlnx_rebase_v5.15_LTS"
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
 
 FILESOVERRIDES:append = ":${XILINX_RELEASE_VERSION}"
