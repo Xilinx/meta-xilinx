@@ -62,7 +62,7 @@ do_install(){
 
 	install -m 0755 ${S}/src/dfx-mgr.sh ${D}${bindir}/
 	install -d ${D}${systemd_system_unitdir} 
-	install -m 0755 ${WORKDIR}/dfx-mgr.service ${D}${systemd_system_unitdir}
+	install -m 0644 ${WORKDIR}/dfx-mgr.service ${D}${systemd_system_unitdir}
 }
 
 PACKAGES =+ "libdfx-mgr libdfxgraph"
