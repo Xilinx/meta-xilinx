@@ -1,8 +1,15 @@
+# SPDX-License-Identifier: MIT
+#
+# DFX manager daemon is used to demonstrate Dynamic Function eXchange (DFX)
+# or partial reconfiguration feature on Xilinx Zynq UltraScale+ and newer.
+# See: UG909 "Vivado Design Suite User Guide Dynamic Function eXchange"
+
 [Unit]
-Description=dfx-mgr
+Description=dfx-mgrd Dynamic Function eXchange
+Documentation=https://github.com/Xilinx/dfx-mgr
 
 [Service]
-ExecStart=/usr/bin/dfx-mgr.sh &
+ExecStart=/usr/bin/dfx-mgrd
 
 [Install]
 WantedBy=multi-user.target
