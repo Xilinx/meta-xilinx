@@ -4,4 +4,4 @@
 FSBL_DEPENDS ?= ""
 FSBL_MCDEPENDS ?= "mc::fsbl-fw:fsbl-firmware:do_deploy"
 FSBL_DEPLOY_DIR ?= "${TOPDIR}/tmp-fsbl-fw/deploy/images/${MACHINE}"
-FSBL_IMAGE_NAME ?= "fsbl"
+FSBL_IMAGE_NAME ?= "fsbl-${MACHINE}"
