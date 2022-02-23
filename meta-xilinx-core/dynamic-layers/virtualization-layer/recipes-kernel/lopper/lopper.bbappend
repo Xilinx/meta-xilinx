@@ -22,28 +22,27 @@ RDEPENDS:${PN} += " \
 "
 
 SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master"
-SRCREV = "4fc085c4be031996e7f48dcaf03d0782989c8d58"
+SRCREV = "17350a773a73c426a826e32e4e093effc718ecf5"
 
 do_install() {
     install -d "${D}/${bindir}"
     install -d "${D}/${datadir}/${BPN}"
 
-    install -m 0644 "${S}/README" "${D}/${datadir}/${BPN}"
-    install -m 0644 "${S}/README-architecture.txt" "${D}/${datadir}/${BPN}"
+    install -m 0644 "${S}/README.md" "${D}/${datadir}/${BPN}"
+    install -m 0644 "${S}/README-architecture.md" "${D}/${datadir}/${BPN}"
     install -m 0644 "${S}/README.pydoc" "${D}/${datadir}/${BPN}"
     install -m 0644 "${S}/LICENSE.md" "${D}/${datadir}/${BPN}"
 
     install -d "${D}/${datadir}/${BPN}/assists"
-    #install -m 0644 "${S}/assists/"* "${D}/${datadir}/${BPN}/assists/"
-    cp -r "${S}/assists/"* "${D}/${datadir}/${BPN}/assists/"
+    cp -r "${S}/lopper/assists/"* "${D}/${datadir}/${BPN}/assists/"
 
     install -d "${D}/${datadir}/${BPN}/lops"
-    install -m 0644 "${S}/lops/"* "${D}/${datadir}/${BPN}/lops/"
+    install -m 0644 "${S}/lopper/lops/"* "${D}/${datadir}/${BPN}/lops/"
 
     install -d "${D}/${datadir}/${BPN}/device-trees"
     install -m 0644 "${S}/device-trees/"* "${D}/${datadir}/${BPN}/device-trees/"
 
-    install -m 0644 "${S}/"lopper.ini "${D}/${datadir}/${BPN}/"
+    install -m 0644 "${S}/lopper/"lopper.ini "${D}/${datadir}/${BPN}/"
 
     install -m 0755 "${S}/"lopper*.py "${D}/${datadir}/${BPN}/"
     sed -i 's,#!/usr/bin/python3,#!/usr/bin/env python3,' ${D}/${datadir}/${BPN}/lopper.py
