@@ -57,7 +57,7 @@ do_install() {
 PACKAGES = ""
 
 # This is the default in most BSPs.  A MACHINE.conf can override this!
-FSBL_IMAGE_NAME ??= "fsbl"
+FSBL_IMAGE_NAME ??= "fsbl-${MACHINE}"
 
 inherit image-artifact-names
 
