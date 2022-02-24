@@ -30,13 +30,13 @@ python (){
             or d.getVar("SRC_URI").count("shell.json") != 1:
             raise bb.parse.SkipRecipe("Need one '.dtsi', one '.bit' and one 'shell.json' file added to SRC_URI")
 
-        d.setVar("DTSI_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split('file://') if '.dtsi' in a][0]))
-        d.setVar("BIT_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split('file://') if '.bit' in a][0]))
-        d.setVar("JSON_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split('file://') if 'shell.json' in a][0]))
+        d.setVar("DTSI_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.dtsi' in a][0].lstrip('file://')))
+        d.setVar("BIT_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.bit' in a][0].lstrip('file://')))
+        d.setVar("JSON_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if 'shell.json' in a][0].lstrip('file://')))
 
         #optional input
         if '.xclbin' in d.getVar("SRC_URI"):
-            d.setVar("XCL_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split('file://') if '.xclbin' in a][0]))
+            d.setVar("XCL_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.xclbin' in a][0].lstrip('file://')))
 }
 python do_configure() {
     import glob, re, shutil
