@@ -36,6 +36,7 @@ FILES_SOLIBSDEV = ""
 FILES:${PN} += "\
     ${libdir}/lib*.so \
     ${libdir}/lib*.so.* \
+    ${libdir}/ps_kernels_lib \
     /lib/*.so* "
 INSANE_SKIP:${PN} += "dev-so"
 
