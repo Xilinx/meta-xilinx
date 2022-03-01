@@ -1,0 +1,7 @@
+# Allegro VCU Encode, Decoder module drivers
+SUBSYSTEM=="allegro_encode_class", KERNEL=="allegroIP", MODE="0660", GROUP="video"
+SUBSYSTEM=="allegro_decode_class", KERNEL=="allegroDecodeIP", MODE="0660", GROUP="video"
+
+# Xilinx Video DMA driver
+SUBSYSTEM=="char", KERNEL=="dmaproxy", MODE="0660", GROUP="video"
+
