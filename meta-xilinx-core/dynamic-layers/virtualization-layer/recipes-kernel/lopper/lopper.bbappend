@@ -1,53 +1,43 @@
-DEPENDS = " \
-    dtc \
+SUMMARY = "Device Tree Lopper"
+DESCRIPTION = "Tool for manipulation of system device tree files"
+LICENSE = "BSD-3-Clause"
+SECTION = "bootloader"
+
+FILESEXTRAPATHS:append := ":${THISDIR}/lopper"
+
+SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master;protocol=https"
+SRCREV = "f70eb86385f49545070a84ad756902b3cd607e21"
+S = "${WORKDIR}/git"
+
+PV="v1.0.2+git${SRCPV}"
+
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=8e5f5f691f01c9fdfa7a7f2d535be619"
+
+RDEPENDS:${PN} = " \
+    python3-core \
     python3-dtc \
-    python3-flask \
-    python3-flask-restful \
-    python3-six \
-    python3-pandas \
-    python3-ruamel-yaml \
-    python3-anytree \
-    python3-pyyaml \
     python3-humanfriendly \
-"
-
-RDEPENDS:${PN} += " \
-    python3-flask \
-    python3-flask-restful \
-    python3-six \
-    python3-pandas \
     python3-ruamel-yaml \
     python3-anytree \
+    python3-six \
     python3-pyyaml \
-"
+    "
 
-SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master"
-SRCREV = "17350a773a73c426a826e32e4e093effc718ecf5"
+inherit setuptools3
+
+INHIBIT_PACKAGE_STRIP = "1"
 
 do_install() {
-    install -d "${D}/${bindir}"
-    install -d "${D}/${datadir}/${BPN}"
+        distutils3_do_install
 
-    install -m 0644 "${S}/README.md" "${D}/${datadir}/${BPN}"
-    install -m 0644 "${S}/README-architecture.md" "${D}/${datadir}/${BPN}"
-    install -m 0644 "${S}/README.pydoc" "${D}/${datadir}/${BPN}"
-    install -m 0644 "${S}/LICENSE.md" "${D}/${datadir}/${BPN}"
+        # we have to remove the vendor'd libfdt, since an attempt to strip it
+        # will be made, and it will fail in a cross environment.
+        rm -rf ${D}/${PYTHON_SITEPACKAGES_DIR}/${BPN}/vendor
+}
 
-    install -d "${D}/${datadir}/${BPN}/assists"
-    cp -r "${S}/lopper/assists/"* "${D}/${datadir}/${BPN}/assists/"
+BBCLASSEXTEND = "native nativesdk"
 
-    install -d "${D}/${datadir}/${BPN}/lops"
-    install -m 0644 "${S}/lopper/lops/"* "${D}/${datadir}/${BPN}/lops/"
-
-    install -d "${D}/${datadir}/${BPN}/device-trees"
-    install -m 0644 "${S}/device-trees/"* "${D}/${datadir}/${BPN}/device-trees/"
-
-    install -m 0644 "${S}/lopper/"lopper.ini "${D}/${datadir}/${BPN}/"
-
-    install -m 0755 "${S}/"lopper*.py "${D}/${datadir}/${BPN}/"
-    sed -i 's,#!/usr/bin/python3,#!/usr/bin/env python3,' ${D}/${datadir}/${BPN}/lopper.py
-    sed -i 's,#!/usr/bin/python3,#!/usr/bin/env python3,' ${D}/${datadir}/${BPN}/lopper_sanity.py
-
-    datadir_relpath=${@os.path.relpath(d.getVar('datadir'), d.getVar('bindir'))}
-    ln -s "${datadir_relpath}/${BPN}/lopper.py" "${D}/${bindir}/"
+python() {
+    d.delVarFlag('do_configure', 'noexec')
+    d.delVarFlag('do_compile', 'noexec')
 }
