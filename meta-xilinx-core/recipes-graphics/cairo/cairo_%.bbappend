@@ -5,6 +5,7 @@ DEFAULT_PACKAGECONFIG := "${PACKAGECONFIG}"
 PACKAGECONFIG_LIBMALI = " \
   ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11 xcb', '', d)} \
   egl glesv2 \
+  trace \
 "
 
 PACKAGECONFIG = "${@'${PACKAGECONFIG_LIBMALI}' if d.getVar('PREFERRED_PROVIDER_virtual/libgles1') == 'libmali-xlnx' else '${DEFAULT_PACKAGECONFIG}'}"
