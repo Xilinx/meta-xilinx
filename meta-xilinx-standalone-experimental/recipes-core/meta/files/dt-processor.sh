@@ -107,21 +107,21 @@ cortex_a53_linux() {
     if [ "${overlay_dtb}" = "true" ]; then
       if [ "${external_fpga}" = "true" ]; then
         LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- xlnx_overlay_dt ${machine} full \
-          || error "lopper.py failed"
+          || error "lopper failed"
       else
         LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dtb}" -- xlnx_overlay_dt ${machine} partial \
-          || error "lopper.py failed"
+          || error "lopper failed"
       fi
       dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi || error "dtc failed"
     elif [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" \
         -i "${lops_dir}/lop-domain-linux-a53.dts" "${system_dtb}" "${dtb_file}" \
-        || error "lopper.py failed"
+        || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
         -i "${lops_dir}/lop-domain-linux-a53.dts" "${system_dtb}" "${dtb_file}" \
-        || error "lopper.py failed"
+        || error "lopper failed"
     fi
     rm -f pl.dtsi lop-a53-imux.dts.dtb lop-domain-linux-a53.dts.dtb
   )
@@ -174,10 +174,10 @@ cortex_a53_baremetal() {
     if [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" "${system_dtb}" "${dtb_file}" \
-        || error "lopper.py failed"
+        || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
-        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+        "${system_dtb}" "${dtb_file}" || error "lopper failed"
     fi
     rm -f lop-a53-imux.dts.dtb
   )
@@ -186,10 +186,10 @@ cortex_a53_baremetal() {
   if [ -n "${domain_file}" ]; then
     ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
       -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" \
-      || error "lopper.py failed"
+      || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" \
-      || error "lopper.py failed"
+      || error "lopper failed"
   fi
 
   mv libxil.conf "${libxil}"
@@ -227,10 +227,10 @@ cortex_a53_freertos() {
     if [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" "${system_dtb}" "${dtb_file}" \
-        || error "lopper.py failed"
+        || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
-        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+        "${system_dtb}" "${dtb_file}" || error "lopper failed"
     fi
     rm -f lop-a53-imux.dts.dtb
   )
@@ -238,10 +238,10 @@ cortex_a53_freertos() {
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
     ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" || error "lopper.py failed"
+      -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" \
-      || error "lopper.py failed"
+      || error "lopper failed"
   fi
 
   mv libxil.conf "${libxil}"
@@ -282,21 +282,21 @@ cortex_a72_linux() {
       # a flag "external_fpga" which says apply overlay without loading the bit file.
       if [ "${external_fpga}" = "true" ]; then
         LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- xlnx_overlay_dt \
-          ${machine} full external_fpga || error "lopper.py failed"
+          ${machine} full external_fpga || error "lopper failed"
       else
         # If there is no external_fpga flag, then the default is full
         LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dtb}" -- xlnx_overlay_dt \
-          ${machine} full || error "lopper.py failed"
+          ${machine} full || error "lopper failed"
       fi
       dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi || error "dtc failed"
     elif [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" \
         -i "${lops_dir}/lop-domain-a72.dts" "${system_dtb}" "${dtb_file}" \
-        || error "lopper.py failed"
+        || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a72-imux.dts" \
-        -i "${lops_dir}/lop-domain-a72.dts" "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+        -i "${lops_dir}/lop-domain-a72.dts" "${system_dtb}" "${dtb_file}" || error "lopper failed"
     fi
     rm -f pl.dtsi lop-a72-imux.dts.dtb lop-domain-a72.dts.dtb
   )
@@ -335,10 +335,10 @@ cortex_a72_baremetal() {
     if [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --permissive --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" "${system_dtb}" "${dtb_file}" \
-        || error "lopper.py failed"
+        || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a72-imux.dts" \
-        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+        "${system_dtb}" "${dtb_file}" || error "lopper failed"
     fi
     rm -f lop-a72-imux.dts.dtb
   )
@@ -346,10 +346,10 @@ cortex_a72_baremetal() {
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
     ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" || error "lopper.py failed"
+      -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" \
-      || error "lopper.py failed"
+      || error "lopper failed"
   fi
 
   mv libxil.conf "${libxil}"
@@ -385,12 +385,12 @@ cortex_a72_freertos() {
   (
     cd dtb || error "Unable to cd to dtb dir"
     if [ -n "${domain_file}" ]; then
-      LOPPER_DTC_FLAGS="-b 0 -@" lopper.py -f  --permissive --enhanced -x '*.yaml' \
+      LOPPER_DTC_FLAGS="-b 0 -@" lopper -f  --permissive --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" "${system_dtb}" "${dtb_file}" \
-        || error "lopper.py failed"
+        || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a72-imux.dts" \
-        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+        "${system_dtb}" "${dtb_file}" || error "lopper failed"
     fi
     rm -f lop-a72-imux.dts.dtb
   )
@@ -398,10 +398,10 @@ cortex_a72_freertos() {
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
     ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" || error "lopper.py failed"
+      -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" \
-      || error "lopper.py failed"
+      || error "lopper failed"
   fi
 
   mv libxil.conf "${libxil}"
@@ -454,10 +454,10 @@ cortex_r5_baremetal() {
     if [ -n "$domain_file" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dtb}" "${dtb_file}" \
-        || error "lopper.py failed"
+        || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-r5-imux.dts" \
-        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+        "${system_dtb}" "${dtb_file}" || error "lopper failed"
     fi
     rm -f lop-r5-imux.dts.dtb
   )
@@ -465,10 +465,10 @@ cortex_r5_baremetal() {
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
     ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" || error "lopper.py failed"
+      -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
-      || error "lopper.py failed"
+      || error "lopper failed"
   fi
 
   mv libxil.conf "${libxil}"
@@ -506,10 +506,10 @@ cortex_r5_freertos() {
     if [ -n "$domain_file" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dtb}" "${dtb_file}" \
-        || error "lopper.py failed"
+        || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-r5-imux.dts" \
-        "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+        "${system_dtb}" "${dtb_file}" || error "lopper failed"
     fi
     rm -f lop-r5-imux.dts.dtb
   )
@@ -517,10 +517,10 @@ cortex_r5_freertos() {
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
     ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" || error "lopper.py failed"
+      -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
-      || error "lopper.py failed"
+      || error "lopper failed"
   fi
 
   mv libxil.conf "${libxil}"
@@ -550,7 +550,7 @@ process_microblaze() {
   (
     cd dtb || error "Unable to cd to dtb dir"
     ${lopper} -f --enhanced -i "${lops_dir}/lop-microblaze-yocto.dts" "${system_dtb}" \
-      || error "lopper.py failed"
+      || error "lopper failed"
     rm -f lop-microblaze-yocto.dts.dtb
   ) >microblaze.conf
 
@@ -575,16 +575,16 @@ pmu-microblaze() {
   # Build device tree
   (
     cd dtb || error "Unable to cd to dtb dir"
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" "${dtb_file}" || error "lopper failed"
   )
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
     ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx microblaze-pmu "${embeddedsw}" || error "lopper.py failed"
+      -- baremetaldrvlist_xlnx microblaze-pmu "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx microblaze-pmu "${embeddedsw}" \
-      || error "lopper.py failed"
+      || error "lopper failed"
   fi
 
   mv libxil.conf "${libxil}"
@@ -627,16 +627,16 @@ pmc-microblaze() {
   # Build device tree
   (
     cd dtb || error "Unable to cd to dtb dir"
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" "${dtb_file}" || error "lopper failed"
   )
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
     ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx microblaze-plm "${embeddedsw}" || error "lopper.py failed"
+      -- baremetaldrvlist_xlnx microblaze-plm "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx microblaze-plm "${embeddedsw}" \
-      || error "lopper.py failed"
+      || error "lopper failed"
   fi
 
   mv libxil.conf "${libxil}"
@@ -679,16 +679,16 @@ psm-microblaze() {
   # Build device tree
   (
     cd dtb || error "Unable to cd to dtb dir"
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" "${dtb_file}" || error "lopper.py failed"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" "${dtb_file}" || error "lopper failed"
   )
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
     ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx microblaze-psm "${embeddedsw}" || error "lopper.py failed"
+      -- baremetaldrvlist_xlnx microblaze-psm "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx microblaze-psm "${embeddedsw}" \
-      || error "lopper.py failed"
+      || error "lopper failed"
   fi
 
   mv libxil.conf "${libxil}"
@@ -854,14 +854,14 @@ gen_local_conf() {
 
 parse_args "$@"
 
-lopper=$(command -v lopper.py)
+lopper=$(command -v lopper)
 lopper_dir=$(dirname "${lopper}")
-lops_dir=$(dirname "${lopper_dir}")/share/lopper/lops
+lops_dir=$(ls -d $(dirname "${lopper_dir}")/lib/python*/site-packages/lopper/lops | head -n 1)
 embeddedsw=$(dirname "${lopper_dir}")/share/embeddedsw
 system_conf=""
 multiconf=""
 
-[ -z "${lopper}" ] && error "Unable to find lopper.py, please source the prestep environment"
+[ -z "${lopper}" ] && error "Unable to find lopper, please source the prestep environment"
 
 # Generate CPU list
 cd "${config_dir}" || exit
@@ -869,7 +869,7 @@ mkdir -p dtb multiconfig/includes
 (
   cd dtb || error "Unable to cd to dtb dir"
   ${lopper} -f --enhanced -i "${lops_dir}/lop-xilinx-id-cpus.dts" "${system_dtb}" \
-    /dev/null >"../cpu-list.tmp" || error "lopper.py failed"
+    /dev/null >"../cpu-list.tmp" || error "lopper failed"
   rm -f "lop-xilinx-id-cpus.dts.dtb"
 )
 

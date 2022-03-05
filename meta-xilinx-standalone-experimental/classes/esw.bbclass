@@ -125,7 +125,7 @@ python do_generate_driver_data() {
         bb.error("Couldn't find source dir %s" % d.getVar('OECMAKE_SOURCEPATH'))
 
     os.chdir(d.getVar('B'))
-    command = ["lopper.py"] + ["-f"] + [system_dt[0]] + ["--"] + ["baremetalconfig_xlnx.py"] + [machine] + [src_dir[0]]
+    command = ["lopper"] + ["-f"] + [system_dt[0]] + ["--"] + ["baremetalconfig_xlnx.py"] + [machine] + [src_dir[0]]
     subprocess.run(command, check = True)
     src_file = str("x") + driver_name.replace('-', '_') + str("_g.c")
     if os.path.exists(src_file):
