@@ -6,7 +6,7 @@ DEPENDS += "xilmailbox"
 
 do_configure:prepend() {
     cd ${S}
-    lopper.py ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
+    lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
     install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
 }
@@ -16,7 +16,7 @@ EXTRA_OECMAKE = "-DCUSTOM_LINKER_FILE=${@d.getVar('ESW_CUSTOM_LINKER_FILE')}"
 
 do_generate_eglist () {
     cd ${S}
-    lopper.py ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
+    lopper ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
 }
 
