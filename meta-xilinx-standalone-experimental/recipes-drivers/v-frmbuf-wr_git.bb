@@ -10,7 +10,7 @@ ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/v_frmbuf_wr/src/"
 ESW_COMPONENT_NAME = "libv_frmbuf_wr.a"
 
 do_configure:prepend() {
-    LOPPER_DTC_FLAGS="-b 0 -@" lopper.py ${DTS_FILE} -- baremetalconfig_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper ${DTS_FILE} -- baremetalconfig_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
     install -m 0755 xv_frmbufwr_g.c ${S}/${ESW_COMPONENT_SRC}/
 }

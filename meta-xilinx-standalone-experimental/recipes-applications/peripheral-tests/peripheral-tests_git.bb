@@ -8,7 +8,7 @@ inherit python3native
 
 do_configure:prepend() {
     cd ${S}
-    lopper.py ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
+    lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
     install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
 }
@@ -28,7 +28,7 @@ python do_generate_app_data() {
         bb.error("Couldn't find source dir %s" % d.getVar('OECMAKE_SOURCEPATH'))
 
     driver_name = d.getVar('REQUIRED_DISTRO_FEATURES')
-    command = ["lopper.py"] + ["-f"] + [system_dt[0]] + ["--"] + ["baremetal_gentestapp_xlnx"] + [machine] + [srcdir[0]]
+    command = ["lopper"] + ["-f"] + [system_dt[0]] + ["--"] + ["baremetal_gentestapp_xlnx"] + [machine] + [srcdir[0]]
     subprocess.run(command, check = True)
     with open("file_list.txt", 'r') as fd:
          for line in fd:
