@@ -1,6 +1,6 @@
 LINUX_VERSION = "5.15.19"
 KBRANCH="xlnx_rebase_v5.15_LTS"
-SRCREV = "70258f5b3efb2f37ffa6dc14adff4bfd1de2760e"
+SRCREV = "802aff9b79e15ede7cbb84ac784f943f5a66287a"
 
 KCONF_AUDIT_LEVEL="0"
 
