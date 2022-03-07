@@ -39,6 +39,7 @@ $0
     [-o <overlay_dtb>]      Generate overlay dts
     [-e <external_fpga>]    Apply a partial overlay
     [-m <machine>]          zynqmp or versal
+    [-l <config_file>]      write local.conf changes to this file
 
 EOF
   exit
@@ -47,7 +48,7 @@ EOF
 parse_args() {
   [ $# -eq 0 ] && usage
 
-  while getopts ":c:s:d:o:e:m:h" opt; do
+  while getopts ":c:s:d:o:e:m:l:h" opt; do
     case ${opt} in
       c) config_dir=$OPTARG ;;
       s) system_dtb=$OPTARG ;;
@@ -55,6 +56,7 @@ parse_args() {
       d) domain_file=$OPTARG ;;
       e) external_fpga=$OPTARG ;;
       m) machine=$OPTARG ;;
+      l) localconf=$OPTARG ;;
       h) usage ;;
       :) error "Missing argument for -$OPTARG" ;;
       \?) error "Invalid option -$OPTARG"
@@ -75,7 +77,7 @@ detect_machine() {
         pmc-microblaze | psm-microblaze)
           machine="versal" ;;
       esac
-    done <cpu-list.tmp
+    done <${cpulist}
   fi
 
   # Machine not provided and we cannot identify..
@@ -811,44 +813,41 @@ parse_cpus() {
         warn "Unknown CPU ${cpu}"
 
     esac
-  done <cpu-list.tmp
+  done <${cpulist}
 }
 
 gen_local_conf() {
-  echo
-  echo "To enable this, add the following to your local.conf:"
-  echo
-  echo "# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere"
-  echo "BASE_TMPDIR = \"\${TOPDIR}\""
-  [ -n "${system_conf}" ] && echo "require ${system_conf}"
-  echo "SYSTEM_DTFILE = \"${system_dtb}\""
-  echo "BBMULTICONFIG += \"${multiconf}\""
+  echo "# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere" >> $1
+  echo "BASE_TMPDIR = \"\${TOPDIR}\"" >> $1
+  [ -n "${system_conf}" ] && echo "require ${system_conf}" >> $1
+  echo "SYSTEM_DTFILE = \"${system_dtb}\"" >> $1
+  echo "BBMULTICONFIG += \"${multiconf}\"" >> $1
   if [ -n "${fsbl_mcdepends}" ]; then
-    echo "FSBL_DEPENDS = \"\""
-    echo "FSBL_MCDEPENDS = \"${fsbl_mcdepends}\""
-    echo "FSBL_DEPLOY_DIR = \"${fsbl_deploy_dir}\""
+    echo "FSBL_DEPENDS = \"\"" >> $1
+    echo "FSBL_MCDEPENDS = \"${fsbl_mcdepends}\"" >> $1
+    echo "FSBL_DEPLOY_DIR = \"${fsbl_deploy_dir}\"" >> $1
   fi
   if [ -n "${r5fsbl_mcdepends}" ]; then
-    echo "R5FSBL_DEPENDS = \"\""
-    echo "R5FSBL_MCDEPENDS = \"${r5fsbl_mcdepends}\""
-    echo "R5FSBL_DEPLOY_DIR = \"${r5fsbl_deploy_dir}\""
+    echo "R5FSBL_DEPENDS = \"\"" >> $1
+    echo "R5FSBL_MCDEPENDS = \"${r5fsbl_mcdepends}\"" >> $1
+    echo "R5FSBL_DEPLOY_DIR = \"${r5fsbl_deploy_dir}\"" >> $1
   fi
   if [ -n "${pmu_mcdepends}" ]; then
-    echo "PMU_DEPENDS = \"\""
-    echo "PMU_MCDEPENDS = \"${pmu_mcdepends}\""
-    echo "PMU_FIRMWARE_DEPLOY_DIR = \"${pmu_firmware_deploy_dir}\""
+    echo "PMU_DEPENDS = \"\"" >> $1
+    echo "PMU_MCDEPENDS = \"${pmu_mcdepends}\"" >> $1
+    echo "PMU_FIRMWARE_DEPLOY_DIR = \"${pmu_firmware_deploy_dir}\"" >> $1
   fi
   if [ -n "${plm_mcdepends}" ]; then
-    echo "PLM_DEPENDS = \"\""
-    echo "PLM_MCDEPENDS = \"${plm_mcdepends}\""
-    echo "PLM_DEPLOY_DIR = \"${plm_deploy_dir}\""
+    echo "PLM_DEPENDS = \"\"" >> $1
+    echo "PLM_MCDEPENDS = \"${plm_mcdepends}\"" >> $1
+    echo "PLM_DEPLOY_DIR = \"${plm_deploy_dir}\"" >> $1
   fi
   if [ -n "${psm_mcdepends}" ]; then
-    echo "PSM_DEPENDS = \"\""
-    echo "PSM_MCDEPENDS = \"${psm_mcdepends}\""
-    echo "PSM_FIRMWARE_DEPLOY_DIR = \"${psm_firmware_deploy_dir}\""
+    echo "PSM_DEPENDS = \"\"" >> $1
+    echo "PSM_MCDEPENDS = \"${psm_mcdepends}\"" >> $1
+    echo "PSM_FIRMWARE_DEPLOY_DIR = \"${psm_firmware_deploy_dir}\"" >> $1
   fi
-  [ "${machine}" = "versal" ] && echo "PDI_PATH = \"__PATH TO PDI FILE HERE__\""
+  [ "${machine}" = "versal" ] && echo "PDI_PATH = \"__PATH TO PDI FILE HERE__\"" >> $1
   echo
 }
 
@@ -863,13 +862,16 @@ multiconf=""
 
 [ -z "${lopper}" ] && error "Unable to find lopper, please source the prestep environment"
 
+cpulist=$(mktemp)
+
+priordir=$(pwd)
 # Generate CPU list
 cd "${config_dir}" || exit
 mkdir -p dtb multiconfig/includes
 (
   cd dtb || error "Unable to cd to dtb dir"
   ${lopper} -f --enhanced -i "${lops_dir}/lop-xilinx-id-cpus.dts" "${system_dtb}" \
-    /dev/null >"../cpu-list.tmp" || error "lopper failed"
+    /dev/null > ${cpulist} || error "lopper failed"
   rm -f "lop-xilinx-id-cpus.dts.dtb"
 )
 
@@ -877,7 +879,21 @@ detect_machine
 
 parse_cpus
 
-gen_local_conf
+cd ${priordir}
+if [ -z "${localconf}" ]; then
+  echo
+  echo "To enable this, add the following to your local.conf:"
+  echo
+  tmpfile=$(mktemp)
+  gen_local_conf ${tmpfile}
+  cat $tmpfile
+  rm $tmpfile
+else
+  echo
+  echo "Configuration for local.conf written to ${localconf}"
+  echo
+  gen_local_conf ${localconf}
+fi
 
 # Cleanup our temp file
-rm cpu-list.tmp
+rm ${cpulist}
