@@ -5,8 +5,9 @@ REQUIRED_DISTRO_FEATURES = "sdps"
 ESW_COMPONENT_SRC = "/lib/sw_services/xilffs/src/"
 ESW_COMPONENT_NAME = "libxilffs.a"
 
-EXTRA_OECMAKE += "-DXILFFS_use_mkfs=OFF"
-EXTRA_OECMAKE += "-DXILFFS_read_only=ON"
-EXTRA_OECMAKE += "-DXILFFS_word_access=OFF"
+PACKAGECONFIG ??= "read_only"
+PACKAGECONFIG[use_mkfs]   ="-DXILFFS_use_mkfs=ON,-DXILFFS_use_mkfs=OFF,,"
+PACKAGECONFIG[read_only]  ="-DXILFFS_read_only=ON,-DXILFFS_read_only=OFF,,"
+PACKAGECONFIG[word_access]="-DXILFFS_word_access=ON,-DXILFFS_word_access=OFF,,"
 
 DEPENDS += "xilstandalone libxil"
