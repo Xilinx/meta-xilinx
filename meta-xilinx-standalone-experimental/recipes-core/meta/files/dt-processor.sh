@@ -131,8 +131,6 @@ cortex_a53_linux() {
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 MACHINE = "${machine}-generic"
-# Override the SYSTEM_DTFILE for Linux builds
-SYSTEM_DTFILE:linux = "\${CONFIG_DTFILE}"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE:${machine}-generic = ""
 # We need u-boot to use the one we passed in
@@ -306,8 +304,6 @@ cortex_a72_linux() {
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 MACHINE = "${machine}-generic"
-# Override the SYSTEM_DTFILE for Linux builds
-SYSTEM_DTFILE:linux = "\${CONFIG_DTFILE}"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE:${machine}-generic = ""
 # We need u-boot to use the one we passed in
