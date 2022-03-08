@@ -39,6 +39,7 @@ $0
     [-o <overlay_dtb>]      Generate overlay dts
     [-e <external_fpga>]    Apply a partial overlay
     [-m <machine>]          zynqmp or versal
+    [-p <psu_init_path>]    Path to psu_init files, defaults to system_dtb path
     [-l <config_file>]      write local.conf changes to this file
 
 EOF
@@ -56,6 +57,7 @@ parse_args() {
       d) domain_file=$OPTARG ;;
       e) external_fpga=$OPTARG ;;
       m) machine=$OPTARG ;;
+      p) psu_init_path=$OPTARG ;;
       l) localconf=$OPTARG ;;
       h) usage ;;
       :) error "Missing argument for -$OPTARG" ;;
@@ -65,6 +67,9 @@ parse_args() {
 
   [ -f "${config_dir}/local.conf" ] || error "Invalid config dir: ${config_dir}"
   [ -f "${system_dtb}" ] || error "Unable to find: ${system_dtb}"
+  if [ -z "$psu_init_path" ]; then
+    psu_init_path=$(dirname ${system_dtb})
+  fi
 }
 
 detect_machine() {
@@ -195,7 +200,21 @@ cortex_a53_baremetal() {
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
 
-  cat <<EOF >"${conf_file}"
+  if [ "$1" = "fsbl" ]; then
+    if [ ! -e "${psu_init_path}/psu_init.c" ]; then
+      warn "Warning: Unable to find psu_init.c in ${psu_init_path}"
+    fi
+    if [ ! -e "${psu_init_path}/psu_init.h" ]; then
+      warn "Warning: Unable to find psu_init.h in ${psu_init_path}"
+    fi
+
+    cat <<EOF >"${conf_file}"
+PSU_INIT_PATH = "${psu_init_path}"
+EOF
+  else
+    cat /dev/null >"${conf_file}"
+  fi
+  cat <<EOF >>"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexa53-${machine}"
 DEFAULTTUNE = "cortexa53"
@@ -472,7 +491,21 @@ cortex_r5_baremetal() {
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
 
-  cat <<EOF >"${conf_file}"
+  if [ "$1" = "fsbl" ]; then
+    if [ ! -e "${psu_init_path}/psu_init.c" ]; then
+      warn "Warning: Unable to find psu_init.c in ${psu_init_path}"
+    fi
+    if [ ! -e "${psu_init_path}/psu_init.h" ]; then
+      warn "Warning: Unable to find psu_init.h in ${psu_init_path}"
+    fi
+
+    cat <<EOF >"${conf_file}"
+PSU_INIT_PATH = "${psu_init_path}"
+EOF
+  else
+    cat /dev/null >"${conf_file}"
+  fi
+  cat <<EOF >>"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "cortexr5-${machine}"
 DEFAULTTUNE = "cortexr5"
