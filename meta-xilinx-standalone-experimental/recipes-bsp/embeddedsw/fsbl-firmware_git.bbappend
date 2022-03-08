@@ -15,23 +15,23 @@ ESW_COMPONENT_SRC:zynqmp = "/lib/sw_apps/zynqmp_fsbl/src"
 
 DEPENDS += "xilstandalone xiltimer xilffs xilsecure xilpm"
 
-do_copy_psu_init[depends] += "device-tree:do_deploy"
-python do_copy_psu_init() {
-    import glob, subprocess, os
+python() {
+    psu_init_path = d.getVar('PSU_INIT_PATH')
+    if not psu_init_path:
+        psu_init_path = os.path.dirname(d.getVar('SYSTEM_DTFILE'))
 
-    system_dt = d.getVar('SYSTEM_DTFILE')
-    src_dir = glob.glob(d.getVar('OECMAKE_SOURCEPATH'))
-    psu_init_src = os.path.dirname(system_dt)
-    src_file = psu_init_src + str("/psu_init.c")
-    hdr_file = psu_init_src + str("/psu_init.h")
-    if os.path.exists(src_file):
-         command = ["install"] + ["-m"] + ["0755"] + [src_file] + [src_dir[0]]
-         subprocess.run(command, check = True)
-         command = ["install"] + ["-m"] + ["0755"] + [hdr_file] + [src_dir[0]]
-         subprocess.run(command, check = True)
+    psu_init_c = os.path.join(psu_init_path, 'psu_init.c')
+    psu_init_h = os.path.join(psu_init_path, 'psu_init.h')
+
+    if os.path.exists(psu_init_c):
+        d.appendVar('SRC_URI', ' file://%s' % psu_init_c)
+    else:
+        bb.warn("Unable to find %s, using default version" % psu_init_c)
+    if os.path.exists(psu_init_h):
+        d.appendVar('SRC_URI', ' file://%s' % psu_init_h)
+    else:
+        bb.warn("Unable to find %s, using default version" % psu_init_h)
 }
-addtask do_copy_psu_init before do_configure after do_prepare_recipe_sysroot
-do_prepare_recipe_sysroot[rdeptask] = "do_unpack"
 
 do_install() {
     :
