@@ -39,13 +39,13 @@ DTB_FILE_NAME = "${@os.path.basename(d.getVar('CONFIG_DTFILE')).replace('.dts', 
 DTB_BASE_NAME ?= "${MACHINE}-system${IMAGE_VERSION_SUFFIX}"
 
 do_install:prepend() {
-    for DTB_FILE in ${CONFIG_DTFILE}; do
+    for DTB_FILE in ${DTB_FILE_NAME}; do
         install -Dm 0644 ${DTB_FILE} ${D}/boot/devicetree/$(basename ${DTB_FILE})
     done
 }
 
 devicetree_do_deploy:append() {
-    for DTB_FILE in ${CONFIG_DTFILE}; do
+    for DTB_FILE in ${DTB_FILE_NAME}; do
         install -Dm 0644 ${DTB_FILE} ${DEPLOYDIR}/devicetree/$(basename ${DTB_FILE})
     done
 
