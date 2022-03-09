@@ -225,6 +225,10 @@ DISTRO = "${yocto_distro}"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
+
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -277,6 +281,10 @@ DISTRO = "xilinx-freertos"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
+
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -383,6 +391,10 @@ DISTRO = "xilinx-standalone-nolto"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
+
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -435,6 +447,10 @@ DISTRO = "xilinx-freertos"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
+
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -516,6 +532,10 @@ DISTRO = "$yocto_distro"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
+
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -568,6 +588,10 @@ DISTRO = "xilinx-freertos"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
+
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -637,6 +661,10 @@ DISTRO = "xilinx-standalone"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
+
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -689,6 +717,10 @@ DISTRO = "xilinx-standalone"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
+
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -741,6 +773,10 @@ DISTRO = "xilinx-standalone"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
+
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
