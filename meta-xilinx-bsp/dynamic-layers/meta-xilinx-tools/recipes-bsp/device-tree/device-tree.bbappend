@@ -1,4 +1,3 @@
-SRC_URI:append:ultra96 = "${@bb.utils.contains('MACHINE_FEATURES', 'mipi', ' file://mipi-support-ultra96.dtsi file://pl.dtsi', '', d)}"
 YAML_MAIN_MEMORY_CONFIG:ultra96 ?= "psu_ddr_0"
 YAML_CONSOLE_DEVICE_CONFIG:ultra96 ?= "psu_uart_1"
 YAML_DT_BOARD_FLAGS:ultra96 ?= "{BOARD avnet-ultra96-rev1}"
@@ -39,10 +38,3 @@ YAML_DT_BOARD_FLAGS:zcu670 ?= "{BOARD zcu670-revb}"
 YAML_DT_BOARD_FLAGS:vpk120 ?= "{BOARD versal-vpk120-reva}"
 YAML_DT_BOARD_FLAGS:vpk-sc ?= "{BOARD zynqmp-vpk120-reva}"
 
-do_configure:append:ultra96() {
-        if [ -e ${WORKDIR}/mipi-support-ultra96.dtsi ]; then
-               cp ${WORKDIR}/mipi-support-ultra96.dtsi ${DT_FILES_PATH}/mipi-support-ultra96.dtsi
-               cp ${WORKDIR}/pl.dtsi ${DT_FILES_PATH}/pl.dtsi
-               echo '/include/ "mipi-support-ultra96.dtsi"' >> ${DT_FILES_PATH}/${BASE_DTS}.dts
-        fi
-}
