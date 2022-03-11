@@ -13,6 +13,9 @@ SRCREV = "a9d452e772da6bc43f524230c79e6dc0f2442fd7"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
+# Sync to 2022.1 version
+SRC_URI += "file://0001-fix-timestamps-issues.patch"
+
 S  = "${WORKDIR}/git"
 
 COMPATIBLE_MACHINE = "^$"
