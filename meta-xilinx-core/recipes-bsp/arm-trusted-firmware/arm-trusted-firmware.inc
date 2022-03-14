@@ -68,6 +68,9 @@ EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.get
 EXTRA_OEMAKE:append:versal = "${@' VERSAL_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
 EXTRA_OEMAKE:append:versal = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
 
+ATF_PROVENCORE = "SPD=pncd ZYNQMP_BL32_MEM_BASE=0x70000000 ZYNQMP_BL32_MEM_SIZE=0x10000000 PRELOADED_BL33_BASE=0x80000000"
+EXTRA_OEMAKE:append = "${@bb.utils.contains('COMBINED_FEATURES', 'provencore', ' ${ATF_PROVENCORE}', '', d)}"
+
 do_configure() {
 	oe_runmake clean -C ${S} BUILD_BASE=${B} PLAT=${PLATFORM}
 }
