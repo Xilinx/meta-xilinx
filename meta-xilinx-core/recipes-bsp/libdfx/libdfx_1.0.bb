@@ -8,7 +8,7 @@ BRANCH ?= "xlnx_rel_v2022.1"
 REPO ?= "git://github.com/Xilinx/libdfx.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
-SRCREV = "80f87f807d2506733f1095607be117073efdd94f"
+SRCREV = "6d423bbafd9ac14194a6a80f4d276c9024d2defa"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
@@ -18,17 +18,17 @@ S = "${WORKDIR}/git"
 
 inherit cmake
 
-RDEPENDS:${PN} = "${PN}-staticdev"
-PACKAGES =+ "${PN}-examples"
-
 do_install () {
     install -d ${D}${libdir}
     install -d ${D}${includedir}
     install -d ${D}${bindir}
+    oe_libinstall -so -C ${B}/src/ libdfx ${D}${libdir}
     install -m 0644 ${B}/src/libdfx.a ${D}${libdir}
     install -m 0644 ${B}/include/libdfx.h ${D}${includedir}
     install -m 0755 ${B}/apps/dfx_app ${D}${bindir}
 }
 
-ALLOW_EMPTY:${PN} = "1"
-ALLOW_EMPTY:${PN}-examples = "1"
+SOLIBSDEV = ".so"
+FILES:${PN} += "${libdir}/libdfx.so ${bindir}/*"
+FILES:${PN}-staticdev = "${libdir}/libdfx.a"
+FILES:${PN}-dev = "${includedir}"
