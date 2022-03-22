@@ -33,7 +33,7 @@ LIC_FILES_CHKSUM[release-2020.1]    = '8b565227e1264d677db8f841c2948cba'
 LIC_FILES_CHKSUM[master-rel-2020.2] = '3a6e22aebf6516f0f74a82e1183f74f8'
 LIC_FILES_CHKSUM[xlnx_rel_v2021.1]  = "73e8997d53c2137fdeea4331a73f40fa"
 LIC_FILES_CHKSUM[xlnx_rel_v2021.2]  = 'ba23909a4bcaf754a2e1ba996f1ca1b0'
-LIC_FILES_CHKSUM[xlnx_rel_v2022.1-next] = '87cee16dbcd2c2f7ceef30163838056e'
+LIC_FILES_CHKSUM[xlnx_rel_v2022.1-next] = 'f3d40ec01cd45728f200f85c1e7a2ded'
 LIC_FILES_CHKSUM[master-next]       = '87cee16dbcd2c2f7ceef30163838056e'
 LIC_FILES_CHKSUM[master]            = '593ba3fb8be51271097ddaa4b9c65cde'
 LIC_FILES_CHKSUM ??= "file://license.txt;md5=${@d.getVarFlag('LIC_FILES_CHKSUM', d.getVar('BRANCH')) or '0'}"
