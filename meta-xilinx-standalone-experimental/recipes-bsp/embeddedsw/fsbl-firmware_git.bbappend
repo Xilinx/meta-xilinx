@@ -33,6 +33,16 @@ python() {
         bb.warn("Unable to find %s, using default version" % psu_init_h)
 }
 
+do_compile:prepend() {
+    if [ -e ${WORKDIR}/psu_init.c ]; then
+        install -m 0644 ${WORKDIR}/psu_init.c ${S}/${ESW_COMPONENT_SRC}
+    fi
+
+    if [ -e ${WORKDIR}/psu_init.h ]; then
+        install -m 0644 ${WORKDIR}/psu_init.h ${S}/${ESW_COMPONENT_SRC}
+    fi
+}
+
 do_install() {
     :
 }
