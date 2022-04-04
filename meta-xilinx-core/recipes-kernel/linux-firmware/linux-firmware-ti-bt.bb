@@ -53,6 +53,10 @@ do_install() {
 #  11.8.32   =   WL180x, WL183x, WL185x PG2.1 or PG2.2, 8.32 ROM Version
 PACKAGES =+ "${PN}-wl180x ${PN}-license"
 
+# Ensure if someone installs the main one, they get the specific named package
+ALLOW_EMPTY:${PN} = "1"
+RDEPENDS:${PN} += "${PN}-wl180x"
+
 FILES:${PN}-license = "${nonarch_base_libdir}/firmware/License.ti-bt"
 
 FILES:${PN}-wl180x = "${nonarch_base_libdir}/firmware/TIInit_11.8.32.bts \
