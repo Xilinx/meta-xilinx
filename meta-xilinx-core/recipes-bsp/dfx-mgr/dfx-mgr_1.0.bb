@@ -8,8 +8,8 @@ REPO ?= "git://github.com/Xilinx/dfx-mgr.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-BRANCH = "master"
-SRCREV = "4e6eef210db4dc0399a70688f17413850012f3a1"
+BRANCH = "xlnx_rel_v2022.1"
+SRCREV = "b82419d93ec3cff6fe8095b5298a28bffb75b184"
 SOMAJOR = "1"
 SOMINOR = "0"
 SOVERSION = "${SOMAJOR}.${SOMINOR}"
@@ -50,9 +50,6 @@ do_install(){
 	
        	oe_soinstall ${B}/src/libdfx-mgr.so.${SOVERSION} ${D}${libdir}
 
-	install -m 0644 ${S}/opendfx-graph/include/graph_api.h ${D}${includedir}
-	oe_soinstall ${B}/opendfx-graph/libdfxgraph.so.${SOVERSION} ${D}${libdir}
-	
 	install -m 0755 ${S}/src/daemon.conf ${D}${sysconfdir}/dfx-mgrd/
 
  	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
@@ -65,9 +62,8 @@ do_install(){
 	install -m 0755 ${WORKDIR}/dfx-mgr.service ${D}${systemd_system_unitdir}
 }
 
-PACKAGES =+ "libdfx-mgr libdfxgraph"
+PACKAGES =+ "libdfx-mgr"
 
 FILES:${PN} += "${base_libdir}/firmware/xilinx"
 FILES:${PN} += "${@bb.utils.contains('DISTRO_FEATURES','sysvinit','${sysconfdir}/init.d/dfx-mgr.sh', '', d)} ${systemd_system_unitdir}"
 FILES:libdfx-mgr = "${libdir}/libdfx-mgr.so.${SOVERSION} ${libdir}/libdfx-mgr.so.${SOMAJOR}"
-FILES:libdfxgraph = "${libdir}/libdfxgraph.so.${SOVERSION} ${libdir}/libdfxgraph.so.${SOMAJOR}"
