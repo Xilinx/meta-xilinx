@@ -123,11 +123,15 @@ cortex_a53_linux() {
     elif [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" \
-        -i "${lops_dir}/lop-domain-linux-a53.dts" "${system_dtb}" "${dtb_file}" \
+        -i "${lops_dir}/lop-domain-linux-a53.dts" \
+        -i "${lops_dir}/lop-domain-linux-a53-prune.dts" \
+	"${system_dtb}" "${dtb_file}" \
         || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
-        -i "${lops_dir}/lop-domain-linux-a53.dts" "${system_dtb}" "${dtb_file}" \
+        -i "${lops_dir}/lop-domain-linux-a53.dts" \
+        -i "${lops_dir}/lop-domain-linux-a53-prune.dts" \
+        "${system_dtb}" "${dtb_file}" \
         || error "lopper failed"
     fi
     rm -f pl.dtsi lop-a53-imux.dts.dtb lop-domain-linux-a53.dts.dtb
