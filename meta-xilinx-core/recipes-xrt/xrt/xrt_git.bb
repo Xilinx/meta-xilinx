@@ -18,24 +18,29 @@ inherit cmake
 BBCLASSEXTEND = "native nativesdk"
 
 # util-linux is for libuuid-dev.
-DEPENDS = "libdrm opencl-headers ocl-icd opencl-clhpp boost util-linux git-replacement-native protobuf-native protobuf elfutils libffi"
+DEPENDS = "libdrm opencl-headers ocl-icd opencl-clhpp boost util-linux git-replacement-native protobuf-native protobuf elfutils libffi rapidjson"
 RDEPENDS:${PN} = "bash ocl-icd boost-system boost-filesystem zocl"
 
 EXTRA_OECMAKE += " \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_EXPORT_COMPILE_COMANDS=ON \
 		"
-
 PACKAGE_ARCH:versal-ai-core = "${SOC_VARIANT_ARCH}"
 EXTRA_OECMAKE:append:versal-ai-core += "-DXRT_AIE_BUILD=true"
 TARGET_CXXFLAGS:append:versal-ai-core += "-DXRT_ENABLE_AIE"
 DEPENDS:append:versal-ai-core += " libmetal libxaiengine aiefal"
 RDEPENDS:${PN}:append:versal-ai-core += " libxaiengine aiefal"
+EXTRA_OECMAKE:append:versal += "-DXRT_LIBDFX=true"
+EXTRA_OECMAKE:append:zynqmp += "-DXRT_LIBDFX=true"
+DEPENDS:append:versal += "libdfx"
+DEPENDS:append:zynqmp += "libdfx"
+
 
 FILES_SOLIBSDEV = ""
 FILES:${PN} += "\
     ${libdir}/lib*.so \
     ${libdir}/lib*.so.* \
+    ${libdir}/ps_kernels_lib \
     /lib/*.so* "
 INSANE_SKIP:${PN} += "dev-so"
 
