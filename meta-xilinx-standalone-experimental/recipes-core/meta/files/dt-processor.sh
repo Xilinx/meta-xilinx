@@ -41,6 +41,7 @@ $0
     [-m <machine>]          zynqmp or versal
     [-p <psu_init_path>]    Path to psu_init files, defaults to system_dtb path
     [-l <config_file>]      write local.conf changes to this file
+    [-P <petalinux_schema>] Path to petalinux schema file
 
 EOF
   exit
@@ -49,7 +50,7 @@ EOF
 parse_args() {
   [ $# -eq 0 ] && usage
 
-  while getopts ":c:s:d:o:e:m:l:h" opt; do
+  while getopts ":c:s:d:o:e:m:l:h:P:" opt; do
     case ${opt} in
       c) config_dir=$OPTARG ;;
       s) system_dtb=$OPTARG ;;
@@ -59,6 +60,7 @@ parse_args() {
       m) machine=$OPTARG ;;
       p) psu_init_path=$OPTARG ;;
       l) localconf=$OPTARG ;;
+      P) petalinux_schema=$OPTARG ;;
       h) usage ;;
       :) error "Missing argument for -$OPTARG" ;;
       \?) error "Invalid option -$OPTARG"
@@ -920,6 +922,13 @@ gen_local_conf() {
   echo
 }
 
+gen_petalinux_conf() {
+  cd "${config_dir}" || exit
+  (
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dtb}" -- petalinuxconfig_xlnx ${petalinux_schema} \
+      || error "lopper failed"
+  )
+}
 parse_args "$@"
 
 lopper=$(command -v lopper)
@@ -962,6 +971,13 @@ else
   echo "Configuration for local.conf written to ${localconf}"
   echo
   gen_local_conf ${localconf}
+fi
+
+if [ -n "${petalinux_schema}" ]; then
+  echo
+  echo "Generating petalinux config file:"
+  echo
+  gen_petalinux_conf
 fi
 
 # Cleanup our temp file
