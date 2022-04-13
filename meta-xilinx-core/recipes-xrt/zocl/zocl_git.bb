@@ -1,6 +1,7 @@
 SUMMARY  = "Xilinx Runtime(XRT) driver module"
 DESCRIPTION = "Xilinx Runtime driver module provides memory management and compute unit schedule"
 
+COMPATIBLE_MACHINE:microblaze = "none"
 
 require recipes-xrt/xrt/xrt.inc
 
