@@ -40,6 +40,7 @@ $0
     [-e <external_fpga>]    Apply a partial overlay
     [-m <machine>]          zynqmp or versal
     [-p <psu_init_path>]    Path to psu_init files, defaults to system_dtb path
+    [-i <pdu_path>]         Path to the pdi file
     [-l <config_file>]      write local.conf changes to this file
     [-P <petalinux_schema>] Path to petalinux schema file
 
@@ -50,7 +51,7 @@ EOF
 parse_args() {
   [ $# -eq 0 ] && usage
 
-  while getopts ":c:s:d:o:e:m:l:h:P:" opt; do
+  while getopts ":c:s:d:o:e:m:l:hP:p:i:" opt; do
     case ${opt} in
       c) config_dir=$OPTARG ;;
       s) system_dtb=$OPTARG ;;
@@ -59,11 +60,12 @@ parse_args() {
       e) external_fpga=$OPTARG ;;
       m) machine=$OPTARG ;;
       p) psu_init_path=$OPTARG ;;
+      i) pdi_path=$OPTARG ;;
       l) localconf=$OPTARG ;;
       P) petalinux_schema=$OPTARG ;;
       h) usage ;;
       :) error "Missing argument for -$OPTARG" ;;
-      \?) error "Invalid option -$OPTARG"
+      \?) error "Invalid option -$OPTARG" ;;
     esac
   done
 
@@ -71,6 +73,9 @@ parse_args() {
   [ -f "${system_dtb}" ] || error "Unable to find: ${system_dtb}"
   if [ -z "$psu_init_path" ]; then
     psu_init_path=$(dirname ${system_dtb})
+  fi
+  if [ -z "$pdi_path" ]; then
+    pdi_path=$(dirname ${system_dtb})
   fi
 }
 
@@ -296,6 +301,15 @@ EOF
 
 cortex_a72_linux() {
   info "cortex-a72 for Linux [ $1 ]"
+
+  # Find the first file ending in .pdi
+  full_pdi_path=$(ls ${pdi_path}/*.pdi 2>/dev/null | head -n 1)
+  if [ -z "${full_pdi_path}" ]; then
+    warn "Warning: Unable to find a pdi file in ${pdi_path}"
+    full_pdi_path="__PATH TO PDI FILE HERE__"
+  elif [ "${full_pdi_path}" != "$(ls ${pdi_path}/*.pdi 2>/dev/null)" ]; then
+    warn "Warning: multiple PDI files found, using first found $(basename ${full_pdi_path})."
+  fi
 
   if [ "$1" = "None" ]; then
     dtb_file="cortexa72-${machine}-linux.dtb"
@@ -922,7 +936,7 @@ gen_local_conf() {
     echo "PSM_MCDEPENDS = \"${psm_mcdepends}\"" >> $1
     echo "PSM_FIRMWARE_DEPLOY_DIR = \"${psm_firmware_deploy_dir}\"" >> $1
   fi
-  [ "${machine}" = "versal" ] && echo "PDI_PATH = \"__PATH TO PDI FILE HERE__\"" >> $1
+  [ "${machine}" = "versal" ] && echo "PDI_PATH = \"${full_pdi_path}\"" >> $1
   echo
 }
 
