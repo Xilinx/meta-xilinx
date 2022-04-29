@@ -1,0 +1,2 @@
+# Device rules for AIE drivers.
+ACTION=="add", SUBSYSTEM=="aie", KERNEL=="aie[0-9]*", MODE="0660", GROUP="aie"
