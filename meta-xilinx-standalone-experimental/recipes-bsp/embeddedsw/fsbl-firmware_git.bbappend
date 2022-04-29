@@ -37,7 +37,7 @@ python() {
         d.prependVar('FILESEXTRAPATHS', '%s:' % psu_init_path)
 }
 
-do_compile:prepend() {
+do_configure:prepend() {
     if [ -e ${WORKDIR}/psu_init.c ]; then
         install -m 0644 ${WORKDIR}/psu_init.c ${S}/${ESW_COMPONENT_SRC}
     else
