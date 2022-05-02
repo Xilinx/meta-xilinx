@@ -1,0 +1,13 @@
+/ {
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		pnc-reserved-memory@70000000{
+			compatible = "pnc,secure-memory";
+			reg = <0x0 0x70000000 0x0 0x0FF00000>;
+			no-map;
+		};
+	};
+};
