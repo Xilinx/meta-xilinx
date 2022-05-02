@@ -4,14 +4,14 @@ SECTION = "kernel/modules"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=eb723b61539feef013de476e68b5c50a"
 
-XLNX_DP_VERSION = "5.10.0"
+XLNX_DP_VERSION = "5.15.19"
 PV = "${XLNX_DP_VERSION}"
 
 S = "${WORKDIR}/git"
 
-BRANCH ?= "xlnx_rel_v2021.2"
+BRANCH ?= "xlnx_rel_v2022.1"
 REPO   ?= "git://github.com/xilinx/dp-modules.git;protocol=https"
-SRCREV ?= "46d4790c3d37ad4b878c5a1704df26edb56314f5"
+SRCREV ?= "9a025fdb7134a8af12de8d69f5a428c8284ae9b3"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
