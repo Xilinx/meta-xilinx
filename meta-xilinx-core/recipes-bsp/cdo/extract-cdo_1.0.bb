@@ -1,4 +1,4 @@
-DESCRIPTION = "Recipe to copy external cdos"
+DESCRIPTION = "Recipe to extract pmc_cdo for qemu usage"
 
 LICENSE = "CLOSED"
 
@@ -21,14 +21,19 @@ BOOTGEN_CMD ?= "bootgen"
 BOOTGEN_ARGS ?= "-arch versal"
 BOOTGEN_OUTFILE ?= "${DEPLOY_DIR_IMAGE}/boot.bin"
 
-#The following line creates the pmc_cdo.bin file at the same dir as the boot.bin which is DEPLOY_DIR_IMAGE
+# bootgen extracts the pmc_cdo file from the boot.bin.  By default this
+# happens in the same directory as the boot.bin.  We need to move it to
+# this directory, as do_compile should never write into a deploy dir
 do_compile() {
-    ${BOOTGEN_CMD} ${BOOTGEN_ARGS} -dump ${BOOTGEN_OUTFILE} pmc_cdo
+    ${BOOTGEN_CMD} ${BOOTGEN_ARGS} -dump_dir ${B} -dump ${BOOTGEN_OUTFILE} pmc_cdo
 }
+
+do_install[noexec] = '1'
 
 do_deploy() {
     install -d ${DEPLOYDIR}/CDO
-    install -m 0644 ${DEPLOY_DIR_IMAGE}/pmc_cdo.bin ${DEPLOYDIR}/CDO/pmc_cdo.bin
+    install -m 0644 ${B}/pmc_cdo.bin ${DEPLOYDIR}/CDO/pmc_cdo.bin
+    install -m 0644 ${B}/pmc_cdo.bin ${DEPLOYDIR}/pmc_cdo.bin
 }
 
-addtask do_deploy after do_install
+addtask do_deploy after do_compile
