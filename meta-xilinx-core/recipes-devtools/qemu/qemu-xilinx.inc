@@ -30,9 +30,17 @@ S = "${WORKDIR}/git"
 PACKAGECONFIG:remove = "kvm"
 PACKAGECONFIG:append = " fdt sdl gcrypt pie"
 
+
 PACKAGECONFIG[gcrypt] = "--enable-gcrypt,--disable-gcrypt,libgcrypt,"
 PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,libsdl2"
 PACKAGECONFIG[pie] = "--enable-pie,--disable-pie,,"
+
+# Remove when version is in sync with core oe-core
+PACKAGECONFIG:remove:class-nativesdk= "pulsedio"
+PACKAGECONFIG:remove:class-native = "pulsedio"
+PACKAGECONFIG[alsa] = "--audio-drv-list=alsa,,alsa-lib"
+PACKAGECONFIG[pulsedio] = "--audio-drv-list=pa,,pulseaudio"
+PACKAGECONFIG[selinux] = ""
 
 DISABLE_STATIC:pn-${PN} = ""
 
