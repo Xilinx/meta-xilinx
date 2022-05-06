@@ -2,7 +2,7 @@ UBOOT_VERSION = "v2021.01"
 
 UBRANCH ?= "master"
 
-SRCREV = "771e1b36ea91069cf48ca7bf763373b3444e7b31"
+SRCREV = "a40ff93a4d77f90815d15be2bfbce525f66eb9ac"
 
 include u-boot-xlnx.inc
 include u-boot-spl-zynq-init.inc
