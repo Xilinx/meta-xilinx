@@ -1,5 +1,5 @@
-meta-xilinx-standalone-experimental
-===================================
+# meta-xilinx-standalone-experimental
+
 This layer contains experimental items that may eventually be added
 to the meta-xilinx-standalone layer.  The components in this layer
 may or may not be buildable as they may require unreleased code.
@@ -9,9 +9,9 @@ this should be considered to be a preview release only.  For instance,
 some components may not be buildable, expect APIs to change on various
 parts and pieces.
 
-Build Instructions
-------------------
-Note: to use this layer you must REMOVE meta-xilinx-tools from your
+## Build Instructions
+
+**Note:** to use this layer you must REMOVE meta-xilinx-tools from your
 project.  meta-xilinx-tools is not compatible with this experimental
 approach.  You may also have to remove other layers that depend
 on meta-xilinx-tools, such as meta-som.
@@ -32,27 +32,18 @@ To install the setup SDK:
 Then follow the instructions in the 'prestep/README-setup' file.
 
 
-Maintainers, Mailing list, Patches
-==================================
 
-Please send any patches, pull requests, comments or questions for this 
-layer to the [meta-xilinx mailing list]
-(https://lists.yoctoproject.org/listinfo/meta-xilinx):
-
-	meta-xilinx@lists.yoctoproject.org
-
-Maintainers:
-
-	Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
-	Mark Hatle <mark.hatle@xilinx.com>
-
-Dependencies
-============
+## Dependencies
 
 This layer depends on:
 
-     URI: git://git.yoctoproject.org/poky
+	URI: git://git.openembedded.org/bitbake
 
-     URI: git://git.yoctoproject.org/meta-xilinx/meta-xilinx-standalone
+	URI: git://git.openembedded.org/openembedded-core
+	layers: meta
+	branch: master or xilinx current release version (e.g. hosister)
 
-     URI: git://git.yoctoproject.org/meta-xilinx/meta-xilinx-bsp
+	URI: git://git.yoctoproject.org/meta-xilinx.git
+	layers: meta-xilinx-core, meta-xilinx-bsp, meta-xilinx-standalone
+	branch: master or xilinx current release version (e.g. hosister)
+
