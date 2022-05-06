@@ -1,24 +1,8 @@
-meta-xilinx-core
-================
+# meta-xilinx-core
 
-This layer provides support for MicroBlaze, Zynq and ZynqMP.
+This layer provides support for MicroBlaze, Zynq, ZynqMP and Versal architectures.
 
-
-Maintainers, Mailing list, Patches
-==================================
-
-Please send any patches, pull requests, comments or questions for this layer to
-the [meta-xilinx mailing list](https://lists.yoctoproject.org/listinfo/meta-xilinx):
-
-	meta-xilinx@lists.yoctoproject.org
-
-Maintainers:
-
-	Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
-	Mark Hatle <mark.hatle@xilinx.com>
-
-Dependencies
-============
+## Dependencies
 
 This layer depends on:
 
@@ -26,9 +10,10 @@ This layer depends on:
 
 	URI: git://git.openembedded.org/openembedded-core
 	layers: meta
+	branch: master or xilinx current release version (e.g. hosister)
 
-Configuring Machines
-====================
+
+## Configuring Machines
 
 All machines that use meta-xilinx-tools should be derived from one of the
 following: microblaze-generic, zynq-generic, zynqmp-generic, or 
@@ -58,8 +43,7 @@ require you to specify the path to a PDI file using PDI_PATH.  The XSCT
 version will extract the PDI automatically.
 
 
-Recipe Licenses
-===============
+## Recipe Licenses
 
 Due to licensing restrictions some recipes in this layer rely on closed source
 or restricted content provided by Xilinx. In order to use these recipes you must

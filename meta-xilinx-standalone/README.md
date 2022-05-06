@@ -1,5 +1,4 @@
-meta-xilinx-standalone
-======================
+# meta-xilinx-standalone
 
 This layer is meant to augment Yocto/OE functionality to provide a 
 Baremetal/Standalone Toolchain as well as a generic version of various
@@ -8,15 +7,14 @@ firmware that is required to boot a ZynqMP or Versal system.
 For optimized versions of the firmware and additional components you must
 use the meta-xilinx-tools layer.
 
-Building
---------
+## Building
+
 The software in this layer may be used in either a standard single
 configuration build, or a multiconfig build.  A multiconfig build, along
 with the MACHINES defined in meta-xilinx-bsps will automate the generation
 of certain firmwares.
 
-Toolchains
-----------
+## Toolchains
 
 To build standalone toolchains similar to those embedded with the
 Xilinx xsct tooling:
@@ -29,8 +27,7 @@ Use one of the custom machines:
 
 MACHINE=<machine> DISTRO=xilinx-standalone bitbake meta-toolchain
 
-Standalone Firmware
--------------------
+## Standalone Firmware
 
 The standalone firmware is a genericly configured firmware, it can be
 build either in a single standalong configuration, or via an automated
@@ -89,25 +86,17 @@ MACHINE=zynqmp-generic bitbake fsbl pmufw
 MACHINE=versal-generic bitbake plmfw psmfw
 
 
-Maintainers, Mailing list, Patches
-==================================
-
-Please send any patches, pull requests, comments or questions for this 
-layer to the [meta-xilinx mailing list]
-(https://lists.yoctoproject.org/listinfo/meta-xilinx):
-
-	meta-xilinx@lists.yoctoproject.org
-
-Maintainers:
-
-	Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
-	Mark Hatle <mark.hatle@xilinx.com>
-
-Dependencies
-============
+## Dependencies
 
 This layer depends on:
 
-     URI: git://git.yoctoproject.org/poky
+	URI: git://git.openembedded.org/bitbake
 
-     URI: git://git.yoctoproject.org/meta-xilinx/meta-xilinx-bsp
+	URI: git://git.openembedded.org/openembedded-core
+	layers: meta
+	branch: master or xilinx current release version (e.g. hosister)
+
+	URI: git://git.yoctoproject.org/meta-xilinx.git
+	layers: meta-xilinx-microblaze, meta-xilinx-core, meta-xilinx-bsp
+	branch: master or xilinx current release version (e.g. hosister)
+
