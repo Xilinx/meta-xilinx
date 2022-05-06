@@ -1,35 +1,21 @@
-meta-xilinx-contrib
-===================
+# meta-xilinx-contrib
 
 This layer is a contribution layer to support for MicroBlaze, Zynq and ZynqMP architectures.
-This layer depends on meta-xilinx-bsp layer.
+Any patches from open source contributors for vendor board can be added here.
 
-Supported Boards/Machines
-=========================
+## Supported Boards/Machines
 
-* Zynq:
-  * Digilent Zybo Linux BD Reference design
-  * [Avnet MiniZed](conf/machine/minized-zynq7.conf) - `minized-zynq7`
-
-Maintainers, Mailing list, Patches
-==================================
-
-Please send any patches, comments or questions for this layer to
-the [meta-xilinx mailing list](https://lists.yoctoproject.org/listinfo/meta-xilinx):
-
-	meta-xilinx@lists.yoctoproject.org with '[meta-xilinx-contrib]' in the subject.
+**Boards/Machines supported by this layer:**
 
 
-Subscribe to mailing list at
-https://lists.yoctoproject.org/listinfo/meta-xilinx
+| Platform | Vendor Board Variant | Machine Configuration file | Board Device tree |
+| ---| --- | ---| ---------- |
+|MicroBlaze|[Xilinx ML605 (QEMU)](https://www.digikey.com/en/products/detail/amd-xilinx/EK-V6-ML605-G/2175174)|[ml605-qemu-microblazeel](conf/machine/ml605-qemu-microblazeel.conf)|NA|
+|Zynq-7000|NA|NA|NA|
+|ZynqMP|NA|NA|NA|
+|Versal|NA|NA|NA|
 
-Maintainers:
-
-	Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
-	Mark Hatle <mark.hatle@xilinx.com>
-
-Dependencies
-============
+## Dependencies
 
 This layer depends on:
 
@@ -37,7 +23,9 @@ This layer depends on:
 
 	URI: git://git.openembedded.org/openembedded-core
 	layers: meta
+	branch: master or xilinx current release version (e.g. hosister)
 
-	URI: git://git.openembedded.org/meta-xilinx
-
+	URI: git://git.yoctoproject.org/meta-xilinx.git
+	layers: meta-xilinx-microblaze, meta-xilinx-core, meta-xilinx-vendor
+	branch: master or xilinx current release version (e.g. hosister)
 
