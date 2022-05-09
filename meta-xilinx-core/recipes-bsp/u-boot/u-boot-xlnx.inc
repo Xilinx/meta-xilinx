@@ -19,7 +19,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/u-boot:"
 
 SYSROOT_DIRS += "/boot"
 
-BASE_DTS ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE') or "system-top")}"
+BASE_DTS ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE') or '').rstrip('.dtb') or 'system-top'}"
 DTB_PATH ?= "/boot/devicetree/"
 DTB_NAME ?= ""
 
