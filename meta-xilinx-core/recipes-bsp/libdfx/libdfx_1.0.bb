@@ -8,7 +8,7 @@ BRANCH ?= "xlnx_rel_v2022.1"
 REPO ?= "git://github.com/Xilinx/libdfx.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
-SRCREV = "6d423bbafd9ac14194a6a80f4d276c9024d2defa"
+SRCREV = "f3c30294b96544081a64b054d4bc3db4ab8202b7"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
@@ -28,7 +28,3 @@ do_install () {
     install -m 0755 ${B}/apps/dfx_app ${D}${bindir}
 }
 
-SOLIBSDEV = ".so"
-FILES:${PN} += "${libdir}/libdfx.so ${bindir}/*"
-FILES:${PN}-staticdev = "${libdir}/libdfx.a"
-FILES:${PN}-dev = "${includedir}"
