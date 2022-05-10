@@ -8,7 +8,7 @@ BRANCH ?= "master"
 REPO ?= "git://github.com/Xilinx/libdfx.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
-SRCREV = "fb8fe48d6ce4a3bb99a6c3d9f17921cecdfe95fc"
+SRCREV = "f3c30294b96544081a64b054d4bc3db4ab8202b7"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
@@ -28,7 +28,3 @@ do_install () {
     install -m 0755 ${B}/apps/dfx_app ${D}${bindir}
 }
 
-SOLIBSDEV = ".so"
-FILES:${PN} += "${libdir}/libdfx.so ${bindir}/*"
-FILES:${PN}-staticdev = "${libdir}/libdfx.a"
-FILES:${PN}-dev = "${includedir}"
