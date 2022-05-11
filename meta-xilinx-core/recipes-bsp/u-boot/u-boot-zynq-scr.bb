@@ -27,8 +27,8 @@ KERNEL_BOOTCMD:zynq ?= "bootm"
 KERNEL_BOOTCMD:versal ?= "booti"
 KERNEL_BOOTCMD:microblaze ?= "bootm"
 
-BOOTMODE ?= "sd"
-BOOTFILE_EXT ?= ".${SOC_FAMILY}"
+BOOTMODE ?= "generic"
+BOOTFILE_EXT ?= ""
 
 #Make this value to "1" to skip appending base address to ddr offsets.
 SKIP_APPEND_BASEADDR ?= "0"
