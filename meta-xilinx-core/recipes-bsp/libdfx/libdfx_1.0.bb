@@ -8,7 +8,7 @@ BRANCH ?= "xlnx_rel_v2022.1"
 REPO ?= "git://github.com/Xilinx/libdfx.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
-SRCREV = "1a1454ed0c3a56912250182f591c051f355fbf47"
+SRCREV = "96d8462a72b9b64e1057f8864795b5f60a2fc884"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
