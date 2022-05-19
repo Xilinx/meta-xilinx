@@ -9,7 +9,7 @@ ESW_COMPONENT_NAME = "libxil.a"
 
 DEPENDS += "xilstandalone "
 REQUIRED_DISTRO_FEATURES = "${DISTRO_FEATURES}"
-PACKAGECONFIG ?= "${DISTRO_FEATURES} ${MACHINE_FEATURES}"
+PACKAGECONFIG ?= "${DISTRO_FEATURES}"
 
 do_configure:prepend() {
     LOPPER_DTC_FLAGS="-b 0 -@" lopper ${DTS_FILE} -- baremetal_xparameters_xlnx.py ${ESW_MACHINE} ${S}
