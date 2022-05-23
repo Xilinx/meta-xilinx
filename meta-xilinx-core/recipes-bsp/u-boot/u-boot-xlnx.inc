@@ -32,9 +32,10 @@ python __anonymous () {
        d.appendVarFlag('do_configure', 'depends', ' virtual/dtb:do_populate_sysroot')
        if d.getVar("DTB_NAME") is not None:
            d.setVar('DTB_NAME', d.getVar('BASE_DTS')+ '.dtb')
-}
 
-require u-boot-xlnx-blob.inc
+    if d.getVar('UBOOT_IMAGE_BLOB') == "1":
+        d.appendVarFlag('do_compile', 'postfuncs', ' do_blob_generate')
+}
 
 UBOOTELF_NODTB_IMAGE ?= "u-boot-nodtb.elf"
 UBOOTELF_NODTB_BINARY ?= "u-boot"
