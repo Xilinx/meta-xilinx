@@ -123,6 +123,12 @@ void print_usage(char *prg)
 		fprintf(stderr, "(Read PL Configuration Registers)\n");
 		fprintf(stderr, "%s -b top.bit.bin -r\n", prg);
 	}
+
+	fprintf(stderr, "(Remove Partial Overlay)\n");
+	fprintf(stderr, "%s -R -n PR0\n", prg);
+	fprintf(stderr, "(Remove Full Overlay)\n");
+	fprintf(stderr, "%s -R -n Full\n", prg);
+	fprintf(stderr, "Note: %s -R is responsible for only removing the dtbo file from the livetree. it will not remove the PL logic from the FPGA region.\n", prg);
 	fprintf(stderr, " \n");
 }
 
