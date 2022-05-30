@@ -20,7 +20,7 @@ DEVICE_TREE_NAME ?= "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/dtb', 'dev
 RAMDISK_IMAGE ?= "rootfs.cpio.gz.u-boot"
 RAMDISK_IMAGE1 ?= "ramdisk.cpio.gz.u-boot"
 
-PXERAMDISK_IMAGE ?= "${'@${RAMDISK_IMAGE1}' if d.getVar('INITRAMFS_IMAGE') and d.getVar('INITRAMFS_IMAGE').find('initramfs') > 0 else '${RAMDISK_IMAGE}'}"
+PXERAMDISK_IMAGE ?= "${@'${RAMDISK_IMAGE1}' if d.getVar('INITRAMFS_IMAGE') and d.getVar('INITRAMFS_IMAGE').find('initramfs') > 0 else '${RAMDISK_IMAGE}'}"
 
 KERNEL_BOOTCMD:zynqmp ?= "booti"
 KERNEL_BOOTCMD:zynq ?= "bootm"
