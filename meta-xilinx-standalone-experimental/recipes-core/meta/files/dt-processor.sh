@@ -107,10 +107,12 @@ cortex_a53_linux() {
 
   if [ "$1" = "None" ]; then
     dtb_file="cortexa53-${machine}-linux.dtb"
+    dts_file="cortexa53-${machine}-linux.dts"
     system_conf=conf/cortexa53-${machine}-linux.conf
     conf_file=cortexa53-${machine}-linux.conf
   else
     dtb_file="cortexa53-${machine}-$1-linux.dtb"
+    dts_file="cortexa53-${machine}-$1-linux.dts"
     multiconf="${multiconf} cortexa53-${machine}-linux"
     conf_file=multiconfig/cortexa53-${machine}-$1-linux.conf
   fi
@@ -134,11 +136,22 @@ cortex_a53_linux() {
         -i "${lops_dir}/lop-domain-linux-a53-prune.dts" \
 	"${system_dtb}" "${dtb_file}" \
         || error "lopper failed"
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+        -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" \
+        -i "${lops_dir}/lop-domain-linux-a53.dts" \
+        -i "${lops_dir}/lop-domain-linux-a53-prune.dts" \
+	"${system_dtb}" "${dts_file}" \
+        || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
         -i "${lops_dir}/lop-domain-linux-a53.dts" \
         -i "${lops_dir}/lop-domain-linux-a53-prune.dts" \
         "${system_dtb}" "${dtb_file}" \
+        || error "lopper failed"
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
+        -i "${lops_dir}/lop-domain-linux-a53.dts" \
+        -i "${lops_dir}/lop-domain-linux-a53-prune.dts" \
+        "${system_dtb}" "${dts_file}" \
         || error "lopper failed"
     fi
     rm -f pl.dtsi lop-a53-imux.dts.dtb lop-domain-linux-a53.dts.dtb
@@ -313,10 +326,12 @@ cortex_a72_linux() {
 
   if [ "$1" = "None" ]; then
     dtb_file="cortexa72-${machine}-linux.dtb"
+    dts_file="cortexa72-${machine}-linux.dts"
     system_conf=conf/cortexa72-${machine}-linux.conf
     conf_file=cortexa72-${machine}-linux.conf
   else
     dtb_file="cortexa72-${machine}-$1-linux.dtb"
+    dts_file="cortexa72-${machine}-$1-linux.dts"
     multiconf="${multiconf} cortexa72-${machine}-linux"
     conf_file=multiconfig/cortexa72-${machine}-$1-linux.conf
   fi
@@ -343,11 +358,21 @@ cortex_a72_linux() {
         -i "${lops_dir}/lop-domain-a72-prune.dts" \
 	"${system_dtb}" "${dtb_file}" \
         || error "lopper failed"
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+        -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" \
+        -i "${lops_dir}/lop-domain-a72.dts" \
+        -i "${lops_dir}/lop-domain-a72-prune.dts" \
+	"${system_dtb}" "${dts_file}" \
+        || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a72-imux.dts" \
         -i "${lops_dir}/lop-domain-a72.dts" \
         -i "${lops_dir}/lop-domain-a72-prune.dts" \
 	"${system_dtb}" "${dtb_file}" || error "lopper failed"
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a72-imux.dts" \
+        -i "${lops_dir}/lop-domain-a72.dts" \
+        -i "${lops_dir}/lop-domain-a72-prune.dts" \
+	"${system_dtb}" "${dts_file}" || error "lopper failed"
     fi
     rm -f pl.dtsi lop-a72-imux.dts.dtb lop-domain-a72.dts.dtb
   )
