@@ -5,7 +5,7 @@
 IMAGE_CLASSES += "qemuboot-xilinx"
 
 # depend on qemu-helper-native, which will depend on QEMU
-EXTRA_IMAGEDEPENDS += "qemu-helper-native"
+EXTRA_IMAGEDEPENDS += "qemu-helper-native:do_addto_recipe_sysroot"
 
 PREFERRED_PROVIDER_qemu-helper-native = "qemu-xilinx-helper-native"
 PREFERRED_PROVIDER_qemu = "qemu-xilinx"

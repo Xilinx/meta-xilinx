@@ -4,8 +4,6 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-DEPENDS:append := "virtual/kernel ${@oe.utils.str_filter_out(d.getVar("BPN"), d.getVar("EXTRA_IMAGEDEPENDS"), d)}"
-
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynq = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
@@ -13,6 +11,18 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit deploy image-wic-utils
+
+def remove_task_from_depends(d):
+    extra_imagedepends = d.getVar('EXTRA_IMAGEDEPENDS') or ''
+    uenv_depends = ''
+    for imagedepend in extra_imagedepends.split():
+        if imagedepend == d.getVar("BPN"):
+            continue
+        elif ':' in imagedepend:
+            uenv_depends += ' %s' % imagedepend.split(':')[0]
+        else:
+            uenv_depends += ' %s' % imagedepend
+    return uenv_depends
 
 def uboot_boot_cmd(d):
     if d.getVar("KERNEL_IMAGETYPE") in ["uImage", "fitImage"]:
@@ -66,6 +76,8 @@ def uenv_populate(d):
         env["uenvcmd"] = "run loadfpga && run bootkernel"
 
     return env
+
+DEPENDS:append := "virtual/kernel ${@remove_task_from_depends(d)}"
 
 # bootargs, default to booting with the rootfs device being partition 2
 KERNEL_BOOTARGS:zynq = "earlyprintk console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootwait"
