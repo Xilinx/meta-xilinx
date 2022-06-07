@@ -1,5 +1,5 @@
 ATF_VERSION = "2.6"
-SRCREV = "145c6169fdf6a2855e0bc9b2ee889a23be751966"
+SRCREV = "afccfa4bc4ebabe0163279ee0984206d055d57c8"
 BRANCH = "xlnx_rebase_v2.6"
 LIC_FILES_CHKSUM = "file://license.rst;md5=1dd070c98a281d18d9eefd938729b031"
 
