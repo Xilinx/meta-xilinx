@@ -6,9 +6,7 @@ require conf/dtb-embeddedsw.inc
 SRCREV_FORMAT = "src_decouple"
 
 S = "${WORKDIR}/git"
-#B = "${WORKDIR}/build"
-B = "${S}"
-
+B = "${WORKDIR}/build"
 OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
 LICFILENAME = "license.txt"
 
