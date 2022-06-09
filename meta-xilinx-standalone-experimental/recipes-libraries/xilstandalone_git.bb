@@ -7,8 +7,10 @@ DEPENDS += "libgloss"
 
 do_configure:prepend() {
     # This script should also not rely on relative paths and such
+    (
     cd ${S}
     lopper ${DTS_FILE} -- baremetal_bspconfig_xlnx ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
     install -m 0755 MemConfig.cmake ${S}/${ESW_COMPONENT_SRC}/
     install -m 0755 *.c ${S}/${ESW_COMPONENT_SRC}/common/
+    )
 }
