@@ -32,4 +32,5 @@ YAML_DT_BOARD_FLAGS:k26 ?= "{BOARD zynqmp-sm-k26-reva}"
 YAML_DT_BOARD_FLAGS:zcu670 ?= "{BOARD zcu670-revb}"
 YAML_DT_BOARD_FLAGS:vpk120 ?= "{BOARD versal-vpk120-reva}"
 YAML_DT_BOARD_FLAGS:vpk-sc ?= "{BOARD zynqmp-vpk120-reva}"
-
+YAML_DT_BOARD_FLAGS:vpk180 ?= "{BOARD versal-vpk180-reva}"
+YAML_DT_BOARD_FLAGS:vhk158 ?= "{BOARD versal-vhk158-reva}"
