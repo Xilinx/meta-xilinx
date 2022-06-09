@@ -7,10 +7,12 @@ DEPENDS += "libxil xiltimer"
 inherit python3native
 
 do_configure:prepend() {
+    (
     cd ${S}
     lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
     install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+    )
 }
 
 python do_generate_app_data() {

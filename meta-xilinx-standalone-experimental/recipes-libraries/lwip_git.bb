@@ -15,10 +15,12 @@ EXTRA_OECMAKE:append:xilinx-freertos += "-Dlwip_api_mode=SOCKET_API"
 
 do_configure:prepend() {
     # This script should also not rely on relative paths and such
+    (
     cd ${S}
     lopper ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
     install -m 0755 xtopology_g.c ${S}/${ESW_COMPONENT_SRC}/
+    )
 }
 
 do_install() {

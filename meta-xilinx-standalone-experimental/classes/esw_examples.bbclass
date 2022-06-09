@@ -3,10 +3,12 @@ inherit esw deploy python3native
 DEPENDS += "python3-dtc-native python3-pyyaml-native xilstandalone libxil xiltimer"
 
 do_configure:prepend() {
+    (
     cd ${S}
     lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
     install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+    )
 }
 
 ESW_CUSTOM_LINKER_FILE ?= "None"
