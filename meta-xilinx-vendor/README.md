@@ -16,11 +16,15 @@ This layer provides support for MicroBlaze, Zynq, ZynqMP and Versal architecture
 ||[Avnet/Digilent ZedBoard](https://www.xilinx.com/products/boards-and-kits/1-8dyf-11.html)|[zedboard-zynq7](conf/machine/zedboard-zynq7.conf)|NA|
 ||[Digilent Zybo](https://www.xilinx.com/support/university/boards-portfolio/xup-boards/DigilentZYBO.html)|[zybo-zynq7](conf/machine/zybo-zynq7.conf)|`zynq-zybo.dtb`|
 ||[Digilent Zybo Linux BD](https://www.xilinx.com/support/university/boards-portfolio/xup-boards/DigilentZYBO.html)|[zybo-linux-bd-zynq7](conf/machine/zybo-linux-bd-zynq7.conf)|NA|
-|ZynqMP|[Avent Ultra96](https://www.xilinx.com/products/boards-and-kits/1-vad4rl.html)|[ultra96-zynqmp](conf/machine/ultra96-zynqmp.conf)|`avnet-ultra96-rev1`|
+|ZynqMP|[Avent Ultra96 v1](https://www.xilinx.com/products/boards-and-kits/1-vad4rl.html)|[ultra96-zynqmp](conf/machine/ultra96-zynqmp.conf)|`avnet-ultra96-rev1`|
 |Versal|NA|NA|NA|
 
 > **Note:** 
-`For Zybo Linux BD reference design, please see meta-xilinx-contrib layer`
+```
+1. For Zybo Linux BD reference design refer meta-xilinx-contrib layer.
+2. Ultra96 Machine configuration file is unsupported and is compatible with v1 board only. Refer to meta-avnet for v2 board.
+```
+
 
 ## Dependencies
 
