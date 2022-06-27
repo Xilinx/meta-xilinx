@@ -46,6 +46,7 @@ def get_default_image_boot_files(d):
     # kernel images
     kerneltypes = set((d.getVar("KERNEL_IMAGETYPE") or "").split())
     kerneltypes |= set((d.getVar("KERNEL_IMAGETYPES") or "").split())
+    kerneltypes |= set((d.getVar("KERNEL_ALT_IMAGETYPE") or "").split())
     for i in kerneltypes:
         files.append(i)
 
