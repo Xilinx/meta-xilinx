@@ -12,6 +12,10 @@ QB_MACHINE_XILINX:microblaze = "-M microblaze-fdt-plnx"
 
 # defaults
 QB_DEFAULT_KERNEL ?= "none"
+QB_DEFAULT_KERNEL:zynq ?= "${@'zImage' if \
+		d.getVar('INITRAMFS_IMAGE_BUNDLE') != '1' else 'zImage-initramfs-${MACHINE}.bin'}"
+QB_DEFAULT_KERNEL:microblaze ?= "${@'simpleImage.mb' if \
+		d.getVar('INITRAMFS_IMAGE_BUNDLE') != '1' else 'simpleImage.mb-initramfs-${MACHINE}.bin'}"
 
 inherit qemuboot
 
