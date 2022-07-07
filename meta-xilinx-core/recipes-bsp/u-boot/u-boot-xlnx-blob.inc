@@ -1,6 +1,7 @@
 # U-boot fitimage/blob generator
 
-UBOOT_IMAGE_BLOB ?= ""
+UBOOT_IMAGE_BLOB_DEFAULT = ""
+UBOOT_IMAGE_BLOB ?= "${UBOOT_IMAGE_BLOB_DEFAULT}"
 DT_BLOB_DIR ?= "${B}/arch/arm/dts/dt-blob"
 UBOOT_BLOB_NAME ?= "${MACHINE}-fit-dtb${IMAGE_VERSION_SUFFIX}.blob"
 
