@@ -130,13 +130,13 @@ cortex_a53_linux() {
       fi
       dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi || error "dtc failed"
     elif [ -n "${domain_file}" ]; then
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" \
         -i "${lops_dir}/lop-domain-linux-a53.dts" \
         -i "${lops_dir}/lop-domain-linux-a53-prune.dts" \
 	"${system_dtb}" "${dtb_file}" \
         || error "lopper failed"
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" \
         -i "${lops_dir}/lop-domain-linux-a53.dts" \
         -i "${lops_dir}/lop-domain-linux-a53-prune.dts" \
@@ -201,7 +201,7 @@ cortex_a53_baremetal() {
   (
     cd dtb || error "Unable to cd to dtb dir"
     if [ -n "${domain_file}" ]; then
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" "${system_dtb}" "${dtb_file}" \
         || error "lopper failed"
     else
@@ -213,7 +213,7 @@ cortex_a53_baremetal() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
       -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" \
       || error "lopper failed"
   else
@@ -272,7 +272,7 @@ cortex_a53_freertos() {
   (
     cd dtb || error "Unable to cd to dtb dir"
     if [ -n "${domain_file}" ]; then
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" "${system_dtb}" "${dtb_file}" \
         || error "lopper failed"
     else
@@ -284,7 +284,7 @@ cortex_a53_freertos() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
       -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" \
@@ -352,13 +352,13 @@ cortex_a72_linux() {
       fi
       dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi || error "dtc failed"
     elif [ -n "${domain_file}" ]; then
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" \
         -i "${lops_dir}/lop-domain-a72.dts" \
         -i "${lops_dir}/lop-domain-a72-prune.dts" \
 	"${system_dtb}" "${dtb_file}" \
         || error "lopper failed"
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" \
         -i "${lops_dir}/lop-domain-a72.dts" \
         -i "${lops_dir}/lop-domain-a72-prune.dts" \
@@ -407,7 +407,7 @@ cortex_a72_baremetal() {
   (
     cd dtb || error "Unable to cd to dtb dir"
     if [ -n "${domain_file}" ]; then
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --permissive --enhanced -x '*.yaml' \
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f   --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" "${system_dtb}" "${dtb_file}" \
         || error "lopper failed"
     else
@@ -419,7 +419,7 @@ cortex_a72_baremetal() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
       -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" \
@@ -463,7 +463,7 @@ cortex_a72_freertos() {
   (
     cd dtb || error "Unable to cd to dtb dir"
     if [ -n "${domain_file}" ]; then
-      LOPPER_DTC_FLAGS="-b 0 -@" lopper -f  --permissive --enhanced -x '*.yaml' \
+      LOPPER_DTC_FLAGS="-b 0 -@" lopper -f --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" "${system_dtb}" "${dtb_file}" \
         || error "lopper failed"
     else
@@ -475,7 +475,7 @@ cortex_a72_freertos() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
       -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" \
@@ -534,7 +534,7 @@ cortex_r5_baremetal() {
   (
     cd dtb || error "Unable to cd to dtb dir"
     if [ -n "$domain_file" ]; then
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dtb}" "${dtb_file}" \
         || error "lopper failed"
     else
@@ -546,7 +546,7 @@ cortex_r5_baremetal() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
       -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
@@ -604,7 +604,7 @@ cortex_r5_freertos() {
   (
     cd dtb || error "Unable to cd to dtb dir"
     if [ -n "$domain_file" ]; then
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --permissive --enhanced -x '*.yaml' \
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dtb}" "${dtb_file}" \
         || error "lopper failed"
     else
@@ -616,7 +616,7 @@ cortex_r5_freertos() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
       -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
@@ -684,7 +684,7 @@ pmu-microblaze() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
       -- baremetaldrvlist_xlnx microblaze-pmu "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx microblaze-pmu "${embeddedsw}" \
@@ -740,7 +740,7 @@ pmc-microblaze() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
       -- baremetaldrvlist_xlnx microblaze-plm "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx microblaze-plm "${embeddedsw}" \
@@ -796,7 +796,7 @@ psm-microblaze() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --permissive --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
       -- baremetaldrvlist_xlnx microblaze-psm "${embeddedsw}" || error "lopper failed"
   else
     ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx microblaze-psm "${embeddedsw}" \
