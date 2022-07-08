@@ -23,13 +23,17 @@ S = "${WORKDIR}/git"
 inherit cmake update-rc.d systemd
 
 DEPENDS += " libwebsockets inotify-tools libdfx zocl libdrm"
+RDEPENDS:${PN} += " fru-print"
 EXTRA_OECMAKE += " \
                -DCMAKE_SYSROOT:PATH=${RECIPE_SYSROOT} \
 		"
 INITSCRIPT_NAME = "dfx-mgr.sh"
 INITSCRIPT_PARAMS = "start 99 S ."
 
-SRC_URI:append = " file://dfx-mgr.service"
+SRC_URI:append = " \
+	file://dfx-mgr.service \
+	file://xlnx-firmware-detect \
+	"
 SYSTEMD_PACKAGES="${PN}"
 SYSTEMD_SERVICE:${PN}="dfx-mgr.service"
 SYSTEMD_AUTO_ENABLE:${PN}="enable"
@@ -58,6 +62,8 @@ do_install(){
 	fi
 
 	install -m 0755 ${S}/src/dfx-mgr.sh ${D}${bindir}/
+	install -m 0755 ${WORKDIR}/xlnx-firmware-detect ${D}${bindir}
+
 	install -d ${D}${systemd_system_unitdir} 
 	install -m 0644 ${WORKDIR}/dfx-mgr.service ${D}${systemd_system_unitdir}
 }

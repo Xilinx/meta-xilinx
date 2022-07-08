@@ -9,6 +9,7 @@ Description=dfx-mgrd Dynamic Function eXchange
 Documentation=https://github.com/Xilinx/dfx-mgr
 
 [Service]
+ExecStartPre=-/usr/bin/xlnx-firmware-detect
 ExecStart=/usr/bin/dfx-mgrd
 
 [Install]

@@ -1,0 +1,92 @@
+#!/bin/sh
+
+# (C) Copyright 2022 Xilinx, Inc.
+# SPDX-License-Identifier: MIT
+
+# read values from dfx-mgr conf file
+conffile="/etc/dfx-mgrd/daemon.conf"
+if [ ! -f "${conffile}" ]; then
+        echo "dfx-mgrd configuration file not found: ${conffile}"
+        exit 1
+fi
+
+fwbasedir=$(grep "firmware_location" ${conffile} | sed 's/.*:.*\[\"\(.*\)\"\],\?/\1/')
+if [ -z "${fwbasedir}" ]; then
+        echo "Property 'firmware_location' not found in ${conffile}"
+        exit 1
+fi
+
+fwfile=$(grep "default_accel" ${conffile} | sed 's/.*:.*\"\(.*\)\",\?/\1/')
+if [ -z "${fwfile}" ]; then
+        echo "Property 'default_accel' not found in ${conffile}"
+        exit 1
+fi
+
+# check if default firmware is already set and present
+if [ -f "${fwfile}" ]; then
+    fwname=$(cat ${fwfile})
+    fwdir="${fwbasedir}/${fwname}"
+    if [ -n "${fwname}" ] && [ -d "${fwdir}" ]; then
+        echo "Default firmware detected: ${fwname}"
+        exit 0
+    fi
+fi
+
+# search for firmware based on EEPROM board id
+echo "Trying to detect default firmware based on EEPROM..."
+
+# check if board is a SOM product
+eeprom=$(ls /sys/bus/i2c/devices/*50/eeprom 2> /dev/null)
+if [ -n "${eeprom}" ]; then
+    boardid=$(fru-print -d ${eeprom} -f product | awk -F- '{ print tolower($2) }')
+    validids="k26"
+    valid=0
+    for id in ${validids}; do
+        if [ "${id}" = "${boardid}" ]; then
+            echo "Known SOM Board ID found: ${boardid}"
+            valid=1
+            break
+        fi
+    done
+    if [ ${valid} -eq 1 ]; then
+        fwname="${boardid}-starter-kits"
+        fwdir="${fwbasedir}/${fwname}"
+        if [ ! -d "${fwdir}" ]; then
+            echo "No default firmware named ${fwname} found in ${fwbasedir}"
+            exit 1
+        fi
+        echo "Default firmware detected: ${fwname}"
+        echo "${fwname}" > "${fwfile}"
+        exit 0
+    fi
+fi
+
+# check if board is a System Controller product
+eeprom=$(ls /sys/bus/i2c/devices/*54/eeprom 2> /dev/null)
+if [ -n "${eeprom}" ]; then
+    boardid=$(fru-print -d ${eeprom} -f product | tr '[:upper:]' '[:lower:]')
+    revision=$(fru-print -d ${eeprom} -f revision | tr '[:upper:]' '[:lower:]')
+    validids="vpk120 vpk180 vhk158"
+    valid=0
+    for id in ${validids}; do
+        if [ "${id}" = "${boardid}" ]; then
+            echo "Known System Controller Board ID found: ${boardid} rev ${revision}"
+            valid=1
+            break
+        fi
+    done
+    if [ ${valid} -eq 1 ]; then
+        fwname="${boardid}-${revision}"
+        fwdir="${fwbasedir}/${fwname}"
+        if [ ! -d "${fwdir}" ]; then
+            echo "No default firmware named ${fwname} found in ${fwbasedir}"
+            exit 1
+        fi
+        echo "Default firmware detected: ${fwname}"
+        echo "${fwname}" > "${fwfile}"
+        exit 0
+    fi
+fi
+
+echo "No known Board ID found"
+exit 1
