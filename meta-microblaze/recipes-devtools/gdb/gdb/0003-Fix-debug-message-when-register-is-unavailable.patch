@@ -1,4 +1,4 @@
-From 80c56ef8463c23f51759f5c64ce0165e259a4071 Mon Sep 17 00:00:00 2001
+From da93f5715ff333ac4807b73fe678dde21fb3bd6c Mon Sep 17 00:00:00 2001
 From: Nathan Rossi <nathan.rossi@petalogix.com>
 Date: Tue, 8 May 2012 18:11:17 +1000
 Subject: [PATCH 03/10] Fix debug message when register is unavailable
