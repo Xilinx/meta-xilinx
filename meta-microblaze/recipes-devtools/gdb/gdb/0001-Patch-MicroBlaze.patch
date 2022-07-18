@@ -1,8 +1,8 @@
-From 699248a2fc4b9334f5042e1657116ac6b67b7321 Mon Sep 17 00:00:00 2001
+From b7b3c1eb19b770b2d700dd3c9fa23a7ae225a72b Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
-Date: Mon, 23 Jan 2017 19:07:44 +0530
-Subject: [PATCH 01/10] Add initial port of linux gdbserver add
- gdb_proc_service_h to gdbserver microblaze-linux
+Date: Thu, 16 Jun 2022 09:50:14 +0530
+Subject: [PATCH 01/10] [Patch,MicroBlaze] : Add initial port of linux
+ gdbserver add gdb_proc_service_h to gdbserver microblaze-linux
 
 gdbserver needs to initialise the microblaze registers
 
@@ -451,7 +451,7 @@ index 00000000000..bd8a4384424
 +32:slr
 +32:shr
 diff --git a/gdbserver/Makefile.in b/gdbserver/Makefile.in
-index 2bd3a578932..7bee1f1894e 100644
+index 2bd3a578932..46b5a0c7c60 100644
 --- a/gdbserver/Makefile.in
 +++ b/gdbserver/Makefile.in
 @@ -184,7 +184,8 @@ SFILES = \
@@ -468,7 +468,7 @@ index 2bd3a578932..7bee1f1894e 100644
  	$(srcdir)/../gdb/nat/linux-namespaces.c \
  	$(srcdir)/../gdb/nat/linux-osdata.c \
  	$(srcdir)/../gdb/nat/linux-personality.c \
-+        $(srcdir)/../gdb/nat/microblaze-linux.c \        
++        $(srcdir)/../gdb/nat/microblaze-linux.c \
  	$(srcdir)/../gdb/nat/mips-linux-watch.c \
  	$(srcdir)/../gdb/nat/ppc-linux.c \
  	$(srcdir)/../gdb/nat/riscv-linux-tdesc.c \
