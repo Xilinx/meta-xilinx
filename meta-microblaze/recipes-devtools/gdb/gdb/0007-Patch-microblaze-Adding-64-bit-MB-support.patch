@@ -1,4 +1,4 @@
-From f9e5f9f884470d0a216126b347b4699d6051fcdd Mon Sep 17 00:00:00 2001
+From 0eea9a3f068837d4792719a8f9ba15736938eea4 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Thu, 31 Jan 2019 14:36:00 +0530
 Subject: [PATCH 07/10] [Patch, microblaze]: Adding 64 bit MB support Added new
@@ -16,6 +16,9 @@ Conflicts:
 Conflicts:
 	bfd/configure
 	opcodes/microblaze-opcm.h
+
+Conflicts:
+	gdb/microblaze-tdep.c
 ---
  bfd/Makefile.am                               |    2 +
  bfd/Makefile.in                               |    3 +
@@ -41,8 +44,8 @@ Conflicts:
  gdb/features/microblaze64.c                   |   77 +
  gdb/features/microblaze64.xml                 |   11 +
  gdb/microblaze-linux-tdep.c                   |   36 +-
- gdb/microblaze-tdep.c                         |  210 +-
- gdb/microblaze-tdep.h                         |    8 +-
+ gdb/microblaze-tdep.c                         |  102 +-
+ gdb/microblaze-tdep.h                         |    4 +-
  .../microblaze-with-stack-protect.dat         |    4 +-
  .../linux-microblaze-low.c                    |    0
  include/elf/common.h                          |    1 +
@@ -50,7 +53,7 @@ Conflicts:
  opcodes/microblaze-dis.c                      |   51 +-
  opcodes/microblaze-opc.h                      |  180 +-
  opcodes/microblaze-opcm.h                     |   36 +-
- 41 files changed, 5454 insertions(+), 248 deletions(-)
+ 41 files changed, 5345 insertions(+), 245 deletions(-)
  create mode 100755 bfd/elf64-microblaze.c
  create mode 100644 gdb/features/microblaze64-core.xml
  create mode 100644 gdb/features/microblaze64-stack-protect.xml
@@ -4880,18 +4883,18 @@ index 00000000000..515d18e65cf
 +  <xi:include href="microblaze64-core.xml"/>
 +</target>
 diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
-index b8277dfd735..0c9ec82cee5 100644
+index b77acc9dc61..ba87d0bbd63 100644
 --- a/gdb/microblaze-linux-tdep.c
 +++ b/gdb/microblaze-linux-tdep.c
-@@ -39,6 +39,7 @@
- #include "glibc-tdep.h"
+@@ -40,6 +40,7 @@
+ #include "features/microblaze-linux.c"
  
  static int microblaze_debug_flag = 0;
 +int MICROBLAZE_REGISTER_SIZE=4;
  
  static void
  microblaze_debug (const char *fmt, ...)
-@@ -54,6 +55,7 @@ microblaze_debug (const char *fmt, ...)
+@@ -55,6 +56,7 @@ microblaze_debug (const char *fmt, ...)
      }
  }
  
@@ -4899,7 +4902,7 @@ index b8277dfd735..0c9ec82cee5 100644
  static int
  microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch, 
  					   struct bp_target_info *bp_tgt)
-@@ -85,6 +87,8 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+@@ -86,6 +88,8 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
    return val;
  }
  
@@ -4908,7 +4911,7 @@ index b8277dfd735..0c9ec82cee5 100644
  static void
  microblaze_linux_sigtramp_cache (struct frame_info *next_frame,
  				 struct trad_frame_cache *this_cache,
-@@ -146,8 +150,8 @@ microblaze_linux_init_abi (struct gdbarch_info info,
+@@ -147,8 +151,8 @@ microblaze_linux_init_abi (struct gdbarch_info info,
  
    linux_init_abi (info, gdbarch);
  
@@ -4919,7 +4922,7 @@ index b8277dfd735..0c9ec82cee5 100644
  
    /* Shared library handling.  */
    set_solib_svr4_fetch_link_map_offsets (gdbarch,
-@@ -159,10 +163,30 @@ microblaze_linux_init_abi (struct gdbarch_info info,
+@@ -160,10 +164,30 @@ microblaze_linux_init_abi (struct gdbarch_info info,
  
    /* BFD target for core files.  */
    if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
@@ -4952,7 +4955,7 @@ index b8277dfd735..0c9ec82cee5 100644
  
    /* Shared library handling.  */
    set_gdbarch_skip_trampoline_code (gdbarch, find_solib_trampoline_target);
-@@ -177,6 +201,8 @@ void _initialize_microblaze_linux_tdep ();
+@@ -178,7 +202,9 @@ void _initialize_microblaze_linux_tdep ();
  void
  _initialize_microblaze_linux_tdep ()
  {
@@ -4961,9 +4964,10 @@ index b8277dfd735..0c9ec82cee5 100644
 +			  microblaze_linux_init_abi);
 +  gdbarch_register_osabi (bfd_arch_microblaze, bfd_mach_microblaze64, GDB_OSABI_LINUX, 
  			  microblaze_linux_init_abi);
+   initialize_tdesc_microblaze_linux ();
  }
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index 399fa0e3dca..e51c022c1ba 100644
+index 0a5b5ab59cc..667d658adfd 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
 @@ -40,7 +40,9 @@
@@ -5023,7 +5027,7 @@ index 399fa0e3dca..e51c022c1ba 100644
  /* Allocate and initialize a frame cache.  */
  
  static struct microblaze_frame_cache *
-@@ -556,17 +568,16 @@ microblaze_extract_return_value (struct type *type, struct regcache *regcache,
+@@ -588,17 +600,16 @@ microblaze_extract_return_value (struct type *type, struct regcache *regcache,
  				 gdb_byte *valbuf)
  {
    gdb_byte buf[8];
@@ -5043,118 +5047,10 @@ index 399fa0e3dca..e51c022c1ba 100644
  	return;
        case 4:	/* for sizes 4 or 8, copy the required length.  */
        case 8:
-@@ -633,7 +644,119 @@ microblaze_stabs_argument_has_addr (struct gdbarch *gdbarch, struct type *type)
-   return (TYPE_LENGTH (type) == 16);
+@@ -765,6 +776,12 @@ microblaze_software_single_step (struct regcache *regcache)
  }
+ #endif
  
--
-+#if 0
-+static std::vector<CORE_ADDR>
-+microblaze_software_single_step (struct regcache *regcache)
-+{
-+//  struct gdbarch *arch = get_frame_arch(frame);
-+  struct gdbarch *arch = get_regcache_arch (regcache);
-+  struct address_space *aspace = get_regcache_aspace (regcache);
-+//  struct address_space *aspace = get_frame_address_space (frame);
-+  struct gdbarch_tdep *tdep = gdbarch_tdep (arch);
-+  static char le_breakp[] = MICROBLAZE_BREAKPOINT_LE;
-+  static char be_breakp[] = MICROBLAZE_BREAKPOINT;
-+  enum bfd_endian byte_order = gdbarch_byte_order (arch);
-+  char *breakp = byte_order == BFD_ENDIAN_BIG ? be_breakp : le_breakp;
-+  std::vector<CORE_ADDR> ret = 0;
-+
-+ /* Save the address and the values of the next_pc and the target */
-+  static struct sstep_breaks
-+  {
-+    CORE_ADDR address;
-+    bfd_boolean valid;
-+    /* Shadow contents.  */
-+    char data[INST_WORD_SIZE];
-+  } stepbreaks[2];
-+ int ii;
-+
-+  if (1)
-+    {
-+      CORE_ADDR pc;
-+      std::vector<CORE_ADDR> *next_pcs = NULL;
-+      long insn;
-+      enum microblaze_instr minstr;
-+      bfd_boolean isunsignednum;
-+      enum microblaze_instr_type insn_type;
-+      short delay_slots;
-+      int imm;
-+      bfd_boolean immfound = FALSE;
-+
-+     /* Set a breakpoint at the next instruction */
-+      /* If the current instruction is an imm, set it at the inst after */
-+      /* If the instruction has a delay slot, skip the delay slot */
-+      pc = regcache_read_pc (regcache);
-+      insn = microblaze_fetch_instruction (pc);
-+      minstr = get_insn_microblaze (insn, &isunsignednum, &insn_type, &delay_slots);
-+      if (insn_type == immediate_inst)
-+	{
-+	  int rd, ra, rb;
-+	  immfound = TRUE;
-+	  minstr = microblaze_decode_insn (insn, &rd, &ra, &rb, &imm);
-+	  pc = pc + INST_WORD_SIZE;
-+	  insn = microblaze_fetch_instruction (pc);
-+	  minstr = get_insn_microblaze (insn, &isunsignednum, &insn_type, &delay_slots);
-+	}
-+      stepbreaks[0].address = pc + (delay_slots * INST_WORD_SIZE) + INST_WORD_SIZE;
-+      if (insn_type != return_inst) {
-+	stepbreaks[0].valid = TRUE;
-+      } else {
-+	stepbreaks[0].valid = FALSE;
-+      }
-+
-+      microblaze_debug ("single-step insn_type=%x insn=%x\n", insn_type, insn);
-+      /* Now check for branch or return instructions */
-+      if (insn_type == branch_inst || insn_type == return_inst) {
-+	int limm;
-+	int lrd, lra, lrb;
-+	int ra, rb;
-+	bfd_boolean targetvalid;
-+	bfd_boolean unconditionalbranch;
-+	microblaze_decode_insn(insn, &lrd, &lra, &lrb, &limm);
-+	if (lra >= 0 && lra < MICROBLAZE_NUM_REGS)
-+	  ra = regcache_raw_get_unsigned(regcache, lra);
-+	else
-+	  ra = 0;
-+	if (lrb >= 0 && lrb < MICROBLAZE_NUM_REGS)
-+	  rb = regcache_raw_get_unsigned(regcache, lrb);
-+	else
-+	  rb = 0;
-+	stepbreaks[1].address = microblaze_get_target_address (insn, immfound, imm, pc, ra, rb, &targetvalid, &unconditionalbranch);
-+        microblaze_debug ("single-step uncondbr=%d targetvalid=%d target=%x\n", unconditionalbranch, targetvalid, stepbreaks[1].address);
-+	if (unconditionalbranch)
-+	  stepbreaks[0].valid = FALSE; /* This is a unconditional branch: will not come to the next address */
-+	if (targetvalid && (stepbreaks[0].valid == FALSE ||
-+			    (stepbreaks[0].address != stepbreaks[1].address))
-+	                && (stepbreaks[1].address != pc)) {
-+	  stepbreaks[1].valid = TRUE;
-+	} else {
-+	  stepbreaks[1].valid = FALSE;
-+	}
-+      } else {
-+	stepbreaks[1].valid = FALSE;
-+      }
-+
-+      /* Insert the breakpoints */
-+      for (ii = 0; ii < 2; ++ii)
-+        {
-+
-+          /* ignore invalid breakpoint. */
-+          if (stepbreaks[ii].valid) {
-+            VEC_safe_push (CORE_ADDR, next_pcs, stepbreaks[ii].address);;
-+//            insert_single_step_breakpoint (arch, aspace, stepbreaks[ii].address);
-+            ret = next_pcs;
-+	  }
-+	}
-+    }
-+    return ret;
-+}
-+#endif
-+
 +static void
 +microblaze_write_pc (struct regcache *regcache, CORE_ADDR pc)
 +{
@@ -5164,7 +5060,7 @@ index 399fa0e3dca..e51c022c1ba 100644
  static int dwarf2_to_reg_map[78] =
  { 0  /* r0  */,   1  /* r1  */,   2  /* r2  */,   3  /* r3  */,  /*  0- 3 */
    4  /* r4  */,   5  /* r5  */,   6  /* r6  */,   7  /* r7  */,  /*  4- 7 */
-@@ -668,13 +791,14 @@ microblaze_dwarf2_reg_to_regnum (struct gdbarch *gdbarch, int reg)
+@@ -799,13 +816,14 @@ microblaze_dwarf2_reg_to_regnum (struct gdbarch *gdbarch, int reg)
  static void
  microblaze_register_g_packet_guesses (struct gdbarch *gdbarch)
  {
@@ -5182,7 +5078,7 @@ index 399fa0e3dca..e51c022c1ba 100644
  }
  
  void
-@@ -682,7 +806,7 @@ microblaze_supply_gregset (const struct regset *regset,
+@@ -813,7 +831,7 @@ microblaze_supply_gregset (const struct regset *regset,
                          struct regcache *regcache,
                          int regnum, const void *gregs)
  {
@@ -5191,7 +5087,7 @@ index 399fa0e3dca..e51c022c1ba 100644
    if (regnum >= 0)
      regcache->raw_supply (regnum, regs + regnum);
  
-@@ -690,7 +814,7 @@ microblaze_supply_gregset (const struct regset *regset,
+@@ -821,7 +839,7 @@ microblaze_supply_gregset (const struct regset *regset,
      int i;
  
      for (i = 0; i < 50; i++) {
@@ -5200,7 +5096,7 @@ index 399fa0e3dca..e51c022c1ba 100644
      }
    }
  }
-@@ -713,6 +837,17 @@ microblaze_iterate_over_regset_sections (struct gdbarch *gdbarch,
+@@ -844,6 +862,17 @@ microblaze_iterate_over_regset_sections (struct gdbarch *gdbarch,
  }
  
  
@@ -5218,7 +5114,7 @@ index 399fa0e3dca..e51c022c1ba 100644
  
  static struct gdbarch *
  microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
-@@ -727,8 +862,15 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -858,8 +887,15 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
    if (arches != NULL)
      return arches->gdbarch;
    if (tdesc == NULL)
@@ -5236,7 +5132,7 @@ index 399fa0e3dca..e51c022c1ba 100644
    /* Check any target description for validity.  */
    if (tdesc_has_registers (tdesc))
      {
-@@ -736,27 +878,35 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -867,27 +903,35 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
        int valid_p;
        int i;
  
@@ -5277,7 +5173,7 @@ index 399fa0e3dca..e51c022c1ba 100644
          }
  
        if (!valid_p)
-@@ -764,6 +914,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -895,6 +939,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
            tdesc_data_cleanup (tdesc_data);
            return NULL;
          }
@@ -5285,7 +5181,7 @@ index 399fa0e3dca..e51c022c1ba 100644
      }
  
    /* Allocate space for the new architecture.  */
-@@ -783,7 +934,17 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -914,7 +959,17 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
    /* Register numbers of various important registers.  */
    set_gdbarch_sp_regnum (gdbarch, MICROBLAZE_SP_REGNUM); 
    set_gdbarch_pc_regnum (gdbarch, MICROBLAZE_PC_REGNUM); 
@@ -5303,7 +5199,7 @@ index 399fa0e3dca..e51c022c1ba 100644
    /* Map Dwarf2 registers to GDB registers.  */
    set_gdbarch_dwarf2_reg_to_regnum (gdbarch, microblaze_dwarf2_reg_to_regnum);
  
-@@ -803,13 +964,15 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -934,7 +989,9 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  				       microblaze_breakpoint::kind_from_pc);
    set_gdbarch_sw_breakpoint_from_kind (gdbarch,
  				       microblaze_breakpoint::bp_from_kind);
@@ -5312,7 +5208,9 @@ index 399fa0e3dca..e51c022c1ba 100644
 +
 +//  set_gdbarch_software_single_step (gdbarch, microblaze_software_single_step);
  
-   set_gdbarch_frame_args_skip (gdbarch, 8);
+   set_gdbarch_software_single_step (gdbarch, microblaze_software_single_step);
+ 
+@@ -942,7 +999,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  
    set_gdbarch_unwind_pc (gdbarch, microblaze_unwind_pc);
  
@@ -5321,7 +5219,7 @@ index 399fa0e3dca..e51c022c1ba 100644
  
    frame_base_set_default (gdbarch, &microblaze_frame_base);
  
-@@ -824,12 +987,11 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -957,12 +1014,11 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
      tdesc_use_registers (gdbarch, tdesc, tdesc_data);
    //frame_base_append_sniffer (gdbarch, microblaze_frame_sniffer);
  
@@ -5336,7 +5234,7 @@ index 399fa0e3dca..e51c022c1ba 100644
    return gdbarch;
  }
  
-@@ -841,6 +1003,8 @@ _initialize_microblaze_tdep ()
+@@ -974,6 +1030,8 @@ _initialize_microblaze_tdep ()
  
    initialize_tdesc_microblaze_with_stack_protect ();
    initialize_tdesc_microblaze ();
@@ -5346,7 +5244,7 @@ index 399fa0e3dca..e51c022c1ba 100644
    add_setshow_zuinteger_cmd ("microblaze", class_maintenance,
  			     &microblaze_debug_flag, _("\
 diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
-index 872a3931f20..dc1d4686914 100644
+index 7f75c693b74..e0fa7ef9b12 100644
 --- a/gdb/microblaze-tdep.h
 +++ b/gdb/microblaze-tdep.h
 @@ -27,7 +27,7 @@ struct microblaze_gregset
@@ -5358,19 +5256,7 @@ index 872a3931f20..dc1d4686914 100644
  };
  
  struct gdbarch_tdep
-@@ -101,9 +101,9 @@ enum microblaze_regnum
-   MICROBLAZE_RTLBSX_REGNUM,
-   MICROBLAZE_RTLBLO_REGNUM,
-   MICROBLAZE_RTLBHI_REGNUM,
--  MICROBLAZE_SLR_REGNUM, MICROBLAZE_NUM_CORE_REGS = MICROBLAZE_SLR_REGNUM,
-+  MICROBLAZE_SLR_REGNUM,
-   MICROBLAZE_SHR_REGNUM,
--  MICROBLAZE_NUM_REGS
-+  MICROBLAZE_NUM_REGS, MICROBLAZE_NUM_CORE_REGS = MICROBLAZE_NUM_REGS
- };
- 
- struct microblaze_frame_cache
-@@ -128,7 +128,7 @@ struct microblaze_frame_cache
+@@ -133,7 +133,7 @@ struct microblaze_frame_cache
    struct trad_frame_saved_reg *saved_regs;
  };
  /* All registers are 32 bits.  */

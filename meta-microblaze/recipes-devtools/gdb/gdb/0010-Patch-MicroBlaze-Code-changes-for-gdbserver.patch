@@ -1,0 +1,401 @@
+From 01e16382c8fce4448c911a4c5780259e181e83dd Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Fri, 8 Jul 2022 12:53:51 +0530
+Subject: [PATCH 10/10] [Patch,MicroBlaze]: Code changes for gdbserver.
+
+---
+ gdb/features/Makefile                         |   1 +
+ gdb/features/microblaze-linux.xml             |   1 +
+ gdb/regformats/microblaze-linux.dat           |  64 +++++++++
+ gdbserver/Makefile.in                         |   5 +-
+ gdbserver/configure.srv                       |   1 +
+ ...croblaze-low.c => linux-microblaze-low.cc} | 132 ++++++++++--------
+ 6 files changed, 138 insertions(+), 66 deletions(-)
+ create mode 100644 gdb/regformats/microblaze-linux.dat
+ rename gdbserver/{linux-microblaze-low.c => linux-microblaze-low.cc} (72%)
+
+diff --git a/gdb/features/Makefile b/gdb/features/Makefile
+index 131fc14adbf..1b15305862e 100644
+--- a/gdb/features/Makefile
++++ b/gdb/features/Makefile
+@@ -47,6 +47,7 @@
+ WHICH = mips-linux mips-dsp-linux \
+ 	microblaze-with-stack-protect \
+ 	microblaze64-with-stack-protect \
++	microblaze-linux \
+ 	mips64-linux mips64-dsp-linux \
+ 	nios2-linux \
+ 	rs6000/powerpc-32 \
+diff --git a/gdb/features/microblaze-linux.xml b/gdb/features/microblaze-linux.xml
+index 8983e66eb3d..688a3f83d1e 100644
+--- a/gdb/features/microblaze-linux.xml
++++ b/gdb/features/microblaze-linux.xml
+@@ -7,6 +7,7 @@
+ 
+ <!DOCTYPE target SYSTEM "gdb-target.dtd">
+ <target>
++  <architecture>microblaze</architecture>
+   <osabi>GNU/Linux</osabi>
+   <xi:include href="microblaze-core.xml"/>
+ </target>
+diff --git a/gdb/regformats/microblaze-linux.dat b/gdb/regformats/microblaze-linux.dat
+new file mode 100644
+index 00000000000..b5b49f485cd
+--- /dev/null
++++ b/gdb/regformats/microblaze-linux.dat
+@@ -0,0 +1,64 @@
++# THIS FILE IS GENERATED.  -*- buffer-read-only: t -*- vi :set ro:
++# Generated from: microblaze-linux.xml
++name:microblaze_linux
++xmltarget:microblaze-linux.xml
++expedite:r1,rpc
++32:r0
++32:r1
++32:r2
++32:r3
++32:r4
++32:r5
++32:r6
++32:r7
++32:r8
++32:r9
++32:r10
++32:r11
++32:r12
++32:r13
++32:r14
++32:r15
++32:r16
++32:r17
++32:r18
++32:r19
++32:r20
++32:r21
++32:r22
++32:r23
++32:r24
++32:r25
++32:r26
++32:r27
++32:r28
++32:r29
++32:r30
++32:r31
++32:rpc
++32:rmsr
++32:rear
++32:resr
++32:rfsr
++32:rbtr
++32:rpvr0
++32:rpvr1
++32:rpvr2
++32:rpvr3
++32:rpvr4
++32:rpvr5
++32:rpvr6
++32:rpvr7
++32:rpvr8
++32:rpvr9
++32:rpvr10
++32:rpvr11
++32:redr
++32:rpid
++32:rzpr
++32:rtlbx
++32:rtlbsx
++32:rtlblo
++32:rtlbhi
++32:slr
++32:shr
+diff --git a/gdbserver/Makefile.in b/gdbserver/Makefile.in
+index 46b5a0c7c60..eaaf6820fe0 100644
+--- a/gdbserver/Makefile.in
++++ b/gdbserver/Makefile.in
+@@ -184,7 +184,7 @@ SFILES = \
+ 	$(srcdir)/linux-ia64-low.cc \
+ 	$(srcdir)/linux-low.cc \
+ 	$(srcdir)/linux-m68k-low.cc \
+-        $(srcdir)/linux-microblaze-low.c \
++        $(srcdir)/linux-microblaze-low.cc \
+  	$(srcdir)/linux-mips-low.cc \
+ 	$(srcdir)/linux-nios2-low.cc \
+ 	$(srcdir)/linux-ppc-low.cc \
+@@ -222,7 +222,6 @@ SFILES = \
+ 	$(srcdir)/../gdb/nat/linux-namespaces.c \
+ 	$(srcdir)/../gdb/nat/linux-osdata.c \
+ 	$(srcdir)/../gdb/nat/linux-personality.c \
+-        $(srcdir)/../gdb/nat/microblaze-linux.c \
+ 	$(srcdir)/../gdb/nat/mips-linux-watch.c \
+ 	$(srcdir)/../gdb/nat/ppc-linux.c \
+ 	$(srcdir)/../gdb/nat/riscv-linux-tdesc.c \
+@@ -564,8 +563,6 @@ target/%.o: ../gdb/target/%.c
+ 
+ %-generated.cc: ../gdb/regformats/rs6000/%.dat $(regdat_sh)
+ 	$(ECHO_REGDAT) $(SHELL) $(regdat_sh) $< $@
+-microblaze-linux.c : $(srcdir)/../regformats/reg-microblaze.dat $(regdat_sh)
+-	$(ECHO_REGDAT) $(SHELL) $(regdat_sh) $(srcdir)/../regformats/reg-microblaze.dat microblaze-linux.c
+ 
+ #
+ # Dependency tracking.
+diff --git a/gdbserver/configure.srv b/gdbserver/configure.srv
+index af10cb05683..026b156bd60 100644
+--- a/gdbserver/configure.srv
++++ b/gdbserver/configure.srv
+@@ -169,6 +169,7 @@ case "${gdbserver_host}" in
+   microblaze*-*-linux*)	srv_regobj="microblaze-linux.o"
+ 			srv_tgtobj="$srv_linux_obj linux-microblaze-low.o "
+ 			srv_xmlfiles="microblaze-linux.xml"
++			srv_xmlfiles="${srv_xmlfiles} microblaze-core.xml"
+ 			srv_linux_regsets=yes
+ 			srv_linux_usrregs=yes
+ 			srv_linux_thread_db=yes
+diff --git a/gdbserver/linux-microblaze-low.c b/gdbserver/linux-microblaze-low.cc
+similarity index 72%
+rename from gdbserver/linux-microblaze-low.c
+rename to gdbserver/linux-microblaze-low.cc
+index a2733f3c21c..d30fa102b5e 100644
+--- a/gdbserver/linux-microblaze-low.c
++++ b/gdbserver/linux-microblaze-low.cc
+@@ -20,12 +20,17 @@
+ #include "server.h"
+ #include "linux-low.h"
+ 
++#include "elf/common.h"
++#include "nat/gdb_ptrace.h"
++#include <endian.h>
++
+ #include <asm/ptrace.h>
+ #include <sys/procfs.h>
+ #include <sys/ptrace.h>
+ 
+ #include "gdb_proc_service.h"
+ 
++
+ static int microblaze_regmap[] =
+  {PT_GPR(0),     PT_GPR(1),     PT_GPR(2),     PT_GPR(3),
+   PT_GPR(4),     PT_GPR(5),     PT_GPR(6),     PT_GPR(7),
+@@ -39,14 +44,46 @@ static int microblaze_regmap[] =
+   PT_FSR
+   };
+ 
++
++
++class microblaze_target : public linux_process_target
++{
++public:
++
++  const regs_info *get_regs_info () override;
++
++  const gdb_byte *sw_breakpoint_from_kind (int kind, int *size) override;
++ // CORE_ADDR microblaze_reinsert_addr (regcache *regcache);
++
++protected:
++
++  void low_arch_setup () override;
++
++  bool low_cannot_fetch_register (int regno) override;
++
++  bool low_cannot_store_register (int regno) override;
++
++ // bool low_supports_breakpoints () override;
++
++  CORE_ADDR low_get_pc (regcache *regcache) override;
++
++  void low_set_pc (regcache *regcache, CORE_ADDR newpc) override;
++
++  bool low_breakpoint_at (CORE_ADDR pc) override;
++};
++
++/* The singleton target ops object.  */
++
++static microblaze_target the_microblaze_target;
++
+ #define microblaze_num_regs (sizeof (microblaze_regmap) / sizeof (microblaze_regmap[0]))
+ 
+ /* Defined in auto-generated file microblaze-linux.c.  */
+-void init_registers_microblaze (void);
+-extern const struct target_desc *tdesc_microblaze;
++void init_registers_microblaze_linux (void);
++extern const struct target_desc *tdesc_microblaze_linux;
+ 
+-static int
+-microblaze_cannot_store_register (int regno)
++bool
++microblaze_target::low_cannot_store_register (int regno)
+ {
+   if (microblaze_regmap[regno] == -1 || regno == 0)
+     return 1;
+@@ -54,14 +91,14 @@ microblaze_cannot_store_register (int regno)
+   return 0;
+ }
+ 
+-static int
+-microblaze_cannot_fetch_register (int regno)
++bool
++microblaze_target::low_cannot_fetch_register (int regno)
+ {
+   return 0;
+ }
+ 
+-static CORE_ADDR
+-microblaze_get_pc (struct regcache *regcache)
++CORE_ADDR
++microblaze_target::low_get_pc (struct regcache *regcache)
+ {
+   unsigned long pc;
+ 
+@@ -69,8 +106,8 @@ microblaze_get_pc (struct regcache *regcache)
+   return (CORE_ADDR) pc;
+ }
+ 
+-static void
+-microblaze_set_pc (struct regcache *regcache, CORE_ADDR pc)
++void
++microblaze_target::low_set_pc (struct regcache *regcache, CORE_ADDR pc)
+ {
+   unsigned long newpc = pc;
+ 
+@@ -84,34 +121,35 @@ static const unsigned long microblaze_breakpoint = 0xba0c0018;
+ 
+ /* Implementation of linux_target_ops method "sw_breakpoint_from_kind".  */
+ 
+-static const gdb_byte *
+-microblaze_sw_breakpoint_from_kind (int kind, int *size)
++const gdb_byte *
++microblaze_target::sw_breakpoint_from_kind (int kind, int *size)
+ {
+   *size = microblaze_breakpoint_len;
+   return (const gdb_byte *) &microblaze_breakpoint;
+ }
+ 
+-static int
+-microblaze_breakpoint_at (CORE_ADDR where)
++bool
++microblaze_target::low_breakpoint_at (CORE_ADDR where)
+ {
+   unsigned long insn;
+ 
+-  (*the_target->read_memory) (where, (unsigned char *) &insn, 4);
++  read_memory (where, (unsigned char *) &insn, 4);
+   if (insn == microblaze_breakpoint)
+     return 1;
+   /* If necessary, recognize more trap instructions here.  GDB only uses the
+      one.  */
+   return 0;
+ }
+-
+-static CORE_ADDR
+-microblaze_reinsert_addr (struct regcache *regcache)
++#if 0
++CORE_ADDR
++microblaze_target::microblaze_reinsert_addr (struct regcache *regcache)
+ {
+   unsigned long pc;
+   collect_register_by_name (regcache, "r15", &pc);
+   return pc;
+ }
+-
++#endif
++#if 0
+ #ifdef HAVE_PTRACE_GETREGS
+ 
+ static void
+@@ -166,12 +204,15 @@ microblaze_store_gregset (struct regcache *regcache, const void *buf)
+ }
+ 
+ #endif /* HAVE_PTRACE_GETREGS */
++#endif
+ 
+ static struct regset_info microblaze_regsets[] = {
++#if 0
+ #ifdef HAVE_PTRACE_GETREGS
+   { PTRACE_GETREGS, PTRACE_SETREGS, 0, sizeof (elf_gregset_t), GENERAL_REGS, microblaze_fill_gregset, microblaze_store_gregset },
+   { 0, 0, 0, -1, GENERAL_REGS, NULL, NULL },
+ #endif /* HAVE_PTRACE_GETREGS */
++#endif
+   { 0, 0, 0, -1, GENERAL_REGS, NULL, NULL },
+   NULL_REGSET
+ };
+@@ -189,17 +230,17 @@ static struct regsets_info microblaze_regsets_info =
+     NULL, /* disabled_regsets */
+   };
+ 
+-static struct regs_info regs_info =
++static struct regs_info microblaze_regs_info =
+   {
+     NULL, /* regset_bitmap */
+     &microblaze_usrregs_info,
+     &microblaze_regsets_info
+   };
+ 
+-static const struct regs_info *
+-microblaze_regs_info (void)
++const regs_info *
++microblaze_target::get_regs_info (void)
+ {
+-  return &regs_info;
++  return &microblaze_regs_info;
+ }
+ 
+ /* Support for hardware single step.  */
+@@ -211,50 +252,17 @@ microblaze_supports_hardware_single_step (void)
+ }
+ 
+ 
+-static void
+-microblaze_arch_setup (void)
++void
++microblaze_target::low_arch_setup (void)
+ {
+-  current_process ()->tdesc = tdesc_microblaze;
++  current_process ()->tdesc = tdesc_microblaze_linux;
+ }
+ 
+-struct linux_target_ops the_low_target = {
+-  microblaze_arch_setup,
+-  microblaze_regs_info,
+-  microblaze_cannot_fetch_register,
+-  microblaze_cannot_store_register,
+-  NULL, /* fetch_register */
+-  microblaze_get_pc,
+-  microblaze_set_pc,
+-  NULL,
+-  microblaze_sw_breakpoint_from_kind,
+-  NULL,
+-  0,
+-  microblaze_breakpoint_at,
+-  NULL,
+-  NULL,
+-  NULL,
+-  NULL,
+-  NULL,
+-  microblaze_collect_ptrace_register,
+-  microblaze_supply_ptrace_register,
+-  NULL, /* siginfo_fixup */
+-  NULL, /* new_process */
+-  NULL, /* new_thread */
+-  NULL, /* new_fork */
+-  NULL, /* prepare_to_resume */
+-  NULL, /* process_qsupported */
+-  NULL, /* supports_tracepoints */
+-  NULL, /* get_thread_area */
+-  NULL, /* install_fast_tracepoint_jump_pad */
+-  NULL, /* emit_ops */
+-  NULL, /* get_min_fast_tracepoint_insn_len */
+-  NULL, /* supports_range_stepping */
+-  NULL, /* breakpoint_kind_from_current_state */
+-  microblaze_supports_hardware_single_step,
+-};
++linux_process_target *the_linux_target = &the_microblaze_target;
+ 
+ void
+ initialize_low_arch (void)
+ {
+-  init_registers_microblaze ();
++  init_registers_microblaze_linux ();
++  initialize_regsets_info (&microblaze_regsets_info);
+ }
+-- 
+2.17.1
+
