@@ -7,6 +7,6 @@ ESW_VER = "experimental"
 REPO = "git://gitenterprise.xilinx.com/decoupling/embeddedsw-experimental-dt-support.git;protocol=https"
 
 ESW_BRANCH[experimental] = "xilinx-v2022.1-sdt-experimental"
-ESW_REV[experimental] = "a2bc0a4286d48b78e43dea4504b7483665d4e148"
+ESW_REV[experimental] = "74445062bbc79dd3ac2fe4fe6ecbc50034b7c472"
 LIC_FILES_CHKSUM[master] = '7c92de7a21a6613265035c28f4a92f48'
 LIC_FILES_CHKSUM[xilinx-v2022.1-sdt-experimental] = 'e26f53a7d6f58f4b1a9687099417225c'
