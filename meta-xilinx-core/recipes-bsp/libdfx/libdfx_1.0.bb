@@ -18,3 +18,6 @@ S = "${WORKDIR}/git"
 
 inherit cmake
 
+# Due to an update where the soname/version was defined, we need to use an RREPLACES
+# so updates will work properly.
+RREPLACES:${PN} = "libdfx"
