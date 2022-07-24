@@ -54,13 +54,14 @@ def qemu_rootfs_params(d,param):
             "zynqmp": "cpio.gz.u-boot",
             "versal": "cpio.gz.u-boot.qemu-sd-fatimg"
         }
-        if initramfs_image:
-            if 'microblaze' in tune_features:
-                return fstype_dict['microblaze']
-            else:
-                return fstype_dict[soc_family]
-        else:
+        if 'microblaze' in tune_features:
+            soc_family = 'microblaze'
+        if not initramfs_image:
+            image_fs = d.getVar('IMAGE_FSTYPES')
+            if 'wic.qemu-sd' in image_fs:
                 return 'wic.qemu-sd'
+        return fstype_dict[soc_family]
+
     elif param == 'rootfs-opt':
         if not initramfs_image or soc_family == 'versal':
             sd_index = "1"
