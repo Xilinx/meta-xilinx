@@ -28,6 +28,8 @@ elif '-plm-args' in APU_args:
     APU_args.remove(MB_args)
     MB_args = MB_args.split()
     mbtype='PLM'
+elif '--help' in APU_args:
+    mbtype='help'
 else:
     error_msg = '\nMultiarch not setup properly.'
     sys.exit(error_msg)
