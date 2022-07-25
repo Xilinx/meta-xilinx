@@ -1,7 +1,7 @@
 COMPATIBLE_HOST = "${HOST_SYS}"
 
 # Add MicroBlaze Patches (only when using MicroBlaze)
-FILESEXTRAPATHS:append:microblaze:xilinx-standalone := ":${THISDIR}/gcc-11"
+FILESEXTRAPATHS:append:microblaze:xilinx-standalone := ":${THISDIR}/gcc-12"
 SRC_URI:append:microblaze:xilinx-standalone = " \
         file://additional-microblaze-multilibs.patch \
 "
