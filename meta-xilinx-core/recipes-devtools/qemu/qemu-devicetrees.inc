@@ -1,6 +1,6 @@
 SUMMARY = "Xilinx's hardware device trees required for QEMU"
 HOMEPAGE = "https://github.com/xilinx/qemu-devicetrees/"
-LICENSE = "BSD"
+LICENSE = "BSD-3-Clause"
 DEPENDS += "dtc-native"
 
 inherit deploy

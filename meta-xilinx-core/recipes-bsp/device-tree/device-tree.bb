@@ -3,7 +3,7 @@ DESCRIPTION = "Xilinx BSP device trees from within layer."
 SECTION = "bsp"
 
 # the device trees from within the layer are licensed as MIT, kernel includes are GPL
-LICENSE = "MIT & GPLv2"
+LICENSE = "MIT & GPL-2.0-or-later"
 LIC_FILES_CHKSUM = " \
 		file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302 \
 		file://${COMMON_LICENSE_DIR}/GPL-2.0-or-later;md5=fed54355545ffd980b814dab4a3b312c \
