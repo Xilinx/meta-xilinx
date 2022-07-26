@@ -13,15 +13,15 @@ ChangeLog:
   2016-02-23 Nagaraju Mekala <nmekala@xilix.com>
              Ajit Agarwal  <ajitkum@xilinx.com>
 
-                                  *microblaze.c (microblaze_expand_divide): Update
+                                  *microblaze.cc (microblaze_expand_divide): Update
 ---
- gcc/config/microblaze/microblaze.c | 2 +-
+ gcc/config/microblaze/microblaze.cc | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
 index 3b1e992fa28..94aaeaa3a67 100644
---- a/gcc/config/microblaze/microblaze.c
-+++ b/gcc/config/microblaze/microblaze.c
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
 @@ -3767,7 +3767,7 @@ microblaze_expand_divide (rtx operands[])
    emit_insn (gen_ashlsi3_bshift (regt1, operands[1], GEN_INT(4)));
    emit_insn (gen_addsi3 (regt1, regt1, operands[2]));

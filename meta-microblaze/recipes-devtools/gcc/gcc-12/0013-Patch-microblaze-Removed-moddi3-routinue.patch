@@ -14,15 +14,14 @@ Conflicts:
  2 files changed, 1 insertion(+), 123 deletions(-)
  delete mode 100644 libgcc/config/microblaze/moddi3.S
 
-diff --git a/libgcc/config/microblaze/moddi3.S b/libgcc/config/microblaze/moddi3.S
-deleted file mode 100644
-index 4bac960107e..00000000000
---- a/libgcc/config/microblaze/moddi3.S
+Index: gcc-12.1.0/libgcc/config/microblaze/moddi3.S
+===================================================================
+--- gcc-12.1.0.orig/libgcc/config/microblaze/moddi3.S
 +++ /dev/null
 @@ -1,121 +0,0 @@
 -###################################
 -# 
--#  Copyright (C) 2009-2021 Free Software Foundation, Inc.
+-#  Copyright (C) 2009-2022 Free Software Foundation, Inc.
 -#
 -#  Contributed by Michael Eager <eager@eagercon.com>.
 -#
@@ -141,10 +140,10 @@ index 4bac960107e..00000000000
 -	addik r1,r1,24
 -        .end __moddi3
 -	
-diff --git a/libgcc/config/microblaze/t-microblaze b/libgcc/config/microblaze/t-microblaze
-index 96959f0292b..8d954a49575 100644
---- a/libgcc/config/microblaze/t-microblaze
-+++ b/libgcc/config/microblaze/t-microblaze
+Index: gcc-12.1.0/libgcc/config/microblaze/t-microblaze
+===================================================================
+--- gcc-12.1.0.orig/libgcc/config/microblaze/t-microblaze
++++ gcc-12.1.0/libgcc/config/microblaze/t-microblaze
 @@ -1,8 +1,7 @@
 -LIB2FUNCS_EXCLUDE += _divsi3 _modsi3 _moddi3 _mulsi3 _udivsi3 _umodsi3
 +LIB2FUNCS_EXCLUDE += _divsi3 _modsi3 _mulsi3 _udivsi3 _umodsi3
@@ -155,6 +154,3 @@ index 96959f0292b..8d954a49575 100644
          $(srcdir)/config/microblaze/modsi3.S \
          $(srcdir)/config/microblaze/muldi3_hard.S \
          $(srcdir)/config/microblaze/mulsi3.S \
--- 
-2.17.1
-

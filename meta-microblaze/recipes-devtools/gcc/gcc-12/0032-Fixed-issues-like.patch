@@ -5,14 +5,14 @@ Subject: [PATCH 32/53] Fixed issues like: 1 Interrupt alignment issue 2 Sign
  extension issue
 
 ---
- gcc/config/microblaze/microblaze.c  | 16 ++++++++++------
+ gcc/config/microblaze/microblaze.cc  | 16 ++++++++++------
  gcc/config/microblaze/microblaze.md |  2 +-
  2 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
 index e33e1bc1482..64b948d6cfc 100644
---- a/gcc/config/microblaze/microblaze.c
-+++ b/gcc/config/microblaze/microblaze.c
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
 @@ -2177,9 +2177,14 @@ compute_frame_size (HOST_WIDE_INT size)
  
    total_size += gp_reg_size;

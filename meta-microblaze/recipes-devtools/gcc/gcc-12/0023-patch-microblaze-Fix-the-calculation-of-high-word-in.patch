@@ -19,17 +19,17 @@ ChangeLog:
 2016-03-01 Nagaraju Mekala <nmekala@xilix.com>
            Ajit Agarwal  <ajitkum@xilinx.com>
 
-    *config/microblaze/microblaze.c (print_operand): Remove the condition of checking
+    *config/microblaze/microblaze.cc (print_operand): Remove the condition of checking
     high word = 0 & low word < 0.
     *testsuite/gcc.target/microblaze/others/long.c: Add -O0 option.
 ---
- gcc/config/microblaze/microblaze.c | 3 ---
+ gcc/config/microblaze/microblaze.cc | 3 ---
  1 file changed, 3 deletions(-)
 
-diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
 index 94aaeaa3a67..84e17fc4520 100644
---- a/gcc/config/microblaze/microblaze.c
-+++ b/gcc/config/microblaze/microblaze.c
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
 @@ -2468,9 +2468,6 @@ print_operand (FILE * file, rtx op, int letter)
          {
  	  val[0] = (INTVAL (op) & 0xffffffff00000000LL) >> 32;

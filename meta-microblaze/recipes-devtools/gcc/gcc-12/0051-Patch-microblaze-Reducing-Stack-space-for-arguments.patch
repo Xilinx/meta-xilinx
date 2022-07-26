@@ -11,14 +11,14 @@ Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
               :Ajit Agarwal  <ajitkum@xilinx.com>
 ---
  gcc/config/microblaze/microblaze-protos.h |   1 +
- gcc/config/microblaze/microblaze.c        | 132 +++++++++++++++++++++-
+ gcc/config/microblaze/microblaze.cc        | 132 +++++++++++++++++++++-
  gcc/config/microblaze/microblaze.h        |   4 +-
  3 files changed, 134 insertions(+), 3 deletions(-)
 
-diff --git a/gcc/config/microblaze/microblaze-protos.h b/gcc/config/microblaze/microblaze-protos.h
-index 302f6bbda2e..87a7093e369 100644
---- a/gcc/config/microblaze/microblaze-protos.h
-+++ b/gcc/config/microblaze/microblaze-protos.h
+Index: gcc-12.1.0/gcc/config/microblaze/microblaze-protos.h
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/microblaze-protos.h
++++ gcc-12.1.0/gcc/config/microblaze/microblaze-protos.h
 @@ -60,6 +60,7 @@ extern int symbol_mentioned_p (rtx);
  extern int label_mentioned_p (rtx);
  extern bool microblaze_cannot_force_const_mem (machine_mode, rtx);
@@ -26,12 +26,12 @@ index 302f6bbda2e..87a7093e369 100644
 +int  microblaze_reg_parm_stack_space(tree fun);
  #endif  /* RTX_CODE */
  
- /* Declare functions in microblaze-c.c.  */
-diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 5afac2ba8d1..6914eb8380c 100644
---- a/gcc/config/microblaze/microblaze.c
-+++ b/gcc/config/microblaze/microblaze.c
-@@ -2080,6 +2080,136 @@ microblaze_must_save_register (int regno)
+ /* Declare functions in microblaze-c.cc.  */
+Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.cc
++++ gcc-12.1.0/gcc/config/microblaze/microblaze.cc
+@@ -2081,6 +2081,136 @@ microblaze_must_save_register (int regno
    return 0;
  }
  
@@ -168,20 +168,11 @@ index 5afac2ba8d1..6914eb8380c 100644
  /* Return the bytes needed to compute the frame pointer from the current
     stack pointer.
  
-@@ -3470,7 +3600,7 @@ microblaze_asm_output_mi_thunk (FILE *file, tree thunk_fndecl ATTRIBUTE_UNUSED,
-   emit_insn (gen_indirect_jump (temp2));
- 
-   /* Run just enough of rest_of_compilation.  This sequence was
--     "borrowed" from rs6000.c.  */
-+     "borrowed" from microblaze.c */
-   insn = get_insns ();
-   shorten_branches (insn);
-   assemble_start_function (thunk_fndecl, fnname);
-diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index 2581d52d17a..9c48978d2ca 100644
---- a/gcc/config/microblaze/microblaze.h
-+++ b/gcc/config/microblaze/microblaze.h
-@@ -447,9 +447,9 @@ extern struct microblaze_frame_info current_frame_info;
+Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.h
++++ gcc-12.1.0/gcc/config/microblaze/microblaze.h
+@@ -447,9 +447,9 @@ extern struct microblaze_frame_info curr
  #define ARG_POINTER_CFA_OFFSET(FNDECL)		0
  #define DWARF_CIE_DATA_ALIGNMENT -1
  
@@ -193,6 +184,3 @@ index 2581d52d17a..9c48978d2ca 100644
  
  #define STACK_BOUNDARY				(TARGET_MB_64 ? 64 : 32)
  
--- 
-2.17.1
-

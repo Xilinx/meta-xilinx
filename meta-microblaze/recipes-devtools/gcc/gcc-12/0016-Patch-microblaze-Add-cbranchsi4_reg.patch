@@ -14,7 +14,7 @@ ChangeLog:
            Ajit Agarwal  <ajitkum@xilinx.com>
 
   *microblaze.md (cbranchsi4_reg): New
-  *microblaze.c (microblaze_expand_conditional_branch_reg): New
+  *microblaze.cc (microblaze_expand_conditional_branch_reg): New
 
 Conflicts:
 

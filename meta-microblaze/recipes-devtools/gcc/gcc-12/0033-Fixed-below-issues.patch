@@ -10,17 +10,17 @@ Subject: [PATCH 33/53] Fixed below issues:
 Conflicts:
 	gcc/config/microblaze/microblaze.md
 ---
- gcc/config/microblaze/microblaze.c  | 12 +++-
+ gcc/config/microblaze/microblaze.cc  | 12 +++-
  gcc/config/microblaze/microblaze.h  |  7 +++
  gcc/config/microblaze/microblaze.md | 86 ++++++++++++++++++++++++-----
  libgcc/config/microblaze/crti.S     | 24 +++++++-
  libgcc/config/microblaze/crtn.S     | 13 +++++
  5 files changed, 125 insertions(+), 17 deletions(-)
 
-diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
 index 64b948d6cfc..b2cd89a310a 100644
---- a/gcc/config/microblaze/microblaze.c
-+++ b/gcc/config/microblaze/microblaze.c
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
 @@ -2473,7 +2473,12 @@ print_operand (FILE * file, rtx op, int letter)
        if (code == CONST_DOUBLE)
  	{

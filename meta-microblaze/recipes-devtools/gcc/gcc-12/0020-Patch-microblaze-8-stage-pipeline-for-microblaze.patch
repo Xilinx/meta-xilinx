@@ -8,16 +8,16 @@ pipeline reduces the latencies of float & integer division drastically
 
 Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
 ---
- gcc/config/microblaze/microblaze.c   | 11 ++++
+ gcc/config/microblaze/microblaze.cc   | 11 ++++
  gcc/config/microblaze/microblaze.h   |  3 +-
  gcc/config/microblaze/microblaze.md  | 79 +++++++++++++++++++++++++++-
  gcc/config/microblaze/microblaze.opt |  4 ++
  4 files changed, 94 insertions(+), 3 deletions(-)
 
-diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
+diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
 index 16f3120e415..c730faa9814 100644
---- a/gcc/config/microblaze/microblaze.c
-+++ b/gcc/config/microblaze/microblaze.c
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
 @@ -1840,6 +1840,17 @@ microblaze_option_override (void)
  		   "%<-mcpu=v8.30.a%>");
          TARGET_REORDER = 0;

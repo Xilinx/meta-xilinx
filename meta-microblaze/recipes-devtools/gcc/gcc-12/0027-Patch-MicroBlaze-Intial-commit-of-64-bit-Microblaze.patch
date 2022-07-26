@@ -8,17 +8,17 @@ Conflicts:
 ---
  gcc/config/microblaze/constraints.md      |   6 +
  gcc/config/microblaze/microblaze-protos.h |   1 +
- gcc/config/microblaze/microblaze.c        | 109 +++++--
+ gcc/config/microblaze/microblaze.cc        | 109 +++++--
  gcc/config/microblaze/microblaze.h        |   4 +-
  gcc/config/microblaze/microblaze.md       | 352 +++++++++++++++++++++-
  gcc/config/microblaze/microblaze.opt      |   7 +-
  gcc/config/microblaze/t-microblaze        |   7 +-
  7 files changed, 456 insertions(+), 30 deletions(-)
 
-diff --git a/gcc/config/microblaze/constraints.md b/gcc/config/microblaze/constraints.md
-index b4d7ee329b8..95b21d58f88 100644
---- a/gcc/config/microblaze/constraints.md
-+++ b/gcc/config/microblaze/constraints.md
+Index: gcc-12.1.0/gcc/config/microblaze/constraints.md
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/constraints.md
++++ gcc-12.1.0/gcc/config/microblaze/constraints.md
 @@ -52,6 +52,12 @@
    (and (match_code "const_int")
         (match_test "ival > 0 && ival < 0x10000")))
@@ -32,11 +32,11 @@ index b4d7ee329b8..95b21d58f88 100644
  ;; Define floating point constraints
  
  (define_constraint "G"
-diff --git a/gcc/config/microblaze/microblaze-protos.h b/gcc/config/microblaze/microblaze-protos.h
-index 3a5f439703c..302f6bbda2e 100644
---- a/gcc/config/microblaze/microblaze-protos.h
-+++ b/gcc/config/microblaze/microblaze-protos.h
-@@ -36,6 +36,7 @@ extern void microblaze_expand_divide (rtx *);
+Index: gcc-12.1.0/gcc/config/microblaze/microblaze-protos.h
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/microblaze-protos.h
++++ gcc-12.1.0/gcc/config/microblaze/microblaze-protos.h
+@@ -36,6 +36,7 @@ extern void microblaze_expand_divide (rt
  extern void microblaze_expand_conditional_branch (enum machine_mode, rtx *);
  extern void microblaze_expand_conditional_branch_reg (machine_mode, rtx *);
  extern void microblaze_expand_conditional_branch_sf (rtx *); 
@@ -44,11 +44,11 @@ index 3a5f439703c..302f6bbda2e 100644
  extern int microblaze_can_use_return_insn (void);
  extern void print_operand (FILE *, rtx, int);
  extern void print_operand_address (FILE *, rtx);
-diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 9f94d015597..58d7397945e 100644
---- a/gcc/config/microblaze/microblaze.c
-+++ b/gcc/config/microblaze/microblaze.c
-@@ -3432,11 +3432,11 @@ microblaze_expand_move (machine_mode mode, rtx operands[])
+Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.cc
++++ gcc-12.1.0/gcc/config/microblaze/microblaze.cc
+@@ -3433,11 +3433,11 @@ microblaze_expand_move (machine_mode mod
    op0 = operands[0];
    op1 = operands[1];
  
@@ -63,7 +63,7 @@ index 9f94d015597..58d7397945e 100644
        emit_move_insn (op0, temp);
        return true;
      }
-@@ -3501,12 +3501,12 @@ microblaze_expand_move (machine_mode mode, rtx operands[])
+@@ -3502,12 +3502,12 @@ microblaze_expand_move (machine_mode mod
  	          && (flag_pic == 2 || microblaze_tls_symbol_p (p0)
  		      || !SMALL_INT (p1)))))
  	{
@@ -78,7 +78,7 @@ index 9f94d015597..58d7397945e 100644
  	  return true;
  	}
      }
-@@ -3637,7 +3637,7 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
+@@ -3638,7 +3638,7 @@ microblaze_expand_conditional_branch (ma
    rtx cmp_op0 = operands[1];
    rtx cmp_op1 = operands[2];
    rtx label1 = operands[3];
@@ -87,7 +87,7 @@ index 9f94d015597..58d7397945e 100644
    rtx condition;
  
    gcc_assert ((GET_CODE (cmp_op0) == REG) || (GET_CODE (cmp_op0) == SUBREG));
-@@ -3646,23 +3646,36 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
+@@ -3647,23 +3647,36 @@ microblaze_expand_conditional_branch (ma
    if (cmp_op1 == const0_rtx)
      {
        comp_reg = cmp_op0;
@@ -130,7 +130,7 @@ index 9f94d015597..58d7397945e 100644
      }
  }
  
-@@ -3673,7 +3686,7 @@ microblaze_expand_conditional_branch_reg (machine_mode mode, rtx operands[])
+@@ -3674,7 +3687,7 @@ microblaze_expand_conditional_branch_reg
    rtx cmp_op0 = operands[1];
    rtx cmp_op1 = operands[2];
    rtx label1 = operands[3];
@@ -139,7 +139,7 @@ index 9f94d015597..58d7397945e 100644
    rtx condition;
  
    gcc_assert ((GET_CODE (cmp_op0) == REG)
-@@ -3684,30 +3697,63 @@ microblaze_expand_conditional_branch_reg (machine_mode mode, rtx operands[])
+@@ -3685,30 +3698,63 @@ microblaze_expand_conditional_branch_reg
      {
        comp_reg = cmp_op0;
        condition = gen_rtx_fmt_ee (signed_condition (code),
@@ -215,7 +215,7 @@ index 9f94d015597..58d7397945e 100644
      }
  }
  
-@@ -3724,6 +3770,19 @@ microblaze_expand_conditional_branch_sf (rtx operands[])
+@@ -3725,6 +3771,19 @@ microblaze_expand_conditional_branch_sf
    emit_jump_insn (gen_condjump (condition, operands[3]));
  }
  
@@ -235,11 +235,11 @@ index 9f94d015597..58d7397945e 100644
  /* Implement TARGET_FRAME_POINTER_REQUIRED.  */
  
  static bool
-diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index 6aac8a6cc2a..22fc3509319 100644
---- a/gcc/config/microblaze/microblaze.h
-+++ b/gcc/config/microblaze/microblaze.h
-@@ -102,6 +102,7 @@ extern enum pipeline_type microblaze_pipe;
+Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.h
++++ gcc-12.1.0/gcc/config/microblaze/microblaze.h
+@@ -102,6 +102,7 @@ extern enum pipeline_type microblaze_pip
  #define ASM_SPEC "\
  %(target_asm_spec) \
  %{mbig-endian:-EB} \
@@ -247,7 +247,7 @@ index 6aac8a6cc2a..22fc3509319 100644
  %{mlittle-endian:-EL}"
  
  /* Extra switches sometimes passed to the linker.  */
-@@ -110,6 +111,7 @@ extern enum pipeline_type microblaze_pipe;
+@@ -110,6 +111,7 @@ extern enum pipeline_type microblaze_pip
  #define LINK_SPEC "%{shared:-shared} -N -relax \
    %{mbig-endian:-EB --oformat=elf32-microblaze} \
    %{mlittle-endian:-EL --oformat=elf32-microblazeel} \
@@ -255,7 +255,7 @@ index 6aac8a6cc2a..22fc3509319 100644
    %{Zxl-mode-xmdstub:-defsym _TEXT_START_ADDR=0x800} \
    %{mxl-mode-xmdstub:-defsym _TEXT_START_ADDR=0x800} \
    %{mxl-gp-opt:%{G*}} %{!mxl-gp-opt: -G 0} \
-@@ -217,7 +219,7 @@ extern enum pipeline_type microblaze_pipe;
+@@ -217,7 +219,7 @@ extern enum pipeline_type microblaze_pip
  #define MIN_UNITS_PER_WORD      4
  #define INT_TYPE_SIZE           32
  #define SHORT_TYPE_SIZE         16
@@ -264,10 +264,10 @@ index 6aac8a6cc2a..22fc3509319 100644
  #define LONG_LONG_TYPE_SIZE     64
  #define FLOAT_TYPE_SIZE         32
  #define DOUBLE_TYPE_SIZE        64
-diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 9dd12d1011b..3834725eec1 100644
---- a/gcc/config/microblaze/microblaze.md
-+++ b/gcc/config/microblaze/microblaze.md
+Index: gcc-12.1.0/gcc/config/microblaze/microblaze.md
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.md
++++ gcc-12.1.0/gcc/config/microblaze/microblaze.md
 @@ -497,7 +497,6 @@
    (set_attr "mode"      "SF")
    (set_attr "length"    "4")])
@@ -630,10 +630,13 @@ index 9dd12d1011b..3834725eec1 100644
  ;;----------------------------------------------------------------
  ;; Conditional branches
  ;;----------------------------------------------------------------
-@@ -1927,6 +2168,115 @@
-    (set_attr "length"   "12")]
- )
- 
+@@ -1924,6 +2165,115 @@
+   }
+   [(set_attr "type"     "branch")
+    (set_attr "mode"     "none")
++   (set_attr "length"   "12")]
++)
++
 +
 +(define_expand "cbranchdi4"
 +  [(set (pc)
@@ -740,16 +743,13 @@ index 9dd12d1011b..3834725eec1 100644
 +  }
 +  [(set_attr "type"     "branch")
 +   (set_attr "mode"     "none")
-+   (set_attr "length"   "12")]
-+)
-+
- ;;----------------------------------------------------------------
- ;; Unconditional branches
- ;;----------------------------------------------------------------
-diff --git a/gcc/config/microblaze/microblaze.opt b/gcc/config/microblaze/microblaze.opt
-index 2a72566372b..206899c0384 100644
---- a/gcc/config/microblaze/microblaze.opt
-+++ b/gcc/config/microblaze/microblaze.opt
+    (set_attr "length"   "12")]
+ )
+ 
+Index: gcc-12.1.0/gcc/config/microblaze/microblaze.opt
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.opt
++++ gcc-12.1.0/gcc/config/microblaze/microblaze.opt
 @@ -136,4 +136,9 @@ Target
  
  mxl-frequency
@@ -761,10 +761,10 @@ index 2a72566372b..206899c0384 100644
 +Target Mask(MB_64)
 +MicroBlaze 64-bit mode.
 +
-diff --git a/gcc/config/microblaze/t-microblaze b/gcc/config/microblaze/t-microblaze
-index 41fa9a92081..e9a1921ae26 100644
---- a/gcc/config/microblaze/t-microblaze
-+++ b/gcc/config/microblaze/t-microblaze
+Index: gcc-12.1.0/gcc/config/microblaze/t-microblaze
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/t-microblaze
++++ gcc-12.1.0/gcc/config/microblaze/t-microblaze
 @@ -1,8 +1,11 @@
 -MULTILIB_OPTIONS = mxl-barrel-shift mno-xl-soft-mul mxl-multiply-high mlittle-endian
 -MULTILIB_DIRNAMES = bs m mh le
@@ -778,7 +778,4 @@ index 41fa9a92081..e9a1921ae26 100644
 +MULTILIB_EXCEPTIONS += *mxl-multiply-high/mlittle-endian/m64
  
  # Extra files
- microblaze-c.o: $(srcdir)/config/microblaze/microblaze-c.c \
--- 
-2.17.1
-
+ microblaze-c.o: $(srcdir)/config/microblaze/microblaze-c.cc \

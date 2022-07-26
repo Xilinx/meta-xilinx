@@ -5,16 +5,16 @@ Subject: [PATCH 24/53] [Patch,MicroBlaze] : this patch has 1.Fixed the bug in
  version calculation. 2.Add new bitfield instructions.
 
 ---
- gcc/config/microblaze/microblaze.c  | 154 ++++++++++++++--------------
+ gcc/config/microblaze/microblaze.cc  | 154 ++++++++++++++--------------
  gcc/config/microblaze/microblaze.h  |   2 +
  gcc/config/microblaze/microblaze.md |  69 +++++++++++++
  3 files changed, 147 insertions(+), 78 deletions(-)
 
-diff --git a/gcc/config/microblaze/microblaze.c b/gcc/config/microblaze/microblaze.c
-index 84e17fc4520..9f94d015597 100644
---- a/gcc/config/microblaze/microblaze.c
-+++ b/gcc/config/microblaze/microblaze.c
-@@ -164,6 +164,9 @@ int microblaze_no_unsafe_delay;
+Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.cc
++++ gcc-12.1.0/gcc/config/microblaze/microblaze.cc
+@@ -165,6 +165,9 @@ int microblaze_no_unsafe_delay;
  /* Set to one if the targeted core has the CLZ insn.  */
  int microblaze_has_clz = 0;
  
@@ -24,7 +24,7 @@ index 84e17fc4520..9f94d015597 100644
  /* Which CPU pipeline do we use. We haven't really standardized on a CPU 
     version having only a particular type of pipeline. There can still be 
     options on the CPU to scale pipeline features up or down. :( 
-@@ -239,6 +242,63 @@ section *sdata2_section;
+@@ -240,6 +243,63 @@ section *sdata2_section;
  #define TARGET_HAVE_TLS true
  #endif
  
@@ -88,7 +88,7 @@ index 84e17fc4520..9f94d015597 100644
  /* Return truth value if a CONST_DOUBLE is ok to be a legitimate constant.  */
  static bool
  microblaze_const_double_ok (rtx op, machine_mode mode)
-@@ -1338,8 +1398,7 @@ microblaze_rtx_costs (rtx x, machine_mode mode, int outer_code ATTRIBUTE_UNUSED,
+@@ -1339,8 +1399,7 @@ microblaze_rtx_costs (rtx x, machine_mod
        {
  	if (TARGET_BARREL_SHIFT)
  	  {
@@ -98,7 +98,7 @@ index 84e17fc4520..9f94d015597 100644
  	      *total = COSTS_N_INSNS (1);
  	    else
  	      *total = COSTS_N_INSNS (2);
-@@ -1400,8 +1459,7 @@ microblaze_rtx_costs (rtx x, machine_mode mode, int outer_code ATTRIBUTE_UNUSED,
+@@ -1401,8 +1460,7 @@ microblaze_rtx_costs (rtx x, machine_mod
  	  }
  	else if (!TARGET_SOFT_MUL)
  	  {
@@ -108,7 +108,7 @@ index 84e17fc4520..9f94d015597 100644
  	      *total = COSTS_N_INSNS (1);
  	    else
  	      *total = COSTS_N_INSNS (3);
-@@ -1674,72 +1732,13 @@ function_arg_partial_bytes (cumulative_args_t cum_v,
+@@ -1675,72 +1733,13 @@ function_arg_partial_bytes (cumulative_a
    return 0;
  }
  
@@ -174,15 +174,15 @@ index 84e17fc4520..9f94d015597 100644
  static void
  microblaze_option_override (void)
  {
-   register int i, start;
-   register int regno;
-   register machine_mode mode;
+   int i, start;
+   int regno;
+   machine_mode mode;
 -  int ver;
 +  int ver,ver_int;
  
-   microblaze_section_threshold = (global_options_set.x_g_switch_value
+   microblaze_section_threshold = (OPTION_SET_P (g_switch_value)
  				  ? g_switch_value
-@@ -1760,13 +1759,13 @@ microblaze_option_override (void)
+@@ -1761,13 +1760,13 @@ microblaze_option_override (void)
    /* Check the MicroBlaze CPU version for any special action to be done.  */
    if (microblaze_select_cpu == NULL)
      microblaze_select_cpu = MICROBLAZE_DEFAULT_CPU;
@@ -199,7 +199,7 @@ index 84e17fc4520..9f94d015597 100644
    if (ver < 0)
      {
        /* No hardware exceptions in earlier versions. So no worries.  */
-@@ -1777,8 +1776,7 @@ microblaze_option_override (void)
+@@ -1778,8 +1777,7 @@ microblaze_option_override (void)
        microblaze_pipe = MICROBLAZE_PIPE_3;
      }
    else if (ver == 0
@@ -209,7 +209,7 @@ index 84e17fc4520..9f94d015597 100644
      {
  #if 0
        microblaze_select_flags |= (MICROBLAZE_MASK_NO_UNSAFE_DELAY);
-@@ -1795,11 +1793,9 @@ microblaze_option_override (void)
+@@ -1796,11 +1794,9 @@ microblaze_option_override (void)
  #endif
        microblaze_no_unsafe_delay = 0;
        microblaze_pipe = MICROBLAZE_PIPE_5;
@@ -224,7 +224,7 @@ index 84e17fc4520..9f94d015597 100644
  	{
  	  /* Pattern compares are to be turned on by default only when 
   	     compiling for MB v5.00.'z'.  */
-@@ -1807,7 +1803,7 @@ microblaze_option_override (void)
+@@ -1808,7 +1804,7 @@ microblaze_option_override (void)
  	}
      }
  
@@ -233,7 +233,7 @@ index 84e17fc4520..9f94d015597 100644
    if (ver < 0)
      {
        if (TARGET_MULTIPLY_HIGH)
-@@ -1816,7 +1812,7 @@ microblaze_option_override (void)
+@@ -1817,7 +1813,7 @@ microblaze_option_override (void)
  		 "%<-mcpu=v6.00.a%> or greater");
      }
  
@@ -242,7 +242,7 @@ index 84e17fc4520..9f94d015597 100644
    microblaze_has_clz = 1;
    if (ver < 0)
      {
-@@ -1825,7 +1821,7 @@ microblaze_option_override (void)
+@@ -1826,7 +1822,7 @@ microblaze_option_override (void)
      }
  
    /* TARGET_REORDER defaults to 2 if -mxl-reorder not specified.  */
@@ -251,7 +251,7 @@ index 84e17fc4520..9f94d015597 100644
    if (ver < 0)
      {
          if (TARGET_REORDER == 1)
-@@ -1840,7 +1836,7 @@ microblaze_option_override (void)
+@@ -1841,7 +1837,7 @@ microblaze_option_override (void)
  		   "%<-mcpu=v8.30.a%>");
          TARGET_REORDER = 0;
      }
@@ -260,7 +260,7 @@ index 84e17fc4520..9f94d015597 100644
    if (ver < 0)
      {
          if (TARGET_AREA_OPTIMIZED_2)
-@@ -1850,6 +1846,8 @@ microblaze_option_override (void)
+@@ -1851,6 +1847,8 @@ microblaze_option_override (void)
      {
          if (TARGET_AREA_OPTIMIZED_2)
            microblaze_pipe = MICROBLAZE_PIPE_8;
@@ -269,10 +269,10 @@ index 84e17fc4520..9f94d015597 100644
      }
  
    if (TARGET_MULTIPLY_HIGH && TARGET_SOFT_MUL)
-diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index 21560ec1618..6aac8a6cc2a 100644
---- a/gcc/config/microblaze/microblaze.h
-+++ b/gcc/config/microblaze/microblaze.h
+Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.h
++++ gcc-12.1.0/gcc/config/microblaze/microblaze.h
 @@ -44,6 +44,7 @@ extern int microblaze_dbx_regno[];
  
  extern int microblaze_no_unsafe_delay;
@@ -281,7 +281,7 @@ index 21560ec1618..6aac8a6cc2a 100644
  extern enum pipeline_type microblaze_pipe;
  
  #define OBJECT_FORMAT_ELF
-@@ -63,6 +64,7 @@ extern enum pipeline_type microblaze_pipe;
+@@ -63,6 +64,7 @@ extern enum pipeline_type microblaze_pip
  /* Do we have CLZ?  */
  #define TARGET_HAS_CLZ      (TARGET_PATTERN_COMPARE && microblaze_has_clz)
  
@@ -289,11 +289,11 @@ index 21560ec1618..6aac8a6cc2a 100644
  /* The default is to support PIC.  */
  #define TARGET_SUPPORTS_PIC 1
  
-diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index ce72acb9ee0..fc3326b2314 100644
---- a/gcc/config/microblaze/microblaze.md
-+++ b/gcc/config/microblaze/microblaze.md
-@@ -2489,4 +2489,73 @@
+Index: gcc-12.1.0/gcc/config/microblaze/microblaze.md
+===================================================================
+--- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.md
++++ gcc-12.1.0/gcc/config/microblaze/microblaze.md
+@@ -2491,4 +2491,73 @@
    DONE;
  }")
  
@@ -367,6 +367,3 @@ index ce72acb9ee0..fc3326b2314 100644
 +   (set_attr "length" "4")])
 +
  (include "sync.md")
--- 
-2.17.1
-
