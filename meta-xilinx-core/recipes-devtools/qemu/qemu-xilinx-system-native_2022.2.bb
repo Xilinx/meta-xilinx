@@ -1,5 +1,7 @@
 require qemu-xilinx-native.inc
 
+PROVIDES = "qemu-system-native"
+
 EXTRA_OECONF:append = " --target-list=${@get_qemu_system_target_list(d)}"
 
 PACKAGECONFIG ??= "fdt alsa kvm pie"
