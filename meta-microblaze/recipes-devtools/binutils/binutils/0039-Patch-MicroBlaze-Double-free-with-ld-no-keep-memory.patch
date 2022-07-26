@@ -10,10 +10,10 @@ Subject: [PATCH] [Patch,MicroBlaze] : Double free with ld --no-keep-memory.
  bfd/elf64-microblaze.c | 43 ++++++++++++++++++++----------------------
  2 files changed, 41 insertions(+), 41 deletions(-)
 
-diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 290e70e0f4..cbbedddd1a 100644
---- a/bfd/elf32-microblaze.c
-+++ b/bfd/elf32-microblaze.c
+Index: git/bfd/elf32-microblaze.c
+===================================================================
+--- git.orig/bfd/elf32-microblaze.c
++++ git/bfd/elf32-microblaze.c
 @@ -1839,10 +1839,8 @@ microblaze_elf_relax_section (bfd *abfd,
  {
    Elf_Internal_Shdr *symtab_hdr;
@@ -42,7 +42,7 @@ index 290e70e0f4..cbbedddd1a 100644
  
  	      if (!bfd_get_section_contents (abfd, sec, contents,
  					     (file_ptr) 0, sec->size))
-@@ -2445,25 +2440,26 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2413,25 +2408,26 @@ microblaze_elf_relax_section (bfd *abfd,
  	}
  
        elf_section_data (sec)->relocs = internal_relocs;
@@ -56,14 +56,15 @@ index 290e70e0f4..cbbedddd1a 100644
  
 -  free (free_relocs);
 -  free_relocs = NULL;
-+  if (internal_relocs != NULL
-+      && elf_section_data (sec)->relocs != internal_relocs)
-+    free (internal_relocs);
- 
+-
 -  if (free_contents != NULL)
 -    {
 -      if (!link_info->keep_memory)
 -	free (free_contents);
++  if (internal_relocs != NULL
++      && elf_section_data (sec)->relocs != internal_relocs)
++    free (internal_relocs);
++
 +  if (contents != NULL
 +      && elf_section_data (sec)->this_hdr.contents != contents)
 +   {
@@ -80,7 +81,7 @@ index 290e70e0f4..cbbedddd1a 100644
      }
  
    if (sec->relax_count == 0)
-@@ -2477,8 +2473,15 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2445,8 +2441,15 @@ microblaze_elf_relax_section (bfd *abfd,
    return true;
  
   error_return:
@@ -98,10 +99,10 @@ index 290e70e0f4..cbbedddd1a 100644
    free (sec->relax);
    sec->relax = NULL;
    sec->relax_count = 0;
-diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index 7bad93e706..677499e672 100644
---- a/bfd/elf64-microblaze.c
-+++ b/bfd/elf64-microblaze.c
+Index: git/bfd/elf64-microblaze.c
+===================================================================
+--- git.orig/bfd/elf64-microblaze.c
++++ git/bfd/elf64-microblaze.c
 @@ -1849,10 +1849,8 @@ microblaze_elf_relax_section (bfd *abfd,
  {
    Elf_Internal_Shdr *symtab_hdr;
@@ -131,7 +132,7 @@ index 7bad93e706..677499e672 100644
  	      if (!bfd_get_section_contents (abfd, sec, contents,
  					     (file_ptr) 0, sec->size))
  		goto error_return;
-@@ -2454,28 +2448,26 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2434,28 +2428,26 @@ microblaze_elf_relax_section (bfd *abfd,
          }
  
        elf_section_data (sec)->relocs = internal_relocs;
@@ -171,7 +172,7 @@ index 7bad93e706..677499e672 100644
      }
  
    if (sec->relax_count == 0)
-@@ -2489,10 +2481,15 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2469,10 +2461,15 @@ microblaze_elf_relax_section (bfd *abfd,
    return true;
  
   error_return:
@@ -191,6 +192,3 @@ index 7bad93e706..677499e672 100644
    if (sec->relax != NULL)
      {
        free (sec->relax);
--- 
-2.17.1
-

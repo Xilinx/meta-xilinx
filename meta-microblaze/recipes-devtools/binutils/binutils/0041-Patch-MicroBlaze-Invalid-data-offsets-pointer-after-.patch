@@ -10,11 +10,11 @@ Subject: [PATCH] [Patch,MicroBlaze] : Invalid data offsets (pointer) after
  bfd/elf64-microblaze.c | 17 +++++++++++++++++
  2 files changed, 35 insertions(+)
 
-diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 713f5e8e50..37a1873570 100644
---- a/bfd/elf32-microblaze.c
-+++ b/bfd/elf32-microblaze.c
-@@ -2131,6 +2131,9 @@ microblaze_elf_relax_section (bfd *abfd,
+Index: git/bfd/elf32-microblaze.c
+===================================================================
+--- git.orig/bfd/elf32-microblaze.c
++++ git/bfd/elf32-microblaze.c
+@@ -2130,6 +2130,9 @@ microblaze_elf_relax_section (bfd *abfd,
                  {
                    unsigned int val;
  
@@ -24,7 +24,7 @@ index 713f5e8e50..37a1873570 100644
                    isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
  
                    /* hax: We only do the following fixup for debug location lists.  */
-@@ -2172,6 +2175,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2171,6 +2174,9 @@ microblaze_elf_relax_section (bfd *abfd,
                }
                if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32)
                  {
@@ -34,7 +34,7 @@ index 713f5e8e50..37a1873570 100644
  	          isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
  
                    /* Look at the reloc only if the value has been resolved.  */
-@@ -2204,6 +2210,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2203,6 +2209,9 @@ microblaze_elf_relax_section (bfd *abfd,
  		    }
  		  else if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_SYM_OP_SYM)
  		    {
@@ -44,7 +44,7 @@ index 713f5e8e50..37a1873570 100644
  		      isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
  
  		      /* Look at the reloc only if the value has been resolved.  */
-@@ -2241,6 +2250,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2240,6 +2249,9 @@ microblaze_elf_relax_section (bfd *abfd,
  		       || (ELF32_R_TYPE (irelscan->r_info)
  				   == (int) R_MICROBLAZE_TEXTREL_32_LO))
  		{
@@ -54,7 +54,7 @@ index 713f5e8e50..37a1873570 100644
  		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
  
  		  /* Look at the reloc only if the value has been resolved.  */
-@@ -2287,6 +2299,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2286,6 +2298,9 @@ microblaze_elf_relax_section (bfd *abfd,
  		  || (ELF32_R_TYPE (irelscan->r_info)
  			      == (int) R_MICROBLAZE_TEXTREL_64))
  		{
@@ -64,7 +64,7 @@ index 713f5e8e50..37a1873570 100644
  		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
  
  		  /* Look at the reloc only if the value has been resolved.  */
-@@ -2331,6 +2346,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2320,6 +2335,9 @@ microblaze_elf_relax_section (bfd *abfd,
  		}
  	      else if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_64_PCREL)
  		{
@@ -74,11 +74,11 @@ index 713f5e8e50..37a1873570 100644
  		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
  
  		  /* Look at the reloc only if the value has been resolved.  */
-diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index 210b84b2a5..bd1c7d3b1f 100644
---- a/bfd/elf64-microblaze.c
-+++ b/bfd/elf64-microblaze.c
-@@ -2138,6 +2138,8 @@ microblaze_elf_relax_section (bfd *abfd,
+Index: git/bfd/elf64-microblaze.c
+===================================================================
+--- git.orig/bfd/elf64-microblaze.c
++++ git/bfd/elf64-microblaze.c
+@@ -2135,6 +2135,8 @@ microblaze_elf_relax_section (bfd *abfd,
                if (1 && ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_NONE)
                  {
                    unsigned int val;
@@ -87,7 +87,7 @@ index 210b84b2a5..bd1c7d3b1f 100644
  
                    isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
  
-@@ -2180,6 +2182,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2177,6 +2179,9 @@ microblaze_elf_relax_section (bfd *abfd,
                if (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32 
  		   || ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_IMML_64)
                  {
@@ -97,7 +97,7 @@ index 210b84b2a5..bd1c7d3b1f 100644
  	          isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
  
                    /* Look at the reloc only if the value has been resolved.  */
-@@ -2212,6 +2217,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2209,6 +2214,9 @@ microblaze_elf_relax_section (bfd *abfd,
                      }
  		  else if (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_SYM_OP_SYM)
  		    {
@@ -107,7 +107,7 @@ index 210b84b2a5..bd1c7d3b1f 100644
  		      isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
  
  		      /* Look at the reloc only if the value has been resolved.  */
-@@ -2247,6 +2255,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2244,6 +2252,9 @@ microblaze_elf_relax_section (bfd *abfd,
  		       || (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_LO)
                 || (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_TEXTREL_32_LO))
  		{
@@ -117,7 +117,7 @@ index 210b84b2a5..bd1c7d3b1f 100644
  		  isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
  
  		  /* Look at the reloc only if the value has been resolved.  */
-@@ -2292,6 +2303,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2289,6 +2300,9 @@ microblaze_elf_relax_section (bfd *abfd,
  	      if (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_64
            || (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_TEXTREL_64))
  		{
@@ -127,7 +127,7 @@ index 210b84b2a5..bd1c7d3b1f 100644
  		  isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
  
  		  /* Look at the reloc only if the value has been resolved.  */
-@@ -2339,6 +2353,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2336,6 +2350,9 @@ microblaze_elf_relax_section (bfd *abfd,
  		}
  	      else if (ELF64_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_64_PCREL)
  		{
@@ -137,6 +137,3 @@ index 210b84b2a5..bd1c7d3b1f 100644
  		  isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
  
  		  /* Look at the reloc only if the value has been resolved.  */
--- 
-2.17.1
-

@@ -9,11 +9,11 @@ Subject: [PATCH] [Patch,MicroBlaze] : Fixing the imm/imml generation for 16
  bfd/elf64-microblaze.c | 5 ++++-
  2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 37a1873570..290e70e0f4 100644
---- a/bfd/elf32-microblaze.c
-+++ b/bfd/elf32-microblaze.c
-@@ -1977,7 +1977,11 @@ microblaze_elf_relax_section (bfd *abfd,
+Index: git/bfd/elf32-microblaze.c
+===================================================================
+--- git.orig/bfd/elf32-microblaze.c
++++ git/bfd/elf32-microblaze.c
+@@ -1972,7 +1972,11 @@ microblaze_elf_relax_section (bfd *abfd,
        else
  	symval += irel->r_addend;
  
@@ -26,11 +26,11 @@ index 37a1873570..290e70e0f4 100644
  	{
  	  /* We can delete this instruction.  */
  	  sec->relax[sec->relax_count].addr = irel->r_offset;
-diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index bd1c7d3b1f..7bad93e706 100644
---- a/bfd/elf64-microblaze.c
-+++ b/bfd/elf64-microblaze.c
-@@ -1987,7 +1987,10 @@ microblaze_elf_relax_section (bfd *abfd,
+Index: git/bfd/elf64-microblaze.c
+===================================================================
+--- git.orig/bfd/elf64-microblaze.c
++++ git/bfd/elf64-microblaze.c
+@@ -1981,7 +1981,10 @@ microblaze_elf_relax_section (bfd *abfd,
        else
  	symval += irel->r_addend;
  
@@ -42,6 +42,3 @@ index bd1c7d3b1f..7bad93e706 100644
  	{
            /* We can delete this instruction.  */
  	  sec->relax[sec->relax_count].addr = irel->r_offset;
--- 
-2.17.1
-

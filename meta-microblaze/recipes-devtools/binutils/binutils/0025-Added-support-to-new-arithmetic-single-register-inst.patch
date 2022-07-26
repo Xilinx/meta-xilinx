@@ -17,10 +17,10 @@ Conflicts:
  opcodes/microblaze-opcm.h  |   5 +-
  4 files changed, 200 insertions(+), 6 deletions(-)
 
-diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 52058d94f98..1a543c328f2 100644
---- a/gas/config/tc-microblaze.c
-+++ b/gas/config/tc-microblaze.c
+Index: git/gas/config/tc-microblaze.c
+===================================================================
+--- git.orig/gas/config/tc-microblaze.c
++++ git/gas/config/tc-microblaze.c
 @@ -423,12 +423,33 @@ void
  md_begin (void)
  {
@@ -68,12 +68,12 @@ index 52058d94f98..1a543c328f2 100644
 @@ -996,9 +1018,10 @@ md_assemble (char * str)
    unsigned reg3;
    unsigned isize;
-   unsigned long immed, immed2, temp;
+   unsigned long immed = 0, immed2 = 0, temp;
 -  expressionS exp;
-+  expressionS exp,exp1;
++  expressionS exp, exp1;
    char name[20];
    long immedl;
-+  int reg=0;
++  int reg = 0;
  
    /* Drop leading whitespace.  */
    while (ISSPACE (* str))
@@ -209,11 +209,11 @@ index 52058d94f98..1a543c328f2 100644
      case INST_TYPE_R1_RFSL:
        if (strcmp (op_end, ""))
          op_end = parse_reg (op_end + 1, &reg1);  /* Get r1.  */
-diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
-index 143a0a9d59e..d945d144c44 100644
---- a/opcodes/microblaze-dis.c
-+++ b/opcodes/microblaze-dis.c
-@@ -130,6 +130,14 @@ get_field_imm15 (struct string_buf *buf, long instr)
+Index: git/opcodes/microblaze-dis.c
+===================================================================
+--- git.orig/opcodes/microblaze-dis.c
++++ git/opcodes/microblaze-dis.c
+@@ -130,6 +130,14 @@ get_field_imm15 (struct string_buf *buf,
    return p;
  }
  
@@ -228,7 +228,7 @@ index 143a0a9d59e..d945d144c44 100644
  static char *
  get_field_special (struct string_buf *buf, long instr,
  		   const struct op_code_struct *op)
-@@ -456,6 +464,9 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+@@ -456,6 +464,9 @@ print_insn_microblaze (bfd_vma memaddr,
  	  /* For mbar 16 or sleep insn.  */
  	case INST_TYPE_NONE:
  	  break;
@@ -238,10 +238,10 @@ index 143a0a9d59e..d945d144c44 100644
          /* For bit field insns.  */
  	case INST_TYPE_RD_R1_IMMW_IMMS:
            print_func (stream, "\t%s, %s, %s, %s", get_field_rd (&buf, inst),get_field_r1(&buf, inst),get_field_immw (&buf, inst), get_field_imms (&buf, inst));
-diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index fff7520ae81..c25383f2de9 100644
---- a/opcodes/microblaze-opc.h
-+++ b/opcodes/microblaze-opc.h
+Index: git/opcodes/microblaze-opc.h
+===================================================================
+--- git.orig/opcodes/microblaze-opc.h
++++ git/opcodes/microblaze-opc.h
 @@ -69,6 +69,7 @@
  #define INST_TYPE_RD_R1_IMMW_IMMS  21
  
@@ -337,10 +337,10 @@ index fff7520ae81..c25383f2de9 100644
    {"imml",    INST_TYPE_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB2000000, OPCODE_MASK_H8, imml, immediate_inst },
    {"breai",   INST_TYPE_IMM, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB8010000, OPCODE_MASK_H12, breai, branch_inst },
    {"breaid",  INST_TYPE_IMM, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB8110000, OPCODE_MASK_H12, breaid, branch_inst },
-diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
-index 70e351f6f4e..cf7512d6a87 100644
---- a/opcodes/microblaze-opcm.h
-+++ b/opcodes/microblaze-opcm.h
+Index: git/opcodes/microblaze-opcm.h
+===================================================================
+--- git.orig/opcodes/microblaze-opcm.h
++++ git/opcodes/microblaze-opcm.h
 @@ -61,7 +61,9 @@ enum microblaze_instr
    eaputd, teaputd, ecaputd, tecaputd, neaputd, tneaputd, necaputd, tnecaputd,
  
@@ -359,6 +359,3 @@ index 70e351f6f4e..cf7512d6a87 100644
 +#define IMM16_MASK 0x0000FFFF
  
  #endif /* MICROBLAZE-OPCM */
--- 
-2.17.1
-

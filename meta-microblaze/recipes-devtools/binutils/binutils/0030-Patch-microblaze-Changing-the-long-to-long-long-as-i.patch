@@ -9,19 +9,16 @@ Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
  gas/config/tc-microblaze.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 805d250b6ac..84f60c029c1 100644
---- a/gas/config/tc-microblaze.c
-+++ b/gas/config/tc-microblaze.c
+Index: git/gas/config/tc-microblaze.c
+===================================================================
+--- git.orig/gas/config/tc-microblaze.c
++++ git/gas/config/tc-microblaze.c
 @@ -1017,7 +1017,7 @@ md_assemble (char * str)
    unsigned reg2;
    unsigned reg3;
    unsigned isize;
--  unsigned long immed, immed2, temp;
-+  unsigned long long immed, immed2, temp;
-   expressionS exp,exp1;
+-  unsigned long immed = 0, immed2 = 0, temp;
++  unsigned long long immed = 0, immed2 = 0, temp;
+   expressionS exp, exp1;
    char name[20];
    long immedl;
--- 
-2.17.1
-

@@ -13,11 +13,11 @@ Conflicts:
  gas/tc.h                   |   2 +-
  3 files changed, 152 insertions(+), 53 deletions(-)
 
-diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index 46c4aba46f1..010ee1d15b4 100644
---- a/bfd/elf64-microblaze.c
-+++ b/bfd/elf64-microblaze.c
-@@ -1511,6 +1511,14 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+Index: git/bfd/elf64-microblaze.c
+===================================================================
+--- git.orig/bfd/elf64-microblaze.c
++++ git/bfd/elf64-microblaze.c
+@@ -1511,6 +1511,14 @@ microblaze_elf_relocate_section (bfd *ou
  			  bfd_put_16 (input_bfd, relocation & 0xffff,
  				      contents + offset + endian);
  
@@ -32,7 +32,7 @@ index 46c4aba46f1..010ee1d15b4 100644
  			else
  			  {
  			    bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
-@@ -1618,6 +1626,14 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1618,6 +1626,14 @@ microblaze_elf_relocate_section (bfd *ou
  			     bfd_put_16 (input_bfd, relocation & 0xffff,
  					 contents + offset + endian);
  			  }
@@ -70,7 +70,7 @@ index 46c4aba46f1..010ee1d15b4 100644
  }
  
  /* Read-modify-write into the bfd, an immediate value into appropriate fields of
-@@ -1741,10 +1767,18 @@ microblaze_bfd_write_imm_value_64 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
+@@ -1741,10 +1767,18 @@ microblaze_bfd_write_imm_value_64 (bfd *
      unsigned long instr_lo;
  
      instr_hi = bfd_get_32 (abfd, bfd_addr);
@@ -93,11 +93,11 @@ index 46c4aba46f1..010ee1d15b4 100644
      instr_lo = bfd_get_32 (abfd, bfd_addr + INST_WORD_SIZE);
      instr_lo &= ~0x0000ffff;
      instr_lo |= (val & 0x0000ffff);
-diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 685a6e93f2b..9b311ed1450 100644
---- a/gas/config/tc-microblaze.c
-+++ b/gas/config/tc-microblaze.c
-@@ -392,7 +392,7 @@ microblaze_s_weakext (int ignore ATTRIBUTE_UNUSED)
+Index: git/gas/config/tc-microblaze.c
+===================================================================
+--- git.orig/gas/config/tc-microblaze.c
++++ git/gas/config/tc-microblaze.c
+@@ -392,7 +392,7 @@ microblaze_s_weakext (int ignore ATTRIBU
     Integer arg to pass to the function.  */
  /* If the pseudo-op is not found in this table, it searches in the obj-elf.c,
     and then in the read.c table.  */
@@ -119,8 +119,8 @@ index 685a6e93f2b..9b311ed1450 100644
    unsigned reg2;
    unsigned reg3;
    unsigned isize;
--  unsigned int immed, immed2, temp;
-+  unsigned long immed, immed2, temp;
+-  unsigned int immed = 0, immed2 = 0, temp;
++  unsigned long immed = 0, immed2 = 0, temp;
    expressionS exp;
    char name[20];
    long immedl;
@@ -316,7 +316,7 @@ index 685a6e93f2b..9b311ed1450 100644
             if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64)
               fixP->fx_r_type = BFD_RELOC_64; 
             if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_PCREL)
-@@ -2636,7 +2693,14 @@ md_estimate_size_before_relax (fragS * fragP,
+@@ -2636,7 +2693,14 @@ md_estimate_size_before_relax (fragS * f
          }
        else
  	{
@@ -332,7 +332,7 @@ index 685a6e93f2b..9b311ed1450 100644
  	  fragP->fr_var = INST_WORD_SIZE*2;
  	}
        break;
-@@ -2913,6 +2977,7 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
+@@ -2913,6 +2977,7 @@ md_parse_option (int c, const char * arg
      case OPTION_M64:
        //if (arg != NULL && strcmp (arg, "64") == 0)
        microblaze_arch_size = 64;
@@ -340,10 +340,10 @@ index 685a6e93f2b..9b311ed1450 100644
        break;
      default:
        return 0;
-diff --git a/gas/tc.h b/gas/tc.h
-index c9722307dea..f1fa7495e29 100644
---- a/gas/tc.h
-+++ b/gas/tc.h
+Index: git/gas/tc.h
+===================================================================
+--- git.orig/gas/tc.h
++++ git/gas/tc.h
 @@ -22,7 +22,7 @@
  /* In theory (mine, at least!) the machine dependent part of the assembler
     should only have to include one file.  This one.  -- JF */
@@ -353,6 +353,3 @@ index c9722307dea..f1fa7495e29 100644
  
  const char * md_atof (int, char *, int *);
  int    md_parse_option (int, const char *);
--- 
-2.17.1
-
