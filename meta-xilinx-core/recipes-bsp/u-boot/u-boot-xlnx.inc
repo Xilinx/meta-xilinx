@@ -29,7 +29,8 @@ DTB_NAME ?= ""
 # Example: UBOOT_USER_SPECIFIED_DTS = "versal-vck190-revA-x-ebm-01-revA"
 UBOOT_USER_SPECIFIED_DTS ?= ""
 
-EXTRA_OEMAKE += "${@'EXT_DTB=${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_NAME}' if (d.getVar('DTB_NAME') != '' and d.getVar('UBOOT_USER_SPECIFIED_DTS') == '') else 'DEVICE_TREE=${UBOOT_USER_SPECIFIED_DTS}'}"
+EXTRA_OEMAKE += "${@'EXT_DTB=${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_NAME}' if (d.getVar('DTB_NAME') != '' and d.getVar('UBOOT_USER_SPECIFIED_DTS') == '') else '' }"
+EXTRA_OEMAKE += "${@'DEVICE_TREE=${UBOOT_USER_SPECIFIED_DTS}' if (d.getVar('UBOOT_USER_SPECIFIED_DTS') != '') else '' }"
 
 python __anonymous () {
     #check if there are any dtb providers
