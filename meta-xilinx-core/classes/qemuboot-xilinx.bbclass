@@ -10,11 +10,11 @@ QB_MACHINE_XILINX:aarch64 = "-machine arm-generic-fdt"
 QB_MACHINE_XILINX:arm = "-M arm-generic-fdt-7series"
 QB_MACHINE_XILINX:microblaze = "-M microblaze-fdt-plnx"
 
-QB_SYSTEM_NAME = "${@qemu_target_binary(d)}"
-QB_DEFAULT_FSTYPE = "${@qemu_rootfs_params(d,'fstype')}"
-QB_ROOTFS = "${@qemu_rootfs_params(d,'rootfs')}"
-QB_ROOTFS_OPT = "${@qemu_rootfs_params(d,'rootfs-opt')}"
-QB_DTB = "${@qemu_default_dtb(d)}"
+QB_SYSTEM_NAME ?= "${@qemu_target_binary(d)}"
+QB_DEFAULT_FSTYPE ?= "${@qemu_rootfs_params(d,'fstype')}"
+QB_ROOTFS ?= "${@qemu_rootfs_params(d,'rootfs')}"
+QB_ROOTFS_OPT ?= "${@qemu_rootfs_params(d,'rootfs-opt')}"
+QB_DTB ?= "${@qemu_default_dtb(d)}"
 
 # defaults
 QB_DEFAULT_KERNEL ?= "none"
