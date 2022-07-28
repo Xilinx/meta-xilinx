@@ -15,7 +15,7 @@ S = "${WORKDIR}/git"
 inherit setuptools3
 
 do_install:append() {
-	rm -f ${D}/${datadir}/LICENSE
+	rm -f ${D}/${datadir}/LICENSE ${D}/${prefix}/LICENSE
 	rmdir ${D}/${datadir} || :
 }
 
