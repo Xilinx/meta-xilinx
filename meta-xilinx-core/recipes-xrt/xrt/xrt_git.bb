@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://../LICENSE;md5=da5408f748bce8a9851dac18e66f4bcf \
 
 S = "${WORKDIR}/git/src"
 
-inherit cmake
+inherit cmake pkgconfig
 
 BBCLASSEXTEND = "native nativesdk"
 
