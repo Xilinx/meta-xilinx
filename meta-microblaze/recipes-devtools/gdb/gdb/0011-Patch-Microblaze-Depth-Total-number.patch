@@ -1,0 +1,61 @@
+From 1f6eef2eb2e6974ba9989977d1b1c8dfdeca94f4 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Thu, 21 Jul 2022 11:45:01 +0530
+Subject: [PATCH] =?UTF-8?q?[Patch,MicroBlaze]:=20Depth:=20=20Total=20numbe?=
+ =?UTF-8?q?r=20of=20inline=20functions=20[refer=20inline-frame.c]=20state-?=
+ =?UTF-8?q?>skipped=5Fframes=20:=20Number=20of=20inline=20functions=20skip?=
+ =?UTF-8?q?ped.=20the=20current=20unwind=5Fpc=20is=20causing=20an=20issue?=
+ =?UTF-8?q?=20when=20we=20try=20to=20step=20into=20inline=20functions[Dept?=
+ =?UTF-8?q?h=20is=20becoming=200].=20It=E2=80=99s=20incrementing=20pc=20by?=
+ =?UTF-8?q?=208=20even=20with=20si=20instruction.?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ gdb/microblaze-tdep.c | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
+
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index aad6a9cae6e..41a2eb511d6 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -524,16 +524,8 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+ static CORE_ADDR
+ microblaze_unwind_pc (struct gdbarch *gdbarch, struct frame_info *next_frame)
+ {
+-  gdb_byte buf[4];
+   CORE_ADDR pc;
+-
+-  frame_unwind_register (next_frame, MICROBLAZE_PC_REGNUM, buf);
+-  pc = extract_typed_address (buf, builtin_type (gdbarch)->builtin_func_ptr);
+-  /* For sentinel frame, return address is actual PC.  For other frames,
+-     return address is pc+8.  This is a workaround because gcc does not
+-     generate correct return address in CIE.  */
+-  if (frame_relative_level (next_frame) >= 0)
+-    pc += 8;
++  pc=frame_unwind_register_unsigned (next_frame, MICROBLAZE_PC_REGNUM);
+   return pc;
+ }
+ 
+@@ -564,7 +556,6 @@ microblaze_skip_prologue (struct gdbarch *gdbarch, CORE_ADDR start_pc)
+   ostart_pc = microblaze_analyze_prologue (gdbarch, func_start, 0xffffffffUL, 
+ 					   &cache);
+ 
+-
+   if (ostart_pc > start_pc)
+     return ostart_pc;
+   return start_pc;
+@@ -670,7 +661,8 @@ static const struct frame_unwind microblaze_frame_unwind =
+   microblaze_frame_this_id,
+   microblaze_frame_prev_register,
+   NULL,
+-  default_frame_sniffer
++  default_frame_sniffer,
++  NULL,
+ };
+ 
+ static CORE_ADDR
+-- 
+2.17.1
+

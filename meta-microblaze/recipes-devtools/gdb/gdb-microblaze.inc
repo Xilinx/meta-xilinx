@@ -15,4 +15,5 @@ SRC_URI:append:microblaze = " \
      file://0008-Patch-MicroBlaze-these-changes-will-make-64-bit-vect.patch \
      file://0009-Patch-MicroBlaze-Added-m64-abi-for-64-bit-target-des.patch \
      file://0010-Patch-MicroBlaze-Code-changes-for-gdbserver.patch \
+     file://0011-Patch-Microblaze-Depth-Total-number.patch \
      "
