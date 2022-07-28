@@ -1,7 +1,7 @@
 SUMMARY = "Xilinx libdfx library"
 DESCRIPTION = "Xilinx libdfx Library and headers"
 
-LICENSE = "GPLv2"
+LICENSE = "MIT & GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=94aba86aec117f003b958a52f019f1a7"
 
 BRANCH ?= "xlnx_rel_v2022.1"

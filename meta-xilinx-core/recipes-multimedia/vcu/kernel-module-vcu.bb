@@ -1,7 +1,7 @@
 SUMMARY = "Linux kernel module for Video Code Unit"
 DESCRIPTION = "Out-of-tree VCU decoder, encoder and common kernel modules provider for MPSoC EV devices"
 SECTION = "kernel/modules"
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=eb723b61539feef013de476e68b5c50a"
 
 XILINX_VCU_VERSION = "1.0.0"
