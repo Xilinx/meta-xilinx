@@ -1,0 +1,10 @@
+Kirkstone is not currently supported.  We are experimenting with enabling the
+Yocto Project LTS branch, but are not currently testing this version.
+
+If you are using this version and find any issues, please report them to the
+
+   meta-xilinx@lists.yoctoproject.org
+
+mailing list.  While we can not promise that it will get priority, patches
+or forward / back port requests are welcome.
+
