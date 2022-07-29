@@ -30,10 +30,6 @@ EXTRA_OECMAKE += " \
 INITSCRIPT_NAME = "dfx-mgr.sh"
 INITSCRIPT_PARAMS = "start 99 S ."
 
-SRC_URI:append = " \
-	file://dfx-mgr.service \
-	file://xlnx-firmware-detect \
-	"
 SYSTEMD_PACKAGES="${PN}"
 SYSTEMD_SERVICE:${PN}="dfx-mgr.service"
 SYSTEMD_AUTO_ENABLE:${PN}="enable"
@@ -51,7 +47,7 @@ do_install(){
 	chrpath -d ${D}${bindir}/dfx-mgrd
 	chrpath -d ${D}${bindir}/dfx-mgr-client
 	install -m 0644 ${S}/src/dfxmgr_client.h ${D}${includedir}
-	
+
        	oe_soinstall ${B}/src/libdfx-mgr.so.${SOVERSION} ${D}${libdir}
 
 	install -m 0755 ${S}/src/daemon.conf ${D}${sysconfdir}/dfx-mgrd/
@@ -61,11 +57,11 @@ do_install(){
 		install -m 0755 ${S}/src/dfx-mgr.sh ${D}${sysconfdir}/init.d/
 	fi
 
-	install -m 0755 ${S}/src/dfx-mgr.sh ${D}${bindir}/
-	install -m 0755 ${WORKDIR}/xlnx-firmware-detect ${D}${bindir}
+	install -m 0755 ${S}/src/dfx-mgr.sh ${D}${bindir}
+	install -m 0755 ${S}/src/scripts/xlnx-firmware-detect ${D}${bindir}
 
-	install -d ${D}${systemd_system_unitdir} 
-	install -m 0644 ${WORKDIR}/dfx-mgr.service ${D}${systemd_system_unitdir}
+	install -d ${D}${systemd_system_unitdir}
+	install -m 0644 ${S}/src/dfx-mgr.service ${D}${systemd_system_unitdir}
 }
 
 PACKAGES =+ "libdfx-mgr"
