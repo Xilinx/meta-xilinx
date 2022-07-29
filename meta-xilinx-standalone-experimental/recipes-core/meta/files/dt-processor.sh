@@ -34,8 +34,8 @@ usage() {
   cat <<EOF
 $0
     -c <config_dir>         Location of the build conf directory
-    -s <system_dtb>         Full path to system DTB
-    -d <domain_file>        Full path to domain file (.yml/.dts)
+    -s <system_dtb>         Path to system DTB
+    -d <domain_file>        Path to domain file (.yml/.dts)
     [-o <overlay_dtb>]      Generate overlay dts
     [-e <external_fpga>]    Apply a partial overlay
     [-m <machine>]          zynqmp or versal
@@ -77,6 +77,11 @@ parse_args() {
   if [ -z "$pdi_path" ]; then
     pdi_path=$(dirname ${system_dtb})
   fi
+  system_dtb=$(realpath ${system_dtb})
+  if [ "$domain_file" ]; then
+    domain_file=$(realpath ${domain_file})
+  fi
+
 }
 
 detect_machine() {
