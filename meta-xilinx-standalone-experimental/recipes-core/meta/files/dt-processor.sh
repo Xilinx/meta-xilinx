@@ -937,7 +937,7 @@ parse_cpus() {
 
 gen_local_conf() {
   echo "# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere" >> $1
-  echo "BASE_TMPDIR = \"\${TOPDIR}\"" >> $1
+  echo "BASE_TMPDIR ?= \"\${TOPDIR}\"" >> $1
   [ -n "${system_conf}" ] && echo "require ${system_conf}" >> $1
   echo "SYSTEM_DTFILE = \"${system_dtb}\"" >> $1
   echo "BBMULTICONFIG += \"${multiconf}\"" >> $1
