@@ -168,6 +168,8 @@ cortex_a53_linux() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 MACHINE = "${machine}-generic"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE:${machine}-generic = ""
@@ -249,6 +251,8 @@ EOF
   fi
   cat <<EOF >>"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "cortexa53-${machine}"
 DEFAULTTUNE = "cortexa53"
 
@@ -305,6 +309,8 @@ cortex_a53_freertos() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "cortexa53-${machine}"
 DEFAULTTUNE = "cortexa53"
 
@@ -388,6 +394,8 @@ cortex_a72_linux() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 MACHINE = "${machine}-generic"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE:${machine}-generic = ""
@@ -440,6 +448,8 @@ cortex_a72_baremetal() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "cortexa72-${machine}"
 DEFAULTTUNE = "cortexa72"
 
@@ -496,6 +506,8 @@ cortex_a72_freertos() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "cortexa72-${machine}"
 DEFAULTTUNE = "cortexa72"
 
@@ -581,6 +593,8 @@ EOF
   fi
   cat <<EOF >>"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "cortexr5-${machine}"
 DEFAULTTUNE = "cortexr5"
 
@@ -637,6 +651,8 @@ cortex_r5_freertos() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "cortexr5-${machine}"
 DEFAULTTUNE = "cortexr5"
 
@@ -705,6 +721,8 @@ pmu-microblaze() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "microblaze-pmu"
 
 require conf/microblaze.conf
@@ -761,6 +779,8 @@ pmc-microblaze() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "microblaze-plm"
 
 require conf/microblaze.conf
@@ -817,6 +837,8 @@ psm-microblaze() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "microblaze-psm"
 
 require conf/microblaze.conf
