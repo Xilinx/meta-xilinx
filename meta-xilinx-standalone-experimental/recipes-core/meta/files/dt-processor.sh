@@ -71,14 +71,18 @@ parse_args() {
 
   [ -f "${config_dir}/local.conf" ] || error "Invalid config dir: ${config_dir}"
   [ -f "${system_dtb}" ] || error "Unable to find: ${system_dtb}"
+  system_dtb=$(realpath ${system_dtb})
   if [ -z "$psu_init_path" ]; then
     psu_init_path=$(dirname ${system_dtb})
+  else
+    psu_init_path=$(realpath ${psu_init_path})
   fi
   if [ -z "$pdi_path" ]; then
     pdi_path=$(dirname ${system_dtb})
+  else
+    pdi_path=$(realpath ${pdi_path})
   fi
-  system_dtb=$(realpath ${system_dtb})
-  if [ "$domain_file" ]; then
+  if [ -n "$domain_file" ]; then
     domain_file=$(realpath ${domain_file})
   fi
 
