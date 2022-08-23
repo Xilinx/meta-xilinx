@@ -27,7 +27,7 @@ KERNEL_BOOTCMD:zynq ?= "bootm"
 KERNEL_BOOTCMD:versal ?= "booti"
 KERNEL_BOOTCMD:microblaze ?= "bootm"
 
-BOOTMODE ?= "generic"
+BOOTMODE ??= "generic"
 BOOTFILE_EXT ?= ""
 
 #Make this value to "1" to skip appending base address to ddr offsets.
@@ -43,6 +43,7 @@ SRC_URI = " \
             file://boot.cmd.sd.versal \
             file://boot.cmd.qspi.versal \
 	    file://boot.cmd.generic \
+	    file://boot.cmd.generic.root \
 	    file://boot.cmd.ubifs \
             file://pxeboot.pxe \
             "
@@ -159,7 +160,17 @@ NAND_FIT_IMAGE_OFFSET ?= "0x4180000"
 NAND_FIT_IMAGE_OFFSET:zynq ?= "0x1080000"
 NAND_FIT_IMAGE_SIZE ?= "0x6400000"
 
+# Set SD/eMMC Controller Device Number as 0
 SDBOOTDEV ?= "0"
+
+# Default to booting with the rootfs device being partition 2 for SD/eMMC
+PARTNUM ?= "2"
+
+# Set Kernel root filesystem parameter for SD/eMMC boot
+KERNEL_ROOT_SD ?= "root=/dev/mmcblk${SDBOOTDEV}p${PARTNUM} rw rootwait"
+
+# Set Kernel root filesystem parameter for JTAG/QSPI/OSPI/NAND(using RAMDISK) boot
+KERNEL_ROOT_RAMDISK ?= "root=/dev/ram0 rw"
 
 BITSTREAM_LOAD_ADDRESS ?= "0x100000"
 
@@ -217,6 +228,9 @@ do_compile() {
 	-e 's/@@UENV_MMC_LOAD_ADDRESS@@/${UENV_MMC_LOAD_ADDRESS}/' \
 	-e 's/@@UENV_TEXTFILE@@/${UENV_TEXTFILE}/' \
 	-e 's/@@RAMDISK_IMAGE1@@/${RAMDISK_IMAGE1}/' \
+	-e 's/@@PARTNUM@@/${PARTNUM}/' \
+	-e 's:@@KERNEL_ROOT_SD@@:${KERNEL_ROOT_SD}:' \
+	-e 's:@@KERNEL_ROOT_RAMDISK@@:${KERNEL_ROOT_RAMDISK}:' \
         "${WORKDIR}/boot.cmd.${BOOTMODE}${BOOTFILE_EXT}" > "${WORKDIR}/boot.cmd"
     mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
