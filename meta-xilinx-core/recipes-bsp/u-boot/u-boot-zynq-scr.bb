@@ -160,14 +160,12 @@ NAND_FIT_IMAGE_OFFSET ?= "0x4180000"
 NAND_FIT_IMAGE_OFFSET:zynq ?= "0x1080000"
 NAND_FIT_IMAGE_SIZE ?= "0x6400000"
 
-# Set SD/eMMC Controller Device Number as 0
-SDBOOTDEV ?= "0"
-
 # Default to booting with the rootfs device being partition 2 for SD/eMMC
 PARTNUM ?= "2"
 
 # Set Kernel root filesystem parameter for SD/eMMC boot
-KERNEL_ROOT_SD ?= "root=/dev/mmcblk${SDBOOTDEV}p${PARTNUM} rw rootwait"
+# Bootdev will automatically be set to 'sda' or 'mmcblkXp'
+KERNEL_ROOT_SD ?= "root=/dev/\${bootdev}${PARTNUM} ro rootwait"
 
 # Set Kernel root filesystem parameter for JTAG/QSPI/OSPI/NAND(using RAMDISK) boot
 KERNEL_ROOT_RAMDISK ?= "root=/dev/ram0 rw"
