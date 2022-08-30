@@ -40,7 +40,8 @@ FILES:${PN} += "\
     ${libdir}/lib*.so \
     ${libdir}/lib*.so.* \
     ${libdir}/ps_kernels_lib \
-    /lib/*.so* "
+    /lib/*.so* \
+    ${datadir}"
 INSANE_SKIP:${PN} += "dev-so"
 
 pkg_postinst_ontarget:${PN}() {
