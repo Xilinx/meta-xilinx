@@ -34,8 +34,8 @@ usage() {
   cat <<EOF
 $0
     -c <config_dir>         Location of the build conf directory
-    -s <system_dtb>         Full path to system DTB
-    -d <domain_file>        Full path to domain file (.yml/.dts)
+    -s <system_dtb>         Path to system DTB
+    -d <domain_file>        Path to domain file (.yml/.dts)
     [-o <overlay_dtb>]      Generate overlay dts
     [-e <external_fpga>]    Apply a partial overlay
     [-m <machine>]          zynqmp or versal
@@ -71,12 +71,21 @@ parse_args() {
 
   [ -f "${config_dir}/local.conf" ] || error "Invalid config dir: ${config_dir}"
   [ -f "${system_dtb}" ] || error "Unable to find: ${system_dtb}"
+  system_dtb=$(realpath ${system_dtb})
   if [ -z "$psu_init_path" ]; then
     psu_init_path=$(dirname ${system_dtb})
+  else
+    psu_init_path=$(realpath ${psu_init_path})
   fi
   if [ -z "$pdi_path" ]; then
     pdi_path=$(dirname ${system_dtb})
+  else
+    pdi_path=$(realpath ${pdi_path})
   fi
+  if [ -n "$domain_file" ]; then
+    domain_file=$(realpath ${domain_file})
+  fi
+
 }
 
 detect_machine() {
@@ -159,6 +168,8 @@ cortex_a53_linux() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 MACHINE = "${machine}-generic"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE:${machine}-generic = ""
@@ -240,6 +251,8 @@ EOF
   fi
   cat <<EOF >>"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "cortexa53-${machine}"
 DEFAULTTUNE = "cortexa53"
 
@@ -296,6 +309,8 @@ cortex_a53_freertos() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "cortexa53-${machine}"
 DEFAULTTUNE = "cortexa53"
 
@@ -379,6 +394,8 @@ cortex_a72_linux() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 MACHINE = "${machine}-generic"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE:${machine}-generic = ""
@@ -431,6 +448,8 @@ cortex_a72_baremetal() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "cortexa72-${machine}"
 DEFAULTTUNE = "cortexa72"
 
@@ -487,6 +506,8 @@ cortex_a72_freertos() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "cortexa72-${machine}"
 DEFAULTTUNE = "cortexa72"
 
@@ -572,6 +593,8 @@ EOF
   fi
   cat <<EOF >>"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "cortexr5-${machine}"
 DEFAULTTUNE = "cortexr5"
 
@@ -628,6 +651,8 @@ cortex_r5_freertos() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "cortexr5-${machine}"
 DEFAULTTUNE = "cortexr5"
 
@@ -696,6 +721,8 @@ pmu-microblaze() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "microblaze-pmu"
 
 require conf/microblaze.conf
@@ -752,6 +779,8 @@ pmc-microblaze() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "microblaze-plm"
 
 require conf/microblaze.conf
@@ -808,6 +837,8 @@ psm-microblaze() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
 ESW_MACHINE = "microblaze-psm"
 
 require conf/microblaze.conf
@@ -932,7 +963,7 @@ parse_cpus() {
 
 gen_local_conf() {
   echo "# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere" >> $1
-  echo "BASE_TMPDIR = \"\${TOPDIR}\"" >> $1
+  echo "BASE_TMPDIR ?= \"\${TOPDIR}\"" >> $1
   [ -n "${system_conf}" ] && echo "require ${system_conf}" >> $1
   echo "SYSTEM_DTFILE = \"${system_dtb}\"" >> $1
   echo "BBMULTICONFIG += \"${multiconf}\"" >> $1
