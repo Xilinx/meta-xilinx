@@ -1,4 +1,4 @@
-From fc3bbcce05e1726bf98948cebfef841b84df73cb Mon Sep 17 00:00:00 2001
+From be2ecb2dd73901484995c39d6c7375be6b8dd545 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Mon, 18 Jan 2016 12:28:21 +0530
 Subject: [PATCH 07/38] Added Address extension instructions
@@ -18,13 +18,15 @@ ChangeLog:
 
 Conflicts:
 	opcodes/microblaze-opcm.h
+
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  opcodes/microblaze-opc.h  | 11 +++++++++++
  opcodes/microblaze-opcm.h | 10 +++++-----
  2 files changed, 16 insertions(+), 5 deletions(-)
 
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index 746566fdb87..5d165dcdf91 100644
+index b8a0cf82516..d3f8e36199e 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -178,8 +178,11 @@ const struct op_code_struct
@@ -74,7 +76,7 @@ index 746566fdb87..5d165dcdf91 100644
    {"swaph",     INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x900001E2, OPCODE_MASK_H4,   swaph,     arithmetic_inst },
    {"", 0, 0, 0, 0, 0, 0, 0, 0},
 diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
-index 10d7e883366..250fd6a250a 100644
+index e56c1d2d47c..ad964560c17 100644
 --- a/opcodes/microblaze-opcm.h
 +++ b/opcodes/microblaze-opcm.h
 @@ -33,13 +33,13 @@ enum microblaze_instr
@@ -95,7 +97,7 @@ index 10d7e883366..250fd6a250a 100644
 +  sb, sbea, sbr, sh, shea, shr, sw, swea, swr, swx, lbui, lhui, lwi,
    sbi, shi, swi, msrset, msrclr, tuqula, mbi_fadd, frsub, mbi_fmul, mbi_fdiv,
    fcmp_lt, fcmp_eq, fcmp_le, fcmp_gt, fcmp_ne, fcmp_ge, fcmp_un, flt,
-   fint, fsqrt,
+   /* 'fsqrt' is a glibc:math.h symbol.  */
 -- 
-2.17.1
+2.25.1
 

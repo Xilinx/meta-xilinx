@@ -1,20 +1,21 @@
-From 5e492aae0baf2ed8593c2fb2df03c54fbb180e57 Mon Sep 17 00:00:00 2001
+From 020b77092a7a86795551a97469134c1e6f72b0cd Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Sun, 28 Nov 2021 17:17:15 +0530
-Subject: [PATCH 38/38] [Patch,MB]: MB binutils Upstream port issues.
+Subject: [PATCH 35/38] MB binutils Upstream port issues.
 
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
- bfd/elf64-microblaze.c     | 266 ++++++++++++++++++++++++++++---------
+ bfd/elf64-microblaze.c     | 250 +++++++++++++++++++++++++++----------
  gas/config/tc-microblaze.c |   2 +-
  opcodes/microblaze-dis.c   |  12 +-
  opcodes/microblaze-opc.h   |   2 +-
- 4 files changed, 208 insertions(+), 74 deletions(-)
+ 4 files changed, 193 insertions(+), 73 deletions(-)
 
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index 4d41ddbd953..210b84b2a50 100644
+index 387ee0da261..2e42366d8d6 100644
 --- a/bfd/elf64-microblaze.c
 +++ b/bfd/elf64-microblaze.c
-@@ -767,12 +767,35 @@ microblaze_elf_is_local_label_name (bfd *abfd, const char *name)
+@@ -808,12 +808,35 @@ microblaze_elf_is_local_label_name (bfd *abfd, const char *name)
    return _bfd_elf_is_local_label_name (abfd, name);
  }
  
@@ -50,7 +51,7 @@ index 4d41ddbd953..210b84b2a50 100644
    /* TLS Reference Types for the symbol; Updated by check_relocs */
  #define TLS_GD     1  /* GD reloc. */
  #define TLS_LD     2  /* LD reloc. */
-@@ -796,6 +819,18 @@ struct elf64_mb_link_hash_table
+@@ -837,6 +860,18 @@ struct elf64_mb_link_hash_table
  {
    struct elf_link_hash_table elf;
  
@@ -69,7 +70,7 @@ index 4d41ddbd953..210b84b2a50 100644
    /* TLS Local Dynamic GOT Entry */
    union {
      bfd_signed_vma refcount;
-@@ -1335,8 +1370,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1376,8 +1411,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  		/* Need to generate relocs ? */
  		if ((bfd_link_pic (info) || indx != 0)
  		    && (h == NULL
@@ -79,7 +80,7 @@ index 4d41ddbd953..210b84b2a50 100644
  		    || h->root.type != bfd_link_hash_undefweak))
  		  need_relocs = true;
  
-@@ -1523,13 +1557,11 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1564,13 +1598,11 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  			            contents + offset + endian);
  			  }
  			else
@@ -97,7 +98,7 @@ index 4d41ddbd953..210b84b2a50 100644
  		    break;
  		  }
  
-@@ -1619,9 +1651,16 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1660,9 +1692,16 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  		    else
  		      {
  			if (r_type == R_MICROBLAZE_64_PCREL)
@@ -116,7 +117,7 @@ index 4d41ddbd953..210b84b2a50 100644
  			else if (r_type == R_MICROBLAZE_TEXTREL_64
  				 || r_type == R_MICROBLAZE_TEXTREL_32_LO)
  			  relocation -= input_section->output_section->vma;
-@@ -1640,14 +1679,11 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1681,14 +1720,11 @@ microblaze_elf_relocate_section (bfd *output_bfd,
                                      contents + offset + endian);
                            }
  			else
@@ -136,29 +137,15 @@ index 4d41ddbd953..210b84b2a50 100644
  		    break;
  		  }
  	      }
-@@ -1718,6 +1754,21 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1759,6 +1795,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  
    return ret;
  }
 +
-+/* Merge backend specific data from an object file to the output
-+   object file when linking.
-+
-+   Note: We only use this hook to catch endian mismatches.  */
-+static bool
-+microblaze_elf_merge_private_bfd_data (bfd * ibfd, bfd * obfd)
-+{
-+  /* Check if we have the same endianess.  */
-+  if (! _bfd_generic_verify_endian_match (ibfd, obfd))
-+    return false;
-+
-+  return true;
-+}
-+
  
  /* Calculate fixup value for reference.  */
  
-@@ -2391,8 +2442,11 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2436,8 +2473,11 @@ microblaze_elf_relax_section (bfd *abfd,
        symtab_hdr->contents = (bfd_byte *) isymbuf;
      }
  
@@ -172,29 +159,29 @@ index 4d41ddbd953..210b84b2a50 100644
  
    if (free_contents != NULL)
      {
-@@ -2415,11 +2469,16 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2460,11 +2500,16 @@ microblaze_elf_relax_section (bfd *abfd,
    return true;
  
   error_return:
 -  free (free_relocs);
 -  free (free_contents);
--  free (sec->relax);
--  sec->relax = NULL;
--  sec->relax_count = 0;
+-  free (sdata->relax);
+-  sdata->relax = NULL;
+-  sdata->relax_count = 0;
 +  if (free_relocs != NULL)
 +    free (free_relocs);
 +  if (free_contents != NULL)
 +    free (free_contents);
-+  if (sec->relax != NULL)
++  if (sdata->relax != NULL)
 +    {
-+      free (sec->relax);
-+      sec->relax = NULL;
-+      sec->relax_count = 0;
++      free (sdata->relax);
++      sdata->relax = NULL;
++      sdata->relax_count = 0;
 +    }
    return false;
  }
  
-@@ -2444,6 +2503,17 @@ microblaze_elf_gc_mark_hook (asection *sec,
+@@ -2489,6 +2534,17 @@ microblaze_elf_gc_mark_hook (asection *sec,
    return _bfd_elf_gc_mark_hook (sec, info, rel, h, sym);
  }
  
@@ -212,7 +199,7 @@ index 4d41ddbd953..210b84b2a50 100644
  /* PIC support.  */
  
  #define PLT_ENTRY_SIZE 16
-@@ -2650,14 +2720,14 @@ microblaze_elf_check_relocs (bfd * abfd,
+@@ -2695,14 +2751,14 @@ microblaze_elf_check_relocs (bfd * abfd,
  			 && (! info->symbolic
  			     || h->root.type == bfd_link_hash_defweak
  			     || !h->def_regular))))
@@ -235,7 +222,7 @@ index 4d41ddbd953..210b84b2a50 100644
  
                  /* When creating a shared object, we must copy these
                     relocs into the output file.  We create a reloc
-@@ -2701,14 +2771,14 @@ microblaze_elf_check_relocs (bfd * abfd,
+@@ -2746,14 +2802,14 @@ microblaze_elf_check_relocs (bfd * abfd,
  		      return false;
  
  		    vpp = &elf_section_data (s)->local_dynrel;
@@ -252,7 +239,7 @@ index 4d41ddbd953..210b84b2a50 100644
  			 bfd_alloc (htab->elf.dynobj, amt));
  		    if (p == NULL)
  		      return false;
-@@ -2731,6 +2801,34 @@ microblaze_elf_check_relocs (bfd * abfd,
+@@ -2776,6 +2832,34 @@ microblaze_elf_check_relocs (bfd * abfd,
    return true;
  }
  
@@ -287,7 +274,7 @@ index 4d41ddbd953..210b84b2a50 100644
  /* Copy the extra info we tack onto an elf_link_hash_entry.  */
  
  static void
-@@ -2743,6 +2841,40 @@ microblaze_elf_copy_indirect_symbol (struct bfd_link_info *info,
+@@ -2788,6 +2872,40 @@ microblaze_elf_copy_indirect_symbol (struct bfd_link_info *info,
    edir = (struct elf64_mb_link_hash_entry *) dir;
    eind = (struct elf64_mb_link_hash_entry *) ind;
  
@@ -328,7 +315,7 @@ index 4d41ddbd953..210b84b2a50 100644
    edir->tls_mask |= eind->tls_mask;
  
    _bfd_elf_link_hash_copy_indirect (info, dir, ind);
-@@ -2828,9 +2960,17 @@ microblaze_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
+@@ -2873,9 +2991,17 @@ microblaze_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
        return true;
      }
  
@@ -348,7 +335,7 @@ index 4d41ddbd953..210b84b2a50 100644
      {
        h->non_got_ref = 0;
        return true;
-@@ -2849,19 +2989,11 @@ microblaze_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
+@@ -2894,19 +3020,11 @@ microblaze_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
    /* We must generate a R_MICROBLAZE_COPY reloc to tell the dynamic linker
       to copy the initial value out of the dynamic object and into the
       runtime process image.  */
@@ -371,7 +358,7 @@ index 4d41ddbd953..210b84b2a50 100644
        h->needs_copy = 1;
      }
  
-@@ -2871,11 +3003,12 @@ microblaze_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
+@@ -2916,11 +3034,12 @@ microblaze_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
    if (power_of_two > 3)
      power_of_two = 3;
  
@@ -387,7 +374,7 @@ index 4d41ddbd953..210b84b2a50 100644
  	return false;
      }
  
-@@ -2897,7 +3030,7 @@ allocate_dynrelocs (struct elf_link_hash_entry *h, void * dat)
+@@ -2942,7 +3061,7 @@ allocate_dynrelocs (struct elf_link_hash_entry *h, void * dat)
    struct bfd_link_info *info;
    struct elf64_mb_link_hash_table *htab;
    struct elf64_mb_link_hash_entry *eh;
@@ -396,7 +383,7 @@ index 4d41ddbd953..210b84b2a50 100644
  
    if (h->root.type == bfd_link_hash_indirect)
      return true;
-@@ -2949,7 +3082,7 @@ allocate_dynrelocs (struct elf_link_hash_entry *h, void * dat)
+@@ -2994,7 +3113,7 @@ allocate_dynrelocs (struct elf_link_hash_entry *h, void * dat)
  	  htab->elf.sgotplt->size += 4;
  
  	  /* We also need to make an entry in the .rel.plt section.  */
@@ -405,7 +392,7 @@ index 4d41ddbd953..210b84b2a50 100644
  	}
        else
          {
-@@ -3015,7 +3148,7 @@ allocate_dynrelocs (struct elf_link_hash_entry *h, void * dat)
+@@ -3060,7 +3179,7 @@ allocate_dynrelocs (struct elf_link_hash_entry *h, void * dat)
    else
      h->got.offset = (bfd_vma) -1;
  
@@ -414,7 +401,7 @@ index 4d41ddbd953..210b84b2a50 100644
      return true;
  
    /* In the shared -Bsymbolic case, discard space allocated for
-@@ -3030,9 +3163,9 @@ allocate_dynrelocs (struct elf_link_hash_entry *h, void * dat)
+@@ -3075,9 +3194,9 @@ allocate_dynrelocs (struct elf_link_hash_entry *h, void * dat)
  	  && (h->forced_local
  	      || info->symbolic))
  	{
@@ -426,7 +413,7 @@ index 4d41ddbd953..210b84b2a50 100644
  	    {
  	      p->count -= p->pc_count;
  	      p->pc_count = 0;
-@@ -3124,7 +3257,7 @@ microblaze_elf_size_dynamic_sections (bfd *output_bfd ATTRIBUTE_UNUSED,
+@@ -3169,7 +3288,7 @@ microblaze_elf_size_dynamic_sections (bfd *output_bfd ATTRIBUTE_UNUSED,
  	{
  	  struct elf_dyn_relocs *p;
  
@@ -435,12 +422,7 @@ index 4d41ddbd953..210b84b2a50 100644
  		    elf_section_data (s)->local_dynrel);
  	       p != NULL;
  	       p = p->next)
-@@ -3601,13 +3734,14 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
- #define bfd_elf64_bfd_is_local_label_name       microblaze_elf_is_local_label_name
- #define elf_backend_relocate_section		microblaze_elf_relocate_section
- #define bfd_elf64_bfd_relax_section             microblaze_elf_relax_section
--#define bfd_elf64_bfd_merge_private_bfd_data    _bfd_generic_verify_endian_match
-+#define bfd_elf64_bfd_merge_private_bfd_data    microblaze_elf_merge_private_bfd_data
+@@ -3650,9 +3769,10 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
  #define bfd_elf64_bfd_reloc_name_lookup		microblaze_elf_reloc_name_lookup
  
  #define elf_backend_gc_mark_hook		microblaze_elf_gc_mark_hook
@@ -454,7 +436,7 @@ index 4d41ddbd953..210b84b2a50 100644
  #define elf_backend_can_gc_sections		1
  #define elf_backend_can_refcount		1
  #define elf_backend_want_got_plt		1
-@@ -3617,11 +3751,11 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
+@@ -3662,11 +3782,11 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
  #define elf_backend_rela_normal			1
  #define elf_backend_dtrel_excludes_plt		1
  
@@ -472,7 +454,7 @@ index 4d41ddbd953..210b84b2a50 100644
  
  #include "elf64-target.h"
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index dfcd0ab1569..e34af099640 100644
+index 123d5ba6214..41d51007273 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -433,7 +433,7 @@ const pseudo_typeS md_pseudo_table[] =
@@ -485,7 +467,7 @@ index dfcd0ab1569..e34af099640 100644
  
    opcode_hash_control = str_htab_create ();
 diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
-index d945d144c44..5e8ebb28b8f 100644
+index 0814cab5bdb..95c2147f86e 100644
 --- a/opcodes/microblaze-dis.c
 +++ b/opcodes/microblaze-dis.c
 @@ -140,7 +140,7 @@ get_field_imm16 (struct string_buf *buf, long instr)
@@ -539,7 +521,7 @@ index d945d144c44..5e8ebb28b8f 100644
  
    *unconditionalbranch = false;
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index 6f9a5a60dab..a6165649793 100644
+index e65f4b58233..4a415495113 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -145,7 +145,7 @@
@@ -552,5 +534,5 @@ index 6f9a5a60dab..a6165649793 100644
    const char * name;
    short inst_type;            /* Registers and immediate values involved.  */
 -- 
-2.17.1
+2.25.1
 

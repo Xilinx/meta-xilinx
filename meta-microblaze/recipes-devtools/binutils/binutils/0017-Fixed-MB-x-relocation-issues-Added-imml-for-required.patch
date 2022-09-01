@@ -1,4 +1,4 @@
-From 835389f0f82b69f923aad7148717c48372a28828 Mon Sep 17 00:00:00 2001
+From 40702a32c685ad81803a666858b1b4133b0a9857 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 28 Sep 2018 12:04:55 +0530
 Subject: [PATCH 17/38] -Fixed MB-x relocation issues -Added imml for required
@@ -7,17 +7,19 @@ Subject: [PATCH 17/38] -Fixed MB-x relocation issues -Added imml for required
 Conflicts:
 	bfd/elf64-microblaze.c
 	gas/config/tc-microblaze.c
+
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  bfd/elf64-microblaze.c     |  48 ++++++++++--
  gas/config/tc-microblaze.c | 155 ++++++++++++++++++++++++++-----------
  gas/tc.h                   |   2 +-
  3 files changed, 152 insertions(+), 53 deletions(-)
 
-Index: git/bfd/elf64-microblaze.c
-===================================================================
---- git.orig/bfd/elf64-microblaze.c
-+++ git/bfd/elf64-microblaze.c
-@@ -1511,6 +1511,14 @@ microblaze_elf_relocate_section (bfd *ou
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index 7434bef393b..104d7a1334f 100644
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -1552,6 +1552,14 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  			  bfd_put_16 (input_bfd, relocation & 0xffff,
  				      contents + offset + endian);
  
@@ -32,7 +34,7 @@ Index: git/bfd/elf64-microblaze.c
  			else
  			  {
  			    bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
-@@ -1618,6 +1626,14 @@ microblaze_elf_relocate_section (bfd *ou
+@@ -1659,6 +1667,14 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  			     bfd_put_16 (input_bfd, relocation & 0xffff,
  					 contents + offset + endian);
  			  }
@@ -47,7 +49,7 @@ Index: git/bfd/elf64-microblaze.c
  			else
  			  {
  			    bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
-@@ -1727,9 +1743,19 @@ static void
+@@ -1769,9 +1785,19 @@ static void
  microblaze_bfd_write_imm_value_32 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
  {
      unsigned long instr = bfd_get_32 (abfd, bfd_addr);
@@ -70,7 +72,7 @@ Index: git/bfd/elf64-microblaze.c
  }
  
  /* Read-modify-write into the bfd, an immediate value into appropriate fields of
-@@ -1741,10 +1767,18 @@ microblaze_bfd_write_imm_value_64 (bfd *
+@@ -1783,10 +1809,18 @@ microblaze_bfd_write_imm_value_64 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
      unsigned long instr_lo;
  
      instr_hi = bfd_get_32 (abfd, bfd_addr);
@@ -93,11 +95,11 @@ Index: git/bfd/elf64-microblaze.c
      instr_lo = bfd_get_32 (abfd, bfd_addr + INST_WORD_SIZE);
      instr_lo &= ~0x0000ffff;
      instr_lo |= (val & 0x0000ffff);
-Index: git/gas/config/tc-microblaze.c
-===================================================================
---- git.orig/gas/config/tc-microblaze.c
-+++ git/gas/config/tc-microblaze.c
-@@ -392,7 +392,7 @@ microblaze_s_weakext (int ignore ATTRIBU
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 9d4dbc12ab3..a0e97231a41 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -392,7 +392,7 @@ microblaze_s_weakext (int ignore ATTRIBUTE_UNUSED)
     Integer arg to pass to the function.  */
  /* If the pseudo-op is not found in this table, it searches in the obj-elf.c,
     and then in the read.c table.  */
@@ -316,7 +318,7 @@ Index: git/gas/config/tc-microblaze.c
             if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64)
               fixP->fx_r_type = BFD_RELOC_64; 
             if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_PCREL)
-@@ -2636,7 +2693,14 @@ md_estimate_size_before_relax (fragS * f
+@@ -2636,7 +2693,14 @@ md_estimate_size_before_relax (fragS * fragP,
          }
        else
  	{
@@ -332,7 +334,7 @@ Index: git/gas/config/tc-microblaze.c
  	  fragP->fr_var = INST_WORD_SIZE*2;
  	}
        break;
-@@ -2913,6 +2977,7 @@ md_parse_option (int c, const char * arg
+@@ -2913,6 +2977,7 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
      case OPTION_M64:
        //if (arg != NULL && strcmp (arg, "64") == 0)
        microblaze_arch_size = 64;
@@ -340,10 +342,10 @@ Index: git/gas/config/tc-microblaze.c
        break;
      default:
        return 0;
-Index: git/gas/tc.h
-===================================================================
---- git.orig/gas/tc.h
-+++ git/gas/tc.h
+diff --git a/gas/tc.h b/gas/tc.h
+index 4a740f9bdd9..bb9a935a353 100644
+--- a/gas/tc.h
++++ b/gas/tc.h
 @@ -22,7 +22,7 @@
  /* In theory (mine, at least!) the machine dependent part of the assembler
     should only have to include one file.  This one.  -- JF */
@@ -353,3 +355,6 @@ Index: git/gas/tc.h
  
  const char * md_atof (int, char *, int *);
  int    md_parse_option (int, const char *);
+-- 
+2.25.1
+

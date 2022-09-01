@@ -1,4 +1,4 @@
-From c5c42765e7436fa20cc2069fa0426995cf940e5a Mon Sep 17 00:00:00 2001
+From 3f45718e99e09679472366a2c7e454c75f0383e3 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Mon, 18 Jul 2016 12:24:28 +0530
 Subject: [PATCH 09/38] Add new bit-field instructions
@@ -15,6 +15,7 @@ Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
 
 Conflicts:
 	opcodes/microblaze-dis.c
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  gas/config/tc-microblaze.c | 71 +++++++++++++++++++++++++++++++++++++-
  opcodes/microblaze-dis.c   | 20 +++++++++--
@@ -22,10 +23,10 @@ Conflicts:
  opcodes/microblaze-opcm.h  |  6 +++-
  4 files changed, 104 insertions(+), 5 deletions(-)
 
-Index: git/gas/config/tc-microblaze.c
-===================================================================
---- git.orig/gas/config/tc-microblaze.c
-+++ git/gas/config/tc-microblaze.c
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 8018d1f5686..1cb9b2519c3 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
 @@ -917,7 +917,7 @@ md_assemble (char * str)
    unsigned reg2;
    unsigned reg3;
@@ -60,7 +61,7 @@ Index: git/gas/config/tc-microblaze.c
 +        as_fatal (_("Cannot use special register with this instruction"));
 +      if (check_spl_reg (&reg2))
 +        as_fatal (_("Cannot use special register with this instruction"));
-+
+ 
 +      /* Width immediate value.  */
 +      if (strcmp (op_end, ""))
 +        op_end = parse_imm (op_end + 1, &exp, MIN_IMM_WIDTH, MAX_IMM_WIDTH);
@@ -75,7 +76,7 @@ Index: git/gas/config/tc-microblaze.c
 +        immed = exp.X_add_number;
 +      if (opcode->instr == bsefi && immed > 31)
 +        as_fatal (_("Width value must be less than 32"));
- 
++
 +      /* Shift immediate value.  */
 +      if (strcmp (op_end, ""))
 +        op_end = parse_imm (op_end + 1, &exp, MIN_IMM, MAX_IMM);
@@ -112,11 +113,11 @@ Index: git/gas/config/tc-microblaze.c
      case INST_TYPE_R1_R2:
        if (strcmp (op_end, ""))
          op_end = parse_reg (op_end + 1, &reg1);  /* Get r1.  */
-Index: git/opcodes/microblaze-dis.c
-===================================================================
---- git.orig/opcodes/microblaze-dis.c
-+++ git/opcodes/microblaze-dis.c
-@@ -91,7 +91,19 @@ get_field_imm5_mbar (struct string_buf *
+diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
+index b057492ba93..f57b98fc9f7 100644
+--- a/opcodes/microblaze-dis.c
++++ b/opcodes/microblaze-dis.c
+@@ -91,7 +91,19 @@ get_field_imm5_mbar (struct string_buf *buf, long instr)
  }
  
  static char *
@@ -137,7 +138,7 @@ Index: git/opcodes/microblaze-dis.c
  {
    char *p = strbuf (buf);
  
-@@ -427,7 +439,11 @@ print_insn_microblaze (bfd_vma memaddr,
+@@ -427,7 +439,11 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
  	  /* For mbar 16 or sleep insn.  */
  	case INST_TYPE_NONE:
  	  break;
@@ -150,10 +151,10 @@ Index: git/opcodes/microblaze-dis.c
  	case INST_TYPE_RD:
  	  print_func (stream, "\t%s", get_field_rd (&buf, inst));
  	  break;
-Index: git/opcodes/microblaze-opc.h
-===================================================================
---- git.orig/opcodes/microblaze-opc.h
-+++ git/opcodes/microblaze-opc.h
+diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
+index 3b3cdbe710c..825c639a41e 100644
+--- a/opcodes/microblaze-opc.h
++++ b/opcodes/microblaze-opc.h
 @@ -59,6 +59,9 @@
  /* For mbar.  */
  #define INST_TYPE_IMM5 20
@@ -201,10 +202,10 @@ Index: git/opcodes/microblaze-opc.h
 +
  #endif /* MICROBLAZE_OPC */
  
-Index: git/opcodes/microblaze-opcm.h
-===================================================================
---- git.orig/opcodes/microblaze-opcm.h
-+++ git/opcodes/microblaze-opcm.h
+diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
+index ad964560c17..aa3401610d9 100644
+--- a/opcodes/microblaze-opcm.h
++++ b/opcodes/microblaze-opcm.h
 @@ -29,7 +29,7 @@ enum microblaze_instr
    addi, rsubi, addic, rsubic, addik, rsubik, addikc, rsubikc, mul,
    mulh, mulhu, mulhsu,swapb,swaph,
@@ -214,7 +215,7 @@ Index: git/opcodes/microblaze-opcm.h
    /* 'or/and/xor' are C++ keywords.  */
    microblaze_or, microblaze_and, microblaze_xor,
    andn, pcmpbf, pcmpbc, pcmpeq, pcmpne, sra, src, srl, sext8, sext16,
-@@ -129,6 +129,7 @@ enum microblaze_instr_type
+@@ -130,6 +130,7 @@ enum microblaze_instr_type
  #define RB_LOW  11 /* Low bit for RB.  */
  #define IMM_LOW  0 /* Low bit for immediate.  */
  #define IMM_MBAR 21 /* low bit for mbar instruction.  */
@@ -222,7 +223,7 @@ Index: git/opcodes/microblaze-opcm.h
  
  #define RD_MASK 0x03E00000
  #define RA_MASK 0x001F0000
-@@ -141,6 +142,9 @@ enum microblaze_instr_type
+@@ -142,6 +143,9 @@ enum microblaze_instr_type
  /* Imm mask for mbar.  */
  #define IMM5_MBAR_MASK 0x03E00000
  
@@ -232,3 +233,6 @@ Index: git/opcodes/microblaze-opcm.h
  /* FSL imm mask for get, put instructions.  */
  #define  RFSL_MASK 0x000000F
  
+-- 
+2.25.1
+

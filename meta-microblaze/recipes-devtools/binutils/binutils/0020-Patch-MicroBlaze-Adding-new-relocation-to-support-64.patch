@@ -1,19 +1,20 @@
-From e49fe1aee519af464c873425212914c56fa683bc Mon Sep 17 00:00:00 2001
+From 2034e50763e51635405988d0cf67345cad1b2101 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 2 Nov 2021 17:28:24 +0530
 Subject: [PATCH 20/38] [Patch,MicroBlaze : Adding new relocation to support
  64bit rodata.
 
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  bfd/elf64-microblaze.c     | 11 +++++++--
  gas/config/tc-microblaze.c | 49 ++++++++++++++++++++++++++++++++++----
  2 files changed, 54 insertions(+), 6 deletions(-)
 
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index 2ae1f2b118a..55c01b44d29 100644
+index 2d4820c50fe..97131c352c7 100644
 --- a/bfd/elf64-microblaze.c
 +++ b/bfd/elf64-microblaze.c
-@@ -1488,6 +1488,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1529,6 +1529,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  	    case (int) R_MICROBLAZE_64_PCREL :
  	    case (int) R_MICROBLAZE_64:
  	    case (int) R_MICROBLAZE_32:
@@ -21,7 +22,7 @@ index 2ae1f2b118a..55c01b44d29 100644
  	      {
  		/* r_symndx will be STN_UNDEF (zero) only for relocs against symbols
  		   from removed linkonce sections, or sections discarded by
-@@ -1497,6 +1498,8 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1538,6 +1539,8 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  		    relocation += addend;
  		    if (r_type == R_MICROBLAZE_32)// || r_type == R_MICROBLAZE_IMML_64)
  		      bfd_put_32 (input_bfd, relocation, contents + offset);
@@ -30,7 +31,7 @@ index 2ae1f2b118a..55c01b44d29 100644
  		    else
  		      {
  			if (r_type == R_MICROBLAZE_64_PCREL)
-@@ -1585,7 +1588,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1626,7 +1629,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  		      }
  		    else
  		      {
@@ -39,7 +40,7 @@ index 2ae1f2b118a..55c01b44d29 100644
  			  {
  			    outrel.r_info = ELF64_R_INFO (0, R_MICROBLAZE_REL);
  			    outrel.r_addend = relocation + addend;
-@@ -1611,6 +1614,8 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1652,6 +1655,8 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  		    relocation += addend;
  		    if (r_type == R_MICROBLAZE_32)
  		      bfd_put_32 (input_bfd, relocation, contents + offset);
@@ -48,7 +49,7 @@ index 2ae1f2b118a..55c01b44d29 100644
  		    else
  		      {
  			if (r_type == R_MICROBLAZE_64_PCREL)
-@@ -2121,7 +2126,8 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2165,7 +2170,8 @@ microblaze_elf_relax_section (bfd *abfd,
                    microblaze_bfd_write_imm_value_32 (abfd, ocontents + irelscan->r_offset,
                                                       irelscan->r_addend);
                }
@@ -58,7 +59,7 @@ index 2ae1f2b118a..55c01b44d29 100644
                  {
  	          isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
  
-@@ -2595,6 +2601,7 @@ microblaze_elf_check_relocs (bfd * abfd,
+@@ -2640,6 +2646,7 @@ microblaze_elf_check_relocs (bfd * abfd,
          case R_MICROBLAZE_64:
          case R_MICROBLAZE_64_PCREL:
          case R_MICROBLAZE_32:
@@ -67,7 +68,7 @@ index 2ae1f2b118a..55c01b44d29 100644
              if (h != NULL && !bfd_link_pic (info))
  	      {
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 542c68a0857..6902a1518a6 100644
+index d3de049e9c0..76ce516d8aa 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -1119,6 +1119,13 @@ md_assemble (char * str)
@@ -163,5 +164,5 @@ index 542c68a0857..6902a1518a6 100644
          default:
            as_bad (_("unsupported BFD relocation size %u"), size);
 -- 
-2.17.1
+2.25.1
 

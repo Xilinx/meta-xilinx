@@ -1,18 +1,19 @@
-From 094a9534b55a51982857859553c582492bf91815 Mon Sep 17 00:00:00 2001
+From a1169180250097b012ed69e3181ea0b4e22ae022 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 21 Feb 2018 12:32:02 +0530
-Subject: [PATCH 13/38] [Patch,Microblaze]: Compiler will give error messages
- in more detail for mxl-gp-opt flag..
+Subject: [PATCH 13/38] Compiler will give error messages in more detail for
+ mxl-gp-opt flag..
 
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  ld/ldmain.c | 12 ++++++++++++
  1 file changed, 12 insertions(+)
 
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index 42660eb9a3c..7849f060aad 100644
+index 545f6a0f31a..d4502e7f3b0 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
-@@ -1562,6 +1562,18 @@ reloc_overflow (struct bfd_link_info *info,
+@@ -1566,6 +1566,18 @@ reloc_overflow (struct bfd_link_info *info,
  	  break;
  	case bfd_link_hash_defined:
  	case bfd_link_hash_defweak:
@@ -32,5 +33,5 @@ index 42660eb9a3c..7849f060aad 100644
  		   "%s against symbol `%pT' defined in %pA section in %pB"),
  		 reloc_name, entry->root.string,
 -- 
-2.17.1
+2.25.1
 

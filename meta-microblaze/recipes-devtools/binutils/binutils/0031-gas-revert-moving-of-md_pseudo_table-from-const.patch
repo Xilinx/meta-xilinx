@@ -1,4 +1,4 @@
-From 2a8a925c35909543738ccacafcdc7000525a27c6 Mon Sep 17 00:00:00 2001
+From 276d9d6138efbe27d2542f9b3dfb2a47072ec588 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 8 Nov 2021 21:57:13 +0530
 Subject: [PATCH 31/38] gas: revert moving of md_pseudo_table from const
@@ -18,7 +18,7 @@ Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
  2 files changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 84f60c029c1..dfcd0ab1569 100644
+index 604a8df86a2..123d5ba6214 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -385,6 +385,17 @@ microblaze_s_weakext (int ignore ATTRIBUTE_UNUSED)
@@ -66,7 +66,7 @@ index 84f60c029c1..dfcd0ab1569 100644
      default:
        return 0;
 diff --git a/gas/tc.h b/gas/tc.h
-index f1fa7495e29..c9722307dea 100644
+index bb9a935a353..4a740f9bdd9 100644
 --- a/gas/tc.h
 +++ b/gas/tc.h
 @@ -22,7 +22,7 @@
@@ -79,5 +79,5 @@ index f1fa7495e29..c9722307dea 100644
  const char * md_atof (int, char *, int *);
  int    md_parse_option (int, const char *);
 -- 
-2.17.1
+2.25.1
 

@@ -1,4 +1,4 @@
-From a150edd000f83578755a749bb8c44553e0dbc1f0 Mon Sep 17 00:00:00 2001
+From 8cfdaf2c7c3b3e8572588e6749f688f6b702fe35 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Mon, 15 Jun 2015 16:50:30 +0530
 Subject: [PATCH 06/38] Fix bug in TLSTPREL Relocation
@@ -8,15 +8,17 @@ When the fixup is applied the addend is not added at the correct offset
 of the instruction. The offset is hard coded considering its big endian
 and it fails for Little endian. This patch allows support for both
 big & little-endian compilers
+
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  bfd/elf32-microblaze.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 2316e085d1f..e0729c6a194 100644
+index e36cd102bd2..c66f4ffef36 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
-@@ -1443,9 +1443,9 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1484,9 +1484,9 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  	      relocation += addend;
  	      relocation -= dtprel_base(info);
  	      bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
@@ -29,5 +31,5 @@ index 2316e085d1f..e0729c6a194 100644
  	    case (int) R_MICROBLAZE_TEXTREL_64:
  	    case (int) R_MICROBLAZE_TEXTREL_32_LO:
 -- 
-2.17.1
+2.25.1
 

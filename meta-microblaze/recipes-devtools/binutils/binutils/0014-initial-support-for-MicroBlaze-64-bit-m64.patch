@@ -1,9 +1,9 @@
-From b53570b1b4eb3e57b21e44515c202dc710b438ce Mon Sep 17 00:00:00 2001
+From fb0b2c799f37daba8aca5d64966f426d16e07cf8 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 1 Nov 2021 19:06:53 +0530
-Subject: [PATCH 14/38] [Patch,MicroBlaze] : initial support for MicroBlaze 64
- bit [-m64]
+Subject: [PATCH 14/38] initial support for MicroBlaze 64 bit [-m64]
 
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  bfd/Makefile.am                    |    2 +
  bfd/Makefile.in                    |    3 +
@@ -11,9 +11,9 @@ Subject: [PATCH 14/38] [Patch,MicroBlaze] : initial support for MicroBlaze 64
  bfd/config.bfd                     |    4 +
  bfd/configure                      |    2 +
  bfd/configure.ac                   |    2 +
- bfd/cpu-microblaze.c               |   53 +-
+ bfd/cpu-microblaze.c               |   55 +-
  bfd/elf32-microblaze.c             |   65 +-
- bfd/elf64-microblaze.c             | 3577 ++++++++++++++++++++++++++++
+ bfd/elf64-microblaze.c             | 3622 ++++++++++++++++++++++++++++
  bfd/libbfd.h                       |    2 +
  bfd/reloc.c                        |   12 +
  bfd/targets.c                      |    6 +
@@ -29,15 +29,15 @@ Subject: [PATCH 14/38] [Patch,MicroBlaze] : initial support for MicroBlaze 64
  opcodes/microblaze-dis.c           |   35 +-
  opcodes/microblaze-opc.h           |  162 +-
  opcodes/microblaze-opcm.h          |   24 +-
- 24 files changed, 4375 insertions(+), 69 deletions(-)
+ 24 files changed, 4422 insertions(+), 69 deletions(-)
  create mode 100644 bfd/elf64-microblaze.c
  create mode 100644 ld/emulparams/elf64microblaze.sh
  create mode 100644 ld/emulparams/elf64microblazeel.sh
 
-Index: git/bfd/Makefile.am
-===================================================================
---- git.orig/bfd/Makefile.am
-+++ git/bfd/Makefile.am
+diff --git a/bfd/Makefile.am b/bfd/Makefile.am
+index 670e0598f55..c76adec960a 100644
+--- a/bfd/Makefile.am
++++ b/bfd/Makefile.am
 @@ -563,6 +563,7 @@ BFD64_BACKENDS = \
  	elf64-riscv.lo \
  	elfxx-riscv.lo \
@@ -46,7 +46,7 @@ Index: git/bfd/Makefile.am
  	elf64-sparc.lo \
  	elf64-tilegx.lo \
  	elf64-x86-64.lo \
-@@ -599,6 +600,7 @@ BFD64_BACKENDS_CFILES = \
+@@ -600,6 +601,7 @@ BFD64_BACKENDS_CFILES = \
  	elf64-nfp.c \
  	elf64-ppc.c \
  	elf64-s390.c \
@@ -54,11 +54,11 @@ Index: git/bfd/Makefile.am
  	elf64-sparc.c \
  	elf64-tilegx.c \
  	elf64-x86-64.c \
-Index: git/bfd/Makefile.in
-===================================================================
---- git.orig/bfd/Makefile.in
-+++ git/bfd/Makefile.in
-@@ -991,6 +991,7 @@ BFD64_BACKENDS = \
+diff --git a/bfd/Makefile.in b/bfd/Makefile.in
+index 6edacdfeb0e..e2721f43391 100644
+--- a/bfd/Makefile.in
++++ b/bfd/Makefile.in
+@@ -1030,6 +1030,7 @@ BFD64_BACKENDS = \
  	elf64-riscv.lo \
  	elfxx-riscv.lo \
  	elf64-s390.lo \
@@ -66,7 +66,7 @@ Index: git/bfd/Makefile.in
  	elf64-sparc.lo \
  	elf64-tilegx.lo \
  	elf64-x86-64.lo \
-@@ -1027,6 +1028,7 @@ BFD64_BACKENDS_CFILES = \
+@@ -1067,6 +1068,7 @@ BFD64_BACKENDS_CFILES = \
  	elf64-nfp.c \
  	elf64-ppc.c \
  	elf64-s390.c \
@@ -74,7 +74,7 @@ Index: git/bfd/Makefile.in
  	elf64-sparc.c \
  	elf64-tilegx.c \
  	elf64-x86-64.c \
-@@ -1535,6 +1537,7 @@ distclean-compile:
+@@ -1650,6 +1652,7 @@ distclean-compile:
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-ppc.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-riscv.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-s390.Plo@am__quote@
@@ -82,36 +82,36 @@ Index: git/bfd/Makefile.in
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-sparc.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-tilegx.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-x86-64.Plo@am__quote@
-Index: git/bfd/bfd-in2.h
-===================================================================
---- git.orig/bfd/bfd-in2.h
-+++ git/bfd/bfd-in2.h
-@@ -5436,11 +5436,21 @@ done here - only used for relaxing  */
+diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
+index 26e3bb2b34b..6cf701abf10 100644
+--- a/bfd/bfd-in2.h
++++ b/bfd/bfd-in2.h
+@@ -5389,11 +5389,21 @@ value in two words (with an imm instruction).  No relocation is
+ done here - only used for relaxing  */
    BFD_RELOC_MICROBLAZE_64_NONE,
  
- /* This is a 64 bit reloc that stores the 32 bit pc relative
++/* This is a 64 bit reloc that stores the 32 bit pc relative
 + *  +value in two words (with an imml instruction).  No relocation is
 + *   +done here - only used for relaxing  */
 +    BFD_RELOC_MICROBLAZE_64,
 +
-+/* This is a 64 bit reloc that stores the 32 bit pc relative
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
  value in two words (with an imm instruction).  The relocation is
  PC-relative GOT offset  */
    BFD_RELOC_MICROBLAZE_64_GOTPC,
  
- /* This is a 64 bit reloc that stores the 32 bit pc relative
++/* This is a 64 bit reloc that stores the 32 bit pc relative
 +value in two words (with an imml instruction).  The relocation is
 +PC-relative GOT offset  */
 +  BFD_RELOC_MICROBLAZE_64_GPC,
 +
-+/* This is a 64 bit reloc that stores the 32 bit pc relative
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
  value in two words (with an imm instruction).  The relocation is
  GOT offset  */
-   BFD_RELOC_MICROBLAZE_64_GOT,
-Index: git/bfd/config.bfd
-===================================================================
---- git.orig/bfd/config.bfd
-+++ git/bfd/config.bfd
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index a4c6c8e8854..49208534de3 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
 @@ -855,11 +855,15 @@ case "${targ}" in
    microblazeel*-*)
      targ_defvec=microblaze_elf32_le_vec
@@ -128,11 +128,11 @@ Index: git/bfd/config.bfd
      ;;
  
  #ifdef BFD64
-Index: git/bfd/configure
-===================================================================
---- git.orig/bfd/configure
-+++ git/bfd/configure
-@@ -14198,6 +14198,8 @@ do
+diff --git a/bfd/configure b/bfd/configure
+index d90db11744b..08e33cf64cd 100755
+--- a/bfd/configure
++++ b/bfd/configure
+@@ -14196,6 +14196,8 @@ do
      s390_elf64_vec)		 tb="$tb elf64-s390.lo elf64.lo $elf"; target_size=64 ;;
      score_elf32_be_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo elf64.lo $elf"; want64=true; target_size=64 ;;
      score_elf32_le_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo elf64.lo $elf"; want64=true; target_size=64 ;;
@@ -141,11 +141,11 @@ Index: git/bfd/configure
      sh_coff_vec)		 tb="$tb coff-sh.lo $coff" ;;
      sh_coff_le_vec)		 tb="$tb coff-sh.lo $coff" ;;
      sh_coff_small_vec)		 tb="$tb coff-sh.lo $coff" ;;
-Index: git/bfd/configure.ac
-===================================================================
---- git.orig/bfd/configure.ac
-+++ git/bfd/configure.ac
-@@ -627,6 +627,8 @@ do
+diff --git a/bfd/configure.ac b/bfd/configure.ac
+index 73e5e03d016..20a50d0f308 100644
+--- a/bfd/configure.ac
++++ b/bfd/configure.ac
+@@ -603,6 +603,8 @@ do
      s390_elf64_vec)		 tb="$tb elf64-s390.lo elf64.lo $elf"; target_size=64 ;;
      score_elf32_be_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo elf64.lo $elf"; want64=true; target_size=64 ;;
      score_elf32_le_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo elf64.lo $elf"; want64=true; target_size=64 ;;
@@ -154,11 +154,11 @@ Index: git/bfd/configure.ac
      sh_coff_vec)		 tb="$tb coff-sh.lo $coff" ;;
      sh_coff_le_vec)		 tb="$tb coff-sh.lo $coff" ;;
      sh_coff_small_vec)		 tb="$tb coff-sh.lo $coff" ;;
-Index: git/bfd/cpu-microblaze.c
-===================================================================
---- git.orig/bfd/cpu-microblaze.c
-+++ git/bfd/cpu-microblaze.c
-@@ -23,7 +23,24 @@
+diff --git a/bfd/cpu-microblaze.c b/bfd/cpu-microblaze.c
+index 0c1d2b1aa69..f64f659cf44 100644
+--- a/bfd/cpu-microblaze.c
++++ b/bfd/cpu-microblaze.c
+@@ -23,7 +23,25 @@
  #include "bfd.h"
  #include "libbfd.h"
  
@@ -177,33 +177,35 @@ Index: git/bfd/cpu-microblaze.c
 +  3,		  		/* Section align power.  */
 +  false,		  		/* Is this the default architecture ?  */
 +  bfd_default_compatible,	/* Architecture comparison function.  */
-+  bfd_default_scan,	   	/* String to architecture conversion.  */
++  bfd_default_scan,		/* String to architecture conversion.  */
 +  bfd_arch_default_fill,	/* Default fill.  */
-+  &bfd_microblaze_arch[1]  	/* Next in list.  */
++  &bfd_microblaze_arch[1],	/* Next in list.  */
++  0 /* Maximum offset of a reloc from the start of an insn.  */
 +},
  {
    32,				/* Bits in a word.  */
    32,				/* Bits in an address.  */
-@@ -39,4 +56,38 @@ const bfd_arch_info_type bfd_microblaze_
+@@ -39,4 +57,39 @@ const bfd_arch_info_type bfd_microblaze_arch =
    bfd_arch_default_fill,	/* Default fill.  */
    NULL,				/* Next in list.  */
    0 /* Maximum offset of a reloc from the start of an insn.  */
 +}
 +#else
 +{
-+  32,		  		/* 32 bits in a word.  */
-+  32,		  		/* 32 bits in an address.  */
-+  8,		  		/* 8 bits in a byte.  */
++  32,				/* 32 bits in a word.  */
++  32,				/* 32 bits in an address.  */
++  8,				/* 8 bits in a byte.  */
 +  bfd_arch_microblaze, 		/* Architecture.  */
-+  0,		  		/* Machine number - 0 for now.  */
-+  "microblaze",	  		/* Architecture name.  */
-+  "MicroBlaze",	  		/* Printable name.  */
-+  3,		  		/* Section align power.  */
-+  true,		  		/* Is this the default architecture ?  */
++  0,				/* Machine number - 0 for now.  */
++  "microblaze",			/* Architecture name.  */
++  "MicroBlaze",			/* Printable name.  */
++  3,				/* Section align power.  */
++  true,				/* Is this the default architecture ?  */
 +  bfd_default_compatible,	/* Architecture comparison function.  */
-+  bfd_default_scan,	   	/* String to architecture conversion.  */
++  bfd_default_scan,		/* String to architecture conversion.  */
 +  bfd_arch_default_fill,	/* Default fill.  */
-+  &bfd_microblaze_arch[1]   	/* Next in list.  */
++  &bfd_microblaze_arch[1],	/* Next in list.  */
++  0  /* Maximum offset of a reloc from the start of an insn.  */
 +},
 +{
 +  64,		  		/* 32 bits in a word.  */
@@ -223,11 +225,11 @@ Index: git/bfd/cpu-microblaze.c
 +}
 +#endif
  };
-Index: git/bfd/elf32-microblaze.c
-===================================================================
---- git.orig/bfd/elf32-microblaze.c
-+++ git/bfd/elf32-microblaze.c
-@@ -114,6 +114,20 @@ static reloc_howto_type microblaze_elf_h
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index 8c89bdcaeeb..71ff973573c 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -114,6 +114,20 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
  	  0x0000ffff,		/* Dest Mask.  */
  	  true),		/* PC relative offset?  */
  
@@ -248,7 +250,7 @@ Index: git/bfd/elf32-microblaze.c
     /* A 64 bit relocation.  Table entry not really used.  */
     HOWTO (R_MICROBLAZE_64,	/* Type.  */
  	  0,			/* Rightshift.  */
-@@ -179,15 +193,15 @@ static reloc_howto_type microblaze_elf_h
+@@ -179,15 +193,15 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
            0,			/* Rightshift.  */
            2,			/* Size (0 = byte, 1 = short, 2 = long).  */
            32,			/* Bitsize.  */
@@ -267,7 +269,7 @@ Index: git/bfd/elf32-microblaze.c
  
     HOWTO (R_MICROBLAZE_64_NONE,	/* Type.  */
  	  0,			/* Rightshift.  */
-@@ -278,6 +292,21 @@ static reloc_howto_type microblaze_elf_h
+@@ -278,6 +292,21 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
  	  0x0000ffff,		/* Dest Mask.  */
  	  true),		/* PC relative offset?  */
  
@@ -289,7 +291,7 @@ Index: git/bfd/elf32-microblaze.c
     /* A 64 bit GOT relocation.  Table-entry not really used.  */
     HOWTO (R_MICROBLAZE_GOT_64,  /* Type.  */
  	  0,			/* Rightshift.  */
-@@ -617,9 +646,15 @@ microblaze_elf_reloc_type_lookup (bfd *
+@@ -617,9 +646,15 @@ microblaze_elf_reloc_type_lookup (bfd * abfd ATTRIBUTE_UNUSED,
      case BFD_RELOC_VTABLE_ENTRY:
        microblaze_reloc = R_MICROBLAZE_GNU_VTENTRY;
        break;
@@ -305,7 +307,7 @@ Index: git/bfd/elf32-microblaze.c
      case BFD_RELOC_MICROBLAZE_64_GOT:
        microblaze_reloc = R_MICROBLAZE_GOT_64;
        break;
-@@ -1459,7 +1494,7 @@ microblaze_elf_relocate_section (bfd *ou
+@@ -1500,7 +1535,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  		if (r_symndx == STN_UNDEF || (input_section->flags & SEC_ALLOC) == 0)
  		  {
  		    relocation += addend;
@@ -314,7 +316,7 @@ Index: git/bfd/elf32-microblaze.c
  		      bfd_put_32 (input_bfd, relocation, contents + offset);
  		    else
  		      {
-@@ -1925,6 +1960,28 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1969,6 +2004,28 @@ microblaze_elf_relax_section (bfd *abfd,
  		    irel->r_addend -= calc_fixup (irel->r_addend, 0, sec);
  		}
  	      break;
@@ -343,11 +345,12 @@ Index: git/bfd/elf32-microblaze.c
  	    case R_MICROBLAZE_NONE:
  	    case R_MICROBLAZE_32_NONE:
  	      {
-Index: git/bfd/elf64-microblaze.c
-===================================================================
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+new file mode 100644
+index 00000000000..7434bef393b
 --- /dev/null
-+++ git/bfd/elf64-microblaze.c
-@@ -0,0 +1,3577 @@
++++ b/bfd/elf64-microblaze.c
+@@ -0,0 +1,3622 @@
 +/* Xilinx MicroBlaze-specific support for 32-bit ELF
 +
 +   Copyright (C) 2009-2021 Free Software Foundation, Inc.
@@ -1099,6 +1102,47 @@ Index: git/bfd/elf64-microblaze.c
 +
 +  cache_ptr->howto = microblaze_elf_howto_table [r_type];
 +  return true;
++}
++
++/* Relax table contains information about instructions which can
++   be removed by relaxation -- replacing a long address with a
++   short address.  */
++struct relax_table
++{
++  /* Address where bytes may be deleted.  */
++  bfd_vma addr;
++
++  /* Number of bytes to be deleted.  */
++  size_t size;
++};
++
++struct _microblaze_elf_section_data
++{
++  struct bfd_elf_section_data elf;
++  /* Count of used relaxation table entries.  */
++  size_t relax_count;
++  /* Relaxation table.  */
++  struct relax_table *relax;
++};
++
++#define microblaze_elf_section_data(sec) \
++  ((struct _microblaze_elf_section_data *) elf_section_data (sec))
++
++static bool
++microblaze_elf_new_section_hook (bfd *abfd, asection *sec)
++{
++  if (!sec->used_by_bfd)
++    {
++      struct _microblaze_elf_section_data *sdata;
++      size_t amt = sizeof (*sdata);
++
++      sdata = bfd_zalloc (abfd, amt);
++      if (sdata == NULL)
++        return false;
++      sec->used_by_bfd = sdata;
++    }
++
++  return _bfd_elf_new_section_hook (abfd, sec);
 +}
 +
 +/* Microblaze ELF local labels start with 'L.' or '$L', not '.L'.  */
@@ -2054,19 +2098,20 @@ Index: git/bfd/elf64-microblaze.c
 +calc_fixup (bfd_vma start, bfd_vma size, asection *sec)
 +{
 +  bfd_vma end = start + size;
-+  int i, fixup = 0;
++  size_t i, fixup = 0;
++  struct _microblaze_elf_section_data *sdata;
 +
-+  if (sec == NULL || sec->relax == NULL)
++  if (sec == NULL || (sdata = microblaze_elf_section_data (sec)) == NULL)
 +    return 0;
 +
 +  /* Look for addr in relax table, total fixup value.  */
-+  for (i = 0; i < sec->relax_count; i++)
++  for (i = 0; i < sdata->relax_count; i++)
 +    {
-+      if (end <= sec->relax[i].addr)
++      if (end <= sdata->relax[i].addr)
 +        break;
-+      if ((end != start) && (start > sec->relax[i].addr))
++      if (end != start && start > sdata->relax[i].addr)
 +        continue;
-+      fixup += sec->relax[i].size;
++      fixup += sdata->relax[i].size;
 +    }
 +  return fixup;
 +}
@@ -2123,6 +2168,7 @@ Index: git/bfd/elf64-microblaze.c
 +  int symcount;
 +  int offset;
 +  bfd_vma src, dest;
++  struct _microblaze_elf_section_data *sdata;
 +
 +  /* We only do this once per section.  We may be able to delete some code
 +     by running multiple passes, but it is not worth it.  */
@@ -2131,8 +2177,9 @@ Index: git/bfd/elf64-microblaze.c
 +  /* Only do this for a text section.  */
 +  if (bfd_link_relocatable (link_info)
 +      || (sec->flags & SEC_RELOC) == 0
-+      || (sec->reloc_count == 0)
-+      || (sec->flags & SEC_CODE) == 0)
++      || (sec->flags & SEC_CODE) == 0
++      || sec->reloc_count == 0
++      || (sdata = microblaze_elf_section_data (sec)) == NULL)
 +    return true;
 +
 +  BFD_ASSERT ((sec->size > 0) || (sec->rawsize > 0));
@@ -2157,11 +2204,11 @@ Index: git/bfd/elf64-microblaze.c
 +  if (! link_info->keep_memory)
 +    free_relocs = internal_relocs;
 +
-+  sec->relax = (struct relax_table *) bfd_malloc ((sec->reloc_count + 1)
-+						  * sizeof (struct relax_table));
-+  if (sec->relax == NULL)
++  sdata->relax_count = 0;
++  sdata->relax = (struct relax_table *) bfd_malloc ((sec->reloc_count + 1)
++                                                    * sizeof (*sdata->relax));
++  if (sdata->relax == NULL)
 +    goto error_return;
-+  sec->relax_count = 0;
 +
 +  irelend = internal_relocs + sec->reloc_count;
 +  rel_count = 0;
@@ -2250,9 +2297,9 @@ Index: git/bfd/elf64-microblaze.c
 +      if ((symval & 0xffff8000) == 0)
 +	{
 +          /* We can delete this instruction.  */
-+	  sec->relax[sec->relax_count].addr = irel->r_offset;
-+	  sec->relax[sec->relax_count].size = INST_WORD_SIZE;
-+	  sec->relax_count++;
++          sdata->relax[sdata->relax_count].addr = irel->r_offset;
++          sdata->relax[sdata->relax_count].size = INST_WORD_SIZE;
++          sdata->relax_count++;
 +
 +	  /* Rewrite relocation type.  */
 +          switch ((enum elf_microblaze_reloc_type) ELF64_R_TYPE (irel->r_info))
@@ -2277,11 +2324,11 @@ Index: git/bfd/elf64-microblaze.c
 +    } /* Loop through all relocations.  */
 +
 +  /* Loop through the relocs again, and see if anything needs to change.  */
-+  if (sec->relax_count > 0)
++  if (sdata->relax_count > 0)
 +    {
 +      shndx = _bfd_elf_section_from_bfd_section (abfd, sec);
 +      rel_count = 0;
-+      sec->relax[sec->relax_count].addr = sec->size;
++      sdata->relax[sdata->relax_count].addr = sec->size;
 +
 +      for (irel = internal_relocs; irel < irelend; irel++, rel_count++)
 +        {
@@ -2674,15 +2721,16 @@ Index: git/bfd/elf64-microblaze.c
 +        }
 +
 +      /* Physically move the code and change the cooked size.  */
-+      dest = sec->relax[0].addr;
-+      for (i = 0; i < sec->relax_count; i++)
++      dest = sdata->relax[0].addr;
++      for (i = 0; i < sdata->relax_count; i++)
 +        {
-+          int len;
-+          src = sec->relax[i].addr + sec->relax[i].size;
-+          len = sec->relax[i+1].addr - sec->relax[i].addr - sec->relax[i].size;
++          size_t len;
++          src = sdata->relax[i].addr + sdata->relax[i].size;
++          len = (sdata->relax[i+1].addr - sdata->relax[i].addr
++                 - sdata->relax[i].size);
 +
 +          memmove (contents + dest, contents + src, len);
-+          sec->size -= sec->relax[i].size;
++          sec->size -= sdata->relax[i].size;
 +          dest += len;
 +        }
 +
@@ -2708,11 +2756,11 @@ Index: git/bfd/elf64-microblaze.c
 +      free_contents = NULL;
 +    }
 +
-+  if (sec->relax_count == 0)
++  if (sdata->relax_count == 0)
 +    {
 +      *again = false;
-+      free (sec->relax);
-+      sec->relax = NULL;
++      free (sdata->relax);
++      sdata->relax = NULL;
 +    }
 +  else
 +    *again = true;
@@ -2721,9 +2769,9 @@ Index: git/bfd/elf64-microblaze.c
 + error_return:
 +  free (free_relocs);
 +  free (free_contents);
-+  free (sec->relax);
-+  sec->relax = NULL;
-+  sec->relax_count = 0;
++  free (sdata->relax);
++  sdata->relax = NULL;
++  sdata->relax_count = 0;
 +  return false;
 +}
 +
@@ -3925,11 +3973,11 @@ Index: git/bfd/elf64-microblaze.c
 +#define elf_backend_add_symbol_hook		microblaze_elf_add_symbol_hook
 +
 +#include "elf64-target.h"
-Index: git/bfd/libbfd.h
-===================================================================
---- git.orig/bfd/libbfd.h
-+++ git/bfd/libbfd.h
-@@ -2994,7 +2994,9 @@ static const char *const bfd_reloc_code_
+diff --git a/bfd/libbfd.h b/bfd/libbfd.h
+index ea2507d1879..e74c051e781 100644
+--- a/bfd/libbfd.h
++++ b/bfd/libbfd.h
+@@ -2991,7 +2991,9 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
    "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
    "BFD_RELOC_MICROBLAZE_32_NONE",
    "BFD_RELOC_MICROBLAZE_64_NONE",
@@ -3939,41 +3987,40 @@ Index: git/bfd/libbfd.h
    "BFD_RELOC_MICROBLAZE_64_GOT",
    "BFD_RELOC_MICROBLAZE_64_PLT",
    "BFD_RELOC_MICROBLAZE_64_GOTOFF",
-Index: git/bfd/reloc.c
-===================================================================
---- git.orig/bfd/reloc.c
-+++ git/bfd/reloc.c
-@@ -6907,6 +6907,12 @@ ENUMDOC
+diff --git a/bfd/reloc.c b/bfd/reloc.c
+index 5ac8a8536a7..0f99df91299 100644
+--- a/bfd/reloc.c
++++ b/bfd/reloc.c
+@@ -6875,12 +6875,24 @@ ENUMDOC
+   done here - only used for relaxing
  ENUM
    BFD_RELOC_MICROBLAZE_64_NONE
- ENUMDOC
++ENUMDOC
 +  This is a 32 bit reloc that stores the 32 bit pc relative
 +  value in two words (with an imml instruction).  No relocation is
 +  done here - only used for relaxing
 +ENUM
 +  BFD_RELOC_MICROBLAZE_64
-+ENUMDOC
+ ENUMDOC
    This is a 64 bit reloc that stores the 32 bit pc relative
    value in two words (with an imm instruction).  No relocation is
    done here - only used for relaxing
-@@ -6914,6 +6920,12 @@ ENUM
+ ENUM
    BFD_RELOC_MICROBLAZE_64_GOTPC
- ENUMDOC
-   This is a 64 bit reloc that stores the 32 bit pc relative
++ENUMDOC
++  This is a 64 bit reloc that stores the 32 bit pc relative
 +  value in two words (with an imml instruction).  No relocation is
 +  done here - only used for relaxing
 +ENUM
 +  BFD_RELOC_MICROBLAZE_64_GPC
-+ENUMDOC
-+  This is a 64 bit reloc that stores the 32 bit pc relative
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
    value in two words (with an imm instruction).  The relocation is
-   PC-relative GOT offset
- ENUM
-Index: git/bfd/targets.c
-===================================================================
---- git.orig/bfd/targets.c
-+++ git/bfd/targets.c
-@@ -794,6 +794,8 @@ extern const bfd_target mep_elf32_le_vec
+diff --git a/bfd/targets.c b/bfd/targets.c
+index 3284bb88aa8..6e93cb2f995 100644
+--- a/bfd/targets.c
++++ b/bfd/targets.c
+@@ -791,6 +791,8 @@ extern const bfd_target mep_elf32_le_vec;
  extern const bfd_target metag_elf32_vec;
  extern const bfd_target microblaze_elf32_vec;
  extern const bfd_target microblaze_elf32_le_vec;
@@ -3982,7 +4029,7 @@ Index: git/bfd/targets.c
  extern const bfd_target mips_ecoff_be_vec;
  extern const bfd_target mips_ecoff_le_vec;
  extern const bfd_target mips_ecoff_bele_vec;
-@@ -1160,6 +1162,10 @@ static const bfd_target * const _bfd_tar
+@@ -1153,6 +1155,10 @@ static const bfd_target * const _bfd_target_vector[] =
  
  	&metag_elf32_vec,
  
@@ -3993,10 +4040,10 @@ Index: git/bfd/targets.c
  	&microblaze_elf32_vec,
  
  	&mips_ecoff_be_vec,
-Index: git/gas/config/tc-microblaze.c
-===================================================================
---- git.orig/gas/config/tc-microblaze.c
-+++ git/gas/config/tc-microblaze.c
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 086f8704156..a6f12dda54a 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
 @@ -35,10 +35,13 @@
  #define streq(a,b) (strcmp (a, b) == 0)
  #endif
@@ -4048,7 +4095,7 @@ Index: git/gas/config/tc-microblaze.c
    {"frame", s_ignore, 0},
    {"mask", s_ignore, 0}, /* Emitted by gcc.  */
    {NULL, NULL, 0}
-@@ -773,6 +781,74 @@ parse_imm (char * s, expressionS * e, of
+@@ -773,6 +781,74 @@ parse_imm (char * s, expressionS * e, offsetT min, offsetT max)
    return new_pointer;
  }
  
@@ -4123,7 +4170,7 @@ Index: git/gas/config/tc-microblaze.c
  static char *
  check_got (int * got_type, int * got_len)
  {
-@@ -827,7 +903,7 @@ check_got (int * got_type, int * got_len
+@@ -827,7 +903,7 @@ check_got (int * got_type, int * got_len)
  extern bfd_reloc_code_real_type
  parse_cons_expression_microblaze (expressionS *exp, int size)
  {
@@ -4132,7 +4179,7 @@ Index: git/gas/config/tc-microblaze.c
      {
        /* Handle @GOTOFF et.al.  */
        char *save, *gotfree_copy;
-@@ -859,6 +935,7 @@ parse_cons_expression_microblaze (expres
+@@ -859,6 +935,7 @@ parse_cons_expression_microblaze (expressionS *exp, int size)
  
  static const char * str_microblaze_ro_anchor = "RO";
  static const char * str_microblaze_rw_anchor = "RW";
@@ -4439,7 +4486,7 @@ Index: git/gas/config/tc-microblaze.c
    { NULL,          no_argument, NULL, 0}
  };
  
-@@ -1971,13 +2230,23 @@ md_convert_frag (bfd * abfd ATTRIBUTE_UN
+@@ -1971,13 +2230,23 @@ md_convert_frag (bfd * abfd ATTRIBUTE_UNUSED,
        fragP->fr_fix += INST_WORD_SIZE * 2;
        fragP->fr_var = 0;
        break;
@@ -4555,7 +4602,7 @@ Index: git/gas/config/tc-microblaze.c
        else if (fixP->fx_r_type == BFD_RELOC_32)
  	fixP->fx_r_type = BFD_RELOC_MICROBLAZE_32_NONE;
        else
-@@ -2323,6 +2614,32 @@ md_estimate_size_before_relax (fragS * f
+@@ -2323,6 +2614,32 @@ md_estimate_size_before_relax (fragS * fragP,
            as_bad (_("Absolute PC-relative value in relaxation code.  Assembler error....."));
            abort ();
          }
@@ -4588,7 +4635,7 @@ Index: git/gas/config/tc-microblaze.c
        else if (S_GET_SEGMENT (fragP->fr_symbol) == segment_type &&
                 !S_IS_WEAK (fragP->fr_symbol))
          {
-@@ -2330,6 +2647,7 @@ md_estimate_size_before_relax (fragS * f
+@@ -2330,6 +2647,7 @@ md_estimate_size_before_relax (fragS * fragP,
            /* Don't know now whether we need an imm instruction.  */
            fragP->fr_var = INST_WORD_SIZE;
          }
@@ -4596,7 +4643,7 @@ Index: git/gas/config/tc-microblaze.c
        else if (S_IS_DEFINED (fragP->fr_symbol)
  	       && (((S_GET_SEGMENT (fragP->fr_symbol))->flags & SEC_CODE) == 0))
          {
-@@ -2432,6 +2750,7 @@ md_estimate_size_before_relax (fragS * f
+@@ -2432,6 +2750,7 @@ md_estimate_size_before_relax (fragS * fragP,
      case TLSLD_OFFSET:
      case TLSTPREL_OFFSET:
      case TLSDTPREL_OFFSET:
@@ -4604,7 +4651,7 @@ Index: git/gas/config/tc-microblaze.c
        fragP->fr_var = INST_WORD_SIZE*2;
        break;
      case DEFINED_RO_SEGMENT:
-@@ -2485,7 +2804,7 @@ md_pcrel_from_section (fixS * fixp, segT
+@@ -2485,7 +2804,7 @@ md_pcrel_from_section (fixS * fixp, segT sec ATTRIBUTE_UNUSED)
    else
      {
        /* The case where we are going to resolve things... */
@@ -4613,7 +4660,7 @@ Index: git/gas/config/tc-microblaze.c
          return  fixp->fx_where + fixp->fx_frag->fr_address + INST_WORD_SIZE;
        else
          return  fixp->fx_where + fixp->fx_frag->fr_address;
-@@ -2518,6 +2837,8 @@ tc_gen_reloc (asection * section ATTRIBU
+@@ -2518,6 +2837,8 @@ tc_gen_reloc (asection * section ATTRIBUTE_UNUSED, fixS * fixp)
      case BFD_RELOC_MICROBLAZE_32_RWSDA:
      case BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM:
      case BFD_RELOC_MICROBLAZE_64_GOTPC:
@@ -4622,7 +4669,7 @@ Index: git/gas/config/tc-microblaze.c
      case BFD_RELOC_MICROBLAZE_64_GOT:
      case BFD_RELOC_MICROBLAZE_64_PLT:
      case BFD_RELOC_MICROBLAZE_64_GOTOFF:
-@@ -2578,6 +2899,18 @@ tc_gen_reloc (asection * section ATTRIBU
+@@ -2578,6 +2899,18 @@ tc_gen_reloc (asection * section ATTRIBUTE_UNUSED, fixS * fixp)
    return rel;
  }
  
@@ -4641,7 +4688,7 @@ Index: git/gas/config/tc-microblaze.c
  int
  md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
  {
-@@ -2591,6 +2924,10 @@ md_parse_option (int c, const char * arg
+@@ -2591,6 +2924,10 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
      case OPTION_LITTLE:
        target_big_endian = 0;
        break;
@@ -4652,7 +4699,7 @@ Index: git/gas/config/tc-microblaze.c
      default:
        return 0;
      }
-@@ -2606,6 +2943,7 @@ md_show_usage (FILE * stream ATTRIBUTE_U
+@@ -2606,6 +2943,7 @@ md_show_usage (FILE * stream ATTRIBUTE_UNUSED)
    fprintf (stream, _(" MicroBlaze specific assembler options:\n"));
    fprintf (stream, "  -%-23s%s\n", "mbig-endian", N_("assemble for a big endian cpu"));
    fprintf (stream, "  -%-23s%s\n", "mlittle-endian", N_("assemble for a little endian cpu"));
@@ -4672,11 +4719,11 @@ Index: git/gas/config/tc-microblaze.c
            break;
          default:
            as_bad (_("unsupported BFD relocation size %u"), size);
-Index: git/gas/config/tc-microblaze.h
-===================================================================
---- git.orig/gas/config/tc-microblaze.h
-+++ git/gas/config/tc-microblaze.h
-@@ -81,7 +81,9 @@ extern const struct relax_type md_relax_
+diff --git a/gas/config/tc-microblaze.h b/gas/config/tc-microblaze.h
+index 36f56725c46..5a97b460212 100644
+--- a/gas/config/tc-microblaze.h
++++ b/gas/config/tc-microblaze.h
+@@ -81,7 +81,9 @@ extern const struct relax_type md_relax_table[];
  
  #ifdef OBJ_ELF
  
@@ -4687,23 +4734,23 @@ Index: git/gas/config/tc-microblaze.h
  
  #define ELF_TC_SPECIAL_SECTIONS \
    { ".sdata",		SHT_PROGBITS,	SHF_ALLOC + SHF_WRITE }, \
-Index: git/include/elf/common.h
-===================================================================
---- git.orig/include/elf/common.h
-+++ git/include/elf/common.h
-@@ -354,6 +354,7 @@
- #define EM_65816	257	/* WDC 65816/65C816 */
- #define EM_LOONGARCH	258	/* LoongArch */
- #define EM_KF32		259	/* ChipON KungFu32 */
-+#define EM_MB_64	260	/* Xilinx MicroBlaze 32-bit RISC soft processor core */
+diff --git a/include/elf/common.h b/include/elf/common.h
+index e4bc53e35b4..1ad565adf7a 100644
+--- a/include/elf/common.h
++++ b/include/elf/common.h
+@@ -360,6 +360,7 @@
+ #define EM_U16_U8CORE	260	/* LAPIS nX-U16/U8 */
+ #define EM_TACHYUM	261	/* Tachyum */
+ #define EM_56800EF	262	/* NXP 56800EF Digital Signal Controller (DSC) */
++#define EM_MB_64	263	/* Xilinx MicroBlaze 32-bit RISC soft processor core */
  
  /* If it is necessary to assign new unofficial EM_* values, please pick large
     random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
-Index: git/include/elf/microblaze.h
-===================================================================
---- git.orig/include/elf/microblaze.h
-+++ git/include/elf/microblaze.h
-@@ -62,6 +62,8 @@ START_RELOC_NUMBERS (elf_microblaze_relo
+diff --git a/include/elf/microblaze.h b/include/elf/microblaze.h
+index a2e1ce4580f..79799b86a49 100644
+--- a/include/elf/microblaze.h
++++ b/include/elf/microblaze.h
+@@ -62,6 +62,8 @@ START_RELOC_NUMBERS (elf_microblaze_reloc_type)
    RELOC_NUMBER (R_MICROBLAZE_TEXTREL_64, 31)    /* TEXT Entry offset 64-bit.  */
    RELOC_NUMBER (R_MICROBLAZE_TEXTREL_32_LO, 32) /* TEXT Entry offset 32-bit.  */
    RELOC_NUMBER (R_MICROBLAZE_32_NONE, 33)
@@ -4712,11 +4759,11 @@ Index: git/include/elf/microblaze.h
     
  END_RELOC_NUMBERS (R_MICROBLAZE_max)
  
-Index: git/ld/Makefile.am
-===================================================================
---- git.orig/ld/Makefile.am
-+++ git/ld/Makefile.am
-@@ -448,6 +448,8 @@ ALL_64_EMULATION_SOURCES = \
+diff --git a/ld/Makefile.am b/ld/Makefile.am
+index 05c7630073d..256a95a2219 100644
+--- a/ld/Makefile.am
++++ b/ld/Makefile.am
+@@ -445,6 +445,8 @@ ALL_64_EMULATION_SOURCES = \
  	eelf64lriscv_lp64f.c \
  	eelf64ltsmip.c \
  	eelf64ltsmip_fbsd.c \
@@ -4725,7 +4772,7 @@ Index: git/ld/Makefile.am
  	eelf64mmix.c \
  	eelf64ppc.c \
  	eelf64ppc_fbsd.c \
-@@ -916,6 +918,8 @@ $(ALL_EMULATION_SOURCES) $(ALL_64_EMULAT
+@@ -906,6 +908,8 @@ $(ALL_EMULATION_SOURCES) $(ALL_64_EMULATION_SOURCES): $(GEN_DEPENDS)
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32ltsmipn32.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32ltsmipn32_fbsd.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32mipswindiss.Pc@am__quote@
@@ -4734,11 +4781,11 @@ Index: git/ld/Makefile.am
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_aix.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_ia64.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_ia64_fbsd.Pc@am__quote@
-Index: git/ld/Makefile.in
-===================================================================
---- git.orig/ld/Makefile.in
-+++ git/ld/Makefile.in
-@@ -938,6 +938,8 @@ ALL_64_EMULATION_SOURCES = \
+diff --git a/ld/Makefile.in b/ld/Makefile.in
+index 05d0ff5e122..a7f7e841acb 100644
+--- a/ld/Makefile.in
++++ b/ld/Makefile.in
+@@ -944,6 +944,8 @@ ALL_64_EMULATION_SOURCES = \
  	eelf64lriscv_lp64f.c \
  	eelf64ltsmip.c \
  	eelf64ltsmip_fbsd.c \
@@ -4747,7 +4794,7 @@ Index: git/ld/Makefile.in
  	eelf64mmix.c \
  	eelf64ppc.c \
  	eelf64ppc_fbsd.c \
-@@ -1411,6 +1413,8 @@ distclean-compile:
+@@ -1410,6 +1412,8 @@ distclean-compile:
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32xstormy16.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32xtensa.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32z80.Po@am__quote@
@@ -4756,7 +4803,7 @@ Index: git/ld/Makefile.in
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_aix.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_ia64.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_ia64_fbsd.Po@am__quote@
-@@ -2583,6 +2587,8 @@ $(ALL_EMULATION_SOURCES) $(ALL_64_EMULAT
+@@ -2575,6 +2579,8 @@ $(ALL_EMULATION_SOURCES) $(ALL_64_EMULATION_SOURCES): $(GEN_DEPENDS)
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32ltsmipn32.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32ltsmipn32_fbsd.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32mipswindiss.Pc@am__quote@
@@ -4765,11 +4812,11 @@ Index: git/ld/Makefile.in
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_aix.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_ia64.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64_ia64_fbsd.Pc@am__quote@
-Index: git/ld/configure.tgt
-===================================================================
---- git.orig/ld/configure.tgt
-+++ git/ld/configure.tgt
-@@ -478,6 +478,9 @@ microblaze*-linux*)	targ_emul="elf32mb_l
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index 2bae9099b6a..80ffbcf23b3 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -515,6 +515,9 @@ microblaze*-linux*)	targ_emul="elf32mb_linux"
  microblazeel*)		targ_emul=elf32microblazeel
  			targ_extra_emuls=elf32microblaze
  			;;
@@ -4779,10 +4826,11 @@ Index: git/ld/configure.tgt
  microblaze*)		targ_emul=elf32microblaze
  			targ_extra_emuls=elf32microblazeel
  			;;
-Index: git/ld/emulparams/elf64microblaze.sh
-===================================================================
+diff --git a/ld/emulparams/elf64microblaze.sh b/ld/emulparams/elf64microblaze.sh
+new file mode 100644
+index 00000000000..9c7b0eb7080
 --- /dev/null
-+++ git/ld/emulparams/elf64microblaze.sh
++++ b/ld/emulparams/elf64microblaze.sh
 @@ -0,0 +1,23 @@
 +SCRIPT_NAME=elfmicroblaze
 +OUTPUT_FORMAT="elf64-microblazeel"
@@ -4807,10 +4855,11 @@ Index: git/ld/emulparams/elf64microblaze.sh
 +
 +TEMPLATE_NAME=elf32
 +#GENERATE_SHLIB_SCRIPT=yes
-Index: git/ld/emulparams/elf64microblazeel.sh
-===================================================================
+diff --git a/ld/emulparams/elf64microblazeel.sh b/ld/emulparams/elf64microblazeel.sh
+new file mode 100644
+index 00000000000..9c7b0eb7080
 --- /dev/null
-+++ git/ld/emulparams/elf64microblazeel.sh
++++ b/ld/emulparams/elf64microblazeel.sh
 @@ -0,0 +1,23 @@
 +SCRIPT_NAME=elfmicroblaze
 +OUTPUT_FORMAT="elf64-microblazeel"
@@ -4835,10 +4884,10 @@ Index: git/ld/emulparams/elf64microblazeel.sh
 +
 +TEMPLATE_NAME=elf32
 +#GENERATE_SHLIB_SCRIPT=yes
-Index: git/opcodes/microblaze-dis.c
-===================================================================
---- git.orig/opcodes/microblaze-dis.c
-+++ git/opcodes/microblaze-dis.c
+diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
+index f57b98fc9f7..f71589d714d 100644
+--- a/opcodes/microblaze-dis.c
++++ b/opcodes/microblaze-dis.c
 @@ -33,6 +33,7 @@
  #define get_field_r1(buf, instr)   get_field (buf, instr, RA_MASK, RA_LOW)
  #define get_field_r2(buf, instr)   get_field (buf, instr, RB_MASK, RB_LOW)
@@ -4847,29 +4896,29 @@ Index: git/opcodes/microblaze-dis.c
  #define get_int_field_r1(instr)    ((instr & RA_MASK) >> RA_LOW)
  
  #define NUM_STRBUFS 3
-@@ -73,11 +74,19 @@ get_field_imm (struct string_buf *buf, l
+@@ -73,11 +74,19 @@ get_field_imm (struct string_buf *buf, long instr)
  }
  
  static char *
 -get_field_imm5 (struct string_buf *buf, long instr)
 +get_field_imml (struct string_buf *buf, long instr)
-+{
-+  char *p = strbuf (buf);
+ {
+   char *p = strbuf (buf);
 +  sprintf (p, "%d", (short)((instr & IMML_MASK) >> IMM_LOW));
 +  return p;
 +}
-+
-+static char *
-+get_field_imms (struct string_buf *buf, long instr)
- {
-   char *p = strbuf (buf);
  
 -  sprintf (p, "%d", (short)((instr & IMM5_MASK) >> IMM_LOW));
++static char *
++get_field_imms (struct string_buf *buf, long instr)
++{
++  char *p = strbuf (buf);
++
 +  sprintf (p, "%d", (short)((instr & IMM6_MASK) >> IMM_LOW));
    return p;
  }
  
-@@ -91,14 +100,14 @@ get_field_imm5_mbar (struct string_buf *
+@@ -91,14 +100,14 @@ get_field_imm5_mbar (struct string_buf *buf, long instr)
  }
  
  static char *
@@ -4887,7 +4936,7 @@ Index: git/opcodes/microblaze-dis.c
    return p;
  }
  
-@@ -308,9 +317,13 @@ print_insn_microblaze (bfd_vma memaddr,
+@@ -308,9 +317,13 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
  		}
  	    }
  	  break;
@@ -4903,7 +4952,7 @@ Index: git/opcodes/microblaze-dis.c
  	  break;
  	case INST_TYPE_RD_RFSL:
  	  print_func (stream, "\t%s, %s", get_field_rd (&buf, inst),
-@@ -417,6 +430,10 @@ print_insn_microblaze (bfd_vma memaddr,
+@@ -417,6 +430,10 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
  	case INST_TYPE_RD_R2:
  	  print_func (stream, "\t%s, %s", get_field_rd (&buf, inst),
  		      get_field_r2 (&buf, inst));
@@ -4914,7 +4963,7 @@ Index: git/opcodes/microblaze-dis.c
  	  break;
  	case INST_TYPE_R2:
  	  print_func (stream, "\t%s", get_field_r2 (&buf, inst));
-@@ -440,8 +457,8 @@ print_insn_microblaze (bfd_vma memaddr,
+@@ -440,8 +457,8 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
  	case INST_TYPE_NONE:
  	  break;
          /* For bit field insns.  */
@@ -4925,10 +4974,10 @@ Index: git/opcodes/microblaze-dis.c
  	     break;
  	/* For tuqula instruction */
  	case INST_TYPE_RD:
-Index: git/opcodes/microblaze-opc.h
-===================================================================
---- git.orig/opcodes/microblaze-opc.h
-+++ git/opcodes/microblaze-opc.h
+diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
+index 825c639a41e..ab90240d88a 100644
+--- a/opcodes/microblaze-opc.h
++++ b/opcodes/microblaze-opc.h
 @@ -40,7 +40,7 @@
  #define INST_TYPE_RD_SPECIAL 11
  #define INST_TYPE_R1 12
@@ -5153,10 +5202,10 @@ Index: git/opcodes/microblaze-opc.h
 +
  #endif /* MICROBLAZE_OPC */
  
-Index: git/opcodes/microblaze-opcm.h
-===================================================================
---- git.orig/opcodes/microblaze-opcm.h
-+++ git/opcodes/microblaze-opcm.h
+diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
+index aa3401610d9..b242ea73c7b 100644
+--- a/opcodes/microblaze-opcm.h
++++ b/opcodes/microblaze-opcm.h
 @@ -25,6 +25,7 @@
  
  enum microblaze_instr
@@ -5174,9 +5223,9 @@ Index: git/opcodes/microblaze-opcm.h
 +  sb, sbea, sbr, sh, shea, shr, sw, swea, swr, swx, lbui, lhui, lwi, lli,
 +  sbi, shi, swi, sli, msrset, msrclr, tuqula, mbi_fadd, frsub, mbi_fmul, mbi_fdiv,
    fcmp_lt, fcmp_eq, fcmp_le, fcmp_gt, fcmp_ne, fcmp_ge, fcmp_un, flt,
-   fint, fsqrt,
-   tget, tcget, tnget, tncget, tput, tcput, tnput, tncput,
-@@ -58,6 +59,18 @@ enum microblaze_instr
+   /* 'fsqrt' is a glibc:math.h symbol.  */
+   fint, microblaze_fsqrt,
+@@ -59,6 +60,18 @@ enum microblaze_instr
    aputd, taputd, caputd, tcaputd, naputd, tnaputd, ncaputd, tncaputd,
    eagetd, teagetd, ecagetd, tecagetd, neagetd, tneagetd, necagetd, tnecagetd,
    eaputd, teaputd, ecaputd, tecaputd, neaputd, tneaputd, necaputd, tnecaputd,
@@ -5195,7 +5244,7 @@ Index: git/opcodes/microblaze-opcm.h
    invalid_inst
  };
  
-@@ -135,15 +148,18 @@ enum microblaze_instr_type
+@@ -136,15 +149,18 @@ enum microblaze_instr_type
  #define RA_MASK 0x001F0000
  #define RB_MASK 0x0000F800
  #define IMM_MASK 0x0000FFFF
@@ -5216,3 +5265,6 @@ Index: git/opcodes/microblaze-opcm.h
  
  /* FSL imm mask for get, put instructions.  */
  #define  RFSL_MASK 0x000000F
+-- 
+2.25.1
+

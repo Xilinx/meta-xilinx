@@ -1,14 +1,15 @@
-From bb27e620e2911e472eee6c1ee4fb2a1e722b65aa Mon Sep 17 00:00:00 2001
+From ba9dde9e1068bb282bb0695d1159cd100bcae54f Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Thu, 28 Jan 2016 14:07:34 +0530
 Subject: [PATCH 08/38] fixing the MAX_OPCODES to correct value
 
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  opcodes/microblaze-opc.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index 5d165dcdf91..bf53e492b9a 100644
+index d3f8e36199e..3b3cdbe710c 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -102,7 +102,7 @@
@@ -21,5 +22,5 @@ index 5d165dcdf91..bf53e492b9a 100644
  const struct op_code_struct
  {
 -- 
-2.17.1
+2.25.1
 

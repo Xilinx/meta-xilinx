@@ -1,20 +1,21 @@
-From aa1705bc097efd5003e5d818e1e2d12ff5fc0c94 Mon Sep 17 00:00:00 2001
+From 8124e17da0056fa6c9f650a0ee5631261e78b93e Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 17 Jun 2020 21:20:26 +0530
-Subject: [PATCH 29/38] [Patch,MicroBlaze] : improper address mapping of
- PROVIDE directive symbols[DTOR_END] are causing runtime loops and we don't
- need to override PROVIDE symbols if symbols are defined in libraries and
- linker so I am disabling override for PROVIDE symbols.
+Subject: [PATCH 29/38] improper address mapping of PROVIDE directive
+ symbols[DTOR_END] are causing runtime loops and we don't need to override
+ PROVIDE symbols if symbols are defined in libraries and linker so I am
+ disabling override for PROVIDE symbols.
 
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  ld/ldlang.c | 12 +++++++++---
  1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/ld/ldlang.c b/ld/ldlang.c
-index 37b64c89ee1..5b179daf8f1 100644
+index f12c09633a7..4a71abc7cbc 100644
 --- a/ld/ldlang.c
 +++ b/ld/ldlang.c
-@@ -3657,10 +3657,16 @@ open_input_bfds (lang_statement_union_type *s, enum open_bfd_mode mode)
+@@ -3692,10 +3692,16 @@ open_input_bfds (lang_statement_union_type *s, enum open_bfd_mode mode)
  	    plugin_insert = NULL;
  #endif
  	  break;
@@ -35,5 +36,5 @@ index 37b64c89ee1..5b179daf8f1 100644
  	  break;
  	}
 -- 
-2.17.1
+2.25.1
 

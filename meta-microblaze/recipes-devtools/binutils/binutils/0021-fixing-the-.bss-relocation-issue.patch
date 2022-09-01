@@ -1,19 +1,21 @@
-From 1131a31133a45553259b3fdb930daae468709bda Mon Sep 17 00:00:00 2001
+From cec495577424c4d5c4c77949a624bc33991ac673 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Wed, 24 Oct 2018 12:34:37 +0530
 Subject: [PATCH 21/38] fixing the .bss relocation issue
 
 Conflicts:
 	bfd/elf64-microblaze.c
+
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  bfd/elf64-microblaze.c | 32 +++++++++++++++++++-------------
  1 file changed, 19 insertions(+), 13 deletions(-)
 
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index 55c01b44d29..6fb88959357 100644
+index 97131c352c7..fe73de86659 100644
 --- a/bfd/elf64-microblaze.c
 +++ b/bfd/elf64-microblaze.c
-@@ -1514,14 +1514,14 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1555,14 +1555,14 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  			  bfd_put_16 (input_bfd, relocation & 0xffff,
  				      contents + offset + endian);
  
@@ -36,7 +38,7 @@ index 55c01b44d29..6fb88959357 100644
  			else
  			  {
  			    bfd_put_16 (input_bfd, (relocation >> 16) & 0xffff,
-@@ -1632,7 +1632,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1673,7 +1673,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
  					 contents + offset + endian);
  			  }
  			unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
@@ -45,7 +47,7 @@ index 55c01b44d29..6fb88959357 100644
                            {
                              insn &= ~0x00ffffff;
                              insn |= (relocation >> 16) & 0xffffff;
-@@ -1749,7 +1749,7 @@ microblaze_bfd_write_imm_value_32 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
+@@ -1791,7 +1791,7 @@ microblaze_bfd_write_imm_value_32 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
  {
      unsigned long instr = bfd_get_32 (abfd, bfd_addr);
  
@@ -54,7 +56,7 @@ index 55c01b44d29..6fb88959357 100644
        {
          instr &= ~0x00ffffff;
          instr |= (val & 0xffffff);
-@@ -1772,7 +1772,7 @@ microblaze_bfd_write_imm_value_64 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
+@@ -1814,7 +1814,7 @@ microblaze_bfd_write_imm_value_64 (bfd *abfd, bfd_byte *bfd_addr, bfd_vma val)
      unsigned long instr_lo;
  
      instr_hi = bfd_get_32 (abfd, bfd_addr);
@@ -63,7 +65,7 @@ index 55c01b44d29..6fb88959357 100644
        {
          instr_hi &= ~0x00ffffff;
          instr_hi |= (val >> 16) & 0xffffff;
-@@ -2276,7 +2276,10 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2320,7 +2320,10 @@ microblaze_elf_relax_section (bfd *abfd,
            unsigned long instr_lo =  bfd_get_32 (abfd, ocontents
                                                  + irelscan->r_offset
                                                  + INST_WORD_SIZE);
@@ -75,7 +77,7 @@ index 55c01b44d29..6fb88959357 100644
            immediate |= (instr_lo & 0x0000ffff);
  		      offset = calc_fixup (irelscan->r_addend, 0, sec);
  		      immediate -= offset;
-@@ -2320,7 +2323,10 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2364,7 +2367,10 @@ microblaze_elf_relax_section (bfd *abfd,
            unsigned long instr_lo =  bfd_get_32 (abfd, ocontents
                                                  + irelscan->r_offset
                                                  + INST_WORD_SIZE);
@@ -88,5 +90,5 @@ index 55c01b44d29..6fb88959357 100644
  		      target_address = immediate;
  		      offset = calc_fixup (target_address, 0, sec);
 -- 
-2.17.1
+2.25.1
 

@@ -1,4 +1,4 @@
-From bf7c7531e54e2f1b995e7ba52213c1df585d7fcc Mon Sep 17 00:00:00 2001
+From 48166e74b46787b10073fcec3c133463504e2dbc Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 23 Jan 2017 19:07:44 +0530
 Subject: [PATCH 33/38] Add initial port of linux gdbserver add
@@ -23,6 +23,7 @@ Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
 Conflicts:
 	gdb/gdbserver/Makefile.in
 	gdb/gdbserver/configure.srv
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  gdb/configure.host                   |   3 +
  gdb/features/microblaze-linux.xml    |  12 +
@@ -40,19 +41,19 @@ Conflicts:
  create mode 100644 gdb/gdbserver/linux-microblaze-low.c
  create mode 100644 gdb/regformats/reg-microblaze.dat
 
-Index: git/gdb/configure.host
-===================================================================
---- git.orig/gdb/configure.host
-+++ git/gdb/configure.host
-@@ -60,6 +60,7 @@ hppa*)			gdb_host_cpu=pa ;;
- i[34567]86*)		gdb_host_cpu=i386 ;;
+diff --git a/gdb/configure.host b/gdb/configure.host
+index da71675b201..3a0c4443a93 100644
+--- a/gdb/configure.host
++++ b/gdb/configure.host
+@@ -61,6 +61,7 @@ i[34567]86*)		gdb_host_cpu=i386 ;;
+ loongarch*)		gdb_host_cpu=loongarch ;;
  m68*)			gdb_host_cpu=m68k ;;
  mips*)			gdb_host_cpu=mips ;;
 +microblaze*)		gdb_host_cpu=microblaze ;;
  powerpc* | rs6000)	gdb_host_cpu=powerpc ;;
  sparcv9 | sparc64)	gdb_host_cpu=sparc ;;
  s390*)			gdb_host_cpu=s390 ;;
-@@ -132,6 +133,8 @@ mips64*-*-openbsd*)	gdb_host=obsd64 ;;
+@@ -135,6 +136,8 @@ mips64*-*-openbsd*)	gdb_host=obsd64 ;;
  
  or1k-*-linux*)		gdb_host=linux ;;
  
@@ -61,10 +62,11 @@ Index: git/gdb/configure.host
  powerpc-*-aix* | rs6000-*-* | powerpc64-*-aix*)
  			gdb_host=aix ;;
  powerpc*-*-freebsd*)	gdb_host=fbsd ;;
-Index: git/gdb/features/microblaze-linux.xml
-===================================================================
+diff --git a/gdb/features/microblaze-linux.xml b/gdb/features/microblaze-linux.xml
+new file mode 100644
+index 00000000000..8983e66eb3d
 --- /dev/null
-+++ git/gdb/features/microblaze-linux.xml
++++ b/gdb/features/microblaze-linux.xml
 @@ -0,0 +1,12 @@
 +<?xml version="1.0"?>
 +<!-- Copyright (C) 2014-2018 Free Software Foundation, Inc.
@@ -78,10 +80,11 @@ Index: git/gdb/features/microblaze-linux.xml
 +  <osabi>GNU/Linux</osabi>
 +  <xi:include href="microblaze-core.xml"/>
 +</target>
-Index: git/gdb/gdbserver/Makefile.in
-===================================================================
+diff --git a/gdb/gdbserver/Makefile.in b/gdb/gdbserver/Makefile.in
+new file mode 100644
+index 00000000000..fb4762a22d5
 --- /dev/null
-+++ git/gdb/gdbserver/Makefile.in
++++ b/gdb/gdbserver/Makefile.in
 @@ -0,0 +1,712 @@
 +# Copyright (C) 1989-2020 Free Software Foundation, Inc.
 +
@@ -795,10 +798,11 @@ Index: git/gdb/gdbserver/Makefile.in
 +.SECONDARY:
 +
 +# This is the end of "Makefile.in".
-Index: git/gdb/gdbserver/configure.srv
-===================================================================
+diff --git a/gdb/gdbserver/configure.srv b/gdb/gdbserver/configure.srv
+new file mode 100644
+index 00000000000..e0d2b2fe04a
 --- /dev/null
-+++ git/gdb/gdbserver/configure.srv
++++ b/gdb/gdbserver/configure.srv
 @@ -0,0 +1,398 @@
 +# Mappings from configuration triplets to gdbserver build options.
 +# This is invoked from the autoconf-generated configure script, to
@@ -1198,10 +1202,11 @@ Index: git/gdb/gdbserver/configure.srv
 +			exit 1
 +			;;
 +esac
-Index: git/gdb/gdbserver/linux-microblaze-low.c
-===================================================================
+diff --git a/gdb/gdbserver/linux-microblaze-low.c b/gdb/gdbserver/linux-microblaze-low.c
+new file mode 100644
+index 00000000000..cba5d6fc585
 --- /dev/null
-+++ git/gdb/gdbserver/linux-microblaze-low.c
++++ b/gdb/gdbserver/linux-microblaze-low.c
 @@ -0,0 +1,189 @@
 +/* GNU/Linux/Microblaze specific low level interface, for the remote server for
 +   GDB.
@@ -1392,10 +1397,10 @@ Index: git/gdb/gdbserver/linux-microblaze-low.c
 +  microblaze_collect_ptrace_register,
 +  microblaze_supply_ptrace_register,
 +};
-Index: git/gdb/microblaze-linux-tdep.c
-===================================================================
---- git.orig/gdb/microblaze-linux-tdep.c
-+++ git/gdb/microblaze-linux-tdep.c
+diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
+index daa7ddf7e4d..5748556a556 100644
+--- a/gdb/microblaze-linux-tdep.c
++++ b/gdb/microblaze-linux-tdep.c
 @@ -37,6 +37,22 @@
  #include "tramp-frame.h"
  #include "linux-tdep.h"
@@ -1419,7 +1424,7 @@ Index: git/gdb/microblaze-linux-tdep.c
  static int
  microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch, 
  					   struct bp_target_info *bp_tgt)
-@@ -50,13 +66,20 @@ microblaze_linux_memory_remove_breakpoin
+@@ -50,13 +66,20 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
    /* Determine appropriate breakpoint contents and size for this address.  */
    bp = gdbarch_breakpoint_from_pc (gdbarch, &addr, &bplen);
  
@@ -1441,7 +1446,7 @@ Index: git/gdb/microblaze-linux-tdep.c
  
    return val;
  }
-@@ -129,6 +152,10 @@ microblaze_linux_init_abi (struct gdbarc
+@@ -129,6 +152,10 @@ microblaze_linux_init_abi (struct gdbarch_info info,
    /* Trampolines.  */
    tramp_frame_prepend_unwinder (gdbarch,
  				&microblaze_linux_sighandler_tramp_frame);
@@ -1452,14 +1457,15 @@ Index: git/gdb/microblaze-linux-tdep.c
  }
  
  void _initialize_microblaze_linux_tdep ();
-Index: git/gdb/microblaze-tdep.c
-===================================================================
---- git.orig/gdb/microblaze-tdep.c
-+++ git/gdb/microblaze-tdep.c
-@@ -128,7 +128,38 @@ microblaze_fetch_instruction (CORE_ADDR
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 3d5dd669341..3e8e8fe35b9 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -128,7 +128,38 @@ microblaze_fetch_instruction (CORE_ADDR pc)
  constexpr gdb_byte microblaze_break_insn[] = MICROBLAZE_BREAKPOINT;
  
  typedef BP_MANIPULATION (microblaze_break_insn) microblaze_breakpoint;
+-
 +static int
 +microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
 +				    struct bp_target_info *bp_tgt)
@@ -1489,13 +1495,13 @@ Index: git/gdb/microblaze-tdep.c
 +    val = target_write_raw_memory (addr, bp_tgt->shadow_contents, bplen);
 +    microblaze_debug ("microblaze_linux_memory_remove_breakpoint writing back to memory at addr 0x%lx\n", addr);
 +  }
- 
++
 +  return val;
 +}
  
  /* Allocate and initialize a frame cache.  */
  
-@@ -716,6 +747,7 @@ microblaze_gdbarch_init (struct gdbarch_
+@@ -716,6 +747,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  				       microblaze_breakpoint::kind_from_pc);
    set_gdbarch_sw_breakpoint_from_kind (gdbarch,
  				       microblaze_breakpoint::bp_from_kind);
@@ -1503,16 +1509,16 @@ Index: git/gdb/microblaze-tdep.c
  
    set_gdbarch_frame_args_skip (gdbarch, 8);
  
-@@ -756,4 +788,5 @@ When non-zero, microblaze specific debug
+@@ -756,4 +788,5 @@ When non-zero, microblaze specific debugging is enabled."),
  			     NULL,
  			     &setdebuglist, &showdebuglist);
  
 +
  }
-Index: git/gdb/microblaze-tdep.h
-===================================================================
---- git.orig/gdb/microblaze-tdep.h
-+++ git/gdb/microblaze-tdep.h
+diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
+index 4d90e8785dc..53fcb2297e6 100644
+--- a/gdb/microblaze-tdep.h
++++ b/gdb/microblaze-tdep.h
 @@ -118,6 +118,8 @@ struct microblaze_frame_cache
  
  /* MICROBLAZE_BREAKPOINT defines the breakpoint that should be used.
@@ -1523,10 +1529,11 @@ Index: git/gdb/microblaze-tdep.h
 +
  
  #endif /* microblaze-tdep.h */
-Index: git/gdb/regformats/reg-microblaze.dat
-===================================================================
+diff --git a/gdb/regformats/reg-microblaze.dat b/gdb/regformats/reg-microblaze.dat
+new file mode 100644
+index 00000000000..bd8a4384424
 --- /dev/null
-+++ git/gdb/regformats/reg-microblaze.dat
++++ b/gdb/regformats/reg-microblaze.dat
 @@ -0,0 +1,41 @@
 +name:microblaze
 +expedite:r1,pc
@@ -1569,3 +1576,6 @@ Index: git/gdb/regformats/reg-microblaze.dat
 +32:fsr
 +32:slr
 +32:shr
+-- 
+2.25.1
+

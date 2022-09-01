@@ -1,19 +1,20 @@
-From 0435ac5ae5d2fa9da8561fd47802ca742061e462 Mon Sep 17 00:00:00 2001
+From 9f2319c6e32c4449604c2ec26042123a88eeb87c Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 24 Jan 2022 16:21:33 +0530
-Subject: [PATCH] [Patch,MicroBlaze] : Fixing the imm/imml generation for 16
- bit argument [CR-1115234].
+Subject: [PATCH 37/38] Fixing the imm/imml generation for 16 bit argument
+ [CR-1115234].
 
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  bfd/elf32-microblaze.c | 6 +++++-
  bfd/elf64-microblaze.c | 5 ++++-
  2 files changed, 9 insertions(+), 2 deletions(-)
 
-Index: git/bfd/elf32-microblaze.c
-===================================================================
---- git.orig/bfd/elf32-microblaze.c
-+++ git/bfd/elf32-microblaze.c
-@@ -1972,7 +1972,11 @@ microblaze_elf_relax_section (bfd *abfd,
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index e284b0e5398..8b947a6ec79 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -2016,7 +2016,11 @@ microblaze_elf_relax_section (bfd *abfd,
        else
  	symval += irel->r_addend;
  
@@ -25,12 +26,12 @@ Index: git/bfd/elf32-microblaze.c
 +
  	{
  	  /* We can delete this instruction.  */
- 	  sec->relax[sec->relax_count].addr = irel->r_offset;
-Index: git/bfd/elf64-microblaze.c
-===================================================================
---- git.orig/bfd/elf64-microblaze.c
-+++ git/bfd/elf64-microblaze.c
-@@ -1981,7 +1981,10 @@ microblaze_elf_relax_section (bfd *abfd,
+ 	  sdata->relax[sdata->relax_count].addr = irel->r_offset;
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index 3b6e6aa47bd..cecfb5506f8 100644
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -2011,7 +2011,10 @@ microblaze_elf_relax_section (bfd *abfd,
        else
  	symval += irel->r_addend;
  
@@ -41,4 +42,7 @@ Index: git/bfd/elf64-microblaze.c
 +	  || (symval & 0xffff8000) == 0xffff8000)
  	{
            /* We can delete this instruction.  */
- 	  sec->relax[sec->relax_count].addr = irel->r_offset;
+           sdata->relax[sdata->relax_count].addr = irel->r_offset;
+-- 
+2.25.1
+

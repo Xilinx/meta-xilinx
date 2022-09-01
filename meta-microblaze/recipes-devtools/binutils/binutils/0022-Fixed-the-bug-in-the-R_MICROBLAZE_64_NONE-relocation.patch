@@ -1,19 +1,20 @@
-From 70b208a66994ba60e36ca3eaa7c525e130b145af Mon Sep 17 00:00:00 2001
+From 622b9e85bde4a88ecfe1884179f547575224b984 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Wed, 28 Nov 2018 14:00:29 +0530
 Subject: [PATCH 22/38] Fixed the bug in the R_MICROBLAZE_64_NONE relocation.
  It was adjusting only lower 16bits.
 
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  bfd/elf32-microblaze.c | 4 ++--
  bfd/elf64-microblaze.c | 4 ++--
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 2f2e1ef7f41..2a976ecbe1d 100644
+index 71ff973573c..f41b503cbb5 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
-@@ -2015,8 +2015,8 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2059,8 +2059,8 @@ microblaze_elf_relax_section (bfd *abfd,
  		sfix = calc_fixup (irel->r_offset + INST_WORD_SIZE, 0, sec);
  		efix = calc_fixup (target_address, 0, sec);
  		irel->r_addend -= (efix - sfix);
@@ -25,10 +26,10 @@ index 2f2e1ef7f41..2a976ecbe1d 100644
  	      break;
  	    }
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index 6fb88959357..4d41ddbd953 100644
+index fe73de86659..387ee0da261 100644
 --- a/bfd/elf64-microblaze.c
 +++ b/bfd/elf64-microblaze.c
-@@ -2053,8 +2053,8 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2097,8 +2097,8 @@ microblaze_elf_relax_section (bfd *abfd,
  		sfix = calc_fixup (irel->r_offset + INST_WORD_SIZE, 0, sec);
  		efix = calc_fixup (target_address, 0, sec);
  		irel->r_addend -= (efix - sfix);
@@ -40,5 +41,5 @@ index 6fb88959357..4d41ddbd953 100644
  	      break;
  	    }
 -- 
-2.17.1
+2.25.1
 
