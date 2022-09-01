@@ -71,12 +71,15 @@ EXTRA_OEMAKE:append:versal = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.get
 ATF_PROVENCORE = "SPD=pncd SPD_PNCD_NS_IRQ=51 ZYNQMP_BL32_MEM_BASE=0x70000000 ZYNQMP_BL32_MEM_SIZE=0x0FF00000"
 EXTRA_OEMAKE:append = "${@bb.utils.contains('MACHINE_FEATURES', 'provencore', ' ${ATF_PROVENCORE}', '', d)}"
 
+# Workaround for bl31.elf has a LOAD segment with RWX permissions
+EXTRA_OEMAKE:append = ' TF_LDFLAGS="--no-warn-rwx-segments --fatal-warnings -O1 --gc-sections"'
+
 do_configure() {
 	oe_runmake clean -C ${S} BUILD_BASE=${B} PLAT=${PLATFORM}
 }
 
 do_compile() {
-	oe_runmake -C ${S} BUILD_BASE=${B} PLAT=${PLATFORM} RESET_TO_BL31=1 bl31
+	oe_runmake -C ${S} BUILD_BASE=${B} PLAT=${PLATFORM} RESET_TO_BL31=1 bl31 V=1
 }
 
 do_install() {
