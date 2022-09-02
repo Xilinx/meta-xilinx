@@ -41,8 +41,8 @@ TimeoutStartSec=60
 WatchdogSec=20
 
 # The user to run Weston as.
-User=root
-Group=root
+User=weston
+Group=weston
 
 # Make sure the working directory is the users home directory
 WorkingDirectory=/home/weston
