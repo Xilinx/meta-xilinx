@@ -53,6 +53,7 @@ KBUILD_DEFCONFIG:zynqmp ?= "xilinx_defconfig"
 KBUILD_DEFCONFIG:zynq ?= "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG:microblaze ?= "mmu_defconfig"
 KBUILD_DEFCONFIG:versal ?= "xilinx_defconfig"
+KBUILD_DEFCONFIG:versal-net ?= "xilinx_versal_net_defconfig"
 
 KERNEL_FEATURES:append:zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
 
