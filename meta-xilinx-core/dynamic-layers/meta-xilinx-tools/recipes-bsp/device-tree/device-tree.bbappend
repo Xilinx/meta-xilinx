@@ -14,5 +14,5 @@ YAML_DT_BOARD_FLAGS:zynqmp-generic ?= "{BOARD zcu102-rev1.0}"
 # versal-generic.conf file uses HDF_MACHINE = "vck190-versal", Hence set versal-vck190-reva-x-ebm-01-reva dtsi file.
 YAML_DT_BOARD_FLAGS:versal-generic ?= "{BOARD versal-vck190-reva-x-ebm-01-reva}"
 
-# versal-net-generic.conf uses HDF_MACHINE = "versal-net-generic", Hence set versal-net-ipp-rev1.5 dtsi file.
-YAML_DT_BOARD_FLAGS:versal-net-generic ?= "{BOARD versal-net-ipp-rev1.5}"
+# versal-net-generic.conf uses HDF_MACHINE = "versal-net-generic", Hence set versal-net-ipp-rev1.9 dtsi file.
+YAML_DT_BOARD_FLAGS:versal-net-generic ?= "{BOARD versal-net-ipp-rev1.9}"
