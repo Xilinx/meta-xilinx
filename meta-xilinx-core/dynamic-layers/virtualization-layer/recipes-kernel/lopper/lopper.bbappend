@@ -5,8 +5,8 @@ SECTION = "bootloader"
 
 FILESEXTRAPATHS:append := ":${THISDIR}/lopper"
 
-SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master;protocol=https"
-SRCREV = "f70eb86385f49545070a84ad756902b3cd607e21"
+SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=v0.2022.x;protocol=https"
+SRCREV = "cdb1a7b55c375f5237683a512257e0fc573063a2"
 S = "${WORKDIR}/git"
 
 PV="v1.0.2+git${SRCPV}"

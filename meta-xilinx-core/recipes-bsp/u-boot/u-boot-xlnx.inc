@@ -19,7 +19,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/u-boot:"
 
 SYSROOT_DIRS += "/boot"
 
-BASE_DTS ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE') or "system-top")}"
+BASE_DTS ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE') or '').rstrip('.dtb') or 'system-top'}"
 DTB_PATH ?= "/boot/devicetree/"
 DTB_NAME ?= ""
 
@@ -32,10 +32,9 @@ python __anonymous () {
        d.appendVarFlag('do_configure', 'depends', ' virtual/dtb:do_populate_sysroot')
        if d.getVar("DTB_NAME") is not None:
            d.setVar('DTB_NAME', d.getVar('BASE_DTS')+ '.dtb')
-
-    if d.getVar('UBOOT_IMAGE_BLOB') == "1":
-        d.appendVarFlag('do_compile', 'postfuncs', ' do_blob_generate')
 }
+
+require u-boot-xlnx-blob.inc
 
 UBOOTELF_NODTB_IMAGE ?= "u-boot-nodtb.elf"
 UBOOTELF_NODTB_BINARY ?= "u-boot"

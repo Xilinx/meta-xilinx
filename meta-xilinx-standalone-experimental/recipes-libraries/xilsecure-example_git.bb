@@ -5,10 +5,12 @@ ESW_COMPONENT_SRC = "/lib/sw_services/xilsecure/examples/"
 DEPENDS += "xilsecure"
 
 do_configure:prepend() {
+    (
     cd ${S}
     lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
     install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+    )
 }
 
 ESW_CUSTOM_LINKER_FILE ?= "None"
@@ -20,8 +22,8 @@ do_install() {
 }
 
 do_deploy() {
-    install -d ${DEPLOYDIR}/${MACHINE}-${BPN}/
-    install -Dm 0644 ${WORKDIR}/package/${base_libdir}/firmware/*.elf ${DEPLOYDIR}/${MACHINE}-${BPN}/
+    install -d ${DEPLOYDIR}/${BPN}/
+    install -Dm 0644 ${WORKDIR}/package/${base_libdir}/firmware/*.elf ${DEPLOYDIR}/${BPN}/
 }
 addtask deploy before do_build after do_package
 

@@ -35,7 +35,6 @@ PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,libsdl2"
 PACKAGECONFIG[pie] = "--enable-pie,--disable-pie,,"
 
 DISABLE_STATIC:pn-${PN} = ""
-EXTRA_OECONF:remove = " --with-git=/bin/false --with-git-submodules=ignore"
 
 PTEST_ENABLED = ""
 

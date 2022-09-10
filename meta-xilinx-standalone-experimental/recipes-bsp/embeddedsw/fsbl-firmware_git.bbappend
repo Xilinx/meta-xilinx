@@ -8,6 +8,7 @@ inherit esw
 
 # Not compatible with Zynq
 COMPATIBLE_MACHINE:zynq = "none"
+COMPATIBLE_MACHINE:microblaze = "none"
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/undefined/src"
 ESW_COMPONENT_SRC:zynq = "/lib/sw_apps/zynq_fsbl/src"
@@ -23,14 +24,31 @@ python() {
     psu_init_c = os.path.join(psu_init_path, 'psu_init.c')
     psu_init_h = os.path.join(psu_init_path, 'psu_init.h')
 
+    add_path = False
     if os.path.exists(psu_init_c):
-        d.appendVar('SRC_URI', ' file://%s' % psu_init_c)
-    else:
-        bb.warn("Unable to find %s, using default version" % psu_init_c)
+        d.appendVar('SRC_URI', ' file://psu_init.c')
+        add_path = True
+
     if os.path.exists(psu_init_h):
-        d.appendVar('SRC_URI', ' file://%s' % psu_init_h)
-    else:
-        bb.warn("Unable to find %s, using default version" % psu_init_h)
+        d.appendVar('SRC_URI', ' file://psu_init.h')
+        add_path = True
+
+    if add_path:
+        d.prependVar('FILESEXTRAPATHS', '%s:' % psu_init_path)
+}
+
+do_configure:prepend() {
+    if [ -e ${WORKDIR}/psu_init.c ]; then
+        install -m 0644 ${WORKDIR}/psu_init.c ${S}/${ESW_COMPONENT_SRC}
+    else
+        bbwarn "Using the default psu_init.c, this may not work correctly."
+    fi
+
+    if [ -e ${WORKDIR}/psu_init.h ]; then
+        install -m 0644 ${WORKDIR}/psu_init.h ${S}/${ESW_COMPONENT_SRC}
+    else
+        bbwarn "Using the default psu_init.h, this may not work correctly."
+    fi
 }
 
 do_install() {
