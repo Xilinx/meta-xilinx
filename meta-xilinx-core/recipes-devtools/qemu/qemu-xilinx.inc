@@ -12,7 +12,7 @@ DEPENDS = "glib-2.0 zlib pixman bison-native ninja-native meson-native"
 
 XILINX_QEMU_VERSION ?= "v6.1.0"
 BRANCH ?= "master"
-SRCREV = "de92de0a3cef8affbf256d8930817bf8765cce21"
+SRCREV = "fbcb55665e9f5f91110ba2a44f62be9bc72752ee"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 

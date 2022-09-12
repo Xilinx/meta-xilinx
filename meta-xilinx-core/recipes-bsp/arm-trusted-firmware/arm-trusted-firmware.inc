@@ -36,6 +36,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 PLATFORM:zynqmp = "zynqmp"
 PLATFORM:versal = "versal"
+PLATFORM:versal-net = "versal_net"
 
 # requires CROSS_COMPILE set by hand as there is no configure script
 export CROSS_COMPILE="${TARGET_PREFIX}"
@@ -55,6 +56,7 @@ DEBUG_ATF:versal ?= "1"
 
 EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_CONSOLE=${ATF_CONSOLE}' if d.getVar('ATF_CONSOLE', True) != '' else ''}"
 EXTRA_OEMAKE:append:versal = "${@' VERSAL_CONSOLE=${ATF_CONSOLE}' if d.getVar('ATF_CONSOLE', True) != '' else ''}"
+EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_CONSOLE=${ATF_CONSOLE}' if d.getVar('ATF_CONSOLE', True) != '' else ''}"
 EXTRA_OEMAKE:append = " ${@bb.utils.contains('DEBUG_ATF', '1', ' DEBUG=${DEBUG_ATF}', '', d)}"
 
 OUTPUT_DIR = "${@bb.utils.contains('DEBUG_ATF', '1', '${B}/${PLATFORM}/debug', '${B}/${PLATFORM}/release', d)}"
@@ -67,6 +69,9 @@ EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.get
 
 EXTRA_OEMAKE:append:versal = "${@' VERSAL_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
 EXTRA_OEMAKE:append:versal = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
+
+EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
+EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
 
 ATF_PROVENCORE = "SPD=pncd SPD_PNCD_NS_IRQ=51 ZYNQMP_BL32_MEM_BASE=0x70000000 ZYNQMP_BL32_MEM_SIZE=0x0FF00000"
 EXTRA_OEMAKE:append = "${@bb.utils.contains('MACHINE_FEATURES', 'provencore', ' ${ATF_PROVENCORE}', '', d)}"
