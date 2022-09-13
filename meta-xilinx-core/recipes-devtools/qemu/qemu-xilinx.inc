@@ -11,12 +11,12 @@ LIC_FILES_CHKSUM = " \
 DEPENDS = "glib-2.0 zlib pixman bison-native ninja-native meson-native"
 
 XILINX_QEMU_VERSION ?= "v6.1.0"
-BRANCH ?= "xlnx_rel_v2022.1"
-SRCREV = "52a9b22faeb149a6b17646b1f912f06ea6c269ca"
+BRANCH ?= "master"
+SRCREV = "fbcb55665e9f5f91110ba2a44f62be9bc72752ee"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-PV = "${XILINX_QEMU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
+PV = "${XILINX_QEMU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git${SRCPV}"
 REPO ?= "gitsm://github.com/Xilinx/qemu.git;protocol=https"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"

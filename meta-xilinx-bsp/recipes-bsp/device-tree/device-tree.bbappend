@@ -4,12 +4,6 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 COMPATIBLE_MACHINE:qemu-zynq7 = ".*"
 SRC_URI:append:qemu-zynq7 = " file://qemu-zynq7.dts"
 
-COMPATIBLE_MACHINE:kc705-microblazeel = ".*"
-SRC_URI:append:kc705-microblazeel = " \
-		file://kc705-microblazeel.dts \
-		file://pl.dtsi \
-		file://system-conf.dtsi \
-		"
 SRC_URI:append = "${@bb.utils.contains('MACHINE_FEATURES', 'provencore', ' file://pnc.dtsi', '', d)}"
 
 do_configure:append() {

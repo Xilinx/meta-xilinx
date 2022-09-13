@@ -7,6 +7,7 @@ SOC_FAMILY ?= "versal"
 # "hbm"      - Versal HMB Devices
 # "ai-core"  - Versal AI-core Devices
 # "ai-edge"  - Versal AI-Edge Devices
+# "net"      - Versal Net Devices
 
 SOC_VARIANT ?= "prime"
 

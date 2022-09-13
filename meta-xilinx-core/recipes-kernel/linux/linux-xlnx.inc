@@ -1,13 +1,12 @@
 # This version extension should match CONFIG_LOCALVERSION in defconfig
-XILINX_RELEASE_VERSION ?= ""
-LINUX_VERSION_EXTENSION ?= "-xilinx-${XILINX_RELEASE_VERSION}"
+LINUX_VERSION_EXTENSION ?= "-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
 # Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
 KBRANCH ?= "xlnx_rebase_v5.15_LTS"
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
 
-FILESOVERRIDES:append = ":${XILINX_RELEASE_VERSION}"
+FILESOVERRIDES:append := ":${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}"
 KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https;name=machine"
 YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.15;destsuffix=yocto-kmeta"
 SRC_URI = "${KERNELURI};${SRCBRANCHARG} ${YOCTO_META}"
@@ -53,6 +52,7 @@ KBUILD_DEFCONFIG:zynqmp ?= "xilinx_defconfig"
 KBUILD_DEFCONFIG:zynq ?= "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG:microblaze ?= "mmu_defconfig"
 KBUILD_DEFCONFIG:versal ?= "xilinx_defconfig"
+KBUILD_DEFCONFIG:versal-net ?= "xilinx_versal_net_defconfig"
 
 KERNEL_FEATURES:append:zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
 

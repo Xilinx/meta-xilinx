@@ -64,6 +64,7 @@ def get_xlnx_cmake_processor(tune, machine, d):
 XLNX_CMAKE_MACHINE = "${@get_xlnx_cmake_machine(d.getVar('SOC_FAMILY'), d)}"
 XLNX_CMAKE_PROCESSOR = "${@get_xlnx_cmake_processor(d.getVar('DEFAULTTUNE'), d.getVar('ESW_MACHINE'), d)}"
 XLNX_CMAKE_SYSTEM_NAME ?= "Generic"
+XLNX_CMAKE_BSP_VARS ?= ""
 
 cmake_do_generate_toolchain_file:append() {
     cat >> ${WORKDIR}/toolchain.cmake <<EOF
@@ -75,6 +76,7 @@ cmake_do_generate_toolchain_file:append() {
     # Will need this in the future to make cmake understand esw variables
     # set( CMAKE_SYSTEM_NAME `echo elf | sed -e 's/^./\u&/' -e 's/^\(Linux\).*/\1/'` )
     set( CMAKE_SYSTEM_NAME "${XLNX_CMAKE_SYSTEM_NAME}" )
+    add_definitions( "${XLNX_CMAKE_BSP_VARS}" )
 EOF
 }
 
