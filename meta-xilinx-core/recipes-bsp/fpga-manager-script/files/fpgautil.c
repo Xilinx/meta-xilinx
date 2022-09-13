@@ -1,6 +1,7 @@
 /******************************************************************************
  *
- * Copyright (C) 2019-2020 Xilinx, Inc.  All rights reserved.
+ * Copyright (C) 2019-2022 Xilinx, Inc.  All rights reserved.
+ * Copyright (C) 2022 Advanced Micro Devices, Inc.  All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -91,7 +92,7 @@ void print_usage(char *prg)
 	fprintf(stderr, "                                Device Tree\n");
 	if (iszynqmp)
 	{
-		fprintf(stderr, "				Default: <Full>\n");
+		fprintf(stderr, "				Default: <full>\n");
 		fprintf(stderr, "	  -s <secure flags>	Optional: <Secure flags>\n");
 		fprintf(stderr, "				   s := <AuthDDR | AuthOCM | EnUsrKey | EnDevKey | AuthEnUsrKeyDDR | AuthEnUsrKeyOCM | AuthEnDevKeyDDR | AuthEnDevKeyOCM>\n");
 		fprintf(stderr, "	  -k <AesKey>		Optional: <AES User Key>\n");
@@ -107,7 +108,7 @@ void print_usage(char *prg)
 	fprintf(stderr, " \n");
 	fprintf(stderr, "Examples:\n");
 	fprintf(stderr, "(Load Full bitstream using Overlay)\n");
-	fprintf(stderr, "%s -b top.bit.bin -o can.dtbo -f Full -n Full \n", prg);
+	fprintf(stderr, "%s -b top.bit.bin -o can.dtbo -f Full -n full \n", prg);
 	fprintf(stderr, "(Load Partial bitstream using Overlay)\n");
 	fprintf(stderr, "%s -b rm0.bit.bin -o rm0.dtbo -f Partial -n PR0\n", prg);
 	fprintf(stderr, "(Load Full bitstream using sysfs interface)\n");
@@ -127,7 +128,7 @@ void print_usage(char *prg)
 	fprintf(stderr, "(Remove Partial Overlay)\n");
 	fprintf(stderr, "%s -R -n PR0\n", prg);
 	fprintf(stderr, "(Remove Full Overlay)\n");
-	fprintf(stderr, "%s -R -n Full\n", prg);
+	fprintf(stderr, "%s -R -n full\n", prg);
 	fprintf(stderr, "Note: %s -R is responsible for only removing the dtbo file from the livetree. it will not remove the PL logic from the FPGA region.\n", prg);
 	fprintf(stderr, " \n");
 }

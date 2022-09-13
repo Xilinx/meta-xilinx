@@ -7,10 +7,7 @@ inherit deploy
 
 LIC_FILES_CHKSUM = "file://Makefile;beginline=1;endline=27;md5=7348b6cbcae69912cb1dee68d6c68d99"
 
-PV = "xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
-
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
-SRC_URI:append = " file://0001-Makefile-Use-python3-instead-of-python.patch"
+PV = "xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git${SRCPV}"
 
 REPO ?= "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https"
 

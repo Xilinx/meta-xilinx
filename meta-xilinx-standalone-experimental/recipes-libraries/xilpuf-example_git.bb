@@ -2,7 +2,7 @@ inherit esw deploy
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilpuf/examples/"
 
-DEPENDS += "xilpuf"
+DEPENDS += "xilpuf xilsecure"
 
 do_configure:prepend() {
     (

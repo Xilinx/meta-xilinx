@@ -37,6 +37,13 @@ XSERVER ?= " \
 	${XSERVER_EXT} \
 	"
 
+# Automatically add WKS_FILE_DEPENDS based on the configuration
+WKS_FILE_DEPENDS:append = "${@bb.utils.contains('IMAGE_BOOT_FILES', 'boot.bin', ' xilinx-bootbin', '', d)}"
+WKS_FILE_DEPENDS:append = "${@bb.utils.contains('IMAGE_BOOT_FILES', 'system.dtb', ' virtual/dtb', '', d)}"
+WKS_FILE_DEPENDS:append = "${@bb.utils.contains('IMAGE_BOOT_FILES', 'boot.scr', ' u-boot-zynq-scr', '', d)}"
+WKS_FILE_DEPENDS:append = "${@bb.utils.contains('IMAGE_BOOT_FILES', 'uEnv.txt', ' u-boot-zynq-uenv', '', d)}"
+WKS_FILE_DEPENDS:append = "${@bb.utils.contains('IMAGE_BOOT_FILES', 'atf-uboot.ub', ' arm-trusted-firmware', '', d)}"
+
 IMAGE_BOOT_FILES ?= "${@get_default_image_boot_files(d)}"
 
 def get_default_image_boot_files(d):

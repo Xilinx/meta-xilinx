@@ -17,9 +17,9 @@ https://www.openembedded.org/wiki/How_to_submit_a_patch_to_OpenEmbedded
 
 **Maintainers:**
 
-	Mark Hatle <mark.hatle@xilinx.com>
-	Sandeep Gundlupet Raju <sandeep.gundlupet-raju@xilinx.com>
-	John Toomey <john.toomey@xilinx.com>
+	Mark Hatle <mark.hatle@amd.com>
+	Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+	John Toomey <john.toomey@amd.com>
 
 > **Note:**
 
