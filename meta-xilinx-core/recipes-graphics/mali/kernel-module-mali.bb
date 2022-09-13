@@ -1,7 +1,7 @@
 SUMMARY = "A Mali 400 Linux Kernel module"
 SECTION = "kernel/modules"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = " \
 	file://linux/license/gpl/mali_kernel_license.h;md5=f5af2d61f4c1eb262cb6a557aaa1070a \
 	"

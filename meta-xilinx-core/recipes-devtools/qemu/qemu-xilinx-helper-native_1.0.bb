@@ -4,7 +4,7 @@ FILESEXTRAPATHS:prepend := "${COREBASE}/meta/recipes-devtools/qemu/qemu-helper:"
 PROVIDES = "qemu-helper-native"
 PR = "r1"
 
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/tunctl.c;endline=4;md5=ff3a09996bc5fff6bc5d4e0b4c28f999"
 
 SRC_URI = "\
