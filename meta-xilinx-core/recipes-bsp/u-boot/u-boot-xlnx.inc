@@ -2,8 +2,8 @@ require recipes-bsp/u-boot/u-boot.inc
 
 DEPENDS += "bc-native dtc-native bison-native xxd-native"
 
-XILINX_RELEASE_VERSION ?= ""
-UBOOT_VERSION_EXTENSION ?= "-xilinx-${XILINX_RELEASE_VERSION}"
+# Use the name of the .bb for the extension
+UBOOT_VERSION_EXTENSION ?= "-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}"
 PV = "${UBOOT_VERSION}${UBOOT_VERSION_EXTENSION}+git${SRCPV}"
 
 UBOOTURI ?= "git://github.com/Xilinx/u-boot-xlnx.git;protocol=https"
