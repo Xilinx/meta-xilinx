@@ -4,13 +4,13 @@ LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=63b45903a9a50120df488435f03cf498"
 
 XILINX_VCU_VERSION = "1.0.0"
-PV = "${XILINX_VCU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
+PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git${SRCPV}"
 
 S  = "${WORKDIR}/git"
 
 BRANCH ?= "xlnx_rel_v2022.1"
 REPO ?= "git://github.com/Xilinx/vcu-firmware.git;protocol=https"
-SRCREV = "3980c778d71fa51a15e89bf70fd8fb28d5cb12e0"
+SRCREV = "569f980527fd58f43baf16bd0b294bf8c7cdf963"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI   = "${REPO};${BRANCHARG}"

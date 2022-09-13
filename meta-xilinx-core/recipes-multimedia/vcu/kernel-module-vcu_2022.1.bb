@@ -5,13 +5,13 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=eb723b61539feef013de476e68b5c50a"
 
 XILINX_VCU_VERSION = "1.0.0"
-PV = "${XILINX_VCU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
+PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git${SRCPV}"
 
 S = "${WORKDIR}/git"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-BRANCH = "master"
+BRANCH = "xlnx_rel_v2022.1"
 REPO = "git://github.com/Xilinx/vcu-modules.git;protocol=https"
 SRCREV = "9d2657550eccebccce08cacfcdd369367b9f6be4"
 
