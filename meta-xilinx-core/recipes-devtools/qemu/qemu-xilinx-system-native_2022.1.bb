@@ -4,7 +4,7 @@ PROVIDES = "qemu-system-native"
 
 EXTRA_OECONF:append = " --target-list=${@get_qemu_system_target_list(d)}"
 
-PACKAGECONFIG ??= "fdt alsa kvm pie"
+PACKAGECONFIG ??= "fdt alsa kvm pie slirp"
 
 PACKAGECONFIG:remove = "${@'kvm' if not os.path.exists('/usr/include/linux/kvm.h') else ''}"
 
