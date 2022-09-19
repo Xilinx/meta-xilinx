@@ -8,7 +8,7 @@ PV = "${XILINX_VCU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 S  = "${WORKDIR}/git"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2022.2"
 REPO ?= "git://github.com/Xilinx/vcu-firmware.git;protocol=https"
 SRCREV = "3980c778d71fa51a15e89bf70fd8fb28d5cb12e0"
 

@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=03a7aef7e6f6a76a59fd9b8ba450b493"
 XILINX_VCU_VERSION = "1.0.0"
 PV = "${XILINX_VCU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2022.2"
 REPO   ?= "git://github.com/Xilinx/vcu-omx-il.git;protocol=https"
 SRCREV = "6752f5da88a8783f689ae762065295b89902d6d4"
 

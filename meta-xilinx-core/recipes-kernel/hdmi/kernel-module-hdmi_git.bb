@@ -9,7 +9,7 @@ PV = "${XLNX_HDMI_VERSION}"
 
 S = "${WORKDIR}/git"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2022.2"
 REPO   ?= "git://github.com/Xilinx/hdmi-modules.git;protocol=https"
 SRCREV = "25b6fe7a26a975be15c002b48cfd4c291486491e"
 
