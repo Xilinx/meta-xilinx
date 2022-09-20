@@ -8,7 +8,7 @@ PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', 
 
 S  = "${WORKDIR}/git"
 
-BRANCH ?= "xlnx_rel_v2022.1"
+BRANCH ?= "xlnx_rel_v2022.2"
 REPO ?= "git://github.com/Xilinx/vcu-firmware.git;protocol=https"
 SRCREV = "569f980527fd58f43baf16bd0b294bf8c7cdf963"
 

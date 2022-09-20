@@ -11,7 +11,7 @@ S = "${WORKDIR}/git"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-BRANCH = "xlnx_rel_v2022.1"
+BRANCH = "xlnx_rel_v2022.2"
 REPO = "git://github.com/Xilinx/vcu-modules.git;protocol=https"
 SRCREV = "9d2657550eccebccce08cacfcdd369367b9f6be4"
 
