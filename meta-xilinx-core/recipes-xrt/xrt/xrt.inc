@@ -3,6 +3,6 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '
 SRC_URI = "${REPO};${BRANCHARG}"
 
 BRANCH= "2022.2"
-SRCREV= "836a1f4e39f04d989b7709f3c41d337e8a073197"
+SRCREV= "a09430a4d1a02de24f3672c78dbda4bd7b790ae0"
 PV = "202220.2.14.0"
 
