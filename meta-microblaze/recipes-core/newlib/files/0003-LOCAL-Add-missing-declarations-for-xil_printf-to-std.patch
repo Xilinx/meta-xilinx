@@ -9,20 +9,17 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
  newlib/libc/include/stdio.h | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/newlib/libc/include/stdio.h b/newlib/libc/include/stdio.h
-index ab18806e3..8240dd8ab 100644
---- a/newlib/libc/include/stdio.h
-+++ b/newlib/libc/include/stdio.h
-@@ -245,6 +245,9 @@ int	sprintf (char *__restrict, const char *__restrict, ...)
+Index: newlib-4.2.0.20211231/newlib/libc/include/stdio.h
+===================================================================
+--- newlib-4.2.0.20211231.orig/newlib/libc/include/stdio.h
++++ newlib-4.2.0.20211231/newlib/libc/include/stdio.h
+@@ -245,6 +245,9 @@ int	sprintf (char *__restrict, const cha
                 _ATTRIBUTE ((__format__ (__printf__, 2, 3)));
  int	remove (const char *);
  int	rename (const char *, const char *);
 +void	xil_printf (const char*, ...);
 +void	putnum (unsigned int );
 +void	print (const char* );
- #ifdef _COMPILING_NEWLIB
+ #ifdef _LIBC
  int	_rename (const char *, const char *);
  #endif
--- 
-2.17.1
-
