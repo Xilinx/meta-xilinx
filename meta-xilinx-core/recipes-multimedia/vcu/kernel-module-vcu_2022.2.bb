@@ -13,7 +13,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 BRANCH = "xlnx_rel_v2022.2"
 REPO = "git://github.com/Xilinx/vcu-modules.git;protocol=https"
-SRCREV = "9d2657550eccebccce08cacfcdd369367b9f6be4"
+SRCREV = "b131e220285e06658b6ab27f9e19b1c592a55f3a"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = " \
