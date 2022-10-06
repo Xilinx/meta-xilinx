@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-DEPENDS:append := "virtual/kernel ${@oe.utils.str_filter_out(d.getVar("BPN"), d.getVar("EXTRA_IMAGEDEPENDS"), d)}"
+DEPENDS:append := " virtual/kernel ${@oe.utils.str_filter_out(d.getVar("BPN"), d.getVar("EXTRA_IMAGEDEPENDS"), d)}"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynq = ".*"
