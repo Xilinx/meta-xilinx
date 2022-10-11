@@ -20,4 +20,4 @@ LIC_FILES_CHKSUM[xlnx_rel_v2022.2]  = 'ce611484168a6000bd35df68fc4f4290'
 LIC_FILES_CHKSUM ??= "file://license.txt;md5=${@d.getVarFlag('LIC_FILES_CHKSUM', d.getVar('BRANCH')) or '0'}"
 
 SRC_URI = "${EMBEDDEDSW_SRCURI}"
-PV = "${ESW_VER}+git${SRCPV}"
+PV .= "+git${SRCPV}"
