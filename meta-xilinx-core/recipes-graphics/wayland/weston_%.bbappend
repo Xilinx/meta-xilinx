@@ -12,6 +12,6 @@ ZYNQMP_PKGARCH = "${SOC_FAMILY_ARCH}"
 ZYNQMP_PKGARCH:mali400 = "${@bb.utils.contains('PACKAGECONFIG', 'egl', '${SOC_VARIANT_ARCH}', '${SOC_FAMILY_ARCH}', d)}"
 
 # Skip dmabuf-feedback, as it requires gbm >= 21.1.1, mali-xlnx only provides 17.3
-SIMPLECLIENTS:mali400 ?= "damage im egl shm touch dmabuf-v4l dmabuf-egl"
+SIMPLECLIENTS:mali400 ?= "damage,im,egl,shm,touch,dmabuf-v4l,dmabuf-egl"
 
 PACKAGE_ARCH:zynqmp = "${ZYNQMP_PKGARCH}"
