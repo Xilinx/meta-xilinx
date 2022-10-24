@@ -27,6 +27,13 @@ RDEPENDS:${PN} += " fru-print"
 EXTRA_OECMAKE += " \
                -DCMAKE_SYSROOT:PATH=${RECIPE_SYSROOT} \
 		"
+
+# Workaround for: the comparison will always evaluate as 'true' for the address of 'defaul_accel_name' will never be NULL [-Werror=address]
+CFLAGS += "-Wno-address"
+
+# Workaround for: '__builtin_strncpy' specified bound depends on the length of the source argument [-Werror=stringop-truncation]
+CFLAGS += "-Wno-stringop-truncation"
+
 INITSCRIPT_NAME = "dfx-mgr.sh"
 INITSCRIPT_PARAMS = "start 99 S ."
 
