@@ -1,0 +1,91 @@
+Use the community device-tree names
+
+The community LIMA driver uses a series of names that are different then
+the legacy Xilinx names.  Moves from the legacy names to the more standard
+names.
+
+This will allow us to have a single device tree that works with both the
+mali driver, as well as the lima driver.
+
+Interrupt-names:
+  IRQGP     -> gp
+  IRQGPMMU  -> gpmmu
+  IRQPP0    -> pp0
+  IRQPPMMU0 -> ppmmu0
+  IRQPP1    -> pp1
+  IRQPPMMU1 -> ppmmu1
+  ...
+
+Clock-names:
+  gpu_pp0 -> core
+  gpu_pp1 -> bus
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
+diff -ur a/linux/mali_kernel_linux.c b/linux/mali_kernel_linux.c
+--- a/linux/mali_kernel_linux.c	2018-09-17 04:04:48.000000000 -0700
++++ b/linux/mali_kernel_linux.c	2022-10-24 14:01:54.614376177 -0700
+@@ -635,11 +635,11 @@
+ 	if (IS_ERR(clk_gpu))
+ 		return PTR_ERR(clk_gpu);
+ 
+-	clk_gpu_pp0 = devm_clk_get(&pdev->dev, "gpu_pp0");
++	clk_gpu_pp0 = devm_clk_get(&pdev->dev, "core");
+ 	if (IS_ERR(clk_gpu_pp0))
+ 		return PTR_ERR(clk_gpu_pp0);
+ 
+-	clk_gpu_pp1 = devm_clk_get(&pdev->dev, "gpu_pp1");
++	clk_gpu_pp1 = devm_clk_get(&pdev->dev, "bus");
+ 	if (IS_ERR(clk_gpu_pp1))
+ 		return PTR_ERR(clk_gpu_pp1);
+ #endif
+diff -ur a/linux/mali_osk_mali.c b/linux/mali_osk_mali.c
+--- a/linux/mali_osk_mali.c	2018-09-12 23:52:20.000000000 -0700
++++ b/linux/mali_osk_mali.c	2022-10-24 14:00:28.470380512 -0700
+@@ -72,26 +72,26 @@
+ #define MALI_OSK_RESOURCE_DMA_LOCATION 26
+ 
+ static _mali_osk_resource_t mali_osk_resource_bank[MALI_OSK_MAX_RESOURCE_NUMBER] = {
+-	{.description = "Mali_GP", .base = MALI_OFFSET_GP, .irq_name = "IRQGP",},
+-	{.description = "Mali_GP_MMU", .base = MALI_OFFSET_GP_MMU, .irq_name = "IRQGPMMU",},
+-	{.description = "Mali_PP0", .base = MALI_OFFSET_PP0, .irq_name = "IRQPP0",},
+-	{.description = "Mali_PP0_MMU", .base = MALI_OFFSET_PP0_MMU, .irq_name = "IRQPPMMU0",},
+-	{.description = "Mali_PP1", .base = MALI_OFFSET_PP1, .irq_name = "IRQPP1",},
+-	{.description = "Mali_PP1_MMU", .base = MALI_OFFSET_PP1_MMU, .irq_name = "IRQPPMMU1",},
+-	{.description = "Mali_PP2", .base = MALI_OFFSET_PP2, .irq_name = "IRQPP2",},
+-	{.description = "Mali_PP2_MMU", .base = MALI_OFFSET_PP2_MMU, .irq_name = "IRQPPMMU2",},
+-	{.description = "Mali_PP3", .base = MALI_OFFSET_PP3, .irq_name = "IRQPP3",},
+-	{.description = "Mali_PP3_MMU", .base = MALI_OFFSET_PP3_MMU, .irq_name = "IRQPPMMU3",},
+-	{.description = "Mali_PP4", .base = MALI_OFFSET_PP4, .irq_name = "IRQPP4",},
+-	{.description = "Mali_PP4_MMU", .base = MALI_OFFSET_PP4_MMU, .irq_name = "IRQPPMMU4",},
+-	{.description = "Mali_PP5", .base = MALI_OFFSET_PP5, .irq_name = "IRQPP5",},
+-	{.description = "Mali_PP5_MMU", .base = MALI_OFFSET_PP5_MMU, .irq_name = "IRQPPMMU5",},
+-	{.description = "Mali_PP6", .base = MALI_OFFSET_PP6, .irq_name = "IRQPP6",},
+-	{.description = "Mali_PP6_MMU", .base = MALI_OFFSET_PP6_MMU, .irq_name = "IRQPPMMU6",},
+-	{.description = "Mali_PP7", .base = MALI_OFFSET_PP7, .irq_name = "IRQPP7",},
+-	{.description = "Mali_PP7_MMU", .base = MALI_OFFSET_PP7_MMU, .irq_name = "IRQPPMMU",},
+-	{.description = "Mali_PP_Broadcast", .base = MALI_OFFSET_PP_BCAST, .irq_name = "IRQPP",},
+-	{.description = "Mali_PMU", .base = MALI_OFFSET_PMU, .irq_name = "IRQPMU",},
++	{.description = "Mali_GP", .base = MALI_OFFSET_GP, .irq_name = "gp",},
++	{.description = "Mali_GP_MMU", .base = MALI_OFFSET_GP_MMU, .irq_name = "gpmmu",},
++	{.description = "Mali_PP0", .base = MALI_OFFSET_PP0, .irq_name = "pp0",},
++	{.description = "Mali_PP0_MMU", .base = MALI_OFFSET_PP0_MMU, .irq_name = "ppmmu0",},
++	{.description = "Mali_PP1", .base = MALI_OFFSET_PP1, .irq_name = "pp1",},
++	{.description = "Mali_PP1_MMU", .base = MALI_OFFSET_PP1_MMU, .irq_name = "ppmmu1",},
++	{.description = "Mali_PP2", .base = MALI_OFFSET_PP2, .irq_name = "pp2",},
++	{.description = "Mali_PP2_MMU", .base = MALI_OFFSET_PP2_MMU, .irq_name = "ppmmu2",},
++	{.description = "Mali_PP3", .base = MALI_OFFSET_PP3, .irq_name = "pp3",},
++	{.description = "Mali_PP3_MMU", .base = MALI_OFFSET_PP3_MMU, .irq_name = "ppmmu3",},
++	{.description = "Mali_PP4", .base = MALI_OFFSET_PP4, .irq_name = "pp4",},
++	{.description = "Mali_PP4_MMU", .base = MALI_OFFSET_PP4_MMU, .irq_name = "ppmmu4",},
++	{.description = "Mali_PP5", .base = MALI_OFFSET_PP5, .irq_name = "pp5",},
++	{.description = "Mali_PP5_MMU", .base = MALI_OFFSET_PP5_MMU, .irq_name = "ppmmu5",},
++	{.description = "Mali_PP6", .base = MALI_OFFSET_PP6, .irq_name = "pp6",},
++	{.description = "Mali_PP6_MMU", .base = MALI_OFFSET_PP6_MMU, .irq_name = "ppmmu6",},
++	{.description = "Mali_PP7", .base = MALI_OFFSET_PP7, .irq_name = "pp7",},
++	{.description = "Mali_PP7_MMU", .base = MALI_OFFSET_PP7_MMU, .irq_name = "ppmmu",},
++	{.description = "Mali_PP_Broadcast", .base = MALI_OFFSET_PP_BCAST, .irq_name = "pp",},
++	{.description = "Mali_PMU", .base = MALI_OFFSET_PMU, .irq_name = "pmu",},
+ 	{.description = "Mali_L2", .base = MALI_OFFSET_L2_RESOURCE0,},
+ 	{.description = "Mali_L2", .base = MALI_OFFSET_L2_RESOURCE1,},
+ 	{.description = "Mali_L2", .base = MALI_OFFSET_L2_RESOURCE2,},
