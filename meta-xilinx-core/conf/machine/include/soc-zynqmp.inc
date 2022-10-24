@@ -12,10 +12,16 @@ SOC_VARIANT ?= "eg"
 require xilinx-soc-family.inc
 
 GRAPHICSOVERRIDES = ""
-GRAPHICSOVERRIDES:zynqmp-eg = "mali400:"
-GRAPHICSOVERRIDES:zynqmp-ev = "mali400:vcu:"
+VCUOVERRIDES = ""
 
-MACHINEOVERRIDES =. "${GRAPHICSOVERRIDES}"
+# Mali400: override is only used with the ARM mali driver, not the lima driver
+GRAPHICSOVERRIDES:zynqmp-eg = "mali400:"
+GRAPHICSOVERRIDES:zynqmp-ev = "mali400:"
+
+# VCUOVERRIDE is only for use with the VCU
+VCUOVERRIDES:zynqmp-ev = "vcu:"
+
+MACHINEOVERRIDES =. "${GRAPHICSOVERRIDES}${VCUOVERRIDES}"
 
 require soc-tune-include.inc
 
