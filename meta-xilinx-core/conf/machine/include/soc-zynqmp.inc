@@ -15,8 +15,7 @@ GRAPHICSOVERRIDES = ""
 VCUOVERRIDES = ""
 
 # Mali400: override is only used with the ARM mali driver, not the lima driver
-GRAPHICSOVERRIDES:zynqmp-eg = "mali400:"
-GRAPHICSOVERRIDES:zynqmp-ev = "mali400:"
+GRAPHICSOVERRIDES = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', 'mali400:', '', d)}"
 
 # VCUOVERRIDE is only for use with the VCU
 VCUOVERRIDES:zynqmp-ev = "vcu:"
