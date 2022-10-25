@@ -27,8 +27,7 @@ SRC_URI = " \
     file://gbm.pc \
     "
 
-PACKAGE_ARCH = "${SOC_VARIANT_ARCH}"
-
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 S = "${WORKDIR}/git"
 
