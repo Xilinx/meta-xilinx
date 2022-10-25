@@ -48,4 +48,4 @@ BIF_PARTITION_IMAGE[device-tree] ?= "${RECIPE_SYSROOT}/boot/devicetree/system-to
 
 # enable bitstream-Note this is not enabled by default (missing in BIF_PARTITION_ATTR)
 BIF_PARTITION_ATTR[bitstream] ?= "destination_device=pl"
-BIF_PARTITION_IMAGE[bitstream] ?= "${DEPLOY_DIR_IMAGE}/download-${MACHINE}.bit"
+BIF_PARTITION_IMAGE[bitstream] ?= "${RECIPE_SYSROOT}/boot/bitstream/download-${MACHINE}.bit"

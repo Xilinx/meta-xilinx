@@ -21,5 +21,5 @@ BIF_PARTITION_ATTR[device-tree] ?= "load=0x100000"
 BIF_PARTITION_IMAGE[device-tree] ?= "${RECIPE_SYSROOT}/boot/devicetree/system-top.dtb"
 
 # enable bitstream-Note this is not enabled by default (missing in BIF_PARTITION_ATTR)
-BIF_PARTITION_IMAGE[bitstream] ?= "${DEPLOY_DIR_IMAGE}/download-${MACHINE}.bit"
+BIF_PARTITION_IMAGE[bitstream] ?= "${RECIPE_SYSROOT}/boot/bitstream/download-${MACHINE}.bit"
 BIF_PARTITION_DEPENDS[bitstream] ?= "virtual/bitstream:do_deploy"
