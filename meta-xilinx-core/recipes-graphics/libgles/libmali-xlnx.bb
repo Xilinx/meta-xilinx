@@ -27,8 +27,7 @@ SRC_URI = " \
     "
 
 COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:zynqmp-eg = "zynqmp-eg"
-COMPATIBLE_MACHINE:zynqmp-ev = "zynqmp-ev"
+COMPATIBLE_MACHINE:mali400 = ".*"
 
 PACKAGE_ARCH = "${SOC_VARIANT_ARCH}"
 
