@@ -44,6 +44,8 @@ def create_bif(config, attrflags, attrimage, ids, common_attr, biffd, d):
                     error_msg = "%s: invalid or missing elf or image" % (cfg)
                     bb.error("BIF atrribute Error: %s " % (error_msg))
                 imagestr = d.expand(attrimage[cfg])
+                if not os.path.exists(imagestr):
+                    bb.fatal("Expected file %s, specified from the bif file does not exists!" %(imagestr))
                 if os.stat(imagestr).st_size == 0:
                     bb.warn("Empty file %s, excluding from bif file" %(imagestr))
                     continue
