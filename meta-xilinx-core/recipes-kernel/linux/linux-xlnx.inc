@@ -10,6 +10,7 @@ FILESOVERRIDES:append := ":${@bb.parse.vars_from_file(d.getVar('FILE', False),d)
 KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https;name=machine"
 YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.15;destsuffix=yocto-kmeta"
 SRC_URI = "${KERNELURI};${SRCBRANCHARG} ${YOCTO_META}"
+SRC_URI += "file://linux-xlnx-kmeta;type=kmeta;name=linux-xlnx-kmeta;destsuffix=linux-xlnx-kmeta"
 
 SRCREV_machine ?= "${SRCREV}"
 SRCREV_meta ?= "eeb5d0c9dd5e2928835c633644426ee357fbce12"
@@ -60,3 +61,7 @@ KERNEL_FEATURES:append:zynqmp = "${@' features/xilinx/overlay_of/overlay_of.scc'
 KERNEL_FEATURES:append:versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} features/xilinx/hdmi-module/hdmi-module.scc"
 
 KERNEL_FEATURES:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' features/ocicontainer/ocicontainer.scc', '', d)}"
+
+# Enable DRM_LIMA support if mali400 is not enabled
+KERNEL_FEATURES:append:zynqmp-eg = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', '', ' features/drm-lima/drm-lima.scc', d)}"
+KERNEL_FEATURES:append:zynqmp-ev = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', '', ' features/drm-lima/drm-lima.scc', d)}"
