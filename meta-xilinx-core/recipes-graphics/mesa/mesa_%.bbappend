@@ -1,3 +1,6 @@
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+SRC_URI += "file://0001-DRI_Add_xlnx_dri.patch"
+
 # This is not compatible with the mali400 driver, use mesa-gl instead
 CONFLICT_MACHINE_FEATURES = "mali400"
 
