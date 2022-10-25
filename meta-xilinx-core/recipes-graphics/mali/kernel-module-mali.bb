@@ -35,14 +35,13 @@ SRC_URI = " \
 SRC_URI[md5sum] = "85ea110dd6675c70b7d01af87ec9633c"
 SRC_URI[sha256sum] = "7a67127341d17640c1fff5dad80258fb2a37c8a2121b81525fe2327e4532ce2b"
 
-inherit module
+inherit features_check module
 
 PARALLEL_MAKE = "-j 1"
 
 S = "${WORKDIR}/DX910-SW-99002-${PV}/driver/src/devicedrv/mali"
 
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:mali400 = ".*"
+REQUIRED_MACHINE_FEATURES = "mali400"
 
 EXTRA_OEMAKE = 'KDIR="${STAGING_KERNEL_DIR}" \
 		ARCH="${ARCH}" \
