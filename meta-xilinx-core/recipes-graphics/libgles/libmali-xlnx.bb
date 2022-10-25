@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://EULA;md5=82e466d0ed92c5a15f568dbe6b31089c"
 inherit features_check update-alternatives
 
 ANY_OF_DISTRO_FEATURES = "x11 fbdev wayland"
+REQUIRED_MACHINE_FEATURES = "mali400"
 
 PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl virtual/libgbm"
 
@@ -25,9 +26,6 @@ SRC_URI = " \
     file://glesv2.pc \
     file://gbm.pc \
     "
-
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:mali400 = ".*"
 
 PACKAGE_ARCH = "${SOC_VARIANT_ARCH}"
 
