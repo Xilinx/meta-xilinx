@@ -9,8 +9,6 @@ SOC_FAMILY ?= "zynqmp"
 
 SOC_VARIANT ?= "eg"
 
-require xilinx-soc-family.inc
-
 GRAPHICSOVERRIDES = ""
 VCUOVERRIDES = ""
 
@@ -21,6 +19,8 @@ GRAPHICSOVERRIDES = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', 'mali40
 VCUOVERRIDES:zynqmp-ev = "vcu:"
 
 MACHINEOVERRIDES =. "${GRAPHICSOVERRIDES}${VCUOVERRIDES}"
+
+require xilinx-soc-family.inc
 
 require soc-tune-include.inc
 
