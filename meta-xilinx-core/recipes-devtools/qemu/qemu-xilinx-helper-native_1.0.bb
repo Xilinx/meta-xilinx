@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/tunctl.c;endline=4;md5=ff3a09996bc5fff6bc5
 
 SRC_URI = "\
     file://tunctl.c \
+    file://qemu-oe-bridge-helper \
     "
 
 S = "${WORKDIR}"
@@ -32,5 +33,6 @@ do_install() {
         install -d ${STAGING_BINDIR_NATIVE}
 	install tunctl ${STAGING_BINDIR_NATIVE}
 
+        install -m 755 ${WORKDIR}/qemu-oe-bridge-helper ${STAGING_BINDIR_NATIVE}/
 }
 addtask addto_recipe_sysroot after do_populate_sysroot before do_build
