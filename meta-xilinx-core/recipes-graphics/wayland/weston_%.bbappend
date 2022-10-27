@@ -1,6 +1,7 @@
 FILESEXTRAPATHS:prepend:zynqmp := "${THISDIR}/files:"
 
 SRC_URI:append:zynqmp = " file://0001-libweston-Remove-substitute-format-for-ARGB8888.patch"
+SRC_URI:append:mali400 = " file://0002-libmali-does-not-support-gles3.patch"
 
 # OpenGL comes from libmali on ev/eg, when egl is enabled
 DEPENDS:append:mali400 = "${@bb.utils.contains('PACKAGECONFIG', 'egl', ' libmali-xlnx', '', d)}"
