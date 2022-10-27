@@ -7,6 +7,8 @@ SOC_FAMILY_ARCH ??= "${TUNE_PKGARCH}"
 PACKAGE_ARCH:zynqmp = "${SOC_FAMILY_ARCH}"
 
 
+SRC_URI:append:mali400 = " file://0002-libmali-does-not-support-gles3.patch"
+
 # OpenGL comes from libmali on ev/eg, when egl is enabled
 DEPENDS:append:mali400 = "${@bb.utils.contains('PACKAGECONFIG', 'egl', ' libmali-xlnx', '', d)}"
 
