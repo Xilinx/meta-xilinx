@@ -1,3 +1,4 @@
+require qemu-xilinx-2022.2.inc
 require qemu-xilinx-native.inc
 BPN = "qemu-xilinx"
 
