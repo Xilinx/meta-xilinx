@@ -5,7 +5,7 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=eb723b61539feef013de476e68b5c50a"
 
 XLNX_DP_VERSION = "5.10.0"
-PV = "${XLNX_DP_VERSION}"
+PV = "${XLNX_DP_VERSION}+xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git${SRCPV}" 
 
 S = "${WORKDIR}/git"
 
