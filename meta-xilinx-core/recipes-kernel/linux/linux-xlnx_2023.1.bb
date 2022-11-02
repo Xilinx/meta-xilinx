@@ -1,0 +1,9 @@
+LINUX_VERSION = "5.15.0"
+KBRANCH="master"
+SRCREV = "e26621179c3b1834a1bb17e9a38e47238ac63bf5"
+
+KCONF_AUDIT_LEVEL="0"
+
+include linux-xlnx.inc
+
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
