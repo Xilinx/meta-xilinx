@@ -10,10 +10,6 @@ LIC_FILES_CHKSUM = " \
 		"
 DEPENDS = "glib-2.0 zlib pixman bison-native ninja-native meson-native"
 
-XILINX_QEMU_VERSION ?= "v6.1.0"
-BRANCH ?= "xlnx_rel_v2022.2"
-SRCREV = "74d70f8008bfbd1566c2eed3496a077a974de0d0"
-
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 PV = "${XILINX_QEMU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git${SRCPV}"
