@@ -1,0 +1,2 @@
+# Device rules for GPU MALI-400 drivers.
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali", MODE="0660", GROUP="video", TAG+="uaccess"
