@@ -1,4 +1,4 @@
-From b60672b856128abc38cbc4d7ea408c17227d62da Mon Sep 17 00:00:00 2001
+From 924721fdb8eed60fe58c8a7976955bac02efc200 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 28 Sep 2018 12:07:43 +0530
 Subject: [PATCH 08/11] fixing the bug in crt files, added addlik instead of
@@ -98,5 +98,5 @@ index 54ba473ea..a25c84734 100644
          brealid	r15, _crtinit               /* Initialize BSS and run program */
  	nop
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 
