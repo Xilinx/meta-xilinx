@@ -1,4 +1,4 @@
-From 93874549e864b39689060edda456c897ea0fac4e Mon Sep 17 00:00:00 2001
+From 80c16e39bdf8643184c353e34f146dc8601c2c1e Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Tue, 9 Oct 2018 10:07:08 +0530
 Subject: [PATCH 34/53] -Added double arith instructions -Fixed prologue stack
@@ -10,7 +10,7 @@ Subject: [PATCH 34/53] -Added double arith instructions -Fixed prologue stack
  2 files changed, 76 insertions(+), 9 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 7d6cf263eb6..943037336f1 100644
+index 5a950b49591..5506aee7be5 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -527,6 +527,66 @@
@@ -113,7 +113,7 @@ index 7d6cf263eb6..943037336f1 100644
    (set_attr "mode"	"DI")
    (set_attr "length"	"4,4,4")])
 diff --git a/gcc/config/microblaze/t-microblaze b/gcc/config/microblaze/t-microblaze
-index 35ab9654052..dfef45c268e 100644
+index 47b869b9303..3522afd4831 100644
 --- a/gcc/config/microblaze/t-microblaze
 +++ b/gcc/config/microblaze/t-microblaze
 @@ -1,6 +1,13 @@
@@ -131,5 +131,5 @@ index 35ab9654052..dfef45c268e 100644
  MULTILIB_EXCEPTIONS += *mlittle-endian/mxl-multiply-high mxl-multiply-high
  MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift/mlittle-endian/mxl-multiply-high
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

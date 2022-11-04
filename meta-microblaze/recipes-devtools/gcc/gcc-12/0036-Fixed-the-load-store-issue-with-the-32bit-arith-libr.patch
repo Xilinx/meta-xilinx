@@ -1,4 +1,4 @@
-From 08ca1c1550145a8bddbd03a594620db13a259238 Mon Sep 17 00:00:00 2001
+From b8c468f1bd467213083b59b54af100ee0c6dea9e Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Sat, 13 Oct 2018 21:12:43 +0530
 Subject: [PATCH 36/53] Fixed the load store issue with the 32bit arith
@@ -13,7 +13,7 @@ Subject: [PATCH 36/53] Fixed the load store issue with the 32bit arith
  5 files changed, 98 insertions(+), 4 deletions(-)
 
 diff --git a/libgcc/config/microblaze/divsi3.S b/libgcc/config/microblaze/divsi3.S
-index 886a4f2bb36..3a7fc4d6122 100644
+index 14829ec6701..b464deed481 100644
 --- a/libgcc/config/microblaze/divsi3.S
 +++ b/libgcc/config/microblaze/divsi3.S
 @@ -41,6 +41,17 @@
@@ -70,7 +70,7 @@ index 886a4f2bb36..3a7fc4d6122 100644
  	.size	__divsi3, . - __divsi3
  
 diff --git a/libgcc/config/microblaze/modsi3.S b/libgcc/config/microblaze/modsi3.S
-index 2c4f39a045f..3e405ea6267 100644
+index b8f2e37809d..e0fbd91e766 100644
 --- a/libgcc/config/microblaze/modsi3.S
 +++ b/libgcc/config/microblaze/modsi3.S
 @@ -41,6 +41,17 @@
@@ -128,7 +128,7 @@ index 2c4f39a045f..3e405ea6267 100644
  	.size	__modsi3, . - __modsi3
  
 diff --git a/libgcc/config/microblaze/mulsi3.S b/libgcc/config/microblaze/mulsi3.S
-index c50a380177a..0329fa3037a 100644
+index f48fcf8270c..657668ef826 100644
 --- a/libgcc/config/microblaze/mulsi3.S
 +++ b/libgcc/config/microblaze/mulsi3.S
 @@ -41,6 +41,9 @@
@@ -142,7 +142,7 @@ index c50a380177a..0329fa3037a 100644
  	.frame	r1,0,r15
  	add	r3,r0,r0
 diff --git a/libgcc/config/microblaze/udivsi3.S b/libgcc/config/microblaze/udivsi3.S
-index 1bf73265b98..7bdcd8873e5 100644
+index 2c321f94b09..fc6a4b5a248 100644
 --- a/libgcc/config/microblaze/udivsi3.S
 +++ b/libgcc/config/microblaze/udivsi3.S
 @@ -41,6 +41,16 @@
@@ -197,7 +197,7 @@ index 1bf73265b98..7bdcd8873e5 100644
          .end __udivsi3
  	.size	__udivsi3, . - __udivsi3
 diff --git a/libgcc/config/microblaze/umodsi3.S b/libgcc/config/microblaze/umodsi3.S
-index 2bc0909605f..7d1e4484a53 100644
+index fbe942dc5f2..b68ba7a5ea6 100644
 --- a/libgcc/config/microblaze/umodsi3.S
 +++ b/libgcc/config/microblaze/umodsi3.S
 @@ -41,6 +41,16 @@
@@ -252,5 +252,5 @@ index 2bc0909605f..7d1e4484a53 100644
  .end __umodsi3
  	.size	__umodsi3, . - __umodsi3
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

@@ -1,4 +1,4 @@
-From b26f11b38406605f1601626f9ee8267f85b4857c Mon Sep 17 00:00:00 2001
+From e8286e00f939486dde52e9475bc9cca0aa025a42 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Fri, 29 Mar 2019 12:08:39 +0530
 Subject: [PATCH 44/53] [Patch,Microblaze] : We will check the possibility of
@@ -9,7 +9,7 @@ Subject: [PATCH 44/53] [Patch,Microblaze] : We will check the possibility of
  1 file changed, 38 insertions(+), 25 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index fed6f5e0234..1490a522a4c 100644
+index 27436c0f660..4b9acddb1f1 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -882,31 +882,44 @@
@@ -83,5 +83,5 @@ index fed6f5e0234..1490a522a4c 100644
  ;;----------------------------------------------------------------
  ;; Negation and one's complement
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

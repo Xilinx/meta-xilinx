@@ -1,4 +1,4 @@
-From fa6e9e4317f9adb0748ade5029cbe3a10504ab54 Mon Sep 17 00:00:00 2001
+From 12d7e086376916ef61e2c48639671fd0f7c8fbbf Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 10:57:19 +0530
 Subject: [PATCH 12/53] [Patch, microblaze]: Use bralid for profiler calls
@@ -9,7 +9,7 @@ Subject: [PATCH 12/53] [Patch, microblaze]: Use bralid for profiler calls
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index 2ecec750526..e32ce7dbb51 100644
+index d28bc766de8..cd544f2030e 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -486,7 +486,7 @@ typedef struct microblaze_args
@@ -22,5 +22,5 @@ index 2ecec750526..e32ce7dbb51 100644
   }
  
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

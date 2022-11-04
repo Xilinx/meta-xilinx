@@ -1,21 +1,22 @@
-From 7c9402f1dc641a1fe4110e92cd16a33ed4bd35cf Mon Sep 17 00:00:00 2001
-From: Nagaraju Mekala <nmekala@xilinx.com>
-Date: Mon, 30 Aug 2021 12:13:45 +0530
+From 6c2e67237a12cecfd8c0575fd17314d3024943fc Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 13 Sep 2022 16:45:41 +0530
 Subject: [PATCH 53/53] [patch, microblaze64]: Add Zero_extended instructions
 
-Due to latest changes in GCC-10.2 MB64 perforamance has reduced
-We have added zero_extended instructions to get rid of left shift
-and right shift loops
+    Due to latest changes in GCC-10.2 MB64 perforamance has reduced
+    We have added zero_extended instructions to get rid of left shift
+    and right shift loops
 
-[CR/TSR]: TSR-974519
+    [CR/TSR]: TSR-974519
 
-Signed-off-by: Nagaraju Mekala<nmekala@xilinx.com>
+    Signed-off-by: Nagaraju Mekala<nmekala@xilinx.com>
+		   Mahesh Bodapati<mbodapat@xilinx.com>
 ---
  gcc/config/microblaze/microblaze.md | 27 +++++++++++++++++++++++++++
  1 file changed, 27 insertions(+)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index b89a4276c7c..ee078b0152a 100644
+index 0ac6e1480e6..7a7c70d607b 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -1191,6 +1191,33 @@
@@ -53,5 +54,5 @@ index b89a4276c7c..ee078b0152a 100644
  ;; Sign extension
  ;;----------------------------------------------------------------
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

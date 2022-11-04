@@ -1,24 +1,24 @@
-From f52258e89f2ea416f418b6c55fef15552a081e18 Mon Sep 17 00:00:00 2001
+From 09e10c513f8970f4d2402244b7ac69ecd33b4c04 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
-Date: Tue, 24 Nov 2020 12:26:32 +0530
+Date: Tue, 13 Sep 2022 16:35:00 +0530
 Subject: [PATCH 51/53] [Patch, microblaze]: Reducing Stack space for arguments
 
-Currently in Microblaze target stack space for arguments in register is being
-allocated even if there are no arguments in the function.
-This patch will optimize the extra 24 bytes that are being allocated.
+    Currently in Microblaze target stack space for arguments in register is being
+    allocated even if there are no arguments in the function.
+    This patch will optimize the extra 24 bytes that are being allocated.
 
-Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
-              :Ajit Agarwal  <ajitkum@xilinx.com>
+    Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+                  :Ajit Agarwal  <ajitkum@xilinx.com>
 ---
  gcc/config/microblaze/microblaze-protos.h |   1 +
- gcc/config/microblaze/microblaze.cc        | 132 +++++++++++++++++++++-
+ gcc/config/microblaze/microblaze.cc       | 130 ++++++++++++++++++++++
  gcc/config/microblaze/microblaze.h        |   4 +-
- 3 files changed, 134 insertions(+), 3 deletions(-)
+ 3 files changed, 133 insertions(+), 2 deletions(-)
 
-Index: gcc-12.1.0/gcc/config/microblaze/microblaze-protos.h
-===================================================================
---- gcc-12.1.0.orig/gcc/config/microblaze/microblaze-protos.h
-+++ gcc-12.1.0/gcc/config/microblaze/microblaze-protos.h
+diff --git a/gcc/config/microblaze/microblaze-protos.h b/gcc/config/microblaze/microblaze-protos.h
+index 7f575c2adec..bd594699940 100644
+--- a/gcc/config/microblaze/microblaze-protos.h
++++ b/gcc/config/microblaze/microblaze-protos.h
 @@ -60,6 +60,7 @@ extern int symbol_mentioned_p (rtx);
  extern int label_mentioned_p (rtx);
  extern bool microblaze_cannot_force_const_mem (machine_mode, rtx);
@@ -27,11 +27,11 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze-protos.h
  #endif  /* RTX_CODE */
  
  /* Declare functions in microblaze-c.cc.  */
-Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
-===================================================================
---- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.cc
-+++ gcc-12.1.0/gcc/config/microblaze/microblaze.cc
-@@ -2081,6 +2081,136 @@ microblaze_must_save_register (int regno
+diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
+index 4668a81d060..24ac215b6d5 100644
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
+@@ -2081,6 +2081,136 @@ microblaze_must_save_register (int regno)
    return 0;
  }
  
@@ -168,11 +168,11 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
  /* Return the bytes needed to compute the frame pointer from the current
     stack pointer.
  
-Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
-===================================================================
---- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.h
-+++ gcc-12.1.0/gcc/config/microblaze/microblaze.h
-@@ -447,9 +447,9 @@ extern struct microblaze_frame_info curr
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 730ad87b13b..dfacd080b6d 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -447,9 +447,9 @@ extern struct microblaze_frame_info current_frame_info;
  #define ARG_POINTER_CFA_OFFSET(FNDECL)		0
  #define DWARF_CIE_DATA_ALIGNMENT -1
  
@@ -184,3 +184,6 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
  
  #define STACK_BOUNDARY				(TARGET_MB_64 ? 64 : 32)
  
+-- 
+2.37.1 (Apple Git-137.1)
+

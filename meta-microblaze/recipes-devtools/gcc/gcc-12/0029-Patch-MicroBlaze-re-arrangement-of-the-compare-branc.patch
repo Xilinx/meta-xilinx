@@ -1,18 +1,19 @@
-From 5b31cd986c75c5f479967b8f9c1b4ac1fc322b1a Mon Sep 17 00:00:00 2001
-From: Nagaraju Mekala <nmekala@xilix.com>
-Date: Fri, 3 Aug 2018 15:41:39 +0530
-Subject: [PATCH 29/53] re-arrangement of the compare branches
+From 10d5e7d6cad5e7349b88b7469eb5ae20d87eb908 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 13 Sep 2022 14:45:15 +0530
+Subject: [PATCH 29/53] [Patch,MicroBlaze] : re-arrangement of the compare
+ branches
 
 ---
- gcc/config/microblaze/microblaze.cc  |  28 ++----
+ gcc/config/microblaze/microblaze.cc |  28 ++----
  gcc/config/microblaze/microblaze.md | 141 +++++++++++++---------------
  2 files changed, 73 insertions(+), 96 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index f59a71ac072..e33e1bc1482 100644
+index 9d3628c6816..4792e3ba370 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -3697,11 +3697,7 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
+@@ -3698,11 +3698,7 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
      {
        comp_reg = cmp_op0;
        condition = gen_rtx_fmt_ee (signed_condition (code), mode, comp_reg, const0_rtx);
@@ -25,7 +26,7 @@ index f59a71ac072..e33e1bc1482 100644
      }
  
    else if (code == EQ || code == NE)
-@@ -3712,10 +3708,7 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
+@@ -3713,10 +3709,7 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
        else
          emit_insn (gen_xordi3 (comp_reg, cmp_op0, cmp_op1));
        condition = gen_rtx_fmt_ee (signed_condition (code), mode, comp_reg, const0_rtx);
@@ -37,7 +38,7 @@ index f59a71ac072..e33e1bc1482 100644
      }
    else
      {
-@@ -3748,10 +3741,7 @@ microblaze_expand_conditional_branch_reg (machine_mode mode, rtx operands[])
+@@ -3749,10 +3742,7 @@ microblaze_expand_conditional_branch_reg (machine_mode mode, rtx operands[])
        comp_reg = cmp_op0;
        condition = gen_rtx_fmt_ee (signed_condition (code),
                                    mode, comp_reg, const0_rtx);
@@ -49,7 +50,7 @@ index f59a71ac072..e33e1bc1482 100644
      }
    else if (code == EQ)
      {
-@@ -3766,10 +3756,7 @@ microblaze_expand_conditional_branch_reg (machine_mode mode, rtx operands[])
+@@ -3767,10 +3757,7 @@ microblaze_expand_conditional_branch_reg (machine_mode mode, rtx operands[])
                                             cmp_op1));
  	}
        condition = gen_rtx_EQ (mode, comp_reg, const0_rtx);
@@ -61,7 +62,7 @@ index f59a71ac072..e33e1bc1482 100644
   
      }
    else if (code == NE)
-@@ -3785,10 +3772,7 @@ microblaze_expand_conditional_branch_reg (machine_mode mode, rtx operands[])
+@@ -3786,10 +3773,7 @@ microblaze_expand_conditional_branch_reg (machine_mode mode, rtx operands[])
                                             cmp_op1));
  	}
        condition = gen_rtx_NE (mode, comp_reg, const0_rtx);
@@ -73,7 +74,7 @@ index f59a71ac072..e33e1bc1482 100644
      }
    else
      {
-@@ -3830,7 +3814,7 @@ microblaze_expand_conditional_branch_df (rtx operands[])
+@@ -3831,7 +3815,7 @@ microblaze_expand_conditional_branch_df (rtx operands[])
  
    emit_insn (gen_cstoredf4 (comp_reg, operands[0], cmp_op0, cmp_op1));
    condition = gen_rtx_NE (Pmode, comp_reg, const0_rtx);
@@ -83,7 +84,7 @@ index f59a71ac072..e33e1bc1482 100644
  
  /* Implement TARGET_FRAME_POINTER_REQUIRED.  */
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 7bc91602ca2..ddf01505bd8 100644
+index c99150ff0da..566c53ba228 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -2268,7 +2268,27 @@ else
@@ -264,5 +265,5 @@ index 7bc91602ca2..ddf01505bd8 100644
  ;; Unconditional branches
  ;;----------------------------------------------------------------
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

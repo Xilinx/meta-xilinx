@@ -1,4 +1,4 @@
-From 66fb54b40c49c86e8cefa94523a3f65a6779d6f2 Mon Sep 17 00:00:00 2001
+From af78edb2cb91c55f54ac2d720cee9871da13b845 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 11 Jan 2017 15:46:28 +0530
 Subject: [PATCH 03/53] [LOCAL]: For dejagnu static testing on qemu, suppress
@@ -12,7 +12,7 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
  1 file changed, 4 deletions(-)
 
 diff --git a/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp b/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp
-index ad62a7348bc..3a38fb1de91 100644
+index d9ecf045554..d6c2b04f286 100644
 --- a/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp
 +++ b/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp
 @@ -48,14 +48,10 @@ if { [istarget *-*-eabi*]
@@ -31,5 +31,5 @@ index ad62a7348bc..3a38fb1de91 100644
      if {![string match *-lib.c $src] && [runtest_file_p $runtests $src]} {
  	c-torture-execute [list $src \
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

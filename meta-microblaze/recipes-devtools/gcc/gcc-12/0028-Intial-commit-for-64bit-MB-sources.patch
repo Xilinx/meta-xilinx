@@ -1,13 +1,13 @@
-From 211cfd6be4b47e1fecf95d1becb713772fd71091 Mon Sep 17 00:00:00 2001
-From: Nagaraju Mekala <nmekala@xilix.com>
-Date: Fri, 27 Jul 2018 15:23:41 +0530
-Subject: [PATCH 28/53] Intial commit for 64bit-MB sources. Need to cleanup the
- code later.
+From da40b160857d0b6a56b6f6c9c81d61dabb5255db Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 13 Sep 2022 14:38:48 +0530
+Subject: [PATCH 28/53]  Intial commit for 64bit-MB sources.  Need to cleanup
+ the code later.
 
 ---
  gcc/config/microblaze/constraints.md    |   2 +-
- gcc/config/microblaze/microblaze-c.cc    |   6 +
- gcc/config/microblaze/microblaze.cc      | 218 ++++++---
+ gcc/config/microblaze/microblaze-c.cc   |   6 +
+ gcc/config/microblaze/microblaze.cc     | 216 ++++++---
  gcc/config/microblaze/microblaze.h      |  63 ++-
  gcc/config/microblaze/microblaze.md     | 605 ++++++++++++++++++------
  gcc/config/microblaze/t-microblaze      |   3 +-
@@ -20,7 +20,7 @@ Subject: [PATCH 28/53] Intial commit for 64bit-MB sources. Need to cleanup the
  libgcc/config/microblaze/t-microblaze   |  11 +-
  libgcc/config/microblaze/udivdi3.S      | 107 +++++
  libgcc/config/microblaze/umoddi3.S      | 110 +++++
- 15 files changed, 1230 insertions(+), 233 deletions(-)
+ 15 files changed, 1229 insertions(+), 232 deletions(-)
  create mode 100644 libgcc/config/microblaze/divdi3.S
  create mode 100644 libgcc/config/microblaze/divdi3_table.c
  create mode 100644 libgcc/config/microblaze/moddi3.S
@@ -28,10 +28,10 @@ Subject: [PATCH 28/53] Intial commit for 64bit-MB sources. Need to cleanup the
  create mode 100644 libgcc/config/microblaze/udivdi3.S
  create mode 100644 libgcc/config/microblaze/umoddi3.S
 
-Index: gcc-12.1.0/gcc/config/microblaze/constraints.md
-===================================================================
---- gcc-12.1.0.orig/gcc/config/microblaze/constraints.md
-+++ gcc-12.1.0/gcc/config/microblaze/constraints.md
+diff --git a/gcc/config/microblaze/constraints.md b/gcc/config/microblaze/constraints.md
+index 2133650147e..0ced155340d 100644
+--- a/gcc/config/microblaze/constraints.md
++++ b/gcc/config/microblaze/constraints.md
 @@ -55,7 +55,7 @@
  (define_constraint "K"
    "A constant in the range 0xffffff8000000000L  to 0x0000007fffffffffL (inclusive)."
@@ -41,11 +41,11 @@ Index: gcc-12.1.0/gcc/config/microblaze/constraints.md
  
  
  ;; Define floating point constraints
-Index: gcc-12.1.0/gcc/config/microblaze/microblaze-c.cc
-===================================================================
---- gcc-12.1.0.orig/gcc/config/microblaze/microblaze-c.cc
-+++ gcc-12.1.0/gcc/config/microblaze/microblaze-c.cc
-@@ -100,4 +100,10 @@ microblaze_cpp_define (cpp_reader *pfile
+diff --git a/gcc/config/microblaze/microblaze-c.cc b/gcc/config/microblaze/microblaze-c.cc
+index caabe99b993..ef8d2430565 100644
+--- a/gcc/config/microblaze/microblaze-c.cc
++++ b/gcc/config/microblaze/microblaze-c.cc
+@@ -100,4 +100,10 @@ microblaze_cpp_define (cpp_reader *pfile)
          builtin_define ("HAVE_HW_FPU_SQRT");
        builtin_define ("__HAVE_HW_FPU_SQRT__");
      }
@@ -56,11 +56,11 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze-c.cc
 +      builtin_define ("__MICROBLAZE64__");
 +    }
  }  
-Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
-===================================================================
---- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.cc
-+++ gcc-12.1.0/gcc/config/microblaze/microblaze.cc
-@@ -384,10 +384,10 @@ simple_memory_operand (rtx op, machine_m
+diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
+index 1ac889041b8..9d3628c6816 100644
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
+@@ -384,10 +384,10 @@ simple_memory_operand (rtx op, machine_mode mode ATTRIBUTE_UNUSED)
  	{
  	  return 1;
  	}
@@ -73,7 +73,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
        else
  	return 0;
  
-@@ -435,7 +435,7 @@ double_memory_operand (rtx op, machine_m
+@@ -435,7 +435,7 @@ double_memory_operand (rtx op, machine_mode mode)
      return 1;
  
    return memory_address_p ((GET_MODE_CLASS (mode) == MODE_INT
@@ -82,7 +82,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
  			   plus_constant (Pmode, addr, 4));
  }
  
-@@ -682,7 +682,7 @@ microblaze_legitimize_tls_address(rtx x,
+@@ -682,7 +682,7 @@ microblaze_legitimize_tls_address(rtx x, rtx reg)
           /* Load the addend.  */
           addend = gen_rtx_UNSPEC (Pmode, gen_rtvec (2, x, GEN_INT (TLS_DTPREL)),
  				  UNSPEC_TLS);
@@ -91,7 +91,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
           dest = gen_rtx_PLUS (Pmode, dest, addend);
           break;
  
-@@ -700,7 +700,7 @@ microblaze_classify_unspec (struct micro
+@@ -700,7 +700,7 @@ microblaze_classify_unspec (struct microblaze_address_info *info, rtx x)
  
    if (XINT (x, 1) == UNSPEC_GOTOFF)
      {
@@ -100,7 +100,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
        info->type = ADDRESS_GOTOFF;
      }
    else if (XINT (x, 1) == UNSPEC_PLT)
-@@ -1303,8 +1303,16 @@ microblaze_block_move_loop (rtx dest, rt
+@@ -1303,8 +1303,16 @@ microblaze_block_move_loop (rtx dest, rtx src, HOST_WIDE_INT length)
    emit_move_insn (dest_reg, plus_constant (Pmode, dest_reg, MAX_MOVE_BYTES));
  
    /* Emit the test & branch.  */
@@ -108,17 +108,17 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
 +
 +  if (TARGET_MB_64) {
 +    emit_insn (gen_cbranchdi4 (gen_rtx_NE (Pmode, src_reg, final_src),
- 			     src_reg, final_src, label));
++			     src_reg, final_src, label));
 +    }
 +  else {
 +    emit_insn (gen_cbranchsi4 (gen_rtx_NE (Pmode, src_reg, final_src),
-+			     src_reg, final_src, label));
+ 			     src_reg, final_src, label));
 +  
 +    }
  
    /* Mop up any left-over bytes.  */
    if (leftover)
-@@ -1634,14 +1642,20 @@ microblaze_function_arg_advance (cumulat
+@@ -1634,14 +1642,20 @@ microblaze_function_arg_advance (cumulative_args_t cum_v,
        break;
  
      case E_DFmode:
@@ -150,7 +150,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
  
  	  mask |= (1L << (regno - GP_REG_FIRST));
  	}
-@@ -2425,7 +2439,7 @@ print_operand (FILE * file, rtx op, int
+@@ -2425,7 +2439,7 @@ print_operand (FILE * file, rtx op, int letter)
  
        if ((letter == 'M' && !WORDS_BIG_ENDIAN)
  	  || (letter == 'L' && WORDS_BIG_ENDIAN) || letter == 'D')
@@ -159,7 +159,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
  
        fprintf (file, "%s", reg_names[regnum]);
      }
-@@ -2451,6 +2465,7 @@ print_operand (FILE * file, rtx op, int
+@@ -2451,6 +2465,7 @@ print_operand (FILE * file, rtx op, int letter)
    else if (letter == 'h' || letter == 'j')
      {
        long val[2];
@@ -167,7 +167,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
        long l[2];
        if (code == CONST_DOUBLE)
  	{
-@@ -2463,12 +2478,12 @@ print_operand (FILE * file, rtx op, int
+@@ -2463,12 +2478,12 @@ print_operand (FILE * file, rtx op, int letter)
  	      val[0] = l[WORDS_BIG_ENDIAN != 0];
  	    }
  	}
@@ -184,7 +184,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
      }
    else if (code == CONST_DOUBLE)
      {
-@@ -2662,7 +2677,10 @@ microblaze_asm_constructor (rtx symbol A
+@@ -2662,7 +2677,10 @@ microblaze_asm_constructor (rtx symbol ATTRIBUTE_UNUSED, int priority)
  
      switch_to_section (get_section (section, 0, NULL));
      assemble_align (POINTER_SIZE);
@@ -196,7 +196,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
      output_addr_const (asm_out_file, symbol);
      fputs ("\n", asm_out_file);
  }
-@@ -2685,7 +2703,10 @@ microblaze_asm_destructor (rtx symbol, i
+@@ -2685,7 +2703,10 @@ microblaze_asm_destructor (rtx symbol, int priority)
  
      switch_to_section (get_section (section, 0, NULL));
      assemble_align (POINTER_SIZE);
@@ -271,7 +271,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
      }
  
    /* Done saving and restoring */
-@@ -2898,7 +2919,10 @@ microblaze_elf_asm_cdtor (rtx symbol, in
+@@ -2898,7 +2919,10 @@ microblaze_elf_asm_cdtor (rtx symbol, int priority, bool is_ctor)
  
    switch_to_section (s);
    assemble_align (POINTER_SIZE);
@@ -306,11 +306,11 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
 +           {
 +              
 +             insn = emit_insn (gen_subdi3 (stack_pointer_rtx, stack_pointer_rtx,
-+				    fsiz_rtx));
+ 				    fsiz_rtx));
 +           }
 +         else { 
 +             insn = emit_insn (gen_subsi3 (stack_pointer_rtx, stack_pointer_rtx,
- 				    fsiz_rtx));
++				    fsiz_rtx));
 +           }
        if (insn)
  	RTX_FRAME_RELATED_P (insn) = 1;
@@ -377,7 +377,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
    emit_jump_insn (gen_return_internal (gen_rtx_REG (Pmode, GP_REG_FIRST +
  						    MB_ABI_SUB_RETURN_ADDR_REGNUM)));
  }
-@@ -3376,9 +3418,14 @@ microblaze_asm_output_mi_thunk (FILE *fi
+@@ -3376,9 +3418,14 @@ microblaze_asm_output_mi_thunk (FILE *file, tree thunk_fndecl ATTRIBUTE_UNUSED,
    else
      this_rtx = gen_rtx_REG (Pmode, MB_ABI_FIRST_ARG_REGNUM);
  
@@ -394,7 +394,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
  
    /* Apply the offset from the vtable, if required.  */
    if (vcall_offset)
-@@ -3391,7 +3438,10 @@ microblaze_asm_output_mi_thunk (FILE *fi
+@@ -3391,7 +3438,10 @@ microblaze_asm_output_mi_thunk (FILE *file, tree thunk_fndecl ATTRIBUTE_UNUSED,
      rtx loc = gen_rtx_PLUS (Pmode, temp1, vcall_offset_rtx);
      emit_move_insn (temp1, gen_rtx_MEM (Pmode, loc));
  
@@ -406,16 +406,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
    }
  
    /* Generate a tail call to the target function.  */
-@@ -3567,7 +3617,7 @@ microblaze_eh_return (rtx op0)
- /* Queue an .ident string in the queue of top-level asm statements.
-    If the string size is below the threshold, put it into .sdata2.
-    If the front-end is done, we must be being called from toplev.cc.
--   In that case, do nothing.  */
-+   In that case, do nothing. */
- void 
- microblaze_asm_output_ident (const char *string)
- {
-@@ -3622,9 +3672,9 @@ microblaze_trampoline_init (rtx m_tramp,
+@@ -3622,9 +3672,9 @@ microblaze_trampoline_init (rtx m_tramp, tree fndecl, rtx chain_value)
    emit_block_move (m_tramp, assemble_trampoline_template (),
  		   GEN_INT (6*UNITS_PER_WORD), BLOCK_OP_NORMAL);
  
@@ -427,7 +418,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
    emit_move_insn (mem, fnaddr);
  }
  
-@@ -3648,7 +3698,7 @@ microblaze_expand_conditional_branch (ma
+@@ -3648,7 +3698,7 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
      {
        comp_reg = cmp_op0;
        condition = gen_rtx_fmt_ee (signed_condition (code), mode, comp_reg, const0_rtx);
@@ -436,7 +427,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
          emit_jump_insn (gen_condjump (condition, label1));
        else
          emit_jump_insn (gen_long_condjump (condition, label1));
-@@ -3767,7 +3817,7 @@ microblaze_expand_conditional_branch_sf
+@@ -3767,7 +3817,7 @@ microblaze_expand_conditional_branch_sf (rtx operands[])
    rtx comp_reg = gen_reg_rtx (SImode);
  
    emit_insn (gen_cstoresf4 (comp_reg, operands[0], cmp_op0, cmp_op1));
@@ -445,7 +436,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
    emit_jump_insn (gen_condjump (condition, operands[3]));
  }
  
-@@ -3777,10 +3827,10 @@ microblaze_expand_conditional_branch_df
+@@ -3777,10 +3827,10 @@ microblaze_expand_conditional_branch_df (rtx operands[])
    rtx condition;
    rtx cmp_op0 = XEXP (operands[0], 0);
    rtx cmp_op1 = XEXP (operands[0], 1);
@@ -458,7 +449,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
    emit_jump_insn (gen_long_condjump (condition, operands[3]));
  }
  
-@@ -3801,8 +3851,8 @@ microblaze_expand_divide (rtx operands[]
+@@ -3801,8 +3851,8 @@ microblaze_expand_divide (rtx operands[])
  {
    /* Table lookup software divides. Works for all (nr/dr) where (0 <= nr,dr <= 15).  */
  
@@ -469,7 +460,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
    rtx regqi = gen_reg_rtx (QImode);
    rtx_code_label *div_label = gen_label_rtx ();
    rtx_code_label *div_end_label = gen_label_rtx ();
-@@ -3810,17 +3860,31 @@ microblaze_expand_divide (rtx operands[]
+@@ -3810,17 +3860,31 @@ microblaze_expand_divide (rtx operands[])
    rtx mem_rtx;
    rtx ret;
    rtx_insn *jump, *cjump, *insn;
@@ -508,7 +499,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
    mem_rtx = gen_rtx_MEM (QImode,
                              gen_rtx_PLUS (QImode, regt1, div_table_rtx));
  
-@@ -3967,7 +4031,7 @@ insert_wic_for_ilb_runout (rtx_insn *fir
+@@ -3967,7 +4031,7 @@ insert_wic_for_ilb_runout (rtx_insn *first)
                {
                  insn =
                    emit_insn_before (gen_iprefetch
@@ -517,7 +508,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
                                      before_4);
                  recog_memoized (insn);
                  INSN_LOCATION (insn) = INSN_LOCATION (before_4);
-@@ -3977,7 +4041,27 @@ insert_wic_for_ilb_runout (rtx_insn *fir
+@@ -3977,7 +4041,27 @@ insert_wic_for_ilb_runout (rtx_insn *first)
             }
         }
  }
@@ -574,11 +565,11 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
  #undef  TARGET_PROMOTE_FUNCTION_MODE
  #define TARGET_PROMOTE_FUNCTION_MODE 	default_promote_function_mode_always_promote
  
-Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
-===================================================================
---- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.h
-+++ gcc-12.1.0/gcc/config/microblaze/microblaze.h
-@@ -173,7 +173,6 @@ extern enum pipeline_type microblaze_pip
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 885abc6e5a1..5f30b8ac195 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -173,7 +173,6 @@ extern enum pipeline_type microblaze_pipe;
  
  /* Generate DWARF exception handling info.  */
  #define DWARF2_UNWIND_INFO 1
@@ -586,7 +577,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
  /* Don't generate .loc operations.  */
  #define DWARF2_ASM_LINE_DEBUG_INFO 0
  
-@@ -206,38 +205,51 @@ extern enum pipeline_type microblaze_pip
+@@ -206,38 +205,51 @@ extern enum pipeline_type microblaze_pipe;
    ((flag_pic || GLOBAL) ? DW_EH_PE_aligned : DW_EH_PE_absptr)
  
  /* Use DWARF 2 debugging information by default.  */
@@ -649,7 +640,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
  
  #define DATA_ALIGNMENT(TYPE, ALIGN)					\
    ((((ALIGN) < BITS_PER_WORD)						\
-@@ -253,12 +265,12 @@ extern enum pipeline_type microblaze_pip
+@@ -253,12 +265,12 @@ extern enum pipeline_type microblaze_pipe;
  #define WORD_REGISTER_OPERATIONS 1
  
  #define LOAD_EXTEND_OP(MODE)  ZERO_EXTEND
@@ -666,7 +657,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
  /* Standard register usage.  */
  
  /* On the MicroBlaze, we have 32 integer registers */
-@@ -438,13 +450,16 @@ extern struct microblaze_frame_info curr
+@@ -438,13 +450,16 @@ extern struct microblaze_frame_info current_frame_info;
  #define FIRST_PARM_OFFSET(FNDECL)		(UNITS_PER_WORD)
  
  #define ARG_POINTER_CFA_OFFSET(FNDECL)		0
@@ -684,7 +675,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
  #define NUM_OF_ARGS				6
  
  #define GP_RETURN				(GP_REG_FIRST + MB_ABI_INT_RETURN_VAL_REGNUM)
-@@ -455,12 +470,15 @@ extern struct microblaze_frame_info curr
+@@ -455,12 +470,15 @@ extern struct microblaze_frame_info current_frame_info;
  #define MAX_ARGS_IN_REGISTERS			MB_ABI_MAX_ARG_REGS
  
  #define LIBCALL_VALUE(MODE)						\
@@ -743,10 +734,10 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
  
  /* Default to -G 8 */
  #ifndef MICROBLAZE_DEFAULT_GVALUE
-Index: gcc-12.1.0/gcc/config/microblaze/microblaze.md
-===================================================================
---- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.md
-+++ gcc-12.1.0/gcc/config/microblaze/microblaze.md
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 40711fe224b..c99150ff0da 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
 @@ -26,6 +26,7 @@
  ;; Constants
  ;;----------------------------------------------------
@@ -1789,11 +1780,11 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.md
    ""
    { 
      rtx target = operands[1];
-Index: gcc-12.1.0/gcc/config/microblaze/t-microblaze
-===================================================================
---- gcc-12.1.0.orig/gcc/config/microblaze/t-microblaze
-+++ gcc-12.1.0/gcc/config/microblaze/t-microblaze
-@@ -2,7 +2,8 @@ MULTILIB_OPTIONS = mxl-barrel-shift mno-
+diff --git a/gcc/config/microblaze/t-microblaze b/gcc/config/microblaze/t-microblaze
+index 4c25cfe15e7..965132b3513 100644
+--- a/gcc/config/microblaze/t-microblaze
++++ b/gcc/config/microblaze/t-microblaze
+@@ -2,7 +2,8 @@ MULTILIB_OPTIONS = mxl-barrel-shift mno-xl-soft-mul mxl-multiply-high mlittle-en
  MULTILIB_DIRNAMES = bs m mh le m64
  MULTILIB_EXCEPTIONS = *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high
  MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high/mlittle-endian
@@ -1803,10 +1794,10 @@ Index: gcc-12.1.0/gcc/config/microblaze/t-microblaze
  MULTILIB_EXCEPTIONS += mxl-multiply-high/mlittle-endian
  MULTILIB_EXCEPTIONS += mxl-multiply-high/m64
  MULTILIB_EXCEPTIONS += *mxl-multiply-high/mlittle-endian/m64
-Index: gcc-12.1.0/libgcc/config/microblaze/crti.S
-===================================================================
---- gcc-12.1.0.orig/libgcc/config/microblaze/crti.S
-+++ gcc-12.1.0/libgcc/config/microblaze/crti.S
+diff --git a/libgcc/config/microblaze/crti.S b/libgcc/config/microblaze/crti.S
+index cbbe32d5f6a..ec797e1bf17 100644
+--- a/libgcc/config/microblaze/crti.S
++++ b/libgcc/config/microblaze/crti.S
 @@ -40,7 +40,7 @@
  
      .align 2
@@ -1823,10 +1814,10 @@ Index: gcc-12.1.0/libgcc/config/microblaze/crti.S
 -    addik   r1, r1, -8
 +    addik   r1, r1, -16
      sw      r15, r0, r1
-Index: gcc-12.1.0/libgcc/config/microblaze/crtn.S
-===================================================================
---- gcc-12.1.0.orig/libgcc/config/microblaze/crtn.S
-+++ gcc-12.1.0/libgcc/config/microblaze/crtn.S
+diff --git a/libgcc/config/microblaze/crtn.S b/libgcc/config/microblaze/crtn.S
+index cb8d8ef2bfa..977b43b9436 100644
+--- a/libgcc/config/microblaze/crtn.S
++++ b/libgcc/config/microblaze/crtn.S
 @@ -33,9 +33,9 @@
      .section .init, "ax"
      lw      r15, r0, r1
@@ -1839,10 +1830,11 @@ Index: gcc-12.1.0/libgcc/config/microblaze/crtn.S
      rtsd    r15, 8 
 -    addik   r1, r1, 8    
 +    addik   r1, r1, 16   
-Index: gcc-12.1.0/libgcc/config/microblaze/divdi3.S
-===================================================================
+diff --git a/libgcc/config/microblaze/divdi3.S b/libgcc/config/microblaze/divdi3.S
+new file mode 100644
+index 00000000000..d37bf5165c6
 --- /dev/null
-+++ gcc-12.1.0/libgcc/config/microblaze/divdi3.S
++++ b/libgcc/config/microblaze/divdi3.S
 @@ -0,0 +1,98 @@
 +###################################-
 +# 
@@ -1942,10 +1934,11 @@ Index: gcc-12.1.0/libgcc/config/microblaze/divdi3.S
 +.end __divdi3
 +	.size	__divdi3, . - __divdi3
 +#endif
-Index: gcc-12.1.0/libgcc/config/microblaze/divdi3_table.c
-===================================================================
+diff --git a/libgcc/config/microblaze/divdi3_table.c b/libgcc/config/microblaze/divdi3_table.c
+new file mode 100644
+index 00000000000..80962597ea5
 --- /dev/null
-+++ gcc-12.1.0/libgcc/config/microblaze/divdi3_table.c
++++ b/libgcc/config/microblaze/divdi3_table.c
 @@ -0,0 +1,62 @@
 +/*  Table for software lookup divide for Xilinx MicroBlaze.
 + 
@@ -2009,10 +2002,11 @@ Index: gcc-12.1.0/libgcc/config/microblaze/divdi3_table.c
 +    15/8,  15/9, 15/10, 15/11, 15/12, 15/13, 15/14, 15/15,
 +};
 +
-Index: gcc-12.1.0/libgcc/config/microblaze/moddi3.S
-===================================================================
+diff --git a/libgcc/config/microblaze/moddi3.S b/libgcc/config/microblaze/moddi3.S
+new file mode 100644
+index 00000000000..5d3f7c03fc8
 --- /dev/null
-+++ gcc-12.1.0/libgcc/config/microblaze/moddi3.S
++++ b/libgcc/config/microblaze/moddi3.S
 @@ -0,0 +1,97 @@
 +###################################
 +# 
@@ -2111,10 +2105,11 @@ Index: gcc-12.1.0/libgcc/config/microblaze/moddi3.S
 +        .end __moddi3
 +	.size	__moddi3, . - __moddi3
 +#endif
-Index: gcc-12.1.0/libgcc/config/microblaze/muldi3.S
-===================================================================
+diff --git a/libgcc/config/microblaze/muldi3.S b/libgcc/config/microblaze/muldi3.S
+new file mode 100644
+index 00000000000..567784197d3
 --- /dev/null
-+++ gcc-12.1.0/libgcc/config/microblaze/muldi3.S
++++ b/libgcc/config/microblaze/muldi3.S
 @@ -0,0 +1,73 @@
 +/*###################################-*-asm*- 
 +# 
@@ -2189,10 +2184,10 @@ Index: gcc-12.1.0/libgcc/config/microblaze/muldi3.S
 +	.end __muldi3
 +	.size	__muldi3, . - __muldi3
 +#endif
-Index: gcc-12.1.0/libgcc/config/microblaze/t-microblaze
-===================================================================
---- gcc-12.1.0.orig/libgcc/config/microblaze/t-microblaze
-+++ gcc-12.1.0/libgcc/config/microblaze/t-microblaze
+diff --git a/libgcc/config/microblaze/t-microblaze b/libgcc/config/microblaze/t-microblaze
+index 8d954a49575..35021b24b7d 100644
+--- a/libgcc/config/microblaze/t-microblaze
++++ b/libgcc/config/microblaze/t-microblaze
 @@ -1,11 +1,16 @@
 -LIB2FUNCS_EXCLUDE += _divsi3 _modsi3 _mulsi3 _udivsi3 _umodsi3
 +LIB2FUNCS_EXCLUDE += _divsi3 _modsi3 _mulsi3 _udivsi3 _umodsi3 \
@@ -2213,10 +2208,11 @@ Index: gcc-12.1.0/libgcc/config/microblaze/t-microblaze
 -        $(srcdir)/config/microblaze/divsi3_table.c
 +        $(srcdir)/config/microblaze/umoddi3.S \
 +        $(srcdir)/config/microblaze/divsi3_table.c \
-Index: gcc-12.1.0/libgcc/config/microblaze/udivdi3.S
-===================================================================
+diff --git a/libgcc/config/microblaze/udivdi3.S b/libgcc/config/microblaze/udivdi3.S
+new file mode 100644
+index 00000000000..c210fbc7128
 --- /dev/null
-+++ gcc-12.1.0/libgcc/config/microblaze/udivdi3.S
++++ b/libgcc/config/microblaze/udivdi3.S
 @@ -0,0 +1,107 @@
 +###################################-
 +# 
@@ -2325,10 +2321,11 @@ Index: gcc-12.1.0/libgcc/config/microblaze/udivdi3.S
 +        .end __udivdi3
 +	.size	__udivdi3, . - __udivdi3
 +#endif
-Index: gcc-12.1.0/libgcc/config/microblaze/umoddi3.S
-===================================================================
+diff --git a/libgcc/config/microblaze/umoddi3.S b/libgcc/config/microblaze/umoddi3.S
+new file mode 100644
+index 00000000000..7f5cd23f9a1
 --- /dev/null
-+++ gcc-12.1.0/libgcc/config/microblaze/umoddi3.S
++++ b/libgcc/config/microblaze/umoddi3.S
 @@ -0,0 +1,110 @@
 +###################################
 +# 
@@ -2440,3 +2437,6 @@ Index: gcc-12.1.0/libgcc/config/microblaze/umoddi3.S
 +.end __umoddi3
 +	.size	__umoddi3, . - __umoddi3
 +#endif
+-- 
+2.37.1 (Apple Git-137.1)
+

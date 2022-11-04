@@ -1,19 +1,20 @@
-From 5b81fec66287856abfe7def27e245fe73e60fe5e Mon Sep 17 00:00:00 2001
+From 89269c9b8d2047ebbc13e98c45e94746edc63de6 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
-Date: Tue, 26 Oct 2021 21:11:21 +0530
-Subject: [PATCH 24/53] [Patch,MicroBlaze] : this patch has 1.Fixed the bug in
+Date: Tue, 13 Sep 2022 12:23:54 +0530
+Subject: [PATCH 24/53] [Patch,MicroBlaze] : this patch has 1.Fixed the bug in 
  version calculation. 2.Add new bitfield instructions.
 
+Signed-off-by :Mahesh Bodapati <mbodapat@xilinx.com>
 ---
- gcc/config/microblaze/microblaze.cc  | 154 ++++++++++++++--------------
+ gcc/config/microblaze/microblaze.cc | 154 ++++++++++++++--------------
  gcc/config/microblaze/microblaze.h  |   2 +
  gcc/config/microblaze/microblaze.md |  69 +++++++++++++
  3 files changed, 147 insertions(+), 78 deletions(-)
 
-Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
-===================================================================
---- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.cc
-+++ gcc-12.1.0/gcc/config/microblaze/microblaze.cc
+diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
+index f75eaff4b49..3abfc834ff2 100644
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
 @@ -165,6 +165,9 @@ int microblaze_no_unsafe_delay;
  /* Set to one if the targeted core has the CLZ insn.  */
  int microblaze_has_clz = 0;
@@ -88,7 +89,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
  /* Return truth value if a CONST_DOUBLE is ok to be a legitimate constant.  */
  static bool
  microblaze_const_double_ok (rtx op, machine_mode mode)
-@@ -1339,8 +1399,7 @@ microblaze_rtx_costs (rtx x, machine_mod
+@@ -1339,8 +1399,7 @@ microblaze_rtx_costs (rtx x, machine_mode mode, int outer_code ATTRIBUTE_UNUSED,
        {
  	if (TARGET_BARREL_SHIFT)
  	  {
@@ -98,7 +99,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
  	      *total = COSTS_N_INSNS (1);
  	    else
  	      *total = COSTS_N_INSNS (2);
-@@ -1401,8 +1460,7 @@ microblaze_rtx_costs (rtx x, machine_mod
+@@ -1401,8 +1460,7 @@ microblaze_rtx_costs (rtx x, machine_mode mode, int outer_code ATTRIBUTE_UNUSED,
  	  }
  	else if (!TARGET_SOFT_MUL)
  	  {
@@ -108,7 +109,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
  	      *total = COSTS_N_INSNS (1);
  	    else
  	      *total = COSTS_N_INSNS (3);
-@@ -1675,72 +1733,13 @@ function_arg_partial_bytes (cumulative_a
+@@ -1675,72 +1733,13 @@ function_arg_partial_bytes (cumulative_args_t cum_v,
    return 0;
  }
  
@@ -259,20 +260,20 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.cc
 +  ver = ver_int - microblaze_version_to_int("v10.0");
    if (ver < 0)
      {
-         if (TARGET_AREA_OPTIMIZED_2)
+ 	if (TARGET_AREA_OPTIMIZED_2)
 @@ -1851,6 +1847,8 @@ microblaze_option_override (void)
      {
-         if (TARGET_AREA_OPTIMIZED_2)
-           microblaze_pipe = MICROBLAZE_PIPE_8;
+ 	if (TARGET_AREA_OPTIMIZED_2)
+ 	 microblaze_pipe = MICROBLAZE_PIPE_8;
 +        if (TARGET_BARREL_SHIFT)
-+          microblaze_has_bitfield = 1;
++         microblaze_has_bitfield = 1;
      }
  
    if (TARGET_MULTIPLY_HIGH && TARGET_SOFT_MUL)
-Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
-===================================================================
---- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.h
-+++ gcc-12.1.0/gcc/config/microblaze/microblaze.h
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 640ae6ea9a3..67015058198 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
 @@ -44,6 +44,7 @@ extern int microblaze_dbx_regno[];
  
  extern int microblaze_no_unsafe_delay;
@@ -281,7 +282,7 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
  extern enum pipeline_type microblaze_pipe;
  
  #define OBJECT_FORMAT_ELF
-@@ -63,6 +64,7 @@ extern enum pipeline_type microblaze_pip
+@@ -63,6 +64,7 @@ extern enum pipeline_type microblaze_pipe;
  /* Do we have CLZ?  */
  #define TARGET_HAS_CLZ      (TARGET_PATTERN_COMPARE && microblaze_has_clz)
  
@@ -289,10 +290,10 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.h
  /* The default is to support PIC.  */
  #define TARGET_SUPPORTS_PIC 1
  
-Index: gcc-12.1.0/gcc/config/microblaze/microblaze.md
-===================================================================
---- gcc-12.1.0.orig/gcc/config/microblaze/microblaze.md
-+++ gcc-12.1.0/gcc/config/microblaze/microblaze.md
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 9e9dfb1ccb0..dede4d068d3 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
 @@ -2491,4 +2491,73 @@
    DONE;
  }")
@@ -367,3 +368,6 @@ Index: gcc-12.1.0/gcc/config/microblaze/microblaze.md
 +   (set_attr "length" "4")])
 +
  (include "sync.md")
+-- 
+2.37.1 (Apple Git-137.1)
+

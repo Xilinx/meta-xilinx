@@ -1,4 +1,4 @@
-From 5576c4ca7641833a91b19b36d105a6b852c1a0cc Mon Sep 17 00:00:00 2001
+From 2d0b5d68aff95a95dfb4ed0b207849658502bd53 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 11 Jan 2017 16:20:01 +0530
 Subject: [PATCH 05/53] [Patch, testsuite]: Update MicroBlaze strings test for
@@ -32,5 +32,5 @@ index efaf3c660ea..347872360d3 100644
  
  extern void somefunc (char *);
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

@@ -1,4 +1,4 @@
-From abef7f4d2ad2869c37c4fb2666b52ed700384877 Mon Sep 17 00:00:00 2001
+From ef94a8b2110f5a3becefb00c1f7c0c3adac6fcac Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 18:18:41 +0530
 Subject: [PATCH 19/53] [Patch, microblaze]: Update ashlsi3 & movsf patterns
@@ -21,16 +21,19 @@ ChangeLog:
   *microblaze.cc (print_operand):
      updated the 'F' case to use "unsinged int" instead
      of HOST_WIDE_INT_PRINT_HEX
+
+Conflicts:
+	gcc/config/microblaze/microblaze.c
 ---
- gcc/config/microblaze/microblaze.cc  |  2 +-
+ gcc/config/microblaze/microblaze.cc |  2 +-
  gcc/config/microblaze/microblaze.md | 10 ++++++++--
  2 files changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index 62630aab64e..16f3120e415 100644
+index 4b0621db168..c23061c4e4a 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -2468,7 +2468,7 @@ print_operand (FILE * file, rtx op, int letter)
+@@ -2469,7 +2469,7 @@ print_operand (FILE * file, rtx op, int letter)
  	  unsigned long value_long;
  	  REAL_VALUE_TO_TARGET_SINGLE (*CONST_DOUBLE_REAL_VALUE (op),
  				       value_long);
@@ -40,7 +43,7 @@ index 62630aab64e..16f3120e415 100644
        else
  	{
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index d86a049355a..986c78f592a 100644
+index effb9774c32..a4d7ea29219 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -1368,7 +1368,10 @@
@@ -68,5 +71,5 @@ index d86a049355a..986c78f592a 100644
    [(set_attr "type"	"no_delay_arith")
     (set_attr "mode"	"SI")
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

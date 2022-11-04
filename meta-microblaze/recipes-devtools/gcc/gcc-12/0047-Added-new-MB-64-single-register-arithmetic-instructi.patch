@@ -1,4 +1,4 @@
-From 688fcf782b7eca82cb2e2ab6589dee843983a5d6 Mon Sep 17 00:00:00 2001
+From e32334b0f8a4c9532975001ffab33e86469ea4e1 Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Fri, 23 Aug 2019 16:16:53 +0530
 Subject: [PATCH 47/53] Added new MB-64 single register arithmetic instructions
@@ -8,7 +8,7 @@ Subject: [PATCH 47/53] Added new MB-64 single register arithmetic instructions
  1 file changed, 56 insertions(+)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 40328b0d39d..6bd042747bf 100644
+index 3695e9e101d..85c1ab45994 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -654,6 +654,18 @@
@@ -103,5 +103,5 @@ index 40328b0d39d..6bd042747bf 100644
    [(set (match_operand:DI 0 "register_operand" "=d,d")
  	(xor:DI (match_operand:DI 1 "arith_operand" "%d,d")
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

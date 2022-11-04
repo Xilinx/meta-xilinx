@@ -1,4 +1,4 @@
-From fe3572f4b0cc033db305b0d67abb88632bf13887 Mon Sep 17 00:00:00 2001
+From b9bb669d9404bd04676f09c793310e1b7f228674 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 15:23:57 +0530
 Subject: [PATCH 15/53] [Patch, microblaze]: Add optimized lshrsi3 When barrel
@@ -26,7 +26,7 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
  create mode 100644 gcc/testsuite/gcc.target/microblaze/others/lshrsi_Os_1.c
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 55477fd0a69..f85d8fcac8a 100644
+index 9fbb3113f3c..52308cce0cb 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -1618,6 +1618,27 @@
@@ -77,5 +77,5 @@ index 00000000000..32a3be7c76a
 +/* { dg-final { scan-assembler "bneid\tr18,.-4" } } */
 +/* { dg-final { scan-assembler "\srl\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1])" } } */
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

@@ -1,4 +1,4 @@
-From db8016ae6874865f57c6841ecabf9d9cdf785ece Mon Sep 17 00:00:00 2001
+From 29c33e35373d7dc52e43162dce38a3ec0e350db3 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 17 Apr 2019 12:36:16 +0530
 Subject: [PATCH 45/53] [Patch,MicroBlaze]: fixed typos in mul,div and mod
@@ -13,7 +13,7 @@ Subject: [PATCH 45/53] [Patch,MicroBlaze]: fixed typos in mul,div and mod
  5 files changed, 212 insertions(+), 20 deletions(-)
 
 diff --git a/libgcc/config/microblaze/divsi3.S b/libgcc/config/microblaze/divsi3.S
-index 3a7fc4d6122..0fd275c8702 100644
+index b464deed481..ceeed6be1f4 100644
 --- a/libgcc/config/microblaze/divsi3.S
 +++ b/libgcc/config/microblaze/divsi3.S
 @@ -46,7 +46,7 @@
@@ -107,7 +107,7 @@ index 3a7fc4d6122..0fd275c8702 100644
  $LaDiv_By_Zero:
  $LaResult_Is_Zero:
 diff --git a/libgcc/config/microblaze/modsi3.S b/libgcc/config/microblaze/modsi3.S
-index c98442c01c2..28775d71ba0 100644
+index 3ec17685e51..637b06c09a3 100644
 --- a/libgcc/config/microblaze/modsi3.S
 +++ b/libgcc/config/microblaze/modsi3.S
 @@ -62,40 +62,72 @@ __modsi3:
@@ -196,7 +196,7 @@ index c98442c01c2..28775d71ba0 100644
  	nop
  #else
 diff --git a/libgcc/config/microblaze/mulsi3.S b/libgcc/config/microblaze/mulsi3.S
-index 0329fa3037a..7557368bc1c 100644
+index 657668ef826..6be75dc95e8 100644
 --- a/libgcc/config/microblaze/mulsi3.S
 +++ b/libgcc/config/microblaze/mulsi3.S
 @@ -43,7 +43,37 @@
@@ -246,7 +246,7 @@ index 0329fa3037a..7557368bc1c 100644
  	.end __mulsi3
  	.size	__mulsi3, . - __mulsi3
 diff --git a/libgcc/config/microblaze/udivsi3.S b/libgcc/config/microblaze/udivsi3.S
-index 7bdcd8873e5..feff14664fb 100644
+index fc6a4b5a248..f8ce88bd8b7 100644
 --- a/libgcc/config/microblaze/udivsi3.S
 +++ b/libgcc/config/microblaze/udivsi3.S
 @@ -59,52 +59,96 @@ __udivsi3:
@@ -360,7 +360,7 @@ index 7bdcd8873e5..feff14664fb 100644
  	NOP
  #else
 diff --git a/libgcc/config/microblaze/umodsi3.S b/libgcc/config/microblaze/umodsi3.S
-index 63ab1c2a357..f5bbb6f2d10 100644
+index 03be6df1fc6..3be3658f7a2 100644
 --- a/libgcc/config/microblaze/umodsi3.S
 +++ b/libgcc/config/microblaze/umodsi3.S
 @@ -46,7 +46,7 @@
@@ -462,5 +462,5 @@ index 63ab1c2a357..f5bbb6f2d10 100644
  $LaRETURN_HERE:
  # Restore values of CSRs and that of r3 and the divisor and the dividend
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

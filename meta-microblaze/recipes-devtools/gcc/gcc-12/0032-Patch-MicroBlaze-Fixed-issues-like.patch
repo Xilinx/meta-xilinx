@@ -1,19 +1,19 @@
-From c03a994475d8894ae0913dd3534e72bfb389aa28 Mon Sep 17 00:00:00 2001
-From: Nagaraju Mekala <nmekala@xilix.com>
-Date: Tue, 11 Sep 2018 14:58:00 +0530
-Subject: [PATCH 32/53] Fixed issues like: 1 Interrupt alignment issue 2 Sign
- extension issue
+From 7f827e73dff27c764e5f475613e3e06ae546103f Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 13 Sep 2022 15:24:25 +0530
+Subject: [PATCH 32/53] [Patch,MicroBlaze]: Fixed issues like:     1 Interrupt
+ alignment issue     2 Sign extension issue
 
 ---
- gcc/config/microblaze/microblaze.cc  | 16 ++++++++++------
+ gcc/config/microblaze/microblaze.cc | 16 ++++++++++------
  gcc/config/microblaze/microblaze.md |  2 +-
  2 files changed, 11 insertions(+), 7 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index e33e1bc1482..64b948d6cfc 100644
+index 4792e3ba370..f1da145232a 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -2177,9 +2177,14 @@ compute_frame_size (HOST_WIDE_INT size)
+@@ -2178,9 +2178,14 @@ compute_frame_size (HOST_WIDE_INT size)
  
    total_size += gp_reg_size;
  
@@ -30,7 +30,7 @@ index e33e1bc1482..64b948d6cfc 100644
  
    /* No space to be allocated for link register in leaf functions with no other
       stack requirements.  */
-@@ -2464,7 +2469,6 @@ print_operand (FILE * file, rtx op, int letter)
+@@ -2465,7 +2470,6 @@ print_operand (FILE * file, rtx op, int letter)
    else if (letter == 'h' || letter == 'j')
      {
        long val[2];
@@ -38,7 +38,7 @@ index e33e1bc1482..64b948d6cfc 100644
        long l[2];
        if (code == CONST_DOUBLE)
  	{
-@@ -2479,10 +2483,10 @@ print_operand (FILE * file, rtx op, int letter)
+@@ -2480,10 +2484,10 @@ print_operand (FILE * file, rtx op, int letter)
  	}
        else if (code == CONST_INT || code == CONST)// || code == SYMBOL_REF ||code == LABEL_REF)
          {
@@ -53,7 +53,7 @@ index e33e1bc1482..64b948d6cfc 100644
    else if (code == CONST_DOUBLE)
      {
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 87158066562..b154d15c34c 100644
+index e54888550f6..4e5d21a1f4c 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -1096,7 +1096,7 @@
@@ -66,5 +66,5 @@ index 87158066562..b154d15c34c 100644
          }
      } 
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

@@ -1,4 +1,4 @@
-From 45f4d3915c2194183a87ca54bd9ecf68eeccba4d Mon Sep 17 00:00:00 2001
+From b3e51ca34dc4048445b178253051ad4bbdfc5ec4 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 4 Jun 2018 10:10:18 +0530
 Subject: [PATCH 26/53] [Patch,Microblaze] : Removed fsqrt generation for
@@ -9,7 +9,7 @@ Subject: [PATCH 26/53] [Patch,Microblaze] : Removed fsqrt generation for
  1 file changed, 14 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 0b3dbdd4a70..9dd12d1011b 100644
+index c6d8a87e9d1..f23a85c7ac7 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -526,20 +526,6 @@
@@ -34,5 +34,5 @@ index 0b3dbdd4a70..9dd12d1011b 100644
    [(set (match_operand:SI 0 "register_operand" "=d")
          (fix:SI (match_operand:SF 1 "register_operand" "d")))]
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 
