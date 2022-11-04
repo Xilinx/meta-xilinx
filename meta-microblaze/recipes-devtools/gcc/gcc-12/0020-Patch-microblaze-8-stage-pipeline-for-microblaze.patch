@@ -1,43 +1,42 @@
-From 39d009f82d0fc316b633a717f173b6195316c8ed Mon Sep 17 00:00:00 2001
+From 65574bdca9006fda7654e33a0081eeecfcd9976b Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
-Date: Mon, 9 Nov 2020 19:54:39 +0530
+Date: Mon, 12 Sep 2022 21:05:51 +0530
 Subject: [PATCH 20/53] [Patch, microblaze]: 8-stage pipeline for microblaze
-
-This patch adds the support for the 8-stage pipeline. The new 8-stage
-pipeline reduces the latencies of float & integer division drastically
+ This patch adds the support for the 8-stage pipeline. The new 8-stage
+ pipeline reduces the latencies of float & integer division drastically
 
 Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
 ---
- gcc/config/microblaze/microblaze.cc   | 11 ++++
+ gcc/config/microblaze/microblaze.cc  | 11 ++++
  gcc/config/microblaze/microblaze.h   |  3 +-
  gcc/config/microblaze/microblaze.md  | 79 +++++++++++++++++++++++++++-
  gcc/config/microblaze/microblaze.opt |  4 ++
  4 files changed, 94 insertions(+), 3 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index 16f3120e415..c730faa9814 100644
+index c23061c4e4a..bd394c411b8 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -1840,6 +1840,17 @@ microblaze_option_override (void)
+@@ -1841,6 +1841,17 @@ microblaze_option_override (void)
  		   "%<-mcpu=v8.30.a%>");
          TARGET_REORDER = 0;
      }
 +  ver = microblaze_version_to_int("v10.0");
 +  if (ver < 0)
 +    {
-+        if (TARGET_AREA_OPTIMIZED_2)
-+          warning (0, "-mxl-frequency can be used only with -mcpu=v10.0 or greater");
++	if (TARGET_AREA_OPTIMIZED_2)
++	 warning (0, "-mxl-frequency can be used only with -mcpu=v10.0 or greater");
 +    }
 +  else
 +    {
-+        if (TARGET_AREA_OPTIMIZED_2)
-+          microblaze_pipe = MICROBLAZE_PIPE_8;
++	if (TARGET_AREA_OPTIMIZED_2)
++	 microblaze_pipe = MICROBLAZE_PIPE_8;
 +    }
  
    if (TARGET_MULTIPLY_HIGH && TARGET_SOFT_MUL)
      error ("%<-mxl-multiply-high%> requires %<-mno-xl-soft-mul%>");
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index e32ce7dbb51..21560ec1618 100644
+index cd544f2030e..640ae6ea9a3 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -27,7 +27,8 @@
@@ -51,7 +50,7 @@ index e32ce7dbb51..21560ec1618 100644
  
  #define MICROBLAZE_MASK_NO_UNSAFE_DELAY         0x00000001
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 986c78f592a..ce72acb9ee0 100644
+index a4d7ea29219..9e9dfb1ccb0 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -35,6 +35,7 @@
@@ -162,7 +161,7 @@ index 986c78f592a..ce72acb9ee0 100644
    (set_attr "length"    "4")])
  
 diff --git a/gcc/config/microblaze/microblaze.opt b/gcc/config/microblaze/microblaze.opt
-index 8dfb134b315..2a72566372b 100644
+index 9f47e67cf2a..cc009363f87 100644
 --- a/gcc/config/microblaze/microblaze.opt
 +++ b/gcc/config/microblaze/microblaze.opt
 @@ -133,3 +133,7 @@ Data referenced by offset from start of text instead of GOT (with -fPIC/-fPIE).
@@ -174,5 +173,5 @@ index 8dfb134b315..2a72566372b 100644
 +Target Mask(AREA_OPTIMIZED_2)
 +Use 8 stage pipeline (frequency optimization)
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

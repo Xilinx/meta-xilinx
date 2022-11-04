@@ -1,4 +1,4 @@
-From 63b07793addb119dfc3ec0a30225e767d8f48706 Mon Sep 17 00:00:00 2001
+From 42ab0f7a2e6834feed456d00b3e2ec0ae2532a41 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 16:41:43 +0530
 Subject: [PATCH 08/53] [Patch, microblaze]: Fix atomic side effects. In
@@ -18,7 +18,7 @@ Conflicts:
  2 files changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 472ef4c1d8d..b02034c9f1e 100644
+index 0765ff930c6..ea7f74f1dff 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -43,6 +43,9 @@
@@ -32,7 +32,7 @@ index 472ef4c1d8d..b02034c9f1e 100644
  
  (define_c_enum "unspec" [
 diff --git a/gcc/config/microblaze/sync.md b/gcc/config/microblaze/sync.md
-index 23e0f1c52e2..3b0fba1d3cf 100644
+index ae8955ce691..77c3ce8ff27 100644
 --- a/gcc/config/microblaze/sync.md
 +++ b/gcc/config/microblaze/sync.md
 @@ -18,14 +18,19 @@
@@ -64,5 +64,5 @@ index 23e0f1c52e2..3b0fba1d3cf 100644
    ""
    {
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

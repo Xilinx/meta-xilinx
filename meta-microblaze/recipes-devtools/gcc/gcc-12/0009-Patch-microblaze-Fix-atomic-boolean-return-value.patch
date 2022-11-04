@@ -1,4 +1,4 @@
-From 0aa9647936673e3ff1ac0082144b196309916ddb Mon Sep 17 00:00:00 2001
+From a1b8136a157c549f0f65c14d628e694310ca0d23 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 16:45:45 +0530
 Subject: [PATCH 09/53] [Patch, microblaze]: Fix atomic boolean return value.
@@ -12,7 +12,7 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
  1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/gcc/config/microblaze/sync.md b/gcc/config/microblaze/sync.md
-index 3b0fba1d3cf..d08400af4bb 100644
+index 77c3ce8ff27..573ce4765a0 100644
 --- a/gcc/config/microblaze/sync.md
 +++ b/gcc/config/microblaze/sync.md
 @@ -34,15 +34,16 @@
@@ -36,5 +36,5 @@ index 3b0fba1d3cf..d08400af4bb 100644
    }
  )
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

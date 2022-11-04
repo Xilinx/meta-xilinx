@@ -1,4 +1,4 @@
-From 3691860b698107ce5338468cbef932c63d195961 Mon Sep 17 00:00:00 2001
+From 0ed24f5a2e6e47f5d13896793ab2c6ea89e8c8e6 Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Thu, 14 Mar 2019 18:11:04 +0530
 Subject: [PATCH 43/53] Fix the MB-64 bug of handling QI objects
@@ -8,7 +8,7 @@ Subject: [PATCH 43/53] Fix the MB-64 bug of handling QI objects
  1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 74be0728e75..fed6f5e0234 100644
+index f509bd5e665..27436c0f660 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -2345,11 +2345,11 @@ else
@@ -43,5 +43,5 @@ index 74be0728e75..fed6f5e0234 100644
    "TARGET_MB_64"
    {
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

@@ -1,4 +1,4 @@
-From b2d05f4ad5c66fb8cec37064a77d21194db9dd32 Mon Sep 17 00:00:00 2001
+From 9c37b9690ec2c6290095209c039725f235537379 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Thu, 29 Nov 2018 17:55:08 +0530
 Subject: [PATCH 42/53] fixing the long & long long mingw toolchain issue
@@ -9,7 +9,7 @@ Subject: [PATCH 42/53] fixing the long & long long mingw toolchain issue
  2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/gcc/config/microblaze/constraints.md b/gcc/config/microblaze/constraints.md
-index 0a4d5269314..e3f89491fb4 100644
+index 0ced155340d..3f9805dfe0a 100644
 --- a/gcc/config/microblaze/constraints.md
 +++ b/gcc/config/microblaze/constraints.md
 @@ -55,7 +55,7 @@
@@ -22,7 +22,7 @@ index 0a4d5269314..e3f89491fb4 100644
  
  ;; Define floating point constraints
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index f62ad28130b..74be0728e75 100644
+index 5a964e70d1f..f509bd5e665 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -648,8 +648,8 @@
@@ -55,5 +55,5 @@ index f62ad28130b..74be0728e75 100644
          else	
  	  return "addlik\t%0,r0,%1";
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

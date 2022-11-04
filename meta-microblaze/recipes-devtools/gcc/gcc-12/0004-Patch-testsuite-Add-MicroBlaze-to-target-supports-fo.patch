@@ -1,4 +1,4 @@
-From dd488cfaf9f909462290c85a1e30665f6252cbf1 Mon Sep 17 00:00:00 2001
+From 34b7dd28e3fe40f55ec7f6df3f000dd797d6c1cc Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 11 Jan 2017 15:50:35 +0530
 Subject: [PATCH 04/53] [Patch, testsuite]: Add MicroBlaze to target-supports
@@ -19,10 +19,10 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/gcc/testsuite/lib/target-supports.exp b/gcc/testsuite/lib/target-supports.exp
-index 411e559f508..9e6a1480e8f 100644
+index 244fe2306f4..c19f251f0d2 100644
 --- a/gcc/testsuite/lib/target-supports.exp
 +++ b/gcc/testsuite/lib/target-supports.exp
-@@ -7958,6 +7958,7 @@ proc check_effective_target_sync_int_long { } {
+@@ -8639,6 +8639,7 @@ proc check_effective_target_sync_int_long { } {
  		 && [check_effective_target_arm_acq_rel])
  	     || [istarget bfin*-*linux*]
  	     || [istarget hppa*-*linux*]
@@ -31,5 +31,5 @@ index 411e559f508..9e6a1480e8f 100644
  	     || [istarget powerpc*-*-*]
  	     || [istarget cris-*-*]
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

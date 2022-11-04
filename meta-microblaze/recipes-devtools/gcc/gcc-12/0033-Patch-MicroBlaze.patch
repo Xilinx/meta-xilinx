@@ -1,16 +1,14 @@
-From 844daa118a8f376e5a53040fc953c86e70d34140 Mon Sep 17 00:00:00 2001
+From 0a86428a345ed359f788a72a0e185053b598e908 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
-Date: Tue, 26 Nov 2019 17:26:15 +0530
-Subject: [PATCH 33/53] Fixed below issues:
+Date: Tue, 13 Sep 2022 15:28:58 +0530
+Subject: [PATCH 33/53] [Patch,MicroBlaze]: fixed below issues:     - Floating
+ point print issues in 64bit mode     - Dejagnu Jump related issues     -
+ Added dbl instruction
 
-- Floating point print issues in 64bit mode
-- Dejagnu Jump related issues
-- Added dbl instruction
-
-Conflicts:
-	gcc/config/microblaze/microblaze.md
+    Conflicts:
+        gcc/config/microblaze/microblaze.md
 ---
- gcc/config/microblaze/microblaze.cc  | 12 +++-
+ gcc/config/microblaze/microblaze.cc | 12 +++-
  gcc/config/microblaze/microblaze.h  |  7 +++
  gcc/config/microblaze/microblaze.md | 86 ++++++++++++++++++++++++-----
  libgcc/config/microblaze/crti.S     | 24 +++++++-
@@ -18,10 +16,10 @@ Conflicts:
  5 files changed, 125 insertions(+), 17 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index 64b948d6cfc..b2cd89a310a 100644
+index f1da145232a..7a08390a027 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -2473,7 +2473,12 @@ print_operand (FILE * file, rtx op, int letter)
+@@ -2474,7 +2474,12 @@ print_operand (FILE * file, rtx op, int letter)
        if (code == CONST_DOUBLE)
  	{
  	  if (GET_MODE (op) == DFmode)
@@ -35,7 +33,7 @@ index 64b948d6cfc..b2cd89a310a 100644
  	  else
  	    {
  	      REAL_VALUE_TO_TARGET_DOUBLE (*CONST_DOUBLE_REAL_VALUE (op), l);
-@@ -3876,7 +3881,10 @@ microblaze_expand_divide (rtx operands[])
+@@ -3877,7 +3882,10 @@ microblaze_expand_divide (rtx operands[])
                              gen_rtx_PLUS (QImode, regt1, div_table_rtx));
  
    insn = emit_insn (gen_zero_extendqisi2(operands[0],mem_rtx));
@@ -48,7 +46,7 @@ index 64b948d6cfc..b2cd89a310a 100644
    LABEL_NUSES (div_end_label) = 1; 
    emit_barrier ();
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index 94ac736221c..17bf470c95b 100644
+index 5f30b8ac195..ac4ea43a706 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -888,10 +888,17 @@ do {									 \
@@ -70,7 +68,7 @@ index 94ac736221c..17bf470c95b 100644
  /* We need to group -lm as well, since some Newlib math functions 
     reference __errno!  */
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index b154d15c34c..7d6cf263eb6 100644
+index 4e5d21a1f4c..5a950b49591 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -527,6 +527,15 @@
@@ -221,7 +219,7 @@ index b154d15c34c..7d6cf263eb6 100644
  ;;----------------------------------------------------------------
  ;; Function prologue/epilogue and stack allocation
  ;;----------------------------------------------------------------
-@@ -3099,7 +3157,7 @@ else
+@@ -3101,7 +3159,7 @@ else
  ;; The insn to set GOT. The hardcoded number "8" accounts for $pc difference
  ;; between "mfs" and "addik" instructions.
  (define_insn "set_got"
@@ -231,7 +229,7 @@ index b154d15c34c..7d6cf263eb6 100644
    ""
    "mfs\t%0,rpc\n\taddik\t%0,%0,_GLOBAL_OFFSET_TABLE_+8"
 diff --git a/libgcc/config/microblaze/crti.S b/libgcc/config/microblaze/crti.S
-index bc69d890370..7400eeb2e3b 100644
+index ec797e1bf17..15ebe68c277 100644
 --- a/libgcc/config/microblaze/crti.S
 +++ b/libgcc/config/microblaze/crti.S
 @@ -33,11 +33,32 @@
@@ -274,7 +272,7 @@ index bc69d890370..7400eeb2e3b 100644
      sw      r15, r0, r1
 +#endif
 diff --git a/libgcc/config/microblaze/crtn.S b/libgcc/config/microblaze/crtn.S
-index 1a1f0a8e0f3..14d9a084e3e 100644
+index 977b43b9436..9de3d4de13c 100644
 --- a/libgcc/config/microblaze/crtn.S
 +++ b/libgcc/config/microblaze/crtn.S
 @@ -29,7 +29,19 @@
@@ -303,5 +301,5 @@ index 1a1f0a8e0f3..14d9a084e3e 100644
      addik   r1, r1, 16   
 +#endif
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

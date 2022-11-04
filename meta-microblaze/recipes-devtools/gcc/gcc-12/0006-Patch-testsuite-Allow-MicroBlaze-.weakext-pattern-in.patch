@@ -1,4 +1,4 @@
-From ea6a9f11d6a866fe20cca13d06c7386754543e6c Mon Sep 17 00:00:00 2001
+From 20b6479f240bfebb46daad06839286a7abcff56c Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 16:14:15 +0530
 Subject: [PATCH 06/53] [Patch, testsuite]: Allow MicroBlaze .weakext pattern
@@ -63,5 +63,5 @@ index 6e8f124bc5e..d1d34fe1e4a 100644
  
  struct Base 
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

@@ -1,4 +1,4 @@
-From fe007d78e220606b220dfc452fe9564ebfecd57a Mon Sep 17 00:00:00 2001
+From 0efefd8ac71dd084c745402afdf07319de9774c6 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 16:34:27 +0530
 Subject: [PATCH 07/53] [Patch, testsuite]: Add MicroBlaze to
@@ -12,10 +12,10 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/gcc/testsuite/lib/target-supports.exp b/gcc/testsuite/lib/target-supports.exp
-index 9e6a1480e8f..7e9d0889f76 100644
+index c19f251f0d2..c136c93e673 100644
 --- a/gcc/testsuite/lib/target-supports.exp
 +++ b/gcc/testsuite/lib/target-supports.exp
-@@ -727,6 +727,7 @@ proc check_profiling_available { test_what } {
+@@ -729,6 +729,7 @@ proc check_profiling_available { test_what } {
  	     || [istarget m68k-*-elf]
  	     || [istarget m68k-*-uclinux*]
  	     || [istarget mips*-*-elf*]
@@ -24,5 +24,5 @@ index 9e6a1480e8f..7e9d0889f76 100644
  	     || [istarget mn10300-*-elf*]
  	     || [istarget moxie-*-elf*]
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

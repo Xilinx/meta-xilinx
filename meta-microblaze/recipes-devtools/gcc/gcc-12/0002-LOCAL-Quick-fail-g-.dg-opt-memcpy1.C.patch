@@ -1,4 +1,4 @@
-From 997e53fc324c3414d09a883a7bff28e1e346c847 Mon Sep 17 00:00:00 2001
+From b1aea8e71692065497ee3e9be5a9f1fccecf5685 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 11 Jan 2017 14:31:10 +0530
 Subject: [PATCH 02/53] [LOCAL]: Quick fail g++.dg/opt/memcpy1.C This
@@ -27,5 +27,5 @@ index 3862756083d..db9f990f781 100644
  typedef uint8_t uint8;
  __extension__ typedef __SIZE_TYPE__ size_t;
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

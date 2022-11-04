@@ -1,4 +1,4 @@
-From 18f970e2dd79c67cefeeaa6634f959be19d1a6ad Mon Sep 17 00:00:00 2001
+From 101f47dedd82fc09bcefd5db986e6d6b0a1761ad Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Thu, 23 Feb 2017 17:09:04 +0530
 Subject: [PATCH 25/53] Fixing the issue with the builtin_alloc. register r18
@@ -11,7 +11,7 @@ signed-off-by:nagaraju mekala <nmekala@xilinx.com>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index fc3326b2314..0b3dbdd4a70 100644
+index dede4d068d3..c6d8a87e9d1 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -2075,10 +2075,10 @@
@@ -40,5 +40,5 @@ index fc3326b2314..0b3dbdd4a70 100644
    }
  )
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

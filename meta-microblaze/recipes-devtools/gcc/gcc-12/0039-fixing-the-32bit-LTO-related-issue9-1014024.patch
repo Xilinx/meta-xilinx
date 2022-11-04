@@ -1,4 +1,4 @@
-From cc2c7e5255edc97064d29880f156d603d3ec740a Mon Sep 17 00:00:00 2001
+From 7dbdc5ba78c9237b0a367ca61f448cf3a0277ea6 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Wed, 17 Oct 2018 16:56:14 +0530
 Subject: [PATCH 39/53] fixing the 32bit LTO related issue9(1014024)
@@ -8,7 +8,7 @@ Subject: [PATCH 39/53] fixing the 32bit LTO related issue9(1014024)
  1 file changed, 14 insertions(+), 10 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index b0c44c4fd50..c6c3a9baa5a 100644
+index 56dfc2a3824..c48b6de0d58 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -265,12 +265,14 @@ extern enum pipeline_type microblaze_pipe;
@@ -64,5 +64,5 @@ index b0c44c4fd50..c6c3a9baa5a 100644
  #define REGNO_OK_FOR_BASE_P(regno)		microblaze_regno_ok_for_base_p ((regno), 1)
  
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

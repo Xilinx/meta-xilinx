@@ -15,26 +15,26 @@ SRC_URI:append:microblaze = " \
     file://0011-Patch-microblaze-Added-ashrsi3_with_size_opt.patch \
     file://0012-Patch-microblaze-Use-bralid-for-profiler-calls.patch \
     file://0013-Patch-microblaze-Removed-moddi3-routinue.patch \
-    file://0014-Patch-microblaze-Add-INIT_PRIORITY-support.patch \
+    file://0014-Patch-microblaze-Add-INIT_PRIORITY-support-Added.patch \
     file://0015-Patch-microblaze-Add-optimized-lshrsi3.patch \
     file://0016-Patch-microblaze-Add-cbranchsi4_reg.patch \
     file://0017-Patch-microblaze-Inline-Expansion-of-fsqrt-builtin.patch \
     file://0018-PATCH-microblaze.md-Improve-adddi3-and-subdi3-insn-d.patch \
     file://0019-Patch-microblaze-Update-ashlsi3-movsf-patterns.patch \
     file://0020-Patch-microblaze-8-stage-pipeline-for-microblaze.patch \
-    file://0021-Patch-microblaze-Correct-the-const-high-double-immed.patch \
+    file://0021-PATCH-21-53-Patch-microblaze-Correct-the-const-high-.patch \
     file://0022-Fix-microblaze-Fix-internal-compiler-error-with-msma.patch \
     file://0023-patch-microblaze-Fix-the-calculation-of-high-word-in.patch \
-    file://0024-Patch-MicroBlaze-this-patch-has.patch \
+    file://0024-Patch-MicroBlaze-this-patch-has-1.Fixed-the-bug-in.patch \
     file://0025-Fixing-the-issue-with-the-builtin_alloc.patch \
     file://0026-Patch-Microblaze-Removed-fsqrt-generation-for-double.patch \
     file://0027-Patch-MicroBlaze-Intial-commit-of-64-bit-Microblaze.patch \
     file://0028-Intial-commit-for-64bit-MB-sources.patch \
-    file://0029-re-arrangement-of-the-compare-branches.patch \
+    file://0029-Patch-MicroBlaze-re-arrangement-of-the-compare-branc.patch \
     file://0030-Patch-Microblaze-previous-commit-broke-the-handling-.patch \
     file://0031-Patch-Microblaze-Support-of-multilibs-with-m64.patch \
-    file://0032-Fixed-issues-like.patch \
-    file://0033-Fixed-below-issues.patch \
+    file://0032-Patch-MicroBlaze-Fixed-issues-like.patch \
+    file://0033-Patch-MicroBlaze.patch \
     file://0034-Added-double-arith-instructions.patch \
     file://0035-Fixed-the-issue-in-the-delay-slot-with-swap-instruct.patch \
     file://0036-Fixed-the-load-store-issue-with-the-32bit-arith-libr.patch \
@@ -47,7 +47,7 @@ SRC_URI:append:microblaze = " \
     file://0043-Fix-the-MB-64-bug-of-handling-QI-objects.patch \
     file://0044-Patch-Microblaze-We-will-check-the-possibility-of-pe.patch \
     file://0045-Patch-MicroBlaze-fixed-typos-in-mul-div-and-mod-asse.patch \
-    file://0046-Author-Nagaraju-nmekala-xilinx.com.patch \
+    file://0046-Patch-microblaze-MB-64-removal-of-barrel-shift-instr.patch \
     file://0047-Added-new-MB-64-single-register-arithmetic-instructi.patch \
     file://0048-Patch-MicroBlaze-Added-support-for-64-bit-Immediate-.patch \
     file://0049-Patch-microblaze-Fix-Compiler-crash-with-freg-struct.patch \

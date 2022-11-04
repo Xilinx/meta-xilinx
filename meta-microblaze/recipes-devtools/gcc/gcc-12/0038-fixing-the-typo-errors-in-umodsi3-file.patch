@@ -1,4 +1,4 @@
-From 23c8d1d396c7ae5e478c793b72fddcec80dfd083 Mon Sep 17 00:00:00 2001
+From 1e0eaa1330f24d4989af6326ce1af4f613ea0d89 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Tue, 16 Oct 2018 07:55:46 +0530
 Subject: [PATCH 38/53] fixing the typo errors in umodsi3 file
@@ -8,7 +8,7 @@ Subject: [PATCH 38/53] fixing the typo errors in umodsi3 file
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/libgcc/config/microblaze/umodsi3.S b/libgcc/config/microblaze/umodsi3.S
-index 7d1e4484a53..63ab1c2a357 100644
+index b68ba7a5ea6..03be6df1fc6 100644
 --- a/libgcc/config/microblaze/umodsi3.S
 +++ b/libgcc/config/microblaze/umodsi3.S
 @@ -47,9 +47,9 @@ __umodsi3:
@@ -25,5 +25,5 @@ index 7d1e4484a53..63ab1c2a357 100644
  __umodsi3:
  	.frame	r1,0,r15	
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

@@ -1,32 +1,22 @@
-From 2673e0dc2d75769c7cc36ca94e4e07caa28b8ef7 Mon Sep 17 00:00:00 2001
-From: Nagaraju <nmekala@xilinx.com>
-Date: Thu, 9 Jan 2020 12:30:41 +0530
+From d45405d05a1f9079f7db86ba60dcd30d358613d4 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 13 Sep 2022 16:06:10 +0530
 Subject: [PATCH 49/53] [Patch, microblaze]: Fix Compiler crash with
- -freg-struct-return This patch fixes a bug in MB GCC regarding the passing
- struct values in registers. Currently we are only handling SImode With this
- patch all other modes are handled properly
+ -freg-struct-return     This patch fixes a bug in MB GCC regarding the
+ passing struct     values in registers. Currently we are only handling SImode
+     With this patch all other modes are handled properly
 
-Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
-
-ChangeLog:
-2020-01-09 Nagaraju Mekala <nmekala@xilix.com>
-
-	* gcc/config/microblaze/microblaze.h
-	(LIBCALL_Value): Remove macro
-	(PROMOTE_MODE): Remove macro
-	* gcc/config/microblaze/microblaze.cc
-	(TARGET_LIBCALL_Value): Added new macro
-	(microblaze_function_value): Updated the return Value
+    Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
 ---
  gcc/config/microblaze/microblaze.cc | 11 ++++++++++-
- gcc/config/microblaze/microblaze.h | 19 -------------------
+ gcc/config/microblaze/microblaze.h  | 19 -------------------
  2 files changed, 10 insertions(+), 20 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index d1257032bfb..5afac2ba8d1 100644
+index 3ee3996a38d..4668a81d060 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -3908,7 +3908,16 @@ microblaze_function_value (const_tree valtype,
+@@ -3909,7 +3909,16 @@ microblaze_function_value (const_tree valtype,
  			   const_tree func ATTRIBUTE_UNUSED,
  			   bool outgoing ATTRIBUTE_UNUSED)
  {
@@ -45,7 +35,7 @@ index d1257032bfb..5afac2ba8d1 100644
  
  /* Implement TARGET_SCHED_ADJUST_COST.  */
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index c6c3a9baa5a..2581d52d17a 100644
+index c48b6de0d58..730ad87b13b 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -266,13 +266,6 @@ extern enum pipeline_type microblaze_pipe;
@@ -82,5 +72,5 @@ index c6c3a9baa5a..2581d52d17a 100644
     On the MicroBlaze, R2 R3 are the only register thus used.
     Currently, R2 are only implemented  here (C has no complex type)  */
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

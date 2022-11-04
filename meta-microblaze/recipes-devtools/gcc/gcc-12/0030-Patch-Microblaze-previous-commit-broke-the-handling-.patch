@@ -1,4 +1,4 @@
-From 37af05f1ea7dc8476057580944a236f135babaf8 Mon Sep 17 00:00:00 2001
+From af910dd71faec99838e421dd76fd5231e34bee3e Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 8 Aug 2018 17:37:26 +0530
 Subject: [PATCH 30/53] [Patch,Microblaze] :  previous commit broke the
@@ -9,7 +9,7 @@ Subject: [PATCH 30/53] [Patch,Microblaze] :  previous commit broke the
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index ddf01505bd8..87158066562 100644
+index 566c53ba228..e54888550f6 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -2224,8 +2224,8 @@ else
@@ -24,5 +24,5 @@ index ddf01505bd8..87158066562 100644
                        (pc)))]
    ""
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

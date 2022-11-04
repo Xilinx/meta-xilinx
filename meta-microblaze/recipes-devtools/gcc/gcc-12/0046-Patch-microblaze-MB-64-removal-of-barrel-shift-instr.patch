@@ -1,25 +1,23 @@
-From 45fcd0217edf07fcb6473812cfc4ccacc8e95aac Mon Sep 17 00:00:00 2001
-From: Nagaraju <nmekala@xilinx.com>
-Date: Thu, 18 Apr 2019 16:00:37 +0530
-Subject: [PATCH 46/53] Author: Nagaraju <nmekala@xilinx.com> Date:   Wed Apr
- 17 14:11:00 2019 +0530
+From 39589348962a2e0453ad49118b6bc3dd8a7b1bb5 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 13 Sep 2022 15:59:12 +0530
+Subject: [PATCH 46/53] [Patch, microblaze]: MB-64 removal of barrel-shift
+ instructions from default         By default MB-64 is generatting
+ barrel-shift instructions. It has been         removed from default.
+ Barrel-shift instructions will be generated only if         barrel-shifter is
+ enabled. Similarly to double instructions as well.
 
-    [Patch, microblaze]: MB-64 removal of barrel-shift instructions from default
-    By default MB-64 is generatting barrel-shift instructions. It has been
-    removed from default. Barrel-shift instructions will be generated only if
-    barrel-shifter is enabled. Similarly to double instructions as well.
-
-    Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+        Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
 ---
- gcc/config/microblaze/microblaze.cc  |   2 +-
+ gcc/config/microblaze/microblaze.cc |   2 +-
  gcc/config/microblaze/microblaze.md | 269 ++++++++++++++++++++++++++--
  2 files changed, 252 insertions(+), 19 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index b2cd89a310a..d1257032bfb 100644
+index 7a08390a027..3ee3996a38d 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -3870,7 +3870,7 @@ microblaze_expand_divide (rtx operands[])
+@@ -3871,7 +3871,7 @@ microblaze_expand_divide (rtx operands[])
    emit_insn (gen_rtx_CLOBBER (Pmode, reg18));
  
    if (TARGET_MB_64) {
@@ -29,7 +27,7 @@ index b2cd89a310a..d1257032bfb 100644
      }
    else  {
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 1490a522a4c..40328b0d39d 100644
+index 4b9acddb1f1..3695e9e101d 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -547,7 +547,7 @@
@@ -475,5 +473,5 @@ index 1490a522a4c..40328b0d39d 100644
    [(set_attr "type"	"arith")
    (set_attr "mode"	"DI")
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

@@ -1,4 +1,4 @@
-From 3ace42f94961162022e9e7baf3e3509fc1a1bfa4 Mon Sep 17 00:00:00 2001
+From 08d7bb4062024f3e34fbb17d695f8fa2c9e1b305 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 17:04:37 +0530
 Subject: [PATCH 16/53] [Patch, microblaze]: Add cbranchsi4_reg This patch
@@ -14,7 +14,7 @@ ChangeLog:
            Ajit Agarwal  <ajitkum@xilinx.com>
 
   *microblaze.md (cbranchsi4_reg): New
-  *microblaze.cc (microblaze_expand_conditional_branch_reg): New
+  *microblaze.c (microblaze_expand_conditional_branch_reg): New
 
 Conflicts:
 
@@ -30,7 +30,7 @@ Conflicts:
  7 files changed, 18 insertions(+), 18 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze-protos.h b/gcc/config/microblaze/microblaze-protos.h
-index 54c26969fbd..3a5f439703c 100644
+index d67355697b5..848cd509003 100644
 --- a/gcc/config/microblaze/microblaze-protos.h
 +++ b/gcc/config/microblaze/microblaze-protos.h
 @@ -33,7 +33,7 @@ extern int microblaze_expand_shift (rtx *);
@@ -143,5 +143,5 @@ index 1d6ba807b12..532c035adfd 100644
      
  }
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

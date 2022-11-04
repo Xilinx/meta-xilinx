@@ -1,4 +1,4 @@
-From 4de570fde0740cbcfea443aea24c2cfc9df5a876 Mon Sep 17 00:00:00 2001
+From 5f799ea01bae0573a44f3fefa825861e99f4e30a Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 24 Oct 2018 18:31:04 +0530
 Subject: [PATCH 41/53] [Patch,Microblaze] : corrected SPN for dlong
@@ -9,7 +9,7 @@ Subject: [PATCH 41/53] [Patch,Microblaze] : corrected SPN for dlong
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 162c6231a86..f62ad28130b 100644
+index 4a372f8fd3f..5a964e70d1f 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -602,9 +602,9 @@
@@ -25,5 +25,5 @@ index 162c6231a86..f62ad28130b 100644
    "dlong\t%0,%1"
    [(set_attr "type"     "fcvt")
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 
