@@ -1,14 +1,17 @@
-From a721a7063f829ccaf6cf8273be04b763b53a735d Mon Sep 17 00:00:00 2001
+From d2f145ec8e4e149e055adc74e92016447af91806 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 9 Nov 2021 16:19:17 +0530
-Subject: [PATCH 09/10] [Patch,MicroBlaze] : Added m64 abi for 64 bit target
+Subject: [PATCH 7/8] [Patch,MicroBlaze] : Added m64 abi for 64 bit target
  descriptions. set m64 abi for 64 bit elf.
 
+Conflicts:
+	gdb/microblaze-tdep.c
+	gdb/microblaze-tdep.h
 ---
  gdb/features/microblaze64.xml |   1 +
- gdb/microblaze-tdep.c         | 150 ++++++++++++++++++++++++++++++++--
- gdb/microblaze-tdep.h         |  11 +++
- 3 files changed, 155 insertions(+), 7 deletions(-)
+ gdb/microblaze-tdep.c         | 159 ++++++++++++++++++++++++++++++++--
+ gdb/microblaze-tdep.h         |  13 ++-
+ 3 files changed, 165 insertions(+), 8 deletions(-)
 
 diff --git a/gdb/features/microblaze64.xml b/gdb/features/microblaze64.xml
 index 515d18e65cf..9c1b7d22003 100644
@@ -22,10 +25,10 @@ index 515d18e65cf..9c1b7d22003 100644
    <xi:include href="microblaze64-core.xml"/>
  </target>
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index 667d658adfd..aad6a9cae6e 100644
+index c347bb9516b..d83072cdaef 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
-@@ -65,8 +65,94 @@
+@@ -65,8 +65,95 @@
  #define IS_SAVE_HIDDEN_PTR(op, rd, ra, rb) \
    ((op == add || op == addik) && ra == MICROBLAZE_FIRST_ARGREG && rb == 0)
  
@@ -39,7 +42,8 @@ index 667d658adfd..aad6a9cae6e 100644
 +enum microblaze_abi
 +microblaze_abi (struct gdbarch *gdbarch)
 +{
-+  return gdbarch_tdep (gdbarch)->microblaze_abi;
++  microblaze_gdbarch_tdep *tdep = (microblaze_gdbarch_tdep *) gdbarch_tdep (gdbarch);
++  return tdep->microblaze_abi;
 +}
  /* The registers of the Xilinx microblaze processor.  */
  
@@ -54,7 +58,7 @@ index 667d658adfd..aad6a9cae6e 100644
 +
 +  /* Force the architecture to update, and (if it's a microblaze architecture)
 + *      microblaze_gdbarch_init will take care of the rest.  */
-+  gdbarch_info_init (&info);
++//  gdbarch_info_init (&info);
 +  gdbarch_update_p (info);
 +}
 +
@@ -117,10 +121,10 @@ index 667d658adfd..aad6a9cae6e 100644
 +  help_list (setmicroblazecmdlist, "set microblaze ", all_commands, gdb_stdout);
 +}
 +
- static const char *microblaze_register_names[] =
+ static const char * const microblaze_register_names[] =
  {
    "r0",   "r1",  "r2",    "r3",   "r4",   "r5",   "r6",   "r7",
-@@ -85,6 +171,18 @@ static const char *microblaze_register_names[] =
+@@ -85,9 +172,21 @@ static const char * const microblaze_register_names[] =
  static unsigned int microblaze_debug_flag = 0;
  int reg_size = 4;
  
@@ -136,13 +140,17 @@ index 667d658adfd..aad6a9cae6e 100644
 +    }
 +}
 +
- static void ATTRIBUTE_PRINTF (1, 2)
- microblaze_debug (const char *fmt, ...)
- { 
-@@ -880,15 +978,30 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
-   struct gdbarch_tdep *tdep;
+ #define microblaze_debug(fmt, ...) \
+   debug_prefixed_printf_cond_nofunc (microblaze_debug_flag, "MICROBLAZE", \
+-				     fmt, ## __VA_ARGS__)
++                                     fmt, ## __VA_ARGS__)
+ 
+ 
+ /* Return the name of register REGNUM.  */
+@@ -868,15 +967,30 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+ {
    struct gdbarch *gdbarch;
-   struct tdesc_arch_data *tdesc_data = NULL;
+   tdesc_arch_data_up tdesc_data;
 +  enum microblaze_abi microblaze_abi, found_abi, wanted_abi;
    const struct target_desc *tdesc = info.target_desc;
  
@@ -172,7 +180,7 @@ index 667d658adfd..aad6a9cae6e 100644
          {
      	  tdesc = tdesc_microblaze64;
            reg_size = 8;
-@@ -903,7 +1016,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -891,7 +1005,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
        int valid_p;
        int i;
  
@@ -181,16 +189,16 @@ index 667d658adfd..aad6a9cae6e 100644
          feature = tdesc_find_feature (tdesc,
                                      "org.gnu.gdb.microblaze64.core");
        else
-@@ -917,7 +1030,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -905,7 +1019,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
        for (i = 0; i < MICROBLAZE_NUM_REGS; i++)
-         valid_p &= tdesc_numbered_register (feature, tdesc_data, i,
+         valid_p &= tdesc_numbered_register (feature, tdesc_data.get(), i,
                                              microblaze_register_names[i]);
 -      if (info.bfd_arch_info->mach == bfd_mach_microblaze64)
 +      if ((info.bfd_arch_info->mach == bfd_mach_microblaze64) || (microblaze_abi == MICROBLAZE_ABI_M64))
          feature = tdesc_find_feature (tdesc,
                                      "org.gnu.gdb.microblaze64.stack-protect");
        else
-@@ -968,7 +1081,8 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -955,7 +1069,8 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
        set_gdbarch_ptr_bit (gdbarch, 64);
      break;
      }
@@ -200,15 +208,21 @@ index 667d658adfd..aad6a9cae6e 100644
    
    /* Map Dwarf2 registers to GDB registers.  */
    set_gdbarch_dwarf2_reg_to_regnum (gdbarch, microblaze_dwarf2_reg_to_regnum);
-@@ -1027,7 +1141,30 @@ void
+@@ -1014,7 +1129,38 @@ void
  _initialize_microblaze_tdep ()
  {
    register_gdbarch_init (bfd_arch_microblaze, microblaze_gdbarch_init);
--
 +// static struct cmd_list_element *setmicroblazecmdlist = NULL;
 +// static struct cmd_list_element *showmicroblazecmdlist = NULL;
 +
 +  /* Add root prefix command for all "set microblaze"/"show microblaze" commands.  */
+ 
++  add_setshow_prefix_cmd ("microblaze", no_class,
++			 _("Various microblaze specific commands."),
++			 _("Various microblaze specific commands."),
++			 &setmicroblazecmdlist,&showmicroblazecmdlist,
++			 &setlist,&showlist);
++#if 0
 +  add_prefix_cmd ("microblaze", no_class, set_microblaze_command,
 +                  _("Various microblaze specific commands."),
 +                  &setmicroblazecmdlist, "set microblaze ", 0, &setlist);
@@ -216,6 +230,7 @@ index 667d658adfd..aad6a9cae6e 100644
 +  add_prefix_cmd ("microblaze", no_class, show_microblaze_command,
 +                  _("Various microblaze specific commands."),
 +                  &showmicroblazecmdlist, "show microblaze ", 0, &showlist);
++#endif
 +
 +  /* Allow the user to override the ABI.  */
 +  add_setshow_enum_cmd ("abi", class_obscure, microblaze_abi_strings,
@@ -232,21 +247,23 @@ index 667d658adfd..aad6a9cae6e 100644
    initialize_tdesc_microblaze_with_stack_protect ();
    initialize_tdesc_microblaze ();
    initialize_tdesc_microblaze64_with_stack_protect ();
-@@ -1042,5 +1179,4 @@ When non-zero, microblaze specific debugging is enabled."),
+@@ -1029,5 +1175,4 @@ When non-zero, microblaze specific debugging is enabled."),
  			     NULL,
  			     &setdebuglist, &showdebuglist);
  
 -
  }
 diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
-index e0fa7ef9b12..9cb9628295f 100644
+index f4d810303ca..babd6c36926 100644
 --- a/gdb/microblaze-tdep.h
 +++ b/gdb/microblaze-tdep.h
-@@ -19,8 +19,16 @@
+@@ -19,9 +19,17 @@
  
  #ifndef MICROBLAZE_TDEP_H
  #define MICROBLAZE_TDEP_H 1
+-
 +#include "objfiles.h"
+ #include "gdbarch.h"
  
 +struct gdbarch;
 +enum microblaze_abi
@@ -254,17 +271,17 @@ index e0fa7ef9b12..9cb9628295f 100644
 +    MICROBLAZE_ABI_AUTO = 0,
 +    MICROBLAZE_ABI_M64,
 + };
- 
++
 +enum microblaze_abi microblaze_abi (struct gdbarch *gdbarch);
  /* Microblaze architecture-specific information.  */
  struct microblaze_gregset
  {
-@@ -34,11 +42,14 @@ struct gdbarch_tdep
+@@ -35,11 +43,14 @@ struct microblaze_gdbarch_tdep : gdbarch_tdep
  {
    int dummy;		// declare something.
  
-+  enum microblaze_abi microblaze_abi;
-+  enum microblaze_abi found_abi;
++  enum microblaze_abi microblaze_abi {};
++  enum microblaze_abi found_abi {};
    /* Register sets.  */
    struct regset *gregset;
    size_t sizeof_gregset;
@@ -275,5 +292,5 @@ index e0fa7ef9b12..9cb9628295f 100644
  
  /* Register numbers.  */
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

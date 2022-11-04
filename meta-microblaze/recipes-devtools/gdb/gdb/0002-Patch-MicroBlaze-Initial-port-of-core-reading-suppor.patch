@@ -1,30 +1,32 @@
-From da36639f95d23083088a27c27f631d304ae316f1 Mon Sep 17 00:00:00 2001
+From 7da397cae8c0f8826184d6e12fda9ccd11f92753 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
-Date: Tue, 24 Jan 2017 14:55:56 +0530
-Subject: [PATCH 02/10] Initial port of core reading support Added support for
- reading notes in linux core dumps Support for reading of PRSTATUS and PSINFO
- information for rebuilding ".reg" sections of core dumps at run time.
+Date: Mon, 10 Oct 2022 16:37:53 +0530
+Subject: [PATCH 2/8] [Patch,MicroBlaze]: Initial port of core reading support
+ Added support for reading notes in linux core dumps Support for reading of
+ PRSTATUS and PSINFO information for rebuilding ".reg" sections of core dumps
+ at run time.
 
 Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
 Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
 ---
  bfd/elf32-microblaze.c      | 84 +++++++++++++++++++++++++++++++++++++
  gdb/configure.tgt           |  2 +-
  gdb/microblaze-linux-tdep.c | 17 +++++++-
  gdb/microblaze-tdep.c       | 48 +++++++++++++++++++++
- gdb/microblaze-tdep.h       | 27 ++++++++++++
- 5 files changed, 176 insertions(+), 2 deletions(-)
+ gdb/microblaze-tdep.h       | 28 +++++++++++++
+ 5 files changed, 177 insertions(+), 2 deletions(-)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 1b5c2efcd6e..cfd70ae9178 100644
+index d09b3f7095d..d3b3c66cf00 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
-@@ -715,6 +715,87 @@ microblaze_elf_is_local_label_name (bfd *abfd, const char *name)
+@@ -713,6 +713,87 @@ microblaze_elf_is_local_label_name (bfd *abfd, const char *name)
    return _bfd_elf_is_local_label_name (abfd, name);
  }
  
 +/* Support for core dump NOTE sections.  */
-+static bfd_boolean
++static bool
 +microblaze_elf_grok_prstatus (bfd *abfd, Elf_Internal_Note *note)
 +{
 +  int offset;
@@ -33,7 +35,7 @@ index 1b5c2efcd6e..cfd70ae9178 100644
 +  switch (note->descsz)
 +    {
 +      default:
-+        return FALSE;
++        return false;
 +
 +      case 228:         /* Linux/MicroBlaze */
 +        /* pr_cursig */
@@ -54,13 +56,13 @@ index 1b5c2efcd6e..cfd70ae9178 100644
 +                                          size, note->descpos + offset);
 +}
 +
-+static bfd_boolean
++static bool
 +microblaze_elf_grok_psinfo (bfd *abfd, Elf_Internal_Note *note)
 +{
 +  switch (note->descsz)
 +    {
 +      default:
-+        return FALSE;
++        return false;
 +
 +      case 128:         /* Linux/MicroBlaze elf_prpsinfo */
 +        elf_tdata (abfd)->core->program
@@ -81,7 +83,7 @@ index 1b5c2efcd6e..cfd70ae9178 100644
 +      command[n - 1] = '\0';
 +  }
 +
-+  return TRUE;
++  return true;
 +}
 +
 +/* The microblaze linker (like many others) needs to keep track of
@@ -107,7 +109,7 @@ index 1b5c2efcd6e..cfd70ae9178 100644
  /* ELF linker hash entry.  */
  
  struct elf32_mb_link_hash_entry
-@@ -3450,4 +3531,7 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
+@@ -3434,4 +3515,7 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
  #define elf_backend_size_dynamic_sections	microblaze_elf_size_dynamic_sections
  #define elf_backend_add_symbol_hook		microblaze_elf_add_symbol_hook
  
@@ -116,7 +118,7 @@ index 1b5c2efcd6e..cfd70ae9178 100644
 +
  #include "elf32-target.h"
 diff --git a/gdb/configure.tgt b/gdb/configure.tgt
-index a3e11c4b9b8..b8378440b23 100644
+index 0705ccf32b8..7ea186481f3 100644
 --- a/gdb/configure.tgt
 +++ b/gdb/configure.tgt
 @@ -400,7 +400,7 @@ mep-*-*)
@@ -126,10 +128,10 @@ index a3e11c4b9b8..b8378440b23 100644
 -	gdb_target_obs="microblaze-tdep.o microblaze-linux-tdep.o solib-svr4.o \
 +	gdb_target_obs="microblaze-tdep.o microblaze-linux-tdep.o solib-svr4.o glibc-tdep.o \
  			symfile-mem.o linux-tdep.o"
- 	gdb_sim=../sim/microblaze/libsim.a
  	;;
+ microblaze*-*-*)
 diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
-index 0322b4ea813..b8277dfd735 100644
+index 5748556a556..d6197c49dfd 100644
 --- a/gdb/microblaze-linux-tdep.c
 +++ b/gdb/microblaze-linux-tdep.c
 @@ -36,6 +36,7 @@
@@ -149,11 +151,11 @@ index 0322b4ea813..b8277dfd735 100644
  microblaze_linux_init_abi (struct gdbarch_info info,
  			   struct gdbarch *gdbarch)
  {
-+  struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
++  struct microblaze_gdbarch_tdep *tdep =(microblaze_gdbarch_tdep *)  gdbarch_tdep (gdbarch);
 +
 +  tdep->sizeof_gregset = 200;
 +
-   linux_init_abi (info, gdbarch);
+   linux_init_abi (info, gdbarch, 0);
  
    set_gdbarch_memory_remove_breakpoint (gdbarch,
 @@ -153,6 +157,17 @@ microblaze_linux_init_abi (struct gdbarch_info info,
@@ -175,11 +177,11 @@ index 0322b4ea813..b8277dfd735 100644
    set_gdbarch_fetch_tls_load_module_address (gdbarch,
                                               svr4_fetch_objfile_link_map);
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index 28c2ed9a74c..399fa0e3dca 100644
+index 3e8e8fe35b9..ccd37d085d6 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
-@@ -677,6 +677,43 @@ microblaze_register_g_packet_guesses (struct gdbarch *gdbarch)
-                                   tdesc_microblaze_with_stack_protect);
+@@ -666,6 +666,43 @@ microblaze_register_g_packet_guesses (struct gdbarch *gdbarch)
+ 				  tdesc_microblaze_with_stack_protect);
  }
  
 +void
@@ -210,7 +212,7 @@ index 28c2ed9a74c..399fa0e3dca 100644
 +                                     void *cb_data,
 +                                     const struct regcache *regcache)
 +{
-+  struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
++  struct microblaze_gdbarch_tdep *tdep =(microblaze_gdbarch_tdep *) gdbarch_tdep (gdbarch);
 +
 +  cb(".reg", tdep->sizeof_gregset, tdep->sizeof_gregset, tdep->gregset, NULL, cb_data);
 +
@@ -222,8 +224,8 @@ index 28c2ed9a74c..399fa0e3dca 100644
  static struct gdbarch *
  microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  {
-@@ -733,6 +770,10 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
-   tdep = XCNEW (struct gdbarch_tdep);
+@@ -718,6 +755,10 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   microblaze_gdbarch_tdep *tdep = new microblaze_gdbarch_tdep;
    gdbarch = gdbarch_alloc (&info, tdep);
  
 +  tdep->gregset = NULL;
@@ -233,10 +235,10 @@ index 28c2ed9a74c..399fa0e3dca 100644
    set_gdbarch_long_double_bit (gdbarch, 128);
  
    set_gdbarch_num_regs (gdbarch, MICROBLAZE_NUM_REGS);
-@@ -781,6 +822,13 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -766,6 +807,13 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
    frame_base_append_sniffer (gdbarch, dwarf2_frame_base_sniffer);
    if (tdesc_data != NULL)
-     tdesc_use_registers (gdbarch, tdesc, tdesc_data);
+     tdesc_use_registers (gdbarch, tdesc, std::move (tdesc_data));
 +  //frame_base_append_sniffer (gdbarch, microblaze_frame_sniffer);
 +
 +  /* If we have register sets, enable the generic core file support.  */
@@ -248,21 +250,22 @@ index 28c2ed9a74c..399fa0e3dca 100644
    return gdbarch;
  }
 diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
-index 8a429cbf001..e91991b8dba 100644
+index 53fcb2297e6..2e853d84d72 100644
 --- a/gdb/microblaze-tdep.h
 +++ b/gdb/microblaze-tdep.h
-@@ -22,8 +22,22 @@
- 
+@@ -23,8 +23,23 @@
+ #include "gdbarch.h"
  
  /* Microblaze architecture-specific information.  */
 +struct microblaze_gregset
 +{
++   microblaze_gregset() {}
 +   unsigned int gregs[32];
 +   unsigned int fpregs[32];
 +   unsigned int pregs[16];
 +};
 +
- struct gdbarch_tdep
+ struct microblaze_gdbarch_tdep : gdbarch_tdep
  {
 +  int dummy;		// declare something.
 +
@@ -274,7 +277,7 @@ index 8a429cbf001..e91991b8dba 100644
  };
  
  /* Register numbers.  */
-@@ -120,5 +134,18 @@ struct microblaze_frame_cache
+@@ -121,5 +136,18 @@ struct microblaze_frame_cache
  #define MICROBLAZE_BREAKPOINT {0xba, 0x0c, 0x00, 0x18}
  #define MICROBLAZE_BREAKPOINT_LE {0x18, 0x00, 0x0c, 0xba}
  
@@ -294,5 +297,5 @@ index 8a429cbf001..e91991b8dba 100644
  
  #endif /* microblaze-tdep.h */
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

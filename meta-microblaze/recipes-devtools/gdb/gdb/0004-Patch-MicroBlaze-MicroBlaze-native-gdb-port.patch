@@ -1,8 +1,9 @@
-From b37df6ced77898e8cb7e1c343af005d5bfe1272f Mon Sep 17 00:00:00 2001
+From 8d05b79cda7617f228fa4bb6e5147689b662699e Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
-Date: Wed, 15 Jun 2022 10:29:09 +0530
-Subject: [PATCH 06/10] [Patch,MicroBlaze] : MicroBlaze native gdb port.
+Date: Mon, 10 Oct 2022 18:53:46 +0530
+Subject: [PATCH 4/8] [Patch,MicroBlaze] : MicroBlaze native gdb port.
 
+signed-off-by : Mahesh Bodapati <mbodapat@amd.com>
 ---
  gdb/Makefile.in                 |   2 +
  gdb/configure.nat               |   4 +
@@ -18,18 +19,18 @@ Subject: [PATCH 06/10] [Patch,MicroBlaze] : MicroBlaze native gdb port.
  create mode 100644 gdb/microblaze-linux-tdep.h
 
 diff --git a/gdb/Makefile.in b/gdb/Makefile.in
-index ec371fc7e52..0449b8e4c2b 100644
+index aecab41eeb8..fb63e1662c1 100644
 --- a/gdb/Makefile.in
 +++ b/gdb/Makefile.in
-@@ -1336,6 +1336,7 @@ HFILES_NO_SRCDIR = \
+@@ -1374,6 +1374,7 @@ HFILES_NO_SRCDIR = \
  	memory-map.h \
  	memrange.h \
  	microblaze-tdep.h \
 +	microblaze-linux-tdep.h \
  	mips-linux-tdep.h \
- 	mips-nbsd-tdep.h \
+ 	mips-netbsd-tdep.h \
  	mips-tdep.h \
-@@ -2214,6 +2215,7 @@ ALLDEPFILES = \
+@@ -2249,6 +2250,7 @@ ALLDEPFILES = \
  	m68k-linux-nat.c \
  	m68k-linux-tdep.c \
  	m68k-tdep.c \
@@ -38,10 +39,10 @@ index ec371fc7e52..0449b8e4c2b 100644
  	microblaze-tdep.c \
  	mingw-hdep.c \
 diff --git a/gdb/configure.nat b/gdb/configure.nat
-index bb70e303384..53f19a3d263 100644
+index b45519fd116..256c666e760 100644
 --- a/gdb/configure.nat
 +++ b/gdb/configure.nat
-@@ -261,6 +261,10 @@ case ${gdb_host} in
+@@ -270,6 +270,10 @@ case ${gdb_host} in
  		# Host: Motorola m68k running GNU/Linux.
  		NATDEPFILES="${NATDEPFILES} m68k-linux-nat.o"
  		;;
@@ -54,7 +55,7 @@ index bb70e303384..53f19a3d263 100644
  		NATDEPFILES="${NATDEPFILES} linux-nat-trad.o \
 diff --git a/gdb/features/microblaze-linux.c b/gdb/features/microblaze-linux.c
 new file mode 100755
-index 00000000000..29f681bf2ac
+index 00000000000..267e12f6d59
 --- /dev/null
 +++ b/gdb/features/microblaze-linux.c
 @@ -0,0 +1,79 @@
@@ -69,12 +70,12 @@ index 00000000000..29f681bf2ac
 +static void
 +initialize_tdesc_microblaze_linux (void)
 +{
-+  struct target_desc *result = allocate_target_description ();
++  target_desc_up result = allocate_target_description ();
 +  struct tdesc_feature *feature;
-+  set_tdesc_architecture (result, bfd_scan_arch ("microblaze"));
-+  set_tdesc_osabi (result, osabi_from_tdesc_string ("GNU/Linux"));
++  set_tdesc_architecture (result.get(), bfd_scan_arch ("microblaze"));
++  set_tdesc_osabi (result.get(), osabi_from_tdesc_string ("GNU/Linux"));
 +
-+  feature = tdesc_create_feature (result, "org.gnu.gdb.microblaze.core");
++  feature = tdesc_create_feature (result.get(), "org.gnu.gdb.microblaze.core");
 +  tdesc_create_reg (feature, "r0", 0, 1, NULL, 32, "int");
 +  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "int");
 +  tdesc_create_reg (feature, "r2", 2, 1, NULL, 32, "int");
@@ -135,7 +136,7 @@ index 00000000000..29f681bf2ac
 +  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
 +  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
 +
-+  tdesc_microblaze_linux = result;
++  tdesc_microblaze_linux = result.release();
 +}
 diff --git a/gdb/microblaze-linux-nat.c b/gdb/microblaze-linux-nat.c
 new file mode 100755
@@ -510,7 +511,7 @@ index 00000000000..6b9daa23120
 +  add_inf_child_target (linux_target);
 +}
 diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
-index b8277dfd735..b77acc9dc61 100644
+index d6197c49dfd..fc52adffb72 100644
 --- a/gdb/microblaze-linux-tdep.c
 +++ b/gdb/microblaze-linux-tdep.c
 @@ -37,6 +37,7 @@
@@ -558,10 +559,10 @@ index 00000000000..a2c744e2961
 + 
 +#endif /* MICROBLAZE_LINUX_TDEP_H */
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index 399fa0e3dca..0a5b5ab59cc 100644
+index ccd37d085d6..ccb6b730d64 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
-@@ -295,6 +295,7 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+@@ -285,6 +285,7 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
  	  cache->frameless_p = 0; /* Frame found.  */
  	  save_hidden_pointer_found = 0;
  	  non_stack_instruction_found = 0;
@@ -569,7 +570,7 @@ index 399fa0e3dca..0a5b5ab59cc 100644
  	  continue;
  	}
        else if (IS_SPILL_SP(op, rd, ra))
-@@ -443,15 +444,17 @@ microblaze_skip_prologue (struct gdbarch *gdbarch, CORE_ADDR start_pc)
+@@ -431,15 +432,17 @@ microblaze_skip_prologue (struct gdbarch *gdbarch, CORE_ADDR start_pc)
    if (find_pc_partial_function (start_pc, NULL, &func_start, &func_end))
      {
        sal = find_pc_line (func_start, 0);
@@ -590,7 +591,7 @@ index 399fa0e3dca..0a5b5ab59cc 100644
    if (ostart_pc > start_pc)
      return ostart_pc;
    return start_pc;
-@@ -465,6 +468,7 @@ microblaze_frame_cache (struct frame_info *next_frame, void **this_cache)
+@@ -453,6 +456,7 @@ microblaze_frame_cache (struct frame_info *next_frame, void **this_cache)
    struct microblaze_frame_cache *cache;
    struct gdbarch *gdbarch = get_frame_arch (next_frame);
    int rn;
@@ -598,7 +599,7 @@ index 399fa0e3dca..0a5b5ab59cc 100644
  
    if (*this_cache)
      return (struct microblaze_frame_cache *) *this_cache;
-@@ -478,10 +482,17 @@ microblaze_frame_cache (struct frame_info *next_frame, void **this_cache)
+@@ -466,10 +470,17 @@ microblaze_frame_cache (struct frame_info *next_frame, void **this_cache)
      cache->register_offsets[rn] = -1;
  
    /* Call for side effects.  */
@@ -620,7 +621,7 @@ index 399fa0e3dca..0a5b5ab59cc 100644
    return cache;
  }
  
-@@ -506,6 +517,25 @@ microblaze_frame_prev_register (struct frame_info *this_frame,
+@@ -494,6 +505,25 @@ microblaze_frame_prev_register (struct frame_info *this_frame,
    struct microblaze_frame_cache *cache =
      microblaze_frame_cache (this_frame, this_cache);
  
@@ -646,7 +647,7 @@ index 399fa0e3dca..0a5b5ab59cc 100644
    if (cache->frameless_p)
      {
        if (regnum == MICROBLAZE_PC_REGNUM)
-@@ -518,7 +548,9 @@ microblaze_frame_prev_register (struct frame_info *this_frame,
+@@ -506,7 +536,9 @@ microblaze_frame_prev_register (struct frame_info *this_frame,
    else
      return trad_frame_get_prev_register (this_frame, cache->saved_regs,
  					 regnum);
@@ -657,7 +658,7 @@ index 399fa0e3dca..0a5b5ab59cc 100644
  }
  
  static const struct frame_unwind microblaze_frame_unwind =
-@@ -633,7 +665,106 @@ microblaze_stabs_argument_has_addr (struct gdbarch *gdbarch, struct type *type)
+@@ -622,7 +654,106 @@ microblaze_stabs_argument_has_addr (struct gdbarch *gdbarch, struct type *type)
    return (TYPE_LENGTH (type) == 16);
  }
  
@@ -765,7 +766,7 @@ index 399fa0e3dca..0a5b5ab59cc 100644
  static int dwarf2_to_reg_map[78] =
  { 0  /* r0  */,   1  /* r1  */,   2  /* r2  */,   3  /* r3  */,  /*  0- 3 */
    4  /* r4  */,   5  /* r5  */,   6  /* r6  */,   7  /* r7  */,  /*  4- 7 */
-@@ -805,6 +936,8 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -790,6 +921,8 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  				       microblaze_breakpoint::bp_from_kind);
    set_gdbarch_memory_remove_breakpoint (gdbarch, microblaze_linux_memory_remove_breakpoint);
  
@@ -775,10 +776,10 @@ index 399fa0e3dca..0a5b5ab59cc 100644
  
    set_gdbarch_unwind_pc (gdbarch, microblaze_unwind_pc);
 diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
-index 872a3931f20..7f75c693b74 100644
+index 2e853d84d72..2415acfe7b6 100644
 --- a/gdb/microblaze-tdep.h
 +++ b/gdb/microblaze-tdep.h
-@@ -59,11 +59,11 @@ enum microblaze_regnum
+@@ -60,11 +60,11 @@ enum microblaze_regnum
    MICROBLAZE_R12_REGNUM,
    MICROBLAZE_R13_REGNUM,
    MICROBLAZE_R14_REGNUM,
@@ -792,7 +793,7 @@ index 872a3931f20..7f75c693b74 100644
    MICROBLAZE_R20_REGNUM,
    MICROBLAZE_R21_REGNUM,
    MICROBLAZE_R22_REGNUM,
-@@ -76,7 +76,8 @@ enum microblaze_regnum
+@@ -77,7 +77,8 @@ enum microblaze_regnum
    MICROBLAZE_R29_REGNUM,
    MICROBLAZE_R30_REGNUM,
    MICROBLAZE_R31_REGNUM,
@@ -802,7 +803,7 @@ index 872a3931f20..7f75c693b74 100644
    MICROBLAZE_MSR_REGNUM,
    MICROBLAZE_EAR_REGNUM,
    MICROBLAZE_ESR_REGNUM,
-@@ -101,17 +102,21 @@ enum microblaze_regnum
+@@ -102,17 +103,21 @@ enum microblaze_regnum
    MICROBLAZE_RTLBSX_REGNUM,
    MICROBLAZE_RTLBLO_REGNUM,
    MICROBLAZE_RTLBHI_REGNUM,
@@ -827,5 +828,5 @@ index 872a3931f20..7f75c693b74 100644
    int frameless_p;
  
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 
