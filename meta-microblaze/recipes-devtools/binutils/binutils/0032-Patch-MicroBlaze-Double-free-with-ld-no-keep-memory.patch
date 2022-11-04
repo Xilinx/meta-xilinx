@@ -1,20 +1,23 @@
-From 24272469bcd56fd8f1e0095e0b2650f03c2cd962 Mon Sep 17 00:00:00 2001
+From 70268d8d38851d06bd66f9c7cc85865f2f3c0e48 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 24 Jan 2022 16:59:19 +0530
-Subject: [PATCH 36/38] Double free with ld --no-keep-memory. Proposed patches
- from the community member (dednev@rambler.ru) for 2021.1. [CR-1115233]
+Subject: [PATCH 32/34] [Patch,MicroBlaze] : Double free with ld
+ --no-keep-memory. Proposed patches from the community member
+ (dednev@rambler.ru) for 2021.1. [CR-1115233]
 
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+Conflicts:
+	bfd/elf32-microblaze.c
+	bfd/elf64-microblaze.c
 ---
- bfd/elf32-microblaze.c | 39 ++++++++++++++++++++------------------
- bfd/elf64-microblaze.c | 43 ++++++++++++++++++++----------------------
- 2 files changed, 41 insertions(+), 41 deletions(-)
+ bfd/elf32-microblaze.c | 40 ++++++++++++++++++++++------------------
+ bfd/elf64-microblaze.c | 38 ++++++++++++++++++++------------------
+ 2 files changed, 42 insertions(+), 36 deletions(-)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 9c6d0411420..e284b0e5398 100644
+index 588367ebcbb..28589db662f 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
-@@ -1881,10 +1881,8 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1800,10 +1800,8 @@ microblaze_elf_relax_section (bfd *abfd,
  {
    Elf_Internal_Shdr *symtab_hdr;
    Elf_Internal_Rela *internal_relocs;
@@ -25,7 +28,7 @@ index 9c6d0411420..e284b0e5398 100644
    int rel_count;
    unsigned int shndx;
    size_t i, sym_index;
-@@ -1928,8 +1926,6 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1847,8 +1845,6 @@ microblaze_elf_relax_section (bfd *abfd,
    internal_relocs = _bfd_elf_link_read_relocs (abfd, sec, NULL, NULL, link_info->keep_memory);
    if (internal_relocs == NULL)
      goto error_return;
@@ -34,7 +37,7 @@ index 9c6d0411420..e284b0e5398 100644
  
    sdata->relax_count = 0;
    sdata->relax = (struct relax_table *) bfd_malloc ((sec->reloc_count + 1)
-@@ -1957,7 +1953,6 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1876,7 +1872,6 @@ microblaze_elf_relax_section (bfd *abfd,
  	      contents = (bfd_byte *) bfd_malloc (sec->size);
  	      if (contents == NULL)
  		goto error_return;
@@ -42,7 +45,7 @@ index 9c6d0411420..e284b0e5398 100644
  
  	      if (!bfd_get_section_contents (abfd, sec, contents,
  					     (file_ptr) 0, sec->size))
-@@ -2458,25 +2453,26 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2396,25 +2391,26 @@ microblaze_elf_relax_section (bfd *abfd,
  	}
  
        elf_section_data (sec)->relocs = internal_relocs;
@@ -80,12 +83,13 @@ index 9c6d0411420..e284b0e5398 100644
      }
  
    if (sdata->relax_count == 0)
-@@ -2490,8 +2486,15 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2428,8 +2424,16 @@ microblaze_elf_relax_section (bfd *abfd,
    return true;
  
   error_return:
 -  free (free_relocs);
 -  free (free_contents);
++ 
 +  if (isymbuf != NULL
 +      && symtab_hdr->contents != (unsigned char *) isymbuf)
 +    free (isymbuf);
@@ -99,10 +103,10 @@ index 9c6d0411420..e284b0e5398 100644
    sdata->relax = NULL;
    sdata->relax_count = 0;
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index 2e42366d8d6..3b6e6aa47bd 100644
+index 76aec43ec7a..77872cef1ab 100644
 --- a/bfd/elf64-microblaze.c
 +++ b/bfd/elf64-microblaze.c
-@@ -1877,10 +1877,8 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1840,10 +1840,8 @@ microblaze_elf_relax_section (bfd *abfd,
  {
    Elf_Internal_Shdr *symtab_hdr;
    Elf_Internal_Rela *internal_relocs;
@@ -112,8 +116,8 @@ index 2e42366d8d6..3b6e6aa47bd 100644
 -  bfd_byte *free_contents = NULL;
    int rel_count;
    unsigned int shndx;
-   int i, sym_index;
-@@ -1924,8 +1922,6 @@ microblaze_elf_relax_section (bfd *abfd,
+   size_t i, sym_index;
+@@ -1887,8 +1885,6 @@ microblaze_elf_relax_section (bfd *abfd,
    internal_relocs = _bfd_elf_link_read_relocs (abfd, sec, NULL, NULL, link_info->keep_memory);
    if (internal_relocs == NULL)
      goto error_return;
@@ -122,7 +126,7 @@ index 2e42366d8d6..3b6e6aa47bd 100644
  
    sdata->relax_count = 0;
    sdata->relax = (struct relax_table *) bfd_malloc ((sec->reloc_count + 1)
-@@ -1953,8 +1949,6 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1916,8 +1912,6 @@ microblaze_elf_relax_section (bfd *abfd,
  	      contents = (bfd_byte *) bfd_malloc (sec->size);
  	      if (contents == NULL)
  		goto error_return;
@@ -131,8 +135,8 @@ index 2e42366d8d6..3b6e6aa47bd 100644
  	      if (!bfd_get_section_contents (abfd, sec, contents,
  					     (file_ptr) 0, sec->size))
  		goto error_return;
-@@ -2465,28 +2459,26 @@ microblaze_elf_relax_section (bfd *abfd,
-         }
+@@ -2449,25 +2443,26 @@ microblaze_elf_relax_section (bfd *abfd,
+ 	}
  
        elf_section_data (sec)->relocs = internal_relocs;
 -      free_relocs = NULL;
@@ -143,11 +147,8 @@ index 2e42366d8d6..3b6e6aa47bd 100644
        symtab_hdr->contents = (bfd_byte *) isymbuf;
      }
  
--  if (free_relocs != NULL)
--    {
--      free (free_relocs);
--      free_relocs = NULL;
--    }
+-  free (free_relocs);
+-  free_relocs = NULL;
 +  if (internal_relocs != NULL
 +      && elf_section_data (sec)->relocs != internal_relocs)
 +    free (internal_relocs);
@@ -171,14 +172,12 @@ index 2e42366d8d6..3b6e6aa47bd 100644
      }
  
    if (sdata->relax_count == 0)
-@@ -2500,10 +2492,15 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2481,8 +2476,15 @@ microblaze_elf_relax_section (bfd *abfd,
    return true;
  
   error_return:
--  if (free_relocs != NULL)
--    free (free_relocs);
--  if (free_contents != NULL)
--    free (free_contents);
+-  free (free_relocs);
+-  free (free_contents);
 +  if (isymbuf != NULL
 +      && symtab_hdr->contents != (unsigned char *) isymbuf)
 +    free (isymbuf);
@@ -188,9 +187,9 @@ index 2e42366d8d6..3b6e6aa47bd 100644
 +  if (contents != NULL
 +      && elf_section_data (sec)->this_hdr.contents != contents)
 +    free (contents);
-   if (sdata->relax != NULL)
-     {
-       free (sdata->relax);
+   free (sdata->relax);
+   sdata->relax = NULL;
+   sdata->relax_count = 0;
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

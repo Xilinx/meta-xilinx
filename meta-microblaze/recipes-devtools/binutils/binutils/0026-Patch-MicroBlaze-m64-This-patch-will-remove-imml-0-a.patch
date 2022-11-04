@@ -1,16 +1,16 @@
-From 3b7579366a80e4f8585f6bd5ab22a595909f6057 Mon Sep 17 00:00:00 2001
+From 6e92cc2429ec37ced6cc70596ad7c6217d25e806 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 16 Apr 2020 18:08:58 +0530
-Subject: [PATCH 28/38] This patch will remove imml 0 and imml -1 instructions
- when the offset is less than 16 bit for Type A branch EA instructions.
+Subject: [PATCH 26/34]  [Patch,MicroBlaze m64] : This patch will remove imml 0
+ and imml -1 instructions when the offset is less than 16 bit for Type A
+ branch EA instructions.
 
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  gas/config/tc-microblaze.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 23c0d080d9d..2378e5037a8 100644
+index bccaafe296c..85509011f8c 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -2158,9 +2158,7 @@ md_assemble (char * str)
@@ -34,5 +34,5 @@ index 23c0d080d9d..2378e5037a8 100644
            /* Generate the imm instruction.  */
             if (((long long)val) > (long long)-549755813888 && ((long long)val) < (long long)549755813887)
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

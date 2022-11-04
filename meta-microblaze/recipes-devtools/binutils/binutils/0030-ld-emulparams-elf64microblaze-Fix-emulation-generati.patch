@@ -1,7 +1,7 @@
-From 23b792fc927b4f24eb20f841cfef6b9548c1d547 Mon Sep 17 00:00:00 2001
+From 62107ba949fe70e5ae0573147d82cbb52bd1fc08 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 8 Nov 2021 22:01:23 +0530
-Subject: [PATCH 32/38] ld/emulparams/elf64microblaze: Fix emulation generation
+Subject: [PATCH 30/34] ld/emulparams/elf64microblaze: Fix emulation generation
 
 Compilation fails when building ld-new with:
 
@@ -11,7 +11,6 @@ ldemul.o:(.data.rel+0x828): undefined reference to `ld_elf64microblaze_emulation
 The error appears to be that the elf64 files were referencing the elf32 emulation.
 
 Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  ld/emulparams/elf64microblaze.sh   | 2 +-
  ld/emulparams/elf64microblazeel.sh | 2 +-
@@ -40,5 +39,5 @@ index 9c7b0eb7080..7b4c7c411bd 100644
 +TEMPLATE_NAME=elf
  #GENERATE_SHLIB_SCRIPT=yes
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

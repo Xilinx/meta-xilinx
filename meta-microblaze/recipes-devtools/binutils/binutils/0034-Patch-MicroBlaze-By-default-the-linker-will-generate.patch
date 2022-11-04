@@ -1,0 +1,27 @@
+From 652c69cca5a9da92369378674707cdc59988bcc3 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Fri, 28 Oct 2022 13:57:48 +0530
+Subject: [PATCH 34/34] [Patch,MicroBlaze] : By default the linker will
+ generate warnings if it is creating an  executable stack or a segment with
+ all three of read, write and  execute permissions.  These settings are not
+ appropriate for all  targets
+
+---
+ ld/configure.tgt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index 80ffbcf23b3..198cd0f71e4 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -55,6 +55,7 @@ if test "${ac_default_ld_warn_rwx_segments}" = unset; then
+     cris-*-* | crisv32-*-* | \
+     hppa*-*-* | \
+     mips*-*-* | \
++    microblaze*-*-* | \
+     sparc*-*-*)
+       ac_default_ld_warn_rwx_segments=0
+       ;;
+-- 
+2.37.1 (Apple Git-137.1)
+

@@ -1,10 +1,9 @@
-From 855b983d270911c35c52b181426e9771f0851979 Mon Sep 17 00:00:00 2001
+From adfa8ca9782799670d87d03a01414aca5d9cc9e5 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Mon, 16 Oct 2017 15:44:23 +0530
-Subject: [PATCH 12/38] fixing the constant range check issue sample error: not
+Subject: [PATCH 10/34] fixing the constant range check issue sample error: not
  in range ffffffff80000000..7fffffff, not ffffffff70000000
 
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  gas/config/tc-microblaze.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -23,5 +22,5 @@ index 1cb9b2519c3..086f8704156 100644
  	  as_fatal (_("operand must be absolute in range %lx..%lx, not %lx"),
  		    (long) min, (long) max, (long) e->X_add_number);
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

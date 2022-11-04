@@ -1,7 +1,7 @@
-From 16dfbc9464ebbf642cae6e45edd96f5fe14a6c0f Mon Sep 17 00:00:00 2001
+From 3c197b12c4b680a230e8350ecd9a523be804fe3c Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Fri, 23 Aug 2019 16:18:43 +0530
-Subject: [PATCH 25/38] Added support to new arithmetic single register
+Subject: [PATCH 23/34] Added support to new arithmetic single register
  instructions
 
 Conflicts:
@@ -11,7 +11,10 @@ Conflicts:
 	gas/config/tc-microblaze.c
 	opcodes/microblaze-dis.c
 
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+Conflicts:
+	gas/config/tc-microblaze.c
+signed-off-by:Nagaraju <nmekala@xilinx.com>
+	      Mahesh <mbodapat@xilinx.com>
 ---
  gas/config/tc-microblaze.c | 147 ++++++++++++++++++++++++++++++++++++-
  opcodes/microblaze-dis.c   |  11 +++
@@ -20,7 +23,7 @@ Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
  4 files changed, 200 insertions(+), 6 deletions(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index a1fb6ccbd44..bca3793c2d8 100644
+index a1fb6ccbd44..27544b60ea3 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -423,12 +423,33 @@ void
@@ -72,10 +75,10 @@ index a1fb6ccbd44..bca3793c2d8 100644
    unsigned isize;
    unsigned long immed = 0, immed2 = 0, temp;
 -  expressionS exp;
-+  expressionS exp, exp1;
++  expressionS exp,exp1;
    char name[20];
    long immedl;
-+  int reg = 0;
++  int reg=0;
  
    /* Drop leading whitespace.  */
    while (ISSPACE (* str))
@@ -212,7 +215,7 @@ index a1fb6ccbd44..bca3793c2d8 100644
        if (strcmp (op_end, ""))
          op_end = parse_reg (op_end + 1, &reg1);  /* Get r1.  */
 diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
-index 97e21a38bd2..0814cab5bdb 100644
+index d837ebb38e2..b5a78dcfe09 100644
 --- a/opcodes/microblaze-dis.c
 +++ b/opcodes/microblaze-dis.c
 @@ -130,6 +130,14 @@ get_field_imm15 (struct string_buf *buf, long instr)
@@ -230,7 +233,7 @@ index 97e21a38bd2..0814cab5bdb 100644
  static char *
  get_field_special (struct string_buf *buf, long instr,
  		   const struct op_code_struct *op)
-@@ -456,6 +464,9 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+@@ -457,6 +465,9 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
  	  /* For mbar 16 or sleep insn.  */
  	case INST_TYPE_NONE:
  	  break;
@@ -362,5 +365,5 @@ index b242ea73c7b..5c44a5ff0ac 100644
  
  #endif /* MICROBLAZE-OPCM */
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

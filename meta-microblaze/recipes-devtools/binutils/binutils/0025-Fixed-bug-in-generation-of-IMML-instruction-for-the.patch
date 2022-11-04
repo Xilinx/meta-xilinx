@@ -1,17 +1,15 @@
-From 1b2e218f16714358ffc0cbffedeaa36725f56819 Mon Sep 17 00:00:00 2001
+From 0ba14f999b266406e7e86fc0e7311ebb275e7b97 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 3 Nov 2021 12:13:32 +0530
-Subject: [PATCH 27/38] Fixed bug in generation of IMML instruction for the
+Subject: [PATCH 25/34] Fixed bug in generation of IMML instruction for the
 
 new MB-64 instructions with single register.
-
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  gas/config/tc-microblaze.c | 50 +++++++++++++++++++++++++++++++++++---
  1 file changed, 47 insertions(+), 3 deletions(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 454d4875ee1..23c0d080d9d 100644
+index 4c455ff02b8..bccaafe296c 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -1643,12 +1643,56 @@ md_assemble (char * str)
@@ -84,5 +82,5 @@ index 454d4875ee1..23c0d080d9d 100644
                /* Needs an immediate inst.  */
  	  if (((long long)immed) > (long long)-549755813888 && ((long long)immed) < (long long)549755813887)
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

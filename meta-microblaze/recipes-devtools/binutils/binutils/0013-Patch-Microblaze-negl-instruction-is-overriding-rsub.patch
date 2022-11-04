@@ -1,10 +1,9 @@
-From a41a5a63d4d52887f1ce5a5cab161670d033c1ce Mon Sep 17 00:00:00 2001
+From 667611ec2dfb22bf13d5c6af65ea62e9c13a68de Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 11 Sep 2018 13:48:33 +0530
-Subject: [PATCH 15/38] negl instruction is overriding rsubl,fixed it by
- changing the instruction order...
+Subject: [PATCH 13/34] [Patch,Microblaze] : negl instruction is overriding
+ rsubl,fixed it by changing the instruction order...
 
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  opcodes/microblaze-opc.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
@@ -33,5 +32,5 @@ index ab90240d88a..5e45df995de 100644
    {"", 0, 0, 0, 0, 0, 0, 0, 0},
  };
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

@@ -1,21 +1,19 @@
-From 507032ec3840b48dfd709ef7c8f277eb0fabf5bb Mon Sep 17 00:00:00 2001
+From 3a46bc21f52c7b5ccbd408eeecd7145b856f6b1d Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Sun, 30 Sep 2018 17:06:58 +0530
-Subject: [PATCH 18/38] Fixing the branch related issues
+Subject: [PATCH 16/34] Fixing the branch related issues
 
 Conflicts:
 	bfd/elf64-microblaze.c
-
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  bfd/elf64-microblaze.c | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index 104d7a1334f..4c79bbe96c6 100644
+index 951bb36506d..6d698383404 100644
 --- a/bfd/elf64-microblaze.c
 +++ b/bfd/elf64-microblaze.c
-@@ -2566,6 +2566,9 @@ microblaze_elf_check_relocs (bfd * abfd,
+@@ -2559,6 +2559,9 @@ microblaze_elf_check_relocs (bfd * abfd,
  	  while (h->root.type == bfd_link_hash_indirect
  		 || h->root.type == bfd_link_hash_warning)
  	    h = (struct elf_link_hash_entry *) h->root.u.i.link;
@@ -26,5 +24,5 @@ index 104d7a1334f..4c79bbe96c6 100644
  
        switch (r_type)
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

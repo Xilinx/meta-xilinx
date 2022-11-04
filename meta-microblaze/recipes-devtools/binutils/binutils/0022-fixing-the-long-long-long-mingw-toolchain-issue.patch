@@ -1,9 +1,8 @@
-From f1c19a5ca7d28745cd9b28f155609eed70c1b349 Mon Sep 17 00:00:00 2001
+From 24269bd086efcd37f702b92fd25dfe45faa7dfb6 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Thu, 29 Nov 2018 17:59:25 +0530
-Subject: [PATCH 24/38] fixing the long & long long mingw toolchain issue
+Subject: [PATCH 22/34] fixing the long & long long mingw toolchain issue
 
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  gas/config/tc-microblaze.c | 10 +++++-----
  opcodes/microblaze-opc.h   |  4 ++--
@@ -54,5 +53,5 @@ index 5e45df995de..6b25d12dace 100644
  #endif /* MICROBLAZE_OPC */
  
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

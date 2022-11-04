@@ -1,7 +1,7 @@
-From 3deb533f60bb078f8a7b3f2dde5dc2125552d310 Mon Sep 17 00:00:00 2001
+From 4e94c1683a806ac46f3a0d54bfe8f7247d5f0cbd Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Tue, 11 Sep 2018 17:30:17 +0530
-Subject: [PATCH 16/38] Added relocations for MB-X
+Subject: [PATCH 14/34] Added relocations for MB-X
 
 Conflicts:
 	bfd/bfd-in2.h
@@ -9,8 +9,6 @@ Conflicts:
 
 Conflicts:
 	gas/config/tc-microblaze.c
-
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  bfd/bfd-in2.h              |  9 +++-
  bfd/libbfd.h               |  4 +-
@@ -347,5 +345,5 @@ index a6f12dda54a..9d4dbc12ab3 100644
      case BFD_RELOC_MICROBLAZE_64_PLT:
      case BFD_RELOC_MICROBLAZE_64_GOTOFF:
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 
