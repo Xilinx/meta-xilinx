@@ -1,7 +1,7 @@
-From be2ecb2dd73901484995c39d6c7375be6b8dd545 Mon Sep 17 00:00:00 2001
+From 7e1cbc2f96a1905eecf3a211153735ed915a5ad5 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Mon, 18 Jan 2016 12:28:21 +0530
-Subject: [PATCH 07/38] Added Address extension instructions
+Subject: [PATCH 07/34] Added Address extension instructions
 
 This patch adds the support of new instructions which are required
 for supporting Address extension feature.
@@ -18,8 +18,6 @@ ChangeLog:
 
 Conflicts:
 	opcodes/microblaze-opcm.h
-
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  opcodes/microblaze-opc.h  | 11 +++++++++++
  opcodes/microblaze-opcm.h | 10 +++++-----
@@ -99,5 +97,5 @@ index e56c1d2d47c..ad964560c17 100644
    fcmp_lt, fcmp_eq, fcmp_le, fcmp_gt, fcmp_ne, fcmp_ge, fcmp_un, flt,
    /* 'fsqrt' is a glibc:math.h symbol.  */
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

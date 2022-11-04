@@ -1,19 +1,18 @@
-From 214d99aef9b21ddbb07c120495203861dfe52c43 Mon Sep 17 00:00:00 2001
+From ec5bfe546213b2cb7fe2a51f9f9571597b2c5aa9 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 26 Aug 2019 15:29:42 +0530
-Subject: [PATCH 26/38] double imml generation for 64 bit values.
+Subject: [PATCH 24/34] [Patch,MicroBlaze] : double imml generation for 64 bit
+ values.
 
 Conflicts:
 	gas/config/tc-microblaze.c
-
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  gas/config/tc-microblaze.c | 321 ++++++++++++++++++++++++++++++-------
  opcodes/microblaze-opc.h   |   4 +-
  2 files changed, 262 insertions(+), 63 deletions(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index bca3793c2d8..454d4875ee1 100644
+index 27544b60ea3..4c455ff02b8 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -1008,7 +1008,7 @@ md_assemble (char * str)
@@ -542,5 +541,5 @@ index 82da7f1179a..e65f4b58233 100644
  #endif /* MICROBLAZE_OPC */
  
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

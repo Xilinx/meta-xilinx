@@ -1,12 +1,11 @@
-From 8124e17da0056fa6c9f650a0ee5631261e78b93e Mon Sep 17 00:00:00 2001
+From 7f4c17e26065d8194a2512f2982c245afa0e7e40 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 17 Jun 2020 21:20:26 +0530
-Subject: [PATCH 29/38] improper address mapping of PROVIDE directive
- symbols[DTOR_END] are causing runtime loops and we don't need to override
- PROVIDE symbols if symbols are defined in libraries and linker so I am
- disabling override for PROVIDE symbols.
+Subject: [PATCH 27/34] [Patch,MicroBlaze] : improper address mapping of
+ PROVIDE directive symbols[DTOR_END] are causing runtime loops and we don't
+ need to override PROVIDE symbols if symbols are defined in libraries and
+ linker so I am disabling override for PROVIDE symbols.
 
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  ld/ldlang.c | 12 +++++++++---
  1 file changed, 9 insertions(+), 3 deletions(-)
@@ -36,5 +35,5 @@ index f12c09633a7..4a71abc7cbc 100644
  	  break;
  	}
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

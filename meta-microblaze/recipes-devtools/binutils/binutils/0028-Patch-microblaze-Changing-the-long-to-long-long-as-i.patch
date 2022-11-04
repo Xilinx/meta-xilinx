@@ -1,17 +1,19 @@
-From 6af09208c03034774aca624b50b2526878ea210e Mon Sep 17 00:00:00 2001
+From 3e308d91912ade69f914383fd9c13f934da37be4 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilinx.com>
 Date: Tue, 20 Apr 2021 21:22:06 +0530
-Subject: [PATCH 30/38] Changing the long to long long as in Windows long is
- 32-bit but we need the variable to be 64-bit
+Subject: [PATCH 28/34] [Patch, microblaze]:Changing the long to long long as
+ in Windows long is 32-bit but we need the variable to be 64-bit
 
 Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+
+Conflicts:
+	gas/config/tc-microblaze.c
 ---
  gas/config/tc-microblaze.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 2378e5037a8..604a8df86a2 100644
+index 85509011f8c..31677446114 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -1017,7 +1017,7 @@ md_assemble (char * str)
@@ -20,9 +22,9 @@ index 2378e5037a8..604a8df86a2 100644
    unsigned isize;
 -  unsigned long immed = 0, immed2 = 0, temp;
 +  unsigned long long immed = 0, immed2 = 0, temp;
-   expressionS exp, exp1;
+   expressionS exp,exp1;
    char name[20];
    long immedl;
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

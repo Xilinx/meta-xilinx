@@ -1,17 +1,16 @@
-From 2034e50763e51635405988d0cf67345cad1b2101 Mon Sep 17 00:00:00 2001
+From 6209a572f4ec70608564fa7aa0270d640aa421f0 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 2 Nov 2021 17:28:24 +0530
-Subject: [PATCH 20/38] [Patch,MicroBlaze : Adding new relocation to support
+Subject: [PATCH 18/34] [Patch,MicroBlaze : Adding new relocation to support
  64bit rodata.
 
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  bfd/elf64-microblaze.c     | 11 +++++++--
  gas/config/tc-microblaze.c | 49 ++++++++++++++++++++++++++++++++++----
  2 files changed, 54 insertions(+), 6 deletions(-)
 
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index 2d4820c50fe..97131c352c7 100644
+index f16b544b1fc..355e9131987 100644
 --- a/bfd/elf64-microblaze.c
 +++ b/bfd/elf64-microblaze.c
 @@ -1529,6 +1529,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
@@ -49,7 +48,7 @@ index 2d4820c50fe..97131c352c7 100644
  		    else
  		      {
  			if (r_type == R_MICROBLAZE_64_PCREL)
-@@ -2165,7 +2170,8 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2166,7 +2171,8 @@ microblaze_elf_relax_section (bfd *abfd,
                    microblaze_bfd_write_imm_value_32 (abfd, ocontents + irelscan->r_offset,
                                                       irelscan->r_addend);
                }
@@ -59,7 +58,7 @@ index 2d4820c50fe..97131c352c7 100644
                  {
  	          isym = isymbuf + ELF64_R_SYM (irelscan->r_info);
  
-@@ -2640,6 +2646,7 @@ microblaze_elf_check_relocs (bfd * abfd,
+@@ -2633,6 +2639,7 @@ microblaze_elf_check_relocs (bfd * abfd,
          case R_MICROBLAZE_64:
          case R_MICROBLAZE_64_PCREL:
          case R_MICROBLAZE_32:
@@ -164,5 +163,5 @@ index d3de049e9c0..76ce516d8aa 100644
          default:
            as_bad (_("unsupported BFD relocation size %u"), size);
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

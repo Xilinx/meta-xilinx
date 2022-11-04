@@ -1,14 +1,15 @@
-From 40702a32c685ad81803a666858b1b4133b0a9857 Mon Sep 17 00:00:00 2001
+From da36307dff05dff1eebd44aec56f9bdc196ad632 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 28 Sep 2018 12:04:55 +0530
-Subject: [PATCH 17/38] -Fixed MB-x relocation issues -Added imml for required
+Subject: [PATCH 15/34] -Fixed MB-x relocation issues -Added imml for required
  MB-x instructions
 
 Conflicts:
 	bfd/elf64-microblaze.c
 	gas/config/tc-microblaze.c
 
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+Conflicts:
+	gas/config/tc-microblaze.c
 ---
  bfd/elf64-microblaze.c     |  48 ++++++++++--
  gas/config/tc-microblaze.c | 155 ++++++++++++++++++++++++++-----------
@@ -16,7 +17,7 @@ Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
  3 files changed, 152 insertions(+), 53 deletions(-)
 
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index 7434bef393b..104d7a1334f 100644
+index 0faa8de73c8..951bb36506d 100644
 --- a/bfd/elf64-microblaze.c
 +++ b/bfd/elf64-microblaze.c
 @@ -1552,6 +1552,14 @@ microblaze_elf_relocate_section (bfd *output_bfd,
@@ -356,5 +357,5 @@ index 4a740f9bdd9..bb9a935a353 100644
  const char * md_atof (int, char *, int *);
  int    md_parse_option (int, const char *);
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

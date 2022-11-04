@@ -1,7 +1,7 @@
-From 318f98ea7f4271b3dd6e364d751415410a4076ac Mon Sep 17 00:00:00 2001
+From 5f27701e5c8bd1784e1c814fb527a1f8f7755ad9 Mon Sep 17 00:00:00 2001
 From: David Holsgrove <david.holsgrove@xilinx.com>
 Date: Wed, 27 Feb 2013 13:56:11 +1000
-Subject: [PATCH 05/38] upstream change to garbage collection sweep causes mb
+Subject: [PATCH 05/34] upstream change to garbage collection sweep causes mb
  regression
 
 Upstream change for PR13177 now clears the def_regular during gc_sweep of a
@@ -21,7 +21,6 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 
 Conflicts:
 	bfd/elflink.c
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  bfd/elflink.c | 1 -
  1 file changed, 1 deletion(-)
@@ -39,5 +38,5 @@ index 2b1450fa4e1..c50919060b3 100644
        h->ref_regular_nonweak = 0;
      }
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

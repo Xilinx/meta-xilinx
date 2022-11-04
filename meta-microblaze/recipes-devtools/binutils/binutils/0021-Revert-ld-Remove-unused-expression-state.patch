@@ -1,7 +1,7 @@
-From 99193a486cc44f7bb56019a10bef413f7f7d9fd7 Mon Sep 17 00:00:00 2001
+From 6238123cdc680941f3b3a253cca5be06d5c81492 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 27 Feb 2019 15:12:32 +0530
-Subject: [PATCH 23/38] Revert "ld: Remove unused expression state" --defsym
+Subject: [PATCH 21/34] Revert "ld: Remove unused expression state" --defsym
  symbol=expression Create a global symbol in the output file, containing the
  absolute address given by expression.
 
@@ -13,8 +13,6 @@ Conflicts:
 Conflicts:
 	ld/ldexp.c
 	ld/ldexp.h
-
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  ld/ldexp.c | 8 +++++---
  ld/ldexp.h | 1 +
@@ -80,5 +78,5 @@ index ed6fb8be715..e838b736306 100644
    } assign;
    struct {
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

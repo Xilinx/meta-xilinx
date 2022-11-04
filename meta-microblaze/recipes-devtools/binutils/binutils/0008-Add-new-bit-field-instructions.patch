@@ -1,7 +1,7 @@
-From 3f45718e99e09679472366a2c7e454c75f0383e3 Mon Sep 17 00:00:00 2001
+From c02813b6a27e6eed281609e5d696bb67ac74c804 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Mon, 18 Jul 2016 12:24:28 +0530
-Subject: [PATCH 09/38] Add new bit-field instructions
+Subject: [PATCH 08/34] Add new bit-field instructions
 
 This patches adds new bsefi and bsifi instructions.
 BSEFI- The instruction shall extract a bit field from a
@@ -15,7 +15,10 @@ Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
 
 Conflicts:
 	opcodes/microblaze-dis.c
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+
+Conflicts:
+	gas/config/tc-microblaze.c
+	opcodes/microblaze-opc.h
 ---
  gas/config/tc-microblaze.c | 71 +++++++++++++++++++++++++++++++++++++-
  opcodes/microblaze-dis.c   | 20 +++++++++--
@@ -152,7 +155,7 @@ index b057492ba93..f57b98fc9f7 100644
  	  print_func (stream, "\t%s", get_field_rd (&buf, inst));
  	  break;
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index 3b3cdbe710c..825c639a41e 100644
+index d3f8e36199e..825c639a41e 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -59,6 +59,9 @@
@@ -179,7 +182,7 @@ index 3b3cdbe710c..825c639a41e 100644
  #define DELAY_SLOT 1
  #define NO_DELAY_SLOT 0
  
--#define MAX_OPCODES 299
+-#define MAX_OPCODES 291
 +#define MAX_OPCODES 301
  
  const struct op_code_struct
@@ -234,5 +237,5 @@ index ad964560c17..aa3401610d9 100644
  #define  RFSL_MASK 0x000000F
  
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

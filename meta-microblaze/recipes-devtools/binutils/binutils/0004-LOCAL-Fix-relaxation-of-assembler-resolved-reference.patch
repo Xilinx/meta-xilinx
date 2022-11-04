@@ -1,10 +1,11 @@
-From 1b47ecbc256f807b239f3f275fefd53bba0f0cde Mon Sep 17 00:00:00 2001
+From f7c540994e73e430e73d220109e911dff5961f16 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 8 Nov 2016 11:54:08 +0530
-Subject: [PATCH 04/38] Fix relaxation of assembler resolved references,Fixup
- debug_loc sections after linker relaxation Adds a new reloctype
- R_MICROBLAZE_32_NONE, used for passing reloc info from the assembler to the
- linker when the linker manages to fully resolve a local symbol reference.
+Subject: [PATCH 04/34] [LOCAL]: Fix relaxation of assembler resolved
+ references,Fixup debug_loc sections after linker relaxation Adds a new
+ reloctype R_MICROBLAZE_32_NONE, used for passing reloc info from the
+ assembler to the linker when the linker manages to fully resolve a local
+ symbol reference.
 
 This is a workaround for design flaws in the assembler to
 linker interface with regards to linker relaxation.
@@ -19,16 +20,18 @@ Conflicts:
 
 Conflicts:
 	binutils/readelf.c
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+
+Conflicts:
+	bfd/elf32-microblaze.c
 ---
  bfd/bfd-in2.h              |   5 ++
- bfd/elf32-microblaze.c     | 118 +++++++++++++++++++++++++++++--------
+ bfd/elf32-microblaze.c     | 126 ++++++++++++++++++++++++++++---------
  bfd/libbfd.h               |   1 +
  bfd/reloc.c                |   6 ++
  binutils/readelf.c         |   4 ++
  gas/config/tc-microblaze.c |   4 ++
  include/elf/microblaze.h   |   2 +
- 7 files changed, 115 insertions(+), 25 deletions(-)
+ 7 files changed, 119 insertions(+), 29 deletions(-)
 
 diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
 index 1f0f18a7e75..26e3bb2b34b 100644
@@ -47,7 +50,7 @@ index 1f0f18a7e75..26e3bb2b34b 100644
  value in two words (with an imm instruction).  No relocation is
  done here - only used for relaxing  */
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 013c32a1e51..e36cd102bd2 100644
+index 013c32a1e51..7cf1b6eab5b 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
 @@ -175,6 +175,20 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
@@ -58,15 +61,15 @@ index 013c32a1e51..e36cd102bd2 100644
 +          0,			/* Rightshift.  */
 +          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
 +          32,			/* Bitsize.  */
-+          TRUE,			/* PC_relative.  */
++          true,			/* PC_relative.  */
 +          0,			/* Bitpos.  */
 +          complain_overflow_bitfield,  /* Complain on overflow.  */
 +          NULL,                  /* Special Function.  */
 +          "R_MICROBLAZE_32_NONE",/* Name.  */
-+          FALSE,		/* Partial Inplace.  */
++          false,		/* Partial Inplace.  */
 +          0,			/* Source Mask.  */
 +          0,			/* Dest Mask.  */
-+          FALSE),		/* PC relative offset?  */
++          false),		/* PC relative offset?  */
 +
     HOWTO (R_MICROBLAZE_64_NONE,	/* Type.  */
  	  0,			/* Rightshift.  */
@@ -83,7 +86,7 @@ index 013c32a1e51..e36cd102bd2 100644
        microblaze_reloc = R_MICROBLAZE_64_NONE;
        break;
      case BFD_RELOC_32:
-@@ -1954,14 +1971,22 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1954,18 +1971,26 @@ microblaze_elf_relax_section (bfd *abfd,
  		}
  	      break;
  	    case R_MICROBLAZE_NONE:
@@ -92,20 +95,28 @@ index 013c32a1e51..e36cd102bd2 100644
  		/* This was a PC-relative instruction that was
  		   completely resolved.  */
  		size_t sfix, efix;
-+		unsigned int val;
++                unsigned int val;
  		bfd_vma target_address;
  		target_address = irel->r_addend + irel->r_offset;
  		sfix = calc_fixup (irel->r_offset, 0, sec);
  		efix = calc_fixup (target_address, 0, sec);
+-		irel->r_addend -= (efix - sfix);
+-		/* Should use HOWTO.  */
+-		microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset,
+-						   irel->r_addend);
 +
-+		/* Validate the in-band val.  */
-+		val = bfd_get_32 (abfd, contents + irel->r_offset);
-+		if (val != irel->r_addend && ELF32_R_TYPE (irel->r_info) == R_MICROBLAZE_32_NONE) {
-+		    fprintf(stderr, "%d: CORRUPT relax reloc %x %lx\n", __LINE__, val, irel->r_addend);
-+		}
- 		irel->r_addend -= (efix - sfix);
- 		/* Should use HOWTO.  */
- 		microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset,
++                /* Validate the in-band val.  */
++                val = bfd_get_32 (abfd, contents + irel->r_offset);
++                if (val != irel->r_addend && ELF32_R_TYPE (irel->r_info) == R_MICROBLAZE_32_NONE) {
++                    fprintf(stderr, "%d: CORRUPT relax reloc %x %lx\n", __LINE__, val, irel->r_addend);
++                }
++	        irel->r_addend -= (efix - sfix);
++	        /* Should use HOWTO.  */
++	        microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset,
++	                                           irel->r_addend);
+ 	      }
+ 	      break;
+ 	    case R_MICROBLAZE_64_NONE:
 @@ -2009,30 +2034,73 @@ microblaze_elf_relax_section (bfd *abfd,
  	  irelscanend = irelocs + o->reloc_count;
  	  for (irelscan = irelocs; irelscan < irelscanend; irelscan++)
@@ -295,5 +306,5 @@ index 43ad3ad3904..a2e1ce4580f 100644
  
  /* Global base address names.  */
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

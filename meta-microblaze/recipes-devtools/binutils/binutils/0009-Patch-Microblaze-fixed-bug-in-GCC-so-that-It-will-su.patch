@@ -1,10 +1,9 @@
-From 6d52004e565699474956e8eaf4f11c32b1c2a64a Mon Sep 17 00:00:00 2001
+From 81fc7ef231ca2890dfa827b4e8f3d0da107f9be2 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Fri, 29 Sep 2017 18:00:23 +0530
-Subject: [PATCH 11/38] fixed bug in GCC so that It will support .long 0U and
- .long 0u
+Subject: [PATCH 09/34] [Patch,Microblaze]: fixed bug in GCC so that It will
+ support .long 0U and .long 0u
 
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  gas/expr.c | 9 +++++++++
  1 file changed, 9 insertions(+)
@@ -30,5 +29,5 @@ index 6ad8bee2733..a1281ef71a8 100644
        switch (c)
  	{
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

@@ -1,7 +1,7 @@
-From fd654b0c7b88cd55fa659e0acea91296c7ed8e80 Mon Sep 17 00:00:00 2001
+From 38ae9c3ae1270b9873e1cfa4397bae4a5269d1aa Mon Sep 17 00:00:00 2001
 From: David Holsgrove <david.holsgrove@xilinx.com>
 Date: Wed, 8 May 2013 11:03:36 +1000
-Subject: [PATCH 01/38] Add wdc.ext.clear and wdc.ext.flush insns
+Subject: [PATCH 01/34] Add wdc.ext.clear and wdc.ext.flush insns
 
 Added two new instructions, wdc.ext.clear and wdc.ext.flush,
 to enable MicroBlaze to flush an external cache, which is
@@ -9,7 +9,6 @@ used with the new coherency support for multiprocessing.
 
 Signed-off-by:nagaraju <nmekala@xilix.com>
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  opcodes/microblaze-opc.h  | 5 ++++-
  opcodes/microblaze-opcm.h | 4 ++--
@@ -62,5 +61,5 @@ index 8e293465fec..e56c1d2d47c 100644
    imm, rtsd, rtid, rtbd, rted, bri, brid, brlid, brai, braid, bralid,
    brki, beqi, beqid, bnei, bneid, blti, bltid, blei, bleid, bgti,
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

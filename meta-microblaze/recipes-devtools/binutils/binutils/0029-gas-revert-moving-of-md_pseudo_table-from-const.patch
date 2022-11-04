@@ -1,7 +1,7 @@
-From 276d9d6138efbe27d2542f9b3dfb2a47072ec588 Mon Sep 17 00:00:00 2001
+From 24d43f5ce8746c653de7de3fad46915755ba789d Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 8 Nov 2021 21:57:13 +0530
-Subject: [PATCH 31/38] gas: revert moving of md_pseudo_table from const
+Subject: [PATCH 29/34] gas: revert moving of md_pseudo_table from const
 
 The base system expect md_pseudo_table to be constant, Changing the
 definition will break other architectures when compiled with a
@@ -18,7 +18,7 @@ Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
  2 files changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 604a8df86a2..123d5ba6214 100644
+index 31677446114..6b398ab5605 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -385,6 +385,17 @@ microblaze_s_weakext (int ignore ATTRIBUTE_UNUSED)
@@ -79,5 +79,5 @@ index bb9a935a353..4a740f9bdd9 100644
  const char * md_atof (int, char *, int *);
  int    md_parse_option (int, const char *);
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

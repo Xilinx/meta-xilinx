@@ -1,13 +1,12 @@
-From 7982c0bdd92531bca3b829255324a769df9521e1 Mon Sep 17 00:00:00 2001
+From 6f53d25f9817f4d9fbc8d838b36d7026d184e63f Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Date: Fri, 22 Jun 2012 01:20:20 +0200
-Subject: [PATCH 03/38] Disable the warning message for eh_frame_hdr
+Subject: [PATCH 03/34] Disable the warning message for eh_frame_hdr
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 
 Conflicts:
 	bfd/elf-eh-frame.c
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  bfd/elf-eh-frame.c | 3 +++
  1 file changed, 3 insertions(+)
@@ -31,5 +30,5 @@ index 2e22d0c9215..db470ed43c3 100644
    free (sec_info);
   success:
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 

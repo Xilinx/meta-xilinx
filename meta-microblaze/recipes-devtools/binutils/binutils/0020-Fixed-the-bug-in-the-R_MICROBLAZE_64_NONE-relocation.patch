@@ -1,20 +1,21 @@
-From 622b9e85bde4a88ecfe1884179f547575224b984 Mon Sep 17 00:00:00 2001
+From 6c6490ed5a5c5c00d1b18a1f446280689bb572d1 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Wed, 28 Nov 2018 14:00:29 +0530
-Subject: [PATCH 22/38] Fixed the bug in the R_MICROBLAZE_64_NONE relocation.
+Subject: [PATCH 20/34] Fixed the bug in the R_MICROBLAZE_64_NONE relocation.
  It was adjusting only lower 16bits.
 
-Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+Conflicts:
+	bfd/elf64-microblaze.c
 ---
  bfd/elf32-microblaze.c | 4 ++--
  bfd/elf64-microblaze.c | 4 ++--
  2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 71ff973573c..f41b503cbb5 100644
+index f20adb6fd73..88ac730582b 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
-@@ -2059,8 +2059,8 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2060,8 +2060,8 @@ microblaze_elf_relax_section (bfd *abfd,
  		sfix = calc_fixup (irel->r_offset + INST_WORD_SIZE, 0, sec);
  		efix = calc_fixup (target_address, 0, sec);
  		irel->r_addend -= (efix - sfix);
@@ -26,20 +27,20 @@ index 71ff973573c..f41b503cbb5 100644
  	      break;
  	    }
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
-index fe73de86659..387ee0da261 100644
+index eb7f9138884..03fe9eba53a 100644
 --- a/bfd/elf64-microblaze.c
 +++ b/bfd/elf64-microblaze.c
-@@ -2097,8 +2097,8 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2098,8 +2098,8 @@ microblaze_elf_relax_section (bfd *abfd,
  		sfix = calc_fixup (irel->r_offset + INST_WORD_SIZE, 0, sec);
  		efix = calc_fixup (target_address, 0, sec);
  		irel->r_addend -= (efix - sfix);
 -    microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset
--                                       + INST_WORD_SIZE, irel->r_addend);
+-				       + INST_WORD_SIZE, irel->r_addend);
 +    microblaze_bfd_write_imm_value_64 (abfd, contents + irel->r_offset,
 +                                       irel->r_addend);
  	      }
  	      break;
  	    }
 -- 
-2.25.1
+2.37.1 (Apple Git-137.1)
 
