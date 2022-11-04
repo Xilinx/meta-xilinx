@@ -1,40 +1,48 @@
-From da93f5715ff333ac4807b73fe678dde21fb3bd6c Mon Sep 17 00:00:00 2001
+From 6ecb1de66a6a5f55e69c9b108a3d5a85b0ebf315 Mon Sep 17 00:00:00 2001
 From: Nathan Rossi <nathan.rossi@petalogix.com>
 Date: Tue, 8 May 2012 18:11:17 +1000
-Subject: [PATCH 03/10] Fix debug message when register is unavailable
+Subject: [PATCH 3/8] Fix debug message when register is unavailable
 
 Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
+
+Conflicts:
+	gdb/frame.c
 ---
- gdb/frame.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ gdb/frame.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
 diff --git a/gdb/frame.c b/gdb/frame.c
-index c1eba5848af..fe4a0dc0dd0 100644
+index ce95cf8343b..c49ab9feab2 100644
 --- a/gdb/frame.c
 +++ b/gdb/frame.c
-@@ -1305,12 +1305,19 @@ frame_unwind_register_value (frame_info *next_frame, int regnum)
+@@ -1261,13 +1261,20 @@ frame_unwind_register_value (frame_info *next_frame, int regnum)
  	  else
  	    {
  	      int i;
--	      const gdb_byte *buf = value_contents (value);
+-	      gdb::array_view<const gdb_byte> buf = value_contents (value);
+-
+-	      fprintf_unfiltered (&debug_file, " bytes=");
+-	      fprintf_unfiltered (&debug_file, "[");
+-	      for (i = 0; i < register_size (gdbarch, regnum); i++)
+-		fprintf_unfiltered (&debug_file, "%02x", buf[i]);
+-	      fprintf_unfiltered (&debug_file, "]");
 +	      const gdb_byte *buf = NULL;
 +	      if (value_entirely_available(value)) {
-+	        buf = value_contents (value);
++	        gdb::array_view<const gdb_byte> buf = value_contents (value);
 +	      }
- 
- 	      fprintf_unfiltered (gdb_stdlog, " bytes=");
- 	      fprintf_unfiltered (gdb_stdlog, "[");
--	      for (i = 0; i < register_size (gdbarch, regnum); i++)
--		fprintf_unfiltered (gdb_stdlog, "%02x", buf[i]);
++
++	      fprintf_unfiltered (gdb_stdlog, " bytes=");
++	      fprintf_unfiltered (gdb_stdlog, "[");
 +	      if (buf != NULL) {
 +	        for (i = 0; i < register_size (gdbarch, regnum); i++)
 +		  fprintf_unfiltered (gdb_stdlog, "%02x", buf[i]);
 +	      } else {
 +	        fprintf_unfiltered (gdb_stdlog, "unavailable");
 +	      }
- 	      fprintf_unfiltered (gdb_stdlog, "]");
++	      fprintf_unfiltered (gdb_stdlog, "]");
  	    }
  	}
+ 
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 

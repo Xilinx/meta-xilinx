@@ -1,7 +1,7 @@
-From cc8ee172b9145ce488c556a2eb50f931f0676eea Mon Sep 17 00:00:00 2001
+From ef411b49f3b2c9e4048eb273f43ab4ee96f96b7e Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 19 Apr 2021 14:33:27 +0530
-Subject: [PATCH 08/10] [Patch,MicroBlaze] : these changes will make 64 bit
+Subject: [PATCH 6/8] [Patch,MicroBlaze] : these changes will make 64 bit
  vectors as default target types when we built gdb with microblaze 64 bit type
  targets,for instance microblaze-xilinx-elf64/microblazeel-xilinx-elf64
 
@@ -10,10 +10,10 @@ Subject: [PATCH 08/10] [Patch,MicroBlaze] : these changes will make 64 bit
  1 file changed, 8 insertions(+)
 
 diff --git a/bfd/config.bfd b/bfd/config.bfd
-index 0f752de267b..4945e7fa3b5 100644
+index 5e9ba3d9805..deb3d078439 100644
 --- a/bfd/config.bfd
 +++ b/bfd/config.bfd
-@@ -823,7 +823,15 @@ case "${targ}" in
+@@ -856,7 +856,15 @@ case "${targ}" in
      targ_defvec=metag_elf32_vec
      targ_underscore=yes
      ;;
@@ -30,5 +30,5 @@ index 0f752de267b..4945e7fa3b5 100644
      targ_defvec=microblaze_elf32_le_vec
      targ_selvecs=microblaze_elf32_vec
 -- 
-2.17.1
+2.37.1 (Apple Git-137.1)
 
