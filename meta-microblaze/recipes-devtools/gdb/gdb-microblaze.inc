@@ -1,8 +1,3 @@
-## This does not currently work
-#python() {
-#    raise bb.parse.SkipRecipe("GDB does not current support microblaze.")
-#}
-
 # MicroBlaze does not support LTTng UST
 LTTNGUST:microblaze = ""
 
