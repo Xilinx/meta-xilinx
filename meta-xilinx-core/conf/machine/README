@@ -11,8 +11,12 @@ can be implements as:
 k26_kv -> k26 -> zynqmp-ev-generic -> zynqmp-generic
 
 The above needs to result MACHINEOVERRIDES and PACKAGE_ARCHS that include
-all 4 machines.  To accomplish this, each machine.conf file should contain
-the following preamble and postamble.
+all 4 machines.  This facilitates sstate-cache and binary distribution
+package re-use.
+
+To accomplish this, each machine.conf file should contain the following
+preamble and postamble.  This ensures that the machine overrides and
+package archs can be extended by another machine configuration file.
 
 #### Preamble
 MACHINEOVERRIDES =. "${@['', '<machine>:']['<machine>' != '${MACHINE}']}"
@@ -24,10 +28,13 @@ MACHINEOVERRIDES =. "${@['', '<machine>:']['<machine>' != '${MACHINE}']}"
 PACKAGE_EXTRA_ARCHS:append = "${@['', ' <machine_arch>']['<machine>' != "${MACHINE}"]}"
 
 
-Typically the first thing after the preamble will be a requires of the machine
-configuration that we depend on.  After the machine would be changes to various
-defaults.  The exception is when a different microblaze tune and/or defaulttune
-is desired; these must be set before require of the inherited machine.
+Between the Preamble and Postamble, you should "require" the machine
+configuration that your machine is based on.  After the 'require' is where
+most variables should be defined.  (See variable requirements at the end
+of this document.)  This will allow you to extend other configurations
+to match your specific requirements.  Values should be set using = and
++=, but not :append or :prepend.  This allows a machine inheriting your
+machine file to add or overwrite the value easily.  Such as:
 
 Typical case example (my-example.conf):
 
@@ -35,7 +42,7 @@ Typical case example (my-example.conf):
 MACHINEOVERRIDES =. "${@['', 'my-example:']['my-example' != '${MACHINE}']}"
 #### Regular settings follow
 
-require conf/machine/zynqmp-ev-generic.conf
+require conf/machine/zynqmp-generic.conf
 
 HDF_MACHINE = "zcu102-zynqmp"
 MACHINE_FEATURES += "pci"
@@ -44,6 +51,11 @@ MACHINE_FEATURES += "pci"
 #### Postamble
 PACKAGE_EXTRA_ARCHS:append = "${@['', ' my_example']['my-example' != "${MACHINE}"]}"
 
+
+A few variable must be set BEFORE the requires, DEFAULTTUNE for example.
+(See variable requirements at the end of this document.)  Usually ?= is the
+correct way to set these, as the machine inheriting your machine may need
+to override the value.
 
 Example of defaulttune override:
 
@@ -51,9 +63,9 @@ Example of defaulttune override:
 MACHINEOVERRIDES =. "${@['', 'my-example:']['my-example' != '${MACHINE}']}"
 #### Regular settings follow
 
-DEFAULTTUNE = "aarch64"
+DEFAULTTUNE ?= "aarch64"
 
-require conf/machine/zynqmp-ev-generic.conf
+require conf/machine/zynqmp-generic.conf
 
 HDF_MACHINE = "zcu102-zynqmp"
 MACHINE_FEATURES += "pci"
@@ -62,6 +74,9 @@ MACHINE_FEATURES += "pci"
 #### Postamble
 PACKAGE_EXTRA_ARCHS:append = "${@['', ' my_example']['my-example' != "${MACHINE}"]}"
 
+
+Additionally, for microblaze you may need to define a specific microblaze
+tune-features.  Like DEFAULTTUNE, this needs to be set before the require line.
 
 Example of microblaze tune override:
 
@@ -79,3 +94,68 @@ SERIAL_CONSOLE = "115200,ttyUL0"
 #### No additional settings should be after the Postamble
 #### Postamble
 PACKAGE_EXTRA_ARCHS:append = "${@['', ' my_example']['my-example' != "${MACHINE}"]}"
+
+
+Variable Requirements
+=====================
+
+The question has been raised why we don't use ?= or ??= for all default
+values, instead we rely on specific ordering of the override components?
+
+This is done intentionally, as it forces the user to create a new machine
+configuration file to extend their system.  In the past, it was common
+for people to just set values in their local.conf file, but this lead to
+problems reproducing success and failures, as well as trying to support
+the overall configuration.  Moving to a model where most variables must
+be added to, or replaced after the require has simplified this model.
+There are a few exception, these will be covered first.
+
+The following variables must be set using ?= BEFORE the 'require' line
+of the inherited base machine .conf file.  This is due to them being
+used to control inclusion of tune data.
+
+DEFAULTTUNE - Default Tune for this machine
+
+TUNEFILE[<tune>] - The tune file, based on DEFAULTTUNE, to load
+
+For DEFAULTTUNE, see the Yocto Project documentation.  For
+TUNEFILE[<tune>] see include/soc-tune-include.inc for the defined ones.
+
+
+The following variables should be set using ?= BEFORE the 'require' line
+of the inherited base machine .conf file, if the user may override them.
+If the values are fixed, then it should be set after the requires per
+the next section.
+
+These are common values a user may want to override and will let the user
+easiy make a local change, if allowed by the machine .conf:
+
+UBOOT_MACHINE - The defconfig for u-boot.  (Note, this may be an error TBD).
+
+SOC_VARIANT - See include/soc-*.inc (Note, most machines this is fixed).
+
+
+The following variables must be set AFTER the 'require' line, using '='
+or '+='/'=+' as required.  Using ':append', ':prepend', or ':remove' will
+prevent an inheriting machine from overriding that value.  Similarly
+you should not use :<machine> override values for the same reason.  Note,
+not every machine file will have all of these variables, only the ones
+you need to override should be set.
+
+System wide setting:
+TUNE_FEATURES:tune-<tune> - Specific tune features
+
+external-hdf recipe from meta-xilinx-tools:
+HDF_MACHINE - Used by the  recipe to find the correct XSA
+HDF_EXT - only xsa is supported, legacy variable
+HDF_BASE - protocol if not using the default external-hdf repository
+HDF_PATH - path to the repository or XSA file
+
+device-tree recipe from meta-xilinx-tools:
+YAML_DT_BOARD_FLAGS - flags used for dtgen
+
+u-boot-xlnx recipe from meta-xilinx-core:
+UBOOT_MACHINE - Name of the defconfig to use
+HAS_PLATFORM_INIT - List of defconfig files available for u-boot
+
+...and more...
