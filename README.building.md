@@ -96,5 +96,5 @@ Additional Information
 
 For more complete details on setting up and using Yocto/OE refer to the Yocto
 Project Quick Start guide available at:
-	http://www.yoctoproject.org/docs/current/yocto-project-qs/yocto-project-qs.html
+        https://docs.yoctoproject.org/brief-yoctoprojectqs
 
