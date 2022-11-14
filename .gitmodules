@@ -1,0 +1,4 @@
+[submodule "gen-machine-conf"]
+	path = gen-machine-conf
+	url = https://gitenterprise.xilinx.com/Petalinux/gen-machine-conf.git
+	branch = master
