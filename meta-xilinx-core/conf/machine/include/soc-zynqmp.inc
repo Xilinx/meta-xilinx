@@ -2,12 +2,12 @@ DEFAULTTUNE ?= "cortexa72-cortexa53"
 SOC_FAMILY ?= "zynqmp"
 
 # Available SOC_VARIANT's for zynqmp:
-# "cg" - Zynq UltraScale+  CG Devices
+# "cg" - Zynq UltraScale+  CG Devices (default lowest common denominator)
 # "eg" - Zynq UltraScale+  EG Devices
 # "ev" - Zynq UltraScale+  EV Devices
 # "dr" - Zynq UltraScale+  DR Devices
 
-SOC_VARIANT ?= "eg"
+SOC_VARIANT ?= "cg"
 
 GRAPHICSOVERRIDES = ""
 VCUOVERRIDES = ""

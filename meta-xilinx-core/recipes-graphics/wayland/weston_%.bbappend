@@ -1,6 +1,7 @@
 FILESEXTRAPATHS:prepend:zynqmp := "${THISDIR}/files:"
 
 SRC_URI:append:zynqmp = " file://0001-libweston-Remove-substitute-format-for-ARGB8888.patch"
+SRC_URI:append:mali400 = " file://0002-libmali-does-not-support-gles3.patch"
 
 # Due to the SRC_URI zynqmp specific change, this needs to be SOC_FAMILY_ARCH specific
 SOC_FAMILY_ARCH ??= "${TUNE_PKGARCH}"

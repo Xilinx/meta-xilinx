@@ -1,3 +1,6 @@
+# HDF_MACHINE should be set _AFTER_ this has been loaded
+HDF_MACHINE_PRIOR := "${HDF_MACHINE}"
+INHERIT += "xilinx-vars"
 INHERIT += "xilinx-deprecated"
 
 # Default Xilinx BSP Machine settings

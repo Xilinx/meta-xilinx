@@ -34,6 +34,7 @@ PACKAGECONFIG[alsa] = "--audio-drv-list=alsa,,alsa-lib"
 PACKAGECONFIG[pulsedio] = "--audio-drv-list=pa,,pulseaudio"
 PACKAGECONFIG[selinux] = ""
 PACKAGECONFIG[slirp] = "--enable-slirp=git,--disable-slirp,,"
+PACKAGECONFIG[jack] = ""
 
 DISABLE_STATIC:pn-${PN} = ""
 
