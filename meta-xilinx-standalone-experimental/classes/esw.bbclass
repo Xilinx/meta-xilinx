@@ -45,9 +45,9 @@ def get_xlnx_cmake_machine(fam, d):
 def get_xlnx_cmake_processor(tune, machine, d):
     cmake_processor = tune
     if tune.startswith('microblaze'):
-        if (machine == 'microblaze-pmu'):
+        if (machine == 'ub1_cpu_pmu'):
             cmake_processor = 'pmu_microblaze'
-        elif (machine == 'microblaze-plm'):
+        elif (machine == 'ub1_cpu_pmc'):
             cmake_processor = 'plm_microblaze'
         else:
             cmake_processor = 'microblaze'

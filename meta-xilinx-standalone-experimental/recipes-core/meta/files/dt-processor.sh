@@ -91,7 +91,7 @@ parse_args() {
 detect_machine() {
   if [ -z "${machine}" ]; then
     # Identify the system type first using PSM/PMC/PMU
-    while read -r cpu domain os_hint; do
+    while read -r cpu core domain cpu_name os_hint; do
       case ${cpu} in
         pmu-microblaze)
           machine="zynqmp" ;;
@@ -188,7 +188,7 @@ cortex_a53_baremetal() {
     [ ${a53_fsbl_done} = 1 ] && return
     info "cortex-a53 FSBL baremetal configuration"
   else
-    info "cortex-a53 for baremetal [ $1 ]"
+    info "cortex-a53 baremetal configuration for core $2 [ $1 ]"
   fi
 
   suffix=""; lto="-nolto"
@@ -196,9 +196,9 @@ cortex_a53_baremetal() {
     suffix="-$1"; lto=""
   fi
 
-  dtb_file="cortexa53-${machine}${suffix}-baremetal.dtb"
-  multiconf="${multiconf} cortexa53-${machine}${suffix}-baremetal"
-  conf_file="multiconfig/cortexa53-${machine}${suffix}-baremetal.conf"
+  dtb_file="cortexa53-$2-${machine}${suffix}-baremetal.dtb"
+  multiconf="${multiconf} cortexa53-$2-${machine}${suffix}-baremetal"
+  conf_file="multiconfig/cortexa53-$2-${machine}${suffix}-baremetal.conf"
   libxil="multiconfig/includes/cortexa53-${machine}${suffix}-libxil.conf"
   distro="multiconfig/includes/cortexa53-${machine}${suffix}-distro.conf"
   yocto_distro="xilinx-standalone${lto}"
@@ -224,11 +224,11 @@ cortex_a53_baremetal() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   else
-    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -253,7 +253,7 @@ EOF
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
-ESW_MACHINE = "cortexa53-${machine}"
+ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa53"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
@@ -270,14 +270,14 @@ EOF
 }
 
 cortex_a53_freertos() {
-  info "cortex-a53 for FreeRTOS [ $1 ]"
+  info "cortex-a53 FreeRTOS configuration for core $2 [ $1 ]"
 
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
 
   dtb_file="cortexa53-${machine}${suffix}-freertos.dtb"
-  multiconf="${multiconf} cortexa53-${machine}${suffix}-freertos"
-  conf_file="multiconfig/cortexa53-${machine}${suffix}-freertos.conf"
+  multiconf="${multiconf} cortexa53-$2-${machine}${suffix}-freertos"
+  conf_file="multiconfig/cortexa53-$2-${machine}${suffix}-freertos.conf"
   libxil="multiconfig/includes/cortexa53-${machine}${suffix}-libxil.conf"
   distro="multiconfig/includes/cortexa53-${machine}${suffix}-distro.conf"
 
@@ -297,10 +297,10 @@ cortex_a53_freertos() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" || error "lopper failed"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx $3 "${embeddedsw}" || error "lopper failed"
   else
-    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa53-${machine} "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -311,7 +311,7 @@ cortex_a53_freertos() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
-ESW_MACHINE = "cortexa53-${machine}"
+ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa53"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
@@ -409,14 +409,14 @@ EOF
 }
 
 cortex_a72_baremetal() {
-  info "cortex-a72 for baremetal [ $1 ]"
+  info "cortex-a72 baremetal configuration for core $2 [ $1 ]"
 
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
 
-  dtb_file="cortexa72-${machine}${suffix}-baremetal.dtb"
-  multiconf="${multiconf} cortexa72-${machine}${suffix}-baremetal"
-  conf_file="multiconfig/cortexa72-${machine}${suffix}-baremetal.conf"
+  dtb_file="cortexa72-$2-${machine}${suffix}-baremetal.dtb"
+  multiconf="${multiconf} cortexa72-$2-${machine}${suffix}-baremetal"
+  conf_file="multiconfig/cortexa72-$2-${machine}${suffix}-baremetal.conf"
   libxil="multiconfig/includes/cortexa72-${machine}${suffix}-libxil.conf"
   distro="multiconfig/includes/cortexa72-${machine}${suffix}-distro.conf"
 
@@ -436,10 +436,10 @@ cortex_a72_baremetal() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" || error "lopper failed"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx $3 "${embeddedsw}" || error "lopper failed"
   else
-    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -450,7 +450,7 @@ cortex_a72_baremetal() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
-ESW_MACHINE = "cortexa72-${machine}"
+ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa72"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
@@ -467,14 +467,14 @@ EOF
 }
 
 cortex_a72_freertos() {
-  info "cortex-a72 for FreeRTOS [ $1 ]"
+  info "cortex-a72 FreeRTOS configuration for core $2 [ $1 ]"
 
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
 
-  dtb_file="cortexa72-${machine}${suffix}-freertos.dtb"
-  multiconf="${multiconf} cortexa72-${machine}${suffix}-freertos"
-  conf_file="multiconfig/cortexa72-${machine}${suffix}-freertos.conf"
+  dtb_file="cortexa72-$2-${machine}${suffix}-freertos.dtb"
+  multiconf="${multiconf} cortexa72-$2-${machine}${suffix}-freertos"
+  conf_file="multiconfig/cortexa72-$2-${machine}${suffix}-freertos.conf"
   libxil="multiconfig/includes/cortexa72-${machine}${suffix}-libxil.conf"
   distro="multiconfig/includes/cortexa72-${machine}${suffix}-distro.conf"
 
@@ -494,10 +494,10 @@ cortex_a72_freertos() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" || error "lopper failed"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx $3 "${embeddedsw}" || error "lopper failed"
   else
-    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexa72-${machine} "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -508,7 +508,7 @@ cortex_a72_freertos() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
-ESW_MACHINE = "cortexa72-${machine}"
+ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa72"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
@@ -530,7 +530,7 @@ cortex_r5_baremetal() {
     [ ${r5_fsbl_done} = 1 ] && return
     info "cortex-r5 FSBL baremetal configuration"
   else
-    info "cortex-r5 for baremetal [ $1 ]"
+    info "cortex-r5 baremetal configuration for core $2 [ $1 ]"
   fi
 
   suffix=""; lto="-nolto"
@@ -538,9 +538,9 @@ cortex_r5_baremetal() {
     suffix="-$1"; lto=""
   fi
 
-  dtb_file="cortexr5-${machine}${suffix}-baremetal.dtb"
-  multiconf="${multiconf} cortexr5-${machine}${suffix}-baremetal"
-  conf_file="multiconfig/cortexr5-${machine}${suffix}-baremetal.conf"
+  dtb_file="cortexr5-$2-${machine}${suffix}-baremetal.dtb"
+  multiconf="${multiconf} cortexr5-$2-${machine}${suffix}-baremetal"
+  conf_file="multiconfig/cortexr5-$2-${machine}${suffix}-baremetal.conf"
   libxil="multiconfig/includes/cortexr5-${machine}${suffix}-libxil.conf"
   distro="multiconfig/includes/cortexr5-${machine}${suffix}-distro.conf"
   yocto_distro="xilinx-standalone${lto}"
@@ -567,10 +567,10 @@ cortex_r5_baremetal() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" || error "lopper failed"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx $3 "${embeddedsw}" || error "lopper failed"
   else
-    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -595,7 +595,7 @@ EOF
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
-ESW_MACHINE = "cortexr5-${machine}"
+ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexr5"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
@@ -612,14 +612,14 @@ EOF
 }
 
 cortex_r5_freertos() {
-  info "cortex-r5 for FreeRTOS [ $1 ]"
+  info "cortex-r5 FreeRTOS configuration for core $2 [ $1 ]"
 
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
 
-  dtb_file="cortexr5-${machine}${suffix}-freertos.dtb"
-  multiconf="${multiconf} cortexr5-${machine}${suffix}-freertos"
-  conf_file="multiconfig/cortexr5-${machine}${suffix}-freertos.conf"
+  dtb_file="cortexr5-$2-${machine}${suffix}-freertos.dtb"
+  multiconf="${multiconf} cortexr5-$2-${machine}${suffix}-freertos"
+  conf_file="multiconfig/cortexr5-$2-${machine}${suffix}-freertos.conf"
   libxil="multiconfig/includes/cortexr5-${machine}${suffix}-libxil.conf"
   distro="multiconfig/includes/cortexr5-${machine}${suffix}-distro.conf"
 
@@ -639,10 +639,10 @@ cortex_r5_freertos() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" || error "lopper failed"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx $3 "${embeddedsw}" || error "lopper failed"
   else
-    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx cortexr5-${machine} "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -653,7 +653,7 @@ cortex_r5_freertos() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
-ESW_MACHINE = "cortexr5-${machine}"
+ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexr5"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
@@ -678,7 +678,7 @@ process_microblaze() {
 
   (
     cd dtb || error "Unable to cd to dtb dir"
-    ${lopper} -f --enhanced -i "${lops_dir}/lop-microblaze-yocto.dts" "${system_dtb}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-microblaze-yocto.dts" "${system_dtb}" \
       || error "lopper failed"
     rm -f lop-microblaze-yocto.dts.dtb
   ) >microblaze.conf
@@ -709,10 +709,10 @@ pmu-microblaze() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx microblaze-pmu "${embeddedsw}" || error "lopper failed"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx $1 "${embeddedsw}" || error "lopper failed"
   else
-    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx microblaze-pmu "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $1 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -723,7 +723,7 @@ pmu-microblaze() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
-ESW_MACHINE = "microblaze-pmu"
+ESW_MACHINE = "$1"
 
 require conf/microblaze.conf
 DEFAULTTUNE = "microblaze"
@@ -767,10 +767,10 @@ pmc-microblaze() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx microblaze-plm "${embeddedsw}" || error "lopper failed"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx $1 "${embeddedsw}" || error "lopper failed"
   else
-    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx microblaze-plm "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $1 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -781,7 +781,7 @@ pmc-microblaze() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
-ESW_MACHINE = "microblaze-plm"
+ESW_MACHINE = "$1"
 
 require conf/microblaze.conf
 DEFAULTTUNE = "microblaze"
@@ -825,10 +825,10 @@ psm-microblaze() {
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
-      -- baremetaldrvlist_xlnx microblaze-psm "${embeddedsw}" || error "lopper failed"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+      -- baremetaldrvlist_xlnx $1 "${embeddedsw}" || error "lopper failed"
   else
-    ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx microblaze-psm "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $1 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -839,7 +839,7 @@ psm-microblaze() {
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
-ESW_MACHINE = "microblaze-psm"
+ESW_MACHINE = "$1"
 
 require conf/microblaze.conf
 DEFAULTTUNE = "microblaze"
@@ -863,8 +863,8 @@ EOF
 parse_cpus() {
   info "Generating configuration..."
 
-  while read -r cpu domain os_hint; do
-
+  gen_linux_dtb="None"
+  while read -r cpu core domain cpu_name os_hint; do
     # Skip commented lines and WARNINGs
     case ${cpu} in
       \#* | \[WARNING\]:) continue ;;
@@ -874,19 +874,28 @@ parse_cpus() {
 
       arm,cortex-a53)
         # We need a base cortex_a53_baremetal for the FSBL
-        cortex_a53_baremetal fsbl
+        if [ "${core}" == 0 ]; then
+          cortex_a53_baremetal fsbl ${core} ${cpu_name}
+	fi
         if [ "${os_hint}" == "None" ]; then
-          cortex_a53_linux "${domain}"
-          cortex_a53_baremetal "${domain}"
-          cortex_a53_freertos "${domain}"
+          if [ "${gen_linux_dtb}" == "None" ]; then
+            cortex_a53_linux "${domain}"
+	    gen_linux_dtb="True"
+	  fi
+          cortex_a53_baremetal "${domain}" ${core} ${cpu_name}
+          cortex_a53_freertos "${domain}" ${core} ${cpu_name}
         else
           case "${os_hint}" in
             linux*)
-              cortex_a53_linux "${domain}" ;;
+              if [ "${gen_linux_dtb}" == "None" ]; then
+                cortex_a53_linux "${domain}"
+		gen_linux_dtb="True"
+	      fi
+	      ;;
             baremetal*)
-              cortex_a53_baremetal "${domain}" ;;
+              cortex_a53_baremetal "${domain}" ${core} ${cpu_name};;
             freertos*)
-              cortex_a53_freertos "${domain}" ;;
+              cortex_a53_freertos "${domain}" ${core} ${cpu_name};;
             *)
               warn "cortex-a53 for unknown OS (${os_hint}), parsing baremetal. ${domain}"
               cortex_a53_baremetal "${domain}"
@@ -896,36 +905,42 @@ parse_cpus() {
 
       arm,cortex-a72)
         if [ "${os_hint}" == "None" ]; then
-          cortex_a72_linux "${domain}"
-          cortex_a72_baremetal "${domain}"
-          cortex_a72_freertos "${domain}"
+          if [ "${gen_linux_dtb}" == "None" ]; then
+            cortex_a72_linux "${domain}"
+	    gen_linux_dtb="True"
+	  fi
+          cortex_a72_baremetal "${domain}" ${core} ${cpu_name}
+          cortex_a72_freertos "${domain}" ${core} ${cpu_name}
         else
           case "${os_hint}" in
             linux*)
-              cortex_a72_linux "${domain}" ;;
+              if [ "${gen_linux_dtb}" == "None" ]; then
+                cortex_a72_linux "${domain}"
+	        gen_linux_dtb="True"
+	      fi
+	      ;;
             baremetal*)
-              cortex_a72_baremetal "${domain}" ;;
+              cortex_a72_baremetal "${domain}" ${core} ${cpu_name};;
             freertos*)
-              cortex_a72_freertos "${domain}" ;;
+              cortex_a72_freertos "${domain}" ${core} ${cpu_name};;
             *)
               warn "cortex-a72 for unknown OS (${os_hint}), parsing baremetal. ${domain}"
               cortex_a72_baremetal "${domain}"
           esac
         fi
         ;;
-
       arm,cortex-r5)
         if [ "${os_hint}" == "None" ]; then
           # We need a base cortex_r5_baremetal for the FSBL for ZynqMP platform
-          [ "${machine}" = "zynqmp" ] && cortex_r5_baremetal fsbl
-          cortex_r5_baremetal "${domain}"
-          cortex_r5_freertos "${domain}"
+          [ "${machine}" = "zynqmp" ] && cortex_r5_baremetal fsbl ${core} ${cpu_name}
+          cortex_r5_baremetal "${domain}" ${core} ${cpu_name}
+          cortex_r5_freertos "${domain}" ${core} ${cpu_name}
         else
           case "${os_hint}" in
             baremetal*)
-              cortex_r5_baremetal "${domain}" ;;
+              cortex_r5_baremetal "${domain}" ${core} ${cpu_name};;
             freertos*)
-              cortex_r5_freertos "${domain}" ;;
+              cortex_r5_freertos "${domain}" ${core} ${cpu_name};;
             *)
               warn "cortex-r5 for unknown OS (${os_hint}), parsing baremetal. ${domain}"
               cortex_r5_baremetal "${domain}"
@@ -946,14 +961,13 @@ parse_cpus() {
         ;;
 
       pmu-microblaze)
-        pmu-microblaze ;;
+        pmu-microblaze ${cpu_name};;
 
       pmc-microblaze)
-        pmc-microblaze ;;
+        pmc-microblaze ${cpu_name};;
 
       psm-microblaze)
-        psm-microblaze ;;
-
+        psm-microblaze ${cpu_name};;
       *)
         warn "Unknown CPU ${cpu}"
 
@@ -1022,7 +1036,7 @@ cd "${config_dir}" || exit
 mkdir -p dtb multiconfig/includes
 (
   cd dtb || error "Unable to cd to dtb dir"
-  ${lopper} -f --enhanced -i "${lops_dir}/lop-xilinx-id-cpus.dts" "${system_dtb}" \
+  LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-xilinx-id-cpus.dts" "${system_dtb}" \
     /dev/null > ${cpulist} || error "lopper failed"
   rm -f "lop-xilinx-id-cpus.dts.dtb"
 )
@@ -1055,4 +1069,4 @@ if [ -n "${petalinux_schema}" ]; then
 fi
 
 # Cleanup our temp file
-rm ${cpulist}
+rm -rf ${cpulist} ${config_dir}/CMakeLists.txt ${config_dir}/DRVLISTConfig.cmake
