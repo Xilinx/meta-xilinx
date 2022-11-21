@@ -1,3 +1,4 @@
+require qemu-system-native-alt.inc
 require qemu-xilinx-2023.1.inc
 require qemu-xilinx-native.inc
 
@@ -17,5 +18,9 @@ do_install:append() {
     rm -rf ${D}${datadir}/qemu/keymaps
     rm -rf ${D}${datadir}/icons
     rm -rf ${D}${includedir}/qemu-plugin.h
+
+    # Install qmp.py to be used with testimage
+    install -d ${D}${libdir}/qemu-python/qmp/
+    install -D ${S}/python/qemu/qmp/* ${D}${libdir}/qemu-python/qmp/
 }
 
