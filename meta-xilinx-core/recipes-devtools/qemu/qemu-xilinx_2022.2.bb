@@ -1,6 +1,7 @@
 require qemu-xilinx-2022.2.inc
 require recipes-devtools/qemu/qemu.inc
 require qemu-xilinx.inc
+require qemu-alt.inc
 
 BBCLASSEXTEND = "nativesdk"
 
