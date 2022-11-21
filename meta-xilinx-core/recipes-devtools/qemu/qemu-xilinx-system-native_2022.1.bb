@@ -1,3 +1,4 @@
+require qemu-system-native-alt.inc
 require qemu-xilinx-2022.1.inc
 require qemu-xilinx-native.inc
 
