@@ -136,13 +136,3 @@ def qemu_zynqmp_unhalt(data, multiarch):
     if multiarch:
         return "-global xlnx,zynqmp-boot.cpu-num=0 -global xlnx,zynqmp-boot.use-pmufw=true"
     return "-device loader,addr=0xfd1a0104,data=0x8000000e,data-len=4 -device loader,addr=0xfd1a0104,data=0x8000000e,data-len=4"
-
-# rewrite the qemuboot with the custom sysroot bindir
-python do_write_qemuboot_conf:append() {
-    val = os.path.join(d.getVar('BASE_WORKDIR'), d.getVar('BUILD_SYS'), 'qemu-xilinx-helper-native/1.0-r1/recipe-sysroot-native/usr/bin/')
-    cf.set('config_bsp', 'STAGING_BINDIR_NATIVE', '%s' % val)
-
-    # write out the updated version from this append
-    with open(qemuboot, 'w') as f:
-        cf.write(f)
-}

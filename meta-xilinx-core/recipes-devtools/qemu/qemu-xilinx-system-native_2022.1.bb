@@ -10,6 +10,7 @@ PACKAGECONFIG ??= "fdt alsa kvm pie slirp"
 PACKAGECONFIG:remove = "${@'kvm' if not os.path.exists('/usr/include/linux/kvm.h') else ''}"
 
 DEPENDS += "pixman-native qemu-xilinx-native bison-native ninja-native meson-native"
+DEPENDS += "qemu-xilinx-multiarch-helper-native"
 
 do_install:append() {
     # The following is also installed by qemu-native
