@@ -38,8 +38,6 @@ PACKAGECONFIG[jack] = ""
 
 DISABLE_STATIC:pn-${PN} = ""
 
-PTEST_ENABLED = ""
-
 do_install:append() {
 	# Prevent QA warnings about installed ${localstatedir}/run
 	if [ -d ${D}${localstatedir}/run ]; then rmdir ${D}${localstatedir}/run; fi
