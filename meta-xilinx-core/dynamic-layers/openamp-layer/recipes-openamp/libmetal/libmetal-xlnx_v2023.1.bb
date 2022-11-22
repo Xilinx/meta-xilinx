@@ -6,4 +6,4 @@ PV = "${SRCBRANCH}+git${SRCPV}"
 
 REPO = "git://github.com/Xilinx/libmetal.git;protocol=https"
 
-require ${LAYER_PATH_openamp-layer}/recipes-openamp/libmetal/libmetal.inc
+include ${LAYER_PATH_openamp-layer}/recipes-openamp/libmetal/libmetal.inc
