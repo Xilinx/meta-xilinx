@@ -21,7 +21,10 @@ def boot_files_split_expand(d):
         # for all sources, yield an entry
         for s in sources:
             if len(parts) == 2:
-                yield s, parts[1].strip()
+                if parts[1].endswith('/'):
+                    yield s, '%s%s' % (parts[1].strip(), s)
+                else:
+                    yield s, parts[1].strip()
             yield s, s
 
 def boot_files_bitstream(d):
