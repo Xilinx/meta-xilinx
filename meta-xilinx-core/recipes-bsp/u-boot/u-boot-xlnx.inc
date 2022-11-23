@@ -17,6 +17,10 @@ B = "${WORKDIR}/build"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/u-boot:"
 
+UBOOT_MB_INC = ""
+UBOOT_MB_INC:microblaze = "u-boot-xlnx-microblaze.inc"
+require ${UBOOT_MB_INC}
+
 SYSROOT_DIRS += "/boot"
 
 BASE_DTS ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE') or '').rstrip('.dtb') or 'system-top'}"
