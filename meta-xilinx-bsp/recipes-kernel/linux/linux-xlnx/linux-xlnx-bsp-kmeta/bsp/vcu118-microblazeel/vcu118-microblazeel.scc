@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: MIT
+
+define KFEATURE_DESCRIPTION "Kernel Config for VCU118 machine BSP"
+define KFEATURE_COMPATIBILITY VCU118 board
+
+kconf hardware vcu118-microblazeel.cfg
