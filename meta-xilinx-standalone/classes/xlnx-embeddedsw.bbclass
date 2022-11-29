@@ -10,7 +10,7 @@ BRANCH ??= "${@d.getVarFlag('ESW_BRANCH', d.getVar('ESW_VER')) or '${ESW_VER}'}"
 
 ESW_REV[2022.1] = "56d94a506fd9f80949f4cff08e13015928603f01"
 ESW_REV[2022.2] = "5330a64c8efd14f0eef09befdbb8d3d738c33ec2"
-ESW_REV[2023.1] = "b009e682a718157db486e6fa20e64a0650822cf0"
+ESW_REV[2023.1] = "2a6b4ca15dda2e35ae43b7ff0a2985d8798f2471"
 SRCREV ??= "${@d.getVarFlag('ESW_REV', d.getVar('ESW_VER')) or '${AUTOREV}'}"
 
 EMBEDDEDSW_BRANCHARG ?= "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
