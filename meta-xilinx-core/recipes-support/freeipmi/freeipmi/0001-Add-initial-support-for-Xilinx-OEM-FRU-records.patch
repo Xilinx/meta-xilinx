@@ -1,0 +1,370 @@
+From 1128691f6e2709b44eccafb0b303b07da55a814e Mon Sep 17 00:00:00 2001
+From: Christian Kohn <chris.kohn@amd.com>
+Date: Mon, 17 Oct 2022 19:28:22 -0700
+Subject: [PATCH] Add initial support for Xilinx OEM FRU records
+
+The supported Xilinx OEM FRU records are MAC_ID and FREE_FORM. This FRU OEM
+extension parses these records and prints them with proper formatting.
+
+To use this feature, run the ipmi-fru command as follows:
+$ sudo ./ipmi-fru --fru-file=/sys/devices/platform/axi/ff030000.i2c/i2c-1/1-0051/eeprom \
+  --interpret-oem-data
+
+Note: The EEPROM address can vary between different platforms. This is just an
+      example.
+
+This feature has been tested with the Xilinx Kria KV260 and KR260 Starter Kits.
+
+Signed-off-by: Christian Kohn <chris.kohn@amd.com>
+---
+ ipmi-fru/Makefile.am                          |   2 +
+ ipmi-fru/ipmi-fru-oem-xilinx.c                | 171 ++++++++++++++++++
+ ipmi-fru/ipmi-fru-oem-xilinx.h                |  33 ++++
+ ipmi-fru/ipmi-fru-output.c                    |  14 ++
+ libfreeipmi/include/freeipmi/freeipmi.h.in    |   1 +
+ .../oem/ipmi-fru-xilinx-oem-record-format.h   |  45 +++++
+ .../spec/ipmi-iana-enterprise-numbers-spec.h  |   1 +
+ 7 files changed, 267 insertions(+)
+ create mode 100644 ipmi-fru/ipmi-fru-oem-xilinx.c
+ create mode 100644 ipmi-fru/ipmi-fru-oem-xilinx.h
+ create mode 100644 libfreeipmi/include/freeipmi/record-format/oem/ipmi-fru-xilinx-oem-record-format.h
+
+diff --git a/ipmi-fru/Makefile.am b/ipmi-fru/Makefile.am
+index c92ba0e8c..c8545eede 100644
+--- a/ipmi-fru/Makefile.am
++++ b/ipmi-fru/Makefile.am
+@@ -25,6 +25,8 @@ ipmi_fru_SOURCES = \
+ 	ipmi-fru-argp.h \
+ 	ipmi-fru-oem-wistron.c \
+ 	ipmi-fru-oem-wistron.h \
++	ipmi-fru-oem-xilinx.c \
++	ipmi-fru-oem-xilinx.h \
+ 	ipmi-fru-output.c \
+ 	ipmi-fru-output.h
+ 
+diff --git a/ipmi-fru/ipmi-fru-oem-xilinx.c b/ipmi-fru/ipmi-fru-oem-xilinx.c
+new file mode 100644
+index 000000000..87bb18f00
+--- /dev/null
++++ b/ipmi-fru/ipmi-fru-oem-xilinx.c
+@@ -0,0 +1,171 @@
++/*
++ * Copyright (C) 2022, Advanced Micro Devices, Inc.
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#if HAVE_CONFIG_H
++#include "config.h"
++#endif /* HAVE_CONFIG_H */
++
++#include <stdio.h>
++#include <stdlib.h>
++#if STDC_HEADERS
++#include <string.h>
++#endif /* STDC_HEADERS */
++#include <assert.h>
++
++#include <freeipmi/freeipmi.h>
++
++#include "ipmi-fru_.h"
++#include "ipmi-fru-oem-xilinx.h"
++
++#include "freeipmi-portability.h"
++
++static char *
++_version_str (uint8_t version)
++{
++  switch (version)
++    {
++    case IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_BOARD:
++      return "Board";
++    case IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_SYSCTL:
++      return "System Controller";
++    case IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_MODULE:
++      return "Module";
++    case IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_DUT_MAC:
++      return "DUT - MAC";
++    case IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_DUT_ETHERCAT:
++      return "DUT - EtherCAT";
++    default:
++      return "";
++    }
++
++  return (NULL);                /* NOT REACHED */
++}
++
++int
++ipmi_fru_oem_xilinx_oem_record (ipmi_fru_state_data_t *state_data,
++                                uint8_t record_type_id,
++                                uint32_t manufacturer_id,
++                                uint8_t *oem_data,
++                                unsigned int oem_data_len)
++{
++  assert (state_data);
++  assert (manufacturer_id == IPMI_IANA_ENTERPRISE_ID_XILINX);
++  assert (oem_data);
++
++  /* The MAC_ID record type ID is 0xD2. The MAC ID record consists of a 1 byte
++   * version ID followed by one or more 6-byte MAC addresses. If the MAC ID
++   * version is set to "DUT - EtherCAT", a 4-byte EtherCAT ID is used instead of
++   * a 6-byte MAC address.
++   */
++  if (record_type_id == IPMI_FRU_OEM_XILINX_MAC_ID && oem_data_len)
++    {
++      uint8_t version = oem_data[0];
++      unsigned int len = oem_data_len - 1;
++
++      pstdout_printf (state_data->pstate,
++                      "  FRU OEM MAC Version: %s (%xh)\n",
++                      _version_str(version),
++                      version);
++
++      /* The MAC_ID record can hold multiple MAC addresses that are 6 bytes long
++       * each if version is set to 0x31.
++       */
++      if ((version == IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_BOARD ||
++           version == IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_SYSCTL ||
++           version == IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_MODULE ||
++           version == IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_DUT_MAC ) &&
++          (len % 6) == 0)
++        {
++          unsigned int i, j, start, stop;
++          unsigned int mac_cnt = len / 6;
++
++          for (j = 0; j < mac_cnt; j++)
++            {
++              pstdout_printf (state_data->pstate, "  FRU OEM MAC ID %d: ", j);
++
++              start = j*6 + 1;
++              stop = start + 5;
++
++              for (i = start; i < stop; i++)
++                {
++                  pstdout_printf (state_data->pstate, "%02x:", oem_data[i]);
++                }
++
++              pstdout_printf (state_data->pstate, "%02x\n", oem_data[i]);
++            }
++
++          return (1);
++        }
++
++      /* The MAC_ID record holds one EtherCAT ID that is 4 bytes long if version
++       * is set to 0x32. The assigned EtherCAT ID for Xilinx is 0x0000056F.
++       */
++      if (version == IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_DUT_ETHERCAT &&
++          len == 4)
++        {
++          pstdout_printf (state_data->pstate, "  FRU OEM EtherCAT ID: 0x");
++
++          for (unsigned int i = 1; i < len+1; i++)
++            {
++              pstdout_printf (state_data->pstate, "%02X", oem_data[i]);
++            }
++
++          pstdout_printf (state_data->pstate, "\n");
++
++          return (1);
++        }
++    }
++
++  /* The free form data record type ID is 0xD3. It consists of one or more
++   * fields where each field is split into N byte identifier and M byte data
++   * followed by a 0x00 end of field delimiter. The below code parses the free
++   * form record and prints each field on a new line prefixed with 'FRU OEM '.
++   */
++  if (record_type_id == IPMI_FRU_OEM_XILINX_FREE_FORM && oem_data_len)
++    {
++      unsigned int i;
++      unsigned int new_field = 1;
++
++      for (i = 0; i < oem_data_len; i++)
++        {
++          /* 0x00 marks the end of the field */
++          if (oem_data[i] == 0)
++            {
++              if (new_field == 0)
++                {
++                  pstdout_printf (state_data->pstate, "\n");
++                }
++              new_field = 1;
++              continue;
++            }
++
++          /* Start of a new field */
++          if (new_field == 1)
++            {
++              new_field = 0;
++              pstdout_printf (state_data->pstate, "  FRU OEM ");
++            }
++
++          pstdout_printf (state_data->pstate, "%c", oem_data[i]);
++        }
++
++      return (1);
++    }
++
++  return (0);
++}
+diff --git a/ipmi-fru/ipmi-fru-oem-xilinx.h b/ipmi-fru/ipmi-fru-oem-xilinx.h
+new file mode 100644
+index 000000000..2484cd515
+--- /dev/null
++++ b/ipmi-fru/ipmi-fru-oem-xilinx.h
+@@ -0,0 +1,33 @@
++/*
++ * Copyright (C) 2022, Advanced Micro Devices, Inc.
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#ifndef IPMI_FRU_OEM_XILINX_H
++#define IPMI_FRU_OEM_XILINX_H
++
++#include <freeipmi/freeipmi.h>
++
++#include "ipmi-fru_.h"
++
++/* Returns 1 on interpretation, 0 if not, -1 on error */
++int ipmi_fru_oem_xilinx_oem_record (ipmi_fru_state_data_t *state_data,
++                                    uint8_t record_type_id,
++                                    uint32_t manufacturer_id,
++                                    uint8_t *oem_data,
++                                    unsigned int oem_data_len);
++
++#endif /* IPMI_FRU_OEM_XILINX_H */
+diff --git a/ipmi-fru/ipmi-fru-output.c b/ipmi-fru/ipmi-fru-output.c
+index 845971018..d29c4470e 100644
+--- a/ipmi-fru/ipmi-fru-output.c
++++ b/ipmi-fru/ipmi-fru-output.c
+@@ -51,6 +51,7 @@
+ #include "ipmi-fru_.h"
+ #include "ipmi-fru-output.h"
+ #include "ipmi-fru-oem-wistron.h"
++#include "ipmi-fru-oem-xilinx.h"
+ #include "tool-util-common.h"
+ 
+ #include "freeipmi-portability.h"
+@@ -1201,6 +1202,19 @@ ipmi_fru_output_oem_record (ipmi_fru_state_data_t *state_data,
+           if (ret)
+             return (0);
+         }
++
++      if (manufacturer_id == IPMI_IANA_ENTERPRISE_ID_XILINX)
++        {
++          if ((ret = ipmi_fru_oem_xilinx_oem_record (state_data,
++                                                     record_type_id,
++                                                     manufacturer_id,
++                                                     oem_data,
++                                                     oem_data_len)) < 0)
++            return (-1);
++
++          if (ret)
++            return (0);
++        }
+     }
+ 
+   if (oem_data_len)
+diff --git a/libfreeipmi/include/freeipmi/freeipmi.h.in b/libfreeipmi/include/freeipmi/freeipmi.h.in
+index a03178e97..fbd6749e9 100644
+--- a/libfreeipmi/include/freeipmi/freeipmi.h.in
++++ b/libfreeipmi/include/freeipmi/freeipmi.h.in
+@@ -82,6 +82,7 @@ extern "C" {
+ #include <freeipmi/record-format/ipmi-sdr-record-format.h>
+ #include <freeipmi/record-format/ipmi-sel-record-format.h>
+ #include <freeipmi/record-format/oem/ipmi-fru-wistron-oem-record-format.h>
++#include <freeipmi/record-format/oem/ipmi-fru-xilinx-oem-record-format.h>
+ #include <freeipmi/record-format/oem/ipmi-sdr-oem-intel-node-manager-record-format.h>
+ #include <freeipmi/record-format/oem/ipmi-sdr-oem-intel-record-format.h>
+ #include <freeipmi/record-format/oem/ipmi-sel-oem-intel-record-format.h>
+diff --git a/libfreeipmi/include/freeipmi/record-format/oem/ipmi-fru-xilinx-oem-record-format.h b/libfreeipmi/include/freeipmi/record-format/oem/ipmi-fru-xilinx-oem-record-format.h
+new file mode 100644
+index 000000000..434e2031a
+--- /dev/null
++++ b/libfreeipmi/include/freeipmi/record-format/oem/ipmi-fru-xilinx-oem-record-format.h
+@@ -0,0 +1,45 @@
++/*
++ * Copyright (C) 2022, Advanced Micro Devices, Inc.
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 3 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#ifndef IPMI_FRU_OEM_XILINX_RECORD_FORMAT_H
++#define IPMI_FRU_OEM_XILINX_RECORD_FORMAT_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#include <freeipmi/fiid/fiid.h>
++
++/* OEM multi-record IDs used by Xilinx */
++#define IPMI_FRU_OEM_XILINX_THERMAL   0xD0
++#define IPMI_FRU_OEM_XILINX_POWER     0xD1
++#define IPMI_FRU_OEM_XILINX_MAC_ID    0xD2
++#define IPMI_FRU_OEM_XILINX_FREE_FORM 0xD3
++
++/* OEM MAC ID versions used by Xilinx */
++#define IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_BOARD        0x01
++#define IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_SYSCTL       0x11
++#define IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_MODULE       0x21
++#define IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_DUT_MAC      0x31
++#define IPMI_FRU_OEM_XILINX_MAC_ID_VERSION_DUT_ETHERCAT 0x32
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* IPMI_FRU_OEM_XILINX_RECORD_FORMAT_H */
+diff --git a/libfreeipmi/include/freeipmi/spec/ipmi-iana-enterprise-numbers-spec.h b/libfreeipmi/include/freeipmi/spec/ipmi-iana-enterprise-numbers-spec.h
+index d286f33a4..4c24b5259 100644
+--- a/libfreeipmi/include/freeipmi/spec/ipmi-iana-enterprise-numbers-spec.h
++++ b/libfreeipmi/include/freeipmi/spec/ipmi-iana-enterprise-numbers-spec.h
+@@ -29,6 +29,7 @@ extern "C" {
+ #define IPMI_IANA_ENTERPRISE_ID_SUN_MICROSYSTEMS         42
+ #define IPMI_IANA_ENTERPRISE_ID_INTEL                   343
+ #define IPMI_IANA_ENTERPRISE_ID_DELL                    674
++#define IPMI_IANA_ENTERPRISE_ID_XILINX                 4314
+ #define IPMI_IANA_ENTERPRISE_ID_MAGNUM_TECHNOLOGIES    5593
+ #define IPMI_IANA_ENTERPRISE_ID_QUANTA                 7244
+ #define IPMI_IANA_ENTERPRISE_ID_FUJITSU               10368
+-- 
+2.17.1
+
