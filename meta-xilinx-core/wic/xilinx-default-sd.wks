@@ -1,0 +1,9 @@
+# Description: Creates a partitioned SD card image. Boot files
+# are located in the first vfat partition. Rootfs will be in second ext4 partition.
+
+# This wks uses a fixed-size /boot parition.  512MiB was selected as it should be large enough
+# for most reference systems and their included bitstreams, while allowing additional space
+# for user data or on-target upgrades.  To adjust the size of the /boot parition change the
+# value of --fixed-size below.  See the Yocto Project WIC documentation for more information.
+part  /boot  --source rootfs --change-directory=boot  --fixed-size=512M  --fstype=vfat  --use-label  --label boot  --active  --align 4
+part  /      --source rootfs --exclude-path=boot/                        --fstype=ext4  --use-label  --label root            --align 4
