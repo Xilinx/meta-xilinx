@@ -174,7 +174,7 @@ MACHINE = "${machine}-generic"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE:${machine}-generic = ""
 # We need u-boot to use the one we passed in
-DEVICE_TREE_NAME:pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+DEVICE_TREE_NAME:pn-u-boot-xlnx-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Remap boot files to ensure the right device tree is listed first
@@ -400,7 +400,7 @@ MACHINE = "${machine}-generic"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE:${machine}-generic = ""
 # We need u-boot to use the one we passed in
-DEVICE_TREE_NAME:pn-u-boot-zynq-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+DEVICE_TREE_NAME:pn-u-boot-xlnx-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 # Remap boot files to ensure the right device tree is listed first
