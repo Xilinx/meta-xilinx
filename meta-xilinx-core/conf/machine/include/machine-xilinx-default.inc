@@ -65,7 +65,7 @@ def get_default_image_boot_files(d):
 
     # device trees (device-tree only), these are first as they are likely desired over the kernel ones
     if "device-tree" in (d.getVar("MACHINE_ESSENTIAL_EXTRA_RDEPENDS") or ""):
-        files.append("devicetree/*.dtb")
+        files.append("devicetree/*.dtb;devicetree/")
 
 
     # device trees (kernel only)
