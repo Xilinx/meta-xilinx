@@ -53,6 +53,18 @@ For more details refer https://u-boot.readthedocs.io/en/latest/develop/devicetre
     fi
 }
 
+# Split u-boot into .bin and .elf packages
+# If the user just installs u-boot they get both
+PACKAGES =+ "${PN}-bin ${PN}-elf"
+RDEPENDS:${PN} = "${PN}-bin ${PN}-elf"
+ALLOW_EMPTY:${PN} = "1"
+
+SUMMARY:${PN}-bin = "${SUMMARY} - files in .bin format"
+FILES:${PN}-bin = "/boot/u-boot*.bin"
+
+SUMMARY:${PN}-elf = "${SUMMARY} - files in .elf format"
+FILES:${PN}-elf = "/boot/u-boot*.elf"
+
 require u-boot-xlnx-blob.inc
 
 UBOOTELF_NODTB_IMAGE ?= "u-boot-nodtb.elf"
