@@ -71,6 +71,9 @@ MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'u
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'zImage',       ' kernel-image-zimage', '', d)}"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', '${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot', ' initramdisk-${INITRAMFS_IMAGE}', '', d)}"
 
+# Default SD card wks file, split /boot and /
+WKS_FILES ?= "xilinx-default-sd.wks"
+
 IMAGE_BOOT_FILES ?= "${@get_default_image_boot_files(d)}"
 
 def get_default_image_boot_files(d):
@@ -90,7 +93,6 @@ def get_default_image_boot_files(d):
     # device trees (device-tree only), these are first as they are likely desired over the kernel ones
     if "device-tree" in (d.getVar("PREFERRED_PROVIDER_virtual/dtb") or ""):
         files.append("devicetree/*.dtb;devicetree/")
-
 
     # device trees (kernel only)
     if d.getVar("KERNEL_DEVICETREE"):
