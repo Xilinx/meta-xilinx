@@ -34,11 +34,18 @@ DTB_FILE_NAME = "${@os.path.basename(d.getVar('CONFIG_DTFILE')).replace('.dts', 
 
 DTB_BASE_NAME ?= "${MACHINE}-system${IMAGE_VERSION_SUFFIX}"
 
-do_install:prepend() {
+FILES:${PN} += "/boot/system.dtb"
+devicetree_do_install:append() {
     if [ -n "${DTB_FILE_NAME}" ]; then
         # If it's already a dtb, we have to copy from the original location
         if [ -e "${DT_FILES_PATH}/${DTB_FILE_NAME}" ]; then
             install -Dm 0644 ${DT_FILES_PATH}/${DTB_FILE_NAME} ${D}/boot/devicetree/${DTB_FILE_NAME}
+        fi
+        if [ -e "${D}/boot/devicetree/${DTB_FILE_NAME}" ]; then
+            # We need the output to be system.dtb for WIC setup to match XSCT flow
+            ln -sf devicetree/${DTB_FILE_NAME} ${D}/boot/system.dtb
+        else
+            bberror "Expected filename ${DTB_FILE_NAME} doesn't exist in ${DEPLOYDIR}/devicetree"
         fi
     fi
 }
