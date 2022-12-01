@@ -11,7 +11,7 @@ EXTRA_OECMAKE += "-Dlwip_dhcp_does_arp_check=ON"
 EXTRA_OECMAKE += "-Dlwip_dhcp=ON"
 EXTRA_OECMAKE += "-Dlwip_pbuf_pool_size=2048"
 EXTRA_OECMAKE += "-Dlwip_ipv6_enable=OFF"
-EXTRA_OECMAKE:append:xilinx-freertos += "-Dlwip_api_mode=SOCKET_API"
+EXTRA_OECMAKE:append:xilinx-freertos = " -Dlwip_api_mode=SOCKET_API"
 
 do_configure:prepend() {
     # This script should also not rely on relative paths and such
