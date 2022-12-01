@@ -1,3 +1,5 @@
+PV = "${ESW_VER}"
+
 inherit python3native xlnx-embeddedsw pkgconfig cmake
 
 # Override xlnx-embeddedsw with out version
