@@ -88,7 +88,18 @@ do_compile() {
 
 do_install() {
 	install -d ${D}/boot
-	install -Dm 0644 ${OUTPUT_DIR}/bl31/bl31.elf ${D}/boot/${PN}.elf
+	install -Dm 0644 ${OUTPUT_DIR}/bl31/bl31.elf ${D}/boot/${ATF_BASE_NAME}.elf
+	ln -sf ${ATF_BASE_NAME}.elf ${D}/boot/${PN}.elf
+	install -m 0644 ${OUTPUT_DIR}/bl31.bin ${D}/boot/${ATF_BASE_NAME}.bin
+	ln -sf ${ATF_BASE_NAME}.bin ${D}/boot/${PN}.bin
+
+	# Get the entry point address from the elf.
+	BL31_BASE_ADDR=$(${READELF} -h ${OUTPUT_DIR}/bl31/bl31.elf | egrep -m 1 -i "entry point.*?0x" | sed -r 's/.*?(0x.*?)/\1/g')
+	mkimage -A arm64 -O arm-trusted-firmware -T kernel -C none \
+		-a $BL31_BASE_ADDR -e $BL31_BASE_ADDR \
+		-d ${OUTPUT_DIR}/bl31.bin ${D}/boot/${ATF_BASE_NAME}.ub
+	ln -sf ${ATF_BASE_NAME}.ub ${D}/boot/${PN}.ub
+	ln -sf ${ATF_BASE_NAME}.ub ${D}/boot/atf-uboot.ub
 }
 
 do_deploy() {
@@ -107,4 +118,4 @@ do_deploy() {
 	ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/atf-uboot.ub
 }
 addtask deploy before do_build after do_compile
-FILES:${PN} += "/boot/${PN}.elf"
+FILES:${PN} += "/boot/*.elf /boot/*.bin /boot/*.ub"
