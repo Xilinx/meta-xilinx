@@ -78,6 +78,9 @@ cmake_do_generate_toolchain_file:append() {
     # Will need this in the future to make cmake understand esw variables
     # set( CMAKE_SYSTEM_NAME `echo elf | sed -e 's/^./\u&/' -e 's/^\(Linux\).*/\1/'` )
     set( CMAKE_SYSTEM_NAME "${XLNX_CMAKE_SYSTEM_NAME}" )
+    set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${S}/cmake)
+    set( CMAKE_EXPORT_COMPILE_COMMANDS ON)
+    set( CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_LIBDIR})
     add_definitions( "${XLNX_CMAKE_BSP_VARS}" )
 EOF
 }

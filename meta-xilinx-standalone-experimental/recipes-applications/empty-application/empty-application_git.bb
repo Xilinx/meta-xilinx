@@ -13,6 +13,7 @@ do_configure:prepend() {
     install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
     install -m 0644 ${CUSTOM_SRCFILE}/* ${S}/${ESW_COMPONENT_SRC}/
+    cp -rf ${S}/scripts/linker_files/ ${S}/${ESW_COMPONENT_SRC}/linker_files
     )
 }
 

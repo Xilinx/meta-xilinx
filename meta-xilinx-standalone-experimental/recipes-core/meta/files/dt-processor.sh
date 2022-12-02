@@ -275,7 +275,7 @@ cortex_a53_freertos() {
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
 
-  dtb_file="cortexa53-${machine}${suffix}-freertos.dtb"
+  dtb_file="cortexa53-$2-${machine}${suffix}-freertos.dtb"
   multiconf="${multiconf} cortexa53-$2-${machine}${suffix}-freertos"
   conf_file="multiconfig/cortexa53-$2-${machine}${suffix}-freertos.conf"
   libxil="multiconfig/includes/cortexa53-${machine}${suffix}-libxil.conf"
@@ -692,9 +692,9 @@ pmu-microblaze() {
 
   process_microblaze
 
-  dtb_file="microblaze-pmu.dtb"
-  multiconf="${multiconf} microblaze-pmu"
-  conf_file="multiconfig/microblaze-pmu.conf"
+  dtb_file="microblaze-0-pmu.dtb"
+  multiconf="${multiconf} microblaze-0-pmu"
+  conf_file="multiconfig/microblaze-0-pmu.conf"
   libxil="multiconfig/includes/microblaze-pmu-libxil.conf"
   distro="multiconfig/includes/microblaze-pmu-distro.conf"
 
@@ -750,9 +750,9 @@ pmc-microblaze() {
 
   process_microblaze
 
-  dtb_file="microblaze-pmc.dtb"
-  multiconf="${multiconf} microblaze-pmc"
-  conf_file="multiconfig/microblaze-pmc.conf"
+  dtb_file="microblaze-0-pmc.dtb"
+  multiconf="${multiconf} microblaze-0-pmc"
+  conf_file="multiconfig/microblaze-0-pmc.conf"
   libxil="multiconfig/includes/microblaze-pmc-libxil.conf"
   distro="multiconfig/includes/microblaze-pmc-distro.conf"
 
@@ -808,9 +808,9 @@ psm-microblaze() {
 
   process_microblaze
 
-  dtb_file="microblaze-psm.dtb"
-  multiconf="${multiconf} microblaze-psm"
-  conf_file="multiconfig/microblaze-psm.conf"
+  dtb_file="microblaze-0-psm.dtb"
+  multiconf="${multiconf} microblaze-0-psm"
+  conf_file="multiconfig/microblaze-0-psm.conf"
   libxil="multiconfig/includes/microblaze-psm-libxil.conf"
   distro="multiconfig/includes/microblaze-psm-distro.conf"
 

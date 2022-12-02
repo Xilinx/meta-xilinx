@@ -11,6 +11,6 @@ do_configure:prepend() {
     cd ${S}
     lopper ${DTS_FILE} -- baremetal_bspconfig_xlnx ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
     install -m 0755 MemConfig.cmake ${S}/${ESW_COMPONENT_SRC}/
-    install -m 0755 *.c ${S}/${ESW_COMPONENT_SRC}/common/
+    install -m 0755 *.c ${S}/${ESW_COMPONENT_SRC}
     )
 }
