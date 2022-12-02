@@ -40,12 +40,36 @@ XSERVER ?= " \
 	${XSERVER_EXT} \
 	"
 
+# Define to avoid parsse errors below if undefind elsewhere
+INITRAMFS_IMAGE ??= ""
+
 # Automatically add WKS_FILE_DEPENDS based on the configuration
-WKS_FILE_DEPENDS:append = "${@bb.utils.contains('IMAGE_BOOT_FILES', 'boot.bin', ' xilinx-bootbin', '', d)}"
-WKS_FILE_DEPENDS:append = "${@bb.utils.contains('IMAGE_BOOT_FILES', 'system.dtb', ' virtual/dtb', '', d)}"
-WKS_FILE_DEPENDS:append = "${@bb.utils.contains('IMAGE_BOOT_FILES', 'boot.scr', ' u-boot-xlnx-scr', '', d)}"
-WKS_FILE_DEPENDS:append = "${@bb.utils.contains('IMAGE_BOOT_FILES', 'uEnv.txt', ' u-boot-xlnx-uenv', '', d)}"
-WKS_FILE_DEPENDS:append = "${@bb.utils.contains('IMAGE_BOOT_FILES', 'atf-uboot.ub', ' arm-trusted-firmware', '', d)}"
+# Initial value from oe-core/meta/classes-recipe/image_types_wic.bbclass
+WKS_FILE_DEPENDS ?= "${WKS_FILE_DEPENDS_DEFAULT} ${WKS_FILE_DEPENDS_BOOTLOADERS}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'boot.bin',     ' virtual/boot-bin', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'system.dtb',   ' virtual/dtb', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'boot.scr',     ' u-boot-xlnx-scr', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'uEnv.txt',     ' u-boot-xlnx-uenv', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'atf-uboot.ub', ' arm-trusted-firmware', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'Image',        ' virtual/kernel', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'uImage',       ' virtual/kernel', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'zImage',       ' virtual/kernel', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'u-boot.bin',   ' virtual/bootloader', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'u-boot.elf',   ' virtual/bootloader', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', '${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot', ' ${INITRAMFS_IMAGE}', '', d)}"
+
+# Automatically add IMAGE_BOOT_FILES to /boot via packages
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'boot.bin',     ' ${PREFERRED_PROVIDER_virtual/boot-bin}', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'system.dtb',   ' ${PREFERRED_PROVIDER_virtual/dtb}', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'boot.scr',     ' u-boot-xlnx-scr', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'uEnv.txt',     ' u-boot-xlnx-uenv', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'atf-uboot.ub', ' arm-trusted-firmware', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'u-boot.bin',   ' ${PREFERRED_PROVIDER_virtual/bootloader}-bin', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'u-boot.elf',   ' ${PREFERRED_PROVIDER_virtual/bootloader}-elf', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'Image',        ' kernel-image-image', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'uImage',       ' kernel-image-uimage', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'zImage',       ' kernel-image-zimage', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', '${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot', ' initramdisk-${INITRAMFS_IMAGE}', '', d)}"
 
 IMAGE_BOOT_FILES ?= "${@get_default_image_boot_files(d)}"
 
@@ -64,7 +88,7 @@ def get_default_image_boot_files(d):
         files.append(d.getVar("UBOOT_BINARY"))
 
     # device trees (device-tree only), these are first as they are likely desired over the kernel ones
-    if "device-tree" in (d.getVar("MACHINE_ESSENTIAL_EXTRA_RDEPENDS") or ""):
+    if "device-tree" in (d.getVar("PREFERRED_PROVIDER_virtual/dtb") or ""):
         files.append("devicetree/*.dtb;devicetree/")
 
 
