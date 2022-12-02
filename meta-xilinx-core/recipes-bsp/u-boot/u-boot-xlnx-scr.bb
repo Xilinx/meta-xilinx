@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 DEPENDS = "u-boot-mkimage-native"
 
-inherit deploy nopackages image-wic-utils
+inherit deploy image-wic-utils
 
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -173,7 +173,6 @@ KERNEL_ROOT_RAMDISK ?= "root=/dev/ram0 rw"
 BITSTREAM_LOAD_ADDRESS ?= "0x100000"
 
 do_configure[noexec] = "1"
-do_install[noexec] = "1"
 
 def append_baseaddr(d,offset):
     skip_append = d.getVar('SKIP_APPEND_BASEADDR') or ""
@@ -237,6 +236,16 @@ do_compile() {
 	"${WORKDIR}/pxeboot.pxe" > "pxeboot.pxe"
 }
 
+do_install() {
+    install -d ${D}/boot
+    install -m 0644 boot.scr ${D}/boot/${UBOOTSCR_BASE_NAME}.scr
+    ln -sf ${UBOOTSCR_BASE_NAME}.scr ${D}/boot/boot.scr
+    install -d ${D}/boot/pxeboot/${UBOOTPXE_CONFIG_NAME}
+    install -m 0644 pxeboot.pxe ${D}/boot/pxeboot/${UBOOTPXE_CONFIG_NAME}/default
+    ln -sf pxeboot/${UBOOTPXE_CONFIG_NAME} ${D}/boot/${UBOOTPXE_CONFIG}
+}
+
+FILES:${PN} = "/boot/*"
 
 do_deploy() {
     install -d ${DEPLOYDIR}
