@@ -50,12 +50,14 @@ def uenv_populate(d):
 
     env["devicetree_image"] = boot_files_dtb_filepath(d)
     env["devicetree_load_address"] = d.getVar("DEVICETREE_LOAD_ADDRESS")
+    env["devicetree_overlay_load_address" ] = d.getVar("DEVICETREE_OVERLAY_LOAD_ADDRESS")
 
     env["bootargs"] = d.getVar("KERNEL_BOOTARGS")
 
     env["loadkernel"] = "fatload mmc " + get_sdbootdev(d) + " ${kernel_load_address} ${kernel_image}"
     env["loaddtb"] = "fatload mmc  " + get_sdbootdev(d) + " ${devicetree_load_address} ${devicetree_image}"
-    env["bootkernel"] = "run loadkernel && run loaddtb && " + uboot_boot_cmd(d) + " ${kernel_load_address} - ${devicetree_load_address}"
+    env["loaddtbo"] = "if test -e mmc " + get_sdbootdev(d) + " /devicetree/openamp.dtbo; then fatload mmc " + get_sdbootdev(d) + " ${devicetree_overlay_load_address} /devicetree/openamp.dtbo ; fdt addr ${devicetree_load_address} ; fdt resize 8192 ; fdt apply ${devicetree_overlay_load_address} ; fi"
+    env["bootkernel"] = "run loadkernel && run loaddtb && run loaddtbo && " + uboot_boot_cmd(d) + " ${kernel_load_address} - ${devicetree_load_address}"
 
     if d.getVar("SOC_FAMILY") in ["zynqmp"]:
         env["bootkernel"] = "setenv bootargs " +  d.getVar("KERNEL_BOOTARGS") + " ; " + env["bootkernel"]
@@ -87,6 +89,7 @@ KERNEL_LOAD_ADDRESS:zynq = "0x2080000"
 KERNEL_LOAD_ADDRESS:zynqmp = "0x200000"
 DEVICETREE_LOAD_ADDRESS:zynq = "0x2000000"
 DEVICETREE_LOAD_ADDRESS:zynqmp = "0x4000000"
+DEVICETREE_OVERLAY_LOAD_ADDRESS = "${@hex(int(d.getVar("DEVICETREE_LOAD_ADDRESS"),16) + 0xf00000)}"
 
 python do_compile() {
     env = uenv_populate(d)
