@@ -71,6 +71,8 @@ DEVICETREE_OFFSET:zynqmp ?= "0x100000"
 DEVICETREE_OFFSET:zynq ?= "0x100000"
 DEVICETREE_OFFSET:versal ?= "0x1000"
 
+DEVICETREE_OVERLAY_ADDRESS ?= "${@hex(int(d.getVar("DEVICETREE_ADDRESS"),16) + 0xf00000)}"
+
 KERNEL_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('KERNEL_OFFSET'))}"
 
 KERNEL_OFFSET:microblaze ?= "0x0"
@@ -196,6 +198,7 @@ do_compile() {
         -e 's/@@KERNEL_LOAD_ADDRESS@@/${KERNEL_LOAD_ADDRESS}/' \
         -e 's/@@DEVICE_TREE_NAME@@/${DEVICE_TREE_NAME}/' \
         -e 's/@@DEVICETREE_ADDRESS@@/${DEVICETREE_ADDRESS}/' \
+        -e 's/@@DEVICETREE_OVERLAY_ADDRESS@@/${DEVICETREE_OVERLAY_ADDRESS}/' \
         -e 's/@@RAMDISK_IMAGE@@/${RAMDISK_IMAGE}/' \
         -e 's/@@RAMDISK_IMAGE_ADDRESS@@/${RAMDISK_IMAGE_ADDRESS}/' \
         -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/' \

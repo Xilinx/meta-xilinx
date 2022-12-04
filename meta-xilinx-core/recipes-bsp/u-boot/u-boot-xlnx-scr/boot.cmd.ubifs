@@ -21,6 +21,13 @@ do
 		if test $? = 0; then
 			ubifsload @@DEVICETREE_ADDRESS@@ system.dtb
 		fi
+		ubifsls devicetree/openamp.dtbo
+		if test $? = 0; then
+			ubifsload @@DEVICETREE_OVERLAY_ADDRESS@@ devicetree/openamp.dtbo;
+			fdt addr @@DEVICETREE_ADDRESS@@
+			fdt resize 8192
+			fdt apply @@DEVICETREE_OVERLAY_ADDRESS@@
+		fi
 		ubifsls @@RAMDISK_IMAGE@@
 		if test $? = 0; then
 			ubifsload @@RAMDISK_IMAGE_ADDRESS@@ @@RAMDISK_IMAGE@@
@@ -42,6 +49,12 @@ do
 		fi
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /system.dtb; then
 			ext4load ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_ADDRESS@@ system.dtb;
+		fi
+		if test -e ${devtype} ${devnum}:${distro_bootpart} /devicetree/openamp.dtbo; then
+			fatload ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_OVERLAY_ADDRESS@@ devicetree/openamp.dtbo;
+			fdt addr @@DEVICETREE_ADDRESS@@
+			fdt resize 8192
+			fdt apply @@DEVICETREE_OVERLAY_ADDRESS@@
 		fi
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@RAMDISK_IMAGE@@; then
 			ext4load ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ @@RAMDISK_IMAGE@@;

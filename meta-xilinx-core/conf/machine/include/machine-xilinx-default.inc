@@ -93,6 +93,7 @@ def get_default_image_boot_files(d):
     # device trees (device-tree only), these are first as they are likely desired over the kernel ones
     if "device-tree" in (d.getVar("PREFERRED_PROVIDER_virtual/dtb") or ""):
         files.append("devicetree/*.dtb;devicetree/")
+        files.append("devicetree/*.dtbo;devicetree/")
 
     # device trees (kernel only)
     if d.getVar("KERNEL_DEVICETREE"):
