@@ -1,0 +1,67 @@
+From d4fcb32f8dc85d01c6e0dc8e5d85c7ed43f0866c Mon Sep 17 00:00:00 2001
+From: Yash Ladani <yash.ladani@amd.com>
+Date: Tue, 6 Dec 2022 00:52:53 -0800
+Subject: [PATCH] Import DMA_BUF module and update register_shrinker function
+ for kernel 5.16 or higher
+
+Added MODULE_IMPORT_NS(DMA_BUF) for kernel version 5.16 or higher.
+register_shrinker function call now requires two arguments
+for kernel 5.16 or higher updated this function call.
+
+Signed-off-by: Yash Ladani <yash.ladani@amd.com>
+---
+ linux/mali_memory_dma_buf.c  | 4 ++++
+ linux/mali_memory_os_alloc.c | 5 ++++-
+ linux/mali_memory_secure.c   | 4 ++++
+ 3 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/linux/mali_memory_dma_buf.c b/linux/mali_memory_dma_buf.c
+index fcdcaac..72e28a8 100644
+--- a/linux/mali_memory_dma_buf.c
++++ b/linux/mali_memory_dma_buf.c
+@@ -34,6 +34,10 @@
+ #include "mali_memory_virtual.h"
+ #include "mali_pp_job.h"
+ 
++#if LINUX_VERSION_CODE > KERNEL_VERSION(5, 15, 0)
++MODULE_IMPORT_NS(DMA_BUF);
++#endif
++
+ /*
+  * Map DMA buf attachment \a mem into \a session at virtual address \a virt.
+  */
+diff --git a/linux/mali_memory_os_alloc.c b/linux/mali_memory_os_alloc.c
+index 7de3920..5bf08f8 100644
+--- a/linux/mali_memory_os_alloc.c
++++ b/linux/mali_memory_os_alloc.c
+@@ -801,8 +801,11 @@ _mali_osk_errcode_t mali_mem_os_init(void)
+ 	dma_set_attr(DMA_ATTR_WRITE_COMBINE, &dma_attrs_wc);
+ #endif
+ 
++#if LINUX_VERSION_CODE > KERNEL_VERSION(5, 15, 0)
++	register_shrinker(&mali_mem_os_allocator.shrinker, "mali");
++#else
+ 	register_shrinker(&mali_mem_os_allocator.shrinker);
+-
++#endif
+ 	return _MALI_OSK_ERR_OK;
+ }
+ 
+diff --git a/linux/mali_memory_secure.c b/linux/mali_memory_secure.c
+index cebd1c8..a9d932f 100644
+--- a/linux/mali_memory_secure.c
++++ b/linux/mali_memory_secure.c
+@@ -20,6 +20,10 @@
+ #endif
+ #include <linux/dma-buf.h>
+ 
++#if LINUX_VERSION_CODE > KERNEL_VERSION(5, 15, 0)
++MODULE_IMPORT_NS(DMA_BUF);
++#endif
++
+ _mali_osk_errcode_t mali_mem_secure_attach_dma_buf(mali_mem_secure *secure_mem, u32 size, int mem_fd)
+ {
+ 	struct dma_buf *buf;
+-- 
+2.17.1
+

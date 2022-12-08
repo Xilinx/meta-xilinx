@@ -31,6 +31,7 @@ SRC_URI = " \
 	file://0022-Set-HAVE_UNLOCKED_IOCTL-default-to-true.patch \
 	file://0023-Use-PTR_ERR_OR_ZERO-instead-of-PTR_RET.patch \
 	file://0024-Use-community-device-tree-names.patch \
+	file://0025-Import-DMA_BUF-module-and-update-register_shrinker-f.patch \
 	"
 SRC_URI[md5sum] = "85ea110dd6675c70b7d01af87ec9633c"
 SRC_URI[sha256sum] = "7a67127341d17640c1fff5dad80258fb2a37c8a2121b81525fe2327e4532ce2b"
