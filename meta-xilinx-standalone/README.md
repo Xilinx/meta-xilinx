@@ -33,35 +33,6 @@ The standalone firmware is a genericly configured firmware, it can be
 build either in a single standalong configuration, or via an automated
 multiconfig approach only when needed.
 
-* single configuration
-
-Select a machine:
-  cortexa53-zynqmp - ZynqMP based Cortex-A53 target
-    Valid Targets: fsbl-firmware, meta-toolchain
-
-  cortexa72-versal - Versal based Cortex-A72 target
-    Valid Targets: meta-toolchain
-
-  cortexa9-zynq    - Zynq based cortex-A9 target
-    Valid Targets: meta-toolchain
-
-  cortexr5-versal  - Versal based Cortex-R5 target
-    Valid Targets: meta-toolchain
-
-  cortexr5-zynqmp  - ZynqMP based Cortex-R5 target
-    Valid Targets: meta-toolchain
-
-  microblaze-versal-fw - Microblaze for Versal PSM/PLM firmware
-    Valid Targets: psm-firmware, plm-firmware, meta-toolchain
-
-  microblaze-zynqmp-pmu - Microblaze for ZynqMP PMU firmware
-    Valid Target: pmu-firmware, meta-toolchain
-
-
-To build you should use a command similar to:
-MACHINE=<machine> DISTRO=xilinx-standalone bitbake <recipe>
-
-
 * multiconfig setup
 
 To automatically build the standalone firmware with a Linux build, you need
