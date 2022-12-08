@@ -3,53 +3,36 @@ DEFAULT_PREFERENCE = "-1"
 
 require psm-firmware.inc
 
-FILESPATH .= ":${FILE_DIRNAME}/embeddedsw"
+# Separate build directories for versal and versal-net
+SOC_DIR = "versal"
+SOC_DIR:versal-net = "versal_net"
+B = "${S}/lib/sw_apps/versal_psmfw/src/${SOC_DIR}"
+
+BSP_DIR ?= "${B}/../../misc/versal_psmfw_bsp"
+
+FILESPATH .= ":${FILE_DIRNAME}/embeddedsw/2023.1:${FILE_DIRNAME}/embeddedsw"
 
 SRC_URI += " \
             file://makefile-skip-copy_bsp.sh.patch \
+            file://0001-versal_fw-Fixup-core-makefiles.patch \
+            file://0001-Workaround-Disable-Wnull-dereference.patch \
            "
 
+EXTRA_COMPILER_FLAGS = "-g -ffunction-sections -fdata-sections -Wall -Wextra"
+
+# Override default since we're in a subdirectory deeper now...
 do_configure() {
     # manually do the copy_bsp step first, so as to be able to fix up use of
     # mb-* commands
-    . ${B}/../misc/copy_bsp.sh
-    echo "$BSP_SEQUENTIAL_MAKEFILES" > ${B}/seq.mak
+    if [ ${SOC_DIR} != "versal" ]; then
+        ${B}/../../misc/${SOC_DIR}/copy_bsp.sh
+    else
+        ${B}/../../misc/copy_bsp.sh
+    fi
 }
 
 do_compile() {
-    # First process the sequential items
-    for i in $(cat seq.mak); do
-        echo Include Seq: $i
-        if [ ! -d $i ]; then
-            echo "Skipping...."
-            continue
-        fi
-        oe_runmake -C $(dirname $i) -s include ${@bsp_make_vars(d)}
-    done
-    for i in $(cat seq.mak); do
-        echo Libs Seq: $i
-        if [ ! -d $i ]; then
-            echo "Skipping...."
-            continue
-        fi
-        oe_runmake -C $(dirname $i) -s libs ${@bsp_make_vars(d)}
-    done
-
-    # the Makefile in ${B}/../misc/Makefile, does not handle CC, AR, AS, etc
-    # properly. So do its job manually. Preparing the includes first, then libs.
-    for i in $(ls ${BSP_TARGETS_DIR}/*/src/Makefile); do
-        echo Include: $i
-        oe_runmake -C $(dirname $i) -s include ${@bsp_make_vars(d)}
-    done
-    for i in $(ls ${BSP_TARGETS_DIR}/*/src/Makefile); do
-        echo Libs: $i
-        oe_runmake -C $(dirname $i) -s libs ${@bsp_make_vars(d)}
-    done
-
-    # --build-id=none is required due to linker script not defining a location for it.
-    # Again, recipe-systoot include is necessary
-    echo Construct: executable
-    oe_runmake psmfw.elf ${@bsp_make_vars(d)} CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
+    oe_runmake
 
     ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
 }
