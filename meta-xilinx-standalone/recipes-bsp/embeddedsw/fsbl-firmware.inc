@@ -2,7 +2,7 @@ DESCRIPTION = "First Stage Bootloader"
 
 inherit xlnx-embeddedsw deploy
 
-COMPATIBLE_HOST = ".*-(elf|eabi)"
+COMPATIBLE_HOST = ".*-(elf|.*eabi)"
 COMPATIBLE_MACHINE = "none"
 COMPATIBLE_MACHINE:zynq = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"

@@ -1,16 +1,20 @@
 # QEMU for the Kria SOM requires a section from the FSBL to be extracted
 
-FSBL_DEFAULT_NAME = "executable.elf"
-PMU_CONF_NAME = "pmu-conf.bin"
+PMU_CONF_NAME ?= "pmu-conf"
+PMU_CONF_BASE_NAME ?= "${PMU_CONF_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+
+# Required so we can run objcopy in do_compile
+DEPENDS:append:zynqmp = " virtual/${TARGET_PREFIX}binutils"
 
 do_compile:append:zynqmp () {
     if [ -z "${SYSTEM_DTFILE}" ]; then
-        aarch64-none-elf-objcopy --dump-section .sys_cfg_data=../${PMU_CONF_NAME} ${FSBL_DEFAULT_NAME}
+        ${OBJCOPY} --dump-section .sys_cfg_data=${B}/${PMU_CONF_NAME}.bin ${B}/${ESW_COMPONENT}
     fi
 }
 
 do_deploy:append:zynqmp () {
     if [ -z "${SYSTEM_DTFILE}" ]; then
-        install -Dm 0644 ${B}/${PMU_CONF_NAME} ${DEPLOYDIR}/${PMU_CONF_NAME}
+        install -Dm 0644 ${B}/${PMU_CONF_NAME}.bin ${DEPLOYDIR}/${PMU_CONF_BASE_NAME}.bin
+        ln -s ${PMU_CONF_BASE_NAME}.bin ${DEPLOYDIR}/${PMU_CONF_NAME}.bin
     fi
 }
