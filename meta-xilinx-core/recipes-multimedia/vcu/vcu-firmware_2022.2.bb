@@ -15,10 +15,11 @@ SRCREV = "3980c778d71fa51a15e89bf70fd8fb28d5cb12e0"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI   = "${REPO};${BRANCHARG}"
 
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:zynqmp = "zynqmp"
+inherit features_check
 
-PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
+REQUIRED_MACHINE_FEATURES = "vcu"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 do_install() {
     install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5d_b.fw ${D}/lib/firmware/al5d_b.fw

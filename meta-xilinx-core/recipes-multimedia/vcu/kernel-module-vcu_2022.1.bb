@@ -21,7 +21,9 @@ SRC_URI = " \
     file://99-vcu-enc-dec.rules \
     "
 
-inherit module
+inherit module features_check
+
+REQUIRED_MACHINE_FEATURES = "vcu"
 
 EXTRA_OEMAKE += "O=${STAGING_KERNEL_BUILDDIR}"
 

@@ -18,7 +18,7 @@ S  = "${WORKDIR}/git"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 
-PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 DEPENDS = "libvcu-xlnx"
 RDEPENDS:${PN} = "kernel-module-vcu libvcu-xlnx"
