@@ -2,9 +2,13 @@ inherit devicetree
 
 DEPENDS = "dtc-native bootgen-native"
 
+# recipes that inherit from this class need to use an appropriate machine
+# override for COMPATIBLE_MACHINE to build successfully; don't allow building
+# for microblaze MACHINE
 COMPATIBLE_MACHINE ?= "^$"
-COMPATIBLE_MACHINE:zynqmp = ".*"
-COMPATIBLE_MACHINE:zynq = ".*"
+COMPATIBLE_MACHINE:microblaze = "^$"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 PROVIDES = ""
 
