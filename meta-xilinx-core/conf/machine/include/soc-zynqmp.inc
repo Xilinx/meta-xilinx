@@ -14,12 +14,11 @@ VCU_MACHINE_FEATURE = ""
 VCU_MACHINE_FEATURE:zynqmp-ev = " vcu"
 MACHINE_FEATURES .= "${VCU_MACHINE_FEATURE}"
 
-GRAPHICSOVERRIDES = ""
-
-# Mali400: override is only used with the ARM mali driver, not the lima driver
-GRAPHICSOVERRIDES = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', 'mali400:', '', d)}"
-
-MACHINEOVERRIDES =. "${GRAPHICSOVERRIDES}"
+# Add mali400 a.k.a Mali Utgard, "ev" and "eg" devices
+MALI_MACHINE_FEATURE = ""
+MALI_MACHINE_FEATURE:zynqmp-eg = " mali400"
+MALI_MACHINE_FEATURE:zynqmp-ev = " mali400"
+MACHINE_FEATURES .= "${MALI_MACHINE_FEATURE}"
 
 require xilinx-soc-family.inc
 
