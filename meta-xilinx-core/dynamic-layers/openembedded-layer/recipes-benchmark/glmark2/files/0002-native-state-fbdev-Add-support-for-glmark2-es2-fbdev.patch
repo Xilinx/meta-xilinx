@@ -1,0 +1,375 @@
+From f5d9664b86592dabeec33421f62eb3cfb43d7f05 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Thu, 30 Jan 2020 14:30:06 -0800
+Subject: [PATCH 2/3] native-state-fbdev: Add support for glmark2-es2-fbdev
+
+This patch add support for mali specific fbdev backend.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Upstream-status: Inappropriate [Xilinx specific]
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ src/gl-state-egl.cpp       |   4 +
+ src/main.cpp               |   4 +
+ src/native-state-fbdev.cpp | 172 +++++++++++++++++++++++++++++++++++++
+ src/native-state-fbdev.h   |  59 +++++++++++++
+ src/wscript_build          |   5 ++
+ wscript                    |   2 +
+ 6 files changed, 246 insertions(+)
+ create mode 100644 src/native-state-fbdev.cpp
+ create mode 100644 src/native-state-fbdev.h
+
+diff --git a/src/gl-state-egl.cpp b/src/gl-state-egl.cpp
+index 5a6843c..14c7dac 100644
+--- a/src/gl-state-egl.cpp
++++ b/src/gl-state-egl.cpp
+@@ -510,6 +510,7 @@ GLStateEGL::gotValidDisplay()
+         return false;
+     }
+ 
++#ifndef GLMARK2_USE_FBDEV
+     char const * __restrict const supported_extensions =
+         egl_query_string(EGL_NO_DISPLAY, EGL_EXTENSIONS);
+ 
+@@ -543,6 +544,9 @@ GLStateEGL::gotValidDisplay()
+         Log::debug("Falling back to eglGetDisplay()\n");
+         egl_display_ = egl_get_display(native_display_);
+     }
++#else
++    egl_display_ = eglGetDisplay(EGL_DEFAULT_DISPLAY);
++#endif
+ 
+     if (!egl_display_) {
+         Log::error("eglGetDisplay() failed with error: 0x%x\n", egl_get_error());
+diff --git a/src/main.cpp b/src/main.cpp
+index ce8b094..7c9f501 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -36,6 +36,8 @@
+ 
+ #if GLMARK2_USE_X11
+ #include "native-state-x11.h"
++#elif GLMARK2_USE_FBDEV
++#include "native-state-fbdev.h"
+ #elif GLMARK2_USE_DRM
+ #include "native-state-drm.h"
+ #elif GLMARK2_USE_MIR
+@@ -172,6 +174,8 @@ main(int argc, char *argv[])
+     // Create the canvas
+ #if GLMARK2_USE_X11
+     NativeStateX11 native_state;
++#elif GLMARK2_USE_FBDEV
++    NativeStateFbdev native_state;
+ #elif GLMARK2_USE_DRM
+     NativeStateDRM native_state;
+ #elif GLMARK2_USE_MIR
+diff --git a/src/native-state-fbdev.cpp b/src/native-state-fbdev.cpp
+new file mode 100644
+index 0000000..0c82a25
+--- /dev/null
++++ b/src/native-state-fbdev.cpp
+@@ -0,0 +1,172 @@
++
++/*
++ * Copyright © 2018 Xilinx Inc
++ *
++ * This file is part of the glmark2 OpenGL (ES) 2.0 benchmark.
++ *
++ * glmark2 is free software: you can redistribute it and/or modify it under the
++ * terms of the GNU General Public License as published by the Free Software
++ * Foundation, either version 3 of the License, or (at your option) any later
++ * version.
++ *
++ * glmark2 is distributed in the hope that it will be useful, but WITHOUT ANY
++ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
++ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
++ * details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * glmark2.  If not, see <http://www.gnu.org/licenses/>.
++ *
++ * Authors:
++ *  Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
++ */
++
++#include <cstring>
++#include <csignal>
++#include <fcntl.h>
++#include <libudev.h>
++#include <linux/fb.h>
++#include "log.h"
++#include "native-state-fbdev.h"
++#include <sys/ioctl.h>
++#include <unistd.h>
++
++volatile bool NativeStateFbdev::should_quit_ = false;
++
++NativeStateFbdev::~NativeStateFbdev()
++{
++    if (isvalid_fd(fd_)) {
++        close(fd_);
++        fd_ = -1;
++    }
++}
++
++bool
++NativeStateFbdev::init_display()
++{
++    struct sigaction new_action;
++
++    new_action.sa_handler = &NativeStateFbdev::quit_handler;
++    new_action.sa_flags = 0;
++    sigemptyset(&new_action.sa_mask);
++
++    sigaction(SIGINT, &new_action, NULL);
++    sigaction(SIGTERM, &new_action, NULL);
++
++    fd_ = get_fd();
++    if (!isvalid_fd(fd_)) {
++        Log::error("Failed to find a suitable FB device\n");
++        return false;
++    }
++
++    return true;
++}
++
++void*
++NativeStateFbdev::display()
++{
++    if (!isvalid_fd(fd_)) {
++        Log::error("Failed to initalize display\n");
++        return NULL;
++    }
++
++    return reinterpret_cast<void*>(fd_);
++}
++
++bool
++NativeStateFbdev::create_window(WindowProperties const& /*properties*/)
++{
++    if (!isvalid_fd(fd_)) {
++        Log::error("Failed to initalize display\n");
++	should_quit_ = true;
++        return false;
++    }
++
++    if (ioctl(fd_, FBIOGET_VSCREENINFO, &fb_info_)) {
++        Log::error("Failed to get Frame buffer info\n");
++	should_quit_ = true;
++        return false;
++    }
++    return true;
++}
++
++void*
++NativeStateFbdev::window(WindowProperties& properties)
++{
++    properties = WindowProperties(fb_info_.xres, fb_info_.yres, true, 0);
++
++    return 0;
++}
++
++void
++NativeStateFbdev::visible(bool /*visible*/)
++{
++}
++
++bool
++NativeStateFbdev::should_quit()
++{
++    return should_quit_;
++}
++
++void
++NativeStateFbdev::flip()
++{
++}
++
++void
++NativeStateFbdev::quit_handler(int /*signum*/)
++{
++    should_quit_ = true;
++}
++
++bool
++NativeStateFbdev::isvalid_fd(int fd)
++{
++    return fd >= 0;
++}
++
++int
++NativeStateFbdev::get_fd()
++{
++    std::string node_path;
++    struct fb_var_screeninfo fb_info;
++    int fd = -1, temp_fd;
++
++    Log::debug("Using Udev to detect the right fb node to use\n");
++    auto udev_cntx = udev_new();
++    auto dev_enum = udev_enumerate_new(udev_cntx);
++
++    udev_enumerate_add_match_sysname(dev_enum, "fb[0-9]*");
++    udev_enumerate_scan_devices(dev_enum);
++
++    Log::debug("Looking for the right fb node...\n");
++
++    auto entity = udev_enumerate_get_list_entry(dev_enum);
++
++    while (entity && !isvalid_fd(fd)) {
++        char const * __restrict entity_sys_path =
++	    udev_list_entry_get_name(entity);
++
++	if (entity_sys_path) {
++            struct udev_device* dev =
++	        udev_device_new_from_syspath(udev_cntx,
++					     entity_sys_path);
++	    const char * dev_node_path =
++	        udev_device_get_devnode(dev);
++
++	    temp_fd = open(dev_node_path, O_RDWR);
++
++	    if (!ioctl(temp_fd, FBIOGET_VSCREENINFO, &fb_info)) {
++                fd = temp_fd;
++		break;
++	    }
++
++	    udev_device_unref(dev);
++	}
++
++	entity = udev_list_entry_get_next(entity);
++    }
++
++    return fd;
++}
+diff --git a/src/native-state-fbdev.h b/src/native-state-fbdev.h
+new file mode 100644
+index 0000000..0162ee0
+--- /dev/null
++++ b/src/native-state-fbdev.h
+@@ -0,0 +1,59 @@
++/*
++ * Copyright © 2018 Xilinx Inc
++ *
++ * This file is part of the glmark2 OpenGL (ES) 2.0 benchmark.
++ *
++ * glmark2 is free software: you can redistribute it and/or modify it under the
++ * terms of the GNU General Public License as published by the Free Software
++ * Foundation, either version 3 of the License, or (at your option) any later
++ * version.
++ *
++ * glmark2 is distributed in the hope that it will be useful, but WITHOUT ANY
++ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
++ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
++ * details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * glmark2.  If not, see <http://www.gnu.org/licenses/>.
++ *
++ * Authors:
++ *  Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
++ */
++
++#ifndef GLMARK2_NATIVE_STATE_FBDEV_H_
++#define GLMARK2_NATIVE_STATE_FBDEV_H_
++
++#include <csignal>
++#include <cstring>
++#include <EGL/egl.h>
++#include <EGL/eglplatform.h>
++#include <linux/fb.h>
++#include "native-state.h"
++
++class NativeStateFbdev : public NativeState
++{
++public:
++    NativeStateFbdev() :
++        fd_(-1),
++        native_window_((EGLNativeWindowType)NULL) {}
++    ~NativeStateFbdev();
++
++    bool init_display();
++    void* display();
++    bool create_window(WindowProperties const& properties);
++    void* window(WindowProperties& properties);
++    void visible(bool v);
++    bool should_quit();
++    void flip();
++
++private:
++    int fd_;
++    struct fb_var_screeninfo fb_info_;
++    NativeWindowType native_window_;
++    static volatile bool should_quit_;
++    static void quit_handler(int signum);
++    static bool isvalid_fd(int fd);
++    static int get_fd();
++};
++
++#endif /* GLMARK2_NATIVE_STATE_FBDEV_H_ */
+diff --git a/src/wscript_build b/src/wscript_build
+index a01c8a8..c179342 100644
+--- a/src/wscript_build
++++ b/src/wscript_build
+@@ -90,6 +90,7 @@ flavor_sources = {
+   'win32-glesv2': common_flavor_sources + ['native-state-win32.cpp', 'gl-state-egl.cpp'],
+   'x11-gl' : common_flavor_sources + ['native-state-x11.cpp', 'gl-state-glx.cpp'],
+   'x11-glesv2' : common_flavor_sources + ['native-state-x11.cpp', 'gl-state-egl.cpp'],
++  'fbdev-glesv2' :  common_flavor_sources + ['native-state-fbdev.cpp', 'gl-state-egl.cpp']
+ }
+ flavor_uselibs = {
+   'dispmanx-glesv2' : ['glad-egl-dispmanx', 'glad-glesv2', 'matrix-glesv2', 'common-glesv2',  'dispmanx'],
+@@ -103,6 +104,7 @@ flavor_uselibs = {
+   'win32-glesv2': ['glad-egl-win32', 'glad-glesv2', 'matrix-glesv2', 'common-glesv2'],
+   'x11-gl' : ['x11', 'glad-gl', 'glad-glx', 'matrix-gl', 'common-gl'],
+   'x11-glesv2' : ['x11', 'glad-egl-x11', 'glad-glesv2', 'matrix-glesv2', 'common-glesv2'],
++  'fbdev-glesv2' : ['udev', 'glad-egl-fbdev', 'glad-glesv2', 'matrix-glesv2', 'common-glesv2']
+ }
+ 
+ flavor_defines = {
+@@ -117,6 +119,7 @@ flavor_defines = {
+   'win32-glesv2': ['GLMARK2_USE_WIN32', 'GLMARK2_USE_GLESv2', 'GLMARK2_USE_EGL'],
+   'x11-gl' : ['GLMARK2_USE_X11', 'GLMARK2_USE_GL', 'GLMARK2_USE_GLX'],
+   'x11-glesv2' : ['GLMARK2_USE_X11', 'GLMARK2_USE_GLESv2', 'GLMARK2_USE_EGL'],
++  'fbdev-glesv2' : ['GLMARK2_USE_FBDEV', 'GLMARK2_USE_GLESv2', 'GLMARK2_USE_EGL']
+ }
+ flavor_libs = {
+   'dispmanx-glesv2' : [],
+@@ -156,6 +159,7 @@ flavor_sources_gen = {
+   'win32-glesv2' : [],
+   'x11-gl' : [],
+   'x11-glesv2' : [],
++  'fbdev-glesv2' : []
+ }
+ egl_platform_defines = {
+   'dispmanx' : ['MESA_EGL_NO_X11_HEADERS'],
+@@ -164,6 +168,7 @@ egl_platform_defines = {
+   'wayland' : ['WL_EGL_PLATFORM'],
+   'win32' : [],
+   'x11' : [],
++  'fbdev' : ['MESA_EGL_NO_X11_HEADERS']
+ }
+ 
+ includes = ['.', 'scene-ideas', 'scene-terrain'] + platform_includes
+diff --git a/wscript b/wscript
+index cecc3d9..4ae50d8 100644
+--- a/wscript
++++ b/wscript
+@@ -19,6 +19,7 @@ FLAVORS = {
+     'win32-glesv2': 'glmark2-es2',
+     'x11-gl' : 'glmark2',
+     'x11-glesv2' : 'glmark2-es2',
++    'fbdev-glesv2' : 'glmark2-es2-fbdev',
+ }
+ FLAVORS_STR = ", ".join(sorted(list(FLAVORS) + ['all-linux', 'all-win32']))
+ 
+@@ -213,6 +214,7 @@ def configure_linux(ctx):
+                 ('gbm','gbm', None, list_contains(ctx.options.flavors, 'drm')),
+                 ('libudev', 'udev', None, list_contains(ctx.options.flavors, 'drm')),
+                 ('mirclient','mirclient', '0.13', list_contains(ctx.options.flavors, 'mir')),
++                ('libudev', 'udev', None, list_contains(ctx.options.flavors, 'fbdev')),
+                 ('wayland-client','wayland-client', None, list_contains(ctx.options.flavors, 'wayland')),
+                 ('wayland-cursor','wayland-cursor', None, list_contains(ctx.options.flavors, 'wayland')),
+                 ('wayland-egl','wayland-egl', None, list_contains(ctx.options.flavors, 'wayland'))]
+-- 
+2.17.1
+
