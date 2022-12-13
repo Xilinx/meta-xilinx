@@ -2,10 +2,11 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += "file://0001-DRI_Add_xlnx_dri.patch"
 
 # This is not compatible with the mali400 driver, use mesa-gl instead
-CONFLICT_MACHINE_FEATURES:class-target = "mali400"
+CONFLICT_DISTRO_FEATURES:class-target = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', bb.utils.contains('DISTRO_FEATURES', 'libmali', 'libmali', '', d), '', d)}"
 
-PACKAGECONFIG:append:zynqmp-eg = " lima"
-PACKAGECONFIG:append:zynqmp-ev = " lima"
+# Enable lima if not using libmali
+PACKAGECONFIG_MALI = "${@bb.utils.contains('DISTRO_FEATURES', 'libmali', '', 'lima', d)}"
+PACKAGECONFIG:append = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', '${PACKAGECONFIG_MALI}', '', d)}"
 
-PACKAGE_ARCH:zynqmp-eg = "${SOC_VARIANT_ARCH}"
-PACKAGE_ARCH:zynqmp-ev = "${SOC_VARIANT_ARCH}"
+PACKAGE_ARCH_DEFAULT := "${PACKAGE_ARCH}"
+PACKAGE_ARCH = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', '${MACHINE_ARCH}', '${PACKAGE_ARCH_DEFAULT}', d)}"
