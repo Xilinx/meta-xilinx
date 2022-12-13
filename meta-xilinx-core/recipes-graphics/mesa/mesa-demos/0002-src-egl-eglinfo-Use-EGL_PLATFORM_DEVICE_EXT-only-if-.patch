@@ -1,0 +1,41 @@
+From 040b0b79a8e73a3348ab2e95f817636a7d479f18 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Tue, 28 Jan 2020 16:17:46 -0800
+Subject: [PATCH 2/2] src: egl: eglinfo: Use EGL_PLATFORM_DEVICE_EXT only if
+ the EGL provider supports it
+
+Compiling against the other EGL provider like mali fails, as they dont
+support this macro as one of thier supported platforms
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+upstream-status: Inappropritate [Xilinx specific]
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ src/egl/opengl/eglinfo.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/egl/opengl/eglinfo.c b/src/egl/opengl/eglinfo.c
+index e8a0225..bc0e869 100644
+--- a/src/egl/opengl/eglinfo.c
++++ b/src/egl/opengl/eglinfo.c
+@@ -243,6 +243,7 @@ doOneDisplay(EGLDisplay d, const char *name)
+ static int
+ doOneDevice(EGLDeviceEXT d, int i)
+ {
++#ifdef EGL_PLATFORM_DEVICE_EXT
+    PFNEGLGETPLATFORMDISPLAYEXTPROC getPlatformDisplay =
+      (PFNEGLGETPLATFORMDISPLAYEXTPROC)
+      eglGetProcAddress("eglGetPlatformDisplayEXT");
+@@ -253,6 +254,9 @@ doOneDevice(EGLDeviceEXT d, int i)
+ 
+    return doOneDisplay(getPlatformDisplay(EGL_PLATFORM_DEVICE_EXT, d, NULL),
+                        "Platform Device");
++#else
++   return 0;
++#endif
+ }
+ 
+ 
+-- 
+2.17.1
+
