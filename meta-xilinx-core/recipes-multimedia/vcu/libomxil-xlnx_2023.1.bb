@@ -21,7 +21,8 @@ COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
 
 DEPENDS = "libvcu-xlnx"
-RDEPENDS:${PN} = "kernel-module-vcu libvcu-xlnx"
+RDEPENDS:${PN} = "libvcu-xlnx"
+#RDEPENDS:${PN} = "kernel-module-vcu"
 
 EXTERNAL_INCLUDE="${STAGING_INCDIR}/vcu-ctrl-sw/include"
 
