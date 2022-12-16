@@ -91,6 +91,8 @@ def qemu_rootfs_params(data, param):
             image_fs = data.getVar('IMAGE_FSTYPES')
             if 'wic.qemu-sd' in image_fs:
                 return 'wic.qemu-sd'
+        if soc_family not in fstype_dict:
+            return ""
         return fstype_dict[soc_family]
 
     elif param == 'rootfs-opt':
