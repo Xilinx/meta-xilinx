@@ -15,9 +15,9 @@ SRC_URI = "${REPO};${BRANCHARG}"
 
 S  = "${WORKDIR}/git"
 
-inherit features_check
+#inherit features_check
 
-REQUIRED_MACHINE_FEATURES = "vcu"
+#REQUIRED_MACHINE_FEATURES = "vcu"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
