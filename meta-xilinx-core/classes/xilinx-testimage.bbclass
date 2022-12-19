@@ -7,5 +7,4 @@ python do_testimage:prepend () {
     supported_fstypes.append('wic.qemu-sd')
 }
 
-IMAGE_AUTOLOGIN = "0"
 IMAGE_FSTYPES = "wic.qemu-sd"
