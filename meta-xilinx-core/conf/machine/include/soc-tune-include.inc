@@ -8,6 +8,7 @@ TUNEFILE[armv8a] = "conf/machine/include/arm/arch-armv8a.inc"
 TUNEFILE[cortexa53] = "conf/machine/include/arm/armv8a/tune-cortexa53.inc"
 TUNEFILE[cortexa72] = "conf/machine/include/arm/armv8a/tune-cortexa72.inc"
 TUNEFILE[cortexa72-cortexa53] = "conf/machine/include/arm/armv8a/tune-cortexa72-cortexa53.inc"
+TUNEFILE[cortexa72-cortexa53-crypto] = "conf/machine/include/arm/armv8a/tune-cortexa72-cortexa53.inc"
 TUNEFILE[microblaze] = "conf/machine/include/xilinx-microblaze.inc"
 
 # Capture the defaulttune, to make sure it's been modified in the right order
