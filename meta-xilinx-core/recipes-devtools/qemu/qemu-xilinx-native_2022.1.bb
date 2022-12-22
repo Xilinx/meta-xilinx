@@ -1,5 +1,5 @@
 require qemu-xilinx-2022.1.inc
-require qemu-xilinx-native.inc
+require qemu-xilinx-native-7.1.inc
 require qemu-native-alt.inc
 
 BPN = "qemu-xilinx"

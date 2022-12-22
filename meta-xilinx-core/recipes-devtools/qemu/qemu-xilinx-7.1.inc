@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = " \
 		"
 DEPENDS = "glib-2.0 zlib pixman bison-native ninja-native meson-native"
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/qemu-xilinx-7.1.0:"
 
 PV = "${XILINX_QEMU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git${SRCPV}"
 REPO ?= "gitsm://github.com/Xilinx/qemu.git;protocol=https"
@@ -22,26 +22,11 @@ SRC_URI:append = " file://0010-configure-Add-pkg-config-handling-for-libgcrypt.p
 
 S = "${WORKDIR}/git"
 
-# Disable KVM completely
-PACKAGECONFIG:remove = "kvm"
-PACKAGECONFIG:append = " fdt sdl gcrypt pie slirp"
-
-
-# Remove when version is in sync with core oe-core
-PACKAGECONFIG:remove:class-nativesdk= "pulsedio"
-PACKAGECONFIG:remove:class-native = "pulsedio"
-PACKAGECONFIG[alsa] = "--audio-drv-list=alsa,,alsa-lib"
-PACKAGECONFIG[pulsedio] = "--audio-drv-list=pa,,pulseaudio"
-PACKAGECONFIG[selinux] = ""
-PACKAGECONFIG[slirp] = "--enable-slirp=git,--disable-slirp,,"
-PACKAGECONFIG[jack] = ""
+PACKAGECONFIG ??= " \
+    fdt sdl kvm gcrypt pie slirp \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'alsa xen', d)} \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'seccomp', d)} \
+"
+PACKAGECONFIG:class-nativesdk ??= "fdt sdl kvm gcrypt pie slirp"
 
 DISABLE_STATIC:pn-${PN} = ""
-
-do_install:append() {
-	# Prevent QA warnings about installed ${localstatedir}/run
-	if [ -d ${D}${localstatedir}/run ]; then rmdir ${D}${localstatedir}/run; fi
-}
-
-FILES:${PN} += "${datadir}/qemu/"
-FILES:${PN}:append:class-nativesdk:mingw32 = " ${SDKPATHNATIVE}"
