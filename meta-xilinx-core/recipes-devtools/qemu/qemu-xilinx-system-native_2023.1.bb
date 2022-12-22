@@ -1,12 +1,12 @@
 require qemu-system-native-alt.inc
 require qemu-xilinx-2023.1.inc
-require qemu-xilinx-native.inc
+require qemu-xilinx-native-7.1.inc
 
 PROVIDES = "qemu-system-native"
 
 EXTRA_OECONF:append = " --target-list=${@get_qemu_system_target_list(d)}"
 
-PACKAGECONFIG ??= "fdt alsa kvm pie slirp"
+PACKAGECONFIG ??= "fdt alsa kvm gcrypt pie slirp"
 
 PACKAGECONFIG:remove = "${@'kvm' if not os.path.exists('/usr/include/linux/kvm.h') else ''}"
 
@@ -24,4 +24,3 @@ do_install:append() {
     install -d ${D}${libdir}/qemu-python/qmp/
     install -D ${S}/python/qemu/qmp/* ${D}${libdir}/qemu-python/qmp/
 }
-
