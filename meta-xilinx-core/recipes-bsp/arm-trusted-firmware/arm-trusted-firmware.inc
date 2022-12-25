@@ -75,6 +75,9 @@ EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${ATF_MEM_SIZE}' 
 ATF_PROVENCORE = "SPD=pncd SPD_PNCD_NS_IRQ=51 ZYNQMP_BL32_MEM_BASE=0x70000000 ZYNQMP_BL32_MEM_SIZE=0x0FF00000"
 EXTRA_OEMAKE:append = "${@bb.utils.contains('MACHINE_FEATURES', 'provencore', ' ${ATF_PROVENCORE}', '', d)}"
 
+TFA_BL33_LOAD ?= ""
+EXTRA_OEMAKE:append = "${@' PRELOADED_BL33_BASE=${TFA_BL33_LOAD}' if d.getVar('TFA_BL33_LOAD', True) != '' else ''}"
+
 # Workaround for bl31.elf has a LOAD segment with RWX permissions
 EXTRA_OEMAKE:append = ' TF_LDFLAGS="--no-warn-rwx-segments --fatal-warnings -O1 --gc-sections"'
 
