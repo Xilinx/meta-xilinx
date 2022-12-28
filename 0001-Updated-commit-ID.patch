@@ -1,0 +1,24 @@
+From 6a8c98d4abbd752a489966ada8336e1ea4a7b86f Mon Sep 17 00:00:00 2001
+From: Siva Addepalli <sivaprasad.addepalli@xilinx.com>
+Date: Tue, 27 Dec 2022 13:56:17 +0530
+Subject: [CI NO-AUTOMERGE meta-xilinx][2023.1][PATCH] Updated commit ID
+
+gen_*_machine.py: Use overrides for yocto variables
+hw-description.tcl: FSBOOT support PL uart
+gen_yocto_machine.py: Update KERNEL_EXTRA_ARGS
+
+Signed-off-by: Siva Addepalli <sivaprasad.addepalli@xilinx.com>
+---
+ meta-xilinx-core/gen-machine-conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meta-xilinx-core/gen-machine-conf b/meta-xilinx-core/gen-machine-conf
+index f8ff42c..cadd760 160000
+--- a/meta-xilinx-core/gen-machine-conf
++++ b/meta-xilinx-core/gen-machine-conf
+@@ -1 +1 @@
+-Subproject commit f8ff42ccf65bf35669f80b5f68478456893b9131
++Subproject commit cadd76061195d5a9d5059aefb7baf346ea88dd60
+-- 
+1.8.3.1
+
