@@ -1013,8 +1013,13 @@ gen_local_conf() {
 gen_petalinux_conf() {
   cd "${config_dir}" || exit
   (
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dtb}" -- petalinuxconfig_xlnx ${petalinux_schema} \
-      || error "lopper failed"
+    if [ "$machine" == "zynqmp" ]; then
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dtb}" -- petalinuxconfig_xlnx psu_cortexa53_0 ${petalinux_schema} \
+        || error "lopper failed"
+    else
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dtb}" -- petalinuxconfig_xlnx psv_cortexa72_0 ${petalinux_schema} \
+        || error "lopper failed"
+    fi
   )
 }
 parse_args "$@"
