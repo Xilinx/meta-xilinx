@@ -12,5 +12,7 @@ do_configure:prepend() {
     lopper ${DTS_FILE} -- baremetal_bspconfig_xlnx ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
     install -m 0755 MemConfig.cmake ${S}/${ESW_COMPONENT_SRC}/
     install -m 0755 *.c ${S}/${ESW_COMPONENT_SRC}
+    lopper ${DTS_FILE} -- bmcmake_metadata_xlnx ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
+    install -m 0755 StandaloneExample.cmake ${S}/${ESW_COMPONENT_SRC}/common/
     )
 }
