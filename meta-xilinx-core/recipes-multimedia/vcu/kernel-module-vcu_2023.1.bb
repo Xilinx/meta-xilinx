@@ -29,6 +29,9 @@ EXTRA_OEMAKE += "O=${STAGING_KERNEL_BUILDDIR}"
 
 RDEPENDS:${PN} = "vcu-firmware"
 
+COMPATIBLE_MACHINE = "^$"
+COMPATIBLE_MACHINE:zynqmp = "zynqmp"
+
 KERNEL_MODULE_AUTOLOAD += "dmaproxy"
 
 do_install:append() {
