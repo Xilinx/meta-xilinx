@@ -15,11 +15,10 @@ SRC_URI = "${REPO};${BRANCHARG}"
 
 S  = "${WORKDIR}/git"
 
-inherit features_check
+COMPATIBLE_MACHINE = "^$"
+COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 
-REQUIRED_MACHINE_FEATURES = "vcu"
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
+PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
 
 DEPENDS = "libvcu-xlnx"
 RDEPENDS:${PN} = "libvcu-xlnx"
