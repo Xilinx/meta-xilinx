@@ -16,6 +16,9 @@ PREFERRED_PROVIDER_virtual/kernel ??= "linux-xlnx"
 # U-Boot Configuration
 PREFERRED_PROVIDER_virtual/bootloader ??= "u-boot-xlnx"
 PREFERRED_PROVIDER_virtual/boot-bin ??= "xilinx-bootbin"
+PREFERRED_PROVIDER_u-boot-tools ??= "u-boot-tools-xlnx"
+PREFERRED_PROVIDER_u-boot-tools-native ??= "u-boot-tools-xlnx-native"
+PREFERRED_PROVIDER_nativesdk-u-boot-tools ??= "nativesdk-u-boot-tools-xlnx"
 
 do_image_wic[depends] += "${@' '.join('%s:do_deploy' % r for r in (d.getVar('WIC_DEPENDS') or "").split())}"
 
