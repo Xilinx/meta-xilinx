@@ -5,7 +5,7 @@ PROVIDES += "qemu"
 # the use of AUTOREV SRCREVs, which may be the default for some recipes.
 python () {
     if bb.data.inherits_class('nativesdk', d):
-        if (not d.getVar("PREFERRED_PROVIDER_nativesdk-qemu") and "qemu" != d.getVar("PN")) or \
+        if (not d.getVar("PREFERRED_PROVIDER_nativesdk-qemu") and "nativesdk-qemu" != d.getVar("PN")) or \
            (d.getVar("PREFERRED_PROVIDER_nativesdk-qemu") and d.getVar("PREFERRED_PROVIDER_nativesdk-qemu") != d.getVar("PN")):
             d.delVar("BB_DONT_CACHE")
             raise bb.parse.SkipRecipe("Set PREFERRED_PROVIDER_nativesdk-qemu to %s to enable it" % (d.getVar("PN")))
