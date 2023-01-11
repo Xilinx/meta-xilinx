@@ -13,6 +13,9 @@ IMAGE_FSTYPES ?= "tar.gz cpio cpio.gz cpio.gz.u-boot"
 # Kernel Configuration
 PREFERRED_PROVIDER_virtual/kernel ??= "linux-xlnx"
 
+# Device tree Configuration
+PREFERRED_PROVIDER_virtual/dtb ??= "device-tree"
+
 # U-Boot Configuration
 PREFERRED_PROVIDER_virtual/bootloader ??= "u-boot-xlnx"
 PREFERRED_PROVIDER_virtual/boot-bin ??= "xilinx-bootbin"
