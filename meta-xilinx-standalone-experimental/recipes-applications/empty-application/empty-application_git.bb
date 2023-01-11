@@ -25,10 +25,10 @@ inherit image-artifact-names
 
 CUSTOM_APP_BASE_NAME ?= "${CUSTOM_APP_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
-ESW_COMPONENT ??= "executable.elf"
+ESW_COMPONENT ??= "empty_application.elf"
 
 do_compile:append() {
-    ${OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/executable.bin
+    ${OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/empty_application.bin
 }
 
 do_install() {
@@ -38,7 +38,7 @@ do_install() {
 do_deploy() {
     install -Dm 0644 ${B}/${ESW_COMPONENT} ${DEPLOYDIR}/${CUSTOM_APP_BASE_NAME}.elf
     ln -sf ${CUSTOM_APP_BASE_NAME}.elf ${DEPLOYDIR}/${CUSTOM_APP_IMAGE_NAME}.elf
-    install -m 0644 ${B}/executable.bin ${DEPLOYDIR}/${CUSTOM_APP_BASE_NAME}.bin
+    install -m 0644 ${B}/empty_application.bin ${DEPLOYDIR}/${CUSTOM_APP_BASE_NAME}.bin
     ln -sf ${CUSTOM_APP_BASE_NAME}.bin ${DEPLOYDIR}/${CUSTOM_APP_IMAGE_NAME}.bin
 }
 addtask deploy before do_build after do_install

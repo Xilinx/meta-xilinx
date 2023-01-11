@@ -42,10 +42,10 @@ inherit image-artifact-names
 
 PERIPHERAL_TEST_BASE_NAME ?= "${PERIPHERAL_TEST_APP_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
-ESW_COMPONENT ??= "executable.elf"
+ESW_COMPONENT ??= "peripheral_tests.elf"
 
 do_compile:append() {
-    ${OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/executable.bin
+    ${OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/peripheral_tests.bin
 }
 
 do_install() {
@@ -55,7 +55,7 @@ do_install() {
 do_deploy() {
     install -Dm 0644 ${B}/${ESW_COMPONENT} ${DEPLOYDIR}/${PERIPHERAL_TEST_BASE_NAME}.elf
     ln -sf ${PERIPHERAL_TEST_BASE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}.elf
-    install -m 0644 ${B}/executable.bin ${DEPLOYDIR}/${PERIPHERAL_TEST_BASE_NAME}.bin
+    install -m 0644 ${B}/peripheral_tests.bin ${DEPLOYDIR}/${PERIPHERAL_TEST_BASE_NAME}.bin
     ln -sf ${PERIPHERAL_TEST_BASE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}.bin
 }
 addtask deploy before do_build after do_install
