@@ -8,7 +8,7 @@ inherit esw
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/zynqmp_pmufw/src"
 
-ESW_COMPONENT = "pmufw.elf"
+ESW_COMPONENT = "zynqmp_pmufw.elf"
 
 do_compile:append() {
     ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
