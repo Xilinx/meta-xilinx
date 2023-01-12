@@ -27,7 +27,7 @@ MACHINE=qemux86-64 bitbake meta-xilinx-setup
 
 To install the setup SDK:
 
-./tmp/deploy/sdk/x86_64-xilinx-nativesdk-prestep-2021.2.sh -d prestep -y
+./tmp/deploy/sdk/x86_64-xilinx-nativesdk-prestep-2023.1....sh -d prestep -y
 
 Then follow the instructions in the 'prestep/README-setup' file.
 
