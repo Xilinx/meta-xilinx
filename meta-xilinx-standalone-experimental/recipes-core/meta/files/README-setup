@@ -1,4 +1,4 @@
-Document Version: 20211209
+Document Version: 20230111
 
 The Yocto Project setup for the new workflow is as follows.  Be sure to read
 everything below, as the steps will be updated in the future if the
@@ -15,10 +15,10 @@ is selected for this workflow.
 
 # Instruct the system to use the decoupling firmware sources,
 # add the following to the conf/local.conf:
-PREFERRED_VERSION_fsbl-firmware = "experimental%"
-PREFERRED_VERSION_pmu-firmware = "experimental%"
-PREFERRED_VERSION_plm-firmware = "experimental%"
-PREFERRED_VERSION_psm-firmware = "experimental%"
+PREFERRED_VERSION_fsbl-firmware = "2023.1_sdt_experimental%"
+PREFERRED_VERSION_pmu-firmware = "2023.1_sdt_experimental%"
+PREFERRED_VERSION_plm-firmware = "2023.1_sdt_experimental%"
+PREFERRED_VERSION_psm-firmware = "2023.1_sdt_experimental%"
 
 * Run the setup script
 
