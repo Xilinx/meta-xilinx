@@ -1,0 +1,46 @@
+From d7a56b7bdf1ea34194fe86639cc318d7a33b9abb Mon Sep 17 00:00:00 2001
+From: Parth Gajjar <parth.gajjar@xilinx.com>
+Date: Thu, 12 Jan 2023 06:00:20 -0800
+Subject: [PATCH] Fix gpu driver probe failure
+
+In patch a1a2b7125e1079cfcc13a116aa3af3df2f9e002b
+(Drop static setup of IRQ resource from DT core) platform_get_resource()
+stopped from returning the IRQ, as all drivers were supposed to have
+switched to platform_get_irq().
+Using platform_get_irq_optional() to avoid printing error messages
+for interrupts not found.
+
+Signed-off-by: Parth Gajjar <parth.gajjar@xilinx.com>
+---
+ linux/mali_osk_mali.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/linux/mali_osk_mali.c b/linux/mali_osk_mali.c
+index c22758d..3f66132 100644
+--- a/linux/mali_osk_mali.c
++++ b/linux/mali_osk_mali.c
+@@ -113,7 +113,7 @@ static int _mali_osk_get_compatible_name(const char **out_string)
+ _mali_osk_errcode_t _mali_osk_resource_initialize(void)
+ {
+ 	mali_bool mali_is_450 = MALI_FALSE, mali_is_470 = MALI_FALSE;
+-	int i, pp_core_num = 0, l2_core_num = 0;
++	int i, pp_core_num = 0, l2_core_num = 0, irq = 0;
+ 	struct resource *res;
+ 	const char *compatible_name = NULL;
+ 
+@@ -128,9 +128,9 @@ _mali_osk_errcode_t _mali_osk_resource_initialize(void)
+ 	}
+ 
+ 	for (i = 0; i < MALI_OSK_RESOURCE_WITH_IRQ_NUMBER; i++) {
+-		res = platform_get_resource_byname(mali_platform_device, IORESOURCE_IRQ, mali_osk_resource_bank[i].irq_name);
+-		if (res) {
+-			mali_osk_resource_bank[i].irq = res->start;
++		irq = platform_get_irq_byname_optional(mali_platform_device, mali_osk_resource_bank[i].irq_name);
++		if (irq > 0) {
++			mali_osk_resource_bank[i].irq = irq;
+ 		} else {
+ 			mali_osk_resource_bank[i].base = MALI_OSK_INVALID_RESOURCE_ADDRESS;
+ 		}
+-- 
+2.17.1
+
