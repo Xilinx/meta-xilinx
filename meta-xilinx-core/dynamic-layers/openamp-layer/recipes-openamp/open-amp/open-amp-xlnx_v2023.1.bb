@@ -1,9 +1,9 @@
-SRCBRANCH ?= "2022.2"
-SRCREV = "e50f1a61d6bd355e54f3d0bd709c8c3b9e8014c6"
-BRANCH = "2022"
-LIC_FILES_CHKSUM ?= "file://LICENSE.md;md5=0e6d7bfe689fe5b0d0a89b2ccbe053fa"
+SRCBRANCH ?= "2023.1"
+SRCREV = "0c7a278fe62827538ef1669c261b683da2997e63"
+BRANCH = "2023"
+LIC_FILES_CHKSUM ?= "file://LICENSE.md;md5=ab88daf995c0bd0071c2e1e55f3d3505"
 PV = "${SRCBRANCH}+git${SRCPV}"
 REPO = "git://github.com/Xilinx/open-amp.git;protocol=https"
 
 include ${LAYER_PATH_openamp-layer}/recipes-openamp/open-amp/open-amp.inc
-require ${LAYER_PATH_openamp-layer}/recipes-openamp/rpmsg-examples/rpmsg-example.inc
+require ${LAYER_PATH_openamp-layer}/vendor/xilinx/recipes-openamp/open-amp/open-amp-xlnx.inc

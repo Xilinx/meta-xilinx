@@ -1,7 +1,7 @@
-SRCBRANCH ?= "2022.2"
-SRCREV = "9cb5bd0f9b697d27da059dd868981aaf271e11ec"
-BRANCH = "2022"
-LIC_FILES_CHKSUM ?= "file://LICENSE.md;md5=1ff609e96fc79b87da48a837cbe5db33"
+SRCBRANCH ?= "2023.1"
+SRCREV = "be635252271de342014a146825870b64bd41d6eb"
+BRANCH = "2023"
+LIC_FILES_CHKSUM ?= "file://LICENSE.md;md5=f4d5df0f12dcea1b1a0124219c0dbab4"
 PV = "${SRCBRANCH}+git${SRCPV}"
 
 REPO = "git://github.com/Xilinx/libmetal.git;protocol=https"
