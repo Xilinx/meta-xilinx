@@ -1,6 +1,6 @@
 UBOOT_VERSION = "v2023.01"
 
-UBRANCH ?= "xlnx_rebase_v2023.01-next"
+UBRANCH ?= "xlnx_rebase_v2023.01"
 
 SRCREV = "907ddbc80d669fa7f65bdab0e9a64ca6228caee6"
 
