@@ -45,3 +45,21 @@ TOOLCHAIN_NEED_CONFIGSITE_CACHE = ""
 
 # Workaround for pulling in nativesdk-mingw-w64-winpthreads
 TOOLCHAIN_HOST_TASK:append:sdkmingw32 = " nativesdk-mingw-w64-winpthreads"
+
+# Disable static for all classes, except for target.  This will ensure we can
+# share more recipe hashes with other distros, while still building
+# static binaries for baremetal targets (by default).  The user can of course
+# still override this, but will need to specifically select class-target to
+# do so.
+DISABLE_STATIC:class-target ?= ""
+
+SECURITY_CFLAGS:class-target ?= ""
+SECURITY_LDFLAGS:class-target ?= ""
+
+require conf/distro/include/no-static-libs.inc
+require conf/distro/include/yocto-uninative.inc
+require conf/distro/include/security_flags.inc
+INHERIT += "uninative"
+
+BB_SIGNATURE_HANDLER ?= "OEEquivHash"
+BB_HASHSERVE ??= "auto"
