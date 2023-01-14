@@ -276,10 +276,6 @@ DISTRO = "${yocto_distro}"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
-
-SKIP_META_VIRT_SANITY_CHECK = "1"
-SKIP_META_SECURITY_SANITY_CHECK = "1"
-SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -333,10 +329,6 @@ DISTRO = "xilinx-freertos"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
-
-SKIP_META_VIRT_SANITY_CHECK = "1"
-SKIP_META_SECURITY_SANITY_CHECK = "1"
-SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -467,10 +459,6 @@ DISTRO = "xilinx-standalone-nolto"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
-
-SKIP_META_VIRT_SANITY_CHECK = "1"
-SKIP_META_SECURITY_SANITY_CHECK = "1"
-SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -524,10 +512,6 @@ DISTRO = "xilinx-freertos"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
-
-SKIP_META_VIRT_SANITY_CHECK = "1"
-SKIP_META_SECURITY_SANITY_CHECK = "1"
-SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -610,10 +594,6 @@ DISTRO = "$yocto_distro"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
-
-SKIP_META_VIRT_SANITY_CHECK = "1"
-SKIP_META_SECURITY_SANITY_CHECK = "1"
-SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -667,10 +647,6 @@ DISTRO = "xilinx-freertos"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
-
-SKIP_META_VIRT_SANITY_CHECK = "1"
-SKIP_META_SECURITY_SANITY_CHECK = "1"
-SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -743,10 +719,6 @@ DISTRO = "xilinx-standalone"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
-
-SKIP_META_VIRT_SANITY_CHECK = "1"
-SKIP_META_SECURITY_SANITY_CHECK = "1"
-SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -799,10 +771,6 @@ DISTRO = "xilinx-standalone"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
-
-SKIP_META_VIRT_SANITY_CHECK = "1"
-SKIP_META_SECURITY_SANITY_CHECK = "1"
-SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -855,10 +823,6 @@ DISTRO = "xilinx-standalone"
 
 LIBXIL_CONFIG = "conf/${libxil}"
 require conf/${distro}
-
-SKIP_META_VIRT_SANITY_CHECK = "1"
-SKIP_META_SECURITY_SANITY_CHECK = "1"
-SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
@@ -1107,6 +1071,13 @@ parse_cpus() {
 
 gen_local_conf() {
   cat << EOF >> $1
+
+# Avoid errors in some baremetal configs as these layers may be present
+# but are not used.  Note the following lines are optional and can be
+# safetly disabled.
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
 
 # Each multiconfig will define it's own TMPDIR, this is the new default based
 # on BASE_TMPDIR for the Linux build
