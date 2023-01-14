@@ -38,7 +38,8 @@ $0
     -d <domain_file>        Path to domain file (.yml/.dts)
     [-o <overlay_dtb>]      Generate overlay dts
     [-e <external_fpga>]    Apply a partial overlay
-    [-m <machine>]          zynqmp or versal
+    [-m <machine_conf>]     The name of the machine .conf to generate
+    [-t <machine>]          Machine type: zynqmp or versal (usually auto detected)
     [-p <psu_init_path>]    Path to psu_init files, defaults to system_dtb path
     [-i <pdu_path>]         Path to the pdi file
     [-l <config_file>]      write local.conf changes to this file
@@ -58,7 +59,8 @@ parse_args() {
       o) overlay_dtb=$OPTARG ;;
       d) domain_file=$OPTARG ;;
       e) external_fpga=$OPTARG ;;
-      m) machine=$OPTARG ;;
+      m) mach_conf=$OPTARG ; mach_conf=${mach_conf%%.conf} ;;
+      t) machine=$OPTARG ;;
       p) psu_init_path=$OPTARG ;;
       i) pdi_path=$OPTARG ;;
       l) localconf=$OPTARG ;;
@@ -103,12 +105,28 @@ detect_machine() {
 
   # Machine not provided and we cannot identify..
   [ -z ${machine} ] && \
-    error "Unable to autodetect machine type, use -m to specify the machine."
+    error "Unable to autodetect machine type, use -t to specify the machine."
 
   case ${machine} in
     zynqmp | versal) : ;;
     *) error "Invalid machine type ${machine}; please choose zynqmp or versal"
   esac
+}
+
+dump_cpus() {
+    prefix="$1"
+    while read -r cpu core domain cpu_name os_hint; do
+      case ${cpu} in
+        \#*) ;;
+        \[*) ;;
+        pmu-microblaze)   echo "${prefix}zynqmp-pmu ${cpu_name}" ;;
+        pmc-microblaze)   echo "${prefix}versal-plm ${cpu_name}" ;;
+        psm-microblaze)   echo "${prefix}versal-psm ${cpu_name}" ;;
+        xlnx,microblaze)  echo "${prefix}microblaze ${core} ${cpu_name}";;
+        arm,*)            echo "${prefix}${cpu/,/ } ${core} ${cpu_name}";;
+        *)                echo "${prefix}${cpu} ${core} ${cpu_name}";;
+      esac
+    done <${cpulist}
 }
 
 cortex_a53_linux() {
@@ -117,7 +135,7 @@ cortex_a53_linux() {
   if [ "$1" = "None" ]; then
     dtb_file="cortexa53-${machine}-linux.dtb"
     dts_file="cortexa53-${machine}-linux.dts"
-    system_conf=conf/cortexa53-${machine}-linux.conf
+    system_conf=${dtb_file}
     conf_file=cortexa53-${machine}-linux.conf
   else
     dtb_file="cortexa53-${machine}-$1-linux.dtb"
@@ -166,19 +184,15 @@ cortex_a53_linux() {
     rm -f pl.dtsi lop-a53-imux.dts.dtb lop-domain-linux-a53.dts.dtb
   )
 
+  if [ "$1" = "None" ]; then
+      return $?
+  fi
+
+  ## Generate a multiconfig
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
-CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
-MACHINE = "${machine}-generic"
-# We don't want the kernel to build us a device-tree
-KERNEL_DEVICETREE:${machine}-generic = ""
-# We need u-boot to use the one we passed in
-DEVICE_TREE_NAME:pn-u-boot-xlnx-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
-# Update bootbin to use proper device tree
-BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
-# Remap boot files to ensure the right device tree is listed first
-IMAGE_BOOT_FILES = "devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))} \${@get_default_image_boot_files(d)}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 EOF
 }
 
@@ -205,6 +219,7 @@ cortex_a53_baremetal() {
   if [ "$1" = "fsbl" ]; then
     fsbl_mcdepends="mc::${dtb_file%%.dtb}:fsbl-firmware:do_deploy"
     fsbl_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
+    multiconf_min="${multiconf_min} cortexa53-$2-${machine}${suffix}-baremetal"
     a53_fsbl_done=1
   fi
 
@@ -251,7 +266,6 @@ EOF
   fi
   cat <<EOF >>"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
-CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa53"
@@ -309,7 +323,6 @@ cortex_a53_freertos() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
-CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa53"
@@ -333,7 +346,7 @@ cortex_a72_linux() {
   # Find the first file ending in .pdi
   full_pdi_path=$(ls ${pdi_path}/*.pdi 2>/dev/null | head -n 1)
   if [ -z "${full_pdi_path}" ]; then
-    warn "Warning: Unable to find a pdi file in ${pdi_path}"
+    error "Unable to find a pdi file in ${pdi_path}, use the -i option to point to the directory containing a .pdi file"
     full_pdi_path="__PATH TO PDI FILE HERE__"
   elif [ "${full_pdi_path}" != "$(ls ${pdi_path}/*.pdi 2>/dev/null)" ]; then
     warn "Warning: multiple PDI files found, using first found $(basename ${full_pdi_path})."
@@ -342,7 +355,7 @@ cortex_a72_linux() {
   if [ "$1" = "None" ]; then
     dtb_file="cortexa72-${machine}-linux.dtb"
     dts_file="cortexa72-${machine}-linux.dts"
-    system_conf=conf/cortexa72-${machine}-linux.conf
+    system_conf=${dtb_file}
     conf_file=cortexa72-${machine}-linux.conf
   else
     dtb_file="cortexa72-${machine}-$1-linux.dtb"
@@ -392,19 +405,15 @@ cortex_a72_linux() {
     rm -f pl.dtsi lop-a72-imux.dts.dtb lop-domain-a72.dts.dtb
   )
 
+  if [ "$1" = "None" ]; then
+      return $?
+  fi
+
+  ## Generate a multiconfig
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
-CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
-MACHINE = "${machine}-generic"
-# We don't want the kernel to build us a device-tree
-KERNEL_DEVICETREE:${machine}-generic = ""
-# We need u-boot to use the one we passed in
-DEVICE_TREE_NAME:pn-u-boot-xlnx-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
-# Update bootbin to use proper device tree
-BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
-# Remap boot files to ensure the right device tree is listed first
-IMAGE_BOOT_FILES = "devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))} \${@get_default_image_boot_files(d)}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
 EOF
 }
 
@@ -448,7 +457,6 @@ cortex_a72_baremetal() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
-CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa72"
@@ -506,7 +514,6 @@ cortex_a72_freertos() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
-CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa72"
@@ -593,7 +600,6 @@ EOF
   fi
   cat <<EOF >>"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
-CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexr5"
@@ -651,7 +657,6 @@ cortex_r5_freertos() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
-CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexr5"
@@ -676,12 +681,15 @@ process_microblaze() {
 
   info "Generating microblaze processor tunes"
 
+  mkdir -p machine/include
   (
     cd dtb || error "Unable to cd to dtb dir"
     LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-microblaze-yocto.dts" "${system_dtb}" \
       || error "lopper failed"
     rm -f lop-microblaze-yocto.dts.dtb
-  ) >microblaze.conf
+  ) >machine/include/${mach_conf}-microblaze.inc
+
+  echo "require conf/machine/include/xilinx-microblaze.inc" >> machine/include/${mach_conf}-microblaze.inc
 
   microblaze_done=1
 }
@@ -694,6 +702,7 @@ pmu-microblaze() {
 
   dtb_file="microblaze-0-pmu.dtb"
   multiconf="${multiconf} microblaze-0-pmu"
+  multiconf_min="${multiconf_min} microblaze-0-pmu"
   conf_file="multiconfig/microblaze-0-pmu.conf"
   libxil="multiconfig/includes/microblaze-pmu-libxil.conf"
   distro="multiconfig/includes/microblaze-pmu-distro.conf"
@@ -721,13 +730,10 @@ pmu-microblaze() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
-CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
 ESW_MACHINE = "$1"
 
-require conf/microblaze.conf
-DEFAULTTUNE = "microblaze"
-TUNE_FEATURES:tune-microblaze:forcevariable = "\${TUNE_FEATURES:tune-pmu-microblaze}"
+DEFAULTTUNE = "microblaze-pmu"
 
 TARGET_CFLAGS += "-DPSU_PMU=1U"
 
@@ -752,6 +758,7 @@ pmc-microblaze() {
 
   dtb_file="microblaze-0-pmc.dtb"
   multiconf="${multiconf} microblaze-0-pmc"
+  multiconf_min="${multiconf_min} microblaze-0-pmc"
   conf_file="multiconfig/microblaze-0-pmc.conf"
   libxil="multiconfig/includes/microblaze-pmc-libxil.conf"
   distro="multiconfig/includes/microblaze-pmc-distro.conf"
@@ -779,13 +786,10 @@ pmc-microblaze() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
-CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
 ESW_MACHINE = "$1"
 
-require conf/microblaze.conf
-DEFAULTTUNE = "microblaze"
-TUNE_FEATURES:tune-microblaze:forcevariable = "\${TUNE_FEATURES:tune-pmc-microblaze}"
+DEFAULTTUNE = "microblaze-pmc"
 
 TARGET_CFLAGS += "-DVERSAL_PLM=1"
 
@@ -810,6 +814,7 @@ psm-microblaze() {
 
   dtb_file="microblaze-0-psm.dtb"
   multiconf="${multiconf} microblaze-0-psm"
+  multiconf_min="${multiconf_min} microblaze-0-psm"
   conf_file="multiconfig/microblaze-0-psm.conf"
   libxil="multiconfig/includes/microblaze-psm-libxil.conf"
   distro="multiconfig/includes/microblaze-psm-distro.conf"
@@ -837,13 +842,10 @@ psm-microblaze() {
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
-CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
 ESW_MACHINE = "$1"
 
-require conf/microblaze.conf
-DEFAULTTUNE = "microblaze"
-TUNE_FEATURES:tune-microblaze:forcevariable = "\${TUNE_FEATURES:tune-psm-microblaze}"
+DEFAULTTUNE = "microblaze-psm"
 
 TARGET_CFLAGS += "-DVERSAL_psm=1"
 
@@ -860,9 +862,137 @@ SKIP_META_TPM_SANITY_CHECK = "1"
 EOF
 }
 
-parse_cpus() {
-  info "Generating configuration..."
+generate_machine() {
+  info "Generating machine conf file"
+  conf_file="machine/${mach_conf}.conf"
+  mkdir -p machine
+  # Generate header
+  cat <<EOF >"${conf_file}"
+#@TYPE: Machine
+#@NAME: ${mach_conf}
+#@DESCRIPTION: ${model}
 
+#### Preamble
+MACHINEOVERRIDES =. "\${@['', '${mach_conf}:']['${mach_conf}' != '\${MACHINE}']}"
+#### Regular settings follow
+
+EOF
+
+  if [ "${machine}" == "zynqmp" ]; then
+    cat <<EOF >>"${conf_file}"
+TUNEFILE[microblaze-pmu] = "conf/machine/include/${mach_conf}-microblaze.inc"
+EOF
+  elif [ "${machine}" == "versal" ]; then
+    cat <<EOF >>"${conf_file}"
+TUNEFILE[microblaze-pmc] = "conf/machine/include/${mach_conf}-microblaze.inc"
+TUNEFILE[microblaze-psm] = "conf/machine/include/${mach_conf}-microblaze.inc"
+EOF
+  fi
+
+  sysdt_path=$(dirname ${system_dtb})
+  sysdt_base=$(basename ${system_dtb})
+  cat <<EOF >>"${conf_file}"
+
+# Set the default (linux) domain device tree
+CONFIG_DTFILE ?= "\${TOPDIR}/conf/dtb/${system_conf}"
+CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
+
+require conf/machine/${machine}-generic.conf
+
+# System Device Tree does not use HDF_MACHINE
+HDF_MACHINE = ""
+
+# Set the system device trees
+SYSTEM_DTFILE_DIR = "${sysdt_path}"
+SYSTEM_DTFILE = "\${SYSTEM_DTFILE_DIR}/${sysdt_base}"
+SYSTEM_DTFILE[vardepsexclude] += "SYSTEM_DTFILE_DIR"
+
+EOF
+
+  if [ -n "${fsbl_mcdepends}" ]; then
+    cat <<EOF >>"${conf_file}"
+# First Stage Boot Loader
+FSBL_DEPENDS = ""
+FSBL_MCDEPENDS = "${fsbl_mcdepends}"
+FSBL_DEPLOY_DIR = "${fsbl_deploy_dir}"
+
+EOF
+  fi
+  if [ -n "${r5fsbl_mcdepends}" ]; then
+    cat <<EOF >>"${conf_file}"
+# Cortex-R5 First Stage Boot Loader
+R5FSBL_DEPENDS = ""
+R5FSBL_MCDEPENDS = "${r5fsbl_mcdepends}"
+R5FSBL_DEPLOY_DIR = "${r5fsbl_deploy_dir}"
+
+EOF
+  fi
+  if [ -n "${pmu_mcdepends}" ]; then
+    cat <<EOF >>"${conf_file}"
+# PMU Firware
+PMU_DEPENDS = ""
+PMU_MCDEPENDS = "${pmu_mcdepends}"
+PMU_FIRMWARE_DEPLOY_DIR = "${pmu_firmware_deploy_dir}"
+
+EOF
+  fi
+  if [ -n "${plm_mcdepends}" ]; then
+    cat <<EOF >>"${conf_file}"
+# Platform Loader and Manager
+PLM_DEPENDS = ""
+PLM_MCDEPENDS = "${plm_mcdepends}"
+PLM_DEPLOY_DIR = "${plm_deploy_dir}"
+
+EOF
+  fi
+  if [ -n "${psm_mcdepends}" ]; then
+    cat <<EOF >>"${conf_file}"
+# PSM Firmware
+PSM_DEPENDS = ""
+PSM_MCDEPENDS = "${psm_mcdepends}"
+PSM_FIRMWARE_DEPLOY_DIR = "${psm_firmware_deploy_dir}"
+
+EOF
+  fi
+
+  if [ -n "${full_pdi_path}" ]; then
+    pdi_path_dir=$(dirname ${full_pdi_path})
+    pdi_path_base=$(basename ${full_pdi_path})
+    cat <<EOF >>"${conf_file}"
+# Versal PDI
+PDI_PATH_DIR = "${pdi_path_dir}"
+PDI_PATH = "\${PDI_PATH_DIR}/${pdi_path_base}"
+PDI_PATH[vardepsexclude] += "PDI_PATH_DIR"
+
+EOF
+  fi
+
+  cat <<EOF >>"${conf_file}"
+# Enable the correct version of the firmware components
+PREFERRED_VERSION_fsbl-firmware = "2023.1_sdt_experimental%"
+PREFERRED_VERSION_pmu-firmware = "2023.1_sdt_experimental%"
+PREFERRED_VERSION_plm-firmware = "2023.1_sdt_experimental%"
+PREFERRED_VERSION_psm-firmware = "2023.1_sdt_experimental%"
+
+# Exclude BASE_TMPDIR from hash calculations
+BB_HASHEXCLUDE_COMMON:append = " BASE_TMPDIR"
+
+# We don't want the kernel to build us a device-tree
+KERNEL_DEVICETREE:example-sdt = ""
+# We need u-boot to use the one we passed in
+DEVICE_TREE_NAME:pn-u-boot-xlnx-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+# Update bootbin to use proper device tree
+BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+# Remap boot files to ensure the right device tree is listed first
+IMAGE_BOOT_FILES =+ "devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+
+#### No additional settings should be after the Postamble
+#### Postamble
+PACKAGE_EXTRA_ARCHS:append = "\${@['', ' ${mach_conf//-/_}']['${mach_conf}' != "\${MACHINE}"]}"
+EOF
+}
+
+parse_cpus() {
   gen_linux_dtb="None"
   while read -r cpu core domain cpu_name os_hint; do
     # Skip commented lines and WARNINGs
@@ -976,38 +1106,26 @@ parse_cpus() {
 }
 
 gen_local_conf() {
-  echo "# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere" >> $1
-  echo "BASE_TMPDIR ?= \"\${TOPDIR}\"" >> $1
-  [ -n "${system_conf}" ] && echo "require ${system_conf}" >> $1
-  echo "SYSTEM_DTFILE = \"${system_dtb}\"" >> $1
-  echo "BBMULTICONFIG += \"${multiconf}\"" >> $1
-  if [ -n "${fsbl_mcdepends}" ]; then
-    echo "FSBL_DEPENDS = \"\"" >> $1
-    echo "FSBL_MCDEPENDS = \"${fsbl_mcdepends}\"" >> $1
-    echo "FSBL_DEPLOY_DIR = \"${fsbl_deploy_dir}\"" >> $1
-  fi
-  if [ -n "${r5fsbl_mcdepends}" ]; then
-    echo "R5FSBL_DEPENDS = \"\"" >> $1
-    echo "R5FSBL_MCDEPENDS = \"${r5fsbl_mcdepends}\"" >> $1
-    echo "R5FSBL_DEPLOY_DIR = \"${r5fsbl_deploy_dir}\"" >> $1
-  fi
-  if [ -n "${pmu_mcdepends}" ]; then
-    echo "PMU_DEPENDS = \"\"" >> $1
-    echo "PMU_MCDEPENDS = \"${pmu_mcdepends}\"" >> $1
-    echo "PMU_FIRMWARE_DEPLOY_DIR = \"${pmu_firmware_deploy_dir}\"" >> $1
-  fi
-  if [ -n "${plm_mcdepends}" ]; then
-    echo "PLM_DEPENDS = \"\"" >> $1
-    echo "PLM_MCDEPENDS = \"${plm_mcdepends}\"" >> $1
-    echo "PLM_DEPLOY_DIR = \"${plm_deploy_dir}\"" >> $1
-  fi
-  if [ -n "${psm_mcdepends}" ]; then
-    echo "PSM_DEPENDS = \"\"" >> $1
-    echo "PSM_MCDEPENDS = \"${psm_mcdepends}\"" >> $1
-    echo "PSM_FIRMWARE_DEPLOY_DIR = \"${psm_firmware_deploy_dir}\"" >> $1
-  fi
-  [ "${machine}" = "versal" ] && echo "PDI_PATH = \"${full_pdi_path}\"" >> $1
-  echo
+  cat << EOF >> $1
+
+# Each multiconfig will define it's own TMPDIR, this is the new default based
+# on BASE_TMPDIR for the Linux build
+TMPDIR = "\${BASE_TMPDIR}/tmp"
+
+# Use the newly generated MACHINE
+MACHINE = "${mach_conf}"
+
+# All of the TMPDIRs must be in a common parent directory. This is defined
+# as BASE_TMPDIR.
+# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere, such as /tmp
+BASE_TMPDIR ?= "\${TOPDIR}"
+
+# The following is the full set of multiconfigs for this configuration
+# A large list can cause a slow parse.
+BBMULTICONFIG = "${multiconf}"
+# Alternatively trim the list to the minimum
+#BBMULTICONFIG = "${multiconf_min}"
+EOF
 }
 
 gen_petalinux_conf() {
@@ -1036,9 +1154,21 @@ multiconf=""
 cpulist=$(mktemp)
 
 priordir=$(pwd)
-# Generate CPU list
 cd "${config_dir}" || exit
 mkdir -p dtb multiconfig/includes
+# Get mach_conf name and model name
+(
+  cd dtb || error "Unable to cd to dtb dir"
+  LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-machine-name.dts" "${system_dtb}" \
+    /dev/null > ${cpulist} || error "lopper failed"
+  rm -f "lop-machine-name.dts.dtb"
+)
+read local_mach_conf model < ${cpulist}
+if [ -z "${mach_conf}" ]; then
+    mach_conf=${local_mach_conf}
+fi
+
+# Generate CPU list
 (
   cd dtb || error "Unable to cd to dtb dir"
   LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-xilinx-id-cpus.dts" "${system_dtb}" \
@@ -1048,7 +1178,18 @@ mkdir -p dtb multiconfig/includes
 
 detect_machine
 
+echo "System Configuration:"
+echo "MODEL       = \"${model}\""
+echo "MACHINE     = \"${mach_conf}\""
+echo "SOC_FAMILY  = \"${machine}\""
+echo "CPUs:"
+dump_cpus "            = "
+echo
+
+info "Generating configuration..."
 parse_cpus
+
+generate_machine
 
 cd ${priordir}
 if [ -z "${localconf}" ]; then

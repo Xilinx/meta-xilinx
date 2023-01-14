@@ -11,7 +11,7 @@ SRC_URI = " \
 	file://lop-machine-name.dts \
 	"
 
-LIC_FILES_CHKSUM = "file://lop-microblaze-yocto.dts;endline=8;md5=a0e89d39fa397ec5d5320409ff701280"
+LIC_FILES_CHKSUM = "file://lop-microblaze-yocto.dts;endline=10;md5=27139f9b862dc6fe466c7157aba7ed9c"
 
 S = "${WORKDIR}"
 
