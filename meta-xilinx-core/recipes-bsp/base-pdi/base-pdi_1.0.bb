@@ -5,6 +5,7 @@ LICENSE = "CLOSED"
 PROVIDES = "virtual/base-pdi"
 
 COMPATIBLE_MACHINE = "^$"
+COMPATIBLE_MACHINE:microblaze = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
