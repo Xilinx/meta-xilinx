@@ -23,4 +23,10 @@ python xilinx_variables_config_eventhandler () {
         bb.fatal("The loaded DEFAULTTUNE is %s, but it appears you intended %s. " \
                  "This is usually as a result of specifying it after the 'require' in the machine .conf file. " \
                  "See meta-xilinx-core/conf/machine/README." % (tune_prior, tune_final))
+
+    # Verify 'xilinx' is in LICENSE_FLAGS_ACCEPTED
+    license_flags = d.getVar('LICENSE_FLAGS_ACCEPTED') or ""
+    if 'xilinx' not in license_flags.split():
+        bb.warn("The ZynqMP pmu-rom is not enabled, qemu may not be able to emulate a ZynqMP system without it. " \
+                "To enable this you must add 'xilinx' to the LICENSE_FLAGS_ACCEPTED to indicate you accept the software license.")
 }
