@@ -213,8 +213,8 @@ cortex_a53_baremetal() {
   dtb_file="cortexa53-$2-${machine}${suffix}-baremetal.dtb"
   multiconf="${multiconf} cortexa53-$2-${machine}${suffix}-baremetal"
   conf_file="multiconfig/cortexa53-$2-${machine}${suffix}-baremetal.conf"
-  libxil="multiconfig/includes/cortexa53-${machine}${suffix}-libxil.conf"
-  distro="multiconfig/includes/cortexa53-${machine}${suffix}-distro.conf"
+  libxil="machine/include/${mach_conf}/cortexa53-${machine}${suffix}-libxil.conf"
+  distro="machine/include/${mach_conf}/cortexa53-${machine}${suffix}-features.conf"
   yocto_distro="xilinx-standalone${lto}"
   if [ "$1" = "fsbl" ]; then
     fsbl_mcdepends="mc::${dtb_file%%.dtb}:fsbl-firmware:do_deploy"
@@ -288,8 +288,8 @@ cortex_a53_freertos() {
   dtb_file="cortexa53-$2-${machine}${suffix}-freertos.dtb"
   multiconf="${multiconf} cortexa53-$2-${machine}${suffix}-freertos"
   conf_file="multiconfig/cortexa53-$2-${machine}${suffix}-freertos.conf"
-  libxil="multiconfig/includes/cortexa53-${machine}${suffix}-libxil.conf"
-  distro="multiconfig/includes/cortexa53-${machine}${suffix}-distro.conf"
+  libxil="machine/include/${mach_conf}/cortexa53-${machine}${suffix}-libxil.conf"
+  distro="machine/include/${mach_conf}/cortexa53-${machine}${suffix}-features.conf"
 
   # Build device tree
   (
@@ -418,8 +418,8 @@ cortex_a72_baremetal() {
   dtb_file="cortexa72-$2-${machine}${suffix}-baremetal.dtb"
   multiconf="${multiconf} cortexa72-$2-${machine}${suffix}-baremetal"
   conf_file="multiconfig/cortexa72-$2-${machine}${suffix}-baremetal.conf"
-  libxil="multiconfig/includes/cortexa72-${machine}${suffix}-libxil.conf"
-  distro="multiconfig/includes/cortexa72-${machine}${suffix}-distro.conf"
+  libxil="machine/include/${mach_conf}/cortexa72-${machine}${suffix}-libxil.conf"
+  distro="machine/include/${mach_conf}/cortexa72-${machine}${suffix}-features.conf"
 
   # Build device tree
   (
@@ -471,8 +471,8 @@ cortex_a72_freertos() {
   dtb_file="cortexa72-$2-${machine}${suffix}-freertos.dtb"
   multiconf="${multiconf} cortexa72-$2-${machine}${suffix}-freertos"
   conf_file="multiconfig/cortexa72-$2-${machine}${suffix}-freertos.conf"
-  libxil="multiconfig/includes/cortexa72-${machine}${suffix}-libxil.conf"
-  distro="multiconfig/includes/cortexa72-${machine}${suffix}-distro.conf"
+  libxil="machine/include/${mach_conf}/cortexa72-${machine}${suffix}-libxil.conf"
+  distro="machine/include/${mach_conf}/cortexa72-${machine}${suffix}-features.conf"
 
   # Build device tree
   (
@@ -532,8 +532,8 @@ cortex_r5_baremetal() {
   dtb_file="cortexr5-$2-${machine}${suffix}-baremetal.dtb"
   multiconf="${multiconf} cortexr5-$2-${machine}${suffix}-baremetal"
   conf_file="multiconfig/cortexr5-$2-${machine}${suffix}-baremetal.conf"
-  libxil="multiconfig/includes/cortexr5-${machine}${suffix}-libxil.conf"
-  distro="multiconfig/includes/cortexr5-${machine}${suffix}-distro.conf"
+  libxil="machine/include/${mach_conf}/cortexr5-${machine}${suffix}-libxil.conf"
+  distro="machine/include/${mach_conf}/cortexr5-${machine}${suffix}-features.conf"
   yocto_distro="xilinx-standalone${lto}"
 
   if [ "$1" = "fsbl" ]; then
@@ -606,8 +606,8 @@ cortex_r5_freertos() {
   dtb_file="cortexr5-$2-${machine}${suffix}-freertos.dtb"
   multiconf="${multiconf} cortexr5-$2-${machine}${suffix}-freertos"
   conf_file="multiconfig/cortexr5-$2-${machine}${suffix}-freertos.conf"
-  libxil="multiconfig/includes/cortexr5-${machine}${suffix}-libxil.conf"
-  distro="multiconfig/includes/cortexr5-${machine}${suffix}-distro.conf"
+  libxil="machine/include/${mach_conf}/cortexr5-${machine}${suffix}-libxil.conf"
+  distro="machine/include/${mach_conf}/cortexr5-${machine}${suffix}-features.conf"
 
   # Build device tree
   (
@@ -657,15 +657,15 @@ process_microblaze() {
 
   info "Generating microblaze processor tunes"
 
-  mkdir -p machine/include
+  mkdir -p machine/include/${mach_conf}
   (
     cd dtb || error "Unable to cd to dtb dir"
     LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-microblaze-yocto.dts" "${system_dtb}" \
       || error "lopper failed"
     rm -f lop-microblaze-yocto.dts.dtb
-  ) >machine/include/${mach_conf}-microblaze.inc
+  ) >machine/include/${mach_conf}/microblaze.inc
 
-  echo "require conf/machine/include/xilinx-microblaze.inc" >> machine/include/${mach_conf}-microblaze.inc
+  echo "require conf/machine/include/xilinx-microblaze.inc" >> machine/include/${mach_conf}/microblaze.inc
 
   microblaze_done=1
 }
@@ -680,8 +680,8 @@ pmu-microblaze() {
   multiconf="${multiconf} microblaze-0-pmu"
   multiconf_min="${multiconf_min} microblaze-0-pmu"
   conf_file="multiconfig/microblaze-0-pmu.conf"
-  libxil="multiconfig/includes/microblaze-pmu-libxil.conf"
-  distro="multiconfig/includes/microblaze-pmu-distro.conf"
+  libxil="machine/include/${mach_conf}/microblaze-pmu-libxil.conf"
+  distro="machine/include/${mach_conf}/microblaze-pmu-features.conf"
 
   pmu_mcdepends="mc::${dtb_file%%.dtb}:pmu-firmware:do_deploy"
   pmu_firmware_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
@@ -732,8 +732,8 @@ pmc-microblaze() {
   multiconf="${multiconf} microblaze-0-pmc"
   multiconf_min="${multiconf_min} microblaze-0-pmc"
   conf_file="multiconfig/microblaze-0-pmc.conf"
-  libxil="multiconfig/includes/microblaze-pmc-libxil.conf"
-  distro="multiconfig/includes/microblaze-pmc-distro.conf"
+  libxil="machine/include/${mach_conf}/microblaze-pmc-libxil.conf"
+  distro="machine/include/${mach_conf}/microblaze-pmc-features.conf"
 
   plm_mcdepends="mc::${dtb_file%%.dtb}:plm-firmware:do_deploy"
   plm_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
@@ -784,8 +784,8 @@ psm-microblaze() {
   multiconf="${multiconf} microblaze-0-psm"
   multiconf_min="${multiconf_min} microblaze-0-psm"
   conf_file="multiconfig/microblaze-0-psm.conf"
-  libxil="multiconfig/includes/microblaze-psm-libxil.conf"
-  distro="multiconfig/includes/microblaze-psm-distro.conf"
+  libxil="machine/include/${mach_conf}/microblaze-psm-libxil.conf"
+  distro="machine/include/${mach_conf}/microblaze-psm-features.conf"
 
   psm_mcdepends="mc::${dtb_file%%.dtb}:psm-firmware:do_deploy"
   psm_firmware_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
@@ -844,12 +844,12 @@ EOF
 
   if [ "${machine}" == "zynqmp" ]; then
     cat <<EOF >>"${conf_file}"
-TUNEFILE[microblaze-pmu] = "conf/machine/include/${mach_conf}-microblaze.inc"
+TUNEFILE[microblaze-pmu] = "conf/machine/include/${mach_conf}/microblaze.inc"
 EOF
   elif [ "${machine}" == "versal" ]; then
     cat <<EOF >>"${conf_file}"
-TUNEFILE[microblaze-pmc] = "conf/machine/include/${mach_conf}-microblaze.inc"
-TUNEFILE[microblaze-psm] = "conf/machine/include/${mach_conf}-microblaze.inc"
+TUNEFILE[microblaze-pmc] = "conf/machine/include/${mach_conf}/microblaze.inc"
+TUNEFILE[microblaze-psm] = "conf/machine/include/${mach_conf}/microblaze.inc"
 EOF
   fi
 
@@ -1126,7 +1126,7 @@ cpulist=$(mktemp)
 
 priordir=$(pwd)
 cd "${config_dir}" || exit
-mkdir -p dtb multiconfig/includes
+mkdir -p dtb multiconfig machine/include
 # Get mach_conf name and model name
 (
   cd dtb || error "Unable to cd to dtb dir"
@@ -1148,6 +1148,8 @@ fi
 )
 
 detect_machine
+# Now that we know the machine name, we can create the directory
+mkdir -p machine/include/${mach_conf}
 
 echo "System Configuration:"
 echo "MODEL       = \"${model}\""
