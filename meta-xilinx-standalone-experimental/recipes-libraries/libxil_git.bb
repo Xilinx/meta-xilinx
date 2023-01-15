@@ -1,8 +1,25 @@
 inherit esw python3native features_check
 
 LIBXIL_CONFIG ??= ""
+include ${LIBXIL_CONFIG}
 
-require ${LIBXIL_CONFIG}
+# The python code allows us to use an include above, instead of require
+# as it enforces that the file will be available for inclusion.  It also
+# gives the user feedback if something isn't configured properly.
+python () {
+    libxil_cfg = d.getVar("LIBXIL_CONFIG")
+    if libxil_cfg:
+        bbpath = d.getVar('BBPATH')
+        libxil_path = bb.utils.which(bbpath, libxil_cfg)
+        if libxil_path:
+            return
+        else:
+            d.setVar('BB_DONT_CACHE', '1')
+            bb.parse.SkipRecipe("LIBXIL_CONFIG (%s) was not found." % libxil_cfg)
+    else:
+        d.setVar('BB_DONT_CACHE', '1')
+        raise bb.parse.SkipRecipe("No LIBXIL_CONFIG set.")
+}
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/"
 ESW_COMPONENT_NAME = "libxil.a"
