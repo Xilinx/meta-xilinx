@@ -35,7 +35,7 @@ usage() {
 $0
     -c <config_dir>         Location of the build conf directory
     -s <system_dtb>         Path to system DTB
-    -d <domain_file>        Path to domain file (.yml/.dts)
+    [-d <domain_file>]      Path to domain file (.yml/.dts)
     [-o <overlay_dtb>]      Generate overlay dts
     [-e <external_fpga>]    Apply a partial overlay
     [-m <machine>]          zynqmp or versal
@@ -50,6 +50,7 @@ EOF
 
 parse_args() {
   [ $# -eq 0 ] && usage
+  [ $1 = "--help" ] && usage
 
   while getopts ":c:s:d:o:e:m:l:hP:p:i:" opt; do
     case ${opt} in
@@ -69,6 +70,8 @@ parse_args() {
     esac
   done
 
+  [ -z "${config_dir}" ] && error "You must specify the path to the build conf directory with -c"
+  [ -z "${system_dtb}" ] && error "You must specify the path to the system device tree with -s"
   [ -f "${config_dir}/local.conf" ] || error "Invalid config dir: ${config_dir}"
   [ -f "${system_dtb}" ] || error "Unable to find: ${system_dtb}"
   system_dtb=$(realpath ${system_dtb})
