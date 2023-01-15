@@ -216,7 +216,7 @@ cortex_a53_baremetal() {
   multiconf="${multiconf} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
-  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
+  features="machine/include/${mach_conf}/${mc_name}-features.conf"
   yocto_distro="xilinx-standalone${lto}"
   if [ "$1" = "fsbl" ]; then
     fsbl_mcdepends="mc::${mc_name}:fsbl-firmware:do_deploy"
@@ -250,8 +250,8 @@ cortex_a53_baremetal() {
   fi
 
   mv libxil.conf "${libxil}"
-  mv distro.conf "${distro}"
-  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
+  mv distro.conf "${features}"
+  sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   if [ "$1" = "fsbl" ]; then
     if [ ! -e "${psu_init_path}/psu_init.c" ]; then
@@ -290,7 +290,7 @@ cortex_a53_freertos() {
   multiconf="${multiconf} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
-  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
+  features="machine/include/${mach_conf}/${mc_name}-features.conf"
 
   # Build device tree
   (
@@ -316,8 +316,8 @@ cortex_a53_freertos() {
   fi
 
   mv libxil.conf "${libxil}"
-  mv distro.conf "${distro}"
-  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
+  mv distro.conf "${features}"
+  sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -420,7 +420,7 @@ cortex_a72_baremetal() {
   multiconf="${multiconf} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
-  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
+  features="machine/include/${mach_conf}/${mc_name}-features.conf"
 
   # Build device tree
   (
@@ -446,8 +446,8 @@ cortex_a72_baremetal() {
   fi
 
   mv libxil.conf "${libxil}"
-  mv distro.conf "${distro}"
-  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
+  mv distro.conf "${features}"
+  sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -472,7 +472,7 @@ cortex_a72_freertos() {
   multiconf="${multiconf} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
-  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
+  features="machine/include/${mach_conf}/${mc_name}-features.conf"
 
   # Build device tree
   (
@@ -498,8 +498,8 @@ cortex_a72_freertos() {
   fi
 
   mv libxil.conf "${libxil}"
-  mv distro.conf "${distro}"
-  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
+  mv distro.conf "${features}"
+  sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -532,7 +532,7 @@ cortex_r5_baremetal() {
   multiconf="${multiconf} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
-  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
+  features="machine/include/${mach_conf}/${mc_name}-features.conf"
   yocto_distro="xilinx-standalone${lto}"
 
   if [ "$1" = "fsbl" ]; then
@@ -565,8 +565,8 @@ cortex_r5_baremetal() {
   fi
 
   mv libxil.conf "${libxil}"
-  mv distro.conf "${distro}"
-  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
+  mv distro.conf "${features}"
+  sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   if [ "$1" = "fsbl" ]; then
     if [ ! -e "${psu_init_path}/psu_init.c" ]; then
@@ -605,7 +605,7 @@ cortex_r5_freertos() {
   multiconf="${multiconf} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
-  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
+  features="machine/include/${mach_conf}/${mc_name}-features.conf"
 
   # Build device tree
   (
@@ -631,8 +631,8 @@ cortex_r5_freertos() {
   fi
 
   mv libxil.conf "${libxil}"
-  mv distro.conf "${distro}"
-  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
+  mv distro.conf "${features}"
+  sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -678,7 +678,7 @@ pmu-microblaze() {
   multiconf_min="${multiconf_min} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
-  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
+  features="machine/include/${mach_conf}/${mc_name}-features.conf"
 
   pmu_mcdepends="mc::${mc_name}:pmu-firmware:do_deploy"
   pmu_firmware_deploy_dir="\${BASE_TMPDIR}/tmp-${mc_name}/deploy/images/\${MACHINE}"
@@ -699,8 +699,8 @@ pmu-microblaze() {
   fi
 
   mv libxil.conf "${libxil}"
-  mv distro.conf "${distro}"
-  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
+  mv distro.conf "${features}"
+  sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -729,7 +729,7 @@ pmc-microblaze() {
   multiconf_min="${multiconf_min} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
-  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
+  features="machine/include/${mach_conf}/${mc_name}-features.conf"
 
   plm_mcdepends="mc::${mc_name}:plm-firmware:do_deploy"
   plm_deploy_dir="\${BASE_TMPDIR}/tmp-${mc_name}/deploy/images/\${MACHINE}"
@@ -750,8 +750,8 @@ pmc-microblaze() {
   fi
 
   mv libxil.conf "${libxil}"
-  mv distro.conf "${distro}"
-  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
+  mv distro.conf "${features}"
+  sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -780,7 +780,7 @@ psm-microblaze() {
   multiconf_min="${multiconf_min} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
-  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
+  features="machine/include/${mach_conf}/${mc_name}-features.conf"
 
   psm_mcdepends="mc::${mc_name}:psm-firmware:do_deploy"
   psm_firmware_deploy_dir="\${BASE_TMPDIR}/tmp-${mc_name}/deploy/images/\${MACHINE}"
@@ -801,8 +801,8 @@ psm-microblaze() {
   fi
 
   mv libxil.conf "${libxil}"
-  mv distro.conf "${distro}"
-  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
+  mv distro.conf "${features}"
+  sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
