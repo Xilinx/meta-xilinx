@@ -14,7 +14,7 @@ parts and pieces.
 **Note:** to use this layer you must REMOVE meta-xilinx-tools from your
 project.  meta-xilinx-tools is not compatible with this experimental
 approach.  You may also have to remove other layers that depend
-on meta-xilinx-tools, such as meta-som.
+on meta-xilinx-tools, such as meta-kria.
 
 To use the experimental version of the embedded software (firmware)
 as well as system configuration, you must build the 'meta-xilinx-setup'
@@ -23,7 +23,7 @@ produces a number of configuration files.
 
 To build the setup SDK:
 
-MACHINE=qemux86-64 bitbake meta-xilinx-setup
+bitbake meta-xilinx-setup
 
 To install the setup SDK:
 
