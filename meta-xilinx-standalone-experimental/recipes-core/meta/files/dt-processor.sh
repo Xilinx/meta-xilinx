@@ -136,12 +136,13 @@ cortex_a53_linux() {
     dtb_file="cortexa53-${machine}-linux.dtb"
     dts_file="cortexa53-${machine}-linux.dts"
     system_conf=${dtb_file}
-    conf_file=cortexa53-${machine}-linux.conf
+    conf_file=""
   else
-    dtb_file="cortexa53-${machine}-$1-linux.dtb"
-    dts_file="cortexa53-${machine}-$1-linux.dts"
-    multiconf="${multiconf} cortexa53-${machine}-linux"
-    conf_file=multiconfig/cortexa53-${machine}-$1-linux.conf
+    mc_name=cortexa53-${machine}-$1-linux
+    dtb_file="${mc_name}.dtb"
+    dts_file="${mc_name}.dts"
+    multiconf="${multiconf} ${mc_name}"
+    conf_file=multiconfig/${mc_name}.conf
   fi
 
   # Check if it is overlay dts otherwise just create linux dtb
@@ -184,7 +185,7 @@ cortex_a53_linux() {
     rm -f pl.dtsi lop-a53-imux.dts.dtb lop-domain-linux-a53.dts.dtb
   )
 
-  if [ "$1" = "None" ]; then
+  if [ -z "${conf_file}" ]; then
       return $?
   fi
 
@@ -192,7 +193,7 @@ cortex_a53_linux() {
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 
-TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 EOF
 }
 
@@ -210,16 +211,17 @@ cortex_a53_baremetal() {
     suffix="-$1"; lto=""
   fi
 
-  dtb_file="cortexa53-$2-${machine}${suffix}-baremetal.dtb"
-  multiconf="${multiconf} cortexa53-$2-${machine}${suffix}-baremetal"
-  conf_file="multiconfig/cortexa53-$2-${machine}${suffix}-baremetal.conf"
-  libxil="machine/include/${mach_conf}/cortexa53-${machine}${suffix}-libxil.conf"
-  distro="machine/include/${mach_conf}/cortexa53-${machine}${suffix}-features.conf"
+  mc_name="cortexa53-$2-${machine}${suffix}-baremetal"
+  dtb_file="${mc_name}.dtb"
+  multiconf="${multiconf} ${mc_name}"
+  conf_file="multiconfig/${mc_name}.conf"
+  libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
+  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
   yocto_distro="xilinx-standalone${lto}"
   if [ "$1" = "fsbl" ]; then
-    fsbl_mcdepends="mc::${dtb_file%%.dtb}:fsbl-firmware:do_deploy"
-    fsbl_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
-    multiconf_min="${multiconf_min} cortexa53-$2-${machine}${suffix}-baremetal"
+    fsbl_mcdepends="mc::${mc_name}:fsbl-firmware:do_deploy"
+    fsbl_deploy_dir="\${BASE_TMPDIR}/tmp-${mc_name}/deploy/images/\${MACHINE}"
+    multiconf_min="${multiconf_min} ${mc_name}"
     a53_fsbl_done=1
   fi
 
@@ -271,12 +273,9 @@ CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa53"
 
-TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 
 DISTRO = "${yocto_distro}"
-
-LIBXIL_CONFIG = "conf/${libxil}"
-require conf/${distro}
 EOF
 }
 
@@ -286,11 +285,12 @@ cortex_a53_freertos() {
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
 
-  dtb_file="cortexa53-$2-${machine}${suffix}-freertos.dtb"
-  multiconf="${multiconf} cortexa53-$2-${machine}${suffix}-freertos"
-  conf_file="multiconfig/cortexa53-$2-${machine}${suffix}-freertos.conf"
-  libxil="machine/include/${mach_conf}/cortexa53-${machine}${suffix}-libxil.conf"
-  distro="machine/include/${mach_conf}/cortexa53-${machine}${suffix}-features.conf"
+  mc_name="cortexa53-$2-${machine}${suffix}-freertos"
+  dtb_file="${mc_name}.dtb"
+  multiconf="${multiconf} ${mc_name}"
+  conf_file="multiconfig/${mc_name}.conf"
+  libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
+  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
 
   # Build device tree
   (
@@ -325,12 +325,9 @@ CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa53"
 
-TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 
 DISTRO = "xilinx-freertos"
-
-LIBXIL_CONFIG = "conf/${libxil}"
-require conf/${distro}
 EOF
 }
 
@@ -350,12 +347,13 @@ cortex_a72_linux() {
     dtb_file="cortexa72-${machine}-linux.dtb"
     dts_file="cortexa72-${machine}-linux.dts"
     system_conf=${dtb_file}
-    conf_file=cortexa72-${machine}-linux.conf
+    conf_file=""
   else
-    dtb_file="cortexa72-${machine}-$1-linux.dtb"
-    dts_file="cortexa72-${machine}-$1-linux.dts"
-    multiconf="${multiconf} cortexa72-${machine}-linux"
-    conf_file=multiconfig/cortexa72-${machine}-$1-linux.conf
+    mc_name="cortexa72-${machine}-$1-linux"
+    dtb_file="${mc_name}.dtb"
+    dts_file="${mc_name}.dts"
+    multiconf="${multiconf} ${mc_name}"
+    conf_file=multiconfig/${mc_name}.conf
   fi
 
   (
@@ -399,7 +397,7 @@ cortex_a72_linux() {
     rm -f pl.dtsi lop-a72-imux.dts.dtb lop-domain-a72.dts.dtb
   )
 
-  if [ "$1" = "None" ]; then
+  if [ -z "${conf_file}" ]; then
       return $?
   fi
 
@@ -407,7 +405,7 @@ cortex_a72_linux() {
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 
-TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 EOF
 }
 
@@ -417,11 +415,12 @@ cortex_a72_baremetal() {
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
 
-  dtb_file="cortexa72-$2-${machine}${suffix}-baremetal.dtb"
-  multiconf="${multiconf} cortexa72-$2-${machine}${suffix}-baremetal"
-  conf_file="multiconfig/cortexa72-$2-${machine}${suffix}-baremetal.conf"
-  libxil="machine/include/${mach_conf}/cortexa72-${machine}${suffix}-libxil.conf"
-  distro="machine/include/${mach_conf}/cortexa72-${machine}${suffix}-features.conf"
+  mc_name="cortexa72-$2-${machine}${suffix}-baremetal"
+  dtb_file="${mc_name}.dtb"
+  multiconf="${multiconf} ${mc_name}"
+  conf_file="multiconfig/${mc_name}.conf"
+  libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
+  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
 
   # Build device tree
   (
@@ -456,12 +455,9 @@ CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa72"
 
-TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 
 DISTRO = "xilinx-standalone-nolto"
-
-LIBXIL_CONFIG = "conf/${libxil}"
-require conf/${distro}
 EOF
 }
 
@@ -471,11 +467,12 @@ cortex_a72_freertos() {
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
 
-  dtb_file="cortexa72-$2-${machine}${suffix}-freertos.dtb"
-  multiconf="${multiconf} cortexa72-$2-${machine}${suffix}-freertos"
-  conf_file="multiconfig/cortexa72-$2-${machine}${suffix}-freertos.conf"
-  libxil="machine/include/${mach_conf}/cortexa72-${machine}${suffix}-libxil.conf"
-  distro="machine/include/${mach_conf}/cortexa72-${machine}${suffix}-features.conf"
+  mc_name="cortexa72-$2-${machine}${suffix}-freertos"
+  dtb_file="${mc_name}.dtb"
+  multiconf="${multiconf} ${mc_name}"
+  conf_file="multiconfig/${mc_name}.conf"
+  libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
+  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
 
   # Build device tree
   (
@@ -510,12 +507,9 @@ CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa72"
 
-TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 
 DISTRO = "xilinx-freertos"
-
-LIBXIL_CONFIG = "conf/${libxil}"
-require conf/${distro}
 EOF
 }
 
@@ -533,16 +527,17 @@ cortex_r5_baremetal() {
     suffix="-$1"; lto=""
   fi
 
-  dtb_file="cortexr5-$2-${machine}${suffix}-baremetal.dtb"
-  multiconf="${multiconf} cortexr5-$2-${machine}${suffix}-baremetal"
-  conf_file="multiconfig/cortexr5-$2-${machine}${suffix}-baremetal.conf"
-  libxil="machine/include/${mach_conf}/cortexr5-${machine}${suffix}-libxil.conf"
-  distro="machine/include/${mach_conf}/cortexr5-${machine}${suffix}-features.conf"
+  mc_name="cortexr5-$2-${machine}${suffix}-baremetal"
+  dtb_file="${mc_name}.dtb"
+  multiconf="${multiconf} ${mc_name}"
+  conf_file="multiconfig/${mc_name}.conf"
+  libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
+  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
   yocto_distro="xilinx-standalone${lto}"
 
   if [ "$1" = "fsbl" ]; then
-    r5fsbl_mcdepends="mc::${dtb_file%%.dtb}:fsbl-firmware:do_deploy"
-    r5fsbl_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
+    r5fsbl_mcdepends="mc::${mc_name}:fsbl-firmware:do_deploy"
+    r5fsbl_deploy_dir="\${BASE_TMPDIR}/tmp-${mc_name}/deploy/images/\${MACHINE}"
     r5_fsbl_done=1
   fi
 
@@ -593,12 +588,9 @@ CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexr5"
 
-TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 
 DISTRO = "$yocto_distro"
-
-LIBXIL_CONFIG = "conf/${libxil}"
-require conf/${distro}
 EOF
 }
 
@@ -608,11 +600,12 @@ cortex_r5_freertos() {
   suffix=""
   [ "$1" != "None" ] && suffix="-$1"
 
-  dtb_file="cortexr5-$2-${machine}${suffix}-freertos.dtb"
-  multiconf="${multiconf} cortexr5-$2-${machine}${suffix}-freertos"
-  conf_file="multiconfig/cortexr5-$2-${machine}${suffix}-freertos.conf"
-  libxil="machine/include/${mach_conf}/cortexr5-${machine}${suffix}-libxil.conf"
-  distro="machine/include/${mach_conf}/cortexr5-${machine}${suffix}-features.conf"
+  mc_name="cortexr5-$2-${machine}${suffix}-freertos"
+  dtb_file="${mc_name}.dtb"
+  multiconf="${multiconf} ${mc_name}"
+  conf_file="multiconfig/${mc_name}.conf"
+  libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
+  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
 
   # Build device tree
   (
@@ -647,12 +640,9 @@ CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexr5"
 
-TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 
 DISTRO = "xilinx-freertos"
-
-LIBXIL_CONFIG = "conf/${libxil}"
-require conf/${distro}
 EOF
 }
 
@@ -682,15 +672,16 @@ pmu-microblaze() {
 
   process_microblaze
 
-  dtb_file="microblaze-0-pmu.dtb"
-  multiconf="${multiconf} microblaze-0-pmu"
-  multiconf_min="${multiconf_min} microblaze-0-pmu"
-  conf_file="multiconfig/microblaze-0-pmu.conf"
-  libxil="machine/include/${mach_conf}/microblaze-pmu-libxil.conf"
-  distro="machine/include/${mach_conf}/microblaze-pmu-features.conf"
+  mc_name="microblaze-0-pmu"
+  dtb_file="${mc_name}.dtb"
+  multiconf="${multiconf} ${mc_name}"
+  multiconf_min="${multiconf_min} ${mc_name}"
+  conf_file="multiconfig/${mc_name}.conf"
+  libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
+  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
 
-  pmu_mcdepends="mc::${dtb_file%%.dtb}:pmu-firmware:do_deploy"
-  pmu_firmware_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
+  pmu_mcdepends="mc::${mc_name}:pmu-firmware:do_deploy"
+  pmu_firmware_deploy_dir="\${BASE_TMPDIR}/tmp-${mc_name}/deploy/images/\${MACHINE}"
 
   # Build device tree
   (
@@ -720,12 +711,9 @@ DEFAULTTUNE = "microblaze-pmu"
 
 TARGET_CFLAGS += "-DPSU_PMU=1U"
 
-TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 
 DISTRO = "xilinx-standalone"
-
-LIBXIL_CONFIG = "conf/${libxil}"
-require conf/${distro}
 EOF
 }
 
@@ -735,15 +723,16 @@ pmc-microblaze() {
 
   process_microblaze
 
-  dtb_file="microblaze-0-pmc.dtb"
-  multiconf="${multiconf} microblaze-0-pmc"
-  multiconf_min="${multiconf_min} microblaze-0-pmc"
-  conf_file="multiconfig/microblaze-0-pmc.conf"
-  libxil="machine/include/${mach_conf}/microblaze-pmc-libxil.conf"
-  distro="machine/include/${mach_conf}/microblaze-pmc-features.conf"
+  mc_name="microblaze-0-pmc"
+  dtb_file="${mc_name}.dtb"
+  multiconf="${multiconf} ${mc_name}"
+  multiconf_min="${multiconf_min} ${mc_name}"
+  conf_file="multiconfig/${mc_name}.conf"
+  libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
+  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
 
-  plm_mcdepends="mc::${dtb_file%%.dtb}:plm-firmware:do_deploy"
-  plm_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
+  plm_mcdepends="mc::${mc_name}:plm-firmware:do_deploy"
+  plm_deploy_dir="\${BASE_TMPDIR}/tmp-${mc_name}/deploy/images/\${MACHINE}"
 
   # Build device tree
   (
@@ -773,12 +762,9 @@ DEFAULTTUNE = "microblaze-pmc"
 
 TARGET_CFLAGS += "-DVERSAL_PLM=1"
 
-TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 
 DISTRO = "xilinx-standalone"
-
-LIBXIL_CONFIG = "conf/${libxil}"
-require conf/${distro}
 EOF
 }
 
@@ -788,15 +774,16 @@ psm-microblaze() {
 
   process_microblaze
 
-  dtb_file="microblaze-0-psm.dtb"
-  multiconf="${multiconf} microblaze-0-psm"
-  multiconf_min="${multiconf_min} microblaze-0-psm"
-  conf_file="multiconfig/microblaze-0-psm.conf"
-  libxil="machine/include/${mach_conf}/microblaze-psm-libxil.conf"
-  distro="machine/include/${mach_conf}/microblaze-psm-features.conf"
+  mc_name="microblaze-0-psm"
+  dtb_file="${mc_name}.dtb"
+  multiconf="${multiconf} ${mc_name}"
+  multiconf_min="${multiconf_min} ${mc_name}"
+  conf_file="multiconfig/${mc_name}.conf"
+  libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
+  distro="machine/include/${mach_conf}/${mc_name}-features.conf"
 
-  psm_mcdepends="mc::${dtb_file%%.dtb}:psm-firmware:do_deploy"
-  psm_firmware_deploy_dir="\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}/deploy/images/\${MACHINE}"
+  psm_mcdepends="mc::${mc_name}:psm-firmware:do_deploy"
+  psm_firmware_deploy_dir="\${BASE_TMPDIR}/tmp-${mc_name}/deploy/images/\${MACHINE}"
 
   # Build device tree
   (
@@ -826,12 +813,9 @@ DEFAULTTUNE = "microblaze-psm"
 
 TARGET_CFLAGS += "-DVERSAL_psm=1"
 
-TMPDIR = "\${BASE_TMPDIR}/tmp-${dtb_file%%.dtb}"
+TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 
 DISTRO = "xilinx-standalone"
-
-LIBXIL_CONFIG = "conf/${libxil}"
-require conf/${distro}
 EOF
 }
 
@@ -879,6 +863,10 @@ HDF_MACHINE = ""
 SYSTEM_DTFILE_DIR = "${sysdt_path}"
 SYSTEM_DTFILE = "\${SYSTEM_DTFILE_DIR}/${sysdt_base}"
 SYSTEM_DTFILE[vardepsexclude] += "SYSTEM_DTFILE_DIR"
+
+# Load the dynamic machine features
+include conf/machine/include/${mach_conf}/\${BB_CURRENT_MC}-features.conf
+LIBXIL_CONFIG = "conf/machine/include/${mach_conf}/\${BB_CURRENT_MC}-libxil.conf"
 
 EOF
 
