@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "emaclite"
+REQUIRED_MACHINE_FEATURES = "emaclite"
 
 inherit esw python3native
 

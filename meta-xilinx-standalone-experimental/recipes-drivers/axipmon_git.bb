@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "axipmon"
+REQUIRED_MACHINE_FEATURES = "axipmon"
 
 inherit esw python3native
 

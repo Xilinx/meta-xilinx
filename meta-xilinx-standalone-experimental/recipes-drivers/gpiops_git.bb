@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "gpiops"
+REQUIRED_MACHINE_FEATURES = "gpiops"
 
 inherit esw python3native
 

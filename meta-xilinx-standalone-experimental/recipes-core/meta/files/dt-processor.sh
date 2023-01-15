@@ -249,6 +249,7 @@ cortex_a53_baremetal() {
 
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
+  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   if [ "$1" = "fsbl" ]; then
     if [ ! -e "${psu_init_path}/psu_init.c" ]; then
@@ -316,6 +317,7 @@ cortex_a53_freertos() {
 
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
+  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -446,6 +448,7 @@ cortex_a72_baremetal() {
 
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
+  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -499,6 +502,7 @@ cortex_a72_freertos() {
 
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
+  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -567,6 +571,7 @@ cortex_r5_baremetal() {
 
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
+  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   if [ "$1" = "fsbl" ]; then
     if [ ! -e "${psu_init_path}/psu_init.c" ]; then
@@ -634,6 +639,7 @@ cortex_r5_freertos() {
 
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
+  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -703,6 +709,7 @@ pmu-microblaze() {
 
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
+  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -755,6 +762,7 @@ pmc-microblaze() {
 
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
+  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
@@ -807,6 +815,7 @@ psm-microblaze() {
 
   mv libxil.conf "${libxil}"
   mv distro.conf "${distro}"
+  sed -i ${distro} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
 CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"

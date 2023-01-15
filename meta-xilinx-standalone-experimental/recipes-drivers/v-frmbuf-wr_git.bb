@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "v-frmbuf-wr"
+REQUIRED_MACHINE_FEATURES = "v-frmbuf-wr"
 
 inherit esw python3native
 

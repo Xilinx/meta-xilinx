@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "spips"
+REQUIRED_MACHINE_FEATURES = "spips"
 
 inherit esw python3native
 

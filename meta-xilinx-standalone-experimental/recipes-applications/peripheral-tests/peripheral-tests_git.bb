@@ -29,7 +29,7 @@ python do_generate_app_data() {
     if len(src_dir) == 0:
         bb.error("Couldn't find source dir %s" % d.getVar('OECMAKE_SOURCEPATH'))
 
-    driver_name = d.getVar('REQUIRED_DISTRO_FEATURES')
+    driver_name = d.getVar('REQUIRED_MACHINE_FEATURES')
     command = ["lopper"] + ["-f"] + ["-O"] + [src_dir[0]] + [system_dt[0]] + ["--"] + ["baremetal_gentestapp_xlnx"] + [machine] + [srcdir[0]]
     subprocess.run(command, check = True)
 }

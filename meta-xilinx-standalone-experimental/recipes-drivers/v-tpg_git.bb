@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "v-tpg"
+REQUIRED_MACHINE_FEATURES = "v-tpg"
 
 inherit esw python3native
 

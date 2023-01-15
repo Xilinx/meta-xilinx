@@ -121,7 +121,7 @@ python do_generate_driver_data() {
     src_dir = glob.glob(d.getVar('OECMAKE_SOURCEPATH'))
     machine = d.getVar('ESW_MACHINE')
 
-    driver_name = d.getVar('REQUIRED_DISTRO_FEATURES')
+    driver_name = d.getVar('REQUIRED_MACHINE_FEATURES')
 
     if len(system_dt) == 0:
         bb.error("Couldn't find device tree %s" % d.getVar('DTS_FILE'))

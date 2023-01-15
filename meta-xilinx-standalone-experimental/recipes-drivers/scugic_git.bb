@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "scugic"
+REQUIRED_MACHINE_FEATURES = "scugic"
 
 inherit esw python3native
 

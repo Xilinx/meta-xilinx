@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "canfd"
+REQUIRED_MACHINE_FEATURES = "canfd"
 
 inherit esw python3native
 

@@ -1,7 +1,7 @@
 inherit esw deploy
 
 # Requires by dependency xilffs
-REQUIRED_DISTRO_FEATURES = "sdps"
+REQUIRED_MACHINE_FEATURES = "sdps"
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilffs/examples/"
 

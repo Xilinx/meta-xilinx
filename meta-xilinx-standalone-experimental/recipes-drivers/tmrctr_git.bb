@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "tmrctr"
+REQUIRED_MACHINE_FEATURES = "tmrctr"
 
 inherit esw python3native
 

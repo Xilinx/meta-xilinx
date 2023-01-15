@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "resetps"
+REQUIRED_MACHINE_FEATURES = "resetps"
 
 inherit esw python3native
 

@@ -1,5 +1,5 @@
 inherit esw_examples features_check
 
-REQUIRED_DISTRO_FEATURES = "llfifo"
+REQUIRED_MACHINE_FEATURES = "llfifo"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/llfifo/examples/"

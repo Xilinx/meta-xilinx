@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "ttcps"
+REQUIRED_MACHINE_FEATURES = "ttcps"
 
 inherit esw python3native
 

@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "mbox"
+REQUIRED_MACHINE_FEATURES = "mbox"
 
 inherit esw python3native
 

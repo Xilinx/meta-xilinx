@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "dppsu"
+REQUIRED_MACHINE_FEATURES = "dppsu"
 
 inherit esw python3native
 

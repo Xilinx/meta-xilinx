@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "nandpsu"
+REQUIRED_MACHINE_FEATURES = "nandpsu"
 
 inherit esw python3native
 

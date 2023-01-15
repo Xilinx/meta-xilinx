@@ -1,14 +1,14 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "common"
+REQUIRED_MACHINE_FEATURES = "common"
 
 inherit esw python3native
 
 DEPENDS += "xilstandalone "
 
-PACKAGECONFIG ?= "${@bb.utils.contains("DISTRO_FEATURES", "clockps", "clockps", "", d)} \
-		  ${@bb.utils.contains("DISTRO_FEATURES", "scugic", "scugic", "", d)} \
-		  ${@bb.utils.contains("DISTRO_FEATURES", "intc", "intc", "", d)}"
+PACKAGECONFIG ?= "${@bb.utils.contains("MACHINE_FEATURES", "clockps", "clockps", "", d)} \
+		  ${@bb.utils.contains("MACHINE_FEATURES", "scugic", "scugic", "", d)} \
+		  ${@bb.utils.contains("MACHINE_FEATURES", "intc", "intc", "", d)}"
 PACKAGECONFIG[clockps] = "${RECIPE_SYSROOT}/usr/lib/libclockps.a,,clockps,,"
 PACKAGECONFIG[scugic] = "${RECIPE_SYSROOT}/usr/lib/libscugic.a,,scugic,,"
 PACKAGECONFIG[intc] = "${RECIPE_SYSROOT}/usr/lib/libintc.a,,intc,,"

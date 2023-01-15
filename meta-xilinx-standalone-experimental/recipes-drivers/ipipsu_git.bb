@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "ipipsu"
+REQUIRED_MACHINE_FEATURES = "ipipsu"
 
 inherit esw python3native
 

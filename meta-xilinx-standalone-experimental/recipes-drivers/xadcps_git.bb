@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "xadcps"
+REQUIRED_MACHINE_FEATURES = "xadcps"
 
 inherit esw python3native
 

@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "axiethernet"
+REQUIRED_MACHINE_FEATURES = "axiethernet"
 
 inherit esw python3native
 

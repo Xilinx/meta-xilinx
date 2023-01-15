@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "uartpsv"
+REQUIRED_MACHINE_FEATURES = "uartpsv"
 
 inherit esw python3native
 

@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "v-deinterlacer"
+REQUIRED_MACHINE_FEATURES = "v-deinterlacer"
 
 inherit esw python3native
 

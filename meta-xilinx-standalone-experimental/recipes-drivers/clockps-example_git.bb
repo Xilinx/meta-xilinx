@@ -2,7 +2,7 @@ inherit esw deploy features_check
 
 ESW_COMPONENT_SRC = "XilinxProcessorIPLib/drivers/clockps/examples/"
 
-REQUIRED_DISTRO_FEATURES = "clockps"
+REQUIRED_MACHINE_FEATURES = "clockps"
 
 DEPENDS += "libxil xiltimer resetps"
 

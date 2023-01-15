@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "clk-wiz"
+REQUIRED_MACHINE_FEATURES = "clk-wiz"
 
 inherit esw python3native
 

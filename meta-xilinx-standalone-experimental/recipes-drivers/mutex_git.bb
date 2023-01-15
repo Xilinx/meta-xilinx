@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "mutex"
+REQUIRED_MACHINE_FEATURES = "mutex"
 
 inherit esw python3native
 

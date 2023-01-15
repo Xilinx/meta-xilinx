@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "sysmonpsv"
+REQUIRED_MACHINE_FEATURES = "sysmonpsv"
 
 inherit esw python3native
 

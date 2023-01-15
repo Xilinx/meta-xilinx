@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "v-vcresampler"
+REQUIRED_MACHINE_FEATURES = "v-vcresampler"
 
 inherit esw python3native
 

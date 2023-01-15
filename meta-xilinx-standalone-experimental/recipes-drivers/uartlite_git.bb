@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "uartlite"
+REQUIRED_MACHINE_FEATURES = "uartlite"
 
 inherit esw python3native
 
