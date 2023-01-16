@@ -1,0 +1,1106 @@
+From f8af7d17252a0705687cb7c4bfe27eefdb17a986 Mon Sep 17 00:00:00 2001
+From: Madhav Bhatt <madhav.bhatt@xilinx.com>
+Date: Tue, 3 Jan 2023 11:43:37 -0800
+Subject: [PATCH] lopper: Implementation of lopper plugin for generating config
+ object
+
+Signed-off-by: Madhav Bhatt <madhav.bhatt@amd.com>
+---
+ .../assists/cfg_obj/modules/cfg_data_tpl.py   |   1 +
+ .../cfg_obj/modules/cfgobj_hard_coding.py     | 277 +++++++++
+ lopper/assists/cfg_obj/modules/sdtinfo.py     | 193 ++++++
+ lopper/assists/cfg_obj/modules/section.py     |  35 ++
+ lopper/assists/generate_config_object.py      | 547 ++++++++++++++++++
+ 5 files changed, 1053 insertions(+)
+ create mode 100644 lopper/assists/cfg_obj/modules/cfg_data_tpl.py
+ create mode 100644 lopper/assists/cfg_obj/modules/cfgobj_hard_coding.py
+ create mode 100644 lopper/assists/cfg_obj/modules/sdtinfo.py
+ create mode 100644 lopper/assists/cfg_obj/modules/section.py
+ create mode 100644 lopper/assists/generate_config_object.py
+
+diff --git a/lopper/assists/cfg_obj/modules/cfg_data_tpl.py b/lopper/assists/cfg_obj/modules/cfg_data_tpl.py
+new file mode 100644
+index 0000000..8b0a865
+--- /dev/null
++++ b/lopper/assists/cfg_obj/modules/cfg_data_tpl.py
+@@ -0,0 +1 @@
++config_object_template = '/******************************************************************************\n* Copyright (c) 2017 - 2021 Xilinx, Inc.  All rights reserved.\n* SPDX-License-Identifier: MIT\n******************************************************************************/\n\n#include "xil_types.h"\n#include "pm_defs.h"\n\n#define PM_CONFIG_MASTER_SECTION_ID	0x101U\n#define PM_CONFIG_SLAVE_SECTION_ID	0x102U\n#define PM_CONFIG_PREALLOC_SECTION_ID	0x103U\n#define PM_CONFIG_POWER_SECTION_ID	0x104U\n#define PM_CONFIG_RESET_SECTION_ID	0x105U\n#define PM_CONFIG_SHUTDOWN_SECTION_ID	0x106U\n#define PM_CONFIG_SET_CONFIG_SECTION_ID	0x107U\n#define PM_CONFIG_GPO_SECTION_ID	0x108U\n\n#define PM_SLAVE_FLAG_IS_SHAREABLE	0x1U\n#define PM_MASTER_USING_SLAVE_MASK	0x2U\n\n#define PM_CONFIG_GPO1_MIO_PIN_34_MAP	(1U << 10U)\n#define PM_CONFIG_GPO1_MIO_PIN_35_MAP	(1U << 11U)\n#define PM_CONFIG_GPO1_MIO_PIN_36_MAP	(1U << 12U)\n#define PM_CONFIG_GPO1_MIO_PIN_37_MAP	(1U << 13U)\n\n#define PM_CONFIG_GPO1_BIT_2_MASK	(1U << 2U)\n#define PM_CONFIG_GPO1_BIT_3_MASK	(1U << 3U)\n#define PM_CONFIG_GPO1_BIT_4_MASK	(1U << 4U)\n#define PM_CONFIG_GPO1_BIT_5_MASK	(1U << 5U)\n\n#define SUSPEND_TIMEOUT	0xFFFFFFFFU\n\n#define PM_CONFIG_OBJECT_TYPE_BASE	0x1U\n\n<<MASTER_IPI_MASK_DEF>>\n\n#if defined (__ICCARM__)\n#pragma language=save\n#pragma language=extended\n#endif\n#if defined (__GNUC__)\n    const u32 XPm_ConfigObject[] __attribute__((used, section(".sys_cfg_data"))) =\n#elif defined (__ICCARM__)\n#pragma location = ".sys_cfg_data"\n__root const u32 XPm_ConfigObject[] =\n#endif\n{\n	/**********************************************************************/\n	/* HEADER */\n	2,	/* Number of remaining words in the header */\n	8,	/* Number of sections included in config object */\n	PM_CONFIG_OBJECT_TYPE_BASE,	/* Type of config object as base */\n	/**********************************************************************/\n	/* MASTER SECTION */\n<<MASTER_SECTION_DATA>>\n	/**********************************************************************/\n	/* SLAVE SECTION */\n<<SLAVE_SECTION_DATA>>\n	/**********************************************************************/\n	/* PREALLOC SECTION */\n<<PREALLOC_SECTION_DATA>>\n	/**********************************************************************/\n	/* POWER SECTION */\n<<POWER_SECTION_DATA>>\n	/**********************************************************************/\n	/* RESET SECTION */\n<<RESET_SECTION_DATA>>\n	/**********************************************************************/\n	/* SET CONFIG SECTION */\n<<SET_CONFIG_SECTION_DATA>>\n	/**********************************************************************/\n	/* SHUTDOWN SECTION */\n<<SHUTDOWN_SECTION_DATA>>\n	/**********************************************************************/\n	/* GPO SECTION */\n<<GPO_SECTION_DATA>>\n};\n#if defined (__ICCARM__)\n#pragma language=restore\n#endif'
+diff --git a/lopper/assists/cfg_obj/modules/cfgobj_hard_coding.py b/lopper/assists/cfg_obj/modules/cfgobj_hard_coding.py
+new file mode 100644
+index 0000000..1d05977
+--- /dev/null
++++ b/lopper/assists/cfg_obj/modules/cfgobj_hard_coding.py
+@@ -0,0 +1,277 @@
++# /*
++# * Copyright (c) 2022 - 2023 Advanced Micro Devices, Inc. All Rights Reserved.
++# *
++# * Author:
++# *       Madhav Bhatt <madhav.bhatt@amd.com>
++# *
++# * SPDX-License-Identifier: BSD-3-Clause
++# */
++
++rpu0_as_power_management_master = True
++rpu1_as_power_management_master = True
++apu_as_power_management_master = True
++rpu0_as_reset_management_master = True
++rpu1_as_reset_management_master = True
++apu_as_reset_management_master = True
++rpu0_as_overlay_config_master = False
++rpu1_as_overlay_config_master = False
++apu_as_overlay_config_master = False
++
++subsys_str = "PMU Firmware:PMU|Secure Subsystem:"
++
++node_map = {
++	"NODE_APU" : { "label" : "NODE_APU", "periph" : "psu_cortexa53_0", "type" : "processor" },
++	"NODE_APU_0" : { "label" : "NODE_APU_0", "periph" : "psu_cortexa53_0", "type" : "processor" },
++	"NODE_APU_1" : { "label" : "NODE_APU_1", "periph" : "psu_cortexa53_1", "type" : "processor" },
++	"NODE_APU_2" : { "label" : "NODE_APU_2", "periph" : "psu_cortexa53_2", "type" : "processor" },
++	"NODE_APU_3" : { "label" : "NODE_APU_3", "periph" : "psu_cortexa53_3", "type" : "processor" },
++	"NODE_RPU" : { "label" : "NODE_RPU", "periph" : "psu_cortexr5_0", "type" : "processor" },
++	"NODE_RPU_0" : { "label" : "NODE_RPU_0", "periph" : "psu_cortexr5_0", "type" : "processor" },
++	"NODE_RPU_1" : { "label" : "NODE_RPU_1", "periph" : "psu_cortexr5_1", "type" : "processor" },
++	"NODE_PLD" : { "label" : "NODE_PLD", "periph" : "NA", "type" : "power" },
++	"NODE_FPD" : { "label" : "NODE_FPD", "periph" : "NA", "type" : "power" },
++	"NODE_OCM_BANK_0" : { "label" : "NODE_OCM_BANK_0", "periph" : "psu_ocm_0", "type" : "memory", "base_addr" : [0xfffc0000]},
++	"NODE_OCM_BANK_1" : { "label" : "NODE_OCM_BANK_1", "periph" : "psu_ocm_1", "type" : "memory", "base_addr" : [0xfffd0000]},
++	"NODE_OCM_BANK_2" : { "label" : "NODE_OCM_BANK_2", "periph" : "psu_ocm_2", "type" : "memory", "base_addr" : [0xfffe0000]},
++	"NODE_OCM_BANK_3" : { "label" : "NODE_OCM_BANK_3", "periph" : "psu_ocm_3", "type" : "memory", "base_addr" : [0xffff0000]},
++	"NODE_TCM_0_A" : { "label" : "NODE_TCM_0_A", "periph" : "psu_r5_0_atcm_global", "type" : "memory", "base_addr" : [0xffe00000] },
++	"NODE_TCM_0_B" : { "label" : "NODE_TCM_0_B", "periph" : "psu_r5_0_btcm_global", "type" : "memory", "base_addr" : [0xffe20000] },
++	"NODE_TCM_1_A" : { "label" : "NODE_TCM_1_A", "periph" : "psu_r5_1_atcm_global", "type" : "memory", "base_addr" : [0xffe90000] },
++	"NODE_TCM_1_B" : { "label" : "NODE_TCM_1_B", "periph" : "psu_r5_1_btcm_global", "type" : "memory", "base_addr" : [0xffeb0000] },
++	"NODE_L2" : { "label" : "NODE_L2", "periph" : "NA", "type" : "others" },
++	"NODE_GPU_PP_0" : { "label" : "NODE_GPU_PP_0", "periph" : "psu_gpu", "type" : "slave", "base_addr" : [0xfd4b0000] },
++	"NODE_GPU_PP_1" : { "label" : "NODE_GPU_PP_1", "periph" : "psu_gpu", "type" : "slave", "base_addr" : [0xfd4b0000] },
++	"NODE_USB_0" : { "label" : "NODE_USB_0", "periph" : "psu_usb_0", "type" : "slave", "base_addr" : [0xff9d0000] },
++	"NODE_USB_1" : { "label" : "NODE_USB_1", "periph" : "psu_usb_1", "type" : "slave", "base_addr" : [0xff9e0000] },
++	"NODE_TTC_0" : { "label" : "NODE_TTC_0", "periph" : "psu_ttc_0", "type" : "slave", "base_addr" : [0xff110000] },
++	"NODE_TTC_1" : { "label" : "NODE_TTC_1", "periph" : "psu_ttc_1", "type" : "slave", "base_addr" : [0xff120000] },
++	"NODE_TTC_2" : { "label" : "NODE_TTC_2", "periph" : "psu_ttc_2", "type" : "slave", "base_addr" : [0xff130000 ] },
++	"NODE_TTC_3" : { "label" : "NODE_TTC_3", "periph" : "psu_ttc_3", "type" : "slave", "base_addr" : [0xff140000] },
++	"NODE_SATA" : { "label" : "NODE_SATA", "periph" : "psu_sata", "type" : "slave", "base_addr" : [0xfd0c0000] },
++	"NODE_ETH_0" : { "label" : "NODE_ETH_0", "periph" : "psu_ethernet_0", "type" : "slave", "base_addr" : [0xff0b0000] },
++	"NODE_ETH_1" : { "label" : "NODE_ETH_1", "periph" : "psu_ethernet_1", "type" : "slave", "base_addr" : [0xff0c0000] },
++	"NODE_ETH_2" : { "label" : "NODE_ETH_2", "periph" : "psu_ethernet_2", "type" : "slave", "base_addr" : [0xff0d0000] },
++	"NODE_ETH_3" : { "label" : "NODE_ETH_3", "periph" : "psu_ethernet_3", "type" : "slave", "base_addr" : [0xff0e0000] },
++	"NODE_UART_0" : { "label" : "NODE_UART_0", "periph" : "psu_uart_0", "type" : "slave", "base_addr" : [0xff000000] },
++	"NODE_UART_1" : { "label" : "NODE_UART_1", "periph" : "psu_uart_1", "type" : "slave", "base_addr" : [0xff010000] },
++	"NODE_SPI_0" : { "label" : "NODE_SPI_0", "periph" : "psu_spi_0", "type" : "slave", "base_addr" : [0xff040000] },
++	"NODE_SPI_1" : { "label" : "NODE_SPI_1", "periph" : "psu_spi_1", "type" : "slave", "base_addr" : [0xff050000] },
++	"NODE_I2C_0" : { "label" : "NODE_I2C_0", "periph" : "psu_i2c_0", "type" : "slave", "base_addr" : [0xff020000] },
++	"NODE_I2C_1" : { "label" : "NODE_I2C_1", "periph" : "psu_i2c_1", "type" : "slave", "base_addr" : [0xff030000] },
++	"NODE_SD_0" : { "label" : "NODE_SD_0", "periph" : "psu_sd_0", "type" : "slave", "base_addr" : [0xff160000] },
++	"NODE_SD_1" : { "label" : "NODE_SD_1", "periph" : "psu_sd_1", "type" : "slave", "base_addr" : [0xff170000] },
++	"NODE_DP" : { "label" : "NODE_DP", "periph" : "psu_dp", "type" : "slave", "base_addr" : [0xfd4a0000] },
++	"NODE_GDMA" : { "label" : "NODE_GDMA", "periph" : "psu_gdma_0", "type" : "slave", "base_addr" : [0xfd500000] },
++	"NODE_ADMA" : { "label" : "NODE_ADMA", "periph" : "psu_adma_0", "type" : "slave", "base_addr" : [0xffa80000] },
++	"NODE_NAND" : { "label" : "NODE_NAND", "periph" : "psu_nand_0", "type" : "slave", "base_addr" : [0xff100000] },
++	"NODE_QSPI" : { "label" : "NODE_QSPI", "periph" : "psu_qspi_0", "type" : "slave", "base_addr" : [0xff0f0000] },
++	"NODE_GPIO" : { "label" : "NODE_GPIO", "periph" : "psu_gpio_0", "type" : "slave", "base_addr" : [0xff0a0000] },
++	"NODE_CAN_0" : { "label" : "NODE_CAN_0", "periph" : "psu_can_0", "type" : "slave", "base_addr" : [0xff060000] },
++	"NODE_CAN_1" : { "label" : "NODE_CAN_1", "periph" : "psu_can_1", "type" : "slave", "base_addr" : [0xff070000] },
++	"NODE_EXTERN" : { "label" : "NODE_EXTERN", "periph" : "NA", "type" : "others" },
++	"NODE_DDR" : { "label" : "NODE_DDR", "periph" : "psu_ddr", "type" : "memory", "base_addr" : [0x100000,0x0] },
++	"NODE_IPI_APU" : { "label" : "NODE_IPI_APU", "periph" : "NA", "type" : "ipi" },
++	"NODE_IPI_RPU_0" : { "label" : "NODE_IPI_RPU_0", "periph" : "NA", "type" : "ipi" },
++	"NODE_IPI_RPU_1" : { "label" : "NODE_IPI_RPU_1", "periph" : "NA", "type" : "ipi" },
++	"NODE_GPU" : { "label" : "NODE_GPU", "periph" : "psu_gpu", "type" : "slave", "base_addr" : [0xfd4b0000] },
++	"NODE_PCIE" : { "label" : "NODE_PCIE", "periph" : "psu_pcie", "type" : "slave", "base_addr" : [0xfd0e0000] },
++	"NODE_PCAP" : { "label" : "NODE_PCAP", "periph" : "NA", "type" : "slave" },
++	"NODE_RTC" : { "label" : "NODE_RTC", "periph" : "psu_rtc", "type" : "slave", "base_addr" : [0xffa60000] },
++	"NODE_VCU" : { "label" : "NODE_VCU", "periph" : "vcu_0", "type" : "slave" },
++	"NODE_PL" : { "label" : "NODE_PL", "periph" : "NA", "type" : "others" },
++}
++
++masters = {
++               "psu_cortexa53_0" : {'name' : 'APU'},
++               "psu_cortexr5_0" : {'name' : 'RPU0'},
++               "psu_cortexr5_1" : {'name' : 'RPU1'}
++          }
++
++ocm_map = {
++    "psu_ocm_0" : { "label" : "OCM_BANK_0", "base" : 0xFFFC0000, "high" : 0xFFFCFFFF },
++    "psu_ocm_1" : { "label" : "OCM_BANK_1", "base" : 0xFFFD0000, "high" : 0xFFFDFFFF },
++    "psu_ocm_2" : { "label" : "OCM_BANK_2", "base" : 0xFFFE0000, "high" : 0xFFFEFFFF },
++    "psu_ocm_3" : { "label" : "OCM_BANK_3", "base" : 0xFFFF0000, "high" : 0xFFFFFFFF }
++}
++
++apu_prealloc_list = [
++                        "NODE_DDR",
++                        "NODE_L2",
++                        "NODE_OCM_BANK_0",
++                        "NODE_OCM_BANK_1",
++                        "NODE_OCM_BANK_2",
++                        "NODE_OCM_BANK_3",
++                        "NODE_I2C_0",
++                        "NODE_I2C_1",
++                        "NODE_SD_1",
++                        "NODE_QSPI",
++                        "NODE_PL"
++                    ]
++
++rpu_0_prealloc_list = [
++                        "NODE_TCM_0_A",
++                        "NODE_TCM_0_B",
++                        "NODE_TCM_1_A",
++                        "NODE_TCM_1_B"
++                     ]
++
++rpu_0_prealloc_conditional_list = [
++		        "NODE_DDR",
++                        "NODE_OCM_BANK_0",
++                        "NODE_OCM_BANK_1",
++                        "NODE_OCM_BANK_2",
++                        "NODE_OCM_BANK_3",
++                        "NODE_I2C_0",
++                        "NODE_I2C_1",
++                        "NODE_SD_1",
++                        "NODE_QSPI",
++                        "NODE_PL",
++                        "NODE_ADMA"
++	            ]
++
++rpu_1_prealloc_list = [
++                        "NODE_TCM_1_A",
++                        "NODE_TCM_1_B"
++                     ]
++
++hardcoded_proc_type = "psu_cortexa53_0"
++
++power_node_list = [
++                    "NODE_APU",
++                    "NODE_RPU",
++                    "NODE_FPD",
++                    "NODE_PLD"
++                  ]
++
++power_perms = {
++                "NODE_APU" : [ "psu_cortexr5_0", "psu_cortexr5_1" ],
++                "NODE_RPU" : [ "psu_cortexa53_0", "psu_cortexr5_0", "psu_cortexr5_1" ],
++                "NODE_FPD" : [ "psu_cortexr5_0", "psu_cortexr5_1" ],
++                "NODE_PLD" : [ "psu_cortexa53_0", "psu_cortexr5_0", "psu_cortexr5_1" ],
++}
++
++reset_line_map = {
++	"XILPM_RESET_PCIE_CFG" : { "label" : "XILPM_RESET_PCIE_CFG",  "type" : "rst_periph",  "node" : "NODE_PCIE" },
++	"XILPM_RESET_PCIE_BRIDGE" : { "label" : "XILPM_RESET_PCIE_BRIDGE",  "type" : "rst_periph",  "node" : "NODE_PCIE" },
++	"XILPM_RESET_PCIE_CTRL" : { "label" : "XILPM_RESET_PCIE_CTRL",  "type" : "rst_periph",  "node" : "NODE_PCIE" },
++	"XILPM_RESET_DP" : { "label" : "XILPM_RESET_DP",  "type" : "rst_periph",  "node" : "NODE_DP" },
++	"XILPM_RESET_SWDT_CRF" : { "label" : "XILPM_RESET_SWDT_CRF",  "type" : "normal" },
++	"XILPM_RESET_AFI_FM5" : { "label" : "XILPM_RESET_AFI_FM5",  "type" : "normal" },
++	"XILPM_RESET_AFI_FM4" : { "label" : "XILPM_RESET_AFI_FM4",  "type" : "normal" },
++	"XILPM_RESET_AFI_FM3" : { "label" : "XILPM_RESET_AFI_FM3",  "type" : "normal" },
++	"XILPM_RESET_AFI_FM2" : { "label" : "XILPM_RESET_AFI_FM2",  "type" : "normal" },
++	"XILPM_RESET_AFI_FM1" : { "label" : "XILPM_RESET_AFI_FM1",  "type" : "normal" },
++	"XILPM_RESET_AFI_FM0" : { "label" : "XILPM_RESET_AFI_FM0",  "type" : "normal" },
++	"XILPM_RESET_GDMA" : { "label" : "XILPM_RESET_GDMA",  "type" : "rst_periph",  "node" : "NODE_GDMA" },
++	"XILPM_RESET_GPU_PP1" : { "label" : "XILPM_RESET_GPU_PP1",  "type" : "rst_periph",  "node" : "NODE_GPU_PP_1" },
++	"XILPM_RESET_GPU_PP0" : { "label" : "XILPM_RESET_GPU_PP0",  "type" : "rst_periph",  "node" : "NODE_GPU_PP_0" },
++	"XILPM_RESET_GPU" : { "label" : "XILPM_RESET_GPU",  "type" : "rst_periph",  "node" : "NODE_GPU" },
++	"XILPM_RESET_GT" : { "label" : "XILPM_RESET_GT",  "type" : "normal" },
++	"XILPM_RESET_SATA" : { "label" : "XILPM_RESET_SATA",  "type" : "rst_periph",  "node" : "NODE_SATA" },
++	"XILPM_RESET_ACPU3_PWRON" : { "label" : "XILPM_RESET_ACPU3_PWRON",  "type" : "rst_proc", "proc" : "APU" },
++	"XILPM_RESET_ACPU2_PWRON" : { "label" : "XILPM_RESET_ACPU2_PWRON",  "type" : "rst_proc", "proc" : "APU" },
++	"XILPM_RESET_ACPU1_PWRON" : { "label" : "XILPM_RESET_ACPU1_PWRON",  "type" : "rst_proc", "proc" : "APU" },
++	"XILPM_RESET_ACPU0_PWRON" : { "label" : "XILPM_RESET_ACPU0_PWRON",  "type" : "rst_proc", "proc" : "APU" },
++	"XILPM_RESET_APU_L2" : { "label" : "XILPM_RESET_APU_L2",  "type" : "rst_proc", "proc" : "APU" },
++	"XILPM_RESET_ACPU3" : { "label" : "XILPM_RESET_ACPU3",  "type" : "rst_proc", "proc" : "APU" },
++	"XILPM_RESET_ACPU2" : { "label" : "XILPM_RESET_ACPU2",  "type" : "rst_proc", "proc" : "APU" },
++	"XILPM_RESET_ACPU1" : { "label" : "XILPM_RESET_ACPU1",  "type" : "rst_proc", "proc" : "APU" },
++	"XILPM_RESET_ACPU0" : { "label" : "XILPM_RESET_ACPU0",  "type" : "rst_proc", "proc" : "APU" },
++	"XILPM_RESET_DDR" : { "label" : "XILPM_RESET_DDR",  "type" : "rst_periph",  "node" : "NODE_DDR" },
++	"XILPM_RESET_APM_FPD" : { "label" : "XILPM_RESET_APM_FPD",  "type" : "normal" },
++	"XILPM_RESET_SOFT" : { "label" : "XILPM_RESET_SOFT",  "type" : "rst_shared" },
++	"XILPM_RESET_GEM0" : { "label" : "XILPM_RESET_GEM0",  "type" : "rst_periph",  "node" : "NODE_ETH_0" },
++	"XILPM_RESET_GEM1" : { "label" : "XILPM_RESET_GEM1",  "type" : "rst_periph",  "node" : "NODE_ETH_1" },
++	"XILPM_RESET_GEM2" : { "label" : "XILPM_RESET_GEM2",  "type" : "rst_periph",  "node" : "NODE_ETH_2" },
++	"XILPM_RESET_GEM3" : { "label" : "XILPM_RESET_GEM3",  "type" : "rst_periph",  "node" : "NODE_ETH_3" },
++	"XILPM_RESET_QSPI" : { "label" : "XILPM_RESET_QSPI",  "type" : "rst_periph",  "node" : "NODE_QSPI" },
++	"XILPM_RESET_UART0" : { "label" : "XILPM_RESET_UART0",  "type" : "rst_periph",  "node" : "NODE_UART_0" },
++	"XILPM_RESET_UART1" : { "label" : "XILPM_RESET_UART1",  "type" : "rst_periph",  "node" : "NODE_UART_1" },
++	"XILPM_RESET_SPI0" : { "label" : "XILPM_RESET_SPI0",  "type" : "rst_periph",  "node" : "NODE_SPI_0" },
++	"XILPM_RESET_SPI1" : { "label" : "XILPM_RESET_SPI1",  "type" : "rst_periph",  "node" : "NODE_SPI_1" },
++	"XILPM_RESET_SDIO0" : { "label" : "XILPM_RESET_SDIO0",  "type" : "normal" },
++	"XILPM_RESET_SDIO1" : { "label" : "XILPM_RESET_SDIO1",  "type" : "normal" },
++	"XILPM_RESET_CAN0" : { "label" : "XILPM_RESET_CAN0",  "type" : "rst_periph",  "node" : "NODE_CAN_0" },
++	"XILPM_RESET_CAN1" : { "label" : "XILPM_RESET_CAN1",  "type" : "rst_periph",  "node" : "NODE_CAN_1" },
++	"XILPM_RESET_I2C0" : { "label" : "XILPM_RESET_I2C0",  "type" : "rst_periph",  "node" : "NODE_I2C_0" },
++	"XILPM_RESET_I2C1" : { "label" : "XILPM_RESET_I2C1",  "type" : "rst_periph",  "node" : "NODE_I2C_1" },
++	"XILPM_RESET_TTC0" : { "label" : "XILPM_RESET_TTC0",  "type" : "rst_periph",  "node" : "NODE_TTC_0" },
++	"XILPM_RESET_TTC1" : { "label" : "XILPM_RESET_TTC1",  "type" : "rst_periph",  "node" : "NODE_TTC_1" },
++	"XILPM_RESET_TTC2" : { "label" : "XILPM_RESET_TTC2",  "type" : "rst_periph",  "node" : "NODE_TTC_2" },
++	"XILPM_RESET_TTC3" : { "label" : "XILPM_RESET_TTC3",  "type" : "rst_periph",  "node" : "NODE_TTC_3" },
++	"XILPM_RESET_SWDT_CRL" : { "label" : "XILPM_RESET_SWDT_CRL",  "type" : "normal" },
++	"XILPM_RESET_NAND" : { "label" : "XILPM_RESET_NAND",  "type" : "rst_periph",  "node" : "NODE_NAND" },
++	"XILPM_RESET_ADMA" : { "label" : "XILPM_RESET_ADMA",  "type" : "rst_periph",  "node" : "NODE_ADMA" },
++	"XILPM_RESET_GPIO" : { "label" : "XILPM_RESET_GPIO",  "type" : "normal" },
++	"XILPM_RESET_IOU_CC" : { "label" : "XILPM_RESET_IOU_CC",  "type" : "normal" },
++	"XILPM_RESET_TIMESTAMP" : { "label" : "XILPM_RESET_TIMESTAMP",  "type" : "normal" },
++	"XILPM_RESET_RPU_R50" : { "label" : "XILPM_RESET_RPU_R50",  "type" : "rst_proc", "proc" : "RPU_0" },
++	"XILPM_RESET_RPU_R51" : { "label" : "XILPM_RESET_RPU_R51",  "type" : "rst_proc", "proc" : "RPU_1" },
++	"XILPM_RESET_RPU_AMBA" : { "label" : "XILPM_RESET_RPU_AMBA",  "type" : "rst_proc", "proc" : "RPU" },
++	"XILPM_RESET_OCM" : { "label" : "XILPM_RESET_OCM",  "type" : "rst_periph",  "node" : "NODE_OCM_BANK_0" },
++	"XILPM_RESET_RPU_PGE" : { "label" : "XILPM_RESET_RPU_PGE",  "type" : "rst_proc", "proc" : "RPU" },
++	"XILPM_RESET_USB0_CORERESET" : { "label" : "XILPM_RESET_USB0_CORERESET",  "type" : "rst_periph",  "node" : "NODE_USB_0" },
++	"XILPM_RESET_USB1_CORERESET" : { "label" : "XILPM_RESET_USB1_CORERESET",  "type" : "rst_periph",  "node" : "NODE_USB_1" },
++	"XILPM_RESET_USB0_HIBERRESET" : { "label" : "XILPM_RESET_USB0_HIBERRESET",  "type" : "rst_periph",  "node" : "NODE_USB_0" },
++	"XILPM_RESET_USB1_HIBERRESET" : { "label" : "XILPM_RESET_USB1_HIBERRESET",  "type" : "rst_periph",  "node" : "NODE_USB_1" },
++	"XILPM_RESET_USB0_APB" : { "label" : "XILPM_RESET_USB0_APB",  "type" : "rst_periph",  "node" : "NODE_USB_0" },
++	"XILPM_RESET_USB1_APB" : { "label" : "XILPM_RESET_USB1_APB",  "type" : "rst_periph",  "node" : "NODE_USB_1" },
++	"XILPM_RESET_IPI" : { "label" : "XILPM_RESET_IPI",  "type" : "rst_shared" },
++	"XILPM_RESET_APM_LPD" : { "label" : "XILPM_RESET_APM_LPD",  "type" : "normal" },
++	"XILPM_RESET_RTC" : { "label" : "XILPM_RESET_RTC",  "type" : "rst_periph",  "node" : "NODE_RTC" },
++	"XILPM_RESET_SYSMON" : { "label" : "XILPM_RESET_SYSMON",  "type" : "NA" },
++	"XILPM_RESET_AFI_FM6" : { "label" : "XILPM_RESET_AFI_FM6",  "type" : "normal" },
++	"XILPM_RESET_LPD_SWDT" : { "label" : "XILPM_RESET_LPD_SWDT",  "type" : "normal" },
++	"XILPM_RESET_FPD" : { "label" : "XILPM_RESET_FPD",  "type" : "rpu_only" },
++	"XILPM_RESET_RPU_DBG1" : { "label" : "XILPM_RESET_RPU_DBG1",  "type" : "rst_proc", "proc" : "RPU" },
++	"XILPM_RESET_RPU_DBG0" : { "label" : "XILPM_RESET_RPU_DBG0",  "type" : "rst_proc", "proc" : "RPU" },
++	"XILPM_RESET_DBG_LPD" : { "label" : "XILPM_RESET_DBG_LPD",  "type" : "normal" },
++	"XILPM_RESET_DBG_FPD" : { "label" : "XILPM_RESET_DBG_FPD",  "type" : "normal" },
++	"XILPM_RESET_APLL" : { "label" : "XILPM_RESET_APLL",  "type" : "rst_proc", "proc" : "APU" },
++	"XILPM_RESET_DPLL" : { "label" : "XILPM_RESET_DPLL",  "type" : "rst_shared" },
++	"XILPM_RESET_VPLL" : { "label" : "XILPM_RESET_VPLL",  "type" : "rst_shared" },
++	"XILPM_RESET_IOPLL" : { "label" : "XILPM_RESET_IOPLL",  "type" : "rst_shared" },
++	"XILPM_RESET_RPLL" : { "label" : "XILPM_RESET_RPLL",  "type" : "rst_proc", "proc" : "RPU" },
++	"XILPM_RESET_GPO3_PL_0" : { "label" : "XILPM_RESET_GPO3_PL_0",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_1" : { "label" : "XILPM_RESET_GPO3_PL_1",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_2" : { "label" : "XILPM_RESET_GPO3_PL_2",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_3" : { "label" : "XILPM_RESET_GPO3_PL_3",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_4" : { "label" : "XILPM_RESET_GPO3_PL_4",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_5" : { "label" : "XILPM_RESET_GPO3_PL_5",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_6" : { "label" : "XILPM_RESET_GPO3_PL_6",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_7" : { "label" : "XILPM_RESET_GPO3_PL_7",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_8" : { "label" : "XILPM_RESET_GPO3_PL_8",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_9" : { "label" : "XILPM_RESET_GPO3_PL_9",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_10" : { "label" : "XILPM_RESET_GPO3_PL_10",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_11" : { "label" : "XILPM_RESET_GPO3_PL_11",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_12" : { "label" : "XILPM_RESET_GPO3_PL_12",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_13" : { "label" : "XILPM_RESET_GPO3_PL_13",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_14" : { "label" : "XILPM_RESET_GPO3_PL_14",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_15" : { "label" : "XILPM_RESET_GPO3_PL_15",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_16" : { "label" : "XILPM_RESET_GPO3_PL_16",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_17" : { "label" : "XILPM_RESET_GPO3_PL_17",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_18" : { "label" : "XILPM_RESET_GPO3_PL_18",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_19" : { "label" : "XILPM_RESET_GPO3_PL_19",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_20" : { "label" : "XILPM_RESET_GPO3_PL_20",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_21" : { "label" : "XILPM_RESET_GPO3_PL_21",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_22" : { "label" : "XILPM_RESET_GPO3_PL_22",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_23" : { "label" : "XILPM_RESET_GPO3_PL_23",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_24" : { "label" : "XILPM_RESET_GPO3_PL_24",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_25" : { "label" : "XILPM_RESET_GPO3_PL_25",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_26" : { "label" : "XILPM_RESET_GPO3_PL_26",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_27" : { "label" : "XILPM_RESET_GPO3_PL_27",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_28" : { "label" : "XILPM_RESET_GPO3_PL_28",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_29" : { "label" : "XILPM_RESET_GPO3_PL_29",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_30" : { "label" : "XILPM_RESET_GPO3_PL_30",  "type" : "normal" },
++	"XILPM_RESET_GPO3_PL_31" : { "label" : "XILPM_RESET_GPO3_PL_31",  "type" : "normal" },
++	"XILPM_RESET_RPU_LS" : { "label" : "XILPM_RESET_RPU_LS",  "type" : "rst_proc", "proc" : "RPU" },
++	"XILPM_RESET_PS_ONLY" : { "label" : "XILPM_RESET_PS_ONLY",  "type" : "normal" },
++	"XILPM_RESET_PL" : { "label" : "XILPM_RESET_PL",  "type" : "normal" },
++	"XILPM_RESET_GPIO5_EMIO_92" : { "label" : "XILPM_RESET_GPIO5_EMIO_92",  "type" : "normal" },
++	"XILPM_RESET_GPIO5_EMIO_93" : { "label" : "XILPM_RESET_GPIO5_EMIO_93",  "type" : "normal" },
++	"XILPM_RESET_GPIO5_EMIO_94" : { "label" : "XILPM_RESET_GPIO5_EMIO_94",  "type" : "normal" },
++	"XILPM_RESET_GPIO5_EMIO_95" : { "label" : "XILPM_RESET_GPIO5_EMIO_95",  "type" : "normal" },
++}
++
++gpo_nums = [2,3,4,5]
++
+diff --git a/lopper/assists/cfg_obj/modules/sdtinfo.py b/lopper/assists/cfg_obj/modules/sdtinfo.py
+new file mode 100644
+index 0000000..9417b0c
+--- /dev/null
++++ b/lopper/assists/cfg_obj/modules/sdtinfo.py
+@@ -0,0 +1,193 @@
++# /*
++# * Copyright (c) 2022 - 2023 Advanced Micro Devices, Inc. All Rights Reserved.
++# *
++# * Author:
++# *       Madhav Bhatt <madhav.bhatt@amd.com>
++# *
++# * SPDX-License-Identifier: BSD-3-Clause
++# */
++
++import cfgobj_hard_coding as chc
++
++class SdtInfo:
++    __sdt__ = None
++    masters = {}
++    ocm_high_value = None
++    ocm_base_value = None
++    gpos = {}
++    rpu0_as_power_management_master = False
++    rpu1_as_power_management_master = False
++    apu_as_power_management_master = False
++    rpu0_as_reset_management_master = False
++    rpu1_as_reset_management_master = False
++    apu_as_reset_management_master = False
++    rpu0_as_overlay_config_master = False
++    rpu1_as_overlay_config_master = False
++    apu_as_overlay_config_master = False
++    subsys_str = None
++    existing_proc_type = None
++    proc_type = None
++
++    def __get_cpu_name(self, node):
++        try:
++            cpu_name = node["xlnx,cpu-name"].value
++        except:
++            cpu_name = ""
++        return cpu_name
++
++    def __is_master_defined(self, master):
++        found_master = False
++        subsys_str = self.subsys_str
++        subsys_list = subsys_str.split("|")
++        for subsys in subsys_list:
++            if master in subsys.split(":")[1].split(";"):
++                found_master = True
++        return found_master
++
++    def __get_masters(self):
++        masters_tmp = {}
++        for master in chc.masters.keys():
++            for node in self.__sdt__.tree:
++                if chc.masters[master]["name"] in  self.__get_cpu_name(node):
++                    if self.__is_master_defined(master):
++                        master_tmp[master] = chc.masters[master]
++        if len(masters_tmp) != 0:
++            self.masters = maaster_tmp
++        else:
++            self.masters = chc.masters
++        return
++
++
++    def __get_ip_name(self, node):
++        try:
++            ip_name = node['xlnx,ip-name'].value
++        except:
++            ip_name = None
++        return ip_name
++
++    def __parse_ipi_bit_pos(self):
++        ip_name = []
++        for node in self.__sdt__.tree:
++            ip_name = self.__get_ip_name(node)
++            if ip_name != None and "psu_ipi" in ip_name:
++                for master in self.masters:
++                    if self.masters[master]["name"] in self.__get_cpu_name(node):
++                       self.masters[master]["ipi_bit_pos"] = node["xlnx,bit-position"].value[0]
++                       self.masters[master]["is_ipi_present"] = True
++        return
++
++
++    def __parse_gpo_info(self):
++        ip_name = []
++        for node in self.__sdt__.tree:
++            ip_name = self.__get_ip_name(node)
++            if ip_name != None and "psu_pmu_iomodule" in ip_name:
++                for num in chc.gpo_nums:
++                    gpo_tmp = {}
++                    enable_prop_str = "xlnx,gpo" + str(num) + "-enable"
++                    polarity_prop_str = "xlnx,gpo" + str(num) + "-polarity"
++                    try:
++                        gpo_tmp["enable"] = node[enable_prop_str].value[0]
++                    except:
++                        gpo_tmp["enable"] = 0
++                    if 1 == gpo_tmp["enable"]:
++                        gpo_tmp["polarity"] = node[polarity_prop_str].value[0]
++                    else:
++                        gpo_tmp["polarity"] = 0
++                    self.gpos["gpo" + str(num)] = gpo_tmp
++                break
++        return
++
++    def __parse_ocm_base_high(self):
++        ip_name = []
++        for node in self.__sdt__.tree:
++            if len(node.child_nodes) > 0:
++                for child_node in node.child_nodes.values():
++                    ip_name = self.__get_ip_name(child_node)
++                    if ip_name != None and "psu_ocm_ram_0" in ip_name:
++                        base = child_node["reg"].value[1]
++                        size = child_node["reg"].value[3]
++                        self.ocm_base_value = base
++                        self.ocm_high_value = base + size - 1
++                        break
++        return
++
++    def __parse_slaves_for_master(self):
++        nodes_temp = self.__sdt__.tree
++        nodelist = {}
++        for node in nodes_temp:
++            temp = node.name.split('@')
++            try:
++                nodelist[int(temp[1], 16)] = temp[0]
++            except:
++                None
++        nodes = self.__sdt__.tree.nodes('/cpu.*')
++        for node in nodes:
++            slaves = []
++            try:
++                if node.propval('reg') != '':
++                    if 'cpus,cluster' in node["compatible"].value:
++                        cnt = 0
++                        addr_cell_size = node["#ranges-address-cells"].value[0]
++                        size_cell_size = node["#ranges-size-cells"].value[0]
++                        while cnt < len(node["address-map"].value):
++                            addr = 0
++                            for cell_num in range(addr_cell_size):
++                                addr = addr << 16 | node["address-map"].value[cnt + cell_num]
++                            cnt += (2 * addr_cell_size) + size_cell_size + 1
++                            for key in chc.node_map.keys():
++                                try:
++                                    for base_addr in chc.node_map[key]["base_addr"]:
++                                        if base_addr == addr:
++                                            periph = ""
++                                            if "psu_ocm_" in chc.node_map[key]["periph"]:
++                                                periph = "psu_ocm_ram_0"
++                                            elif "psu_ddr" in chc.node_map[key]["periph"]:
++                                                if "cpus-a53" in node.name:
++                                                    periph = "psu_ddr_0"
++                                                elif "cpus-r5" in  node.name:
++                                                    periph = "psu_r5_ddr_0"
++                                            else:
++                                                periph = chc.node_map[key]["periph"]
++                                            if periph not in slaves:
++                                                slaves.append(periph)
++                                except:
++                                    None
++                if node.name == "cpus-a53@0":
++                    self.masters["psu_cortexa53_0"]["slaves"] = slaves
++                elif node.name == "cpus-r5@1":
++                    self.masters["psu_cortexr5_0"]["slaves"] = slaves
++                elif node.name == "cpus-r5@2":
++                    self.masters["psu_cortexr5_1"]["slaves"] = slaves
++            except:
++                None
++
++    def __get_proc_type(self, options):
++        try:
++            self.proc_type = options['args'][1]
++        except:
++            self.proc_type = chc.hardcoded_proc_type
++        return
++
++    def __init__(self, sdt, options):
++        self.__sdt__ = sdt
++        self.__get_proc_type(options)
++
++        # Hard coded values
++        self.rpu0_as_power_management_master = chc.rpu0_as_power_management_master
++        self.rpu1_as_power_management_master = chc.rpu1_as_power_management_master
++        self.apu_as_power_management_master = chc.apu_as_power_management_master
++        self.rpu0_as_reset_management_master = chc.rpu0_as_reset_management_master
++        self.rpu1_as_reset_management_master = chc.rpu1_as_reset_management_master
++        self.apu_as_reset_management_master = chc.apu_as_reset_management_master
++        self.rpu0_as_overlay_config_master = chc.rpu0_as_overlay_config_master
++        self.rpu1_as_overlay_config_master = chc.rpu1_as_overlay_config_master
++        self.apu_as_overlay_config_master = chc.apu_as_overlay_config_master
++        self.subsys_str = chc.subsys_str
++
++        # Parsing values from SDT
++        self.__get_masters()
++        self.__parse_slaves_for_master()
++        self.__parse_ipi_bit_pos()
++        self.__parse_ocm_base_high()
++        self.__parse_gpo_info()
+diff --git a/lopper/assists/cfg_obj/modules/section.py b/lopper/assists/cfg_obj/modules/section.py
+new file mode 100644
+index 0000000..912edfd
+--- /dev/null
++++ b/lopper/assists/cfg_obj/modules/section.py
+@@ -0,0 +1,35 @@
++# /*
++# * Copyright (c) 2022 - 2023 Advanced Micro Devices, Inc. All Rights Reserved.
++# *
++# * Author:
++# *       Madhav Bhatt <madhav.bhatt@amd.com>
++# *
++# * SPDX-License-Identifier: BSD-3-Clause
++# */
++
++class Section:
++    __section_identifier = ""
++    __section_file_name = None
++    __section_parsing_cb = None
++    __sdtinfo_obj = None
++
++    def __init__(self, identifier, section_parsing_cb, sdtinfo_obj):
++        self.__section_identifier = identifier
++        self.__section_parsing_cb = section_parsing_cb
++        self.__sdtinfo_obj = sdtinfo_obj
++
++    def replace_section(self, out_lines):
++        data_lines = self.__section_parsing_cb(self.__sdtinfo_obj)
++        line_num = 0
++        #print(out_lines)
++        for out_line in out_lines:
++            if self.__section_identifier in out_line:
++                out_lines.pop(line_num)
++                break
++            line_num += 1
++        if line_num == len(out_lines):
++            return out_lines
++        for data_line in data_lines:
++            out_lines.insert(line_num, data_line)
++            line_num += 1
++        return out_lines
+diff --git a/lopper/assists/generate_config_object.py b/lopper/assists/generate_config_object.py
+new file mode 100644
+index 0000000..81b1b78
+--- /dev/null
++++ b/lopper/assists/generate_config_object.py
+@@ -0,0 +1,547 @@
++# /*
++# * Copyright (c) 2022 - 2023 Advanced Micro Devices, Inc. All Rights Reserved.
++# *
++# * Author:
++# *       Madhav Bhatt <madhav.bhatt@amd.com>
++# *
++# * SPDX-License-Identifier: BSD-3-Clause
++# */
++
++import sys
++import os
++import re
++
++sys.path.append(os.path.dirname(__file__))
++sys.path.append(os.path.dirname(__file__) + "/cfg_obj/modules/")
++
++from section import Section
++import cfgobj_hard_coding as chc
++from sdtinfo import SdtInfo
++import cfg_data_tpl
++
++def props():
++    return ["id", "file_ext"]
++
++def id():
++    return "xlnx,output,cfgobj"
++
++def file_ext():
++    return ".c"
++
++def is_compat(node, compat_id):
++    if re.search("module,generate_config_object", compat_id):
++        return cfg_obj_write
++    return ""
++
++def get_slaves_for_master(sdtinfo_obj, master):
++    try:
++        slave_list = sdtinfo_obj.masters[master]["slaves"]
++    except:
++        slave_list = []
++    return slave_list
++
++def is_rpu_lockstep(sdtinfo_obj):
++    subsys_str = sdtinfo_obj.subsys_str
++    found_rpu0 = False
++    found_rpu1 = False
++
++    subsys_list  = subsys_str.split("|")
++    for subsys in subsys_list:
++        if "RPU0" in subsys.split(":")[1].split(";"):
++            found_rpu0 = True
++        if "RPU1" in subsys.split(":")[1].split(";"):
++            found_rpu1 = True
++    if found_rpu0 == True and found_rpu1 == False:
++        return True
++    else:
++        return False
++
++def mask_to_str(mask):
++    return "0x%08X"%mask
++
++def is_ipi_present(master, sdtinfo_obj):
++    try:
++        if sdtinfo_obj.masters[master]["is_ipi_present"] == True:
++            return True
++        else:
++            return False
++    except:
++        return False
++
++def get_ipi_mask(master, sdtinfo_obj):
++    if is_ipi_present(master, sdtinfo_obj) == True:
++        bit_pos = sdtinfo_obj.masters[master]["ipi_bit_pos"]
++        return (1<<bit_pos)
++    else:
++        return 0
++
++def get_ipi_mask_txt(master, sdtinfo_obj):
++    if is_ipi_present(master, sdtinfo_obj) == True:
++        return "PM_CONFIG_IPI_" + master.upper() + "_MASK"
++    else:
++        return ""
++
++def get_all_masters_mask_txt(sdtinfo_obj):
++    macro_list = []
++    for master in sdtinfo_obj.masters.keys():
++        if is_ipi_present(master, sdtinfo_obj) == True:
++            macro_list.append(get_ipi_mask_txt(master, sdtinfo_obj))
++    if len(macro_list) > 0:
++        return " | ".join(macro_list)
++    else:
++        return "0U"
++
++def get_all_other_masters_mask_txt(master_name, sdtinfo_obj):
++    macro_list = []
++    for master in sdtinfo_obj.masters.keys():
++        if (master != master_name) and (is_ipi_present(master, sdtinfo_obj) == True):
++            if "psu_cortexa53_0" == master_name:
++                if sdtinfo_obj.rpu0_as_power_management_master == False and \
++                    "psu_cortexr5_0" == master:
++                    continue
++                if sdtinfo_obj.rpu1_as_power_management_master == False and \
++                    False == is_rpu_lockstep(sdtinfo_obj) and "psu_cortexr5_1" == master:
++                    continue
++            elif "psu_cortexr5_0" == master_name:
++                if sdtinfo_obj.apu_as_power_management_master == False and \
++                    "psu_cortexa53_0" == master:
++                    continue
++                if sdtinfo_obj.rpu1_as_power_management_master == False and \
++                    False == is_rpu_lockstep(sdtinfo_obj) and "psu_cortexr5_1" == master:
++                    continue
++            elif False == is_rpu_lockstep(sdtinfo_obj) and "psu_cortexr5_1" == master_name:
++                if sdtinfo_obj.apu_as_power_management_master == False and \
++                    "psu_cortexa53_0" == master:
++                    continue
++                if sdtinfo_obj.rpu0_as_power_management_master == False and \
++                    "psu_cortexr5_0" == master:
++                    continue
++            macro_list.append(get_ipi_mask_txt(master, sdtinfo_obj))
++    if len(macro_list) > 0:
++        return " | ".join(macro_list)
++    else:
++        return "0U"
++
++def get_slave_perm_mask_txt(periph, sdtinfo_obj):
++    macro_list = []
++    for master in sdtinfo_obj.masters.keys():
++        slave_list = get_slaves_for_master(sdtinfo_obj, master)
++        for slave in slave_list:
++            if periph == slave and (is_ipi_present(master, sdtinfo_obj) == True):
++                macro_list.append(get_ipi_mask_txt(master, sdtinfo_obj))
++    if len(macro_list) > 0:
++        return " | ".join(macro_list)
++    else:
++        return "0U"
++
++
++def get_slave_perm_mask(periph, sdtinfo_obj):
++    perm_mask = 0x00000000
++    for master in sdtinfo_obj.masters.keys():
++        slave_list = get_slaves_for_master(sdtinfo_obj, master)
++        for slave in slave_list:
++            if re.search(periph,slave) != None and (is_ipi_present(master, sdtinfo_obj) == True):
++                perm_mask  = perm_mask | get_ipi_mask(master, sdtinfo_obj)
++    return perm_mask
++
++def get_tcm_r5_perm_mask(r5_proc, tcm_bank, sdtinfo_obj):
++    perm_mask = 0x00000000
++    if "psu_cortexr5_0" == r5_proc:
++        if is_rpu_lockstep(sdtinfo_obj) == True:
++            perm_mask = get_ipi_mask(r5_proc, sdtinfo_obj)
++        else:
++            if tcm_bank == "psu_r5_0_atcm_global" or tcm_bank == "psu_r5_0_btcm_global":
++                perm_mask = get_ipi_mask(r5_proc, sdtinfo_obj)
++    elif r5_proc == "psu_cortexr5_1":
++        if is_rpu_lockstep(sdtinfo_obj) == True:
++            perm_mask = 0x00000000
++        else:
++            if tcm_bank == "psu_r5_1_atcm_global" or tcm_bank == "psu_r5_1_btcm_global":
++                perm_mask = get_ipi_mask(r5_proc, sdtinfo_obj)
++    else:
++        perm_mask = 0x00000000
++    return perm_mask
++
++def convert_ipi_mask_to_txt(ipi_mask, sdtinfo_obj):
++    macro_list = []
++    for master in sdtinfo_obj.masters.keys():
++        if ((ipi_mask & get_ipi_mask(master, sdtinfo_obj)) != 0) and is_ipi_present(master, sdtinfo_obj) == True:
++            macro_list.append(get_ipi_mask_txt(master, sdtinfo_obj))
++    if len(macro_list) > 0:
++        return " | ".join(macro_list)
++    else:
++        return "0U"
++
++def get_tcm_perm_mask(tcm, sdtinfo_obj):
++    perm_mask = 0x00000000
++    for master in sdtinfo_obj.masters.keys():
++        if re.search("psu_cortexr5_*", master) != None:
++            perm_mask  = perm_mask | get_tcm_r5_perm_mask(master, tcm, sdtinfo_obj)
++        else:
++            slave_list = get_slaves_for_master(sdtinfo_obj, master)
++            for slave in slave_list:
++                if tcm == slave:
++                    perm_mask  = perm_mask | get_ipi_mask(master, sdtinfo_obj)
++    return perm_mask
++
++def get_ocm_perm_mask(ocm, sdtinfo_obj):
++    perm_mask = 0x00000000
++    island_base = sdtinfo_obj.ocm_base_value
++    island_high = sdtinfo_obj.ocm_high_value
++    for master in sdtinfo_obj.masters.keys():
++        if "psu_ocm_ram_0" in get_slaves_for_master(sdtinfo_obj, master):
++            base_val = sdtinfo_obj.ocm_base_value
++            high_val = sdtinfo_obj.ocm_high_value
++            if ((island_base >= base_val) and (island_base <= high_val)) or ((island_high >= base_val) and (island_high <= high_val)):
++                perm_mask = perm_mask | get_ipi_mask(master, sdtinfo_obj)
++    return perm_mask
++
++def get_mem_perm_mask(mem, sdtinfo_obj):
++    perm_mask = 0x00000000
++    if "psu_ddr" in mem:
++        perm_mask = get_slave_perm_mask("psu_ddr_", sdtinfo_obj) | get_slave_perm_mask("psu_r5_ddr_", sdtinfo_obj)
++    elif "psu_ocm_" in mem:
++        perm_mask  = get_ocm_perm_mask(mem, sdtinfo_obj)
++    elif re.search("psu_r5_.*tcm_global", mem) != None:
++        perm_mask = get_tcm_perm_mask(mem, sdtinfo_obj)
++    else:
++        perm_mask = 0x00
++    return perm_mask
++
++def get_power_domain_perm_mask_txt(pwr_domain, sdtinfo_obj):
++    macro_list = []
++    pwr_perm_masters = chc.power_perms[pwr_domain]
++    for master in pwr_perm_masters:
++        if master in sdtinfo_obj.masters.keys() and is_ipi_present(master, sdtinfo_obj) == True:
++            if (sdtinfo_obj.apu_as_power_management_master == False) and ("psu_cortexa53_0" == master):
++                continue
++            elif (sdtinfo_obj.rpu0_as_power_management_master == False) and ("psu_cortexr5_0" == master):
++                continue
++            elif (sdtinfo_obj.rpu1_as_power_management_master == False) and ("psu_cortexr5_1" == master):
++                continue
++            macro_list.append(get_ipi_mask_txt(master, sdtinfo_obj))
++    if (pwr_domain == "NODE_FPD" or pwr_domain == "NODE_APU") and (len(macro_list) == 0):
++        macro_list.append("psu_cortexa53_0")
++    if len(macro_list) > 0:
++        return " | ".join(macro_list)
++    else:
++        return "0U"
++
++def is_all_master_enabled(master_type, sdtinfo_obj):
++    if "power" == master_type:
++        rpu0_as_master = sdtinfo_obj.rpu0_as_power_management_master
++        rpu1_as_master = sdtinfo_obj.rpu1_as_power_management_master
++        apu_as_master =  sdtinfo_obj.apu_as_power_management_master
++    elif "reset" == master_type:
++        rpu0_as_master = sdtinfo_obj.rpu0_as_reset_management_master
++        rpu1_as_master = sdtinfo_obj.rpu1_as_reset_management_master
++        apu_as_master = sdtinfo_obj.apu_as_reset_management_master
++    else:
++        return -1
++    if rpu0_as_master == True and apu_as_master == True:
++        if is_rpu_lockstep(sdtinfo_obj) == False:
++            if rpu1_as_master == True:
++                return 1
++            else:
++                return 0
++        else:
++            return 1
++    else:
++        return 0
++
++
++def get_list_of_management_master(master_type, sdtinfo_obj):
++    macro_list = []
++    if "power" == master_type:
++        rpu0_as_master = sdtinfo_obj.rpu0_as_power_management_master
++        rpu1_as_master = sdtinfo_obj.rpu1_as_power_management_master
++        apu_as_master =  sdtinfo_obj.apu_as_power_management_master
++    elif "reset" == master_type:
++        rpu0_as_master = sdtinfo_obj.rpu0_as_reset_management_master
++        rpu1_as_master = sdtinfo_obj.rpu1_as_reset_management_master
++        apu_as_master = sdtinfo_obj.apu_as_reset_management_master
++    elif "overlay_config" == master_type:
++        rpu0_as_master = sdtinfo_obj.rpu0_as_overlay_config_master
++        rpu1_as_master = sdtinfo_obj.rpu1_as_overlay_config_master
++        apu_as_master = sdtinfo_obj.apu_as_overlay_config_master
++    else:
++        return "0U"
++    for master in sdtinfo_obj.masters.keys():
++        if is_ipi_present(master, sdtinfo_obj) != 0:
++            if (apu_as_master == False) and ("psu_cortexa53_0" == master):
++                continue
++            elif (rpu0_as_master == False) and ("psu_cortexr5_0" == master):
++                continue
++            elif (rpu1_as_master == False) and ("psu_cortexr5_1" == master):
++                continue
++            macro_list.append(get_ipi_mask_txt(master, sdtinfo_obj))
++    if len(macro_list) > 0:
++        return " | ".join(macro_list)
++    else:
++        return "0U"
++
++def generate_master_ipi_mask_def(sdtinfo_obj):
++    out_lines = ["\n"]
++    for master in sdtinfo_obj.masters.keys():
++        if is_ipi_present(master, sdtinfo_obj) == True:
++            out_lines.append("#define " + get_ipi_mask_txt(master, sdtinfo_obj) + "    " + mask_to_str(get_ipi_mask(master, sdtinfo_obj)) + "\n")
++    out_lines.append("\n\n")
++    return out_lines
++
++def get_prealloc_for_master_txt(master_name, prealloc_list, sdtinfo_obj):
++    node_count = 0
++    master_prealloc_txt = []
++    if is_ipi_present(master_name, sdtinfo_obj) != "":
++        master_mask = get_ipi_mask_txt(master_name, sdtinfo_obj)
++        master_prealloc_txt.append("\t/* Prealloc for " + master_name + " */\n")
++        master_prealloc_txt.append("\t" + master_mask + ",\n")
++        for key in prealloc_list:
++            periph_perms = chc.node_map[key]['perms']
++            periph_name = chc.node_map[key]['periph']
++            periph_type = chc.node_map[key]['type']
++            periph_label = chc.node_map[key]['label']
++            if master_mask in periph_perms:
++                master_prealloc_txt.append("\t" + periph_label + ",\n")
++                master_prealloc_txt.append("\tPM_MASTER_USING_SLAVE_MASK, /* Master is using Slave */\n")
++                master_prealloc_txt.append("\tPM_CAP_ACCESS | PM_CAP_CONTEXT, /* Current Requirements */\n")
++                master_prealloc_txt.append("\tPM_CAP_ACCESS | PM_CAP_CONTEXT, /* Default Requirements */\n")
++                master_prealloc_txt.append("\n")
++                node_count += 1
++    master_prealloc_txt.insert(2, "\t" + str(node_count) + ",\n")
++    master_prealloc_txt.append("\n")
++    return master_prealloc_txt
++
++
++def generate_master_section_data(sdtinfo_obj):
++    out_lines = []
++    out_lines.append("\tPM_CONFIG_MASTER_SECTION_ID, /* Master SectionID */" + "\n")
++    master_count = len(sdtinfo_obj.masters.keys())
++    out_lines.append("\t" + str(master_count) + "U, /* No. of Masters*/" + "\n")
++    out_lines.append("\n")
++    for master in sdtinfo_obj.masters.keys():
++        if sdtinfo_obj.masters[master]["name"] == "RPU0":
++            if is_rpu_lockstep(sdtinfo_obj) == True:
++                master_node = "NODE_RPU"
++            else:
++                master_node = "NODE_RPU_0"
++        elif sdtinfo_obj.masters[master]["name"] == "RPU1":
++            master_node = "NODE_RPU_1"
++        elif sdtinfo_obj.masters[master]["name"] == "APU":
++            master_node = "NODE_APU"
++        out_lines.append("\t" + master_node + ", /* Master Node ID */" + "\n")
++        if is_ipi_present(master, sdtinfo_obj) == True:
++            out_lines.append("\t" + get_ipi_mask_txt(master, sdtinfo_obj) + ", /* IPI Mask of this master */" + "\n")
++        else:
++            out_lines.append("\t0U, /* IPI Mask of this master */" + "\n")
++        out_lines.append("\tSUSPEND_TIMEOUT, /* Suspend timeout */" + "\n")
++        out_lines.append("\t" +  get_all_other_masters_mask_txt(master, sdtinfo_obj) + ", /* Suspend permissions */" + "\n")
++        out_lines.append("\t" +  get_all_other_masters_mask_txt(master, sdtinfo_obj) + ", /* Wake permissions */" + "\n")
++        out_lines.append("\n")
++    out_lines.append("\n")
++    return out_lines
++
++def generate_slave_section_data(sdtinfo_obj):
++    out_lines = ["\n\n\tPM_CONFIG_SLAVE_SECTION_ID,\t/* Section ID */\n"]
++    slave_count = 0
++    for key in chc.node_map:
++        periph_name = chc.node_map[key]['periph']
++        periph_type = chc.node_map[key]['type']
++        periph_label = chc.node_map[key]['label']
++        if periph_type == "slave":
++            chc.node_map[key]['perms'] = get_slave_perm_mask_txt(periph_name, sdtinfo_obj)
++        elif (periph_type == "memory") and (periph_type != "NA"):
++            chc.node_map[key]['perms'] = convert_ipi_mask_to_txt(get_mem_perm_mask(periph_name, sdtinfo_obj), sdtinfo_obj)
++        elif periph_type == "others":
++            chc.node_map[key]['perms'] = get_all_masters_mask_txt(sdtinfo_obj)
++
++        if ("slave" == periph_type) or ("memory" == periph_type and "NA" != periph_type) or ("others" == periph_type):
++            if chc.node_map[key]['perms'] == "0U":
++                continue
++            slave_count += 1
++            out_lines.append("\t" + periph_label + ",\n")
++            out_lines.append("\tPM_SLAVE_FLAG_IS_SHAREABLE,\n")
++            out_lines.append("\t" + chc.node_map[key]['perms']+ ", /* IPI Mask */\n\n")
++
++        ipi_perm = ""
++        if periph_type == "ipi":
++            if periph_label == "NODE_IPI_APU":
++                if "psu_cortexa53_0" in sdtinfo_obj.masters.keys() and is_ipi_present("psu_cortexa53_0", sdtinfo_obj) != "":
++                    ipi_perm = get_ipi_mask_txt("psu_cortexa53_0", sdtinfo_obj)
++                else:
++                    ipi_perm = ""
++            elif periph_label == "NODE_IPI_RPU_0":
++                if "psu_cortexr5_0" in sdtinfo_obj.masters.keys() and is_ipi_present("psu_cortexr5_0", sdtinfo_obj) != "":
++                    ipi_perm = get_ipi_mask_txt("psu_cortexr5_0", sdtinfo_obj)
++                else:
++                    ipi_perm = ""
++            elif periph_label == "NODE_IPI_RPU_1":
++                if "psu_cortexr5_1" in sdtinfo_obj.masters.keys() and is_ipi_present("psu_cortexr5_1", sdtinfo_obj) != "":
++                    ipi_perm = get_ipi_mask_txt("psu_cortexr5_1", sdtinfo_obj)
++                else:
++                    ipi_perm = ""
++            else:
++                ipi_perm = ""
++            if ipi_perm != "":
++                slave_count += 1
++                chc.node_map[key]['perms'] = ipi_perm
++                out_lines.append("\t" + periph_label + ",\n")
++                out_lines.append("\t0U,\n")
++                out_lines.append("\t" + chc.node_map[key]['perms']+ ", /* IPI Mask */\n\n")
++
++    out_lines.insert(1, "\t" + str(slave_count) + ",\t\t\t\t/* Number of slaves */\n\n")
++    out_lines.append("\n")
++    return out_lines
++
++def generate_prealloc_section_data(sdtinfo_obj):
++    out_lines = ["\n"]
++    master_count = 0
++    proc_type = sdtinfo_obj.proc_type
++    if is_ipi_present("psu_cortexa53_0", sdtinfo_obj) != "":
++        chc.apu_prealloc_list.append("NODE_IPI_APU")
++    if proc_type == "psu_cortexr5_0":
++        chc.rpu_0_prealloc_list.extend(chc.rpu_0_prealloc_conditional_list)
++    if is_ipi_present("psu_cortexr5_0", sdtinfo_obj) != "":
++        chc.rpu_0_prealloc_list.append("NODE_IPI_RPU_0")
++    if is_ipi_present("psu_cortexr5_1", sdtinfo_obj) != "":
++        chc.rpu_1_prealloc_list.append("NODE_IPI_RPU_1")
++    out_lines.append("\tPM_CONFIG_PREALLOC_SECTION_ID, /* Preallaoc SectionID */\n")
++    for master in sdtinfo_obj.masters.keys():
++        if is_ipi_present(master, sdtinfo_obj) == True:
++            master_count += 1
++    out_lines.append("\t" + str(master_count) + "U, /* No. of Masters*/\n")
++    out_lines.append("\n")
++    if "psu_cortexa53_0" in sdtinfo_obj.masters.keys() and is_ipi_present("psu_cortexa53_0", sdtinfo_obj):
++        out_lines.extend(get_prealloc_for_master_txt("psu_cortexa53_0", chc.apu_prealloc_list, sdtinfo_obj))
++    if "psu_cortexr5_0" in sdtinfo_obj.masters.keys() and is_ipi_present("psu_cortexr5_0", sdtinfo_obj):
++        out_lines.extend(get_prealloc_for_master_txt("psu_cortexr5_0", chc.rpu_0_prealloc_list, sdtinfo_obj))
++    if "psu_cortexr5_1" in sdtinfo_obj.masters.keys() and is_ipi_present("psu_cortexr5_1", sdtinfo_obj):
++        out_lines.extend(get_prealloc_for_master_txt("psu_cortexr5_1", chc.rpu_1_prealloc_list, sdtinfo_obj))
++    out_lines.append("\t\n")
++    return out_lines
++
++def generate_power_section_data(sdtinfo_obj):
++    out_lines = ["\n"]
++    out_lines.append("\tPM_CONFIG_POWER_SECTION_ID, /* Power Section ID */\n")
++    out_lines.append("\t" + str(len(chc.power_node_list)) + "U, /* Number of power nodes */\n")
++    out_lines.append("\n")
++    for node in chc.power_node_list:
++        out_lines.append("\t" + node + ", /* Power node ID */\n")
++        out_lines.append("\t" + get_power_domain_perm_mask_txt(node, sdtinfo_obj) + ", /* Force power down permissions */\n")
++        out_lines.append("\n")
++    out_lines.append("\n")
++    return out_lines
++
++def generate_reset_section_data(sdtinfo_obj):
++    out_lines = ["\n"]
++    reset_management_master_list = get_list_of_management_master("reset", sdtinfo_obj)
++    out_lines.append("\tPM_CONFIG_RESET_SECTION_ID, /* Reset Section ID */\n")
++    out_lines.append("\t" + str(len(chc.reset_line_map)) + "U, /* Number of resets */\n")
++    out_lines.append("\n")
++    for reset_line in chc.reset_line_map:
++        line_name = chc.reset_line_map[reset_line]["label"]
++        line_type = chc.reset_line_map[reset_line]["type"]
++        if line_type == "normal":
++            out_lines.append("\t" + line_name + ", " + get_all_masters_mask_txt(sdtinfo_obj) + ",\n")
++        elif line_type == "rpu_only":
++            if ("psu_cortexr5_0" in sdtinfo_obj.masters.keys()) and (is_ipi_present("psu_cortexr5_0", sdtinfo_obj) != ""):
++                out_lines.append("\t" + line_name + ", " + get_ipi_mask_txt("psu_cortexr5_0", sdtinfo_obj) + ",\n")
++            else:
++                out_lines.append("\t" + line_name + ", 0,\n")
++        elif (1 == is_all_master_enabled("reset", sdtinfo_obj)) and ((line_type == "rst_periph") or (line_type == "rst_shared" ) or (line_type == "rst_proc")) :
++            out_lines.append("\t" + line_name + ", " + get_all_masters_mask_txt(sdtinfo_obj) + ",\n")
++        elif (0 == is_all_master_enabled("reset", sdtinfo_obj)) and ((line_type == "rst_periph") or (line_type == "rst_shared" ) or (line_type == "rst_proc")) :
++            if line_type == "rst_periph":
++                perms = get_periph_perm_mask_txt_for_rst_line(reset_line)
++                out_lines.append("\t" + line_name + ", " + perms + ",\n")
++            elif line_type == "rst_shared":
++                out_lines.append("\t" + line_name + ", " + reset_management_master_list + ",\n")
++            elif line_type == "rst_proc":
++                line_proc = chc.reset_line_map[reset_line]["proc"]
++                macro_list  = []
++                master_txt = []
++                if line_proc == "APU":
++                    master_txt.append(get_ipi_mask_txt("psu_cortexa53_0", sdtinfo_obj))
++                elif (line_proc == "RPU_1") or (line_proc == "RPU" and is_rpu_lockstep(sdtinfo_obj)) or line_proc == "RPU_0" :
++                    master_txt.append(get_ipi_mask_txt("psu_cortexr5_0", sdtinfo_obj))
++                elif line_proc == "RPU_1":
++                    master_txt.append(get_ipi_mask_txt("psu_cortexr5_1", sdtinfo_obj))
++                elif line_proc == "RPU":
++                    master_rpu_0 = get_ipi_mask_txt("psu_cortexr5_0", sdtinfo_obj)
++                    master_rpu_1 = get_ipi_mask_txt("psu_cortexr5_1", sdtinfo_obj)
++                    if ((master_rpu_0 in reset_management_master_list) and len(master_rpu_0) > 0) and \
++                       ((master_rpu_1 in reset_management_master_list) and len(master_rpu_1) > 0):
++                        master_txt.append(master_rpu_0 + " | " + master_rpu_1)
++                if (master_txt in reset_management_master_list) and len(master_txt) > 0:
++                    macro_list.append(master_txt)
++                if "0U" == reset_management_master_list:
++                    if len(macro_list) > 0:
++                        macro_list.append(" | ")
++                    macro_list.append(reset_management_master_list)
++                if len(macro_list) == 0:
++                    out_lines.append("\t" + line_name + ",  " + macro_list + ",\n")
++        else:
++            out_lines.append("\t" + line_name + ", 0,\n")
++    out_lines.append("\n")
++    return out_lines
++
++def generate_set_config_section_data(sdtinfo_obj):
++    out_lines = []
++    overlay_config_master_list = get_list_of_management_master("overlay_config", sdtinfo_obj)
++    out_lines.append("\tPM_CONFIG_SET_CONFIG_SECTION_ID,\t\t/* Set Config Section ID */\n")
++    out_lines.append("\t0U, /* Permissions to load base config object */\n")
++    out_lines.append("\t" + overlay_config_master_list + ", /* Permissions to load overlay config object */\n")
++    out_lines.append("\n")
++
++    return out_lines
++
++def generate_shutdown_section_data(sdtinfo_obj):
++    out_lines = ["\n"]
++    power_management_master_list = get_list_of_management_master("power", sdtinfo_obj)
++    out_lines.append("\tPM_CONFIG_SHUTDOWN_SECTION_ID, /* Shutdown Section ID */\n")
++    out_lines.append("\t" + power_management_master_list + ", /* System Shutdown/Restart Permission */\n")
++    out_lines.append("\n")
++    return out_lines
++
++def generate_gpo_section_data(sdtinfo_obj):
++    out_lines = []
++    out_lines.append("\tPM_CONFIG_GPO_SECTION_ID,\t\t/* GPO Section ID */\n")
++    for num in chc.gpo_nums:
++        if 1 == sdtinfo_obj.gpos["gpo" + str(num)]["polarity"]:
++            out_lines.append("\tPM_CONFIG_GPO1_BIT_" + str(num) + "_MASK |\n")
++        if 1 == sdtinfo_obj.gpos["gpo" + str(num)]["enable"]:
++            out_lines.append("\tPM_CONFIG_GPO1_MIO_PIN_"+ str(32+num) +"_MAP |\n")
++    out_lines.append("\t0,\t\t\t\t\t/* State of GPO pins */")
++    out_lines.append("\n")
++    return out_lines
++
++def generate_tpl_lines():
++    final_lines = cfg_data_tpl.config_object_template.split('\n')
++    for line_num in range(len(final_lines)):
++        final_lines[line_num] += '\n'
++    return final_lines
++
++def cfg_obj_write(root_node, sdt, options):
++    sdtinfo_obj = SdtInfo(sdt, options)
++
++    final_lines = generate_tpl_lines()
++
++    sections = [
++                {"identifier" : "<<MASTER_IPI_MASK_DEF>>",     "handler" : generate_master_ipi_mask_def},
++                {"identifier" : "<<MASTER_SECTION_DATA>>",     "handler" : generate_master_section_data},
++                {"identifier" : "<<SLAVE_SECTION_DATA>>",      "handler" : generate_slave_section_data},
++                {"identifier" : "<<PREALLOC_SECTION_DATA>>",   "handler" : generate_prealloc_section_data},
++                {"identifier" : "<<POWER_SECTION_DATA>>",      "handler" : generate_power_section_data},
++                {"identifier" : "<<RESET_SECTION_DATA>>",      "handler" : generate_reset_section_data},
++                {"identifier" : "<<SET_CONFIG_SECTION_DATA>>", "handler" : generate_set_config_section_data},
++                {"identifier" : "<<SHUTDOWN_SECTION_DATA>>",   "handler" : generate_shutdown_section_data},
++                {"identifier" : "<<GPO_SECTION_DATA>>",        "handler" : generate_gpo_section_data},
++               ]
++
++    for section in sections:
++        section_obj =  Section(section["identifier"], section["handler"], sdtinfo_obj)
++        final_lines = section_obj.replace_section(final_lines)
++
++    outfile_name = options["args"][0]
++    outfile = open(outfile_name, 'w')
++    outfile.writelines(final_lines)
++    return True
+-- 
+2.37.1 (Apple Git-137.1)
+
