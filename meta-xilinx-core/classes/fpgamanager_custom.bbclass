@@ -97,7 +97,7 @@ python devicetree_do_compile:append() {
     # In case of dtbo as input, bbclass doesn't know if firmware-name is .bit or
     # .bit.bin format and corresponding file name. Hence we are not doing
     # bit.bin conversion.
-    if soc_family != 'versal' and '.dtsi' in d.getVar("SRC_URI"):
+    if soc_family != 'versal' and glob.glob(d.getVar('S') + '/*.dtsi'):
         pn = d.getVar('PN')
         biffile = pn + '.bif'
 
