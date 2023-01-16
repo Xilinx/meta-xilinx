@@ -67,7 +67,7 @@ def check_fsbl_variables(d):
 
         if not os.path.exists(d.getVar('FSBL_FILE') + ".elf"):
             if not d.getVar('WITHIN_EXT_SDK'):
-                raise bb.parse.SkipRecipe("The expect file %s.elf is not available.\nSet FSBL_FILE to the path with a precompiled FSBL binary. See the meta-xilinx-core README for more information." % d.getVar('FSBL_FILE'))
+                raise bb.parse.SkipRecipe("The expected file %s.elf is not available.\nSet FSBL_FILE to the path with a precompiled FSBL binary. See the meta-xilinx-core README for more information." % d.getVar('FSBL_FILE'))
         else:
             # We found the file, so be sure to track it
             d.setVar('SRC_URI', 'file://${FSBL_FILE}.elf')
