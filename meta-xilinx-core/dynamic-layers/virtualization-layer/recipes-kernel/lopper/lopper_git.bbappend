@@ -1,5 +1,5 @@
 SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master;protocol=https"
-SRCREV = "146b2e86c888ee405cceeaccc290bd24f8ff2d03"
+SRCREV = "aa96fcc23ae332a826fa17eb9cf4986f44688f9b"
 
 BASEVERSION = "1.1.0"
 
