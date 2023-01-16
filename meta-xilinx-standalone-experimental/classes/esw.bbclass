@@ -25,6 +25,7 @@ inherit ccmake
 COMPATIBLE_HOST = ".*-elf"
 COMPATIBLE_HOST:arm = "[^-]*-[^-]*-eabi"
 
+CONFIG_DTFILE ??= ""
 DTS_FILE = "${DEPLOY_DIR_IMAGE}/devicetree/${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
 
 DEPENDS += "python3-pyyaml-native lopper-native device-tree python3-dtc-native"
