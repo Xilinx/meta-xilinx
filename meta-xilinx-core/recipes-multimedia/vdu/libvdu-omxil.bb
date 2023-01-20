@@ -1,14 +1,14 @@
 SUMMARY = "OpenMAX Integration layer for VDU"
 DESCRIPTION = "OMX IL Libraries,test application and headers for VDU"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=c15ae83ba15c4ab3fa4eb2c22975258f"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=aaf483d309243c4596f6373eb9c8325f"
 
 XILINX_VDU_VERSION = "1.0.0"
 PV = "${XILINX_VDU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vdu-omx-il.git;protocol=https"
-SRCREV ?= "f7059a0a304f16926208218dee27c88244bece90"
+SRCREV ?= "de48c14534cb1c8d7bf2146f436307aaec23c290"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG} \

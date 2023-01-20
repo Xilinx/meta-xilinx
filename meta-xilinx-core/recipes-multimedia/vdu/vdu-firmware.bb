@@ -1,7 +1,7 @@
 SUMMARY = "Firmware for VDU"
 DESCRIPTION = "Firmware binaries provider for VDU"
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=9a0e309e0fae4f23561b63b72f69e77f"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=c5784f63397086d836580d8785d1deb9"
 
 XILINX_VDU_VERSION = "1.0.0"
 PV = "${XILINX_VDU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
@@ -14,7 +14,7 @@ REQUIRED_MACHINE_FEATURES = "vdu"
 
 BRANCH ?= "master"
 REPO ?= "git://github.com/Xilinx/vdu-firmware.git;protocol=https"
-SRCREV ?= "baf73ff6e31fec2aea457e401fc46504c4bdbe5e"
+SRCREV ?= "4b5a0170f4257538ef1e8780845f4b5885826c87"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI   = "${REPO};${BRANCHARG}"

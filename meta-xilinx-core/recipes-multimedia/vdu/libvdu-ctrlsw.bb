@@ -1,7 +1,7 @@
 SUMMARY = "Control Software for VDU"
 DESCRIPTION = "Control software libraries, test applications and headers provider for VDU"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=c15ae83ba15c4ab3fa4eb2c22975258f"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=aaf483d309243c4596f6373eb9c8325f"
 
 XILINX_VDU_VERSION = "1.0.0"
 PV = "${XILINX_VDU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
@@ -12,7 +12,7 @@ REQUIRED_MACHINE_FEATURES = "vdu"
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vdu-ctrl-sw.git;protocol=https"
-SRCREV ?= "89a186d39c77d3625ee43b722e9220639fa24bde"
+SRCREV ?= "5fc0a72d61bfbd54f61404fda31566e440bb9b83"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
