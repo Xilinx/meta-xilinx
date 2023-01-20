@@ -1,8 +1,7 @@
 SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master;protocol=https"
-SRCREV = "aa96fcc23ae332a826fa17eb9cf4986f44688f9b"
+SRCREV = "46a9d819b3b09e886076897879bf8dee4b1a70ca"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/lopper:"
-SRC_URI += "file://0001-lopper-Implementation-of-lopper-plugin-for-generatin.patch"
 
 BASEVERSION = "1.1.0"
 
