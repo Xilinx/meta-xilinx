@@ -2,7 +2,7 @@ UBOOT_VERSION = "v2023.01"
 
 UBRANCH ?= "xlnx_rebase_v2023.01"
 
-SRCREV = "907ddbc80d669fa7f65bdab0e9a64ca6228caee6"
+SRCREV = "7e4e3b34eb2fbbb74c4584e6b8053db5cba88ff8"
 
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=4;md5=744e7e3bb0c94b4b9f6b3db3bf893897"
