@@ -53,7 +53,7 @@ CONVERSION_CMD:qemu-sd-fatimg () {
 	dd if=${WORKDIR}/${BOOT_VOLUME_ID}.img of=${QEMU_IMG} conv=notrunc seek=1 bs=$(expr ${IMAGE_ALIGNMENT} \* 1024)
 }
 
-CONVERSION_DEPENDS_qemu-sd = "qemu-xilinx-system-native"
+CONVERSION_DEPENDS_qemu-sd = "qemu-system-native"
 CONVERSION_DEPENDS_qemu-sd-fatimg = "mtools-native:do_populate_sysroot \
 				dosfstools-native:do_populate_sysroot \
 				parted-native:do_populate_sysroot"
