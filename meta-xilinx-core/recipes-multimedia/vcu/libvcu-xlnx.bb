@@ -15,10 +15,9 @@ SRC_URI = "${REPO};${BRANCHARG}"
 
 S  = "${WORKDIR}/git"
 
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:zynqmp = "zynqmp"
+inherit features_check
 
-PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
+REQUIRED_MACHINE_FEATURES = "vcu"
 
 RDEPENDS:${PN} = "kernel-module-vcu"
 
