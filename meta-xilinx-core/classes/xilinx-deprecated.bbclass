@@ -7,7 +7,7 @@ xilinx_deprecated_config_eventhandler[eventmask] = "bb.event.ConfigParsed"
 python xilinx_deprecated_config_eventhandler () {
     # Check for BOARD & BOARD_VARIANT usage
     if d.getVar('BOARD') or d.getVar('BOARD_VARIANT'):
-        bb.warn("Deprecated BOARD (%s) or BOARD_VARIANT (%s) is being used, they are no longer supported and are ignored." % (d.getVar('BOARD'), d.getVar('BOARD_VARIANT')))
+        bb.error("Deprecated BOARD (%s) or BOARD_VARIANT (%s) is being used, they are no longer supported and are ignored." % (d.getVar('BOARD'), d.getVar('BOARD_VARIANT')))
 
     msg_list = d.getVarFlags('XILINX_DEPRECATED') or []
     for msg_source in msg_list:
