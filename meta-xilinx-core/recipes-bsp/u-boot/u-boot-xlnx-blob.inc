@@ -96,11 +96,11 @@ do_blob_generate () {
 	install -d ${DT_BLOB_DIR}
 	for CC_DTB in ${IMPORT_CC_DTBS}; do
 		DTBO=$(echo $CC_DTB | cut -d: -f1)
-		DTB=$(echo $CC_DTB | cut -d: -f2)
-		bbnote "fdtoverlay -o ${DT_BLOB_DIR}/${DTB} -i ${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_NAME} ${B}/arch/arm/dts/${DTBO}"
+        BASE_DTB=$(echo $CC_DTB | cut -d: -f2)
+        OUTPUT_DTB=$(echo $CC_DTB | cut -d: -f3)
+        bbnote "fdtoverlay -o ${DT_BLOB_DIR}/${OUTPUT_DTB} -i ${B}/arch/arm/dts/${BASE_DTB} ${B}/arch/arm/dts/${DTBO}"
 		if [ -f ${B}/arch/arm/dts/${DTBO} ]; then
-		fdtoverlay -o ${DT_BLOB_DIR}/${DTB} \
-			-i ${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_NAME} ${B}/arch/arm/dts/${DTBO}
+        fdtoverlay -o ${DT_BLOB_DIR}/${OUTPUT_DTB} -i ${B}/arch/arm/dts/${BASE_DTB} ${B}/arch/arm/dts/${DTBO}
 		fi
 	done
 
