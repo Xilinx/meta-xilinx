@@ -1,7 +1,7 @@
 SUMMARY = "Firmware for VCU"
 DESCRIPTION = "Firmware binaries provider for VCU"
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=63b45903a9a50120df488435f03cf498"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=3d96ffc2b27fb919e2f40a5a702c3dc7"
 
 XILINX_VCU_VERSION = "1.0.0"
 PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git${SRCPV}"
@@ -10,7 +10,7 @@ S  = "${WORKDIR}/git"
 
 BRANCH ?= "master"
 REPO ?= "git://github.com/Xilinx/vcu-firmware.git;protocol=https"
-SRCREV = "d59b5f22ea9b6eac7b402c1381b8e49702837064"
+SRCREV = "7c4b35c5f5f59f01277dfd9a54e25cb88ddb6ff3"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI   = "${REPO};${BRANCHARG}"
