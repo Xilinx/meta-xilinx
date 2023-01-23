@@ -21,14 +21,13 @@ SRC_URI = " \
     file://99-vcu-enc-dec.rules \
     "
 
-inherit module
+inherit module features_check
+
+REQUIRED_MACHINE_FEATURES = "vcu"
 
 EXTRA_OEMAKE += "O=${STAGING_KERNEL_BUILDDIR}"
 
 RDEPENDS:${PN} = "vcu-firmware"
-
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 
 KERNEL_MODULE_AUTOLOAD += "dmaproxy"
 
