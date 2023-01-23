@@ -9,8 +9,6 @@ EXTRA_OECONF:append:xilinx-standalone:class-target = " \
 	--enable-plugins \
 	--with-gnu-as \
 	--disable-libitm \
-	glibcxx_cv_getentropy=no \
-	glibcxx_cv_arc4random=no \
 "
 
 EXTRA_OECONF:append:xilinx-standalone:aarch64:class-target = " \
