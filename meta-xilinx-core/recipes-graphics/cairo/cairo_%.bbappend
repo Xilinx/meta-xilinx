@@ -1,8 +1,13 @@
 # OpenGL comes from libmali on ev/eg, when egl is enabled
-PACKAGECONFIG = " \
+# Adjust the configuration if we're using libmali for this distro
+DEFAULT_PACKAGECONFIG := "${PACKAGECONFIG}"
+
+PACKAGECONFIG_LIBMALI = " \
   ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11 xcb', '', d)} \
   egl glesv2 \
 "
+
+PACKAGECONFIG = "${@'${PACKAGECONFIG_LIBMALI}' if d.getVar('PREFERRED_PROVIDER_virtual/libgles1') == 'libmali-xlnx' else '${DEFAULT_PACKAGECONFIG}'}"
 
 # Links to libmali-xlnx, so it becomes MACHINE_ARCH specific
 DEFAULT_PACKAGE_ARCH := "${PACKAGE_ARCH}"
