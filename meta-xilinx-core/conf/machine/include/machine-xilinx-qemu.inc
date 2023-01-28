@@ -1,7 +1,6 @@
 # This include is used to setup default QEMU and qemuboot config for meta-xilinx
 # machines.
 
-PREFERRED_PROVIDER_qemu = "qemu-xilinx"
 PREFERRED_PROVIDER_qemu-native = "qemu-xilinx-native"
 PREFERRED_PROVIDER_qemu-system-native = "qemu-xilinx-system-native"
 PREFERRED_PROVIDER_nativesdk-qemu = "nativesdk-qemu-xilinx"
