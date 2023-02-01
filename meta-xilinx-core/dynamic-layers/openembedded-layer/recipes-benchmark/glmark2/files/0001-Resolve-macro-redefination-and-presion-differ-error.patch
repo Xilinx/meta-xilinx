@@ -1,0 +1,61 @@
+From e27d75a274d038b94c908b3ade844301794b5920 Mon Sep 17 00:00:00 2001
+From: Yash Ladani <yash.ladani@amd.com>
+Date: Tue, 31 Jan 2023 01:55:03 -0800
+Subject: [PATCH] Resolve macro redefination and presion differ error
+
+While running glmark2-es2 facing macro redefination error
+Error:   0:24: P0001: Macro 'HIGHP_OR_DEFAULT' redefined
+When glmark is compiling the fragment shaders macro
+HIGHP_OR_DEFAULT is being redefined.
+Added the guard(#if !defined(HIGHP_OR_DEFAULT)) to avoid
+this sceneario.
+
+We are also getting the precision differ error as same
+uCurrentTime variable is defined in both fragment and
+vertex shader and they both have different precision.
+Error: Failed to link program created from files None and None:
+L0010 Uniform 'uCurrentTime' differ on precision
+Added highp in jellyfish fragment shader file to avoid this.
+
+Signed-off-by: Yash Ladani <yash.ladani@amd.com>
+---
+ data/shaders/jellyfish.frag    | 4 ++++
+ src/libmatrix/shader-source.cc | 3 +++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/data/shaders/jellyfish.frag b/data/shaders/jellyfish.frag
+index c10477a..3431f22 100644
+--- a/data/shaders/jellyfish.frag
++++ b/data/shaders/jellyfish.frag
+@@ -1,3 +1,7 @@
++#ifdef GL_ES
++precision highp float;
++#endif
++
+ uniform sampler2D uSampler;
+ uniform sampler2D uSampler1;
+ uniform float uCurrentTime;
+diff --git a/src/libmatrix/shader-source.cc b/src/libmatrix/shader-source.cc
+index 659832e..4d13500 100644
+--- a/src/libmatrix/shader-source.cc
++++ b/src/libmatrix/shader-source.cc
+@@ -490,6 +490,8 @@ ShaderSource::str()
+     /* Create the precision statements */
+     std::stringstream precision_macros_ss;
+ 
++    precision_macros_ss << "#if !defined(HIGHP_OR_DEFAULT)";
++    precision_macros_ss << std::endl;
+     precision_macros_ss << "#if defined(GL_ES)";
+     if (type_ == ShaderSource::ShaderTypeFragment)
+         precision_macros_ss << " && defined(GL_FRAGMENT_PRECISION_HIGH)";
+@@ -498,6 +500,7 @@ ShaderSource::str()
+     precision_macros_ss << "#else" << std::endl;
+     precision_macros_ss << "#define HIGHP_OR_DEFAULT" << std::endl;
+     precision_macros_ss << "#endif" << std::endl;
++    precision_macros_ss << "#endif" << std::endl;
+     precision_macros_ss << "#if defined(GL_ES)"  << std::endl;
+     precision_macros_ss << "#define MEDIUMP_OR_DEFAULT mediump" << std::endl;
+     precision_macros_ss << "#else" << std::endl;
+-- 
+2.34.1
+
