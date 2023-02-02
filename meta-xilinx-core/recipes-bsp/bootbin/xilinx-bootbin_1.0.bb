@@ -9,6 +9,12 @@ include machine-xilinx-${SOC_FAMILY}.inc
 
 inherit deploy
 
+# Don't allow building for microblaze MACHINE
+COMPATIBLE_MACHINE ?= "^$"
+COMPATIBLE_MACHINE:zynq = ".*"
+COMPATIBLE_MACHINE:zynqmp = ".*"
+COMPATIBLE_MACHINE:versal = ".*"
+
 PROVIDES = "virtual/boot-bin"
 
 DEPENDS += "bootgen-native"
@@ -25,6 +31,14 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 SRC_URI += "${@('file://' + d.getVar("BIF_FILE_PATH")) if d.getVar("BIF_FILE_PATH") != (d.getVar('B') + '/bootgen.bif') else ''}"
 
+# bootgen command -arch option for different SOC architectures
+# zynq7000   : zynq
+# zynqmp     : zynqmp
+# versal     : versal
+# versal-net : versalnet
+BOOTGEN_ARCH_DEFAULT = "${SOC_FAMILY}"
+BOOTGEN_ARCH_DEFAULT:versal-net = "${SOC_FAMILY}${SOC_VARIANT}"
+BOOTGEN_ARCH ?= "${BOOTGEN_ARCH_DEFAULT}"
 BOOTGEN_EXTRA_ARGS ?= ""
 
 do_patch[noexec] = "1"
@@ -136,7 +150,7 @@ do_compile() {
     if [ "${BIF_FILE_PATH}" != "${B}/bootgen.bif" ];then
         BIF_FILE_PATH="${WORKDIR}${BIF_FILE_PATH}"
     fi
-    bootgen -image ${BIF_FILE_PATH} -arch ${SOC_FAMILY} ${BOOTGEN_EXTRA_ARGS} -w -o ${B}/BOOT.bin
+    bootgen -image ${BIF_FILE_PATH} -arch ${BOOTGEN_ARCH} ${BOOTGEN_EXTRA_ARGS} -w -o ${B}/BOOT.bin
     if [ ! -e ${B}/BOOT.bin ]; then
         bbfatal "bootgen failed. See log"
     fi
