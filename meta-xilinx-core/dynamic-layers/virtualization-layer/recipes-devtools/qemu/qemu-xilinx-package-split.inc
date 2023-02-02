@@ -43,4 +43,4 @@ INSANE_SKIP:${PN}-firmware:class-target = "arch"
 FILES:${PN}-keymaps:class-target = "${datadir}/${PN}/keymaps/*"
 RDEPENDS:${PN}-keymaps:class-target = "${PN}"
 
-PACKAGECONFIG:append = " virtfs"
+PACKAGECONFIG:append:class-target = " virtfs"
