@@ -1,14 +1,14 @@
 SUMMARY = "OpenMAX Integration layer for VCU"
 DESCRIPTION = "OMX IL Libraries,test applications and headers for VCU"
-LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=dd1f177bf5d6f4c9fa313f05c7c8ef41"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=edad0cda7391abd51da1baba436d88a0"
 
 XILINX_VCU_VERSION = "1.0.0"
 PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git${SRCPV}"
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vcu-omx-il.git;protocol=https"
-SRCREV = "442e0012d3c7422ab2c85563c59b63cf5e6c3eb7"
+SRCREV = "704cf05ee3b814c4481582a6d47461e5566bdb3e"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
