@@ -8,13 +8,16 @@ XILINX_VDU_VERSION = "1.0.0"
 PV = "${XILINX_VDU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 S = "${WORKDIR}/git"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 BRANCH ?= "master"
 REPO ?= "git://github.com/Xilinx/vdu-modules.git;protocol=https"
 SRCREV ?= "81cd9cd4f8fea9e0cb8951bf62ac2d37f33fce25"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
-SRC_URI = "${REPO};${BRANCHARG}"
+SRC_URI = "${REPO};${BRANCHARG} \
+	file://99-vdu-enc-dec.rules \
+"
 
 inherit module features_check
 
@@ -29,3 +32,10 @@ COMPATIBLE_MACHINE:versal-ai-core = "versal-ai-core"
 COMPATIBLE_MACHINE:versal-ai-edge = "versal-ai-edge"
 
 PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
+
+do_install:append() {
+    install -d ${D}${sysconfdir}/udev/rules.d
+    install -m 0644 ${WORKDIR}/99-vdu-enc-dec.rules ${D}${sysconfdir}/udev/rules.d/
+}
+
+FILES:${PN} = "${sysconfdir}/udev/rules.d/*"
