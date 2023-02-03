@@ -8,7 +8,7 @@ PV = "${XILINX_VDU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vdu-omx-il.git;protocol=https"
-SRCREV ?= "de48c14534cb1c8d7bf2146f436307aaec23c290"
+SRCREV ?= "811eefac953fd5e098c69cada97a0dd35f5e9015"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG} \
