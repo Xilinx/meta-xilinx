@@ -34,13 +34,13 @@ usage() {
   cat <<EOF
 $0
     -c <config_dir>         Location of the build conf directory
-    -s <system_dtb>         Path to system DTB
+    -s <system_dts>         Path to system dts
     [-d <domain_file>]      Path to domain file (.yml/.dts)
-    [-o <overlay_dtb>]      Generate overlay dts
+    [-o <overlay_dts>]      Generate overlay dts
     [-e <external_fpga>]    Apply a partial overlay
     [-m <machine_conf>]     The name of the machine .conf to generate
     [-t <machine>]          Machine type: zynqmp or versal (usually auto detected)
-    [-p <psu_init_path>]    Path to psu_init files, defaults to system_dtb path
+    [-p <psu_init_path>]    Path to psu_init files, defaults to system_dts path
     [-i <pdu_path>]         Path to the pdi file
     [-l <config_file>]      write local.conf changes to this file
     [-P <petalinux_schema>] Path to petalinux schema file
@@ -56,8 +56,8 @@ parse_args() {
   while getopts ":c:s:d:o:e:m:l:hP:p:i:" opt; do
     case ${opt} in
       c) config_dir=$OPTARG ;;
-      s) system_dtb=$OPTARG ;;
-      o) overlay_dtb=$OPTARG ;;
+      s) system_dts=$OPTARG ;;
+      o) overlay_dts=$OPTARG ;;
       d) domain_file=$OPTARG ;;
       e) external_fpga=$OPTARG ;;
       m) mach_conf=$OPTARG ; mach_conf=${mach_conf%%.conf} ;;
@@ -73,17 +73,17 @@ parse_args() {
   done
 
   [ -z "${config_dir}" ] && error "You must specify the path to the build conf directory with -c"
-  [ -z "${system_dtb}" ] && error "You must specify the path to the system device tree with -s"
+  [ -z "${system_dts}" ] && error "You must specify the path to the system device tree with -s"
   [ -f "${config_dir}/local.conf" ] || error "Invalid config dir: ${config_dir}"
-  [ -f "${system_dtb}" ] || error "Unable to find: ${system_dtb}"
-  system_dtb=$(realpath ${system_dtb})
+  [ -f "${system_dts}" ] || error "Unable to find: ${system_dts}"
+  system_dts=$(realpath ${system_dts})
   if [ -z "$psu_init_path" ]; then
-    psu_init_path=$(dirname ${system_dtb})
+    psu_init_path=$(dirname ${system_dts})
   else
     psu_init_path=$(realpath ${psu_init_path})
   fi
   if [ -z "$pdi_path" ]; then
-    pdi_path=$(dirname ${system_dtb})
+    pdi_path=$(dirname ${system_dts})
   else
     pdi_path=$(realpath ${pdi_path})
   fi
@@ -136,27 +136,25 @@ cortex_a53_linux() {
   info "cortex-a53 for Linux [ $1 ]"
 
   if [ "$1" = "None" ]; then
-    dtb_file="cortexa53-${machine}-linux.dtb"
     dts_file="cortexa53-${machine}-linux.dts"
-    system_conf=${dtb_file}
+    system_conf=${dts_file}
     conf_file=""
   else
     mc_name=cortexa53-${machine}-$1-linux
-    dtb_file="${mc_name}.dtb"
     dts_file="${mc_name}.dts"
     multiconf="${multiconf} ${mc_name}"
     conf_file=multiconfig/${mc_name}.conf
   fi
 
-  # Check if it is overlay dts otherwise just create linux dtb
+  # Check if it is overlay dts otherwise just create linux dts
   (
-    cd dtb || error "Unable to cd to dtb dir"
-    if [ "${overlay_dtb}" = "true" ]; then
+    cd dts || error "Unable to cd to dts dir"
+    if [ "${overlay_dts}" = "true" ]; then
       if [ "${external_fpga}" = "true" ]; then
-        LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- xlnx_overlay_dt ${machine} full \
+        LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- xlnx_overlay_dt ${machine} full \
           || error "lopper failed"
       else
-        LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dtb}" -- xlnx_overlay_dt ${machine} partial \
+        LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dts}" -- xlnx_overlay_dt ${machine} partial \
           || error "lopper failed"
       fi
       dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi || error "dtc failed"
@@ -165,27 +163,16 @@ cortex_a53_linux() {
         -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" \
         -i "${lops_dir}/lop-domain-linux-a53.dts" \
         -i "${lops_dir}/lop-domain-linux-a53-prune.dts" \
-	"${system_dtb}" "${dtb_file}" \
-        || error "lopper failed"
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
-        -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" \
-        -i "${lops_dir}/lop-domain-linux-a53.dts" \
-        -i "${lops_dir}/lop-domain-linux-a53-prune.dts" \
-	"${system_dtb}" "${dts_file}" \
+	"${system_dts}" "${dts_file}" \
         || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
         -i "${lops_dir}/lop-domain-linux-a53.dts" \
         -i "${lops_dir}/lop-domain-linux-a53-prune.dts" \
-        "${system_dtb}" "${dtb_file}" \
-        || error "lopper failed"
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
-        -i "${lops_dir}/lop-domain-linux-a53.dts" \
-        -i "${lops_dir}/lop-domain-linux-a53-prune.dts" \
-        "${system_dtb}" "${dts_file}" \
+        "${system_dts}" "${dts_file}" \
         || error "lopper failed"
     fi
-    rm -f pl.dtsi lop-a53-imux.dts.dtb lop-domain-linux-a53.dts.dtb
+    rm -f pl.dtsi lop-a53-imux.dts.dtb lop-domain-linux-a53.dts.dtb lop-domain-linux-a53-prune.dts.dtb
   )
 
   if [ -z "${conf_file}" ]; then
@@ -194,7 +181,7 @@ cortex_a53_linux() {
 
   ## Generate a multiconfig
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 EOF
@@ -215,7 +202,7 @@ cortex_a53_baremetal() {
   fi
 
   mc_name="cortexa53-$2-${machine}${suffix}-baremetal"
-  dtb_file="${mc_name}.dtb"
+  dts_file="${mc_name}.dts"
   multiconf="${multiconf} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
@@ -230,25 +217,25 @@ cortex_a53_baremetal() {
 
   # Build device tree
   (
-    cd dtb || error "Unable to cd to dtb dir"
+    cd dts || error "Unable to cd to dts dir"
     if [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
-        -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" "${system_dtb}" "${dtb_file}" \
+        -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" "${system_dts}" "${dts_file}" \
         || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
-        "${system_dtb}" "${dtb_file}" || error "lopper failed"
+        "${system_dts}" "${dts_file}" || error "lopper failed"
     fi
     rm -f lop-a53-imux.dts.dtb
   )
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dts}" \
       -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   else
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -271,7 +258,7 @@ EOF
     cat /dev/null >"${conf_file}"
   fi
   cat <<EOF >>"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa53"
@@ -289,7 +276,7 @@ cortex_a53_freertos() {
   [ "$1" != "None" ] && suffix="-$1"
 
   mc_name="cortexa53-$2-${machine}${suffix}-freertos"
-  dtb_file="${mc_name}.dtb"
+  dts_file="${mc_name}.dts"
   multiconf="${multiconf} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
@@ -297,24 +284,24 @@ cortex_a53_freertos() {
 
   # Build device tree
   (
-    cd dtb || error "Unable to cd to dtb dir"
+    cd dts || error "Unable to cd to dts dir"
     if [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' \
-        -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" "${system_dtb}" "${dtb_file}" \
+        -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" "${system_dts}" "${dts_file}" \
         || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a53-imux.dts" \
-        "${system_dtb}" "${dtb_file}" || error "lopper failed"
+        "${system_dts}" "${dts_file}" || error "lopper failed"
     fi
     rm -f lop-a53-imux.dts.dtb
   )
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dts}" \
       -- baremetaldrvlist_xlnx $3 "${embeddedsw}" || error "lopper failed"
   else
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -323,7 +310,7 @@ cortex_a53_freertos() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa53"
@@ -347,30 +334,28 @@ cortex_a72_linux() {
   fi
 
   if [ "$1" = "None" ]; then
-    dtb_file="cortexa72-${machine}-linux.dtb"
     dts_file="cortexa72-${machine}-linux.dts"
-    system_conf=${dtb_file}
+    system_conf=${dts_file}
     conf_file=""
   else
     mc_name="cortexa72-${machine}-$1-linux"
-    dtb_file="${mc_name}.dtb"
     dts_file="${mc_name}.dts"
     multiconf="${multiconf} ${mc_name}"
     conf_file=multiconfig/${mc_name}.conf
   fi
 
   (
-    cd dtb || error "Unable to cd to dtb dir"
-    # Check if it is overlay dts otherwise just create linux dtb
-    if [ "${overlay_dtb}" = "true" ]; then
+    cd dts || error "Unable to cd to dts dir"
+    # Check if it is overlay dts otherwise just create linux dts
+    if [ "${overlay_dts}" = "true" ]; then
       # As there is no partial support on Versal, As per fpga manager implementatin there is
       # a flag "external_fpga" which says apply overlay without loading the bit file.
       if [ "${external_fpga}" = "true" ]; then
-        LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- xlnx_overlay_dt \
+        LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- xlnx_overlay_dt \
           ${machine} full external_fpga || error "lopper failed"
       else
         # If there is no external_fpga flag, then the default is full
-        LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dtb}" -- xlnx_overlay_dt \
+        LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dts}" -- xlnx_overlay_dt \
           ${machine} full || error "lopper failed"
       fi
       dtc -q -O dtb -o pl.dtbo -b 0 -@ pl.dtsi || error "dtc failed"
@@ -379,25 +364,15 @@ cortex_a72_linux() {
         -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" \
         -i "${lops_dir}/lop-domain-a72.dts" \
         -i "${lops_dir}/lop-domain-a72-prune.dts" \
-	"${system_dtb}" "${dtb_file}" \
-        || error "lopper failed"
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
-        -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" \
-        -i "${lops_dir}/lop-domain-a72.dts" \
-        -i "${lops_dir}/lop-domain-a72-prune.dts" \
-	"${system_dtb}" "${dts_file}" \
+	"${system_dts}" "${dts_file}" \
         || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a72-imux.dts" \
         -i "${lops_dir}/lop-domain-a72.dts" \
         -i "${lops_dir}/lop-domain-a72-prune.dts" \
-	"${system_dtb}" "${dtb_file}" || error "lopper failed"
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a72-imux.dts" \
-        -i "${lops_dir}/lop-domain-a72.dts" \
-        -i "${lops_dir}/lop-domain-a72-prune.dts" \
-	"${system_dtb}" "${dts_file}" || error "lopper failed"
+	"${system_dts}" "${dts_file}" || error "lopper failed"
     fi
-    rm -f pl.dtsi lop-a72-imux.dts.dtb lop-domain-a72.dts.dtb
+    rm -f pl.dtsi lop-a72-imux.dts.dtb lop-domain-a72.dts.dtb lop-domain-a72-prune.dts.dtb
   )
 
   if [ -z "${conf_file}" ]; then
@@ -406,7 +381,7 @@ cortex_a72_linux() {
 
   ## Generate a multiconfig
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 EOF
@@ -419,7 +394,7 @@ cortex_a72_baremetal() {
   [ "$1" != "None" ] && suffix="-$1"
 
   mc_name="cortexa72-$2-${machine}${suffix}-baremetal"
-  dtb_file="${mc_name}.dtb"
+  dts_file="${mc_name}.dts"
   multiconf="${multiconf} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
@@ -427,24 +402,24 @@ cortex_a72_baremetal() {
 
   # Build device tree
   (
-    cd dtb || error "Unable to cd to dtb dir"
+    cd dts || error "Unable to cd to dts dir"
     if [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f   --enhanced -x '*.yaml' \
-        -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" "${system_dtb}" "${dtb_file}" \
+        -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" "${system_dts}" "${dts_file}" \
         || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a72-imux.dts" \
-        "${system_dtb}" "${dtb_file}" || error "lopper failed"
+        "${system_dts}" "${dts_file}" || error "lopper failed"
     fi
     rm -f lop-a72-imux.dts.dtb
   )
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dts}" \
       -- baremetaldrvlist_xlnx $3 "${embeddedsw}" || error "lopper failed"
   else
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -453,7 +428,7 @@ cortex_a72_baremetal() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa72"
@@ -471,7 +446,7 @@ cortex_a72_freertos() {
   [ "$1" != "None" ] && suffix="-$1"
 
   mc_name="cortexa72-$2-${machine}${suffix}-freertos"
-  dtb_file="${mc_name}.dtb"
+  dts_file="${mc_name}.dts"
   multiconf="${multiconf} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
@@ -479,24 +454,24 @@ cortex_a72_freertos() {
 
   # Build device tree
   (
-    cd dtb || error "Unable to cd to dtb dir"
+    cd dts || error "Unable to cd to dts dir"
     if [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" lopper -f --enhanced -x '*.yaml' \
-        -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" "${system_dtb}" "${dtb_file}" \
+        -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" "${system_dts}" "${dts_file}" \
         || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-a72-imux.dts" \
-        "${system_dtb}" "${dtb_file}" || error "lopper failed"
+        "${system_dts}" "${dts_file}" || error "lopper failed"
     fi
     rm -f lop-a72-imux.dts.dtb
   )
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dts}" \
       -- baremetaldrvlist_xlnx $3 "${embeddedsw}" || error "lopper failed"
   else
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -505,7 +480,7 @@ cortex_a72_freertos() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa72"
@@ -531,7 +506,7 @@ cortex_r5_baremetal() {
   fi
 
   mc_name="cortexr5-$2-${machine}${suffix}-baremetal"
-  dtb_file="${mc_name}.dtb"
+  dts_file="${mc_name}.dts"
   multiconf="${multiconf} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
@@ -546,24 +521,24 @@ cortex_r5_baremetal() {
 
   # Build device tree
   (
-    cd dtb || error "Unable to cd to dtb dir"
+    cd dts || error "Unable to cd to dts dir"
     if [ -n "$domain_file" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
-        -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dtb}" "${dtb_file}" \
+        -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dts}" "${dts_file}" \
         || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-r5-imux.dts" \
-        "${system_dtb}" "${dtb_file}" || error "lopper failed"
+        "${system_dts}" "${dts_file}" || error "lopper failed"
     fi
     rm -f lop-r5-imux.dts.dtb
   )
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dts}" \
       -- baremetaldrvlist_xlnx $3 "${embeddedsw}" || error "lopper failed"
   else
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -586,7 +561,7 @@ EOF
     cat /dev/null >"${conf_file}"
   fi
   cat <<EOF >>"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexr5"
@@ -604,7 +579,7 @@ cortex_r5_freertos() {
   [ "$1" != "None" ] && suffix="-$1"
 
   mc_name="cortexr5-$2-${machine}${suffix}-freertos"
-  dtb_file="${mc_name}.dtb"
+  dts_file="${mc_name}.dts"
   multiconf="${multiconf} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
   libxil="machine/include/${mach_conf}/${mc_name}-libxil.conf"
@@ -612,24 +587,24 @@ cortex_r5_freertos() {
 
   # Build device tree
   (
-    cd dtb || error "Unable to cd to dtb dir"
+    cd dts || error "Unable to cd to dts dir"
     if [ -n "$domain_file" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
-        -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dtb}" "${dtb_file}" \
+        -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dts}" "${dts_file}" \
         || error "lopper failed"
     else
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-r5-imux.dts" \
-        "${system_dtb}" "${dtb_file}" || error "lopper failed"
+        "${system_dts}" "${dts_file}" || error "lopper failed"
     fi
     rm -f lop-r5-imux.dts.dtb
   )
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dts}" \
       -- baremetaldrvlist_xlnx $3 "${embeddedsw}" || error "lopper failed"
   else
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- baremetaldrvlist_xlnx $3 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -638,7 +613,7 @@ cortex_r5_freertos() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexr5"
@@ -658,8 +633,8 @@ process_microblaze() {
 
   mkdir -p machine/include/${mach_conf}
   (
-    cd dtb || error "Unable to cd to dtb dir"
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-microblaze-yocto.dts" "${system_dtb}" \
+    cd dts || error "Unable to cd to dts dir"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-microblaze-yocto.dts" "${system_dts}" \
       || error "lopper failed"
     rm -f lop-microblaze-yocto.dts.dtb
   ) >machine/include/${mach_conf}/microblaze.inc
@@ -676,7 +651,7 @@ pmu-microblaze() {
   process_microblaze
 
   mc_name="microblaze-0-pmu"
-  dtb_file="${mc_name}.dtb"
+  dts_file="${mc_name}.dts"
   multiconf="${multiconf} ${mc_name}"
   multiconf_min="${multiconf_min} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
@@ -688,16 +663,16 @@ pmu-microblaze() {
 
   # Build device tree
   (
-    cd dtb || error "Unable to cd to dtb dir"
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" "${dtb_file}" || error "lopper failed"
+    cd dts || error "Unable to cd to dts dir"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" "${dts_file}" || error "lopper failed"
   )
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' -i "${domain_file}" "${system_dts}" \
       -- baremetaldrvlist_xlnx $1 "${embeddedsw}" || error "lopper failed"
   else
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $1 "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- baremetaldrvlist_xlnx $1 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -706,7 +681,7 @@ pmu-microblaze() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
 
 ESW_MACHINE = "$1"
 
@@ -727,7 +702,7 @@ pmc-microblaze() {
   process_microblaze
 
   mc_name="microblaze-0-pmc"
-  dtb_file="${mc_name}.dtb"
+  dts_file="${mc_name}.dts"
   multiconf="${multiconf} ${mc_name}"
   multiconf_min="${multiconf_min} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
@@ -739,16 +714,16 @@ pmc-microblaze() {
 
   # Build device tree
   (
-    cd dtb || error "Unable to cd to dtb dir"
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" "${dtb_file}" || error "lopper failed"
+    cd dts || error "Unable to cd to dts dir"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" "${dts_file}" || error "lopper failed"
   )
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dts}" \
       -- baremetaldrvlist_xlnx $1 "${embeddedsw}" || error "lopper failed"
   else
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $1 "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- baremetaldrvlist_xlnx $1 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -757,7 +732,7 @@ pmc-microblaze() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
 
 ESW_MACHINE = "$1"
 
@@ -778,7 +753,7 @@ psm-microblaze() {
   process_microblaze
 
   mc_name="microblaze-0-psm"
-  dtb_file="${mc_name}.dtb"
+  dts_file="${mc_name}.dts"
   multiconf="${multiconf} ${mc_name}"
   multiconf_min="${multiconf_min} ${mc_name}"
   conf_file="multiconfig/${mc_name}.conf"
@@ -790,16 +765,16 @@ psm-microblaze() {
 
   # Build device tree
   (
-    cd dtb || error "Unable to cd to dtb dir"
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" "${dtb_file}" || error "lopper failed"
+    cd dts || error "Unable to cd to dts dir"
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" "${dts_file}" || error "lopper failed"
   )
 
   # Build baremetal multiconfig
   if [ -n "${domain_file}" ]; then
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dtb}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' -i "${domain_file}" "${system_dts}" \
       -- baremetaldrvlist_xlnx $1 "${embeddedsw}" || error "lopper failed"
   else
-    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dtb}" -- baremetaldrvlist_xlnx $1 "${embeddedsw}" \
+    LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- baremetaldrvlist_xlnx $1 "${embeddedsw}" \
       || error "lopper failed"
   fi
 
@@ -808,7 +783,7 @@ psm-microblaze() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dtb/${dtb_file}"
+CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
 
 ESW_MACHINE = "$1"
 
@@ -849,12 +824,12 @@ TUNEFILE[microblaze-psm] = "conf/machine/include/${mach_conf}/microblaze.inc"
 EOF
   fi
 
-  sysdt_path=$(dirname ${system_dtb})
-  sysdt_base=$(basename ${system_dtb})
+  sysdt_path=$(dirname ${system_dts})
+  sysdt_base=$(basename ${system_dts})
   cat <<EOF >>"${conf_file}"
 
 # Set the default (linux) domain device tree
-CONFIG_DTFILE ?= "\${TOPDIR}/conf/dtb/${system_conf}"
+CONFIG_DTFILE ?= "\${TOPDIR}/conf/dts/${system_conf}"
 CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
 require conf/machine/${machine}-generic.conf
@@ -944,11 +919,11 @@ BB_HASHEXCLUDE_COMMON:append = " BASE_TMPDIR"
 # We don't want the kernel to build us a device-tree
 KERNEL_DEVICETREE:example-sdt = ""
 # We need u-boot to use the one we passed in
-DEVICE_TREE_NAME:pn-u-boot-xlnx-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+DEVICE_TREE_NAME:pn-u-boot-xlnx-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE').replace('.dts', '.dtb'))}"
 # Update bootbin to use proper device tree
-BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE').replace('.dts', '.dtb'))}"
 # Remap boot files to ensure the right device tree is listed first
-IMAGE_BOOT_FILES =+ "devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+IMAGE_BOOT_FILES =+ "devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE').replace('.dts', '.dtb'))}"
 
 #### No additional settings should be after the Postamble
 #### Postamble
@@ -957,7 +932,7 @@ EOF
 }
 
 parse_cpus() {
-  gen_linux_dtb="None"
+  gen_linux_dts="None"
   while read -r cpu core domain cpu_name os_hint; do
     # Skip commented lines and WARNINGs
     case ${cpu} in
@@ -972,18 +947,18 @@ parse_cpus() {
           cortex_a53_baremetal fsbl ${core} ${cpu_name}
 	fi
         if [ "${os_hint}" == "None" ]; then
-          if [ "${gen_linux_dtb}" == "None" ]; then
+          if [ "${gen_linux_dts}" == "None" ]; then
             cortex_a53_linux "${domain}"
-	    gen_linux_dtb="True"
+	    gen_linux_dts="True"
 	  fi
           cortex_a53_baremetal "${domain}" ${core} ${cpu_name}
           cortex_a53_freertos "${domain}" ${core} ${cpu_name}
         else
           case "${os_hint}" in
             linux*)
-              if [ "${gen_linux_dtb}" == "None" ]; then
+              if [ "${gen_linux_dts}" == "None" ]; then
                 cortex_a53_linux "${domain}"
-		gen_linux_dtb="True"
+		gen_linux_dts="True"
 	      fi
 	      ;;
             baremetal*)
@@ -999,18 +974,18 @@ parse_cpus() {
 
       arm,cortex-a72)
         if [ "${os_hint}" == "None" ]; then
-          if [ "${gen_linux_dtb}" == "None" ]; then
+          if [ "${gen_linux_dts}" == "None" ]; then
             cortex_a72_linux "${domain}"
-	    gen_linux_dtb="True"
+	    gen_linux_dts="True"
 	  fi
           cortex_a72_baremetal "${domain}" ${core} ${cpu_name}
           cortex_a72_freertos "${domain}" ${core} ${cpu_name}
         else
           case "${os_hint}" in
             linux*)
-              if [ "${gen_linux_dtb}" == "None" ]; then
+              if [ "${gen_linux_dts}" == "None" ]; then
                 cortex_a72_linux "${domain}"
-	        gen_linux_dtb="True"
+	        gen_linux_dts="True"
 	      fi
 	      ;;
             baremetal*)
@@ -1103,10 +1078,10 @@ gen_petalinux_conf() {
   cd "${config_dir}" || exit
   (
     if [ "$machine" == "zynqmp" ]; then
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dtb}" -- petalinuxconfig_xlnx psu_cortexa53_0 ${petalinux_schema} \
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dts}" -- petalinuxconfig_xlnx psu_cortexa53_0 ${petalinux_schema} \
         || error "lopper failed"
     else
-      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dtb}" -- petalinuxconfig_xlnx psv_cortexa72_0 ${petalinux_schema} \
+      LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} "${system_dts}" -- petalinuxconfig_xlnx psv_cortexa72_0 ${petalinux_schema} \
         || error "lopper failed"
     fi
   )
@@ -1126,11 +1101,11 @@ cpulist=$(mktemp)
 
 priordir=$(pwd)
 cd "${config_dir}" || exit
-mkdir -p dtb multiconfig machine/include
+mkdir -p dts multiconfig machine/include
 # Get mach_conf name and model name
 (
-  cd dtb || error "Unable to cd to dtb dir"
-  LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-machine-name.dts" "${system_dtb}" \
+  cd dts || error "Unable to cd to dts dir"
+  LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-machine-name.dts" "${system_dts}" \
     /dev/null > ${cpulist} || error "lopper failed"
   rm -f "lop-machine-name.dts.dtb"
 )
@@ -1141,8 +1116,8 @@ fi
 
 # Generate CPU list
 (
-  cd dtb || error "Unable to cd to dtb dir"
-  LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-xilinx-id-cpus.dts" "${system_dtb}" \
+  cd dts || error "Unable to cd to dts dir"
+  LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-xilinx-id-cpus.dts" "${system_dts}" \
     /dev/null > ${cpulist} || error "lopper failed"
   rm -f "lop-xilinx-id-cpus.dts.dtb"
 )
