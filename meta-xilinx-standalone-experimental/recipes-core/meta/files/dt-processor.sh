@@ -40,6 +40,7 @@ $0
     [-e <external_fpga>]    Apply a partial overlay
     [-m <machine_conf>]     The name of the machine .conf to generate
     [-t <machine>]          Machine type: zynqmp or versal (usually auto detected)
+    [-v <soc_variant>]      SOC Variant: cg, dr, eg, ev, ai-prime, premium (usually auto detected)
     [-p <psu_init_path>]    Path to psu_init files, defaults to system_dts path
     [-i <pdu_path>]         Path to the pdi file
     [-l <config_file>]      write local.conf changes to this file
@@ -53,7 +54,7 @@ parse_args() {
   [ $# -eq 0 ] && usage
   [ $1 = "--help" ] && usage
 
-  while getopts ":c:s:d:o:e:m:l:hP:p:i:" opt; do
+  while getopts ":c:s:d:o:e:m:l:hP:p:i:t:v:" opt; do
     case ${opt} in
       c) config_dir=$OPTARG ;;
       s) system_dts=$OPTARG ;;
@@ -62,6 +63,7 @@ parse_args() {
       e) external_fpga=$OPTARG ;;
       m) mach_conf=$OPTARG ; mach_conf=${mach_conf%%.conf} ;;
       t) machine=$OPTARG ;;
+      v) soc_variant=$OPTARG ;;
       p) psu_init_path=$OPTARG ;;
       i) pdi_path=$OPTARG ;;
       l) localconf=$OPTARG ;;
@@ -95,15 +97,61 @@ parse_args() {
 
 detect_machine() {
   if [ -z "${machine}" ]; then
-    # Identify the system type first using PSM/PMC/PMU
-    while read -r cpu core domain cpu_name os_hint; do
-      case ${cpu} in
-        pmu-microblaze)
-          machine="zynqmp" ;;
-        pmc-microblaze | psm-microblaze)
-          machine="versal" ;;
+    if [ -n "${deviceid}" ]; then
+      case ${deviceid} in
+         # ZynqMP variants
+         xczu*cg)
+           machine="zynqmp"
+           soc_variant="cg" ;;
+         xczu*dr)
+           machine="zynqmp"
+           soc_variant="dr" ;;
+         xczu*eg)
+           machine="zynqmp"
+           soc_variant="eg" ;;
+         xczu*ev)
+           machine="zynqmp"
+           soc_variant="ev" ;;
+         # Versal variants
+         xcvm*)
+           machine="versal"
+           soc_variant="prime" ;;
+         xcvc*)
+           machine="versal"
+           soc_variant="ai-core" ;;
+         xcve*)
+           machine="versal"
+           soc_variant="ai-edge" ;;
+         xcvn*)
+           machine="versal"
+           soc_variant="net" ;;
+         xcvp*)
+           machine="versal"
+           soc_variant="premium" ;;
+         xcvh*)
+           machine="versal"
+           soc_variant="hbm" ;;
+         # Special Case Starter Kit SOMs
+         xck26)
+           incmachine="k26-smk.conf"
+           machine="zynqmp"
+           soc_variant="ev" ;;
+         xck24)
+           incmachine="k24-smk.conf"
+           machine="zynqmp"
+           soc_variant="eg" ;;
       esac
-    done <${cpulist}
+    else
+      # Identify the system type first using PSM/PMC/PMU
+      while read -r cpu core domain cpu_name os_hint; do
+        case ${cpu} in
+          pmu-microblaze)
+            machine="zynqmp" ;;
+          pmc-microblaze | psm-microblaze)
+            machine="versal" ;;
+        esac
+      done <${cpulist}
+    fi
   fi
 
   # Machine not provided and we cannot identify..
@@ -114,6 +162,9 @@ detect_machine() {
     zynqmp | versal) : ;;
     *) error "Invalid machine type ${machine}; please choose zynqmp or versal"
   esac
+
+  [ -z ${soc_variant} ] && \
+    warn "Unable to autodetect soc variant, use -v to specify a variant."
 }
 
 dump_cpus() {
@@ -800,6 +851,16 @@ EOF
 generate_machine() {
   info "Generating machine conf file"
   conf_file="machine/${mach_conf}.conf"
+
+  # Machine include file
+  if [ -z ${incmachine} ]; then
+    if [ -n ${soc_variant} ]; then
+      incmachine="${machine}-${soc_variant}-generic.conf"
+    else
+      incmachine="${machine}-generic.conf"
+    fi
+  fi
+
   mkdir -p machine
   # Generate header
   cat <<EOF >"${conf_file}"
@@ -832,7 +893,7 @@ EOF
 CONFIG_DTFILE ?= "\${TOPDIR}/conf/dts/${system_conf}"
 CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
-require conf/machine/${machine}-generic.conf
+require conf/machine/${incmachine}
 
 # System Device Tree does not use HDF_MACHINE
 HDF_MACHINE = ""
@@ -1109,7 +1170,7 @@ mkdir -p dts multiconfig machine/include
     /dev/null > ${cpulist} || error "lopper failed"
   rm -f "lop-machine-name.dts.dtb"
 )
-read local_mach_conf model < ${cpulist}
+read local_mach_conf deviceid model < ${cpulist}
 if [ -z "${mach_conf}" ]; then
     mach_conf=${local_mach_conf}
 fi
@@ -1129,7 +1190,9 @@ mkdir -p machine/include/${mach_conf}
 echo "System Configuration:"
 echo "MODEL       = \"${model}\""
 echo "MACHINE     = \"${mach_conf}\""
+echo "DEVICE_ID   = \"${deviceid}\""
 echo "SOC_FAMILY  = \"${machine}\""
+echo "SOC_VARIANT = \"${soc_variant}\""
 echo "CPUs:"
 dump_cpus "            = "
 echo

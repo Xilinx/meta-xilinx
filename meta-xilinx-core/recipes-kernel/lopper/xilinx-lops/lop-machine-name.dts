@@ -35,7 +35,8 @@
                                     for n in tree.__selected__:
                                         mach_name = n['compatible'].value[0].replace(',','-').replace('.','-')
                                         model = n['model'].value[0]
-                                        print( '%s %s' % (mach_name.lower(), model) )
+                                        device_id = n['device_id'].value[0]
+                                        print( '%s %s %s' % (mach_name.lower(), device_id, model) )
                         ";
                       };
                 };
