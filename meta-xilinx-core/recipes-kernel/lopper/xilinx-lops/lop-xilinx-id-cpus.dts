@@ -111,6 +111,7 @@
                                          for c_node in c.subnodes( children_only = True ):
                                              try:
                                                  cpu_node = c_node['device_type'].value[0]
+                                                 num_cpu = c_node['reg'].value[0]
                                                  num_cpu = num_cpu + 1
                                              except:
                                                  cpu_node = None
@@ -119,7 +120,7 @@
                                                  cpu_name = match[0]
                                                  if num_cpu != 0:
                                                      cpu_type = c_node['compatible'].value[0]
-                                                     dict_key = cpu_type + str(num_cpu)
+                                                     dict_key = cpu_name + str(num_cpu)
                                                      cpu_output[dict_key] = '{} {} {} {} {}'.format(cpu_type, num_cpu-1, 'None', cpu_name, 'None')
 
                                      if cpu_output:
