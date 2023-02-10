@@ -6,12 +6,12 @@ ESW_COMPONENT_NAME = "liblwip211.a"
 DEPENDS += "libxil"
 DEPENDS:append:xilinx-freertos = "freertos10-xilinx"
 
-EXTRA_OECMAKE += "-Dlwip_api_mode=RAW_API"
-EXTRA_OECMAKE += "-Dlwip_dhcp_does_arp_check=ON"
-EXTRA_OECMAKE += "-Dlwip_dhcp=ON"
-EXTRA_OECMAKE += "-Dlwip_pbuf_pool_size=2048"
-EXTRA_OECMAKE += "-Dlwip_ipv6_enable=OFF"
-EXTRA_OECMAKE:append:xilinx-freertos = " -Dlwip_api_mode=SOCKET_API"
+EXTRA_OECMAKE += "-Dlwip211_api_mode=RAW_API"
+EXTRA_OECMAKE += "-Dlwip211_dhcp_does_arp_check=ON"
+EXTRA_OECMAKE += "-Dlwip211_dhcp=ON"
+EXTRA_OECMAKE += "-Dlwip211_pbuf_pool_size=2048"
+EXTRA_OECMAKE += "-Dlwip211_ipv6_enable=OFF"
+EXTRA_OECMAKE:append:xilinx-freertos = " -Dlwip211_api_mode=SOCKET_API"
 
 do_configure:prepend() {
     # This script should also not rely on relative paths and such
@@ -30,5 +30,5 @@ do_install() {
     install -m 0644  ${B}/include/*.h ${D}${includedir}
     cp -r ${B}/include/arch/ ${D}${includedir}
     cp -r ${B}/include/include/lwip/ ${D}${includedir}
-    cp -r ${B}/include/include/netif/ ${D}${includedir}
+    cp -r ${B}/include/netif/ ${D}${includedir}
 }
