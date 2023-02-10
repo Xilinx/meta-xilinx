@@ -10,6 +10,6 @@ do_configure:prepend:zynqmp() {
     (
         cd ${S}
         lopper -f --enhanced --werror ${DTS_FILE} -- generate_config_object pm_cfg_obj.c ${ESW_MACHINE}
-        install -m 0755 pm_cfg_obj.c ${S}/${ESW_COMPONENT_SRC}/
+        install -m 0755 pm_cfg_obj.c ${S}/${ESW_COMPONENT_SRC}/zynqmp/client/common/
     )
 }
