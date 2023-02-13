@@ -6,13 +6,15 @@ BPN = "gnu-toolchain-canadian"
 
 LICENSE = "MIT"
 
+EXEEXT:sdkmingw32 = ".exe"
+
 do_install () {
 	if [ "${TARGET_SYS_MULTILIB_ORIGINAL}" != "" -a "${TARGET_SYS_MULTILIB_ORIGINAL}" != "${TARGET_SYS}" ]; then
 		mkdir -p ${D}${bindir}
 
 		# Create a link for each item references by the environment files
 		for each in gcc g++ as ld gdb strip ranlib objcopy objdump readelf ar nm ; do
-			ln -s ../${TARGET_SYS_MULTILIB_ORIGINAL}/${TARGET_SYS_MULTILIB_ORIGINAL}-${each} ${D}${bindir}/${TARGET_SYS}-$each
+			ln -s ../${TARGET_SYS_MULTILIB_ORIGINAL}/${TARGET_SYS_MULTILIB_ORIGINAL}-${each}${EXEEXT} ${D}${bindir}/${TARGET_SYS}-${each}${EXEEXT}
 		done
 	fi
 }
