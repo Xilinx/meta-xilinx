@@ -13,7 +13,8 @@ python () {
        (d.getVar("PREFERRED_PROVIDER_qemu") and d.getVar("PREFERRED_PROVIDER_qemu") != d.getVar("PN")):
         d.delVar("BB_DONT_CACHE")
         raise bb.parse.SkipRecipe("Set PREFERRED_PROVIDER_qemu to %s to enable it" % (d.getVar("PN")))
-}
 
-RPROVIDES:${PN} += "qemu"
-RPROVIDES:${PN}-ptest += "qemu-ptest"
+    if (d.getVar('BPN') != 'qemu'):
+        for pkg in d.getVar('PACKAGES').split():
+            d.appendVar('RPROVIDES:%s' % pkg, ' ' + pkg.replace(d.getVar('PN'), 'qemu'))
+}
