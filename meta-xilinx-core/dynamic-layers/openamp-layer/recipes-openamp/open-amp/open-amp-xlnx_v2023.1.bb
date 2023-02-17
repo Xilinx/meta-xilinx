@@ -7,3 +7,10 @@ REPO = "git://github.com/Xilinx/open-amp.git;protocol=https"
 
 include ${LAYER_PATH_openamp-layer}/recipes-openamp/open-amp/open-amp.inc
 require ${LAYER_PATH_openamp-layer}/vendor/xilinx/recipes-openamp/open-amp/open-amp-xlnx.inc
+
+RPROVIDES:${PN}-dbg += "open-amp-dbg"
+RPROVIDES:${PN}-dev += "open-amp-dev"
+RPROVIDES:${PN}-lic += "open-amp-lic"
+RPROVIDES:${PN}-src += "open-amp-src"
+RPROVIDES:${PN}-staticdev += "open-amp-staticdev"
+

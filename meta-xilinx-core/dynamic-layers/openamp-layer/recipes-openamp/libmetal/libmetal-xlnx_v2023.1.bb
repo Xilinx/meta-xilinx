@@ -7,3 +7,9 @@ PV = "${SRCBRANCH}+git${SRCPV}"
 REPO = "git://github.com/Xilinx/libmetal.git;protocol=https"
 
 include ${LAYER_PATH_openamp-layer}/recipes-openamp/libmetal/libmetal.inc
+
+RPROVIDES:${PN}-dbg += "libmetal-dbg"
+RPROVIDES:${PN}-dev += "libmetal-dev"
+RPROVIDES:${PN}-lic += "libmetal-lic"
+RPROVIDES:${PN}-src += "libmetal-src"
+RPROVIDES:${PN}-staticdev += "libmetal-staticdev"
