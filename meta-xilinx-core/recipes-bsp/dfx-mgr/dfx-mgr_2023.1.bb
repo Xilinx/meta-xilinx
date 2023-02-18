@@ -9,7 +9,7 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '
 SRC_URI = "${REPO};${BRANCHARG}"
 
 BRANCH = "master"
-SRCREV = "fca3b25d6b226a49d88df2a850cdd1e03afc9ea1"
+SRCREV = "5918fb3406d828693cca484b77229ffd031b5dc4"
 SOMAJOR = "1"
 SOMINOR = "0"
 SOVERSION = "${SOMAJOR}.${SOMINOR}"
@@ -27,12 +27,6 @@ RDEPENDS:${PN} += " freeipmi"
 EXTRA_OECMAKE += " \
                -DCMAKE_SYSROOT:PATH=${RECIPE_SYSROOT} \
 		"
-
-# Workaround for: the comparison will always evaluate as 'true' for the address of 'defaul_accel_name' will never be NULL [-Werror=address]
-CFLAGS += "-Wno-address"
-
-# Workaround for: '__builtin_strncpy' specified bound depends on the length of the source argument [-Werror=stringop-truncation]
-CFLAGS += "-Wno-stringop-truncation"
 
 INITSCRIPT_NAME = "dfx-mgr.sh"
 INITSCRIPT_PARAMS = "start 99 S ."
