@@ -57,13 +57,6 @@ XSERVER ?= " \
 	${XSERVER_EXT} \
 	"
 
-# If the user generates a fit-image, there may be more then one DTB to choose from
-# define a reasonable default that should work for most cases.  If the default
-# does not work, the user will need to define their own value for FIT_CONF_DEFAULT_DTB
-SYSTEM_DTFILE ??= ""
-CONFIG_DTFILE ??= "${SYSTEM_DTFILE}"
-FIT_CONF_DEFAULT_DTB ?= "${@d.getVar('CONFIG_DTFILE').replace('.dts', '.dtb')}"
-
 # Define to avoid parsse errors below if undefind elsewhere
 INITRAMFS_IMAGE ??= ""
 
