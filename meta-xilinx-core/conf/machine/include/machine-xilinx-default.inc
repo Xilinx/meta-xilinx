@@ -57,6 +57,10 @@ XSERVER ?= " \
 	${XSERVER_EXT} \
 	"
 
+SYSTEM_DTFILE ??= ""
+CONFIG_DTFILE ??= "${SYSTEM_DTFILE}"
+FIT_CONF_DEFAULT_DTB ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE')).replace('.dts', '.dtb') if d.getVar('CONFIG_DTFILE') else 'system.dtb'}"
+
 # Define to avoid parsse errors below if undefind elsewhere
 INITRAMFS_IMAGE ??= ""
 
