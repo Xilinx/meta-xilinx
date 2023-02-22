@@ -977,10 +977,6 @@ PREFERRED_VERSION_psm-firmware = "2023.1_sdt_experimental%"
 # Exclude BASE_TMPDIR from hash calculations
 BB_HASHEXCLUDE_COMMON:append = " BASE_TMPDIR"
 
-# We don't want the kernel to build us a device-tree
-KERNEL_DEVICETREE:example-sdt = ""
-# We need u-boot to use the one we passed in
-DEVICE_TREE_NAME:pn-u-boot-xlnx-scr = "\${@os.path.basename(d.getVar('CONFIG_DTFILE').replace('.dts', '.dtb'))}"
 # Update bootbin to use proper device tree
 BIF_PARTITION_IMAGE[device-tree] = "\${RECIPE_SYSROOT}/boot/devicetree/\${@os.path.basename(d.getVar('CONFIG_DTFILE').replace('.dts', '.dtb'))}"
 # Remap boot files to ensure the right device tree is listed first
