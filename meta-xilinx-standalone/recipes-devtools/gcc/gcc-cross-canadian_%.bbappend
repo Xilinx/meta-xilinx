@@ -1,13 +1,6 @@
 require gcc-configure-xilinx-standalone.inc
 require gcc-xilinx-standalone.inc
 
-# We want to use the stock multilib configs, when available
-EXTRACONFFUNCS:xilinx-standalone = ""
-
-EXTRA_OECONF:append:xilinx-standalone = " \
-        --enable-multilib \
-"
-
 # Temporary hack to build gcc cross canadian for tclibc-newlib as --with-sysroot=/not/exist
 # has been removed from TARGET_OS for elf and eabi in gcc-cross-canadian.inc
 
