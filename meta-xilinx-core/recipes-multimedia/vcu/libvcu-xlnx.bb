@@ -1,14 +1,14 @@
 SUMMARY = "Control Software for VCU"
 DESCRIPTION = "Control software libraries, test applications and headers provider for VCU"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=edad0cda7391abd51da1baba436d88a0"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=5375796c5ae4ee85ea1f2c1603e58509"
 
 XILINX_VCU_VERSION = "1.0.0"
 PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git${SRCPV}"
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vcu-ctrl-sw.git;protocol=https"
-SRCREV = "d0fc66609f0c89b5a0608dd57980a86dc4ec3bdb"
+SRCREV = "83aabb84c26667f7d6aee632654c63e504838061"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
