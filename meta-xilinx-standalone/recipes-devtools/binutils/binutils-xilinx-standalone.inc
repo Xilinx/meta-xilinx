@@ -6,7 +6,6 @@ EXTRA_OECONF:append:xilinx-standalone = " \
 	--disable-shared \
 	--enable-lto \
 	--enable-static \
-	--enable-multilib \
 "
 
 # CortexR5 and 32-bit arm are both "arm"
