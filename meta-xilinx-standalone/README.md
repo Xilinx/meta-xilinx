@@ -1,7 +1,7 @@
 # meta-xilinx-standalone
 
 This layer is meant to augment Yocto/OE functionality to provide a 
-Baremetal/Standalone Toolchain as well as a generic version of various
+Baremetal/Standalone distribution as well as a generic version of various
 firmware that is required to boot a ZynqMP or Versal system.
 
 For optimized versions of the firmware and additional components you must
@@ -13,19 +13,6 @@ The software in this layer may be used in either a standard single
 configuration build, or a multiconfig build.  A multiconfig build, along
 with the MACHINES defined in meta-xilinx-bsps will automate the generation
 of certain firmwares.
-
-## Toolchains
-
-To build standalone toolchains similar to those embedded with the
-Xilinx xsct tooling:
-
-Use one of the custom machines:
-  aarch32-tc - 32-bit ARM toolchains (various)
-  aarch64-tc - 64-bit ARM toolchains (various)
-  arm-rm-tc  - ARM Cortex-R (and various)
-  microblaze-tc - Microblaze toolchains (various)
-
-MACHINE=<machine> DISTRO=xilinx-standalone bitbake meta-toolchain
 
 ## Standalone Firmware
 
