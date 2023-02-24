@@ -12,9 +12,3 @@ EXTRA_OECONF:append:xilinx-standalone = " \
 do_configure:prepend:xilinx-standalone(){
     export CC_FOR_TARGET="${CC}"
 }
-
-# Fix for multilib newlib installations
-do_install:prepend:xilinx-standalone() {
-        mkdir -p $(dirname ${D}${libdir})
-        mkdir -p $(dirname ${D}${includedir})
-}
