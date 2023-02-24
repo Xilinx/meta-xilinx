@@ -1,7 +1,7 @@
 # Add MicroBlaze Patches (only when using MicroBlaze)
-FILESEXTRAPATHS:append:microblaze := ":${THISDIR}/gcc-12"
+FILESEXTRAPATHS:append := ":${THISDIR}/gcc-12"
 
-SRC_URI:append:microblaze = " \
+SRC_URI += " \
     file://0001-LOCAL-Testsuite-builtins-tests-require-fpic.patch \
     file://0002-LOCAL-Quick-fail-g-.dg-opt-memcpy1.C.patch \
     file://0003-LOCAL-For-dejagnu-static-testing-on-qemu-suppress-wa.patch \
