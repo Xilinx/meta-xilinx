@@ -124,3 +124,6 @@ do_deploy() {
 }
 addtask deploy before do_build after do_compile
 FILES:${PN} += "/boot/*.elf /boot/*.bin /boot/*.ub"
+
+# Disable buildpaths QA check warnings for Versal.
+INSANE_SKIP:${PN}:append:versal = " buildpaths"
