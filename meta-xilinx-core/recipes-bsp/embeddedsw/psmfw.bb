@@ -57,6 +57,9 @@ addtask deploy before do_build after do_install
 INSANE_SKIP:${PN} = "arch"
 INSANE_SKIP:${PN}-dbg = "arch"
 
+# Disable buildpaths QA check warnings.
+INSANE_SKIP:${PN} += "buildpaths"
+
 SYSROOT_DIRS += "/boot"
 FILES:${PN} = "/boot/${PN}.elf"
 
