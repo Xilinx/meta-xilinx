@@ -25,7 +25,7 @@ RPROVIDES:${PN}	= "libxaiengine"
 # The makefile isn't ready for parallel execution at the moment
 PARALLEL_MAKE = "-j 1"
 
-CFLAGS += "-Wall -Wextra"
+CFLAGS += "-Wall -Wextra -fno-thread-jumps -fno-tree-pre"
 CFLAGS += "${@bb.utils.contains('IOBACKENDS', 'Linux', ' -D__AIELINUX__', '', d)}"
 CFLAGS += "${@bb.utils.contains('IOBACKENDS', 'metal', ' -D__AIEMETAL__', '', d)}"
 EXTRA_OEMAKE = "-C ${AIEDIR}/src -f Makefile.Linux CFLAGS='${CFLAGS}'"
