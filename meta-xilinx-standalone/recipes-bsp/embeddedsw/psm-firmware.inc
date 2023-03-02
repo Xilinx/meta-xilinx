@@ -82,3 +82,5 @@ do_deploy() {
 
 addtask deploy before do_build after do_install
 
+# Disable buildpaths QA check warnings.
+INSANE_SKIP:${PN} += "buildpaths"
