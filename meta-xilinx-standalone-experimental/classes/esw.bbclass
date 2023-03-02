@@ -81,6 +81,9 @@ cmake_do_generate_toolchain_file:append() {
     set( CMAKE_SYSTEM_NAME "${XLNX_CMAKE_SYSTEM_NAME}" )
     set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${S}/cmake)
     set( CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_LIBDIR})
+    if ("${XLNX_CMAKE_PROCESSOR}" STREQUAL "plm_microblaze")
+        set( CMAKE_BUILD_TYPE Release)
+    endif()
     add_definitions( "${XLNX_CMAKE_BSP_VARS}" )
 EOF
 }
