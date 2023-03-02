@@ -7,3 +7,6 @@ python () {
     if d.getVar('KERNEL_IMAGETYPE', True).endswith('.ub'):
         d.setVar('DEPENDS', "%s u-boot-mkimage-native" % d.getVar('DEPENDS', True))
 }
+
+# Disable buildpaths QA check warnings for linux-xlnx-scr
+INSANE_SKIP:${PN}-src += "buildpaths"
