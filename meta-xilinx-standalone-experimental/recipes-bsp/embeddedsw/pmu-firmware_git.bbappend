@@ -10,6 +10,14 @@ ESW_COMPONENT_SRC = "/lib/sw_apps/zynqmp_pmufw/src"
 
 ESW_COMPONENT = "zynqmp_pmufw.elf"
 
+
+do_configure:prepend() {
+    (
+    cd ${S}
+    install -m 0644 ${S}/cmake/UserConfig.cmake ${S}/${ESW_COMPONENT_SRC}
+    )
+}
+
 do_compile:append() {
     ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
 }
