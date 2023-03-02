@@ -4,6 +4,7 @@ SRC_URI = " \
     file://zynq-openamp.dtsi \
     file://zynqmp-openamp.dtsi \
     file://versal-openamp.dtsi \
+    file://versal-net-openamp.dtsi \
 "
 
 # openamp.dtsi is in the WORKDIR

@@ -1,0 +1,97 @@
+/*
+ * SPDX-License-Identifier: MIT
+ *
+ * dts file for Versal NET OpenAMP
+ *
+ * Copyright (C) 2023, Advanced Micro Devices, Inc.  All rights reserved.
+ *
+ */
+
+&{/} {
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+		rproc_0_reserved: rproc@3ed00000 {
+			no-map;
+			reg = <0x0 0x3ed00000 0x0 0x40000>;
+		};
+		rpu0vdev0vring0: rpu0vdev0vring0@3ed40000 {
+			no-map;
+			reg = <0x0 0x3ed40000 0x0 0x4000>;
+		};
+		rpu0vdev0vring1: rpu0vdev0vring1@3ed44000 {
+			no-map;
+			reg = <0x0 0x3ed44000 0x0 0x4000>;
+		};
+		rpu0vdev0buffer: rpu0vdev0buffer@3ed48000 {
+			no-map;
+			reg = <0x0 0x3ed48000 0x0 0x100000>;
+		};
+	};
+
+	tcm_0a: tcm_0a@eba00000 {
+		no-map;
+		reg = <0x0 0xeba00000 0x0 0x10000>;
+		status = "okay";
+		compatible = "mmio-sram";
+		power-domain = <&versal_firmware 0x183180cb>;
+	};
+
+	tcm_0b: tcm_0b@eba10000 {
+		no-map;
+		reg = <0x0 0xeba10000 0x0 0x8000>;
+		status = "okay";
+		compatible = "mmio-sram";
+		power-domain = <&versal_firmware 0x183180cc>;
+	};
+
+	tcm_0c: tcm_0b@eba20000 {
+		no-map;
+		reg = <0x0 0xeba20000 0x0 0x8000>;
+		status = "okay";
+		compatible = "mmio-sram";
+		power-domain = <&versal_firmware 0x183180cd>;
+	};
+
+	r52ss {
+		compatible = "xlnx,versal-net-r52-remoteproc";
+		#address-cells = <0x2>;
+		#size-cells = <0x2>;
+		ranges;
+		xlnx,cluster-mode = <1>;
+
+		r52_0 {
+			compatible = "xilinx,r52";
+			#address-cells = <0x2>;
+			#size-cells = <0x2>;
+			ranges;
+			sram = <&tcm_0a>, <&tcm_0b>, <&tcm_0c>;
+			memory-region = <&rproc_0_reserved>, <&rpu0vdev0buffer>, <&rpu0vdev0vring0>, <&rpu0vdev0vring1>;
+			power-domain = <&versal_firmware 0x181100BF>;
+			mboxes = <&ipi_mailbox_rpu0 0>, <&ipi_mailbox_rpu0 1>;
+			mbox-names = "tx", "rx";
+		};
+	};
+
+	zynqmp_ipi1 {
+		compatible = "xlnx,zynqmp-ipi-mailbox";
+		interrupt-parent = <&gic>;
+		interrupts = <0x00 0x3c 0x04>;
+		xlnx,ipi-id = <5>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		/* APU<->RPU0 IPI mailbox controller */
+		ipi_mailbox_rpu0: mailbox@eb3f0ac0 {
+			reg = <0xeb3f0ac0 0x20 0xeb3f0ae0 0x20 0xeb3f0740 0x20 0xeb3f0760 0x20>;
+			reg-names = "local_request_region",
+				    "local_response_region",
+				    "remote_request_region",
+				    "remote_response_region";
+			#mbox-cells = <0x01>;
+			xlnx,ipi-id = <0x03>;
+		};
+	};
+};
