@@ -1,4 +1,4 @@
-inherit esw
+inherit esw features_check
 
 REQUIRED_MACHINE_FEATURES = "sdps"
 
