@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=aaf483d309243c4596f6373eb9c8325f"
 XILINX_VDU_VERSION = "1.0.0"
 PV = "${XILINX_VDU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2023.1"
 REPO   ?= "git://github.com/Xilinx/vdu-omx-il.git;protocol=https"
 SRCREV ?= "811eefac953fd5e098c69cada97a0dd35f5e9015"
 

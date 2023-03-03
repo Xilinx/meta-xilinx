@@ -1,6 +1,6 @@
 SRCBRANCH ?= "2023.1"
 SRCREV = "c8aaf2f26d5493f492f0af09dd558d45908636da"
-BRANCH = "2023"
+BRANCH = "xlnx_rel_v2023.1"
 LIC_FILES_CHKSUM ?= "file://LICENSE.md;md5=ab88daf995c0bd0071c2e1e55f3d3505"
 PV = "${SRCBRANCH}+git${SRCPV}"
 REPO = "git://github.com/Xilinx/open-amp.git;protocol=https"
