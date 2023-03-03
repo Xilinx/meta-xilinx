@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/linux-xlnx:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/linux-xlnx/v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}:"
 
 # Note: These patches are very old and doesn't apply on top of 5.x
 #       kernel. For more details refer README.md file.
