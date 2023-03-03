@@ -1,4 +1,0 @@
-XILINX_QEMU_VERSION = "v6.1.0"
-BRANCH = "xlnx_rel_v2022.2"
-SRCREV = "74d70f8008bfbd1566c2eed3496a077a974de0d0"
-
