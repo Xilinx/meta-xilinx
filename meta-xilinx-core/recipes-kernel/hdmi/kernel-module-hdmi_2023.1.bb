@@ -9,7 +9,7 @@ PV = "${XLNX_HDMI_VERSION}+xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', F
 
 S = "${WORKDIR}/git"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2023.1"
 REPO   ?= "git://github.com/Xilinx/hdmi-modules.git;protocol=https"
 SRCREV = "1c6330f02fea68992e22400fdbc8c0d0e63e2958"
 
