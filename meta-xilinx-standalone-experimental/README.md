@@ -34,7 +34,7 @@ $ bitbake meta-xilinx-setup
 ```
 3. Install the setup SDK:
 ```
-$ .${TMPDIR}/tmp/deploy/sdk/x86_64-xilinx-nativesdk-prestep-2023.1....sh -d prestep -y
+$ .${TMPDIR}/tmp/deploy/sdk/x86_64-xilinx-nativesdk-prestep-2023.2....sh -d prestep -y
 ```
 
 Then follow the instructions in the 'prestep/README-setup' file.
