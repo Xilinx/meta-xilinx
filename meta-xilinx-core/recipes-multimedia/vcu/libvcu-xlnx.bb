@@ -39,3 +39,6 @@ do_install() {
 # explicitly depends upon them.
 
 EXCLUDE_FROM_WORLD = "1"
+
+# Disable buildpaths QA check warnings.
+INSANE_SKIP:${PN} += "buildpaths"
