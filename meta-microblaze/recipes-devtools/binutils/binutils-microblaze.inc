@@ -37,3 +37,5 @@ SRC_URI:append = " \
      file://0034-Patch-MicroBlaze-By-default-the-linker-will-generate.patch \
      "
 
+LDGOLD_ALTS:microblaze = ""
+USE_ALTERNATIVES_FOR:remove:microblaze = "gprof"
