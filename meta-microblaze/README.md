@@ -6,12 +6,16 @@ This layer provides support specific to the MicroBlaze architecture
 
 This layer depends on:
 
-	URI: git://git.openembedded.org/bitbake
+	URI: https://git.yoctoproject.org/poky
+	layers: meta, meta-poky
+	branch: langdale
 
-	URI: git://git.openembedded.org/openembedded-core
-	layers: meta
-	branch: master or xilinx current release version (e.g. hosister)
+	URI: https://git.openembedded.org/meta-openembedded
+	layers: meta-oe
+	branch: langdale
 
-	URI: git://git.yoctoproject.org/meta-xilinx.git
+	URI:
+        https://git.yoctoproject.org/meta-xilinx (official version)
+        https://github.com/Xilinx/meta-xilinx (development and amd xilinx release)
 	layers: meta-xilinx-core
-	branch: master or xilinx current release version (e.g. hosister)
+	branch: langdale or amd xilinx release version (e.g. rel-v2022.2)
