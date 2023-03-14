@@ -4,6 +4,13 @@ Booting OS images on Zynq boards can be done using JTAG, SD, eMMC, QSPI and NAND
 boot modes.
 
 * [Setting Up the Target](#setting-up-the-target)
+* [Booting from JTAG](#booting-from-jtag)
+  * [Loading boot components using XSCT](#loading-boot-components-using-xsct)
+  * [Loading Kernel, Root Filesystem and U-boot boot script](#loading-kernel-root-filesystem-and-u-boot-boot-script)
+    * [Using XSCT](#using-xsct)
+    * [Using TFTP](#using-tftp)
+* [Booting from SD](#booting-from-sd)
+* [Booting from QSPI](#booting-from-qspi)
 
 ## Setting Up the Target
 1. Connect a USB cable between the CP210x USB-to-UART bridge USB Mini-B on
@@ -25,6 +32,7 @@ boot modes.
 | QSPI      | 01000           | OFF, ON, OFF, OFF, OFF  | QSPI 32-bit addressing |
 | SD        | 00110           | OFF, OFF, ON, ON, OFF   | SD 2.0                 |
 
+---
 ## Booting from JTAG
 
 This boot flow requires the use of the AMD Xilinx tools, specifically XSCT and 
@@ -54,7 +62,7 @@ xsct% targets
 
 > **Note:** For non-interactive usage such as scripting, you can use the `-filter`
    option to select a target instead of selecting the target using its ID.
-
+---
 ### Loading boot components using XSCT
 
 1. Download the boot images for the target using XSCT with the `fpga` and `dow` 
@@ -92,7 +100,7 @@ xsct% con
 Hit any key to stop autoboot: 0
 U-Boot>
 ```
-
+---
 ### Loading Kernel, Root Filesystem and U-boot boot script
 
 Load the images into the target DDR load address i.e.,
@@ -118,7 +126,7 @@ system has ethernet it is recommended that you use TFTP to load these images
 using U-Boot. 
 > 4. If common ${DEPLOY_DIR_IMAGE}/system.dtb is used by u-boot and kernel, this
 > is already part of boot.bin we can skip loading dtb, else load kernel dtb.
-
+---
 #### Using XSCT
 
 1. Suspend the execution of active target using `stop` command in XSCT.
@@ -133,7 +141,7 @@ xsct% dow -data ${DEPLOY_DIR_IMAGE}/system.dtb 0x100000
 xsct% dow -data ${DEPLOY_DIR_IMAGE}/core-image-minimal-${MACHINE}.cpio.gz.u-boot 0x4000000
 xsct% dow -data ${DEPLOY_DIR_IMAGE}/boot.scr 0x3000000
 ```
-
+---
 #### Using TFTP
 
 1. Configure the `ipaddr` and `serverip` of the U-Boot environment. 
@@ -147,8 +155,8 @@ U-Boot> tftpboot 0x200000 ${TFTPDIR}/uImage
 U-Boot> tftpboot 0x100000 ${TFTPDIR}/system.dtb
 U-Boot> tftpboot 0x4000000 ${TFTPDIR}/core-image-minimal-${MACHINE}.cpio.gz.u-boot
 U-Boot> tftpboot 0x3000000 ${TFTPDIR}/boot.scr
-
 ```
+---
 ### Booting Linux
 
 Once the images are loaded continue the execution.
@@ -166,14 +174,14 @@ xsct% exit
 ```
 U-Boot> boot
 ```
-
+---
 ## Booting from SD
 
 1. Load the SD card into the ZC702 board in the SD slot.
 2. Configure the ZC702 board to boot in SD-Boot mode (1-OFF, 2-OFF, 3-ON, 4-ON, 5-OFF)
    by setting the SW6. Refer [Setting Up the Target](#setting-up-the-target).
 3. Follow SD boot instructions [README](README.booting.storage.md) for more details.
-
+---
 ## Booting from QSPI
 
 1. To boot ZC702 board in QSPI boot mode, Power on the ZCU102 board and boot 
