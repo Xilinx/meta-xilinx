@@ -6,14 +6,25 @@ the [meta-xilinx mailing list](https://lists.yoctoproject.org/g/meta-xilinx):
 	meta-xilinx@lists.yoctoproject.org
 
 When sending patches, please make sure the email subject line includes
-"[meta-xilinx][PATCH]" and cc'ing the maintainers.
+`[meta-xilinx][<BRANCH_NAME>][PATCH]` and cc'ing the maintainers.
 
 For more details follow the OE community patch submission guidelines, as described in:
 
 https://www.openembedded.org/wiki/Commit_Patch_Message_Guidelines
 https://www.openembedded.org/wiki/How_to_submit_a_patch_to_OpenEmbedded
 
-`git send-email --subject-prefix 'meta-xilinx][PATCH' --to meta-xilinx@yoctoproject.org`
+`git send-email --to meta-xilinx@lists.yoctoproject.org *.patch`
+
+> **Note:** When creating patches, please use below format. To follow best practice,
+> if you have more than one patch use `--cover-letter` option while generating the
+> patches. Edit the 0000-cover-letter.patch and change the title and top of the
+> body as appropriate.
+
+**Syntax:**
+`git format-patch -s --subject-prefix="meta-xilinx][<BRANCH_NAME>][PATCH" -1`
+
+**Example:**
+`git format-patch -s --subject-prefix="meta-xilinx][langdale][PATCH" -1`
 
 **Maintainers:**
 
