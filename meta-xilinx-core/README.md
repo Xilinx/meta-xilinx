@@ -1,17 +1,21 @@
 # meta-xilinx-core
 
-This layer provides support for MicroBlaze, Zynq, ZynqMP and Versal architectures.
+This layer enables AMD Xilinx hardware devices metadata such as tune files,
+generic and soc variant machine configurations, boot firmware components, kernel,
+multimedia, graphics, xrt etc.
 
 ## Dependencies
 
 This layer depends on:
 
-	URI: git://git.openembedded.org/bitbake
+	URI: https://git.yoctoproject.org/poky
+	layers: meta, meta-poky
+	branch: langdale
 
-	URI: git://git.openembedded.org/openembedded-core
-	layers: meta
-	branch: master or xilinx current release version (e.g. hosister)
-
+	URI: https://git.openembedded.org/meta-openembedded
+	layers: meta-oe
+	branch: langdale
+---
 
 ## Configuring Machines
 
@@ -41,7 +45,7 @@ meta-xilinx-tools or the DTB workflow version using
 meta-xilinx-standalone-experimental.  Additionally some configurations may
 require you to specify the path to a PDI file using PDI_PATH.  The XSCT
 version will extract the PDI automatically.
-
+---
 
 ## Recipe Licenses
 
