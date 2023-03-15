@@ -13,11 +13,11 @@ The software in this layer may be used in either a standard single
 configuration build, or a multiconfig build.  A multiconfig build, along
 with the MACHINES defined in meta-xilinx-bsps will automate the generation
 of certain firmwares.
-
+---
 ## Standalone Firmware
 
-The standalone firmware is a genericly configured firmware, it can be
-build either in a single standalong configuration, or via an automated
+The standalone firmware is a generically configured firmware, it can be
+build either in a single standalone configuration, or via an automated
 multiconfig approach only when needed.
 
 * multiconfig setup
@@ -29,32 +29,43 @@ standalone firmware on demand.
 
 Edit the conf/local.conf file, add:
 
+```
 # For zynqmp-generic
 BBMULTICONFIG += "fsbl-fw zynqmp-pmufw"
+```
 
+```
 # For versal-generic
 BBMULTICONFIG += "versal-fw"
+```
 
-To build:
+**To build:**
 
+```
 # For zynqmp, select a zynqmp machine or the generic one
-MACHINE=zynqmp-generic bitbake fsbl pmufw
+$ MACHINE=zynqmp-generic bitbake fsbl pmufw
+```
 
+```
 # For versal, select a versal machine or the generic one
-MACHINE=versal-generic bitbake plmfw psmfw
-
+$ MACHINE=versal-generic bitbake plmfw psmfw
+```
+---
 
 ## Dependencies
 
 This layer depends on:
 
-	URI: git://git.openembedded.org/bitbake
+	URI: https://git.yoctoproject.org/poky
+	layers: meta, meta-poky
+	branch: langdale
 
-	URI: git://git.openembedded.org/openembedded-core
-	layers: meta
-	branch: master or xilinx current release version (e.g. hosister)
+	URI: https://git.openembedded.org/meta-openembedded
+	layers: meta-oe
+	branch: langdale
 
-	URI: git://git.yoctoproject.org/meta-xilinx.git
+	URI:
+        https://git.yoctoproject.org/meta-xilinx (official version)
+        https://github.com/Xilinx/meta-xilinx (development and amd xilinx release)
 	layers: meta-xilinx-microblaze, meta-xilinx-core, meta-xilinx-bsp
-	branch: master or xilinx current release version (e.g. hosister)
-
+	branch: langdale or amd xilinx release version (e.g. rel-v2023.1)

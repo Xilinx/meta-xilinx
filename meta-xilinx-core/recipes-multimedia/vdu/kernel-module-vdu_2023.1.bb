@@ -10,7 +10,7 @@ PV = "${XILINX_VDU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
 S = "${WORKDIR}/git"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2023.1"
 REPO ?= "git://github.com/Xilinx/vdu-modules.git;protocol=https"
 SRCREV ?= "82d06e395c93a1e941b83cccbb6f2e4e6d966f1c"
 

@@ -44,13 +44,17 @@ Then follow the instructions in the 'prestep/README-setup' file.
 
 This layer depends on:
 
-	URI: git://git.openembedded.org/bitbake
-
-	URI: git://git.openembedded.org/openembedded-core
-	layers: meta
+	URI: https://git.yoctoproject.org/poky
+	layers: meta, meta-poky
 	branch: langdale
 
-	URI: git://git.yoctoproject.org/meta-xilinx.git
+	URI: https://git.openembedded.org/meta-openembedded
+	layers: meta-oe
+	branch: langdale
+
+	URI:
+        https://git.yoctoproject.org/meta-xilinx (official version)
+        https://github.com/Xilinx/meta-xilinx (development and amd xilinx release)
 	layers: meta-xilinx-core, meta-xilinx-bsp, meta-xilinx-standalone
-	branch: langdale
+	branch: langdale or amd xilinx release version (e.g. rel-v2023.1)
 
