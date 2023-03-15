@@ -1,3 +1,7 @@
+# This bbclass is inherited by flat, DFx Static and DFx RP firmware recipes.
+# fpgamanager_custom.bbclass expects user to generate pl dtsi for flat, DFx Static
+# and DFx RP xsa outside of yocto.
+
 inherit devicetree
 
 DEPENDS = "dtc-native bootgen-native"
@@ -61,8 +65,8 @@ python() {
             raise bb.parse.SkipRecipe("Need one '.dtsi' or one '.dtbo' file added to SRC_URI ")
 
         # Optional input
-        if 'accel.json' in d.getVar("SRC_URI"):
-            d.setVar("JSON_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if 'accel.json' in a][0].lstrip('file://')))
+        if '.json' in d.getVar("SRC_URI"):
+            d.setVar("JSON_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.json' in a][0].lstrip('file://')))
 
         if '.xclbin' in d.getVar("SRC_URI"):
             d.setVar("XCL_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.xclbin' in a][0].lstrip('file://')))
@@ -151,8 +155,8 @@ do_install() {
         install -Dm 0644 ${S}/${XCL_PATH}/*.xclbin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.xclbin
     fi
 
-    if [ -f ${WORKDIR}/${JSON_PATH}/accel.json ]; then
-        install -Dm 0644 ${S}/${JSON_PATH}/accel.json ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/accel.json
+    if [ -f ${S}/${JSON_PATH}/shell.json ] || [ -f ${S}/${JSON_PATH}/accel.json ]; then
+        install -Dm 0644 ${S}/${JSON_PATH}/*.json ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
     fi
 }
 
