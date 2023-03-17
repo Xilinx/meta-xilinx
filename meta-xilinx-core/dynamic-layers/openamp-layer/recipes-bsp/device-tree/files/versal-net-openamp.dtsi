@@ -35,7 +35,7 @@
 		reg = <0x0 0xeba00000 0x0 0x10000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_firmware 0x183180cb>;
+		power-domain = <&versal_net_firmware 0x183180cb>;
 	};
 
 	tcm_0b: tcm_0b@eba10000 {
@@ -43,7 +43,7 @@
 		reg = <0x0 0xeba10000 0x0 0x8000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_firmware 0x183180cc>;
+		power-domain = <&versal_net_firmware 0x183180cc>;
 	};
 
 	tcm_0c: tcm_0b@eba20000 {
@@ -51,7 +51,7 @@
 		reg = <0x0 0xeba20000 0x0 0x8000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_firmware 0x183180cd>;
+		power-domain = <&versal_net_firmware 0x183180cd>;
 	};
 
 	r52ss {
@@ -68,7 +68,7 @@
 			ranges;
 			sram = <&tcm_0a>, <&tcm_0b>, <&tcm_0c>;
 			memory-region = <&rproc_0_reserved>, <&rpu0vdev0buffer>, <&rpu0vdev0vring0>, <&rpu0vdev0vring1>;
-			power-domain = <&versal_firmware 0x181100BF>;
+			power-domain = <&versal_net_firmware 0x181100BF>;
 			mboxes = <&ipi_mailbox_rpu0 0>, <&ipi_mailbox_rpu0 1>;
 			mbox-names = "tx", "rx";
 		};

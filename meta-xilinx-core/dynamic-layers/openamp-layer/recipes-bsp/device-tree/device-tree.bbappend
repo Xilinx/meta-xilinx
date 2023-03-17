@@ -10,20 +10,19 @@ SRC_URI = " \
 # openamp.dtsi is in the WORKDIR
 DT_INCLUDE:append = " ${WORKDIR}"
 
-do_configure:append() {
-	if ${@bb.utils.contains('DISTRO_FEATURES', 'openamp', ' true', 'false', d)} && [ "${ENABLE_OPENAMP_DTSI}" = "1" ]; then
-		if [ -e "${DT_FILES_PATH}/system-top.dts" ]; then
-			if [ -e "${WORKDIR}/${MACHINE}-openamp.dtsi" ]; then
-				sed -i '/${MACHINE}-openamp\.dtsi/d' ${DT_FILES_PATH}/system-top.dts
-				echo '/include/ "${MACHINE}-openamp.dtsi"' >> ${DT_FILES_PATH}/system-top.dts
-			elif [ -e "${WORKDIR}/${SOC_FAMILY}-openamp.dtsi" ]; then
-				sed -i '/${SOC_FAMILY}-openamp\.dtsi/d' ${DT_FILES_PATH}/system-top.dts
-				echo '/include/ "${SOC_FAMILY}-openamp.dtsi"' >> ${DT_FILES_PATH}/system-top.dts
-			else
-				bbfatal "${MACHINE}-openamp.dtsi or ${SOC_FAMILY}-openamp.dtsi file is not available.  Cannot automatically add to system-top.dts."
-			fi
-		else
-			bbfatal "system-top.dts not found in this configuration, cannot automatically add OpenAmp device tree nodes (openamp.dtsi)"
-		fi
-	fi
-}
+do_configure[vardeps] += "ENABLE_OPENAMP_DTSI OPENAMP_EXTRA_OVERLAYS"
+
+OPENAMP_EXTRA_OVERLAYS:zynq = "zynq-openamp.dtsi"
+OPENAMP_EXTRA_OVERLAYS:zynqmp = "zynqmp-openamp.dtsi"
+OPENAMP_EXTRA_OVERLAYS:versal = "versal-openamp.dtsi"
+OPENAMP_EXTRA_OVERLAYS:versal-net = "versal-net-openamp.dtsi"
+
+def set_openamp_extra_overlays(d):
+    distro_features = d.getVar('DISTRO_FEATURES', True)
+    enable_openamp_dtsi = d.getVar('ENABLE_OPENAMP_DTSI')
+    if 'openamp' in distro_features and enable_openamp_dtsi == '1':
+        return d.getVar('OPENAMP_EXTRA_OVERLAYS', True)
+    else:
+        return ''
+
+EXTRA_OVERLAYS:append = "${@set_openamp_extra_overlays(d)}"
