@@ -19,7 +19,7 @@ PROVIDES = ""
 do_fetch[cleandirs] = "${B}"
 
 DT_PADDING_SIZE = "0x1000"
-BOOTGEN_FLAGS ?= " -arch ${SOC_FAMILY} ${@bb.utils.contains('SOC_FAMILY','zynqmp','-w','-process_bitstream bin',d)}"
+BOOTGEN_FLAGS ?= " -arch ${SOC_FAMILY} -w ${@bb.utils.contains('SOC_FAMILY','zynqmp','','-process_bitstream bin',d)}"
 
 S ?= "${WORKDIR}"
 FW_DIR ?= ""
@@ -94,7 +94,7 @@ python do_configure() {
 }
 
 python devicetree_do_compile:append() {
-    import glob, subprocess
+    import glob, subprocess, shutil
     soc_family = d.getVar("SOC_FAMILY")
 
     # Convert .bit to bit.bin format only if dtsi is input.
@@ -112,8 +112,20 @@ python devicetree_do_compile:append() {
         bootgenargs += ["-image", biffile, "-o", pn + ".bit.bin"]
         subprocess.run(bootgenargs, check = True)
 
+        # In Zynq7k using both "-process_bitstream bin" and "-o" in bootgen flag,
+        # to convert bit file to bin format, "-o" option will not be effective
+        # and generated output file name is ${S}+${BIT_PATH}/<bit_file_name>.bit.bin
+        # file, Hence we need to rename this file from <bit_file_name>.bit.bin to
+        # ${PN}.bit.bin which matches the firmware name in dtbo and move
+        # ${PN}.bit.bin to ${B} directory.
+        if soc_family == 'zynq':
+            src_bitbin_file = glob.glob(d.getVar('S') + (d.getVar('BIT_PATH') or '') + '/*.bit.bin')[0]
+            dst_bitbin_file = d.getVar('B') + '/' + pn + '.bit.bin'
+            shutil.move(src_bitbin_file, dst_bitbin_file)
+
         if not os.path.isfile(pn + ".bit.bin"):
-            bb.fatal("bootgen failed. Enable -log debug with bootgen and check logs")
+            bb.fatal("Couldn't find %s file, Enable '-log trace' in BOOTGEN_FLAGS" \
+                "and check bootgen_log.txt" % (d.getVar('B') + '/' + pn + '.bit.bin'))
 }
 
 do_install() {
