@@ -79,7 +79,7 @@ def uenv_populate(d):
 
     return env
 
-DEPENDS:append := "virtual/kernel ${@remove_task_from_depends(d)}"
+DEPENDS:append := " virtual/kernel ${@remove_task_from_depends(d)}"
 
 # bootargs, default to booting with the rootfs device being partition 2
 KERNEL_BOOTARGS:zynq = "earlyprintk console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootwait"
