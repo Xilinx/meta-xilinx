@@ -1,7 +1,5 @@
 inherit esw features_check
 
-REQUIRED_MACHINE_FEATURES = "sdps"
-
 ESW_COMPONENT_SRC = "/lib/sw_services/xilffs/src/"
 ESW_COMPONENT_NAME = "libxilffs.a"
 
