@@ -1,0 +1,95 @@
+From a64707b7fea40d326c5b18636a41a5994f60048d Mon Sep 17 00:00:00 2001
+From: Parth Gajjar <parth.gajjar@amd.com>
+Date: Fri, 24 Feb 2023 05:11:38 -0800
+Subject: [PATCH] Updated clock name and structure to match LIMA driver
+
+Clock-names:
+  gpu             -> bus
+  gpu_pp0,gpu_pp1 -> core
+
+This will allow us to have a single device tree that works with both the
+mali driver, as well as the lima driver.
+
+Signed-off-by: Parth Gajjar <parth.gajjar@amd.com>
+---
+ linux/mali_kernel_linux.c  | 37 +++++++------------
+ 1 file changed, 13 insertions(+), 24 deletions(-)
+
+diff --git a/linux/mali_kernel_linux.c b/linux/mali_kernel_linux.c
+index ad450b4..050af67 100644
+--- a/linux/mali_kernel_linux.c
++++ b/linux/mali_kernel_linux.c
+@@ -48,9 +48,8 @@
+ 
+ #if defined(CONFIG_ARCH_ZYNQMP)
+ /* Initialize variables for clocks */
+-struct clk *clk_gpu;
+-struct clk *clk_gpu_pp0;
+-struct clk *clk_gpu_pp1;
++struct clk *clk_bus;
++struct clk *clk_core;
+ mali_bool clk_enabled;
+ #endif
+ 
+@@ -291,19 +290,14 @@ static int mali_enable_clk(void)
+ 		return 0;
+ 
+ 	clk_enabled = MALI_TRUE;
+-	err = clk_prepare_enable(clk_gpu);
++	err = clk_prepare_enable(clk_bus);
+ 	if (err) {
+ 		MALI_PRINT_ERROR(("Could not enable clock for GP\n\r"));
+ 		return err;
+ 	}
+-	err = clk_prepare_enable(clk_gpu_pp0);
++	err = clk_prepare_enable(clk_core);
+ 	if (err) {
+-		MALI_PRINT_ERROR(("Could not enable clock for PP0\n\r"));
+-		return err;
+-	}
+-	err = clk_prepare_enable(clk_gpu_pp1);
+-	if (err) {
+-		MALI_PRINT_ERROR(("Could not enable clock for PP1\n\r"));
++		MALI_PRINT_ERROR(("Could not enable clock for PP\n\r"));
+ 		return err;
+ 	}
+ #endif
+@@ -315,9 +309,8 @@ static void mali_disable_clk(void)
+ #if defined(CONFIG_ARCH_ZYNQMP)
+ 	if (clk_enabled) {
+ 		clk_enabled = MALI_FALSE;
+-		clk_disable_unprepare(clk_gpu);
+-		clk_disable_unprepare(clk_gpu_pp0);
+-		clk_disable_unprepare(clk_gpu_pp1);
++		clk_disable_unprepare(clk_bus);
++		clk_disable_unprepare(clk_core);
+ 	}
+ #endif
+ }
+@@ -631,17 +624,13 @@ static int mali_probe(struct platform_device *pdev)
+ 
+ #if defined(CONFIG_ARCH_ZYNQMP)
+ 	/* Initialize clocks for GPU and PP */
+-	clk_gpu = devm_clk_get(&pdev->dev, "gpu");
+-	if (IS_ERR(clk_gpu))
+-		return PTR_ERR(clk_gpu);
+-
+-	clk_gpu_pp0 = devm_clk_get(&pdev->dev, "core");
+-	if (IS_ERR(clk_gpu_pp0))
+-		return PTR_ERR(clk_gpu_pp0);
++	clk_bus = devm_clk_get(&pdev->dev, "bus");
++	if (IS_ERR(clk_bus))
++		return PTR_ERR(clk_bus);
+ 
+-	clk_gpu_pp1 = devm_clk_get(&pdev->dev, "bus");
+-	if (IS_ERR(clk_gpu_pp1))
+-		return PTR_ERR(clk_gpu_pp1);
++	clk_core = devm_clk_get(&pdev->dev, "core");
++	if (IS_ERR(clk_core))
++		return PTR_ERR(clk_core);
+ #endif
+ 
+ 	err = mali_enable_clk();
+-- 
+2.25.1
+
