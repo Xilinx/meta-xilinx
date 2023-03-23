@@ -12,7 +12,7 @@ REQUIRED_MACHINE_FEATURES = "vdu"
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vdu-ctrl-sw.git;protocol=https"
-SRCREV ?= "7f87371a010c22fb0019abe92c7590cd3c08d13f"
+SRCREV ?= "06fc18b303b40d4fee7549ad162c22ee1bc31582"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
