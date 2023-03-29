@@ -100,9 +100,14 @@ do_blob_generate () {
 		DTBO=$(echo $CC_DTB | cut -d: -f1)
         BASE_DTB=$(echo $CC_DTB | cut -d: -f2)
         OUTPUT_DTB=$(echo $CC_DTB | cut -d: -f3)
-        bbnote "fdtoverlay -o ${DT_BLOB_DIR}/${OUTPUT_DTB} -i ${B}/arch/arm/dts/${BASE_DTB} ${B}/arch/arm/dts/${DTBO}"
+        if [ "${SYSTEM_DTB_BLOB}" == "1" ]; then
+		BASE_SYS_DTB="${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_NAME}"
+        else
+		BASE_SYS_DTB="${B}/arch/arm/dts/${BASE_DTB}"
+        fi
+        bbnote "fdtoverlay -o ${DT_BLOB_DIR}/${OUTPUT_DTB} -i ${BASE_SYS_DTB} ${B}/arch/arm/dts/${DTBO}"
 		if [ -f ${B}/arch/arm/dts/${DTBO} ]; then
-        fdtoverlay -o ${DT_BLOB_DIR}/${OUTPUT_DTB} -i ${B}/arch/arm/dts/${BASE_DTB} ${B}/arch/arm/dts/${DTBO}
+        fdtoverlay -o ${DT_BLOB_DIR}/${OUTPUT_DTB} -i ${BASE_SYS_DTB} ${B}/arch/arm/dts/${DTBO}
 		fi
 	done
 
