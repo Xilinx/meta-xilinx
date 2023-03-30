@@ -6,7 +6,7 @@ REPO ??= "git://github.com/Xilinx/embeddedsw.git;protocol=https"
 ESW_BRANCH[2023.1] = "xlnx_rel_v2023.1-next"
 BRANCH ??= "${@d.getVarFlag('ESW_BRANCH', d.getVar('ESW_VER')) or '${ESW_VER}'}"
 
-ESW_REV[2023.1] = "2aafc903aa8430f169f2a4a20ec5efa15fe32961"
+ESW_REV[2023.1] = "6e115bf7dd9729621f82a9c5f5c7346728ddfab5"
 SRCREV ??= "${@d.getVarFlag('ESW_REV', d.getVar('ESW_VER')) or '${AUTOREV}'}"
 
 EMBEDDEDSW_BRANCHARG ?= "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
