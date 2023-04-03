@@ -36,6 +36,8 @@ SRC_URI += "\
            file://0001-net-tulip-Restrict-DMA-engine-to-memories.patch \
            file://arm-cpreg-fix.patch \
            file://CVE-2022-3165.patch \
+           file://qemu-guest-agent.init \
+           file://qemu-guest-agent.udev \
            "
 
 S = "${WORKDIR}/git"
