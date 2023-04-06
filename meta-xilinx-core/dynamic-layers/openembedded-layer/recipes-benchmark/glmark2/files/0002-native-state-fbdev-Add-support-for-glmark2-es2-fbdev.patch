@@ -19,11 +19,11 @@ Signed-off-by: Mark Hatle <mark.hatle@amd.com>
  create mode 100644 src/native-state-fbdev.cpp
  create mode 100644 src/native-state-fbdev.h
 
-diff --git a/src/gl-state-egl.cpp b/src/gl-state-egl.cpp
-index 5a6843c..14c7dac 100644
---- a/src/gl-state-egl.cpp
-+++ b/src/gl-state-egl.cpp
-@@ -510,6 +510,7 @@ GLStateEGL::gotValidDisplay()
+Index: git/src/gl-state-egl.cpp
+===================================================================
+--- git.orig/src/gl-state-egl.cpp
++++ git/src/gl-state-egl.cpp
+@@ -508,6 +508,7 @@ GLStateEGL::gotValidDisplay()
          return false;
      }
  
@@ -31,7 +31,7 @@ index 5a6843c..14c7dac 100644
      char const * __restrict const supported_extensions =
          egl_query_string(EGL_NO_DISPLAY, EGL_EXTENSIONS);
  
-@@ -543,6 +544,9 @@ GLStateEGL::gotValidDisplay()
+@@ -541,6 +542,9 @@ GLStateEGL::gotValidDisplay()
          Log::debug("Falling back to eglGetDisplay()\n");
          egl_display_ = egl_get_display(native_display_);
      }
@@ -41,11 +41,11 @@ index 5a6843c..14c7dac 100644
  
      if (!egl_display_) {
          Log::error("eglGetDisplay() failed with error: 0x%x\n", egl_get_error());
-diff --git a/src/main.cpp b/src/main.cpp
-index ce8b094..7c9f501 100644
---- a/src/main.cpp
-+++ b/src/main.cpp
-@@ -36,6 +36,8 @@
+Index: git/src/main.cpp
+===================================================================
+--- git.orig/src/main.cpp
++++ git/src/main.cpp
+@@ -37,6 +37,8 @@
  
  #if GLMARK2_USE_X11
  #include "native-state-x11.h"
@@ -53,21 +53,20 @@ index ce8b094..7c9f501 100644
 +#include "native-state-fbdev.h"
  #elif GLMARK2_USE_DRM
  #include "native-state-drm.h"
- #elif GLMARK2_USE_MIR
-@@ -172,6 +174,8 @@ main(int argc, char *argv[])
-     // Create the canvas
+ #elif GLMARK2_USE_GBM
+@@ -160,6 +162,8 @@ main(int argc, char *argv[])
+ {
  #if GLMARK2_USE_X11
      NativeStateX11 native_state;
 +#elif GLMARK2_USE_FBDEV
 +    NativeStateFbdev native_state;
  #elif GLMARK2_USE_DRM
      NativeStateDRM native_state;
- #elif GLMARK2_USE_MIR
-diff --git a/src/native-state-fbdev.cpp b/src/native-state-fbdev.cpp
-new file mode 100644
-index 0000000..0c82a25
+ #elif GLMARK2_USE_GBM
+Index: git/src/native-state-fbdev.cpp
+===================================================================
 --- /dev/null
-+++ b/src/native-state-fbdev.cpp
++++ git/src/native-state-fbdev.cpp
 @@ -0,0 +1,172 @@
 +
 +/*
@@ -241,11 +240,10 @@ index 0000000..0c82a25
 +
 +    return fd;
 +}
-diff --git a/src/native-state-fbdev.h b/src/native-state-fbdev.h
-new file mode 100644
-index 0000000..0162ee0
+Index: git/src/native-state-fbdev.h
+===================================================================
 --- /dev/null
-+++ b/src/native-state-fbdev.h
++++ git/src/native-state-fbdev.h
 @@ -0,0 +1,59 @@
 +/*
 + * Copyright © 2018 Xilinx Inc
@@ -306,11 +304,11 @@ index 0000000..0162ee0
 +};
 +
 +#endif /* GLMARK2_NATIVE_STATE_FBDEV_H_ */
-diff --git a/src/wscript_build b/src/wscript_build
-index a01c8a8..c179342 100644
---- a/src/wscript_build
-+++ b/src/wscript_build
-@@ -90,6 +90,7 @@ flavor_sources = {
+Index: git/src/wscript_build
+===================================================================
+--- git.orig/src/wscript_build
++++ git/src/wscript_build
+@@ -88,6 +88,7 @@ flavor_sources = {
    'win32-glesv2': common_flavor_sources + ['native-state-win32.cpp', 'gl-state-egl.cpp'],
    'x11-gl' : common_flavor_sources + ['native-state-x11.cpp', 'gl-state-glx.cpp'],
    'x11-glesv2' : common_flavor_sources + ['native-state-x11.cpp', 'gl-state-egl.cpp'],
@@ -318,7 +316,7 @@ index a01c8a8..c179342 100644
  }
  flavor_uselibs = {
    'dispmanx-glesv2' : ['glad-egl-dispmanx', 'glad-glesv2', 'matrix-glesv2', 'common-glesv2',  'dispmanx'],
-@@ -103,6 +104,7 @@ flavor_uselibs = {
+@@ -99,6 +100,7 @@ flavor_uselibs = {
    'win32-glesv2': ['glad-egl-win32', 'glad-glesv2', 'matrix-glesv2', 'common-glesv2'],
    'x11-gl' : ['x11', 'glad-gl', 'glad-glx', 'matrix-gl', 'common-gl'],
    'x11-glesv2' : ['x11', 'glad-egl-x11', 'glad-glesv2', 'matrix-glesv2', 'common-glesv2'],
@@ -326,7 +324,7 @@ index a01c8a8..c179342 100644
  }
  
  flavor_defines = {
-@@ -117,6 +119,7 @@ flavor_defines = {
+@@ -111,6 +113,7 @@ flavor_defines = {
    'win32-glesv2': ['GLMARK2_USE_WIN32', 'GLMARK2_USE_GLESv2', 'GLMARK2_USE_EGL'],
    'x11-gl' : ['GLMARK2_USE_X11', 'GLMARK2_USE_GL', 'GLMARK2_USE_GLX'],
    'x11-glesv2' : ['GLMARK2_USE_X11', 'GLMARK2_USE_GLESv2', 'GLMARK2_USE_EGL'],
@@ -334,7 +332,7 @@ index a01c8a8..c179342 100644
  }
  flavor_libs = {
    'dispmanx-glesv2' : [],
-@@ -156,6 +159,7 @@ flavor_sources_gen = {
+@@ -144,6 +147,7 @@ flavor_sources_gen = {
    'win32-glesv2' : [],
    'x11-gl' : [],
    'x11-glesv2' : [],
@@ -342,7 +340,7 @@ index a01c8a8..c179342 100644
  }
  egl_platform_defines = {
    'dispmanx' : ['MESA_EGL_NO_X11_HEADERS'],
-@@ -164,6 +168,7 @@ egl_platform_defines = {
+@@ -151,6 +155,7 @@ egl_platform_defines = {
    'wayland' : ['WL_EGL_PLATFORM'],
    'win32' : [],
    'x11' : [],
@@ -350,11 +348,11 @@ index a01c8a8..c179342 100644
  }
  
  includes = ['.', 'scene-ideas', 'scene-terrain'] + platform_includes
-diff --git a/wscript b/wscript
-index cecc3d9..4ae50d8 100644
---- a/wscript
-+++ b/wscript
-@@ -19,6 +19,7 @@ FLAVORS = {
+Index: git/wscript
+===================================================================
+--- git.orig/wscript
++++ git/wscript
+@@ -17,6 +17,7 @@ FLAVORS = {
      'win32-glesv2': 'glmark2-es2',
      'x11-gl' : 'glmark2',
      'x11-glesv2' : 'glmark2-es2',
@@ -362,14 +360,11 @@ index cecc3d9..4ae50d8 100644
  }
  FLAVORS_STR = ", ".join(sorted(list(FLAVORS) + ['all-linux', 'all-win32']))
  
-@@ -213,6 +214,7 @@ def configure_linux(ctx):
+@@ -210,6 +211,7 @@ def configure_linux(ctx):
+                 ('libdrm','drm', None, list_contains(ctx.options.flavors, 'drm')),
                  ('gbm','gbm', None, list_contains(ctx.options.flavors, 'drm')),
                  ('libudev', 'udev', None, list_contains(ctx.options.flavors, 'drm')),
-                 ('mirclient','mirclient', '0.13', list_contains(ctx.options.flavors, 'mir')),
 +                ('libudev', 'udev', None, list_contains(ctx.options.flavors, 'fbdev')),
                  ('wayland-client','wayland-client', None, list_contains(ctx.options.flavors, 'wayland')),
                  ('wayland-cursor','wayland-cursor', None, list_contains(ctx.options.flavors, 'wayland')),
                  ('wayland-egl','wayland-egl', None, list_contains(ctx.options.flavors, 'wayland'))]
--- 
-2.17.1
-
