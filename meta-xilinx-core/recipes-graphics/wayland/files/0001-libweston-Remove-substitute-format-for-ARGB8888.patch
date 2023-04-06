@@ -12,18 +12,15 @@ Upstream-Status : Inappropriate [Xilinx specific]
  libweston/pixel-formats.c | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/libweston/pixel-formats.c b/libweston/pixel-formats.c
-index 79dc709..ec2d3b7 100644
---- a/libweston/pixel-formats.c
-+++ b/libweston/pixel-formats.c
-@@ -193,7 +193,6 @@ static const struct pixel_format_info pixel_format_table[] = {
+Index: weston-11.0.1/libweston/pixel-formats.c
+===================================================================
+--- weston-11.0.1.orig/libweston/pixel-formats.c
++++ weston-11.0.1/libweston/pixel-formats.c
+@@ -247,7 +247,6 @@ static const struct pixel_format_info pi
  	{
  		DRM_FORMAT(ARGB8888),
  		BITS_RGBA_FIXED(8, 8, 8, 8),
 -		.opaque_substitute = DRM_FORMAT_XRGB8888,
- 		.depth = 32,
+ 		.addfb_legacy_depth = 32,
  		.bpp = 32,
  		GL_FORMAT(GL_BGRA_EXT),
--- 
-2.17.1
-
