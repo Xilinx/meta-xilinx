@@ -22,21 +22,34 @@ $ mkdir sources
 $ git clone -b <release-branch> https://git.yoctoproject.org/poky.git
 $ git clone -b <release-branch> https://git.openembedded.org/meta-openembedded.git
 $ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx.git
+$ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx-tools.git
 ```
 3. Initialize a build environment using the `oe-init-build-env` script. 
 ```
 $ source poky/oe-init-build-env
 ```
-4. Once initialized configure `bblayers.conf` add `meta-xilinx` layer as shown
-   below using `bitbake-layers` command
+4. Once initialized configure `bblayers.conf` by adding dependency layers as shown
+   below using `bitbake-layers` command.
+> **Note:** From step 3 by default `meta-yocto-bsp` will be included in bblayers.conf
+> file and this can be removed using `$ bitbake-layers add-layer meta-yocto-bsp`
+> command.
+
 ```
+$ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-oe
+$ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-python
+$ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-filesystems
+$ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-networking
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-microbalze
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-core
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-bsp
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-vendor
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-contrib
+$ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-tools
 ```
+> **Note:** We recommend using meta-xilinx-tools, the version that is built as
+> standalone may not work on many boards as it does not know the board configuration.
+
 5. Set hardware `MACHINE` configuration variable in <proj-dir>/build/conf/local.conf
    file for a specific target which can boot and run the in the board or QEMU.
 ```
@@ -75,8 +88,12 @@ Available target machines are:
 |            | vhk158-versal       |
 
 6. Build an OS image for the target using `bitbake` command.
+> **Note:** Refer ./<path-to-distro-layer>/conf/templates/default/conf-notes.txt
+> for available target image-name. e.g. core-image-minimal
+
 ```
-$ bitbake core-image-minimal
+$ bitbake <image-name>
 ```
+
 7. Once complete the images for the target machine will be available in the output
    directory `${TMPDIR}/deploy/images/${MACHINE}/`.
