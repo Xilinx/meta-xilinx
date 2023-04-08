@@ -4,54 +4,65 @@ Date: Sun, 11 Apr 2021 20:04:06 -0700
 Subject: [PATCH] Add systemd support for microblaze architecture
 
 Signed-off-by: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
+
+Applied to current version of systemd
+Reworked to split microblaze and microblazeel
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 ---
  src/basic/architecture.c | 3 +++
  src/basic/architecture.h | 4 ++++
  2 files changed, 7 insertions(+)
 
-diff --git a/src/basic/architecture.c b/src/basic/architecture.c
-index 85837b5..dbcefbc 100644
---- a/src/basic/architecture.c
-+++ b/src/basic/architecture.c
-@@ -54,6 +54,8 @@ int uname_architecture(void) {
-                 { "mips",       ARCHITECTURE_MIPS     },
+Index: git/src/basic/architecture.c
+===================================================================
+--- git.orig/src/basic/architecture.c
++++ git/src/basic/architecture.c
+@@ -49,6 +49,10 @@ Architecture uname_architecture(void) {
  #elif defined(__alpha__)
                  { "alpha" ,     ARCHITECTURE_ALPHA    },
-+#elif defined(__microblaze__)
-+                { "microblaze" ,     ARCHITECTURE_MICROBLAZE },
- #elif defined(__arm__) || defined(__aarch64__)
-                 { "aarch64",    ARCHITECTURE_ARM64    },
-                 { "aarch64_be", ARCHITECTURE_ARM64_BE },
-@@ -173,6 +175,7 @@ static const char *const architecture_table[_ARCHITECTURE_MAX] = {
-         [ARCHITECTURE_RISCV64] = "riscv64",
-         [ARCHITECTURE_ARC] = "arc",
-         [ARCHITECTURE_ARC_BE] = "arc-be",
-+        [ARCHITECTURE_MICROBLAZE] = "microblaze",
- };
  
- DEFINE_STRING_TABLE_LOOKUP(architecture, int);
-diff --git a/src/basic/architecture.h b/src/basic/architecture.h
-index 443e890..559ada9 100644
---- a/src/basic/architecture.h
-+++ b/src/basic/architecture.h
-@@ -42,6 +42,7 @@ enum {
-         ARCHITECTURE_NIOS2,
-         ARCHITECTURE_RISCV32,
-         ARCHITECTURE_RISCV64,
++#elif defined(__microblaze__)
++                { "microblaze", ARCHITECTURE_MICROBLAZE },
++                { "microblazeel", ARCHITECTURE_MICROBLAZE_LE },
++
+ #elif defined(__arc__)
+                 { "arc",        ARCHITECTURE_ARC      },
+                 { "arceb",      ARCHITECTURE_ARC_BE   },
+@@ -147,6 +151,8 @@ static const char *const architecture_ta
+         [ARCHITECTURE_ALPHA]       = "alpha",
+         [ARCHITECTURE_ARC]         = "arc",
+         [ARCHITECTURE_ARC_BE]      = "arc-be",
++        [ARCHITECTURE_MICROBLAZE]  = "microblaze",
++        [ARCHITECTURE_MICROBLAZE_LE] = "microblazeel",
+         [ARCHITECTURE_CRIS]        = "cris",
+         [ARCHITECTURE_X86_64]      = "x86-64",
+         [ARCHITECTURE_X86]         = "x86",
+Index: git/src/basic/architecture.h
+===================================================================
+--- git.orig/src/basic/architecture.h
++++ git/src/basic/architecture.h
+@@ -22,6 +22,8 @@ typedef enum {
+         ARCHITECTURE_IA64,
+         ARCHITECTURE_LOONGARCH64,
+         ARCHITECTURE_M68K,
 +        ARCHITECTURE_MICROBLAZE,
-         ARCHITECTURE_ARC,
-         ARCHITECTURE_ARC_BE,
-         _ARCHITECTURE_MAX,
-@@ -229,6 +230,9 @@ int uname_architecture(void);
++        ARCHITECTURE_MICROBLAZE_LE,
+         ARCHITECTURE_MIPS,
+         ARCHITECTURE_MIPS64,
+         ARCHITECTURE_MIPS64_LE,
+@@ -239,6 +241,14 @@ Architecture uname_architecture(void);
  #    define native_architecture() ARCHITECTURE_ARC
  #    define LIB_ARCH_TUPLE "arc-linux"
  #  endif
 +#elif defined(__microblaze__)
-+#  define native_architecture() ARCHITECTURE_MICROBLAZE
-+#  define LIB_ARCH_TUPLE "microblazeel-xilinx-linux"
++#  if __BYTE_ORDER == __BIG_ENDIAN
++#    define native_architecture() ARCHITECTURE_MICROBLAZE
++#    define LIB_ARCH_TUPLE "microblaze-linux"
++#  else
++#    define native_architecture() ARCHITECTURE_MICROBLAZE_LE
++#    define LIB_ARCH_TUPLE "microblazeel-linux"
++#  endif
  #else
  #  error "Please register your architecture here!"
  #endif
--- 
-2.7.4
-
