@@ -3,6 +3,8 @@ SRC_URI += " \
     file://microblaze_generic.cfg \
     "
 
+KERNEL_FEATURES:append = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', ' features/microblaze-systemd/microblaze-systemd.scc', '', d)}"
+
 # MicroBlaze is a uImage target, but its not called 'uImage' instead it is called 'linux.bin.ub'
 python () {
     if d.getVar('KERNEL_IMAGETYPE', True).endswith('.ub'):
