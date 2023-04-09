@@ -8,7 +8,7 @@ ESW_BRANCH[2023.2] = "master-next"
 BRANCH ??= "${@d.getVarFlag('ESW_BRANCH', d.getVar('ESW_VER')) or '${ESW_VER}'}"
 
 ESW_REV[2023.1] = "2e9f85579e203d76b983ff21c4294a8c3d578942"
-ESW_REV[2023.2] = "7addf6855144a06f9fa61771b6c994603889cd95"
+ESW_REV[2023.2] = "3deba273b5c03e2257c266d05ef10fed8eab4286"
 SRCREV ??= "${@d.getVarFlag('ESW_REV', d.getVar('ESW_VER')) or '${AUTOREV}'}"
 
 EMBEDDEDSW_BRANCHARG ?= "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
