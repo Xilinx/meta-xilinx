@@ -6,7 +6,7 @@ CONFLICT_DISTRO_FEATURES:class-target = "${@bb.utils.contains('MACHINE_FEATURES'
 
 # Enable lima if not using libmali
 PACKAGECONFIG_MALI = "${@bb.utils.contains('DISTRO_FEATURES', 'libmali', '', 'lima', d)}"
-PACKAGECONFIG:append = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', '${PACKAGECONFIG_MALI}', '', d)}"
+PACKAGECONFIG:append:class-target = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', '${PACKAGECONFIG_MALI}', '', d)}"
 
 PACKAGE_ARCH_DEFAULT := "${PACKAGE_ARCH}"
 PACKAGE_ARCH = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', '${MACHINE_ARCH}', '${PACKAGE_ARCH_DEFAULT}', d)}"
