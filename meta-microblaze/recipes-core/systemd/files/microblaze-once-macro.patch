@@ -9,19 +9,19 @@ worst expected behavior could be multiple log messages.
 
 Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
 
-diff --git a/src/fundamental/macro-fundamental.h b/src/fundamental/macro-fundamental.h
-index 967518600d..44785e516b 100644
---- a/src/fundamental/macro-fundamental.h
-+++ b/src/fundamental/macro-fundamental.h
-@@ -55,11 +55,28 @@
+Index: git/src/fundamental/macro-fundamental.h
+===================================================================
+--- git.orig/src/fundamental/macro-fundamental.h
++++ git/src/fundamental/macro-fundamental.h
+@@ -109,11 +109,28 @@
   * on this macro will run concurrently to all other code conditionalized
   * the same way, there's no ordering or completion enforced. */
  #define ONCE __ONCE(UNIQ_T(_once_, UNIQ))
 +#if !defined (__microblaze__)
  #define __ONCE(o)                                                       \
          ({                                                              \
-                 static bool (o) = false;                                \
-                 __sync_bool_compare_and_swap(&(o), false, true);        \
+                 static sd_bool (o) = sd_false;                          \
+                 __sync_bool_compare_and_swap(&(o), sd_false, sd_true);  \
          })
 +#else
 +  /* Microblaze does not contain __sync_bool_compare_and_swap, so we do it
@@ -30,11 +30,11 @@ index 967518600d..44785e516b 100644
 +   * an issue. */
 +#define __ONCE(o)                                                       \
 +        ({                                                              \
-+                static bool (o) = false;                                \
-+                bool rc = false;                                        \
-+                if ((o) == false) {                                     \
-+                        (o) = true;                                     \
-+                        rc = true;                                      \
++                static bool (o) = sd_false;                             \
++                bool rc = sd_false;                                     \
++                if ((o) == sd_false) {                                  \
++                        (o) = sd_true;                                  \
++                        rc = sd_true;                                   \
 +                }                                                       \
 +                rc;                                                     \
 +        })
