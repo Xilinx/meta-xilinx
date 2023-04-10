@@ -29,19 +29,9 @@ EXTRA_OECMAKE += " \
 		-DCMAKE_EXPORT_COMPILE_COMANDS=ON \
 		"
 
-# For vck190 kind of devices
-PACKAGE_ARCH:versal-ai-core = "${SOC_VARIANT_ARCH}"
-EXTRA_OECMAKE:append:versal-ai-core = " -DXRT_AIE_BUILD=true"
-TARGET_CXXFLAGS:append:versal-ai-core = " -DXRT_ENABLE_AIE"
-DEPENDS:append:versal-ai-core = " libmetal libxaiengine aiefal"
-RDEPENDS:${PN}:append:versal-ai-core = " libxaiengine aiefal"
-
-# For vek280 kind of devices
-PACKAGE_ARCH:versal-ai-edge = "${SOC_VARIANT_ARCH}"
-EXTRA_OECMAKE:append:versal-ai-edge = " -DXRT_AIE_BUILD=true"
-TARGET_CXXFLAGS:append:versal-ai-edge = " -DXRT_ENABLE_AIE"
-DEPENDS:append:versal-ai-edge = " libmetal libxaiengine aiefal"
-RDEPENDS:${PN}:append:versal-ai-edge = " libxaiengine aiefal"
+# Systems with AIE also require libmetal, this is implemented in the dynamic-layers
+# See: meta-xilinx-core/dynamic-layers/openamp-layer/recipes-xrt/xrt_gt.bbappend
+# Note: If meta-openamp is not available, AIE will not be enabled.
 
 EXTRA_OECMAKE:append:versal = " -DXRT_LIBDFX=true"
 EXTRA_OECMAKE:append:zynqmp = " -DXRT_LIBDFX=true"
