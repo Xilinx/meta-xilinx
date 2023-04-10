@@ -1,8 +1,8 @@
 
 SRC_URI:append:minized-zynq7 = " \
-       git://github.com/murata-wireless/cyw-fmac-nvram;protocol=git;branch=orga;destsuffix=cyw-fmac-nvram;name=cyw-fmac-nvram \
-       git://github.com/murata-wireless/cyw-bt-patch;protocol=git;branch=morty-orga;destsuffix=cyw-bt-patch;name=cyw-bt-patch \
-       git://github.com/murata-wireless/cyw-fmac-utils-imx32;protocol=git;branch=orga;destsuffix=cyw-fmac-utils-imx32;name=cyw-fmac-utils-imx32 \
+       git://github.com/murata-wireless/cyw-fmac-nvram;protocol=git;branch=orga;destsuffix=cyw-fmac-nvram;name=cyw-fmac-nvram;protocol=https \
+       git://github.com/murata-wireless/cyw-bt-patch;protocol=git;branch=morty-orga;destsuffix=cyw-bt-patch;name=cyw-bt-patch;protocol=https \
+       git://github.com/murata-wireless/cyw-fmac-utils-imx32;protocol=git;branch=orga;destsuffix=cyw-fmac-utils-imx32;name=cyw-fmac-utils-imx32;protocol=https \
 "
 
 SRCREV_cyw-fmac-nvram = "d12c2ac1b93941eaa03063bb7cb3c1ee1aa1b7d0"
