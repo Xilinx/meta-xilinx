@@ -29,38 +29,43 @@ PROVIDES = "virtual/bitstream virtual/xilinx-platform-init"
 FILES:${PN}-platform-init += "${PLATFORM_INIT_DIR}/*"
 
 FILES:${PN}-bitstream += " \
-		download.bit \
+		/boot/bitstream \
 		"
 
 PACKAGES = "${PN}-platform-init ${PN}-bitstream"
 
-BITSTREAM ?= "bitstream-${PV}-${PR}.bit"
+inherit image-artifact-names
+
+BITSTREAM_NAME ?= "download"
+BITSTREAM_BASE_NAME ?= "${BITSTREAM_NAME}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit xilinx-platform-init
 inherit deploy
 
-SYSROOT_DIRS += "${PLATFORM_INIT_DIR}"
+SYSROOT_DIRS += "${PLATFORM_INIT_DIR} /boot/bitstream"
 
 do_install() {
 	fn=$(unzip -l ${S}/${HDF} | awk '{print $NF}' | grep ".bit$")
 	unzip -o ${S}/${HDF} ${fn} -d ${D}
-	[ "${fn}" == "download.bit" ] || mv ${D}/${fn} ${D}/download.bit
+        install -d ${D}/boot/bitstream
+	mv ${D}/*.bit ${D}/boot/bitstream/${BITSTREAM_BASE_NAME}.bit
+	ln -s ${BITSTREAM_BASE_NAME}.bit ${D}/boot/bitstream/${BITSTREAM_NAME}-${MACHINE}.bit
 
 	install -d ${D}${PLATFORM_INIT_DIR}
 	for fn in ${PLATFORM_INIT_FILES}; do
 		unzip -o ${S}/${HDF} ${fn} -d ${D}${PLATFORM_INIT_DIR}
 	done
+
+
 }
 
 do_deploy () {
 	if [ -e ${D}/download.bit ]; then
 		install -d ${DEPLOYDIR}
-		install -m 0644 ${D}/download.bit ${DEPLOYDIR}/${BITSTREAM}
-		ln -sf ${BITSTREAM} ${DEPLOYDIR}/download.bit
-		# for u-boot 2016.3 with spl load bitstream patch
-		ln -sf ${BITSTREAM} ${DEPLOYDIR}/bitstream
+		install -m 0644 ${D}/download.bit ${DEPLOYDIR}/${BITSTREAM_BASE_NAME}.bit
+		ln -sf ${BITSTREAM_BASE_NAME}.bit ${DEPLOYDIR}/${BITSTREAM_NAME}-${MACHINE}.bit
 	fi
 }
 addtask deploy before do_build after do_install
