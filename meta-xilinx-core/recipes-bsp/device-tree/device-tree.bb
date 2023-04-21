@@ -27,6 +27,11 @@ UBOOT_DTFILE_PREFIX ?= "system-top"
 UBOOT_DTFILES_BUNDLE ?= ""
 EXTRA_OVERLAYS ?= ""
 
+SYSTEM_DTFILE[doc] = "System Device Tree which accepts at 0...1 dts file"
+CONFIG_DTFILE[doc] = "Domain Specific Device Tree which accepts 0...1 dts file"
+EXTRA_DT_FILES[doc] = "Add extra files to DT_FILES_PATH, it accepts 1...n dtsi files and adds to SRC_URI"
+EXTRA_OVERLAYS[doc] = "Add extra files to DT_FILES_PATH and adds a #include for each to the BASE_DTS, it access 1..n dtsi files and adds to SRC_URI"
+
 SRC_URI:append = " ${@" ".join(["file://%s" % f for f in (d.getVar('EXTRA_DT_FILES') or "").split()])}"
 SRC_URI:append = " ${@" ".join(["file://%s" % f for f in (d.getVar('EXTRA_OVERLAYS') or "").split()])}"
 
@@ -87,6 +92,7 @@ devicetree_do_compile:append() {
 }
 
 FILES:${PN} += "/boot/system.dtb"
+
 devicetree_do_install:append() {
     if [ -n "${DTB_FILE_NAME}" ]; then
         # If it's already a dtb, we have to copy from the original location
