@@ -19,6 +19,17 @@ SYSTEM_DTFILE ??= ""
 CONFIG_DTFILE ??= "${SYSTEM_DTFILE}"
 DT_FILES_PATH = "${@os.path.dirname(d.getVar('CONFIG_DTFILE')) if d.getVar('CONFIG_DTFILE') else d.getVar('S')}"
 
+EXTRA_DT_FILES ?= ""
+EXTRA_DTFILE_PREFIX ?= "system-top"
+EXTRA_DTFILES_BUNDLE ?= ""
+UBOOT_DT_FILES ?= ""
+UBOOT_DTFILE_PREFIX ?= "system-top"
+UBOOT_DTFILES_BUNDLE ?= ""
+EXTRA_OVERLAYS ?= ""
+
+SRC_URI:append = " ${@" ".join(["file://%s" % f for f in (d.getVar('EXTRA_DT_FILES') or "").split()])}"
+SRC_URI:append = " ${@" ".join(["file://%s" % f for f in (d.getVar('EXTRA_OVERLAYS') or "").split()])}"
+
 COMPATIBLE_MACHINE:zynq   = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
@@ -33,6 +44,47 @@ SRC_URI:append:zynq = " file://zynq-7000-qspi-dummy.dtsi"
 DTB_FILE_NAME = "${@os.path.basename(d.getVar('CONFIG_DTFILE')).replace('.dts', '.dtb') if d.getVar('CONFIG_DTFILE') else ''}"
 
 DTB_BASE_NAME ?= "${MACHINE}-system${IMAGE_VERSION_SUFFIX}"
+
+do_configure:append () {
+    for f in ${EXTRA_DT_FILES}; do
+        cp ${WORKDIR}/${f} ${DT_FILES_PATH}/
+    done
+
+    for f in ${EXTRA_OVERLAYS}; do
+        cp ${WORKDIR}/${f} ${DT_FILES_PATH}/
+        echo "/include/ \"$f\"" >> ${DT_FILES_PATH}/${BASE_DTS}.dts
+    done
+}
+
+devicetree_do_compile:append() {
+    import subprocess
+
+    dtb_file = d.getVar('DTB_FILE_NAME') or ''
+    if not dtb_file or not os.path.isfile(dtb_file):
+        return
+
+    if d.getVar('EXTRA_DTFILES_BUNDLE'):
+        ccdtb_prefix = d.getVar('EXTRA_DTFILE_PREFIX')
+        extra_dt_files = d.getVar('EXTRA_DT_FILES').split() or []
+
+        for dtsfile in extra_dt_files:
+            dtname = os.path.splitext(os.path.basename(dtsfile))[0]
+            if os.path.isfile(f"{dtname}.dtbo"):
+                fdtargs = ["fdtoverlay", "-o", f"{ccdtb_prefix}-{dtname}.dtb", "-i", dtb_file, f"{dtname}.dtbo"]
+                bb.note("Running {0}".format(" ".join(fdtargs)))
+                subprocess.run(fdtargs, check = True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+    if d.getVar('UBOOT_DTFILES_BUNDLE'):
+        uboot_ccdtb_prefix = d.getVar('UBOOT_DTFILE_PREFIX')
+        uboot_dt_files = d.getVar('UBOOT_DT_FILES').split() or []
+
+        for dtsfile in uboot_dt_files:
+            dtname = os.path.splitext(os.path.basename(dtsfile))[0]
+            if os.path.isfile(f"{dtname}.dtbo"):
+                fdtargs = ["fdtoverlay", "-o", f"{uboot_ccdtb_prefix}-{dtname}.dtb", "-i", dtb_file, f"{dtname}.dtbo"]
+                bb.note("Running {0}".format(" ".join(fdtargs)))
+                subprocess.run(fdtargs, check = True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+}
 
 FILES:${PN} += "/boot/system.dtb"
 devicetree_do_install:append() {
