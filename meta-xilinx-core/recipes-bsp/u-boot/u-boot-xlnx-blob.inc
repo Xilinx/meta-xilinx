@@ -101,7 +101,7 @@ do_blob_generate () {
         BASE_DTB=$(echo $CC_DTB | cut -d: -f2)
         OUTPUT_DTB=$(echo $CC_DTB | cut -d: -f3)
         if [ "${SYSTEM_DTB_BLOB}" == "1" ]; then
-		BASE_SYS_DTB="${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_NAME}"
+		BASE_SYS_DTB="${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_FILE_NAME}"
         else
 		BASE_SYS_DTB="${B}/arch/arm/dts/${BASE_DTB}"
         fi
@@ -125,13 +125,13 @@ do_blob_generate () {
 	its_filename="dtblob.its"
 	dtblob_emit_its_section "${its_filename}" "header"
 	dtblob_emit_its_section "${its_filename}" "imagestart"
-	for dtb in ${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_NAME} $(find ${DT_BLOB_DIR} -name '*.dtb' | sort); do
+	for dtb in ${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_FILE_NAME} $(find ${DT_BLOB_DIR} -name '*.dtb' | sort); do
 		dtblob_emit_dtb "${its_filename}" "$(basename $dtb .dtb)" "$dtb"
 	done
 	dtblob_emit_its_section "${its_filename}" "sectend"
 	dtblob_emit_its_section "${its_filename}" "confstart"
 	dtbcount=1
-	for dtb in ${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_NAME} $(find ${DT_BLOB_DIR} -name '*.dtb' | sort); do
+	for dtb in ${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_FILE_NAME} $(find ${DT_BLOB_DIR} -name '*.dtb' | sort); do
 		dtblob_emit_config "${its_filename}" "$(basename $dtb .dtb)" "$(basename $dtb .dtb)" "$dtbcount"
 		dtbcount=`expr $dtbcount + 1`
 	done
