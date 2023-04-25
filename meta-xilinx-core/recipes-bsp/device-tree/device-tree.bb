@@ -17,7 +17,6 @@ inherit devicetree image-artifact-names
 # system.
 SYSTEM_DTFILE ??= ""
 CONFIG_DTFILE ??= "${SYSTEM_DTFILE}"
-DT_FILES_PATH = "${@os.path.dirname(d.getVar('CONFIG_DTFILE')) if d.getVar('CONFIG_DTFILE') else d.getVar('S')}"
 
 EXTRA_DT_FILES ?= ""
 EXTRA_DTFILE_PREFIX ?= "system-top"
@@ -31,6 +30,11 @@ SYSTEM_DTFILE[doc] = "System Device Tree which accepts at 0...1 dts file"
 CONFIG_DTFILE[doc] = "Domain Specific Device Tree which accepts 0...1 dts file"
 EXTRA_DT_FILES[doc] = "Add extra files to DT_FILES_PATH, it accepts 1...n dtsi files and adds to SRC_URI"
 EXTRA_OVERLAYS[doc] = "Add extra files to DT_FILES_PATH and adds a #include for each to the BASE_DTS, it access 1..n dtsi files and adds to SRC_URI"
+
+# There should only be ONE CONFIG_DTFILE listed
+# These need to be passed in from global, not from a bbappend
+FILESEXTRAPATHS:prepend := "${@'%s:' % os.path.dirname(d.getVar('CONFIG_DTFILE') or '') if (d.getVar('CONFIG_DTFILE')) else ''}"
+SRC_URI:append := " ${@'file://%s' % os.path.basename(d.getVar('CONFIG_DTFILE') or '') if (d.getVar('CONFIG_DTFILE')) else ''}"
 
 SRC_URI:append = " ${@" ".join(["file://%s" % f for f in (d.getVar('EXTRA_DT_FILES') or "").split()])}"
 SRC_URI:append = " ${@" ".join(["file://%s" % f for f in (d.getVar('EXTRA_OVERLAYS') or "").split()])}"
@@ -131,14 +135,6 @@ def check_devicetree_variables(d):
 
     if not d.getVar('CONFIG_DTFILE'):
         raise bb.parse.SkipRecipe("CONFIG_DTFILE or SYSTEM_DTFILE is not defined.")
-    else:
-        if not os.path.exists(d.getVar('CONFIG_DTFILE')):
-            if not d.getVar('WITHIN_EXT_SDK'):
-                raise bb.parse.SkipRecipe("The device tree %s is not available." % d.getVar('CONFIG_DTFILE'))
-        else:
-            d.appendVar('SRC_URI', ' file://${CONFIG_DTFILE}')
-            d.setVarFlag('do_install', 'file-checksums', '${CONFIG_DTFILE}:True')
-            d.setVarFlag('do_deploy', 'file-checksums', '${CONFIG_DTFILE}:True')
 
 python() {
     # Need to allow bbappends to change the check
