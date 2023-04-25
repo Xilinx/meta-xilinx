@@ -9,6 +9,11 @@ LIC_FILES_CHKSUM = " \
 		file://${COMMON_LICENSE_DIR}/GPL-2.0-or-later;md5=fed54355545ffd980b814dab4a3b312c \
 		"
 
+# Since we're not based on a kernel default to nothing.
+# This needs to be before the devicetree inherit, as it configured for use
+# with a linux kernel by default.
+KERNEL_INCLUDE ?= ""
+
 inherit devicetree image-artifact-names
 
 # Fall back to SYSTEM_DTFILE if specified...
