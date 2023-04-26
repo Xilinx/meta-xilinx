@@ -13,7 +13,7 @@ EMBEDDEDSW_BRANCHARG ?= "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH'
 EMBEDDEDSW_SRCURI ?= "${REPO};${EMBEDDEDSW_BRANCHARG}"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM[xlnx_rel_v2023.1-next] = '15386ea7656d3b83815bce88c0bbe66d'
+LIC_FILES_CHKSUM[xlnx_rel_v2023.1-next] = '3c310a3ee2197a4c92c6a0e2937c207c'
 LIC_FILES_CHKSUM ??= "file://license.txt;md5=${@d.getVarFlag('LIC_FILES_CHKSUM', d.getVar('BRANCH')) or '0'}"
 
 SRC_URI = "${EMBEDDEDSW_SRCURI}"
