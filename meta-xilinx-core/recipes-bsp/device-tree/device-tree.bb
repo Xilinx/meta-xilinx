@@ -23,6 +23,8 @@ inherit devicetree image-artifact-names
 SYSTEM_DTFILE ??= ""
 CONFIG_DTFILE ??= "${SYSTEM_DTFILE}"
 
+BASE_DTS ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE') or '').rstrip('.dtb').rstrip('.dts') or 'system-top'}"
+
 EXTRA_DT_FILES ?= ""
 EXTRA_DTFILE_PREFIX ?= "system-top"
 EXTRA_DTFILES_BUNDLE ?= ""
@@ -55,7 +57,7 @@ PROVIDES = "virtual/dtb"
 # common zynq include
 SRC_URI:append:zynq = " file://zynq-7000-qspi-dummy.dtsi"
 
-DTB_FILE_NAME = "${@os.path.basename(d.getVar('CONFIG_DTFILE')).replace('.dts', '.dtb') if d.getVar('CONFIG_DTFILE') else ''}"
+DTB_FILE_NAME ?= "${BASE_DTS}.dtb"
 
 DTB_BASE_NAME ?= "${MACHINE}-system${IMAGE_VERSION_SUFFIX}"
 
