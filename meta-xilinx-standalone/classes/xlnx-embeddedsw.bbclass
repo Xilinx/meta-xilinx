@@ -8,7 +8,7 @@ ESW_BRANCH[2023.2] = "master-next"
 BRANCH ??= "${@d.getVarFlag('ESW_BRANCH', d.getVar('ESW_VER')) or '${ESW_VER}'}"
 
 ESW_REV[2023.1] = "e24fe92b5517ee447e560790e798cad792f53bab"
-ESW_REV[2023.2] = "0a86a22212eb3ade44ca71f513c4b3fa1d2d17ac"
+ESW_REV[2023.2] = "69b70af59ec418d5c4d6e108b5bc7e537a181813"
 SRCREV ??= "${@d.getVarFlag('ESW_REV', d.getVar('ESW_VER')) or '${AUTOREV}'}"
 
 EMBEDDEDSW_BRANCHARG ?= "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
@@ -16,7 +16,7 @@ EMBEDDEDSW_SRCURI ?= "${REPO};${EMBEDDEDSW_BRANCHARG}"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM[xlnx_rel_v2023.1] = '3c310a3ee2197a4c92c6a0e2937c207c'
-LIC_FILES_CHKSUM[master-next] = '15386ea7656d3b83815bce88c0bbe66d'
+LIC_FILES_CHKSUM[master-next] = '3c310a3ee2197a4c92c6a0e2937c207c'
 LIC_FILES_CHKSUM ??= "file://license.txt;md5=${@d.getVarFlag('LIC_FILES_CHKSUM', d.getVar('BRANCH')) or '0'}"
 
 SRC_URI = "${EMBEDDEDSW_SRCURI}"
