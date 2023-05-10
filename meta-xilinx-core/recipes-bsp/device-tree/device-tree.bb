@@ -95,7 +95,7 @@ devicetree_do_compile:append() {
 
     dtb_file = d.getVar('DTB_FILE_NAME') or ''
     if not dtb_file or not os.path.isfile(dtb_file):
-        return
+        bb.error("Expected file ${DTB_FILE_NAME} doesn't exist")
 
     if d.getVar('EXTRA_DTFILES_BUNDLE'):
         ccdtb_prefix = d.getVar('EXTRA_DTFILE_PREFIX')
