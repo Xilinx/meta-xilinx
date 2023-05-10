@@ -59,13 +59,31 @@ DTB_FILE_NAME = "${@os.path.basename(d.getVar('CONFIG_DTFILE')).replace('.dts', 
 
 DTB_BASE_NAME ?= "${MACHINE}-system${IMAGE_VERSION_SUFFIX}"
 
-do_configure:append () {
-    for f in ${EXTRA_DT_FILES}; do
-        cp ${WORKDIR}/${f} ${DT_FILES_PATH}/
-    done
+# Copy the EXTRA_DT_FILES and EXTRA_OVERLAYS files in prepend operation so that
+# it can be preprocessed.
+do_configure:prepend () {
+    # Create DT_FILES_PATH directory if doesn't exist during prepend operation.
+    if [ ! -d ${DT_FILES_PATH} ]; then
+        mkdir -p ${DT_FILES_PATH}
+    fi
 
+    for f in ${EXTRA_DT_FILES} ${EXTRA_OVERLAYS}; do
+        if [ "$(realpath ${WORKDIR}/${f})" != "$(realpath ${DT_FILES_PATH}/`basename ${f}`)" ]; then
+            cp ${WORKDIR}/${f} ${DT_FILES_PATH}/
+        fi
+    done
+}
+
+do_configure:append () {
     for f in ${EXTRA_OVERLAYS}; do
-        cp ${WORKDIR}/${f} ${DT_FILES_PATH}/
+        if [ ! -e ${DT_FILES_PATH}/${BASE_DTS}.dts ]; then
+            if [ -e ${DT_FILES_PATH}/${BASE_DTS}.dtb ]; then
+                bberror "Unable to find ${BASE_DTS}.dts, to use EXTRA_OVERLAYS you must use a 'dts' and not 'dtb' in CONFIG_DTFILE"
+            else
+                bberror "Unable to find ${BASE_DTS}.dts, to use EXTRA_OVERLAYS you must set a valid CONFIG_DTFILE or use system-top.dts"
+            fi
+            exit 1
+        fi
         echo "/include/ \"$f\"" >> ${DT_FILES_PATH}/${BASE_DTS}.dts
     done
 }
