@@ -14,7 +14,7 @@ def set_openamp_extra_overlays(d):
     distro_features = d.getVar('DISTRO_FEATURES', True)
     enable_openamp_dtsi = d.getVar('ENABLE_OPENAMP_DTSI')
     if 'openamp' in distro_features and enable_openamp_dtsi == '1':
-        return d.getVar('OPENAMP_EXTRA_OVERLAYS', True)
+        return ' ${OPENAMP_EXTRA_OVERLAYS}'
     else:
         return ''
 
