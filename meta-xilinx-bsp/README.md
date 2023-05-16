@@ -43,7 +43,7 @@ The following boards are supported by the meta-xilinx-bsp layer:
 |            | [VCK5000](https://www.xilinx.com/products/boards-and-kits/vck5000.html)       | [vck5000-versal](conf/machine/vck5000-versal.conf)           | `vck5000-versal`      | `versal-vck5000-reva-x-ebm-01-reva` | No          | No        |
 |            | [VPK120](https://www.xilinx.com/products/boards-and-kits/vpk120.html)         | [vpk120-versal](conf/machine/vpk120-versal.conf)             | `vpk120-versal`       | `versal-vpk120-reva`                | Yes         | Yes       |
 |            | [VPK180](https://www.xilinx.com/products/boards-and-kits/vpk180.html)         | [vpk180-versal](conf/machine/vpk180-versal.conf)             | `vpk180-versal`       | `versal-vpk180-reva`                | Yes         | Yes       |
-|            | [VEK280](https://www.xilinx.com/products/boards-and-kits/vek280.html)         | [vek280-versal](conf/machine/vek280-versal.conf)             | `vek280-versal`       | `versal-vek280-reva`                | Yes         | Yes       |
+|            | [VEK280](https://www.xilinx.com/products/boards-and-kits/vek280.html)         | [vek280-versal](conf/machine/vek280-versal.conf)             | `vek280-versal`       | `versal-vek280-revb`                | Yes         | Yes       |
 |            | [VHK158](https://www.xilinx.com/products/boards-and-kits/vhk158.html)         | [vhk158-versal](conf/machine/vhk158-versal.conf)             | `vhk158-versal`       | `versal-vhk158-reva`                | Yes         | Yes       |
 
 > **Note:** Additional information on Xilinx architectures can be found at:
