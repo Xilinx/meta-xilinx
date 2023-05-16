@@ -51,7 +51,7 @@ do
 		fi
 		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ - @@DEVICETREE_ADDRESS@@
 	fi
-	if test "${boot_target}" = "xspi0" || test "${boot_target}" = "qspi" || test "${boot_target}" = "qspi0"; then
+	if test "${boot_target}" = "xspi0" || test "${boot_target}" = "xspi1" || test "${boot_target}" = "qspi" || test "${boot_target}" = "qspi0"; then
 		sf probe 0 0 0;
 		sf read @@FIT_IMAGE_LOAD_ADDRESS@@ @@QSPI_FIT_IMAGE_OFFSET@@ @@QSPI_FIT_IMAGE_SIZE@@
 		bootm @@FIT_IMAGE_LOAD_ADDRESS@@;
