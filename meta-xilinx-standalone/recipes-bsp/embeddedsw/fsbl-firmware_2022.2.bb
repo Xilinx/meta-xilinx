@@ -3,7 +3,7 @@ require fsbl-firmware.inc
 FILESPATH .= ":${FILE_DIRNAME}/embeddedsw"
 
 SRC_URI += " \
-            file://makefile-skip-copy_bsp.sh.patch \
+            file://${ESW_VER}/makefile-skip-copy_bsp.sh.patch \
             file://fsbl-fixups.patch \
            "
 
