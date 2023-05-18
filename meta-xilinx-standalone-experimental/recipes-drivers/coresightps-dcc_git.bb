@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "coresightps-dcc"
+REQUIRED_MACHINE_FEATURES = "coresightps-dcc"
 
 inherit esw python3native
 

@@ -49,6 +49,7 @@ do_configure:prepend() {
     else
         bbwarn "Using the default psu_init.h, this may not work correctly."
     fi
+    install -m 0644 ${S}/cmake/UserConfig.cmake ${S}/${ESW_COMPONENT_SRC}
 }
 
 do_install() {

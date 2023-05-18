@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "wdtps"
+REQUIRED_MACHINE_FEATURES = "wdtps"
 
 inherit esw python3native
 

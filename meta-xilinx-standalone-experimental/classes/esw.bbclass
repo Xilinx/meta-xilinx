@@ -26,7 +26,7 @@ COMPATIBLE_HOST = ".*-elf"
 COMPATIBLE_HOST:arm = "[^-]*-[^-]*-eabi"
 
 CONFIG_DTFILE ??= ""
-DTS_FILE = "${DEPLOY_DIR_IMAGE}/devicetree/${@os.path.basename(d.getVar('CONFIG_DTFILE'))}"
+DTS_FILE = "${DEPLOY_DIR_IMAGE}/devicetree/${@os.path.basename(d.getVar('CONFIG_DTFILE').replace('.dts','.dtb'))}"
 
 DEPENDS += "python3-pyyaml-native lopper-native device-tree python3-dtc-native"
 
@@ -48,9 +48,9 @@ def get_xlnx_cmake_machine(fam, d):
 def get_xlnx_cmake_processor(tune, machine, d):
     cmake_processor = tune
     if tune.startswith('microblaze'):
-        if (machine == 'microblaze-pmu'):
+        if (machine == 'psu_pmu_0'):
             cmake_processor = 'pmu_microblaze'
-        elif (machine == 'microblaze-plm'):
+        elif (machine == 'psv_pmc_0'):
             cmake_processor = 'plm_microblaze'
         else:
             cmake_processor = 'microblaze'
@@ -79,6 +79,11 @@ cmake_do_generate_toolchain_file:append() {
     # Will need this in the future to make cmake understand esw variables
     # set( CMAKE_SYSTEM_NAME `echo elf | sed -e 's/^./\u&/' -e 's/^\(Linux\).*/\1/'` )
     set( CMAKE_SYSTEM_NAME "${XLNX_CMAKE_SYSTEM_NAME}" )
+    set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${S}/cmake)
+    set( CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_LIBDIR})
+    if ("${XLNX_CMAKE_PROCESSOR}" STREQUAL "plm_microblaze")
+        set( CMAKE_BUILD_TYPE Release)
+    endif()
     add_definitions( "${XLNX_CMAKE_BSP_VARS}" )
 EOF
 }
@@ -119,7 +124,7 @@ python do_generate_driver_data() {
     src_dir = glob.glob(d.getVar('OECMAKE_SOURCEPATH'))
     machine = d.getVar('ESW_MACHINE')
 
-    driver_name = d.getVar('REQUIRED_DISTRO_FEATURES')
+    driver_name = d.getVar('REQUIRED_MACHINE_FEATURES')
 
     if len(system_dt) == 0:
         bb.error("Couldn't find device tree %s" % d.getVar('DTS_FILE'))

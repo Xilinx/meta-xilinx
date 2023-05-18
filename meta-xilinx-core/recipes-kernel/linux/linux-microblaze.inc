@@ -1,5 +1,4 @@
 SRC_URI += " \
-    file://mb-no-tree-loop-distribute-patterns.patch \
     file://microblaze_generic.cfg \
     "
 

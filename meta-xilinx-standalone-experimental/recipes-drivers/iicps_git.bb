@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "iicps"
+REQUIRED_MACHINE_FEATURES = "iicps"
 
 inherit esw python3native
 

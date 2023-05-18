@@ -1,6 +1,6 @@
 inherit features_check
   
-REQUIRED_DISTRO_FEATURES = "uartns550"
+REQUIRED_MACHINE_FEATURES = "uartns550"
 
 inherit esw python3native
 

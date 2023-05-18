@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "tmr-manager"
+REQUIRED_MACHINE_FEATURES = "tmr-manager"
 
 inherit esw python3native
 

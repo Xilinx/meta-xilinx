@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "dpdma"
+REQUIRED_MACHINE_FEATURES = "dpdma"
 
 inherit esw python3native
 

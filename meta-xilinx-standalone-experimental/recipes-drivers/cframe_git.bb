@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "cframe"
+REQUIRED_MACHINE_FEATURES = "cframe"
 
 inherit esw python3native
 

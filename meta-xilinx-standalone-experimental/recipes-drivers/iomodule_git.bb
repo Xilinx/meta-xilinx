@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "iomodule"
+REQUIRED_MACHINE_FEATURES = "iomodule"
 
 inherit esw python3native
 

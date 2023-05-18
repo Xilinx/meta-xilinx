@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "qspipsu"
+REQUIRED_MACHINE_FEATURES = "qspipsu"
 
 inherit esw python3native
 

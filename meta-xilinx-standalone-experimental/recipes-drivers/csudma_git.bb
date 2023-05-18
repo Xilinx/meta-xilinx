@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "csudma"
+REQUIRED_MACHINE_FEATURES = "csudma"
 
 inherit esw python3native
 

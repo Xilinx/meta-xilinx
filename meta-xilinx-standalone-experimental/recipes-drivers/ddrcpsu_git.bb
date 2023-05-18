@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "ddrcpsu"
+REQUIRED_MACHINE_FEATURES = "ddrcpsu"
 
 inherit esw python3native
 

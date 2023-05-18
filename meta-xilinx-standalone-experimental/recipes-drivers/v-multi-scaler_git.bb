@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "v-multi-scaler"
+REQUIRED_MACHINE_FEATURES = "v-multi-scaler"
 
 inherit esw python3native
 

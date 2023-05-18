@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "rtcpsu"
+REQUIRED_MACHINE_FEATURES = "rtcpsu"
 
 inherit esw python3native
 

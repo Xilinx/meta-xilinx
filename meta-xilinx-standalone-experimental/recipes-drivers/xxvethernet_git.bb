@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "xxvethernet"
+REQUIRED_MACHINE_FEATURES = "xxvethernet"
 
 inherit esw python3native
 

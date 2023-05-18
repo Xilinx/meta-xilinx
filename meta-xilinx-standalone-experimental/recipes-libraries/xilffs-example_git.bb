@@ -1,7 +1,7 @@
 inherit esw deploy
 
 # Requires by dependency xilffs
-REQUIRED_DISTRO_FEATURES = "sdps"
+REQUIRED_MACHINE_FEATURES = "sdps"
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilffs/examples/"
 
@@ -11,7 +11,6 @@ do_configure:prepend() {
     (
     cd ${S}
     lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
-    install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
     )
 }

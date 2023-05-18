@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "v-letterbox"
+REQUIRED_MACHINE_FEATURES = "v-letterbox"
 
 inherit esw python3native
 

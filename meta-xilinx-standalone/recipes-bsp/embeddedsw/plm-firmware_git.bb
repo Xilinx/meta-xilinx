@@ -3,7 +3,14 @@ DEFAULT_PREFERENCE = "-1"
 
 require plm-firmware.inc
 
-FILESPATH .= ":${FILE_DIRNAME}/embeddedsw"
+# Separate build directories for versal and versal-net
+SOC_DIR = "versal"
+SOC_DIR:versal-net = "versal_net"
+B = "${S}/lib/sw_apps/versal_plm/src/${SOC_DIR}"
+
+BSP_DIR ?= "${B}/../../misc/versal_plm_bsp"
+
+FILESPATH .= ":${FILE_DIRNAME}/embeddedsw/2023.1:${FILE_DIRNAME}/embeddedsw"
 
 SRC_URI += " \
             file://makefile-skip-copy_bsp.sh.patch \
@@ -11,6 +18,12 @@ SRC_URI += " \
            "
 
 EXTRA_COMPILER_FLAGS = "-g -ffunction-sections -fdata-sections -Wall -Wextra -Os -flto -ffat-lto-objects"
+
+do_configure() {
+    # manually do the copy_bsp step first, so as to be able to fix up use of
+    # mb-* commands
+    ${B}/../../misc/${SOC_DIR}/copy_bsp.sh
+}
 
 do_compile() {
     oe_runmake

@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "ospipsv"
+REQUIRED_MACHINE_FEATURES = "ospipsv"
 
 inherit esw python3native
 

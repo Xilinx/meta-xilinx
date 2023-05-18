@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "v-csc"
+REQUIRED_MACHINE_FEATURES = "v-csc"
 
 inherit esw python3native
 

@@ -1,8 +1,10 @@
 /*
  * Copyright (c) 2020 Xilinx Inc. All rights reserved.
+ * Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
  *
  * Author:
- *       Bruce Ashfield <bruce.ashfield@xilinx.com>
+ *       Bruce Ashfield <bruce.ashfield@amd.com>
+ *       Mark Hatle <mark.hatle@amd.com>
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -38,13 +40,16 @@
                                            n.tunes = OrderedDict()
                                            n.tunes['microblaze'] = 'microblaze'
                                            n.tunes['version'] = 'v9.2'
+                                           n.tune_type = val.split('-')[0]
 
-                                        if val == 'pmc-microblaze' or val == 'psm-microblaze':
+                                        elif val == 'pmc-microblaze' or val == 'psm-microblaze':
                                            n.tunes = OrderedDict()
                                            n.tunes['microblaze'] = 'microblaze'
                                            n.tunes['version'] = 'v10.0'
+                                           n.tune_type = val.split('-')[0]
 
-                                        n.tune_type = val
+                                        else:
+                                           n.tune_type = re.split('@', n.name)[0]
                         ";
                       };
                 };
@@ -225,18 +230,16 @@
                            compatible = "system-device-tree-v1,lop,code-v1";
                            code = "
                                cpu_addr = 0
+                               firmware_cpus = {}
                                for n in __selected__:
-                                   tname = re.split('@', n.name)
-                                   tname = tname[0]+str(cpu_addr)
-                                   cpu_addr += 1
-                                   print( 'AVAILTUNES += \"microblaze-%s\"' % tname )
-                                   print( 'TUNE_FEATURES:tune-microblaze-%s = \"' % tname, end='' )
-                                   for t in n.tunes.values():
-                                       print( ' %s' % t, end='' )
-                                   print( '\"' )
-                                   print( 'PACKAGE_EXTRA_ARCHS:tune-microblaze-%s = \"${TUNE_PKGARCH}\"' % tname )
-                                   print( 'TUNE_FEATURES:tune-%s = \"${TUNE_FEATURES:tune-microblaze-%s}\"\\n' % (n.tune_type,tname) )
-
+                                   tname = 'microblaze-'+n.tune_type
+                                   if n.tune_type == 'cpu':
+                                       tname = tname + str(cpu_addr)
+                                       cpu_addr += 1
+                                   print( '# %s\\n#   compatible = \"%s\";' % (n, n['compatible'].value[0]))
+                                   print( 'AVAILTUNES += \"%s\"' % tname )
+                                   print( 'TUNE_FEATURES:tune-%s = \"%s\"' % (tname, ' '.join(n.tunes.values())))
+                                   print( 'PACKAGE_EXTRA_ARCHS:tune-%s = \"${TUNE_PKGARCH}\"\\n' % tname )
                                ";
                       };
                 };

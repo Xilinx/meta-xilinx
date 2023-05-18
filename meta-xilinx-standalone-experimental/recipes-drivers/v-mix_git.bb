@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "v-mix"
+REQUIRED_MACHINE_FEATURES = "v-mix"
 
 inherit esw python3native
 

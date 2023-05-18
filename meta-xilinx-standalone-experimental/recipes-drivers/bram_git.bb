@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "bram"
+REQUIRED_MACHINE_FEATURES = "bram"
 
 inherit esw python3native
 

@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "avbuf"
+REQUIRED_MACHINE_FEATURES = "avbuf"
 
 inherit esw
 
