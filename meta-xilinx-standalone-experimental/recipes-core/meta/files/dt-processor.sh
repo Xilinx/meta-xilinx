@@ -970,10 +970,10 @@ EOF
 
   cat <<EOF >>"${conf_file}"
 # Enable the correct version of the firmware components
-PREFERRED_VERSION_fsbl-firmware = "2023.1_sdt_experimental%"
-PREFERRED_VERSION_pmu-firmware = "2023.1_sdt_experimental%"
-PREFERRED_VERSION_plm-firmware = "2023.1_sdt_experimental%"
-PREFERRED_VERSION_psm-firmware = "2023.1_sdt_experimental%"
+PREFERRED_VERSION_fsbl-firmware = "2023_sdt_experimental%"
+PREFERRED_VERSION_pmu-firmware = "2023_sdt_experimental%"
+PREFERRED_VERSION_plm-firmware = "2023_sdt_experimental%"
+PREFERRED_VERSION_psm-firmware = "2023_sdt_experimental%"
 
 # Exclude BASE_TMPDIR from hash calculations
 BB_HASHEXCLUDE_COMMON:append = " BASE_TMPDIR"
