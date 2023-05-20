@@ -37,14 +37,11 @@ The following boards are supported by the meta-xilinx-bsp layer:
 |            | [ZCU1285](https://www.xilinx.com/products/boards-and-kits/zcu1285.html)       | [zcu1285-zynqmp](conf/machine/zcu1285-zynqmp.conf)           | `zcu1285-zynqmp`      | `zcu1285-reva`                      | Yes         | Yes       |
 |            | [ZCU208](https://www.xilinx.com/products/boards-and-kits/zcu208.html)         | [zcu208-zynqmp](conf/machine/zcu208-zynqmp.conf)             | `zcu208-zynqmp`       | `zcu208-reva`                       | Yes         | Yes       |
 |            | [ZCU216](https://www.xilinx.com/products/boards-and-kits/zcu216.html)         | [zcu216-zynqmp](conf/machine/zcu216-zynqmp.conf)             | `zcu216-zynqmp`       | `zcu216-reva`                       | Yes         | Yes       |
-|            | [ZCU670](https://www.xilinx.com/products/boards-and-kits/zcu670.html)         | [zcu670-zynqmp](conf/machine/zcu670-zynqmp.conf)             | `zcu670-zynqmp`       | `zcu670-revb`                       | Yes         | Yes       |
 | Versal     | [VCK190](https://www.xilinx.com/products/boards-and-kits/vck190.html)         | [vck190-versal](conf/machine/vck190-versal.conf)             | `vck190-versal`       | `versal-vck190-reva-x-ebm-01-reva`  | Yes         | Yes       |
 |            | [VMK180](https://www.xilinx.com/products/boards-and-kits/vmk180.html)         | [vmk180-versal](conf/machine/vmk180-versal.conf)             | `vmk180-versal`       | `versal-vmk180-reva-x-ebm-01-reva`  | Yes         | Yes       |
-|            | [VCK5000](https://www.xilinx.com/products/boards-and-kits/vck5000.html)       | [vck5000-versal](conf/machine/vck5000-versal.conf)           | `vck5000-versal`      | `versal-vck5000-reva-x-ebm-01-reva` | No          | No        |
 |            | [VPK120](https://www.xilinx.com/products/boards-and-kits/vpk120.html)         | [vpk120-versal](conf/machine/vpk120-versal.conf)             | `vpk120-versal`       | `versal-vpk120-reva`                | Yes         | Yes       |
 |            | [VPK180](https://www.xilinx.com/products/boards-and-kits/vpk180.html)         | [vpk180-versal](conf/machine/vpk180-versal.conf)             | `vpk180-versal`       | `versal-vpk180-reva`                | Yes         | Yes       |
 |            | [VEK280](https://www.xilinx.com/products/boards-and-kits/vek280.html)         | [vek280-versal](conf/machine/vek280-versal.conf)             | `vek280-versal`       | `versal-vek280-reva`                | Yes         | Yes       |
-|            | [VHK158](https://www.xilinx.com/products/boards-and-kits/vhk158.html)         | [vhk158-versal](conf/machine/vhk158-versal.conf)             | `vhk158-versal`       | `versal-vhk158-reva`                | Yes         | Yes       |
 
 > **Note:** Additional information on Xilinx architectures can be found at:
 	https://www.xilinx.com/products/silicon-devices.html
