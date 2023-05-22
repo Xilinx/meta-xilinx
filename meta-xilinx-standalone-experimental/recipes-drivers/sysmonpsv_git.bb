@@ -1,10 +1,10 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "sysmonpsv"
+REQUIRED_MACHINE_FEATURES = "sysmonpsv"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone ${@'scugic' if d.getVar('ESW_MACHINE') != 'microblaze-plm' and d.getVar('ESW_MACHINE') != 'microblaze-psm' else ''}"
+DEPENDS += "xilstandalone ${@'scugic' if d.getVar('ESW_MACHINE') != 'psv_pmc_0' and d.getVar('ESW_MACHINE') != 'psv_psm_0' else ''}"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/sysmonpsv/src/"
 ESW_COMPONENT_NAME = "libsysmonpsv.a"

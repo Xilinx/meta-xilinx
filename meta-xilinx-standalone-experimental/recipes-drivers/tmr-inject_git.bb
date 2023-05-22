@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "tmr-inject"
+REQUIRED_MACHINE_FEATURES = "tmr-inject"
 
 inherit esw python3native
 

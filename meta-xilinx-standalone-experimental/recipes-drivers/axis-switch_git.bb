@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "axis-switch"
+REQUIRED_MACHINE_FEATURES = "axis-switch"
 
 inherit esw python3native
 

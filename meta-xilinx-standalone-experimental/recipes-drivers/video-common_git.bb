@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "video-common"
+REQUIRED_MACHINE_FEATURES = "video-common"
 
 inherit esw
 

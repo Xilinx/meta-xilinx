@@ -31,4 +31,4 @@ This layer depends on:
         https://git.yoctoproject.org/meta-xilinx (official version)
         https://github.com/Xilinx/meta-xilinx (development and amd xilinx release)
 	layers: meta-xilinx-microblaze, meta-xilinx-core, meta-xilinx-vendor
-	branch: langdale or amd xilinx release version (e.g. rel-v2022.2)
+	branch: langdale or amd xilinx release version (e.g. rel-v2023.1)

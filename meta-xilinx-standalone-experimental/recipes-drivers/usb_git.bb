@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "usb"
+REQUIRED_MACHINE_FEATURES = "usb"
 
 inherit esw python3native
 

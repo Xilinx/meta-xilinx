@@ -179,8 +179,8 @@ IMAGE_INSTALL:append = " \
 
 * ZynqMP
 ```
-yocto-zynqmp-generic-20222:~$ sudo su
-yocto-zynqmp-generic-20222:/home/petalinux# cat /proc/interrupts
+yocto-zynqmp-generic-20231:~$ sudo su
+yocto-zynqmp-generic-20231:/home/petalinux# cat /proc/interrupts
            CPU0       CPU1       CPU2       CPU3
  11:      13309      13021      13673      14170     GICv2  30 Level     arch_timer
  14:          0          0          0          0     GICv2  67 Level     zynqmp_ipi
@@ -230,7 +230,7 @@ IPI4:         0          0          0          0       Timer broadcast interrupt
 IPI5:         0          0          0          0       IRQ work interrupts
 IPI6:         0          0          0          0       CPU wake-up interrupts
 Err:          0
-yocto-zynqmp-generic-20222:/home/petalinux# tree /lib/firmware/
+yocto-zynqmp-generic-20231:/home/petalinux# tree /lib/firmware/
 /lib/firmware/
 `-- xilinx
     `-- zcu111-pl-demo
@@ -238,7 +238,7 @@ yocto-zynqmp-generic-20222:/home/petalinux# tree /lib/firmware/
         `-- zcu111-pl-demo.dtbo
 
 2 directories, 2 files
-yocto-zynqmp-generic-20222:/home/petalinux# fpgautil -b /lib/firmware/xilinx/zcu111-pl-demo/zcu111-pl-demo.bit -o /lib/firmware/xilinx/zcu111-pl-demo/zcu111-pl-demo.dtbo
+yocto-zynqmp-generic-20231:/home/petalinux# fpgautil -b /lib/firmware/xilinx/zcu111-pl-demo/zcu111-pl-demo.bit -o /lib/firmware/xilinx/zcu111-pl-demo/zcu111-pl-demo.dtbo
 [   91.039773] fpga_manager fpga0: writing zcu111-pl-demo.bit to Xilinx ZynqMP FPGA Manager
 [   91.528214] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /fpga-full/firmware-name
 [   91.538354] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /fpga-full/pid
@@ -259,13 +259,13 @@ yocto-zynqmp-generic-20222:/home/petalinux# fpgautil -b /lib/firmware/xilinx/zcu
 [   91.906539] input: pl-gpio-keys as /devices/platform/pl-gpio-keys/input/input1
 Time taken to load BIN is 901.000000 Milli Seconds
 BIN FILE loaded through FPGA manager successfully
-yocto-zynqmp-generic-20222:/home/petalinux#
+yocto-zynqmp-generic-20231:/home/petalinux#
 ```
 * Versal (DFx Static)
 ```
-yocto-vck190-dfx-2022:~$ sudo su
-root@yocto-vck190-dfx-2022:~# 
-root@yocto-vck190-dfx-2022:~# fpgautil -o /lib/firmware/xilinx/vck190-dfx-static/vck190-dfx-static.dtbo
+yocto-vck190-dfx-2023:~$ sudo su
+root@yocto-vck190-dfx-2023:~# 
+root@yocto-vck190-dfx-2023:~# fpgautil -o /lib/firmware/xilinx/vck190-dfx-static/vck190-dfx-static.dtbo
 [  257.555571] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /fpga/external-fpga-config
 [  257.565879] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /fpga/pid
 [  257.574670] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /fpga/uid
@@ -279,11 +279,11 @@ root@yocto-vck190-dfx-2022:~# fpgautil -o /lib/firmware/xilinx/vck190-dfx-static
 [  257.663234] of-fpga-region fpga:fpga-PR0: FPGA Region probed
 [  257.669135] of-fpga-region fpga:fpga-PR1: FPGA Region probed
 [  257.675022] of-fpga-region fpga:fpga-PR2: FPGA Region probed
-root@yocto-vck190-dfx-2022:~#
+root@yocto-vck190-dfx-2023:~#
 ```
 * Versal (DFx RP)
 ```
-root@yocto-vck190-dfx-2022:~# fpgautil -b /lib/firmware/xilinx/vck190-dfx-static/rp1/vck190-dfx-rp1rm1-dipsw/vck190-dfx-rp1rm1-dipsw.pdi -o /lib/firmware/xilinx/vck190-dfx-static/rp1/vck190-dfx-rp1rm1-dipsw/vck190-dfx-rp1rm1-dipsw.dtbo -f Partial -n PR0
+root@yocto-vck190-dfx-2023:~# fpgautil -b /lib/firmware/xilinx/vck190-dfx-static/rp1/vck190-dfx-rp1rm1-dipsw/vck190-dfx-rp1rm1-dipsw.pdi -o /lib/firmware/xilinx/vck190-dfx-static/rp1/vck190-dfx-rp1rm1-dipsw/vck190-dfx-rp1rm1-dipsw.dtbo -f Partial -n PR0
 [  273.511455] fpga_manager fpga0: writing vck190-dfx-rp1rm1-dipsw.pdi to Xilinx Versal FPGA Manager
 [284052.461]Loading PDI from DDR
 [284052.566]Monolithic/Master Device
@@ -314,7 +314,7 @@ root@yocto-vck190-dfx-2022:~# fpgautil -b /lib/firmware/xilinx/vck190-dfx-static
 [  273.670490] input: pl-gpio-keys as /devices/platform/pl-gpio-keys/input/input0
 Time taken to load BIN is 171.000000 Milli Seconds
 BIN FILE loaded through FPGA manager successfully
-root@yocto-vck190-dfx-2022:~#
+root@yocto-vck190-dfx-2023:~#
 ```
 ---
 
@@ -324,7 +324,7 @@ root@yocto-vck190-dfx-2022:~#
 * Verify PL GPIO DIP switches and Push buttons are registered.
 * Move the DIP Switches ON/OFF and verify the interrupt counts.
 ```
-yocto-zynqmp-generic-20222:/home/petalinux# cat /proc/interrupts
+yocto-zynqmp-generic-20231:/home/petalinux# cat /proc/interrupts
            CPU0       CPU1       CPU2       CPU3
  11:      23303      22971      24203      24990     GICv2  30 Level     arch_timer
  14:          0          0          0          0     GICv2  67 Level     zynqmp_ipi
@@ -387,7 +387,7 @@ IPI4:         0          0          0          0       Timer broadcast interrupt
 IPI5:         0          0          0          0       IRQ work interrupts
 IPI6:         0          0          0          0       CPU wake-up interrupts
 Err:          0
-yocto-zynqmp-generic-20222:/home/petalinux# cat /proc/interrupts
+yocto-zynqmp-generic-20231:/home/petalinux# cat /proc/interrupts
            CPU0       CPU1       CPU2       CPU3
  11:      28169      27725      29250      30190     GICv2  30 Level     arch_timer
  14:          0          0          0          0     GICv2  67 Level     zynqmp_ipi
@@ -450,22 +450,22 @@ IPI4:         0          0          0          0       Timer broadcast interrupt
 IPI5:         0          0          0          0       IRQ work interrupts
 IPI6:         0          0          0          0       CPU wake-up interrupts
 Err:          0
-yocto-zynqmp-generic-20222:/home/petalinux#
+yocto-zynqmp-generic-20231:/home/petalinux#
 ```
 ---
 
 ### Unloading PL bitstream or pdi and dt overlay
 * Zynq or ZynqMP
 ```
-yocto-zynqmp-generic-20222:/home/petalinux# fpgautil -R
+yocto-zynqmp-generic-20231:/home/petalinux# fpgautil -R
 ```
 * Versal (DFx RP)
 ```
-root@yocto-vck190-dfx-2022:~# fpgautil -R -n PR0
+root@yocto-vck190-dfx-2023:~# fpgautil -R -n PR0
 ```
 * Versal (DFx Static)
 ```
-root@yocto-vck190-dfx-2022:~# fpgautil -R -n Full
+root@yocto-vck190-dfx-2023:~# fpgautil -R -n Full
 ```
 ---
 

@@ -11,8 +11,6 @@ SRC_URI = " \
     file://zynqmp-openamp-overlay.dts \
     file://versal-openamp.dtsi \
     file://versal-openamp-overlay.dts \
-    file://versal-net-openamp.dtsi \
-    file://versal-net-openamp-overlay.dts \
 "
 
 # We don't have anything to include from the kernel
@@ -21,7 +19,6 @@ KERNEL_INCLUDE = ""
 COMPATIBLE_MACHINE:zynq = "${MACHINE}"
 COMPATIBLE_MACHINE:zynqmp = "${MACHINE}"
 COMPATIBLE_MACHINE:versal = "${MACHINE}"
-COMPATIBLE_MACHINE:versal-net = "${MACHINE}"
 
 inherit devicetree image-artifact-names features_check
 

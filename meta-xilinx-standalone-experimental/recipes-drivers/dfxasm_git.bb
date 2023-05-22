@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "dfxasm"
+REQUIRED_MACHINE_FEATURES = "dfxasm"
 
 inherit esw python3native
 

@@ -2,7 +2,7 @@ inherit esw deploy features_check
 
 ESW_COMPONENT_SRC = "XilinxProcessorIPLib/drivers/clockps/examples/"
 
-REQUIRED_DISTRO_FEATURES = "clockps"
+REQUIRED_MACHINE_FEATURES = "clockps"
 
 DEPENDS += "libxil xiltimer resetps"
 
@@ -12,7 +12,6 @@ do_configure:prepend() {
     (
     cd ${S}
     lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
-    install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
     )
 }

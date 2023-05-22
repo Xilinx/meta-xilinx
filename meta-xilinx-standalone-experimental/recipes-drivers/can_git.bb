@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "can"
+REQUIRED_MACHINE_FEATURES = "can"
 
 inherit esw python3native
 

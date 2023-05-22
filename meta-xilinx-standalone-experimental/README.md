@@ -14,36 +14,47 @@ parts and pieces.
 **Note:** to use this layer you must REMOVE meta-xilinx-tools from your
 project.  meta-xilinx-tools is not compatible with this experimental
 approach.  You may also have to remove other layers that depend
-on meta-xilinx-tools, such as meta-som.
+on meta-xilinx-tools, such as meta-kria and meta-system-controller.
 
 To use the experimental version of the embedded software (firmware)
 as well as system configuration, you must build the 'meta-xilinx-setup'
-SDK.  This SDK is passed a device tree, constructed from DTG++ and
+SDK.  This SDK is passed a device tree, constructed from System Device tree and
 produces a number of configuration files.
 
-To build the setup SDK:
-
-MACHINE=qemux86-64 bitbake meta-xilinx-setup
-
-To install the setup SDK:
-
-./tmp/deploy/sdk/x86_64-xilinx-nativesdk-prestep-2021.2.sh -d prestep -y
+1. Remove meta-xilinx-tools, meta-kria and meta-system-controller, then add the decoupling layer
+```
+$ bitbake-layers remove-layer meta-xilinx-tools
+$ bitbake-layers remove-layer meta-kria
+$ bitbake-layers remove-layer meta-system-controller
+$ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone-experimental
+```
+2. Build the setup SDK
+```
+$ bitbake meta-xilinx-setup
+```
+3. Install the setup SDK:
+```
+$ .${TMPDIR}/tmp/deploy/sdk/x86_64-xilinx-nativesdk-prestep-2023.1....sh -d prestep -y
+```
 
 Then follow the instructions in the 'prestep/README-setup' file.
-
 
 
 ## Dependencies
 
 This layer depends on:
 
-	URI: git://git.openembedded.org/bitbake
+	URI: https://git.yoctoproject.org/poky
+	layers: meta, meta-poky
+	branch: langdale
 
-	URI: git://git.openembedded.org/openembedded-core
-	layers: meta
-	branch: master or xilinx current release version (e.g. hosister)
+	URI: https://git.openembedded.org/meta-openembedded
+	layers: meta-oe
+	branch: langdale
 
-	URI: git://git.yoctoproject.org/meta-xilinx.git
+	URI:
+        https://git.yoctoproject.org/meta-xilinx (official version)
+        https://github.com/Xilinx/meta-xilinx (development and amd xilinx release)
 	layers: meta-xilinx-core, meta-xilinx-bsp, meta-xilinx-standalone
-	branch: master or xilinx current release version (e.g. hosister)
+	branch: langdale or amd xilinx release version (e.g. rel-v2023.1)
 

@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "clockps"
+REQUIRED_MACHINE_FEATURES = "clockps"
 
 inherit esw
 

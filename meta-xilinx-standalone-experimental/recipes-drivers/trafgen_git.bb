@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "trafgen"
+REQUIRED_MACHINE_FEATURES = "trafgen"
 
 inherit esw python3native
 

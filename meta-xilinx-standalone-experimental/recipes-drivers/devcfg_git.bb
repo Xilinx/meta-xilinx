@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "devcfg"
+REQUIRED_MACHINE_FEATURES = "devcfg"
 
 inherit esw python3native
 

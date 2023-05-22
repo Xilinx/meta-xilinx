@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "pciepsu"
+REQUIRED_MACHINE_FEATURES = "pciepsu"
 
 inherit esw python3native
 

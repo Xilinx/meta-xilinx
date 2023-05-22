@@ -25,8 +25,8 @@ ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/"
 ESW_COMPONENT_NAME = "libxil.a"
 
 DEPENDS += "xilstandalone "
-REQUIRED_DISTRO_FEATURES = "${DISTRO_FEATURES}"
-PACKAGECONFIG ?= "${DISTRO_FEATURES}"
+REQUIRED_MACHINE_FEATURES = "${MACHINE_FEATURES}"
+PACKAGECONFIG ?= "${MACHINE_FEATURES}"
 
 do_configure:prepend() {
     LOPPER_DTC_FLAGS="-b 0 -@" lopper ${DTS_FILE} -- baremetal_xparameters_xlnx.py ${ESW_MACHINE} ${S}
@@ -37,7 +37,7 @@ do_compile() {
    # Combines the .a archives produced by all of the dependent items
    cd ${RECIPE_SYSROOT}/usr/lib/
    echo create libxil.a > libxil.mri
-   for each in ${REQUIRED_DISTRO_FEATURES}; do
+   for each in ${REQUIRED_MACHINE_FEATURES}; do
      each=$(echo $each | sed 's/-/_/g')
      if [ -e lib$each.a ]; then
        echo addlib lib$each.a >> libxil.mri

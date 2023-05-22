@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "axicdma"
+REQUIRED_MACHINE_FEATURES = "axicdma"
 
 inherit esw python3native
 

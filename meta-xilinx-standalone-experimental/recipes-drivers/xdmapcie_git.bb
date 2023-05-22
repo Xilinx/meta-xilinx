@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "xdmapcie"
+REQUIRED_MACHINE_FEATURES = "xdmapcie"
 
 inherit esw python3native
 

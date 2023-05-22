@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "cfupmc"
+REQUIRED_MACHINE_FEATURES = "cfupmc"
 
 inherit esw python3native
 

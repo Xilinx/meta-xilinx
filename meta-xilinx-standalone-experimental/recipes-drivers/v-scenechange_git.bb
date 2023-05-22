@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "v-scenechange"
+REQUIRED_MACHINE_FEATURES = "v-scenechange"
 
 inherit esw python3native
 

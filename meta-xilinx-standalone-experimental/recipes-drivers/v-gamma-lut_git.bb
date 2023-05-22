@@ -1,6 +1,6 @@
 inherit features_check
 
-REQUIRED_DISTRO_FEATURES = "v-gamma-lut"
+REQUIRED_MACHINE_FEATURES = "v-gamma-lut"
 
 inherit esw python3native
 
