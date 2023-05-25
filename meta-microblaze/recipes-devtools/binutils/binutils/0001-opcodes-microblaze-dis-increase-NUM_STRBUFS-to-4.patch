@@ -1,0 +1,29 @@
+From 53429fbdaf5a9253707549d2331a795484d0e413 Mon Sep 17 00:00:00 2001
+From: Stanislas Bach <sbach@0g.re>
+Date: Thu, 15 Sep 2022 14:36:51 -0700
+Subject: [PATCH] opcodes: microblaze-dis: increase 'NUM_STRBUFS' to 4
+
+This commit fixes issues when printing certain instructions in
+'print_insn_microblaze'. Some calls to 'print_call' may include up-to
+four uses of 'get_field_*' functions, where 'strbuf' is called.
+
+As such, to prevent reaching 'abort' and properly print the instruction,
+we increase the number of buffers accordingly to the maximum used.
+
+---
+ opcodes/microblaze-dis.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
+index 54861d2e..c967e9d1 100644
+--- a/opcodes/microblaze-dis.c
++++ b/opcodes/microblaze-dis.c
+@@ -36,7 +36,7 @@
+ #define get_int_field_imml(instr)  ((instr & IMML_MASK) >> IMM_LOW)
+ #define get_int_field_r1(instr)    ((instr & RA_MASK) >> RA_LOW)
+ 
+-#define NUM_STRBUFS 3
++#define NUM_STRBUFS 4
+ #define STRBUF_SIZE 25
+ 
+ struct string_buf
