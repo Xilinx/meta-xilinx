@@ -143,6 +143,8 @@ do_blob_generate () {
 			bbnote "Node ${DT_BLOB_DIR}/${DTB} with ${DT_BLOB_DIR}/${DUP_DTB}"
 			dtblob_emit_config "${its_filename}" "$DTB" "$DUP_DTB" "$dtbcount"
 			dtbcount=`expr $dtbcount + 1`
+        else
+            bberror "CC_DTBS_DUP file not found ${DT_BLOB_DIR}/${DTB}.dtb"
 		fi
 	done
 
