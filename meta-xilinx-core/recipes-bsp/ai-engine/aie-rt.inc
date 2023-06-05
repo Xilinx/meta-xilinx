@@ -3,7 +3,7 @@ SECTION	= "libs"
 REPO ?= "git://github.com/Xilinx/aie-rt.git;protocol=https"
 
 BRANCH ?= "xlnx_rel_v2023.1"
-SRCREV ?= "c0f2192b995142c896d817f7e501e226c9b84ee0"
+SRCREV ?= "1ad203de0b7f282b1c0659fd2ae3f218652c7274"
 
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM ?= "file://license.txt;md5=b81abf1f508952331dd7d2ab36408f5b"
