@@ -1126,9 +1126,9 @@ BASE_TMPDIR ?= "\${TOPDIR}"
 
 # The following is the full set of multiconfigs for this configuration
 # A large list can cause a slow parse.
-BBMULTICONFIG ?= "${multiconf}"
+#BBMULTICONFIG ?= "${multiconf}"
 # Alternatively trim the list to the minimum
-#BBMULTICONFIG = "${multiconf_min}"
+BBMULTICONFIG = "${multiconf_min}"
 EOF
 }
 
