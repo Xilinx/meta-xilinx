@@ -49,4 +49,7 @@ PACKAGECONFIG ??= " \
 "
 PACKAGECONFIG:class-nativesdk ??= "fdt sdl kvm gcrypt pie slirp"
 
+# Disable this
+PACKAGECONFIG[debuginfo] = ""
+
 DISABLE_STATIC:pn-${PN} = ""
