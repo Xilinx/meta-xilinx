@@ -1,4 +1,4 @@
-DESCRIPTION = "Intel(r) Data Plane Development Kit"
+DESCRIPTION = "Data Plane Development Kit"
 HOMEPAGE = "http://dpdk.org"
 
 LICENSE = "BSD-3-Clause & LGPL-2.1-only & GPL-2.0-only"

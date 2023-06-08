@@ -1,28 +1,20 @@
 include dpdk.inc
 
-SRC_URI = "git://dpdk.org/git/dpdk;branch=${BRANCH};protocol=https \
-           file://0001-meson.build-march-and-mcpu-already-passed-by-Yocto-21.11.patch \
+SRC_URI = "git://github.com/Xilinx-CNS/cns-dpdk-next-sfc;branch=${BRANCH};protocol=https \
 "
 
-BRANCH = "releases"
-SRCREV = "4fceceed5b5e9fbf04acffd66239c79d81e79260"
+BRANCH = "cdx_22.11"
+SRCREV = "e0cfb566341221dd08a5a0d7fdefce5432b41735"
 S = "${WORKDIR}/git"
 
-# CVE-2021-3839 has been fixed by commit 4c40d30d2b in 21.11.1
-# NVD database is incomplete
-# CVE-2022-0669 has been fixed by commit 6cb68162e4 in 21.11.1
-# NVD database is incomplete
-CVE_CHECK_IGNORE += "\
-    CVE-2021-3839 \
-    CVE-2022-0669 \
-"
-
 # kernel module is provide by dpdk-module recipe, so disable here
-EXTRA_OEMESON = " -Denable_kmods=false \
-                -Dexamples=all \
+EXTRA_OEMESON = " \
+                -Denable_kmods=false \
+                -Dexamples=cdma_demo,cdx_test,mcdi/mcdi_test,mcdi/mcdi_init \
 "
 
 COMPATIBLE_MACHINE = "null"
+COMPATIBLE_MACHINE:versal-net = "${MACHINE}"
 COMPATIBLE_HOST:libc-musl:class-target = "null"
 COMPATIBLE_HOST:linux-gnux32 = "null"
 
@@ -37,6 +29,10 @@ DEPENDS = "numactl python3-pyelftools-native"
 inherit meson pkgconfig
 
 INSTALL_PATH = "${prefix}/share/dpdk"
+
+do_write_config:append(){
+    sed -i "/\[properties\]/a platform = \'cdx\'" ${WORKDIR}/meson.cross
+}
 
 do_install:append(){
     # remove  source files
@@ -61,7 +57,7 @@ FILES:${PN} += " ${bindir}/dpdk-testpmd \
 		 ${libdir}/dpdk/pmds-22.0/*.so* \
 		 "
 FILES:${PN}-examples = " \
-	${prefix}/share/dpdk/examples/* \
+	${INSTALL_PATH}/examples/* \
 	"
 
 FILES:${PN}-tools = " \
