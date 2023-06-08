@@ -1,0 +1,42 @@
+From 5f2d8db6692e257b16f1c5204efaaac2362f34ab Mon Sep 17 00:00:00 2001
+From: Andrea Righi <andrea.righi@canonical.com>
+Date: Tue, 15 Nov 2022 13:56:45 +0800
+Subject: [PATCH] support 5.18+ kernel ABI
+
+Upstream-Status: Pending [Taken from Ubuntu Source, https://git.launchpad.net/ubuntu/+source/dpdk-kmods/commit/debian/patches?id=9d628c02c169d8190bc2cb6afd81e4d364c382cd]
+
+Signed-off-by: Andrea Righi <andrea.righi@canonical.com>
+Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
+---
+ linux/igb_uio/igb_uio.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/linux/igb_uio/igb_uio.c b/linux/igb_uio/igb_uio.c
+index 33e0e02..89b5262 100644
+--- a/linux/igb_uio/igb_uio.c
++++ b/linux/igb_uio/igb_uio.c
+@@ -30,9 +30,20 @@ enum rte_intr_mode {
+ #define RTE_INTR_MODE_MSI_NAME "msi"
+ #define RTE_INTR_MODE_MSIX_NAME "msix"
+ 
+-
+ #include "compat.h"
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 18, 0)
++static inline int pci_set_dma_mask(struct pci_dev *dev, u64 mask)
++{
++	return dma_set_mask(&dev->dev, mask);
++}
++
++static inline int pci_set_consistent_dma_mask(struct pci_dev *dev, u64 mask)
++{
++	return dma_set_coherent_mask(&dev->dev, mask);
++}
++#endif
++
+ /**
+  * A structure describing the private information for a uio device.
+  */
+-- 
+2.25.1
+
