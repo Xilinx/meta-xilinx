@@ -172,6 +172,9 @@ KERNEL_ROOT_SD ?= "root=/dev/\${bootdev}${PARTNUM} ro rootwait"
 # Set Kernel root filesystem parameter for JTAG/QSPI/OSPI/NAND(using RAMDISK) boot
 KERNEL_ROOT_RAMDISK ?= "root=/dev/ram0 rw"
 
+# Append the kernel command line
+KERNEL_COMMAND_APPEND ?= ""
+
 BITSTREAM_LOAD_ADDRESS ?= "0x100000"
 
 do_configure[noexec] = "1"
@@ -231,6 +234,7 @@ do_compile() {
 	-e 's/@@PARTNUM@@/${PARTNUM}/' \
 	-e 's:@@KERNEL_ROOT_SD@@:${KERNEL_ROOT_SD}:' \
 	-e 's:@@KERNEL_ROOT_RAMDISK@@:${KERNEL_ROOT_RAMDISK}:' \
+	-e 's:@@KERNEL_COMMAND_APPEND@@:${KERNEL_COMMAND_APPEND}:' \
         "${WORKDIR}/boot.cmd.${BOOTMODE}${BOOTFILE_EXT}" > "${WORKDIR}/boot.cmd"
     mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
