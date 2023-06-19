@@ -60,11 +60,11 @@ In order to use recipes that rely on restricted content the `xilinx` license
 flag must be white-listed in the build configuration (e.g. `local.conf`). This
 can be done on a per package basis:
 
-	LICENSE_FLAGS_WHITELIST += "xilinx_pmu-rom-native"
+	LICENSE_FLAGS_ACCEPTED += "xilinx_pmu-rom-native"
 
 or generally:
 
-	LICENSE_FLAGS_WHITELIST += "xilinx"
+	LICENSE_FLAGS_ACCEPTED += "xilinx"
 
 Generally speaking Xilinx content that is provided as a restricted download
 cannot be obtained without a Xilinx account, in order to use this content you
