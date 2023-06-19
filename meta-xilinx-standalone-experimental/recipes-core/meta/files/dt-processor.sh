@@ -44,6 +44,7 @@ $0
     [-t <machine>]          Machine type: zynqmp or versal (usually auto detected)
     [-v <soc_variant>]      SOC Variant: cg, dr, eg, ev, ai-prime, premium (usually auto detected)
     [-r <require_machine>]  This machine will be required, instead of the generic machine if defined
+    [-O <overrides>]        Optional, can add additional overrides to the generated machine
     [-p <psu_init_path>]    Path to psu_init files, defaults to system_dts path
     [-i <pdi_path>]         Path to the pdi file
     [-l <config_file>]      write local.conf changes to this file
@@ -57,7 +58,7 @@ parse_args() {
   [ $# -eq 0 ] && usage
   [ $1 = "--help" ] && usage
 
-  while getopts ":c:s:d:o:e:m:D:l:hP:p:i:t:v:r:" opt; do
+  while getopts ":c:s:d:o:e:m:D:l:hP:p:i:t:v:r:O:" opt; do
     case ${opt} in
       c) config_dir=$OPTARG ;;
       s) system_dts=$OPTARG ;;
@@ -69,6 +70,7 @@ parse_args() {
       t) machine=$OPTARG ;;
       v) soc_variant=$OPTARG ;;
       r) incmachine=$OPTARG ;;
+      O) overrides=$OPTARG ;;
       p) psu_init_path=$OPTARG ;;
       i) pdi_path=$OPTARG ;;
       l) localconf=$OPTARG ;;
@@ -882,6 +884,10 @@ MACHINEOVERRIDES =. "\${@['', '${mach_conf}:']['${mach_conf}' != '\${MACHINE}']}
 #### Regular settings follow
 
 EOF
+
+  if [ -n "${overrides}" ]; then
+    echo "MACHINEOVERRIDES .= \":${overrides}\""
+  fi
 
   if [ "${machine}" == "zynqmp" ]; then
     cat <<EOF >>"${conf_file}"
