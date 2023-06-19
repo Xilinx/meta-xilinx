@@ -45,3 +45,5 @@ do_install(){
 }
 
 PACKAGE_ARCH:versal-ai-core = "${SOC_VARIANT_ARCH}"
+PACKAGE_ARCH:versal-ai-edge = "${SOC_VARIANT_ARCH}"
+
