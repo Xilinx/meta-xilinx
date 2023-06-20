@@ -8,7 +8,7 @@ PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', 
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vcu-omx-il.git;protocol=https"
-SRCREV = "10531499e0361b1ce97e0214ffa4e4b32887565e"
+SRCREV = "3a04b5adc661a0eced626c1373dbbfe699ae6fe0"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
@@ -37,8 +37,7 @@ do_install() {
 
     install -m 0644 ${S}/omx_header/*.h ${D}${includedir}/vcu-omx-il
 
-    install -Dm 0755 ${S}/bin/omx_decoder ${D}/${bindir}/omx_decoder
-    install -Dm 0755 ${S}/bin/omx_encoder ${D}/${bindir}/omx_encoder
+    oe_runmake install INSTALL_PATH=${D}${bindir}
 
     oe_libinstall -C ${S}/bin/ -so libOMX.allegro.core ${D}/${libdir}/
     oe_libinstall -C ${S}/bin/ -so libOMX.allegro.video_decoder ${D}/${libdir}/

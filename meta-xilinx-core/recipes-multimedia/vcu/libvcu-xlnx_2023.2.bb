@@ -8,7 +8,7 @@ PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', 
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vcu-ctrl-sw.git;protocol=https"
-SRCREV = "5cff15b1f76e10e727798967428030af9c8a9a33"
+SRCREV = "84b0856cad7844d69f57ac4d9447c20930875475"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
@@ -27,10 +27,7 @@ do_install() {
     install -d ${D}${libdir}
     install -d ${D}${includedir}/vcu-ctrl-sw/include
 
-    install -Dm 0755 ${S}/bin/ctrlsw_encoder ${D}/${bindir}/ctrlsw_encoder
-    install -Dm 0755 ${S}/bin/ctrlsw_decoder ${D}/${bindir}/ctrlsw_decoder
-
-    oe_runmake install_headers INSTALL_HDR_PATH=${D}${includedir}/vcu-ctrl-sw/include
+    oe_runmake install_headers INSTALL_HDR_PATH=${D}${includedir}/vcu-ctrl-sw/include INSTALL_PATH=${D}/${bindir}
     oe_libinstall -C ${S}/bin/ -so liballegro_decode ${D}/${libdir}/
     oe_libinstall -C ${S}/bin/ -so liballegro_encode ${D}/${libdir}/
 }
