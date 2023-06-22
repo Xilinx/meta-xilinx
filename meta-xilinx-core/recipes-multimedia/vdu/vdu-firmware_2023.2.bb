@@ -4,7 +4,8 @@ LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=c5784f63397086d836580d8785d1deb9"
 
 XILINX_VDU_VERSION = "1.0.0"
-PV = "${XILINX_VDU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
+PV =. "${XILINX_VDU_VERSION}-xilinx-v"
+PV .= "+git${SRCPV}"
 
 S  = "${WORKDIR}/git"
 
