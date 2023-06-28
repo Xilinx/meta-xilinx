@@ -9,10 +9,16 @@ ramdisk_name=@@RAMDISK_IMAGE1@@
 rootfs_name=@@RAMDISK_IMAGE@@
 @@PRE_BOOTENV@@
 
+
+setenv get_bootargs 'fdt addr $fdtcontroladdr;fdt get value bootargs /chosen bootargs;'
+setenv update_bootargs 'if test -n ${launch_ramdisk_init} && test ${bootargs} = "";then if run get_bootargs;then setenv bootargs "\$bootargs launch_ramdisk_init=${launch_ramdisk_init} $extrabootargs";fi;fi'
+
+
 for boot_target in ${boot_targets};
 do
 	echo "Trying to load boot images from ${boot_target}"
 	if test "${boot_target}" = "jtag" ; then
+		run update_bootargs
 		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
 	fi
 	if test "${boot_target}" = "mmc0" || test "${boot_target}" = "mmc1" || test "${boot_target}" = "usb0" || test "${boot_target}" = "usb1"; then
@@ -34,6 +40,7 @@ do
 		fi
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /system.dtb; then
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_ADDRESS@@ system.dtb;
+			setenv fdtcontroladdr @@DEVICETREE_ADDRESS@@
 		fi
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /devicetree/openamp.dtbo; then
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_OVERLAY_ADDRESS@@ devicetree/openamp.dtbo;
@@ -41,6 +48,7 @@ do
 			fdt resize 8192
 			fdt apply @@DEVICETREE_OVERLAY_ADDRESS@@
 		fi
+		run update_bootargs
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /${ramdisk_name} && test "${skip_tinyramdisk}" != "yes"; then
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${ramdisk_name};
 			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
@@ -59,6 +67,7 @@ do
 
 		sf read @@KERNEL_LOAD_ADDRESS@@ @@QSPI_KERNEL_OFFSET@@ @@QSPI_KERNEL_SIZE@@
 		sf read @@RAMDISK_IMAGE_ADDRESS@@ @@QSPI_RAMDISK_OFFSET@@ @@QSPI_RAMDISK_SIZE@@
+		run update_bootargs
 		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@;
 		echo "Booting using Separate images failed"
 	fi
@@ -70,6 +79,7 @@ do
 
 		nand read @@KERNEL_LOAD_ADDRESS@@ @@NAND_KERNEL_OFFSET@@ @@NAND_KERNEL_SIZE@@
 		nand read @@RAMDISK_IMAGE_ADDRESS@@ @@NAND_RAMDISK_OFFSET@@ @@NAND_RAMDISK_SIZE@@
+		run update_bootargs
 		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@;
 		echo "Booting using Separate images failed"
 	fi
