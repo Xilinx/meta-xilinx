@@ -71,7 +71,14 @@ DEVICETREE_OFFSET:zynqmp ?= "0x100000"
 DEVICETREE_OFFSET:zynq ?= "0x100000"
 DEVICETREE_OFFSET:versal ?= "0x1000"
 
-DEVICETREE_OVERLAY_ADDRESS ?= "${@hex(int(d.getVar("DEVICETREE_ADDRESS"),16) + 0xf00000)}"
+DEVICETREE_OVERLAY_OFFSET:microblaze ?= "0x1e00000"
+DEVICETREE_OVERLAY_OFFSET:zynqmp ?= "0x100000"
+DEVICETREE_OVERLAY_OFFSET:zynq ?= "0x100000"
+DEVICETREE_OVERLAY_OFFSET:versal ?= "0x1000"
+DEVICETREE_OVERLAY_PADSIZE ?= "0xf00000"
+
+DEVICETREE_OVERLAY_ADDRESS ?= "${@hex(int(append_baseaddr(d,d.getVar('DEVICETREE_OVERLAY_OFFSET')),16) \
+				+ int(d.getVar('DEVICETREE_OVERLAY_PADSIZE'),16))}"
 
 KERNEL_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('KERNEL_OFFSET'))}"
 
@@ -182,6 +189,9 @@ do_configure[noexec] = "1"
 def append_baseaddr(d,offset):
     skip_append = d.getVar('SKIP_APPEND_BASEADDR') or ""
     if skip_append == "1":
+        return offset
+    if offset.startswith('$'):
+        # If offset startswith '$' Assuming as uboot env variable.
         return offset
     import subprocess
     baseaddr = d.getVar('DDR_BASEADDR') or "0x0"
