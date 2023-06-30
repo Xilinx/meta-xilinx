@@ -3,7 +3,7 @@ LINUX_VERSION_EXTENSION ?= "-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE',
 PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
 
 # Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
-KBRANCH ?= "xlnx_rebase_v5.15_LTS"
+KBRANCH ?= "undefined"
 SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
 
 FILESOVERRIDES:append := ":${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}"
