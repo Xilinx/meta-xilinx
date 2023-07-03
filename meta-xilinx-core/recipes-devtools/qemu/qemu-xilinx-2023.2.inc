@@ -1,3 +1,3 @@
 XILINX_QEMU_VERSION = "v7.1.0"
 BRANCH = "master"
-SRCREV = "7d4bc887fbcaa67a6bc746215022756f75630ee2"
+SRCREV = "bebe3a9aff6faee9202f6aa2ea2f8b4e777a6aa0"
