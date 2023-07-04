@@ -886,7 +886,10 @@ MACHINEOVERRIDES =. "\${@['', '${mach_conf}:']['${mach_conf}' != '\${MACHINE}']}
 EOF
 
   if [ -n "${overrides}" ]; then
-    echo "MACHINEOVERRIDES .= \":${overrides}\""
+    cat <<EOF >>"${conf_file}"
+MACHINEOVERRIDES .= ":${overrides}"
+
+EOF
   fi
 
   if [ "${machine}" == "zynqmp" ]; then
