@@ -1,0 +1,33 @@
+From 81b137e9b313d828cba8212d17c4d6a3265f565e Mon Sep 17 00:00:00 2001
+From: Niko Mauno <niko.mauno@vaisala.com>
+Date: Mon, 24 Apr 2023 05:00:00 +0000
+Subject: [PATCH] Avoid race induced build failure
+
+Limit number of concurrent jobs to one in order to mitigate the
+non-propagation of -j1 option from PARALLEL_MAKE directive which
+helps us to avoid the following kind of build failure:
+
+  | .../pmu-firmware/2022.2+gitAUTOINC+5330a64c8e-r0/recipe-sysroot-native/usr/bin/microblazeel-xilinx-elf/../../libexec/microblazeel-xilinx-elf/gcc/microblazeel-xilinx-elf/11.3.0/ar: xdppsu_edid.o: No such file or directory
+  | make[3]: *** [Makefile:31: dppsu_libs] Error 1
+  | make[2]: *** [Makefile:48: psu_pmu_0/libsrc/dppsu/src/make.libs] Error 2
+
+Upstream-Status: Pending
+
+Signed-off-by: Niko Mauno <niko.mauno@vaisala.com>
+---
+
+diff --git a/lib/sw_apps/zynqmp_pmufw/misc/Makefile b/lib/sw_apps/zynqmp_pmufw/misc/Makefile
+index a773498512..4528600745 100644
+--- a/lib/sw_apps/zynqmp_pmufw/misc/Makefile
++++ b/lib/sw_apps/zynqmp_pmufw/misc/Makefile
+@@ -17,7 +19,7 @@ endif
+ 
+ all:
+ 	$(MAKE) --no-print-directory seq_libs
+-	$(MAKE) -j --no-print-directory par_libs
++	$(MAKE) -j1 --no-print-directory par_libs
+ 	$(MAKE) --no-print-directory archive
+ 	@echo 'Finished building libraries'
+ 
+-- 
+2.20.1
