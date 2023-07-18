@@ -128,3 +128,6 @@ def get_default_image_boot_files(d):
 XSERVER_EXT ?= ""
 
 FPGA_MNGR_RECONFIG_ENABLE ?= "1"
+
+# This variable is supported only with SysVinit.
+SERIAL_CONSOLES_CHECK = "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', '${SERIAL_CONSOLES}', '', d)}"
