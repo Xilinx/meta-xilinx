@@ -7,9 +7,9 @@
 
 CONVERSIONTYPES:append = " qemu-sd qemu-sd-fatimg"
 CONVERSION_CMD:qemu-sd () {
-	cp ${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type} ${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.qemu-sd
+	cp ${IMGDEPLOYDIR}/${IMAGE_NAME}.${type} ${IMGDEPLOYDIR}/${IMAGE_NAME}.${type}.qemu-sd
 	# Get the wic.qemu-sd file size
-	file_size=`stat -c '%s' ${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.qemu-sd`
+	file_size=`stat -c '%s' ${IMGDEPLOYDIR}/${IMAGE_NAME}.${type}.qemu-sd`
 	powerof2=1
 	file_size=${file_size%.*}
 	# Get the next power of 2 value for the image size value
@@ -17,7 +17,7 @@ CONVERSION_CMD:qemu-sd () {
 		powerof2=$(expr $powerof2 \* 2)
 	done
 	# Resize the image using qemu-img
-	qemu-img resize -f raw ${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.qemu-sd ${powerof2}
+	qemu-img resize -f raw ${IMGDEPLOYDIR}/${IMAGE_NAME}.${type}.qemu-sd ${powerof2}
 }
 
 BOOT_VOLUME_ID ?= "BOOT"
