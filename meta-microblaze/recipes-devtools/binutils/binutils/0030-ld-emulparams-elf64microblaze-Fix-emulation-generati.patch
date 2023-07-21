@@ -10,6 +10,8 @@ ldemul.o:(.data.rel+0x828): undefined reference to `ld_elf64microblaze_emulation
 
 The error appears to be that the elf64 files were referencing the elf32 emulation.
 
+Upstream-Status: Pending
+
 Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
 ---
  ld/emulparams/elf64microblaze.sh   | 2 +-

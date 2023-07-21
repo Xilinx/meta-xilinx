@@ -17,6 +17,8 @@ implement purely with instructions as microblaze does not provide an
 instruction to perform a forward arithmetic subtraction (it only
 provides reverse 'rD = IMM - rA').
 
+Upstream-Status: Pending
+
 Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
 ---
  gcc/config/microblaze/microblaze.md | 13 ++++++-------

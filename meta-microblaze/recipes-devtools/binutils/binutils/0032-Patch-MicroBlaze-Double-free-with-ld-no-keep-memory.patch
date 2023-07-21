@@ -8,6 +8,10 @@ Subject: [PATCH 32/34] [Patch,MicroBlaze] : Double free with ld
 Conflicts:
 	bfd/elf32-microblaze.c
 	bfd/elf64-microblaze.c
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  bfd/elf32-microblaze.c | 40 ++++++++++++++++++++++------------------
  bfd/elf64-microblaze.c | 38 ++++++++++++++++++++------------------

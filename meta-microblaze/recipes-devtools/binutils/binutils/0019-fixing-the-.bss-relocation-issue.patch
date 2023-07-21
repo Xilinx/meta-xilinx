@@ -8,6 +8,10 @@ Conflicts:
 
 Conflicts:
 	bfd/elf64-microblaze.c
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  bfd/elf64-microblaze.c | 41 +++++++++++++++++++++++++++++------------
  1 file changed, 29 insertions(+), 12 deletions(-)

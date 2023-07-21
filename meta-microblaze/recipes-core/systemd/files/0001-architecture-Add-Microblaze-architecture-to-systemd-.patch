@@ -8,6 +8,8 @@ Signed-off-by: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
 Applied to current version of systemd
 Reworked to split microblaze and microblazeel
 
+Upstream-Status: Pending
+
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 ---
  src/basic/architecture.c | 3 +++

@@ -14,6 +14,10 @@ Subject: [PATCH 23/53] [patch,microblaze]: Fix the calculation of high word in
 
     Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
                    Ajit Agarwal  <ajitkum@xilinx.com>
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gcc/config/microblaze/microblaze.cc | 3 ---
  1 file changed, 3 deletions(-)

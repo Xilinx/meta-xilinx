@@ -5,6 +5,10 @@ Subject: [PATCH 24/53] [Patch,MicroBlaze] : this patch has 1.Fixed the bug in
  version calculation. 2.Add new bitfield instructions.
 
 Signed-off-by :Mahesh Bodapati <mbodapat@xilinx.com>
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gcc/config/microblaze/microblaze.cc | 154 ++++++++++++++--------------
  gcc/config/microblaze/microblaze.h  |   2 +

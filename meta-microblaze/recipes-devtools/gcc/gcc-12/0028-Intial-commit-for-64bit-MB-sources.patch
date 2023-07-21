@@ -4,6 +4,10 @@ Date: Tue, 13 Sep 2022 14:38:48 +0530
 Subject: [PATCH 28/53]  Intial commit for 64bit-MB sources.  Need to cleanup
  the code later.
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gcc/config/microblaze/constraints.md    |   2 +-
  gcc/config/microblaze/microblaze-c.cc   |   6 +

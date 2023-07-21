@@ -4,6 +4,10 @@ Date: Tue, 9 Oct 2018 10:07:08 +0530
 Subject: [PATCH 34/53] -Added double arith instructions -Fixed prologue stack
  pointer decrement issue
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gcc/config/microblaze/microblaze.md | 78 +++++++++++++++++++++++++----
  gcc/config/microblaze/t-microblaze  |  7 +++

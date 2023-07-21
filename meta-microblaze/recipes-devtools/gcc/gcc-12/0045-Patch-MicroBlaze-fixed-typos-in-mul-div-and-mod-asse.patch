@@ -4,6 +4,10 @@ Date: Wed, 17 Apr 2019 12:36:16 +0530
 Subject: [PATCH 45/53] [Patch,MicroBlaze]: fixed typos in mul,div and mod
  assembly files.
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  libgcc/config/microblaze/divsi3.S  | 47 ++++++++++++++++++++----
  libgcc/config/microblaze/modsi3.S  | 40 ++++++++++++++++++---

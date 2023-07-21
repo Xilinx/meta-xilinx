@@ -3,6 +3,8 @@ From: Nathan Rossi <nathan.rossi@petalogix.com>
 Date: Tue, 8 May 2012 18:11:17 +1000
 Subject: [PATCH 3/8] Fix debug message when register is unavailable
 
+Upstream-Status: Pending
+
 Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
 
 Conflicts:

@@ -3,6 +3,8 @@ Microblaze does not support stack-protector:
 | cc1: warning: '-fstack-protector' not supported for this target
 | ninja: build stopped: subcommand failed.
 
+Upstream-Status: Pending
+
 Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
 
 Index: git/meson.build

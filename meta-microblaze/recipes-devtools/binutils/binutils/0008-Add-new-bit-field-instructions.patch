@@ -19,6 +19,10 @@ Conflicts:
 Conflicts:
 	gas/config/tc-microblaze.c
 	opcodes/microblaze-opc.h
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gas/config/tc-microblaze.c | 71 +++++++++++++++++++++++++++++++++++++-
  opcodes/microblaze-dis.c   | 20 +++++++++--

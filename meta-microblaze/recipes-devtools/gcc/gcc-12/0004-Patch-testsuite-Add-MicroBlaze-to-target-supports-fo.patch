@@ -13,6 +13,8 @@ Changelog/testsuite
  * gcc/testsuite/lib/target-supports.exp: Add microblaze to
    check_effective_target_sync_int_long.
 
+Upstream-Status: Pending
+
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 ---
  gcc/testsuite/lib/target-supports.exp | 1 +

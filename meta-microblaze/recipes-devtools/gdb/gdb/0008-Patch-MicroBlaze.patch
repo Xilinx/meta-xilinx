@@ -12,6 +12,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gdb/microblaze-tdep.c | 14 +++-----------
  1 file changed, 3 insertions(+), 11 deletions(-)

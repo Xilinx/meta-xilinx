@@ -4,6 +4,10 @@ Date: Tue, 11 Sep 2018 13:48:33 +0530
 Subject: [PATCH 13/34] [Patch,Microblaze] : negl instruction is overriding
  rsubl,fixed it by changing the instruction order...
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  opcodes/microblaze-opc.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

@@ -7,6 +7,10 @@ Subject: [PATCH 7/8] [Patch,MicroBlaze] : Added m64 abi for 64 bit target
 Conflicts:
 	gdb/microblaze-tdep.c
 	gdb/microblaze-tdep.h
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gdb/features/microblaze64.xml |   1 +
  gdb/microblaze-tdep.c         | 159 ++++++++++++++++++++++++++++++++--

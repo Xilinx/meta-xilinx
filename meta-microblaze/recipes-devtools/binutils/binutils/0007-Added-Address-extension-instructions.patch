@@ -18,6 +18,10 @@ ChangeLog:
 
 Conflicts:
 	opcodes/microblaze-opcm.h
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  opcodes/microblaze-opc.h  | 11 +++++++++++
  opcodes/microblaze-opcm.h | 10 +++++-----

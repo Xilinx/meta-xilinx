@@ -7,6 +7,8 @@ a less 'safe' way of doing the work.  However a quick inspection of
 the ONCE users shows that even if we end up with a race condition the
 worst expected behavior could be multiple log messages.
 
+Upstream-Status: Pending
+
 Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
 
 Index: git/src/fundamental/macro-fundamental.h

@@ -3,6 +3,8 @@ From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Date: Fri, 22 Jun 2012 01:20:20 +0200
 Subject: [PATCH 03/34] Disable the warning message for eh_frame_hdr
 
+Upstream-Status: Pending
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 
 Conflicts:

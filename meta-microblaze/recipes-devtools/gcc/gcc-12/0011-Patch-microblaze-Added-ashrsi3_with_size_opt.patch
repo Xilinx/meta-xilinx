@@ -6,6 +6,8 @@ Subject: [PATCH 11/53] [Patch, microblaze]: Added ashrsi3_with_size_opt Added
  optimization is used. lshrsi3_with_size_opt is being removed as it has
  conflicts with unsigned int variables
 
+Upstream-Status: Pending
+
 Signed-off-by:Nagaraju Mekala <nmekala@xilix.com>
 ---
  gcc/config/microblaze/microblaze.md | 21 +++++++++++++++++++++

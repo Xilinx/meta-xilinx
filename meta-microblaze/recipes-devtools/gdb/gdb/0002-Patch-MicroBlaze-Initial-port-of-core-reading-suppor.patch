@@ -6,6 +6,8 @@ Subject: [PATCH 2/8] [Patch,MicroBlaze]: Initial port of core reading support
  PRSTATUS and PSINFO information for rebuilding ".reg" sections of core dumps
  at run time.
 
+Upstream-Status: Pending
+
 Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
 Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>

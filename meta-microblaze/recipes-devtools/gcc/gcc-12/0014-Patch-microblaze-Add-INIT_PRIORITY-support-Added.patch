@@ -10,6 +10,10 @@ attribute by specifying a relative priority, a constant integral
 expression currently bounded between 101 and 65535 inclusive.
 
 Lower numbers indicate a higher priority.
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gcc/config/microblaze/microblaze.cc | 53 +++++++++++++++++++++++++++++
  1 file changed, 53 insertions(+)

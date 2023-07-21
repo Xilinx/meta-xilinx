@@ -4,6 +4,10 @@ Date: Fri, 29 Mar 2019 12:08:39 +0530
 Subject: [PATCH 44/53] [Patch,Microblaze] : We will check the possibility of
  peephole2 optimization,if we can then we will fix the compiler issue.
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gcc/config/microblaze/microblaze.md | 63 +++++++++++++++++------------
  1 file changed, 38 insertions(+), 25 deletions(-)

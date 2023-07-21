@@ -9,6 +9,10 @@ Subject: [PATCH 21/53] [PATCH 21/53] [Patch, microblaze]: Correct the const
 
 Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
                Ajit Agarwal  <ajitkum@xilinx.com>
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gcc/config/microblaze/microblaze.cc               | 6 ++++--
  gcc/testsuite/gcc.target/microblaze/others/long.c | 9 +++++++++

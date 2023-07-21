@@ -5,6 +5,10 @@ Subject: [PATCH 31/34] [Patch,MicroBlaze] : Invalid data offsets (pointer)
  after relaxation. Proposed patch from community member (dednev@rambler.ru)
  against 2021.1 [CR-1115232]
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  bfd/elf32-microblaze.c | 18 ++++++++++++++++++
  bfd/elf64-microblaze.c | 17 +++++++++++++++++

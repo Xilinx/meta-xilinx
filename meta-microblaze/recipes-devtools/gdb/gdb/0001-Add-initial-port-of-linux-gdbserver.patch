@@ -17,6 +17,8 @@ architecture specific setup - may need to add in future
  * add set_gdbarch_fetch_tls_load_module_address
  * Force reading of r0 as 0, prevent stores
 
+Upstream-Status: Pending
+
 Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
 Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>

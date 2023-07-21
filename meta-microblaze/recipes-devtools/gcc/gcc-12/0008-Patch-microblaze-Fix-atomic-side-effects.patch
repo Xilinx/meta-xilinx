@@ -7,6 +7,8 @@ Subject: [PATCH 08/53] [Patch, microblaze]: Fix atomic side effects. In
  generated assembly code with undefined side effects after invocation of the
  atomic.
 
+Upstream-Status: Pending
+
 Signed-off-by: Kirk Meyer <kirk.meyer@sencore.com>
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 

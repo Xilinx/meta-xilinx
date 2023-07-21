@@ -5,6 +5,10 @@ Subject: [PATCH 16/34] Fixing the branch related issues
 
 Conflicts:
 	bfd/elf64-microblaze.c
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  bfd/elf64-microblaze.c | 3 +++
  1 file changed, 3 insertions(+)

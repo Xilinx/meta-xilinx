@@ -4,6 +4,10 @@ Date: Mon, 10 Oct 2022 18:53:46 +0530
 Subject: [PATCH 4/8] [Patch,MicroBlaze] : MicroBlaze native gdb port.
 
 signed-off-by : Mahesh Bodapati <mbodapat@amd.com>
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gdb/Makefile.in                 |   2 +
  gdb/configure.nat               |   4 +

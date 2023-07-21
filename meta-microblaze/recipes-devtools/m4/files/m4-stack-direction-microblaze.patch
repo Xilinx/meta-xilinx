@@ -1,3 +1,9 @@
+Need a broader match for microblazeel.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 --- m4-1.4.19/m4/stack-direction.m4.orig	2021-11-30 13:19:56.005640547 -0800
 +++ m4-1.4.19/m4/stack-direction.m4	2021-11-30 13:20:03.917640741 -0800
 @@ -35,7 +35,7 @@

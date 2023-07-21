@@ -10,6 +10,8 @@ Subject: [PATCH 04/34] [LOCAL]: Fix relaxation of assembler resolved
 This is a workaround for design flaws in the assembler to
 linker interface with regards to linker relaxation.
 
+Upstream-Status: Pending
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 

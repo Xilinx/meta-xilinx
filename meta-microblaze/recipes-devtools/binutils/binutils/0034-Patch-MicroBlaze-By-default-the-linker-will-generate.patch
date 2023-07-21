@@ -5,6 +5,10 @@ Subject: [PATCH 34/34] By default the linker will generate warnings if it is
  creating an executable stack or a segment with all three of read, write and
  execute permissions. These settings are not appropriate for all targets
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  ld/configure.tgt | 1 +
  1 file changed, 1 insertion(+)

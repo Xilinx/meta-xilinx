@@ -7,6 +7,8 @@ Added two new instructions, wdc.ext.clear and wdc.ext.flush,
 to enable MicroBlaze to flush an external cache, which is
 used with the new coherency support for multiprocessing.
 
+Upstream-Status: Pending
+
 Signed-off-by:nagaraju <nmekala@xilix.com>
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 ---

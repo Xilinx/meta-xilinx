@@ -4,6 +4,10 @@ Date: Fri, 29 Sep 2017 18:00:23 +0530
 Subject: [PATCH 09/34] [Patch,Microblaze]: fixed bug in GCC so that It will
  support .long 0U and .long 0u
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gas/expr.c | 9 +++++++++
  1 file changed, 9 insertions(+)

@@ -6,6 +6,8 @@ Subject: [PATCH 03/53] [LOCAL]: For dejagnu static testing on qemu, suppress
  with method used by powerpc. Dynamic linking and using a qemu binary which
  understands sysroot resolves all test failures with builtins
 
+Upstream-Status: Pending
+
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 ---
  gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp | 4 ----

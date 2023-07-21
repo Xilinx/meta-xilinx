@@ -6,6 +6,10 @@ Subject: [PATCH 33/34] [Patch,MB]: MB binutils Upstream port issues.
 It's resolving the seg faults with ADDLIK
 Conflicts:
 	bfd/elf64-microblaze.c
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  bfd/elf64-microblaze.c     | 248 ++++++++++++++++++++++++++++---------
  gas/config/tc-microblaze.c |   2 +-

@@ -5,6 +5,10 @@ Subject: [PATCH 26/34]  [Patch,MicroBlaze m64] : This patch will remove imml 0
  and imml -1 instructions when the offset is less than 16 bit for Type A
  branch EA instructions.
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gas/config/tc-microblaze.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)

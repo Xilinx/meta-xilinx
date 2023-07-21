@@ -13,6 +13,10 @@ Conflicts:
 Conflicts:
 	ld/ldexp.c
 	ld/ldexp.h
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  ld/ldexp.c | 8 +++++---
  ld/ldexp.h | 1 +

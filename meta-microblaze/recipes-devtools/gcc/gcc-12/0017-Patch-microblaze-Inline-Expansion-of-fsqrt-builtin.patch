@@ -22,6 +22,8 @@ ChangeLog:
 	* config/microblaze/microblaze.md (sqrtdf2): New
 	pattern.
 
+Upstream-Status: Pending
+
 Signed-off-by:Ajit Agarwal ajitkum@xilinx.com
               Nagaraju Mekala nmekala@xilinx.com
 ---

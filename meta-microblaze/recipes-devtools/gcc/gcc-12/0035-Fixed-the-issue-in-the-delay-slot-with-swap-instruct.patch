@@ -4,6 +4,10 @@ Date: Fri, 12 Oct 2018 16:07:36 +0530
 Subject: [PATCH 35/53] Fixed the issue in the delay slot with swap
  instructions
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gcc/config/microblaze/microblaze.md | 6 ++++++
  1 file changed, 6 insertions(+)

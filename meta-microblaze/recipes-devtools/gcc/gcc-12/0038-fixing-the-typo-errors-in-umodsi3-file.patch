@@ -3,6 +3,10 @@ From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Tue, 16 Oct 2018 07:55:46 +0530
 Subject: [PATCH 38/53] fixing the typo errors in umodsi3 file
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  libgcc/config/microblaze/umodsi3.S | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)

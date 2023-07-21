@@ -6,6 +6,8 @@ Subject: [PATCH 07/53] [Patch, testsuite]: Add MicroBlaze to
  check_profiling_available inline with other archs setting
  profiling_available_saved to 0
 
+Upstream-Status: Pending
+
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 ---
  gcc/testsuite/lib/target-supports.exp | 1 +

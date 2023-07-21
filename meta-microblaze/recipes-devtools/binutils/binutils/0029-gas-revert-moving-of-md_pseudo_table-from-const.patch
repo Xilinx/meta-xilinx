@@ -11,6 +11,8 @@ Patch reverts the change away from const, and implements a newer
 dynamic handler that passes the correct argument value based on word
 size.
 
+Upstream-Status: Pending
+
 Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
 ---
  gas/config/tc-microblaze.c | 16 +++++++++++++---

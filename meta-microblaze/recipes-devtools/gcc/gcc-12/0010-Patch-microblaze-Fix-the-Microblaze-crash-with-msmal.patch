@@ -9,6 +9,8 @@ Subject: [PATCH 10/53] [Patch, microblaze]: Fix the Microblaze crash with
  have subreg register due to this compiler was crashing. Changed the logic to
  avoid sub_reg call
 
+Upstream-Status: Pending
+
 Signed-off-by:Nagaraju Mekala <nmekala@xilix.com>
 
 Conflicts:

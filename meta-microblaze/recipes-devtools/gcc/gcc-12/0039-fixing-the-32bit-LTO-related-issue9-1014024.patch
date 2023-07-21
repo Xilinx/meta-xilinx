@@ -3,6 +3,10 @@ From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Wed, 17 Oct 2018 16:56:14 +0530
 Subject: [PATCH 39/53] fixing the 32bit LTO related issue9(1014024)
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gcc/config/microblaze/microblaze.h | 24 ++++++++++++++----------
  1 file changed, 14 insertions(+), 10 deletions(-)

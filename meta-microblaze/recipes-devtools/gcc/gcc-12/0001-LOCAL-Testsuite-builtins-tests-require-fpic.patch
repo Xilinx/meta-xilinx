@@ -2,6 +2,8 @@ From 376b0ee790231a99fe50b50e20070c104bbba0d8 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 11 Jan 2017 13:13:57 +0530
 Subject: [PATCH 01/53] LOCAL]: Testsuite - builtins tests require fpic
+Upstream-Status: Pending
+
  Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 
 Conflicts:

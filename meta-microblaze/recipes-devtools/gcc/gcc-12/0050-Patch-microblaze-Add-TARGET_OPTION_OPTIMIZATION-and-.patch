@@ -9,6 +9,8 @@ Added TARGET_OPTION_OPTIMIZATIONS and Turn off ivopts by default.
  * gcc/common/config/microblaze/microblaze-common.c
    (microblaze_option_optimization_table): Disable fivopts by default.
 
+Upstream-Status: Pending
+
 Signed-off-by: Nagaraju Mekala <nmekala@xilinx.com>
 	       Mahesh Bodapati <mbodapat@xilinx.com>
 Conflicts:

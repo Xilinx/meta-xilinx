@@ -4,6 +4,8 @@ Date: Thu, 12 Jan 2017 17:36:16 +0530
 Subject: [PATCH 13/53] [Patch, microblaze]: Removed moddi3 routinue Using the
  default moddi3 function as the existing implementation has many bugs
 
+Upstream-Status: Pending
+
 Signed-off-by:Nagaraju <nmekala@xilix.com>
 
 Conflicts:

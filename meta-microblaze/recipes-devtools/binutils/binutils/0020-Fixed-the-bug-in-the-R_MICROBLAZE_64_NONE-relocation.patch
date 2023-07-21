@@ -6,6 +6,10 @@ Subject: [PATCH 20/34] Fixed the bug in the R_MICROBLAZE_64_NONE relocation.
 
 Conflicts:
 	bfd/elf64-microblaze.c
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  bfd/elf32-microblaze.c | 4 ++--
  bfd/elf64-microblaze.c | 4 ++--

@@ -17,6 +17,8 @@ on execution.
 This does not occur if static linking libstdc++.a, so its during the
 relocations for a shared lib with garbage collection this occurs
 
+Upstream-Status: Pending
+
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 
 Conflicts:

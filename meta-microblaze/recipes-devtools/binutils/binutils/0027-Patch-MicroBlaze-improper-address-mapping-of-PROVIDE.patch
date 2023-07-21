@@ -6,6 +6,10 @@ Subject: [PATCH 27/34] [Patch,MicroBlaze] : improper address mapping of
  need to override PROVIDE symbols if symbols are defined in libraries and
  linker so I am disabling override for PROVIDE symbols.
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  ld/ldlang.c | 12 +++++++++---
  1 file changed, 9 insertions(+), 3 deletions(-)

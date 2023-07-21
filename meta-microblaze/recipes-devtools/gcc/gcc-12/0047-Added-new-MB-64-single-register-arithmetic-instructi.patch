@@ -3,6 +3,10 @@ From: Nagaraju <nmekala@xilinx.com>
 Date: Fri, 23 Aug 2019 16:16:53 +0530
 Subject: [PATCH 47/53] Added new MB-64 single register arithmetic instructions
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gcc/config/microblaze/microblaze.md | 56 +++++++++++++++++++++++++++++
  1 file changed, 56 insertions(+)

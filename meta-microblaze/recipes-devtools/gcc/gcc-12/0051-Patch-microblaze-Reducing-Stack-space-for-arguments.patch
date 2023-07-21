@@ -9,6 +9,10 @@ Subject: [PATCH 51/53] [Patch, microblaze]: Reducing Stack space for arguments
 
     Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
                   :Ajit Agarwal  <ajitkum@xilinx.com>
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  gcc/config/microblaze/microblaze-protos.h |   1 +
  gcc/config/microblaze/microblaze.cc       | 130 ++++++++++++++++++++++

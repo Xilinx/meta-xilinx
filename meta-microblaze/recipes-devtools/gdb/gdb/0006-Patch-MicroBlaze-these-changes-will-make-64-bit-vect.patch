@@ -5,6 +5,10 @@ Subject: [PATCH 6/8] [Patch,MicroBlaze] : these changes will make 64 bit
  vectors as default target types when we built gdb with microblaze 64 bit type
  targets,for instance microblaze-xilinx-elf64/microblazeel-xilinx-elf64
 
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
 ---
  bfd/config.bfd | 8 ++++++++
  1 file changed, 8 insertions(+)

@@ -1,5 +1,7 @@
 Add microblaze syscalls to systemd
 
+Upstream-Status: Pending
+
 Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
 
 Index: git/src/basic/meson.build

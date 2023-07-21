@@ -9,6 +9,8 @@ as options.
 Updated show usage for MicroBlaze specific assembler options
 to include new entries.
 
+Upstream-Status: Pending
+
 Signed-off-by:nagaraju <nmekala@xilix.com>
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 ---
