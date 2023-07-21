@@ -8,7 +8,7 @@ Although the macro definitions are consistent, using the macros name
 defined under khronos makes it backward compatible with older eglext.h
 
 Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
-upstream-status: Inappropriate [Xilinx specific]
+Upstream-Status: Inappropriate [Xilinx specific]
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 ---
  src/egl/opengl/eglinfo.c | 6 +++---

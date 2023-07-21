@@ -8,7 +8,7 @@ Compiling against the other EGL provider like mali fails, as they dont
 support this macro as one of thier supported platforms
 
 Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
-upstream-status: Inappropritate [Xilinx specific]
+Upstream-Status: Inappropriate [Xilinx specific]
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 ---
  src/egl/opengl/eglinfo.c | 4 ++++

@@ -1,3 +1,5 @@
+Upstream-Status: Inappropriate [libmali specific]
+
 Index: mesa-demos-8.5.0/src/egl/opengl/eglinfo.c
 ===================================================================
 --- mesa-demos-8.5.0.orig/src/egl/opengl/eglinfo.c
