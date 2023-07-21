@@ -1,7 +1,6 @@
 include dpdk.inc
 
-SRC_URI = "git://github.com/Xilinx-CNS/cns-dpdk-next-sfc;branch=${BRANCH};protocol=https \
-"
+SRC_URI = "git://github.com/Xilinx-CNS/cns-dpdk-next-sfc.git;branch=${BRANCH};protocol=https"
 
 BRANCH = "cdx_22.11"
 SRCREV = "e0cfb566341221dd08a5a0d7fdefce5432b41735"
@@ -10,7 +9,7 @@ S = "${WORKDIR}/git"
 # kernel module is provide by dpdk-module recipe, so disable here
 EXTRA_OEMESON = " \
                 -Denable_kmods=false \
-                -Dexamples=cdma_demo,cdx_test,mcdi/mcdi_test,mcdi/mcdi_init \
+                -Dexamples=cdma_demo,cdx_test \
 "
 
 COMPATIBLE_MACHINE = "null"
