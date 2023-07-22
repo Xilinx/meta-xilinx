@@ -1,3 +1,5 @@
+@@PRE_BOOTENV@@
+
 if test -n "@@BITSTREAM@@"; then
    fatload mmc $sdbootdev @@BITSTREAM_LOAD_ADDRESS@@ @@BITSTREAM_IMAGE@@ && fpga @@BITSTREAM_LOAD_TYPE@@ 0 @@BITSTREAM_LOAD_ADDRESS@@ ${filesize}
 fi
