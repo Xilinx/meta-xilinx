@@ -45,3 +45,5 @@ INHERIT += "uninative"
 
 BB_SIGNATURE_HANDLER ?= "OEEquivHash"
 BB_HASHSERVE ??= "auto"
+
+MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc qemu-usermode"
