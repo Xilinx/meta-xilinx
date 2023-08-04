@@ -12,7 +12,7 @@ S = "${WORKDIR}/git"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:versal-net = "${MACHINE}"
 
-INSTALL_PATH = "${prefix}/share/${PN}/examples"
+MCDI_PATH_EXAMPLES = "${datadir}/${BPN}/examples"
 
 do_compile() {
     oe_runmake all CC="${CC}" CROSS_COMPILE="${TARGET_PREFIX}"
@@ -21,9 +21,11 @@ do_compile() {
 do_install() {
     oe_runmake install prefix="${prefix}" DESTDIR="${D}"
 
-    install -d ${D}/${INSTALL_PATH}
-    install -m 0755 ${B}/example/mcdi_example_app ${D}/${INSTALL_PATH}
-    install -m 0755 ${B}/init/init_app ${D}/${INSTALL_PATH}
+    install -d ${D}/${MCDI_PATH_EXAMPLES}
+    install -m 0755 ${B}/example/mcdi_example_app ${D}/${MCDI_PATH_EXAMPLES}
+    install -m 0755 ${B}/init/init_app ${D}/${MCDI_PATH_EXAMPLES}
 }
 
-FILES:${PN} = "${INSTALL_PATH}/* ${libdir}/*"
+FILES:${PN} += " \
+    ${MCDI_PATH_EXAMPLES}/* \
+    "
