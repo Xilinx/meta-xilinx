@@ -26,6 +26,8 @@ do_install() {
     install -m 0755 ${B}/init/init_app ${D}/${MCDI_PATH_EXAMPLES}
 }
 
-FILES:${PN} += " \
+PACKAGES =+ "${PN}-examples"
+
+FILES:${PN}-examples = " \
     ${MCDI_PATH_EXAMPLES}/* \
     "
