@@ -41,6 +41,7 @@ python() {
         dtsi_found = False
         dtbo_found = False
         bit_found = False
+        bin_found = False
         pdi_found = False
 
         # Required Inputs
@@ -56,6 +57,10 @@ python() {
             bit_found = True
             d.setVar("BIT_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.bit' in a][0].lstrip('file://')))
 
+        if '.bin' in d.getVar("SRC_URI") and soc_family != "versal":
+            bin_found = True
+            d.setVar("BIT_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.bin' in a][0].lstrip('file://')))
+
         if '.pdi' in d.getVar("SRC_URI") and soc_family == "versal":
             pdi_found = True
             d.setVar("PDI_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.pdi' in a][0].lstrip('file://')))
@@ -63,8 +68,10 @@ python() {
         # Check for valid combination of input files in SRC_URI
         if dtsi_found or dtbo_found:
             bb.debug(2, "dtsi or dtbo found in SRC_URI")
-            if bit_found or pdi_found:
+            if bit_found or pdi_found or bin_found:
                 bb.debug(2, "bitstream or pdi found in SRC_URI")
+            elif bit_found and bin_found:
+                raise bb.parse.SkipRecipe("Both '.bit' and '.bin' file found in SRC_URI, either .bit or .bin file is supported but not both.")
             else:
                 raise bb.parse.SkipRecipe("Need one '.bit' or one '.pdi' file added to SRC_URI ")
         else:
@@ -74,8 +81,8 @@ python() {
         # Following file combinations are not supported use case.
         # 1. More than one '.dtsi' and zero '.dts' file.
         # 2. More than one '.dts' and zero or more than one '.dtsi'file .
-        pattern_dts = re.compile(r'.dts\b')
-        pattern_dtsi = re.compile(r'.dtsi\b')
+        pattern_dts = re.compile(r'[.]+dts\b')
+        pattern_dtsi = re.compile(r'[.]+dtsi\b')
         dts_count = len([*re.finditer(pattern_dts, d.getVar('SRC_URI'))])
         dtsi_count = len([*re.finditer(pattern_dtsi, d.getVar("SRC_URI"))])
 
@@ -145,35 +152,39 @@ python devicetree_do_compile:append() {
     import glob, subprocess, shutil
     soc_family = d.getVar("SOC_FAMILY")
 
-    # Convert .bit to bit.bin format only if dtsi is input.
-    # In case of dtbo as input, bbclass doesn't know if firmware-name is .bit or
-    # .bit.bin format and corresponding file name. Hence we are not doing
-    # bit.bin conversion.
-    if soc_family != 'versal' and glob.glob(d.getVar('S') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE')):
-        pn = d.getVar('PN')
-        biffile = pn + '.bif'
+    dtbo_count = sum(1 for f in glob.iglob((d.getVar('S') + '/*.dtbo'),recursive=True) if os.path.isfile(f))
 
-        with open(biffile, 'w') as f:
-            f.write('all:\n{\n\t' + glob.glob(d.getVar('S')+(d.getVar('BIT_PATH') or '') + '/*.bit')[0] + '\n}')
+    # Skip devicetree do_compile task if input file is dtbo in SRC_URI
+    if not dtbo_count:
+        # Convert .bit to bit.bin format only if dtsi is input.
+        # In case of dtbo as input, bbclass doesn't know if firmware-name is .bit or
+        # .bit.bin format and corresponding file name. Hence we are not doing
+        # bit.bin conversion.
+        if soc_family != 'versal' and glob.glob(d.getVar('S') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE')):
+            pn = d.getVar('PN')
+            biffile = pn + '.bif'
 
-        bootgenargs = ["bootgen"] + (d.getVar("BOOTGEN_FLAGS") or "").split()
-        bootgenargs += ["-image", biffile, "-o", pn + ".bit.bin"]
-        subprocess.run(bootgenargs, check = True)
+            with open(biffile, 'w') as f:
+                f.write('all:\n{\n\t' + glob.glob(d.getVar('S')+(d.getVar('BIT_PATH') or '') + '/*.bit')[0] + '\n}')
 
-        # In Zynq7k using both "-process_bitstream bin" and "-o" in bootgen flag,
-        # to convert bit file to bin format, "-o" option will not be effective
-        # and generated output file name is ${S}+${BIT_PATH}/<bit_file_name>.bit.bin
-        # file, Hence we need to rename this file from <bit_file_name>.bit.bin to
-        # ${PN}.bit.bin which matches the firmware name in dtbo and move
-        # ${PN}.bit.bin to ${B} directory.
-        if soc_family == 'zynq':
-            src_bitbin_file = glob.glob(d.getVar('S') + (d.getVar('BIT_PATH') or '') + '/*.bit.bin')[0]
-            dst_bitbin_file = d.getVar('B') + '/' + pn + '.bit.bin'
-            shutil.move(src_bitbin_file, dst_bitbin_file)
+            bootgenargs = ["bootgen"] + (d.getVar("BOOTGEN_FLAGS") or "").split()
+            bootgenargs += ["-image", biffile, "-o", pn + ".bit.bin"]
+            subprocess.run(bootgenargs, check = True)
 
-        if not os.path.isfile(pn + ".bit.bin"):
-            bb.fatal("Couldn't find %s file, Enable '-log trace' in BOOTGEN_FLAGS" \
-                "and check bootgen_log.txt" % (d.getVar('B') + '/' + pn + '.bit.bin'))
+            # In Zynq7k using both "-process_bitstream bin" and "-o" in bootgen flag,
+            # to convert bit file to bin format, "-o" option will not be effective
+            # and generated output file name is ${S}+${BIT_PATH}/<bit_file_name>.bit.bin
+            # file, Hence we need to rename this file from <bit_file_name>.bit.bin to
+            # ${PN}.bit.bin which matches the firmware name in dtbo and move
+            # ${PN}.bit.bin to ${B} directory.
+            if soc_family == 'zynq':
+                src_bitbin_file = glob.glob(d.getVar('S') + (d.getVar('BIT_PATH') or '') + '/*.bit.bin')[0]
+                dst_bitbin_file = d.getVar('B') + '/' + pn + '.bit.bin'
+                shutil.move(src_bitbin_file, dst_bitbin_file)
+
+            if not os.path.isfile(pn + ".bit.bin"):
+                bb.fatal("Couldn't find %s file, Enable '-log trace' in BOOTGEN_FLAGS" \
+                    "and check bootgen_log.txt" % (d.getVar('B') + '/' + pn + '.bit.bin'))
 }
 
 # If user inputs both dtsi and dts files then device-tree will generate dtbo
@@ -188,7 +199,7 @@ python find_user_dts_overlay_file() {
         dtsi_count = get_dt_count(d, 'dtsi')
         if dtsi_count == 1 and dts_count == 0:
             dts_file =glob.glob(d.getVar('S')+ (d.getVar('DTSI_PATH') or '') + '/*.dtsi')[0]
-        elif dtsi_count > 1 and dts_count == 1:
+        elif dtsi_count >=0 and dts_count == 1:
             dts_file = glob.glob(d.getVar('S')+ (d.getVar('DTSI_PATH') or '') + '/*.dts')[0]
 
         d.setVar('USER_DTS_FILE', os.path.splitext(os.path.basename(dts_file))[0])
@@ -224,16 +235,21 @@ do_install() {
             bbfatal "A PDI file with '.pdi' expected but not found"
         fi
     else
-        # In case of dtbo as input, .bit or .bit.bin will be copied from directly
-        # from ${S} without renaming the .bit name to ${PN}.bit.bin
-        if [ `ls ${S}/*.bit* | wc -l` -eq 1 ] && [ `ls ${S}/*.dtbo | wc -l` -eq 1 ]; then
-            install -Dm 0644 ${S}/*.bit* ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
-        elif [ `ls ${S}/*.bit* | wc -l` -gt 1 ]; then
-            bbfatal "Multiple bit/bit.bin found, use the right bit/bit.bin in SRC_URI from the following:\n$(basename -a ${S}/*.bit*)"
+        # In case of dtbo as input, .bit or .bin will be copied from directly
+        # from ${S} without renaming the .bit/.bin name to ${PN}.bit/${PN}.bin
+        # if more than one .bit/.bin file is found then fail the task.
+        if [ `ls ${S}/*.bit | wc -l` -gt 1 ]; then
+            bbfatal "Multiple .bit found, use the right .bit in SRC_URI from the following:\n$(basename -a ${S}/*.bit)"
+        elif [ `ls ${S}/*.bin | wc -l` -gt 1 ]; then
+            bbfatal "Multiple .bin found, use the right .bin in SRC_URI from the following:\n$(basename -a ${S}/*.bin)"
+        elif [ `ls ${S}/*.bit | wc -l` -eq 1 ] && [ `ls ${S}/*.dtbo | wc -l` -eq 1 ]; then
+            install -Dm 0644 ${S}/*.bit ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+        elif [ `ls ${S}/*.bin | wc -l` -eq 1 ] && [ `ls ${S}/*.dtbo | wc -l` -eq 1 ]; then
+            install -Dm 0644 ${S}/*.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
         elif [ -f ${B}/${PN}.bit.bin ] && [ -f ${B}/${USER_DTS_FILE}.dtbo ]; then
             install -Dm 0644 ${B}/${PN}.bit.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.bit.bin
         else
-            bbfatal "A bitstream file with '.bit' or '.bit.bin' expected but not found"
+            bbfatal "A bitstream file with '.bit' or '.bin' expected but not found"
         fi
     fi
 
