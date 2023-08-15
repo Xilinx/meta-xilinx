@@ -1,5 +1,5 @@
 ATF_VERSION = "2.8"
-SRCREV = "f0ba7ad93cca64ca89cab9039ad76557c1db42dd"
+SRCREV = "8fa10866141b488d3c257174c1cbc052aec59fac"
 BRANCH = "xlnx_rebase_v2.8"
 LIC_FILES_CHKSUM = "file://license.rst;md5=1dd070c98a281d18d9eefd938729b031"
 
