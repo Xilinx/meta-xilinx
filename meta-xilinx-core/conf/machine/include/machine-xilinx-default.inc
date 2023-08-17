@@ -64,33 +64,38 @@ FIT_CONF_DEFAULT_DTB ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE')).replace(
 # Define to avoid parsse errors below if undefind elsewhere
 INITRAMFS_IMAGE ??= ""
 
+# IMAGE_BOOT_FILES is a whitespace-separated list of entries specifying files to be installed into the boot partition
+# entries can change the installed filename by specifying the destination name after a semicolon (e.g. u-boot.img;uboot)
+# make sure to use the installed filename when scanning IMAGE_BOOT_FILES
+IMAGE_BOOT_FILES_INSTALLED = "${@' '.join([x.split(';')[-1] for x in d.getVar('IMAGE_BOOT_FILES').split()])}"
+
 # Automatically add WKS_FILE_DEPENDS based on the configuration
 # Initial value from oe-core/meta/classes-recipe/image_types_wic.bbclass
 WKS_FILE_DEPENDS ?= "${WKS_FILE_DEPENDS_DEFAULT} ${WKS_FILE_DEPENDS_BOOTLOADERS}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'boot.bin',     ' virtual/boot-bin', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'system.dtb',   ' virtual/dtb', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'boot.scr',     ' u-boot-xlnx-scr', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'uEnv.txt',     ' u-boot-xlnx-uenv', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'atf-uboot.ub', ' arm-trusted-firmware', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'Image',        ' virtual/kernel', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'uImage',       ' virtual/kernel', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'zImage',       ' virtual/kernel', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'u-boot.bin',   ' virtual/bootloader', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'u-boot.elf',   ' virtual/bootloader', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', '${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot', ' ${INITRAMFS_IMAGE}', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'boot.bin',     ' virtual/boot-bin', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'system.dtb',   ' virtual/dtb', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'boot.scr',     ' u-boot-xlnx-scr', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'uEnv.txt',     ' u-boot-xlnx-uenv', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'atf-uboot.ub', ' arm-trusted-firmware', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'Image',        ' virtual/kernel', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'uImage',       ' virtual/kernel', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'zImage',       ' virtual/kernel', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'u-boot.bin',   ' virtual/bootloader', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'u-boot.elf',   ' virtual/bootloader', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', '${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot', ' ${INITRAMFS_IMAGE}', '', d)}"
 
 # Automatically add IMAGE_BOOT_FILES to /boot via packages
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'boot.bin',     ' ${PREFERRED_PROVIDER_virtual/boot-bin}', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'system.dtb',   ' ${PREFERRED_PROVIDER_virtual/dtb}', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'boot.scr',     ' u-boot-xlnx-scr', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'uEnv.txt',     ' u-boot-xlnx-uenv', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'atf-uboot.ub', ' arm-trusted-firmware', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'u-boot.bin',   ' ${PREFERRED_PROVIDER_virtual/bootloader}-bin', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'u-boot.elf',   ' ${PREFERRED_PROVIDER_virtual/bootloader}-elf', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'Image',        ' kernel-image-image', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'uImage',       ' kernel-image-uimage', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', 'zImage',       ' kernel-image-zimage', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES', '${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot', ' initramdisk-${INITRAMFS_IMAGE}', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'boot.bin',     ' ${PREFERRED_PROVIDER_virtual/boot-bin}', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'system.dtb',   ' ${PREFERRED_PROVIDER_virtual/dtb}', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'boot.scr',     ' u-boot-xlnx-scr', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'uEnv.txt',     ' u-boot-xlnx-uenv', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'atf-uboot.ub', ' arm-trusted-firmware', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'u-boot.bin',   ' ${PREFERRED_PROVIDER_virtual/bootloader}-bin', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'u-boot.elf',   ' ${PREFERRED_PROVIDER_virtual/bootloader}-elf', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'Image',        ' kernel-image-image', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'uImage',       ' kernel-image-uimage', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'zImage',       ' kernel-image-zimage', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', '${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot', ' initramdisk-${INITRAMFS_IMAGE}', '', d)}"
 
 # Default SD card wks file, split /boot and /
 WKS_FILES ?= "xilinx-default-sd.wks"
