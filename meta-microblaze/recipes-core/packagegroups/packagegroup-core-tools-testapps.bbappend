@@ -6,6 +6,8 @@ X11GLTOOLS:microblaze ?= ""
 KEXECTOOLS:microblaze = ""
 
 RDEPENDS:${PN}:remove:microblaze = "\
+alsa-utils-amixer \
+alsa-utils-aplay \
 ltp \
 connman-tools \
 connman-tests \
