@@ -11,7 +11,7 @@ PV .= "+git${SRCPV}"
 S = "${WORKDIR}/git"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2023.2"
 REPO ?= "git://github.com/Xilinx/vdu-modules.git;protocol=https"
 SRCREV ?= "4d5134f54006f904f0b28f00e05dd3febd5fcfd3"
 
