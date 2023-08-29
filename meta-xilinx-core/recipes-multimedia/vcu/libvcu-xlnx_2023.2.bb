@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ef69c2bb405668101824f0b644631e2e"
 XILINX_VCU_VERSION = "1.0.0"
 PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git${SRCPV}"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2023.2"
 REPO   ?= "git://github.com/Xilinx/vcu-ctrl-sw.git;protocol=https"
 SRCREV = "84b0856cad7844d69f57ac4d9447c20930875475"
 
