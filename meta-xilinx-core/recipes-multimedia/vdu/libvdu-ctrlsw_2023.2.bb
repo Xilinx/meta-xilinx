@@ -11,7 +11,7 @@ inherit autotools features_check
 
 REQUIRED_MACHINE_FEATURES = "vdu"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2023.2"
 REPO   ?= "git://github.com/Xilinx/vdu-ctrl-sw.git;protocol=https"
 SRCREV ?= "1beb8f247d01b1a728faea36ce8f7847c895482f"
 
