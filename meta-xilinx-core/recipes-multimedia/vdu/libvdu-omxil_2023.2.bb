@@ -7,7 +7,7 @@ XILINX_VDU_VERSION = "1.0.0"
 PV =. "${XILINX_VDU_VERSION}-xilinx-v"
 PV .= "+git${SRCPV}"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2023.2"
 REPO   ?= "git://github.com/Xilinx/vdu-omx-il.git;protocol=https"
 SRCREV ?= "811eefac953fd5e098c69cada97a0dd35f5e9015"
 
