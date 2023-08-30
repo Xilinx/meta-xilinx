@@ -199,7 +199,7 @@ YAML_DT_BOARD_FLAGS:pn-device-tree - YAML based configuration for setting eval
 board specific dtsi files available in DTG repo.
 
 arm-trusted-firmware recipe from meta-xilinx-core:
-ATF_CONSOLE_DEFAULT - Uart console configuration for all aarch64 device families.
+ATF_CONSOLE - Uart console configuration for all aarch64 device families.
 Example: pl011 or cadence or cadence1 etc,.
 TFA_BL33_LOAD - BL33 preloadded base address to EXTRA_OEMAKE for aarch64.
 
