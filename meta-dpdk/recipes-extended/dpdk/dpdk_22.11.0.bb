@@ -3,7 +3,7 @@ include dpdk.inc
 SRC_URI = "git://github.com/Xilinx-CNS/cns-dpdk-next-sfc.git;branch=${BRANCH};protocol=https"
 
 BRANCH = "cdx_22.11"
-SRCREV = "92339d519b50996915e7dbb5b8246b34febcba93"
+SRCREV = "59161e5e88faf7475a8db180efe6d6f5113631b4"
 S = "${WORKDIR}/git"
 
 # kernel module is provide by dpdk-module recipe, so disable here
