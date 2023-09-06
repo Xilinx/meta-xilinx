@@ -15,7 +15,7 @@ do
 	if test "${boot_target}" = "jtag" ; then
 		fdt addr @@DEVICETREE_ADDRESS@@
 		fdt get value bootargs /chosen bootargs
-		setenv bootargs $bootargs @@KERNEL_ROOT_RAMDISK@@
+		setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@
 		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
 	fi
 	if test "${boot_target}" = "mmc0" || test "${boot_target}" = "mmc1" || test "${boot_target}" = "usb0" || test "${boot_target}" = "usb1"; then
@@ -65,7 +65,7 @@ do
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${ramdisk_name};
 			fdt addr @@DEVICETREE_ADDRESS@@
 			fdt get value bootargs /chosen bootargs
-			setenv bootargs $bootargs @@KERNEL_ROOT_RAMDISK@@
+			setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@
 			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
 		fi
 		echo "Checking for /${rootfs_name}"
@@ -74,12 +74,12 @@ do
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${rootfs_name};
 			fdt addr @@DEVICETREE_ADDRESS@@
 			fdt get value bootargs /chosen bootargs
-			setenv bootargs $bootargs @@KERNEL_ROOT_RAMDISK@@
+			setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@
 			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
 		fi
 		fdt addr @@DEVICETREE_ADDRESS@@
 		fdt get value bootargs /chosen bootargs
-		setenv bootargs $bootargs @@KERNEL_ROOT_SD@@
+		setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_SD@@
 		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ - @@DEVICETREE_ADDRESS@@
 	fi
 	if test "${boot_target}" = "xspi0" || test "${boot_target}" = "qspi" || test "${boot_target}" = "qspi0"; then
@@ -93,7 +93,7 @@ do
 		sf read @@RAMDISK_IMAGE_ADDRESS@@ @@QSPI_RAMDISK_OFFSET@@ @@QSPI_RAMDISK_SIZE@@
 		fdt addr @@DEVICETREE_ADDRESS@@
 		fdt get value bootargs /chosen bootargs
-		setenv bootargs $bootargs @@KERNEL_ROOT_RAMDISK@@
+		setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@
 		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@;
 		echo "Booting using Separate images failed"
 	fi
@@ -108,7 +108,7 @@ do
 		nand read @@RAMDISK_IMAGE_ADDRESS@@ @@NAND_RAMDISK_OFFSET@@ @@NAND_RAMDISK_SIZE@@
 		fdt addr @@DEVICETREE_ADDRESS@@
 		fdt get value bootargs /chosen bootargs
-		setenv bootargs $bootargs @@KERNEL_ROOT_RAMDISK@@
+		setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@
 		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@;
 		echo "Booting using Separate images failed"
 	fi
