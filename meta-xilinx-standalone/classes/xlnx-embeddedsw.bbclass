@@ -9,7 +9,7 @@ ESW_BRANCH[2024.1] = "xlnx_rel_v2023.2-next"
 BRANCH ??= "${@d.getVarFlag('ESW_BRANCH', d.getVar('ESW_VER')) or '${ESW_VER}'}"
 
 ESW_REV[2023.1] = "e24fe92b5517ee447e560790e798cad792f53bab"
-ESW_REV[2023.2] = "8070822a60c8a6e869522e9febd72ed7b188358d"
+ESW_REV[2023.2] = "6ccd026d115ed986ccb1541c62dc7dac21bf2ab8"
 ESW_REV[2024.1] = "8070822a60c8a6e869522e9febd72ed7b188358d"
 SRCREV ??= "${@d.getVarFlag('ESW_REV', d.getVar('ESW_VER')) or '${AUTOREV}'}"
 
