@@ -1,5 +1,5 @@
-DESCRIPTION = "Image update is used to update alternate image on SOM."
-SUMMARY = "Image update is used to update alternate image on SOM. \
+DESCRIPTION = "Image update is used to update alternate images on compatible firmware."
+SUMMARY = "Image update is used to update alternate image on compatible firmware. \
 	If the current image is ImageA, ImageB will get updated and vice versa. \
 	Usage: image_update <Input Image File>"
 
