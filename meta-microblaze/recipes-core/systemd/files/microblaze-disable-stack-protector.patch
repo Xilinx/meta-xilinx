@@ -1,30 +1,37 @@
-Microblaze does not support stack-protector:
+From ec286a0b613a9fa487be75b7c1c01e5c8ce62a1a Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Fri, 22 Sep 2023 11:01:16 -0600
+Subject: [PATCH] meson.build: Microblaze does not support stack-protector
 
 | cc1: warning: '-fstack-protector' not supported for this target
 | ninja: build stopped: subcommand failed.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [Configuration]
 
 Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+---
+ meson.build | 3 ---
+ 1 file changed, 3 deletions(-)
 
-Index: git/meson.build
-===================================================================
---- git.orig/meson.build
-+++ git/meson.build
-@@ -403,7 +403,6 @@ possible_link_flags = [
-         '-Wl,--fatal-warnings',
-         '-Wl,-z,now',
-         '-Wl,-z,relro',
+diff --git a/meson.build b/meson.build
+index 395eca1943..8b87c5b3a2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -405,14 +405,11 @@ possible_common_cc_flags = [
+ 
+         '-fdiagnostics-show-option',
+         '-fno-common',
+-        '-fstack-protector',
+-        '-fstack-protector-strong',
+         '-fstrict-flex-arrays',
+         '--param=ssp-buffer-size=4',
+ ]
+ 
+ possible_common_link_flags = [
 -        '-fstack-protector',
  ]
  
- if get_option('b_sanitize') == 'none'
-@@ -423,8 +422,6 @@ possible_cc_flags = possible_common_cc_f
-         '-fdiagnostics-show-option',
-         '-fno-common',
-         '-fno-strict-aliasing',
--        '-fstack-protector',
--        '-fstack-protector-strong',
-         '-fvisibility=hidden',
-         '--param=ssp-buffer-size=4',
- ]
+ c_args = get_option('c_args')
+-- 
+2.34.1
+

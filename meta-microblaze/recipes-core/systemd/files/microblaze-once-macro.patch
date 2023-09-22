@@ -1,42 +1,49 @@
-For microblaze, replace the ONCE macro
+From 239d51b5b02ba766f34b3fce9803f8fd13097471 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Fri, 22 Sep 2023 11:09:50 -0600
+Subject: [PATCH] macro-funcamental.h: Microblaze does not have atomic
+ functions
 
 For some reason the systemd developers decided that needed to hardcode
-the usage of __sync_bool_compare_and_swap, however not all architectures
+the usage of __atomic_exchange functions, however not all architectures
 define this.  Microblaze is one such architecture, so we fall back to
-a less 'safe' way of doing the work.  However a quick inspection of
-the ONCE users shows that even if we end up with a race condition the
+a less safe way of doing the same thing.  A quick inspection of
+the ONCE users show that even if we end up with a race condition the
 worst expected behavior could be multiple log messages.
 
 Upstream-Status: Pending
 
-Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ src/fundamental/macro-fundamental.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-Index: git/src/fundamental/macro-fundamental.h
-===================================================================
---- git.orig/src/fundamental/macro-fundamental.h
-+++ git/src/fundamental/macro-fundamental.h
-@@ -109,11 +109,28 @@
+diff --git a/src/fundamental/macro-fundamental.h b/src/fundamental/macro-fundamental.h
+index 1d49765fce..f45f55cdfe 100644
+--- a/src/fundamental/macro-fundamental.h
++++ b/src/fundamental/macro-fundamental.h
+@@ -116,11 +116,28 @@
   * on this macro will run concurrently to all other code conditionalized
   * the same way, there's no ordering or completion enforced. */
  #define ONCE __ONCE(UNIQ_T(_once_, UNIQ))
 +#if !defined (__microblaze__)
- #define __ONCE(o)                                                       \
-         ({                                                              \
-                 static sd_bool (o) = sd_false;                          \
-                 __sync_bool_compare_and_swap(&(o), sd_false, sd_true);  \
+ #define __ONCE(o)                                                  \
+         ({                                                         \
+                 static bool (o) = false;                           \
+                 __atomic_exchange_n(&(o), true, __ATOMIC_SEQ_CST); \
          })
 +#else
-+  /* Microblaze does not contain __sync_bool_compare_and_swap, so we do it
++  /* Microblaze does not contain __atomic_exchange_n*, so we do it
 +   * the old fashioned way.  Note, it's possible that ONCE may run more
 +   * then ONCE due to possible races, however it is not expected to cause
-+   * an issue. */
++   * an issue with systemd usage. */
 +#define __ONCE(o)                                                       \
 +        ({                                                              \
-+                static bool (o) = sd_false;                             \
-+                bool rc = sd_false;                                     \
-+                if ((o) == sd_false) {                                  \
-+                        (o) = sd_true;                                  \
-+                        rc = sd_true;                                   \
++                static bool (o) = false;                             \
++                bool rc = false;                                     \
++                if ((o) == false) {                                  \
++                        (o) = true;                                  \
++                        rc = true;                                   \
 +                }                                                       \
 +                rc;                                                     \
 +        })
@@ -44,3 +51,6 @@ Index: git/src/fundamental/macro-fundamental.h
  
  #undef MAX
  #define MAX(a, b) __MAX(UNIQ, (a), UNIQ, (b))
+-- 
+2.34.1
+

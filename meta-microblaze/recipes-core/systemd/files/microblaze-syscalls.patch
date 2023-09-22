@@ -1,14 +1,24 @@
-Add microblaze syscalls to systemd
+From 2bd273c3a474b04b60c08c98fb7859fce28eac6d Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Fri, 22 Sep 2023 10:26:47 -0600
+Subject: [PATCH] syscalls-microblaze.txt: Add microblaze syscalls to systemd
 
 Upstream-Status: Pending
 
-Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ src/basic/meson.build             |   1 +
+ src/basic/missing_syscall_def.h   |  33 ++
+ src/basic/missing_syscalls.py     |   2 +
+ src/basic/syscalls-microblaze.txt | 598 ++++++++++++++++++++++++++++++
+ 4 files changed, 634 insertions(+)
+ create mode 100644 src/basic/syscalls-microblaze.txt
 
-Index: git/src/basic/meson.build
-===================================================================
---- git.orig/src/basic/meson.build
-+++ git/src/basic/meson.build
-@@ -347,6 +347,7 @@ arch_list = [
+diff --git a/src/basic/meson.build b/src/basic/meson.build
+index 3af013b014..e77f7cef16 100644
+--- a/src/basic/meson.build
++++ b/src/basic/meson.build
+@@ -190,6 +190,7 @@ arch_list = [
          'ia64',
          'loongarch64',
          'm68k',
@@ -16,10 +26,10 @@ Index: git/src/basic/meson.build
          'mips64',
          'mips64n32',
          'mipso32',
-Index: git/src/basic/missing_syscall_def.h
-===================================================================
---- git.orig/src/basic/missing_syscall_def.h
-+++ git/src/basic/missing_syscall_def.h
+diff --git a/src/basic/missing_syscall_def.h b/src/basic/missing_syscall_def.h
+index 402fdd00dc..94f41c1522 100644
+--- a/src/basic/missing_syscall_def.h
++++ b/src/basic/missing_syscall_def.h
 @@ -16,6 +16,7 @@
  #  elif defined(__ia64__)
  #  elif defined(__loongarch64)
@@ -28,7 +38,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #    elif _MIPS_SIM == _MIPS_SIM_NABI32
-@@ -58,6 +59,8 @@
+@@ -59,6 +60,8 @@
  #    define systemd_NR_bpf 280
  #  elif defined(__m68k__)
  #    define systemd_NR_bpf 354
@@ -37,7 +47,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_bpf 4355
-@@ -124,6 +127,8 @@ assert_cc(__NR_bpf == systemd_NR_bpf);
+@@ -127,6 +130,8 @@ assert_cc(__NR_bpf == systemd_NR_bpf);
  #    define systemd_NR_close_range 436
  #  elif defined(__m68k__)
  #    define systemd_NR_close_range 436
@@ -46,7 +56,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_close_range 4436
-@@ -190,6 +195,8 @@ assert_cc(__NR_close_range == systemd_NR
+@@ -195,6 +200,8 @@ assert_cc(__NR_close_range == systemd_NR_close_range);
  #    define systemd_NR_copy_file_range 285
  #  elif defined(__m68k__)
  #    define systemd_NR_copy_file_range 376
@@ -55,16 +65,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_copy_file_range 4360
-@@ -256,6 +263,8 @@ assert_cc(__NR_copy_file_range == system
- #    define systemd_NR_epoll_pwait2 441
- #  elif defined(__m68k__)
- #    define systemd_NR_epoll_pwait2 441
-+#  elif defined(__microblaze__)
-+#    define systemd_NR_epoll_pwait2 441
- #  elif defined(_MIPS_SIM)
- #    if _MIPS_SIM == _MIPS_SIM_ABI32
- #      define systemd_NR_epoll_pwait2 4441
-@@ -322,6 +331,8 @@ assert_cc(__NR_epoll_pwait2 == systemd_N
+@@ -263,6 +270,8 @@ assert_cc(__NR_copy_file_range == systemd_NR_copy_file_range);
  #    define systemd_NR_getrandom 278
  #  elif defined(__m68k__)
  #    define systemd_NR_getrandom 352
@@ -73,7 +74,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_getrandom 4353
-@@ -388,6 +399,8 @@ assert_cc(__NR_getrandom == systemd_NR_g
+@@ -331,6 +340,8 @@ assert_cc(__NR_getrandom == systemd_NR_getrandom);
  #    define systemd_NR_memfd_create 279
  #  elif defined(__m68k__)
  #    define systemd_NR_memfd_create 353
@@ -82,7 +83,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_memfd_create 4354
-@@ -454,6 +467,8 @@ assert_cc(__NR_memfd_create == systemd_N
+@@ -399,6 +410,8 @@ assert_cc(__NR_memfd_create == systemd_NR_memfd_create);
  #    define systemd_NR_mount_setattr 442
  #  elif defined(__m68k__)
  #    define systemd_NR_mount_setattr 442
@@ -91,7 +92,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_mount_setattr 4442
-@@ -520,6 +535,8 @@ assert_cc(__NR_mount_setattr == systemd_
+@@ -467,6 +480,8 @@ assert_cc(__NR_mount_setattr == systemd_NR_mount_setattr);
  #    define systemd_NR_move_mount 429
  #  elif defined(__m68k__)
  #    define systemd_NR_move_mount 429
@@ -100,7 +101,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_move_mount 4429
-@@ -586,6 +603,8 @@ assert_cc(__NR_move_mount == systemd_NR_
+@@ -535,6 +550,8 @@ assert_cc(__NR_move_mount == systemd_NR_move_mount);
  #    define systemd_NR_name_to_handle_at 264
  #  elif defined(__m68k__)
  #    define systemd_NR_name_to_handle_at 340
@@ -109,7 +110,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_name_to_handle_at 4339
-@@ -652,6 +671,8 @@ assert_cc(__NR_name_to_handle_at == syst
+@@ -603,6 +620,8 @@ assert_cc(__NR_name_to_handle_at == systemd_NR_name_to_handle_at);
  #    define systemd_NR_open_tree 428
  #  elif defined(__m68k__)
  #    define systemd_NR_open_tree 428
@@ -118,7 +119,16 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_open_tree 4428
-@@ -784,6 +805,8 @@ assert_cc(__NR_openat2 == systemd_NR_ope
+@@ -671,6 +690,8 @@ assert_cc(__NR_open_tree == systemd_NR_open_tree);
+ #    define systemd_NR_openat2 437
+ #  elif defined(__m68k__)
+ #    define systemd_NR_openat2 437
++#  elif defined(__microblaze__)
++#    define systemd_NR_openat2 437
+ #  elif defined(_MIPS_SIM)
+ #    if _MIPS_SIM == _MIPS_SIM_ABI32
+ #      define systemd_NR_openat2 4437
+@@ -739,6 +760,8 @@ assert_cc(__NR_openat2 == systemd_NR_openat2);
  #    define systemd_NR_pidfd_open 434
  #  elif defined(__m68k__)
  #    define systemd_NR_pidfd_open 434
@@ -127,7 +137,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_pidfd_open 4434
-@@ -850,6 +873,8 @@ assert_cc(__NR_pidfd_open == systemd_NR_
+@@ -807,6 +830,8 @@ assert_cc(__NR_pidfd_open == systemd_NR_pidfd_open);
  #    define systemd_NR_pidfd_send_signal 424
  #  elif defined(__m68k__)
  #    define systemd_NR_pidfd_send_signal 424
@@ -136,7 +146,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_pidfd_send_signal 4424
-@@ -916,6 +941,8 @@ assert_cc(__NR_pidfd_send_signal == syst
+@@ -875,6 +900,8 @@ assert_cc(__NR_pidfd_send_signal == systemd_NR_pidfd_send_signal);
  #    define systemd_NR_pkey_mprotect 288
  #  elif defined(__m68k__)
  #    define systemd_NR_pkey_mprotect 381
@@ -145,7 +155,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_pkey_mprotect 4363
-@@ -982,6 +1009,8 @@ assert_cc(__NR_pkey_mprotect == systemd_
+@@ -943,6 +970,8 @@ assert_cc(__NR_pkey_mprotect == systemd_NR_pkey_mprotect);
  #    define systemd_NR_renameat2 276
  #  elif defined(__m68k__)
  #    define systemd_NR_renameat2 351
@@ -154,7 +164,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_renameat2 4351
-@@ -1048,6 +1077,8 @@ assert_cc(__NR_renameat2 == systemd_NR_r
+@@ -1011,6 +1040,8 @@ assert_cc(__NR_renameat2 == systemd_NR_renameat2);
  #    define systemd_NR_setns 268
  #  elif defined(__m68k__)
  #    define systemd_NR_setns 344
@@ -163,7 +173,7 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_setns 4344
-@@ -1114,6 +1145,8 @@ assert_cc(__NR_setns == systemd_NR_setns
+@@ -1079,6 +1110,8 @@ assert_cc(__NR_setns == systemd_NR_setns);
  #    define systemd_NR_statx 291
  #  elif defined(__m68k__)
  #    define systemd_NR_statx 379
@@ -172,11 +182,11 @@ Index: git/src/basic/missing_syscall_def.h
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_statx 4366
-Index: git/src/basic/missing_syscalls.py
-===================================================================
---- git.orig/src/basic/missing_syscalls.py
-+++ git/src/basic/missing_syscalls.py
-@@ -64,6 +64,8 @@ DEF_TEMPLATE_B = '''\
+diff --git a/src/basic/missing_syscalls.py b/src/basic/missing_syscalls.py
+index 5ccf02adec..e09023abe1 100644
+--- a/src/basic/missing_syscalls.py
++++ b/src/basic/missing_syscalls.py
+@@ -63,6 +63,8 @@ DEF_TEMPLATE_B = '''\
  #    define systemd_NR_{syscall} {nr_loongarch64}
  #  elif defined(__m68k__)
  #    define systemd_NR_{syscall} {nr_m68k}
@@ -185,10 +195,11 @@ Index: git/src/basic/missing_syscalls.py
  #  elif defined(_MIPS_SIM)
  #    if _MIPS_SIM == _MIPS_SIM_ABI32
  #      define systemd_NR_{syscall} {nr_mipso32}
-Index: git/src/basic/syscalls-microblaze.txt
-===================================================================
+diff --git a/src/basic/syscalls-microblaze.txt b/src/basic/syscalls-microblaze.txt
+new file mode 100644
+index 0000000000..3fc4cd6aef
 --- /dev/null
-+++ git/src/basic/syscalls-microblaze.txt
++++ b/src/basic/syscalls-microblaze.txt
 @@ -0,0 +1,598 @@
 +_llseek	140
 +_newselect	142
@@ -788,3 +799,6 @@ Index: git/src/basic/syscalls-microblaze.txt
 +waitpid	7
 +write	4
 +writev	146
+-- 
+2.34.1
+
