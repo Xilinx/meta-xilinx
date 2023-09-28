@@ -1,0 +1,52 @@
+From b58c0a7dd0eeb16b2251edfad3b4763ce5653ea2 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Thu, 28 Sep 2023 12:04:34 -0600
+Subject: [PATCH] Support updated gcc, add cstdint where necessary
+
+With the latest gcc, cstdint is now needs to be explicitly included, otherwise
+errors similar to the following will occur:
+
+  include/lib_app/Parser.h:413:36: error: 'uint32_t' has not been declared
+    413 | static void resetFlag(T* bitfield, uint32_t uFlag)
+        |                                    ^~~~~~~~
+  include/lib_app/Parser.h: In function 'void resetFlag(T*, int)':
+  include/lib_app/Parser.h:415:20: error: 'uint32_t' was not declared in this scope
+    415 |   *bitfield = (T)((uint32_t)*bitfield & ~uFlag);
+        |                    ^~~~~~~~
+  include/lib_app/Parser.h:18:1: note: 'uint32_t' is defined in header '<cstdint>'; did you forget to '#include <cstdint>'?
+     17 | #include <iomanip>
+    +++ |+#include <cstdint>
+     18 |
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ exe_encoder/EncCmdMngr.h | 1 +
+ include/lib_app/Parser.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/exe_encoder/EncCmdMngr.h b/exe_encoder/EncCmdMngr.h
+index 6dacd68..cd3d0a6 100644
+--- a/exe_encoder/EncCmdMngr.h
++++ b/exe_encoder/EncCmdMngr.h
+@@ -7,6 +7,7 @@
+ #include <iostream>
+ #include <string>
+ #include <vector>
++#include <cstdint>
+ 
+ #include "ICommandsSender.h"
+ 
+diff --git a/include/lib_app/Parser.h b/include/lib_app/Parser.h
+index efb7f94..66d5164 100644
+--- a/include/lib_app/Parser.h
++++ b/include/lib_app/Parser.h
+@@ -15,6 +15,7 @@
+ #include <sstream>
+ #include <vector>
+ #include <iomanip>
++#include <cstdint>
+ 
+ std::deque<Token> toReversePolish(std::deque<Token>& tokens);
+ std::string parseString(std::deque<Token>& tokens);
+-- 
+2.34.1
