@@ -31,7 +31,7 @@ $ source poky/oe-init-build-env
 4. Once initialized configure `bblayers.conf` by adding dependency layers as shown
    below using `bitbake-layers` command.
 > **Note:** From step 3 by default `meta-yocto-bsp` will be included in bblayers.conf
-> file and this can be removed using `$ bitbake-layers add-layer meta-yocto-bsp`
+> file and this can be removed using `$ bitbake-layers remove-layer meta-yocto-bsp`
 > command.
 
 ```
