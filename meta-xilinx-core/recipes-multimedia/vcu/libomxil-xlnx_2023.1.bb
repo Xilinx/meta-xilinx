@@ -13,6 +13,8 @@ SRCREV = "4773b372b72b88ccbabc122b023f042fb22a019e"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
+SRC_URI += "file://0001-Current-gcc-requires-cstdint-for-C-types.patch"
+
 S  = "${WORKDIR}/git"
 
 inherit features_check
