@@ -18,18 +18,18 @@ do_install[vardepsexclude] += "DEPLOY_DIR_IMAGE"
 do_install[depends] += "${INITRAMFS_IMAGE}:do_image_complete"
 do_install[cleandirs] = "${D}"
 do_install() {
-	if [ -e ${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot ]; then
+	if [ -e ${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.rootfs.cpio.gz.u-boot ]; then
 		install -d ${D}/boot/
-		install -m 0644 ${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot ${D}/boot/.
+		install -m 0644 ${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE}-${MACHINE}.rootfs.cpio.gz.u-boot ${D}/boot/.
 	else
-		bbfatal "Unable to find expected initramfs: ${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot"
+		bbfatal "Unable to find expected initramfs: ${INITRAMFS_IMAGE}-${MACHINE}.rootfs.cpio.gz.u-boot"
 	fi
 }
 
 PACKAGES = "${PACKAGE_BEFORE_PN} ${PN}"
 
 RPROVIDES:${PN} = "initramdisk"
-FILES:${PN} = "/boot/${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot"
+FILES:${PN} = "/boot/${INITRAMFS_IMAGE}-${MACHINE}.rootfs.cpio.gz.u-boot"
 
 python() {
     if not d.getVar('INITRAMFS_IMAGE'):
