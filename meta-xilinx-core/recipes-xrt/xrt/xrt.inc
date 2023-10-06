@@ -2,8 +2,8 @@ REPO ?= "git://github.com/Xilinx/XRT.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG};name=xrt"
 
-BRANCH= "2023.2"
-SRCREV_xrt = "323fc40274fc0cf44b253925385613aa742050cf"
+BRANCH= "master"
+SRCREV_xrt = "ca4a49bdf51ef441e190cc922e46aeaaacd36ff9"
 PV = "202320.2.16.0"
 
 SRC_URI += "git://github.com/Xilinx/dma_ip_drivers.git;branch=master;name=dma_ip_drivers;destsuffix=git/src/runtime_src/core/pcie/driver/linux/xocl/lib/libqdma;protocol=https"
