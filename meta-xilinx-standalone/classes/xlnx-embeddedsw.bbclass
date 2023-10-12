@@ -8,7 +8,7 @@ ESW_BRANCH[2023.2] = "xlnx_rel_v2023.2"
 BRANCH ??= "${@d.getVarFlag('ESW_BRANCH', d.getVar('ESW_VER')) or '${ESW_VER}'}"
 
 ESW_REV[2023.1] = "e24fe92b5517ee447e560790e798cad792f53bab"
-ESW_REV[2023.2] = "bd497446bded94d1ea627096127587f60c9b8db6"
+ESW_REV[2023.2] = "c9a0ee31b2a14cbcfcb56ca369037319b4ad4847"
 SRCREV ??= "${@d.getVarFlag('ESW_REV', d.getVar('ESW_VER')) or '${AUTOREV}'}"
 
 EMBEDDEDSW_BRANCHARG ?= "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
