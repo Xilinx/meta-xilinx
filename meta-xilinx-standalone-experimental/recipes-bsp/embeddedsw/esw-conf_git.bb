@@ -1,5 +1,5 @@
 # Can't depend on esw since this is needed for setup!
-inherit xlnx-embeddedsw nativesdk
+inherit xlnx-embeddedsw
 
 # We need to override the inherit
 require conf/dtb-embeddedsw.inc
@@ -7,8 +7,10 @@ require conf/dtb-embeddedsw.inc
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
-# Don't need any specific dependencies for this
-DEPENDS = ""
+INHIBIT_DEFAULT_DEPS = "1"
+
+# Installing this recipe should install the lopper tools and such
+DEPENDS = "lopper xilinx-lops"
 
 COMPATIBLE_HOST:forcevariable = ".*"
 
@@ -28,3 +30,5 @@ do_install() {
 }
 
 FILES:${PN} += "${datadir}/embeddedsw"
+
+BBCLASSEXTEND = "native nativesdk"
