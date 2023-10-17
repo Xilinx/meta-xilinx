@@ -2,7 +2,7 @@ UBOOT_VERSION = "v2023.01"
 
 UBRANCH = "master"
 
-SRCREV = "939c03d124cb3e5a07edeb9a1d9c12cf650a1468"
+SRCREV = "2bb777cd7a00b3f64e05971272786b6be77bb830"
 
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=4;md5=744e7e3bb0c94b4b9f6b3db3bf893897"
