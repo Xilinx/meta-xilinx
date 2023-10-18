@@ -13,11 +13,13 @@ PACKAGECONFIG[clockps] = "${RECIPE_SYSROOT}/usr/lib/libclockps.a,,clockps,,"
 PACKAGECONFIG[scugic] = "${RECIPE_SYSROOT}/usr/lib/libscugic.a,,scugic,,"
 PACKAGECONFIG[intc] = "${RECIPE_SYSROOT}/usr/lib/libintc.a,,intc,,"
 
-ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/common/src/"
+ESW_COMPONENT_SRC = "/lib/bsp/standalone/src/common/intr/"
 ESW_COMPONENT_NAME = "libcommon.a"
 
 do_configure:prepend() {
     LOPPER_DTC_FLAGS="-b 0 -@" lopper ${DTS_FILE} -- baremetalconfig_xlnx.py ${ESW_MACHINE} ${S}/XilinxProcessorIPLib/drivers/intc/src/
     LOPPER_DTC_FLAGS="-b 0 -@" lopper ${DTS_FILE} -- baremetalconfig_xlnx.py ${ESW_MACHINE} ${S}/XilinxProcessorIPLib/drivers/scugic/src/
-    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+    if [ -f *.cmake ]; then
+	install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+    fi
 }

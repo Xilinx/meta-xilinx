@@ -14,5 +14,8 @@ do_configure:prepend() {
     install -m 0755 *.c ${S}/${ESW_COMPONENT_SRC}
     lopper ${DTS_FILE} -- bmcmake_metadata_xlnx ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
     install -m 0755 StandaloneExample.cmake ${S}/${ESW_COMPONENT_SRC}/common/
+    LOPPER_DTC_FLAGS="-b 0 -@" lopper ${DTS_FILE} -- baremetal_xparameters_xlnx.py ${ESW_MACHINE} ${S}
+    install -m 0755 xparameters.h ${S}/${ESW_COMPONENT_SRC}/common/
     )
+
 }

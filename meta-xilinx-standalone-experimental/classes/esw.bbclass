@@ -80,11 +80,11 @@ cmake_do_generate_toolchain_file:append() {
     # set( CMAKE_SYSTEM_NAME `echo elf | sed -e 's/^./\u&/' -e 's/^\(Linux\).*/\1/'` )
     set( CMAKE_SYSTEM_NAME "${XLNX_CMAKE_SYSTEM_NAME}" )
     set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${S}/cmake)
-    set( CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_LIBDIR})
+    set( CMAKE_LIBRARY_PATH ${B})
     if ("${XLNX_CMAKE_PROCESSOR}" STREQUAL "plm_microblaze")
         set( CMAKE_BUILD_TYPE Release)
     endif()
-    add_definitions( "${XLNX_CMAKE_BSP_VARS}" )
+    add_definitions( "${XLNX_CMAKE_BSP_VARS} -DSDT" )
 EOF
 }
 
@@ -96,6 +96,7 @@ do_install() {
 }
 
 CFLAGS:append = " ${ESW_CFLAGS}"
+EXTRA_OECMAKE += "-DYOCTO=ON"
 
 # We need to find the license file, which vaires depending on the component
 # recurse a maximum of x times, could be fancier but it gets complicated since

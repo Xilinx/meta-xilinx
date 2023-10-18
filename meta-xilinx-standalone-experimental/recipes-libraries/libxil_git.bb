@@ -28,11 +28,6 @@ DEPENDS += "xilstandalone "
 REQUIRED_MACHINE_FEATURES = "${MACHINE_FEATURES}"
 PACKAGECONFIG ?= "${MACHINE_FEATURES}"
 
-do_configure:prepend() {
-    LOPPER_DTC_FLAGS="-b 0 -@" lopper ${DTS_FILE} -- baremetal_xparameters_xlnx.py ${ESW_MACHINE} ${S}
-    install -m 0755 xparameters.h ${S}/${ESW_COMPONENT_SRC}/
-}
-
 do_compile() {
    # Combines the .a archives produced by all of the dependent items
    cd ${RECIPE_SYSROOT}/usr/lib/
@@ -47,4 +42,9 @@ do_compile() {
    echo “end” >> libxil.mri
    ${AR} -M <libxil.mri
    cp libxil.a ${B}
+}
+
+do_install() {
+    install -d ${D}${libdir}
+    install -m 0755  ${B}/${ESW_COMPONENT_NAME} ${D}${libdir}
 }

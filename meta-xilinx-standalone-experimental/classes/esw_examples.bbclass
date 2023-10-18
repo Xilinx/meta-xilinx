@@ -7,6 +7,7 @@ do_configure:prepend() {
     cd ${S}
     lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
     install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+    cp -rf ${S}/scripts/linker_files/ ${S}/${ESW_COMPONENT_SRC}/linker_files
     )
 }
 
