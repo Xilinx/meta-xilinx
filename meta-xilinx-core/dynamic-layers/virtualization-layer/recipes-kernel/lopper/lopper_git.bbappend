@@ -1,5 +1,5 @@
 SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master;protocol=https"
-SRCREV = "807435ae6fa0a07e8c84b458d138f3f54614eb5c"
+SRCREV = "657c7d67aba7f1694f2e6ece5cfbdf94eaf4d960"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/lopper:"
 
