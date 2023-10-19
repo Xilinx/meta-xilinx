@@ -1,9 +1,6 @@
 # Can't depend on esw since this is needed for setup!
 inherit xlnx-embeddedsw
 
-# We need to override the inherit
-require conf/dtb-embeddedsw.inc
-
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 

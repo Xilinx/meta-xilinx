@@ -2,9 +2,6 @@ PV = "${ESW_VER}"
 
 inherit python3native xlnx-embeddedsw pkgconfig cmake
 
-# Override xlnx-embeddedsw with out version
-require conf/dtb-embeddedsw.inc
-
 SRCREV_FORMAT = "src_decouple"
 
 S = "${WORKDIR}/git"
