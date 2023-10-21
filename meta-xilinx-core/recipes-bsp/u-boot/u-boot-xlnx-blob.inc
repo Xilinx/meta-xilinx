@@ -7,7 +7,9 @@ UBOOT_BLOB_NAME ?= "${MACHINE}-fit-dtb${IMAGE_VERSION_SUFFIX}.blob"
 
 IMPORT_CC_DTBS ?= ""
 CC_DTBS_DUP ?= ""
+IMPORT_CC_UBOOT_DTBS ?= ""
 
+DEPENDS:append:eval-brd-sc-zynqmp = " uboot-device-tree"
 MKIMAGE_DTBLOB_OPTS ?= "-E -B 0x8"
 
 # Everything is swtiched on with UBOOT_IMAGE_BLOB = '1'
@@ -98,9 +100,24 @@ do_blob_generate () {
 		DTBO=$(echo $CC_DTB | cut -d: -f1)
         BASE_DTB=$(echo $CC_DTB | cut -d: -f2)
         OUTPUT_DTB=$(echo $CC_DTB | cut -d: -f3)
-        bbnote "fdtoverlay -o ${DT_BLOB_DIR}/${OUTPUT_DTB} -i ${B}/arch/arm/dts/${BASE_DTB} ${B}/arch/arm/dts/${DTBO}"
+        if [ "${SYSTEM_DTB_BLOB}" = "1" ]; then
+		BASE_SYS_DTB="${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_NAME}"
+        else
+		BASE_SYS_DTB="${B}/arch/arm/dts/${BASE_DTB}"
+        fi
+        bbnote "fdtoverlay -o ${DT_BLOB_DIR}/${OUTPUT_DTB} -i ${BASE_SYS_DTB} ${B}/arch/arm/dts/${DTBO}"
 		if [ -f ${B}/arch/arm/dts/${DTBO} ]; then
-        fdtoverlay -o ${DT_BLOB_DIR}/${OUTPUT_DTB} -i ${B}/arch/arm/dts/${BASE_DTB} ${B}/arch/arm/dts/${DTBO}
+        fdtoverlay -o ${DT_BLOB_DIR}/${OUTPUT_DTB} -i ${BASE_SYS_DTB} ${B}/arch/arm/dts/${DTBO}
+		fi
+	done
+
+	for CC_DTB in ${IMPORT_CC_UBOOT_DTBS}; do
+	        DTBO=$(echo $CC_DTB | cut -d: -f1)
+	OUTPUT_DTB=$(echo $CC_DTB | cut -d: -f3)
+	BASE_SYS_DTB="${RECIPE_SYSROOT}/${DTB_PATH}/${PACKAGE_UBOOT_DTB_NAME}"
+		if [ -f ${B}/arch/arm/dts/${DTBO} ] && [ -f ${BASE_SYS_DTB} ]; then
+	bbnote "fdtoverlay -o ${DT_BLOB_DIR}/${OUTPUT_DTB} -i ${BASE_SYS_DTB} ${B}/arch/arm/dts/${DTBO}"
+	fdtoverlay -o ${DT_BLOB_DIR}/${OUTPUT_DTB} -i ${BASE_SYS_DTB} ${B}/arch/arm/dts/${DTBO}
 		fi
 	done
 
