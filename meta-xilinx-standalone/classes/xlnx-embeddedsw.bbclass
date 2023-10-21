@@ -9,7 +9,7 @@ ESW_BRANCH[2024.1] = "master-next"
 BRANCH ??= "${@d.getVarFlag('ESW_BRANCH', d.getVar('ESW_VER')) or '${ESW_VER}'}"
 
 ESW_REV[2023.1] = "af784f742dad0ca6e69e05baf8de51152c396b9a"
-ESW_REV[2023.2] = "19ade382dd3b8a89aa737d9a67ceb2d28c6ab1bc"
+ESW_REV[2023.2] = "c9a0ee31b2a14cbcfcb56ca369037319b4ad4847"
 ESW_REV[2024.1] = "c62753a4278de3d5d9da8cfb4f3355b98ae17baf"
 SRCREV ??= "${@d.getVarFlag('ESW_REV', d.getVar('ESW_VER')) or '${AUTOREV}'}"
 
