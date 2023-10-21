@@ -4,5 +4,5 @@ ZYNQMP_WARN = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', '${ZYNQMP_WAR
 
 python() {
     if d.getVar('ZYNQMP_WARN') == "1":
-        raise bb.parse.SkipRecipe("Weston 10.0.0.2 requires GLES 3 interfaces which are not available when libmali enabled.  Use Weston 9.0.0.0 instead.")
+        raise bb.parse.SkipRecipe("Weston %s requires GLES 3 interfaces which are not available when libmali enabled.  Use Weston 9.0.0.0 instead." % d.getVar('PV'))
 }
