@@ -9,7 +9,7 @@ SYSROOT_DIRS += "/boot"
 
 BASE_DTS ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE') or '').rstrip('.dtb').rstrip('.dts') or 'system-top'}"
 DTB_PATH ?= "boot/devicetree/"
-DTB_NAME ?= ""
+DTB_FILE_NAME ?= ""
 
 # This vairable is used for U-boot user specified dts from u-boot repo path
 # u-boot-xlnx/arch/arm/dts/versal-vck190-revA-x-ebm-01-revA.dts.
@@ -17,7 +17,7 @@ DTB_NAME ?= ""
 # Example: UBOOT_USER_SPECIFIED_DTS = "versal-vck190-revA-x-ebm-01-revA"
 UBOOT_USER_SPECIFIED_DTS ?= ""
 
-EXTRA_OEMAKE += "${@'EXT_DTB=${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_NAME}' if (d.getVar('DTB_NAME') != '' and d.getVar('UBOOT_USER_SPECIFIED_DTS') == '') else '' }"
+EXTRA_OEMAKE += "${@'EXT_DTB=${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_FILE_NAME}' if (d.getVar('DTB_FILE_NAME') != '' and d.getVar('UBOOT_USER_SPECIFIED_DTS') == '') else '' }"
 EXTRA_OEMAKE += "${@'DEVICE_TREE=${UBOOT_USER_SPECIFIED_DTS}' if (d.getVar('UBOOT_USER_SPECIFIED_DTS') != '') else '' }"
 
 python __anonymous () {
@@ -25,8 +25,8 @@ python __anonymous () {
     providerdtb = d.getVar("PREFERRED_PROVIDER_virtual/dtb")
     if providerdtb:
        d.appendVarFlag('do_configure', 'depends', ' virtual/dtb:do_populate_sysroot')
-       if d.getVar("DTB_NAME") is not None:
-           d.setVar('DTB_NAME', d.getVar('BASE_DTS')+ '.dtb')
+       if d.getVar("DTB_FILE_NAME") is not None:
+           d.setVar('DTB_FILE_NAME', d.getVar('BASE_DTS')+ '.dtb')
 }
 
 do_configure:prepend () {

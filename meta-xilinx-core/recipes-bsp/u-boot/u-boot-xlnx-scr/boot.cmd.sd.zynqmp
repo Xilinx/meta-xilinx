@@ -1,3 +1,5 @@
+@@PRE_BOOTENV@@
+
 setenv sdbootdev @@SDBOOTDEV@@
 setenv bootargs $bootargs root=/dev/mmcblk${sdbootdev}p2 rw rootwait earlycon clk_ignore_unused
 if test -n "@@BITSTREAM@@"; then
