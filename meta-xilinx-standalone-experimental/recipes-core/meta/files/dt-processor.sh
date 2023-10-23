@@ -865,7 +865,7 @@ generate_machine() {
 
   # Machine include file
   if [ -z ${incmachine} ]; then
-    if [ -n ${soc_variant} ]; then
+    if [ -n "${soc_variant}" ]; then
       incmachine="${machine}-${soc_variant}-generic.conf"
     else
       incmachine="${machine}-generic.conf"
@@ -1189,7 +1189,7 @@ if [ -z "${mach_conf}" ]; then
     mach_conf=${local_mach_conf}
 fi
 
-if [ -z "${dts_path}"]; then
+if [ -z "${dts_path}" ]; then
     dts_path=${local_mach_conf}
 fi
 # Is it relative?  If so, relative to conf/dts
