@@ -4,7 +4,8 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=aaf483d309243c4596f6373eb9c8325f"
 
 XILINX_VDU_VERSION = "1.0.0"
-PV = "${XILINX_VDU_VERSION}-xilinx-${XILINX_RELEASE_VERSION}+git${SRCPV}"
+PV =. "${XILINX_VDU_VERSION}-xilinx-v"
+PV .= "+git${SRCPV}"
 
 BRANCH ?= "xlnx_rel_v2023.1"
 REPO   ?= "git://github.com/Xilinx/vdu-omx-il.git;protocol=https"

@@ -8,6 +8,9 @@
   * [Unloading PL bitstream or pdi and dt overlay](#unloading-pl-bitstream-or-pdi-and-dt-overlay)
 * [References](#references)
 
+> **Note:** This README will be deprecated in 2024.1 release. User sthould start
+> using [DFx User DTS README](README.dfx.user.dts.md)
+
 ## Introduction
 This readme describes the build instructions to create firmware recipes using
 fpgamanager_custom.bbclass for dynamic configuration. This bitbake class supports

@@ -1,4 +1,4 @@
 [submodule "gen-machine-conf"]
 	path = meta-xilinx-core/gen-machine-conf
-	url = https://github.com/Xilinx/gen-machine-conf.git
-	branch = xlnx_rel_v2023.1
+	url = https://gitenterprise.xilinx.com/Petalinux/gen-machine-conf.git
+	branch = xlnx_rel_v2023.2
