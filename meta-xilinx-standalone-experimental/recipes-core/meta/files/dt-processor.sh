@@ -1,6 +1,7 @@
 #! /bin/bash
 
-# Copyright (c) 2021 Xilinx Inc
+# Copyright (c) 2021-2022 Xilinx Inc
+# Copyright (C) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -39,10 +40,13 @@ $0
     [-o <overlay_dts>]      Generate overlay dts
     [-e <external_fpga>]    Apply a partial overlay
     [-m <machine_conf>]     The name of the machine .conf to generate
+    [-D <dts_path>]         Absolute path or subdirectory of conf/dts to place DTS files in (usually auto detected from DTS)
     [-t <machine>]          Machine type: zynqmp or versal (usually auto detected)
     [-v <soc_variant>]      SOC Variant: cg, dr, eg, ev, ai-prime, premium (usually auto detected)
+    [-r <require_machine>]  This machine will be required, instead of the generic machine if defined
+    [-O <overrides>]        Optional, can add additional overrides to the generated machine
     [-p <psu_init_path>]    Path to psu_init files, defaults to system_dts path
-    [-i <pdu_path>]         Path to the pdi file
+    [-i <pdi_path>]         Path to the pdi file
     [-l <config_file>]      write local.conf changes to this file
     [-P <petalinux_schema>] Path to petalinux schema file
 
@@ -54,7 +58,7 @@ parse_args() {
   [ $# -eq 0 ] && usage
   [ $1 = "--help" ] && usage
 
-  while getopts ":c:s:d:o:e:m:l:hP:p:i:t:v:" opt; do
+  while getopts ":c:s:d:o:e:m:D:l:hP:p:i:t:v:r:O:" opt; do
     case ${opt} in
       c) config_dir=$OPTARG ;;
       s) system_dts=$OPTARG ;;
@@ -62,8 +66,11 @@ parse_args() {
       d) domain_file=$OPTARG ;;
       e) external_fpga=$OPTARG ;;
       m) mach_conf=$OPTARG ; mach_conf=${mach_conf%%.conf} ;;
+      D) dts_path=$OPTARG ;;
       t) machine=$OPTARG ;;
       v) soc_variant=$OPTARG ;;
+      r) incmachine=$OPTARG ;;
+      O) overrides=$OPTARG ;;
       p) psu_init_path=$OPTARG ;;
       i) pdi_path=$OPTARG ;;
       l) localconf=$OPTARG ;;
@@ -133,11 +140,15 @@ detect_machine() {
            soc_variant="hbm" ;;
          # Special Case Starter Kit SOMs
          xck26)
-           incmachine="k26-smk.conf"
+           if [ -z "${incmachine}" ]; then
+             incmachine="k26-smk.conf"
+           fi
            machine="zynqmp"
            soc_variant="ev" ;;
          xck24)
-           incmachine="k24-smk.conf"
+           if [ -z "${incmachine}" ]; then
+             incmachine="k24-smk.conf"
+           fi
            machine="zynqmp"
            soc_variant="eg" ;;
       esac
@@ -199,7 +210,7 @@ cortex_a53_linux() {
 
   # Check if it is overlay dts otherwise just create linux dts
   (
-    cd dts || error "Unable to cd to dts dir"
+    cd ${dts_path} || error "Unable to cd to ${dts_path} dir"
     if [ "${overlay_dts}" = "true" ]; then
       if [ "${external_fpga}" = "true" ]; then
         LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- xlnx_overlay_dt ${machine} full \
@@ -232,7 +243,7 @@ cortex_a53_linux() {
 
   ## Generate a multiconfig
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
+CONFIG_DTFILE = "${dts_file_path}/${dts_file}"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 EOF
@@ -268,7 +279,7 @@ cortex_a53_baremetal() {
 
   # Build device tree
   (
-    cd dts || error "Unable to cd to dts dir"
+    cd ${dts_path} || error "Unable to cd to ${dts_path} dir"
     if [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" "${system_dts}" "${dts_file}" \
@@ -309,7 +320,7 @@ EOF
     cat /dev/null >"${conf_file}"
   fi
   cat <<EOF >>"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
+CONFIG_DTFILE = "${dts_file_path}/${dts_file}"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa53"
@@ -335,7 +346,7 @@ cortex_a53_freertos() {
 
   # Build device tree
   (
-    cd dts || error "Unable to cd to dts dir"
+    cd ${dts_path} || error "Unable to cd to ${dts_path} dir"
     if [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f  --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a53-imux.dts" "${system_dts}" "${dts_file}" \
@@ -361,7 +372,7 @@ cortex_a53_freertos() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
+CONFIG_DTFILE = "${dts_file_path}/${dts_file}"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa53"
@@ -396,10 +407,10 @@ cortex_a72_linux() {
   fi
 
   (
-    cd dts || error "Unable to cd to dts dir"
+    cd ${dts_path} || error "Unable to cd to ${dts_path} dir"
     # Check if it is overlay dts otherwise just create linux dts
     if [ "${overlay_dts}" = "true" ]; then
-      # As there is no partial support on Versal, As per fpga manager implementatin there is
+      # As there is no partial support on Versal, As per fpga manager implementation there is
       # a flag "external_fpga" which says apply overlay without loading the bit file.
       if [ "${external_fpga}" = "true" ]; then
         LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" -- xlnx_overlay_dt \
@@ -432,7 +443,7 @@ cortex_a72_linux() {
 
   ## Generate a multiconfig
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
+CONFIG_DTFILE = "${dts_file_path}/${dts_file}"
 
 TMPDIR = "\${BASE_TMPDIR}/tmp-${mc_name}"
 EOF
@@ -453,7 +464,7 @@ cortex_a72_baremetal() {
 
   # Build device tree
   (
-    cd dts || error "Unable to cd to dts dir"
+    cd ${dts_path} || error "Unable to cd to ${dts_path} dir"
     if [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f   --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" "${system_dts}" "${dts_file}" \
@@ -479,7 +490,7 @@ cortex_a72_baremetal() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
+CONFIG_DTFILE = "${dts_file_path}/${dts_file}"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa72"
@@ -505,7 +516,7 @@ cortex_a72_freertos() {
 
   # Build device tree
   (
-    cd dts || error "Unable to cd to dts dir"
+    cd ${dts_path} || error "Unable to cd to ${dts_path} dir"
     if [ -n "${domain_file}" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" lopper -f --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-a72-imux.dts" "${system_dts}" "${dts_file}" \
@@ -531,7 +542,7 @@ cortex_a72_freertos() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
+CONFIG_DTFILE = "${dts_file_path}/${dts_file}"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexa72"
@@ -572,7 +583,7 @@ cortex_r5_baremetal() {
 
   # Build device tree
   (
-    cd dts || error "Unable to cd to dts dir"
+    cd ${dts_path} || error "Unable to cd to ${dts_path} dir"
     if [ -n "$domain_file" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dts}" "${dts_file}" \
@@ -612,7 +623,7 @@ EOF
     cat /dev/null >"${conf_file}"
   fi
   cat <<EOF >>"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
+CONFIG_DTFILE = "${dts_file_path}/${dts_file}"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexr5"
@@ -638,7 +649,7 @@ cortex_r5_freertos() {
 
   # Build device tree
   (
-    cd dts || error "Unable to cd to dts dir"
+    cd ${dts_path} || error "Unable to cd to ${dts_path} dir"
     if [ -n "$domain_file" ]; then
       LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -x '*.yaml' \
         -i "${domain_file}" -i "${lops_dir}/lop-r5-imux.dts" "${system_dts}" "${dts_file}" \
@@ -664,7 +675,7 @@ cortex_r5_freertos() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
+CONFIG_DTFILE = "${dts_file_path}/${dts_file}"
 
 ESW_MACHINE = "$3"
 DEFAULTTUNE = "cortexr5"
@@ -684,7 +695,7 @@ process_microblaze() {
 
   mkdir -p machine/include/${mach_conf}
   (
-    cd dts || error "Unable to cd to dts dir"
+    cd ${dts_path} || error "Unable to cd to ${dts_path} dir"
     LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f --enhanced -i "${lops_dir}/lop-microblaze-yocto.dts" "${system_dts}" \
       || error "lopper failed"
     rm -f lop-microblaze-yocto.dts.dtb
@@ -714,7 +725,7 @@ pmu-microblaze() {
 
   # Build device tree
   (
-    cd dts || error "Unable to cd to dts dir"
+    cd ${dts_path} || error "Unable to cd to ${dts_path} dir"
     LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" "${dts_file}" || error "lopper failed"
   )
 
@@ -732,7 +743,7 @@ pmu-microblaze() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
+CONFIG_DTFILE = "${dts_file_path}/${dts_file}"
 
 ESW_MACHINE = "$1"
 
@@ -765,7 +776,7 @@ pmc-microblaze() {
 
   # Build device tree
   (
-    cd dts || error "Unable to cd to dts dir"
+    cd ${dts_path} || error "Unable to cd to ${dts_path} dir"
     LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" "${dts_file}" || error "lopper failed"
   )
 
@@ -783,7 +794,7 @@ pmc-microblaze() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
+CONFIG_DTFILE = "${dts_file_path}/${dts_file}"
 
 ESW_MACHINE = "$1"
 
@@ -816,7 +827,7 @@ psm-microblaze() {
 
   # Build device tree
   (
-    cd dts || error "Unable to cd to dts dir"
+    cd ${dts_path} || error "Unable to cd to ${dts_path} dir"
     LOPPER_DTC_FLAGS="-b 0 -@" ${lopper} -f "${system_dts}" "${dts_file}" || error "lopper failed"
   )
 
@@ -834,7 +845,7 @@ psm-microblaze() {
   sed -i ${features} -e "s,DISTRO_FEATURES,MACHINE_FEATURES,"
 
   cat <<EOF >"${conf_file}"
-CONFIG_DTFILE = "\${TOPDIR}/conf/dts/${dts_file}"
+CONFIG_DTFILE = "${dts_file_path}/${dts_file}"
 
 ESW_MACHINE = "$1"
 
@@ -874,6 +885,13 @@ MACHINEOVERRIDES =. "\${@['', '${mach_conf}:']['${mach_conf}' != '\${MACHINE}']}
 
 EOF
 
+  if [ -n "${overrides}" ]; then
+    cat <<EOF >>"${conf_file}"
+MACHINEOVERRIDES .= ":${overrides}"
+
+EOF
+  fi
+
   if [ "${machine}" == "zynqmp" ]; then
     cat <<EOF >>"${conf_file}"
 TUNEFILE[microblaze-pmu] = "conf/machine/include/${mach_conf}/microblaze.inc"
@@ -890,7 +908,7 @@ EOF
   cat <<EOF >>"${conf_file}"
 
 # Set the default (linux) domain device tree
-CONFIG_DTFILE ?= "\${TOPDIR}/conf/dts/${system_conf}"
+CONFIG_DTFILE ?= "${dts_file_path}/${system_conf}"
 CONFIG_DTFILE[vardepsexclude] += "TOPDIR"
 
 require conf/machine/${incmachine}
@@ -969,10 +987,10 @@ EOF
 
   cat <<EOF >>"${conf_file}"
 # Enable the correct version of the firmware components
-PREFERRED_VERSION_fsbl-firmware = "2023.1_sdt_experimental%"
-PREFERRED_VERSION_pmu-firmware = "2023.1_sdt_experimental%"
-PREFERRED_VERSION_plm-firmware = "2023.1_sdt_experimental%"
-PREFERRED_VERSION_psm-firmware = "2023.1_sdt_experimental%"
+PREFERRED_VERSION_fsbl-firmware = "2023_sdt_experimental%"
+PREFERRED_VERSION_pmu-firmware = "2023_sdt_experimental%"
+PREFERRED_VERSION_plm-firmware = "2023_sdt_experimental%"
+PREFERRED_VERSION_psm-firmware = "2023_sdt_experimental%"
 
 # Exclude BASE_TMPDIR from hash calculations
 BB_HASHEXCLUDE_COMMON:append = " BASE_TMPDIR"
@@ -1125,9 +1143,9 @@ BASE_TMPDIR ?= "\${TOPDIR}"
 
 # The following is the full set of multiconfigs for this configuration
 # A large list can cause a slow parse.
-BBMULTICONFIG ?= "${multiconf}"
+#BBMULTICONFIG ?= "${multiconf}"
 # Alternatively trim the list to the minimum
-#BBMULTICONFIG = "${multiconf_min}"
+BBMULTICONFIG = "${multiconf_min}"
 EOF
 }
 
@@ -1171,6 +1189,22 @@ if [ -z "${mach_conf}" ]; then
     mach_conf=${local_mach_conf}
 fi
 
+if [ -z "${dts_path}"]; then
+    dts_path=${local_mach_conf}
+fi
+# Is it relative?  If so, relative to conf/dts
+if [ "${dts_path##/}" = "${dts_path}" ]; then
+    dts_path="dts/${dts_path}"
+else
+    dts_path=$(realpath ${dts_path})
+fi
+# Convert the DTS_PATH into something we can put in a config file
+if [ "${dts_path##/}" = "${dts_path}" ]; then
+    dts_file_path="\${TOPDIR}/conf/${dts_path}"
+else
+    dts_file_path="${dts_path}"
+fi
+
 # Generate CPU list
 (
   cd dts || error "Unable to cd to dts dir"
@@ -1182,6 +1216,7 @@ fi
 detect_machine
 # Now that we know the machine name, we can create the directory
 mkdir -p machine/include/${mach_conf}
+mkdir -p ${dts_path}
 
 echo "System Configuration:"
 echo "MODEL       = \"${model}\""

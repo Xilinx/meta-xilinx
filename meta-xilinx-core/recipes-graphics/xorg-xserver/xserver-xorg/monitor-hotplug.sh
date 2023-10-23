@@ -27,12 +27,27 @@ DEVICES=$(find /sys/class/drm/*/status)
 
 # inspired by /etc/acpd/lid.sh and the function it sources.
 
-displaynum=`ls /tmp/.X11-unix/* | sed s#/tmp/.X11-unix/X##`
+# Read first X display number from the list.
+displaynum=`ls /tmp/.X11-unix/* | sed s#/tmp/.X11-unix/X## | head -n 1`
+displaynum=${displaynum%% *}
+
 display=":$displaynum.0"
 export DISPLAY=":$displaynum.0"
 
 # from https://wiki.archlinux.org/index.php/Acpid#Laptop_Monitor_Power_Off
-export XAUTHORITY=$(ps -C Xorg -f --no-header | sed -n 's/.*-auth //; s/ -[^ ].*//; p')
+
+# Clear XAUTHORITY by default in case X session is not using display manager.
+unset XAUTHORITY
+
+# Detect X session command line started for the display $displaynum and extract
+# -auth argument if any.
+ps -eo args | grep -e "Xorg\W*:$displaynum" | grep -e -auth | while read -r line
+do
+	if [[ "${line%% *}" == *Xorg ]]; then
+		export XAUTHORITY=`echo $line | sed -n 's/.*-auth //; s/ -[^ ].*//; p'`
+		break
+	fi
+done
 
 for i in /sys/class/drm/*/*/status ;
 do

@@ -1,0 +1,71 @@
+#! /bin/sh
+
+# Copyright (C) 2022 Xilinx, Inc. All rights reserved.
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+
+# read values from dfx-mgr conf file
+conffile="/etc/dfx-mgrd/daemon.conf"
+if [ ! -f "${conffile}" ]; then
+        echo "dfx-mgrd configuration file not found: ${conffile}"
+        exit 1
+fi
+
+fwbasedir=$(grep "firmware_location" ${conffile} | sed 's/.*:.*\[\"\(.*\)\"\],\?/\1/')
+if [ -z "${fwbasedir}" ]; then
+        echo "Property 'firmware_location' not found in ${conffile}"
+        exit 1
+fi
+
+fwfile=$(grep "default_accel" ${conffile} | sed 's/.*:.*\"\(.*\)\",\?/\1/')
+if [ -z "${fwfile}" ]; then
+        echo "Property 'default_accel' not found in ${conffile}"
+        exit 1
+fi
+
+# check if default firmware is already set and present
+if [ -f "${fwfile}" ]; then
+    fwname=$(cat ${fwfile})
+    fwdir="${fwbasedir}/${fwname}"
+    if [ -n "${fwname}" ] && [ -d "${fwdir}" ]; then
+        echo "Default firmware detected: ${fwname}"
+        exit 0
+    fi
+fi
+
+# search for firmware based on EEPROM board id
+echo "Trying to detect default firmware based on EEPROM..."
+
+#check if board is a zcu106 eval board product
+eeprom=$(ls /sys/bus/i2c/devices/*54/eeprom 2> /dev/null)
+if [ -n "${eeprom}" ]; then
+    boardid=`dd if=$eeprom bs=1 count=6 skip=208 2>/dev/null | tr '[:upper:]' '[:lower:]'`
+    revision=`dd if=$eeprom bs=1 count=3 skip=224 2>/dev/null | tr '[:upper:]' '[:lower:]'`
+
+    fwname="${boardid}-${revision}"
+    fwdir="${fwbasedir}/${fwname}"
+
+    fixed_rev=2.0
+    var=$(awk 'BEGIN{ print "'$fixed_rev'"<"'$revision'" }')
+
+    if [ "${boardid}" == "zcu106" ] && [ "${var}" -eq 1 ] ;then
+         revision=2.0
+         echo "later than 2.0 board revisions are supported in 2.0 bit and dtbo files"
+         fwname="${boardid}-${revision}"
+         fwdir="${fwbasedir}/${fwname}"
+         echo "${fwname}" > "${fwfile}"
+         exit 1
+    elif [ ! -d "${fwdir}" ] ; then
+         echo "No default firmware named ${fwname} found in ${fwbasedir} , Loading rev1.0 bitstream and dtbo as default "
+         revision=1.0
+         fwname=$(ls ${fwbasedir} | grep ${revision})
+         fwdir="${fwbasedir}/${fwname}"
+         echo "${fwname}" > "${fwfile}"
+         exit 1
+    fi
+
+    echo "Default firmware detected: ${fwname}"
+    echo "${fwname}" > "${fwfile}"
+    exit 0
+fi

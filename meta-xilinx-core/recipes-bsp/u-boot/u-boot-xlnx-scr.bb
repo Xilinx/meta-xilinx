@@ -71,7 +71,14 @@ DEVICETREE_OFFSET:zynqmp ??= "0x100000"
 DEVICETREE_OFFSET:zynq ??= "0x100000"
 DEVICETREE_OFFSET:versal ??= "0x1000"
 
-DEVICETREE_OVERLAY_ADDRESS ?= "${@hex(int(d.getVar("DEVICETREE_ADDRESS"),16) + 0xf00000)}"
+DEVICETREE_OVERLAY_OFFSET:microblaze ??= "0x1e00000"
+DEVICETREE_OVERLAY_OFFSET:zynqmp ??= "0x100000"
+DEVICETREE_OVERLAY_OFFSET:zynq ??= "0x100000"
+DEVICETREE_OVERLAY_OFFSET:versal ??= "0x1000"
+DEVICETREE_OVERLAY_PADSIZE ??= "0xf00000"
+
+DEVICETREE_OVERLAY_ADDRESS ?= "${@hex(int(append_baseaddr(d,d.getVar('DEVICETREE_OVERLAY_OFFSET')),16) \
+				+ int(d.getVar('DEVICETREE_OVERLAY_PADSIZE'),16))}"
 
 KERNEL_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('KERNEL_OFFSET'))}"
 
@@ -162,14 +169,8 @@ NAND_FIT_IMAGE_OFFSET ??= "0x4180000"
 NAND_FIT_IMAGE_OFFSET:zynq ??= "0x1080000"
 NAND_FIT_IMAGE_SIZE ??= "0x6400000"
 
-# Xen boot script variables. Define here and set it from meta-virtualization
-XEN_OFFSET ??= "0xBA00000"
-XEN_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('XEN_OFFSET'))}"
-XEN_IMAGE_NAME ??= "xen"
-DOM0_MEM ??= "1500M"
-XEN_SERIAL_CONSOLES ??= "serial0"
-XEN_CMDLINE_APPEND ??= ""
-DOM0_MAX_VCPUS ??= "1"
+# Add variables as addendum.
+SCRIPT_SED_ADDENDUM = ""
 
 # Default to booting with the rootfs device being partition 2 for SD/eMMC
 PARTNUM ?= "2"
@@ -181,6 +182,9 @@ KERNEL_ROOT_SD ?= "root=/dev/\${bootdev}${PARTNUM} ro rootwait"
 # Set Kernel root filesystem parameter for JTAG/QSPI/OSPI/NAND(using RAMDISK) boot
 KERNEL_ROOT_RAMDISK ?= "root=/dev/ram0 rw"
 
+# Append the kernel command line
+KERNEL_COMMAND_APPEND ?= ""
+
 BITSTREAM_LOAD_ADDRESS ?= "0x100000"
 
 do_configure[noexec] = "1"
@@ -188,6 +192,9 @@ do_configure[noexec] = "1"
 def append_baseaddr(d,offset):
     skip_append = d.getVar('SKIP_APPEND_BASEADDR') or ""
     if skip_append == "1":
+        return offset
+    if offset.startswith('$'):
+        # If offset startswith '$' Assuming as uboot env variable.
         return offset
     import subprocess
     baseaddr = d.getVar('DDR_BASEADDR') or "0x0"
@@ -240,13 +247,8 @@ do_compile() {
         -e 's/@@PARTNUM@@/${PARTNUM}/' \
         -e 's:@@KERNEL_ROOT_SD@@:${KERNEL_ROOT_SD}:' \
         -e 's:@@KERNEL_ROOT_RAMDISK@@:${KERNEL_ROOT_RAMDISK}:' \
-        -e 's/@@XEN_IMAGE_NAME@@/${XEN_IMAGE_NAME}/' \
-        -e 's/@@XEN_OFFSET@@/${XEN_OFFSET}/' \
-        -e 's/@@XEN_LOAD_ADDRESS@@/${XEN_LOAD_ADDRESS}/' \
-        -e 's/@@DOM0_MEM@@/${DOM0_MEM}/' \
-        -e 's/@@DOM0_MAX_VCPUS@@/${DOM0_MAX_VCPUS}/' \
-        -e 's:@@XEN_SERIAL_CONSOLES@@:${XEN_SERIAL_CONSOLES}:' \
-        -e 's:@@XEN_CMDLINE_APPEND@@:${XEN_CMDLINE_APPEND}:' \
+        -e 's:@@KERNEL_COMMAND_APPEND@@:${KERNEL_COMMAND_APPEND}:' \
+        ${SCRIPT_SED_ADDENDUM} \
         "${WORKDIR}/boot.cmd.${BOOTMODE}${BOOTFILE_EXT}" > "${WORKDIR}/boot.cmd"
 
     mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr

@@ -44,6 +44,10 @@ BOOTGEN_EXTRA_ARGS ?= ""
 do_patch[noexec] = "1"
 
 def create_bif(config, attrflags, attrimage, ids, common_attr, biffd, d):
+    arch = d.getVar("SOC_FAMILY")
+    bb.error("create_bif function not defined for arch: %s" % (arch))
+
+def create_zynq_bif(config, attrflags, attrimage, ids, common_attr, biffd, d):
     import re, os
     for cfg in config:
         if cfg not in attrflags and common_attr:
@@ -117,23 +121,32 @@ def create_versal_bif(config, attrflags, attrimage, ids, common_attr, biffd, d):
 python do_configure() {
     fp = d.getVar("BIF_FILE_PATH")
     if fp == (d.getVar('B') + '/bootgen.bif'):
-        arch = d.getVar("SOC_FAMILY")
-        biffunc = {'versal':create_versal_bif, 'zynq':create_bif, 'zynqmp':create_bif}
         biffd = open(fp, 'w')
         biffd.write("the_ROM_image:\n")
         biffd.write("{\n")
 
+        arch = d.getVar("SOC_FAMILY")
         bifattr = (d.getVar("BIF_COMMON_ATTR") or "").split()
         if bifattr:
             attrflags = d.getVarFlags("BIF_COMMON_ATTR") or {}
-            biffunc[arch](bifattr, attrflags,'','', 1, biffd, d)
+            if arch in ['zynq', 'zynqmp']:
+                create_zynq_bif(bifattr, attrflags,'','', 1, biffd, d)
+            elif arch in ['versal']:
+                create_versal_bif(bifattr, attrflags,'','', 1, biffd, d)
+            else:
+                create_bif(bifattr, attrflags,'','', 1, biffd, d)
 
         bifpartition = (d.getVar("BIF_PARTITION_ATTR") or "").split()
         if bifpartition:
             attrflags = d.getVarFlags("BIF_PARTITION_ATTR") or {}
             attrimage = d.getVarFlags("BIF_PARTITION_IMAGE") or {}
             ids = d.getVarFlags("BIF_PARTITION_ID") or {}
-            biffunc[arch](bifpartition, attrflags, attrimage, ids, 0, biffd, d)
+            if arch in ['zynq', 'zynqmp']:
+                create_zynq_bif(bifpartition, attrflags, attrimage, ids, 0, biffd, d)
+            elif arch in ['versal']:
+                create_versal_bif(bifpartition, attrflags, attrimage, ids, 0, biffd, d)
+            else:
+                create_bif(bifpartition, attrflags, attrimage, ids, 0, biffd, d)
 
         biffd.write("}")
         biffd.close()

@@ -12,7 +12,7 @@ I = "${AIEDIR}/include"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:versal-ai-core = "versal-ai-core"
 COMPATIBLE_MACHINE:versal-ai-edge = "${SOC_VARIANT_ARCH}"
-PV = "3.2"
+PV = "3.3"
 
 IOBACKENDS ?= "Linux"
 
@@ -25,7 +25,7 @@ RPROVIDES:${PN}	= "libxaiengine"
 # The makefile isn't ready for parallel execution at the moment
 PARALLEL_MAKE = "-j 1"
 
-CFLAGS += "-Wall -Wextra -fno-thread-jumps -fno-tree-pre"
+CFLAGS += "-Wall -Wextra"
 CFLAGS += "${@bb.utils.contains('IOBACKENDS', 'Linux', ' -D__AIELINUX__', '', d)}"
 CFLAGS += "${@bb.utils.contains('IOBACKENDS', 'metal', ' -D__AIEMETAL__', '', d)}"
 EXTRA_OEMAKE = "-C ${AIEDIR}/src -f Makefile.Linux CFLAGS='${CFLAGS}'"
@@ -45,3 +45,5 @@ do_install(){
 }
 
 PACKAGE_ARCH:versal-ai-core = "${SOC_VARIANT_ARCH}"
+PACKAGE_ARCH:versal-ai-edge = "${SOC_VARIANT_ARCH}"
+

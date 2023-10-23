@@ -9,6 +9,11 @@ LIC_FILES_CHKSUM = " \
 		file://${COMMON_LICENSE_DIR}/GPL-2.0-or-later;md5=fed54355545ffd980b814dab4a3b312c \
 		"
 
+# Since we're not based on a kernel default to nothing.
+# This needs to be before the devicetree inherit, as it configured for use
+# with a linux kernel by default.
+KERNEL_INCLUDE ?= ""
+
 inherit devicetree image-artifact-names
 
 # Fall back to SYSTEM_DTFILE if specified...
@@ -17,7 +22,29 @@ inherit devicetree image-artifact-names
 # system.
 SYSTEM_DTFILE ??= ""
 CONFIG_DTFILE ??= "${SYSTEM_DTFILE}"
-DT_FILES_PATH = "${@os.path.dirname(d.getVar('CONFIG_DTFILE')) if d.getVar('CONFIG_DTFILE') else d.getVar('S')}"
+
+BASE_DTS ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE') or '').rstrip('.dtb').rstrip('.dts') or 'system-top'}"
+
+EXTRA_DT_FILES ?= ""
+EXTRA_DTFILE_PREFIX ?= "system-top"
+EXTRA_DTFILES_BUNDLE ?= ""
+UBOOT_DT_FILES ?= ""
+UBOOT_DTFILE_PREFIX ?= "system-top"
+UBOOT_DTFILES_BUNDLE ?= ""
+EXTRA_OVERLAYS ?= ""
+
+SYSTEM_DTFILE[doc] = "System Device Tree which accepts at 0...1 dts file"
+CONFIG_DTFILE[doc] = "Domain Specific Device Tree which accepts 0...1 dts file"
+EXTRA_DT_FILES[doc] = "Add extra files to DT_FILES_PATH, it accepts 1...n dtsi files and adds to SRC_URI"
+EXTRA_OVERLAYS[doc] = "Add extra files to DT_FILES_PATH and adds a #include for each to the BASE_DTS, it access 1..n dtsi files and adds to SRC_URI"
+
+# There should only be ONE CONFIG_DTFILE listed
+# These need to be passed in from global, not from a bbappend
+FILESEXTRAPATHS:prepend := "${@'%s:' % os.path.dirname(d.getVar('CONFIG_DTFILE') or '') if (d.getVar('CONFIG_DTFILE')) else ''}"
+SRC_URI:append := " ${@'file://%s' % os.path.basename(d.getVar('CONFIG_DTFILE') or '') if (d.getVar('CONFIG_DTFILE')) else ''}"
+
+SRC_URI:append = " ${@" ".join(["file://%s" % f for f in (d.getVar('EXTRA_DT_FILES') or "").split()])}"
+SRC_URI:append = " ${@" ".join(["file://%s" % f for f in (d.getVar('EXTRA_OVERLAYS') or "").split()])}"
 
 COMPATIBLE_MACHINE:zynq   = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
@@ -30,11 +57,71 @@ PROVIDES = "virtual/dtb"
 # common zynq include
 SRC_URI:append:zynq = " file://zynq-7000-qspi-dummy.dtsi"
 
-DTB_FILE_NAME = "${@os.path.basename(d.getVar('CONFIG_DTFILE')).replace('.dts', '.dtb') if d.getVar('CONFIG_DTFILE') else ''}"
+DTB_FILE_NAME ?= "${BASE_DTS}.dtb"
 
 DTB_BASE_NAME ?= "${MACHINE}-system${IMAGE_VERSION_SUFFIX}"
 
+# Copy the EXTRA_DT_FILES and EXTRA_OVERLAYS files in prepend operation so that
+# it can be preprocessed.
+do_configure:prepend () {
+    # Create DT_FILES_PATH directory if doesn't exist during prepend operation.
+    if [ ! -d ${DT_FILES_PATH} ]; then
+        mkdir -p ${DT_FILES_PATH}
+    fi
+
+    for f in ${EXTRA_DT_FILES} ${EXTRA_OVERLAYS}; do
+        if [ "$(realpath ${WORKDIR}/${f})" != "$(realpath ${DT_FILES_PATH}/`basename ${f}`)" ]; then
+            cp ${WORKDIR}/${f} ${DT_FILES_PATH}/
+        fi
+    done
+}
+
+do_configure:append () {
+    for f in ${EXTRA_OVERLAYS}; do
+        if [ ! -e ${DT_FILES_PATH}/${BASE_DTS}.dts ]; then
+            if [ -e ${DT_FILES_PATH}/${BASE_DTS}.dtb ]; then
+                bberror "Unable to find ${BASE_DTS}.dts, to use EXTRA_OVERLAYS you must use a 'dts' and not 'dtb' in CONFIG_DTFILE"
+            else
+                bberror "Unable to find ${BASE_DTS}.dts, to use EXTRA_OVERLAYS you must set a valid CONFIG_DTFILE or use system-top.dts"
+            fi
+            exit 1
+        fi
+        echo "/include/ \"$f\"" >> ${DT_FILES_PATH}/${BASE_DTS}.dts
+    done
+}
+
+devicetree_do_compile:append() {
+    import subprocess
+
+    dtb_file = d.getVar('DTB_FILE_NAME') or ''
+    if not dtb_file or not os.path.isfile(dtb_file):
+        bb.error("Expected file ${DTB_FILE_NAME} doesn't exist")
+
+    if d.getVar('EXTRA_DTFILES_BUNDLE'):
+        ccdtb_prefix = d.getVar('EXTRA_DTFILE_PREFIX')
+        extra_dt_files = d.getVar('EXTRA_DT_FILES').split() or []
+
+        for dtsfile in extra_dt_files:
+            dtname = os.path.splitext(os.path.basename(dtsfile))[0]
+            if os.path.isfile(f"{dtname}.dtbo"):
+                fdtargs = ["fdtoverlay", "-o", f"{ccdtb_prefix}-{dtname}.dtb", "-i", dtb_file, f"{dtname}.dtbo"]
+                bb.note("Running {0}".format(" ".join(fdtargs)))
+                subprocess.run(fdtargs, check = True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+    if d.getVar('UBOOT_DTFILES_BUNDLE'):
+        uboot_ccdtb_prefix = d.getVar('UBOOT_DTFILE_PREFIX')
+        uboot_dt_files = d.getVar('UBOOT_DT_FILES').split() or []
+
+        for dtsfile in uboot_dt_files:
+            dtname = os.path.splitext(os.path.basename(dtsfile))[0]
+            if os.path.isfile(f"{dtname}.dtbo"):
+                fdtargs = ["fdtoverlay", "-o", f"{uboot_ccdtb_prefix}-{dtname}.dtb", "-i", dtb_file, f"{dtname}.dtbo"]
+                bb.note("Running {0}".format(" ".join(fdtargs)))
+                subprocess.run(fdtargs, check = True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+}
+
 FILES:${PN} += "/boot/system.dtb"
+
 devicetree_do_install:append() {
     if [ -n "${DTB_FILE_NAME}" ]; then
         # If it's already a dtb, we have to copy from the original location
@@ -73,14 +160,6 @@ def check_devicetree_variables(d):
 
     if not d.getVar('CONFIG_DTFILE'):
         raise bb.parse.SkipRecipe("CONFIG_DTFILE or SYSTEM_DTFILE is not defined.")
-    else:
-        if not os.path.exists(d.getVar('CONFIG_DTFILE')):
-            if not d.getVar('WITHIN_EXT_SDK'):
-                raise bb.parse.SkipRecipe("The device tree %s is not available." % d.getVar('CONFIG_DTFILE'))
-        else:
-            d.appendVar('SRC_URI', ' file://${CONFIG_DTFILE}')
-            d.setVarFlag('do_install', 'file-checksums', '${CONFIG_DTFILE}:True')
-            d.setVarFlag('do_deploy', 'file-checksums', '${CONFIG_DTFILE}:True')
 
 python() {
     # Need to allow bbappends to change the check
