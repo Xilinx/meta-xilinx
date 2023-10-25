@@ -10,6 +10,6 @@ PTESTS_PROBLEMS:append:zynq = " qemu-ptest"
 
 # Microblaze has some limitations
 # graphics is the primary one, bluez5 requires graphics support by default
-PTESTS_FAST:remove:microblaze = "pango-ptest wayland-ptest qemu-ptest bluez5-ptest"
-PTESTS_PROBLEMS:append:microblaze = " pango-ptest wayland-ptest qemu-ptest bluez5-ptest"
+PTESTS_FAST:remove:microblaze = "pango-ptest wayland-ptest qemu-ptest bluez5-ptest python3-bcrypt qemu"
+PTESTS_PROBLEMS:append:microblaze = " pango-ptest wayland-ptest qemu-ptest bluez5-ptest python3-bcrypt qemu"
 
