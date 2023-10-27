@@ -13,3 +13,13 @@ EXTRA_IMAGEDEPENDS += "qemu-system-native qemu-helper-native:do_addto_recipe_sys
 
 # Use the xilinx specific version for these users
 IMAGE_CLASSES += "qemuboot-xilinx"
+
+# As of Yocto Project nanbield, if a -serial is pass in QB_OPT_APPEND the
+# runqemu may add additional null entries or simply skip further setup.
+#
+# To help us be able to adjust for this behavior add a special
+# QB_XILINX_SERIAL that will allow us to define serial ports for qemu
+# emulated boards that may not match the standard Linux behavior.
+#
+QB_XILINX_SERIAL ?= ""
+QB_OPT_APPEND += "${QB_XILINX_SERIAL}"
