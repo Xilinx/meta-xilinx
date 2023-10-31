@@ -1,44 +1,122 @@
 # meta-xilinx-standalone-experimental
 
-This layer contains experimental items that may eventually be added
-to the meta-xilinx-standalone layer.  The components in this layer
-may or may not be buildable as they may require unreleased code.
+This layer contains experimental items that may eventually be added to the
+meta-xilinx-standalone layer.  The components in this layer may or may not be
+buildable as they may require unreleased code.
 
-The non-Linux software components are still in development and
-this should be considered to be a preview release only.  For instance,
-some components may not be buildable, expect APIs to change on various
-parts and pieces.
+The non-Linux software components are still in development and this should be
+considered to be a preview release only.  For instance, some components may not
+be buildable, expect APIs to change on various parts and pieces.
 
 ## Build Instructions
 
-**Note:** to use this layer you must REMOVE meta-xilinx-tools from your
-project.  meta-xilinx-tools is not compatible with this experimental
-approach.  You may also have to remove other layers that depend
-on meta-xilinx-tools, such as meta-kria and meta-system-controller.
+> **Note:**
+> * To use this layer you must REMOVE meta-xilinx-tools from your project.
+meta-xilinx-tools is not compatible with this experimental approach. You may
+also have to remove other layers that depend on meta-xilinx-tools, such as
+meta-kria and meta-system-controller.
+> * To use the experimental version of the embedded software (firmware) as well
+as system configuration, you must build through gen-machineconf tool. This tool
+is passed a output of system device tree directory.
 
-To use the experimental version of the embedded software (firmware)
-as well as system configuration, you must build the 'meta-xilinx-setup'
-SDK.  This SDK is passed a device tree, constructed from System Device tree and
-produces a number of configuration files.
+The Yocto Project setup for the System Device Tree workflow is as follows.
+Be sure to read everything below.
 
-1. Remove meta-xilinx-tools, meta-kria and meta-system-controller, then add the decoupling layer
+1. Follow [Building Instructions](https://github.com/Xilinx/meta-xilinx/blob/master/README.building.md)
+   upto step 4.
+
+2. Remove meta-xilinx-tools and meta-xilinx-tools dependency layers(such as
+   meta-kria and meta-system-controller if included in bblayers.conf), then add
+   the meta-xilinx-standalone-experimental layer.
 ```
 $ bitbake-layers remove-layer meta-xilinx-tools
 $ bitbake-layers remove-layer meta-kria
 $ bitbake-layers remove-layer meta-system-controller
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone-experimental
 ```
-2. Build the setup SDK
+
+3. Export gen-machineconf tool.
 ```
-$ bitbake meta-xilinx-setup
-```
-3. Install the setup SDK:
-```
-$ .${TMPDIR}/tmp/deploy/sdk/x86_64-xilinx-nativesdk-prestep-2023.2....sh -d prestep -y
+$ export PATH=$PATH:<ABSOLUTE_PATH>/gen-machine-conf
 ```
 
-Then follow the instructions in the 'prestep/README-setup' file.
+4. Run the script from the build or ${TOPDIR} directory.
+```
+ $ gen-machineconf --hw-description <path_to_sdtgen_output_directory> -c <conf> -l conf/local.conf
+```
+> **Note:**
+> 1. The -l option will automatically add the necessary parameters to the
+   local.conf file.  If you need to re-run this comment, you just clear the
+   parameters from the end of the file.  Without the -l option the items are
+   printed to the screen and must be manually added to your conf/local.conf
+> 2. The --soc-family argument is an optional argument and user can skip this.
 
+For example, zynqmp:
+```
+$ gen-machineconf --soc-family zynqmp --hw-description <path_to_sdtgen_output_directory> -c conf/ -l conf/local.conf
+```
+The following will be written to the end of the conf/local.conf file:
+
+```
+# Each multiconfig will define it's own TMPDIR, this is the new default based
+# on BASE_TMPDIR for the Linux build
+TMPDIR = "${BASE_TMPDIR}/tmp"
+
+# Use the newly generated MACHINE
+MACHINE = "xlnx-zynqmp-zcu102-rev1-0"
+
+# All of the TMPDIRs must be in a common parent directory. This is defined
+# as BASE_TMPDIR.
+# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere, such as /tmp
+BASE_TMPDIR ?= "${TOPDIR}"
+
+# The following is the full set of multiconfigs for this configuration
+# A large list can cause a slow parse.
+BBMULTICONFIG = " cortexa53-0-zynqmp-fsbl-baremetal cortexa53-0-zynqmp-baremetal cortexa53-0-zynqmp-freertos cortexa53-1-zynqmp-baremetal cortexa53-1-zynqmp-freertos cortexa53-2-zynqmp-baremetal cortexa53-2-zynqmp-freertos cortexa53-3-zynqmp-baremetal cortexa53-3-zynqmp-freertos cortexr5-0-zynqmp-fsbl-baremetal cortexr5-0-zynqmp-baremetal cortexr5-0-zynqmp-freertos cortexr5-1-zynqmp-baremetal cortexr5-1-zynqmp-freertos microblaze-0-pmu"
+# Alternatively trim the list to the minimum
+#BBMULTICONFIG = " cortexa53-0-zynqmp-fsbl-baremetal microblaze-0-pmu"
+```
+
+For example, versal:
+```
+$ gen-machineconf --soc-family versal --hw-description <path_to_sdtgen_output_directory> -c conf/ -l conf/local.conf
+```
+
+The following will be written to the end of the conf/local.conf file:
+
+```
+# Each multiconfig will define it's own TMPDIR, this is the new default based
+# on BASE_TMPDIR for the Linux build
+TMPDIR = "${BASE_TMPDIR}/tmp"
+
+# Use the newly generated MACHINE
+MACHINE = "xlnx-versal-vmk180-rev1-1-x-ebm-01-reva"
+
+# All of the TMPDIRs must be in a common parent directory. This is defined
+# as BASE_TMPDIR.
+# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere, such as /tmp
+BASE_TMPDIR ?= "${TOPDIR}"
+
+# The following is the full set of multiconfigs for this configuration
+# A large list can cause a slow parse.
+BBMULTICONFIG = " cortexa72-0-versal-baremetal cortexa72-0-versal-freertos cortexa72-1-versal-baremetal cortexa72-1-versal-freertos microblaze-0-pmc microblaze-0-psm cortexr5-0-versal-baremetal cortexr5-0-versal-freertos cortexr5-1-versal-baremetal cortexr5-1-versal-freertos"
+# Alternatively trim the list to the minimum
+#BBMULTICONFIG = " microblaze-0-pmc microblaze-0-psm"
+```
+> **Bitbake Performance Note:**
+Each BBMULTICONFIG value requires all of the recipes to be parsed for that
+configuration.  Thus each multiconfig will add more parsing time.  A long list
+can lead to a very slow parse (many minutes).  To speed up parsing, it is
+suggested that you trim this down to only the configurations you require.
+A minimum configuration is included with the generated configuration.
+
+
+5. Build your project, You should now be able to build your project normally.
+   See the Yocto Project documentation if you have questions on how to work with
+   the multiconfig recipes. The following is a simple build for testing.
+
+6. Continue [Building Instructions](https://github.com/Xilinx/meta-xilinx/blob/master/README.building.md)
+   from step 6.
 
 ## Dependencies
 
@@ -58,3 +136,5 @@ This layer depends on:
 	layers: meta-xilinx-core, meta-xilinx-bsp, meta-xilinx-standalone
 	branch: langdale or amd xilinx release version (e.g. rel-v2023.1)
 
+       URI: https://git.yoctoproject.org/meta-virtualization
+       branch: langdale
