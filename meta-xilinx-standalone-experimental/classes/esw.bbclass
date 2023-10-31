@@ -95,6 +95,14 @@ do_install() {
 CFLAGS:append = " ${ESW_CFLAGS}"
 EXTRA_OECMAKE += "-DYOCTO=ON"
 
+do_configure:prepend() {
+    (
+    cd ${S}
+    lopper ${DTS_FILE} -- bmcmake_metadata_xlnx ${ESW_MACHINE} ${S}/lib/bsp/standalone/src/ hwcmake_metadata ${S}
+    install -m 0755 StandaloneExample.cmake ${S}/cmake/Findcommonmeta.cmake
+    )
+}
+
 # We need to find the license file, which vaires depending on the component
 # recurse a maximum of x times, could be fancier but it gets complicated since
 # we dont know for certain we are running devtool or just externalsrc
