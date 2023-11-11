@@ -20,16 +20,16 @@ inherit features_check
 REQUIRED_MACHINE_FEATURES = "vcu"
 
 do_install() {
-    install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5d_b.fw ${D}/lib/firmware/al5d_b.fw
-    install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5d.fw ${D}/lib/firmware/al5d.fw
-    install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5e_b.fw ${D}/lib/firmware/al5e_b.fw
-    install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5e.fw ${D}/lib/firmware/al5e.fw
+    install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5d_b.fw ${D}${nonarch_base_libdir}/firmware/al5d_b.fw
+    install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5d.fw ${D}${nonarch_base_libdir}/firmware/al5d.fw
+    install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5e_b.fw ${D}${nonarch_base_libdir}/firmware/al5e_b.fw
+    install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5e.fw ${D}${nonarch_base_libdir}/firmware/al5e.fw
 }
 
 # Inhibit warnings about files being stripped
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 INHIBIT_PACKAGE_STRIP = "1"
-FILES:${PN} = "/lib/firmware/*"
+FILES:${PN} = "${nonarch_base_libdir}/firmware/*"
 
 # These libraries shouldn't get installed in world builds unless something
 # explicitly depends upon them.
