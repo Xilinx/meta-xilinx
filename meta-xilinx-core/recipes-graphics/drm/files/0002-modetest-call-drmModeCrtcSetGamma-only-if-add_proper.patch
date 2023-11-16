@@ -1,0 +1,32 @@
+From ab7aa7563e3b044f84f123f0ed59b370ff0af3f5 Mon Sep 17 00:00:00 2001
+From: Rohit Visavalia <rohit.visavalia@xilinx.com>
+Date: Mon, 24 Feb 2020 03:35:58 -0800
+Subject: [PATCH 2/5] modetest: call drmModeCrtcSetGamma() only if
+ add_property_optional returns true
+
+gamma is a optional property then also it prints error message, so
+set gamma only if add_property_optional() returns true.
+
+Upstream-Status: Pending
+
+Signed-off-by: Rohit Visavalia <rohit.visavalia@xilinx.com>
+---
+ tests/modetest/modetest.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/modetest/modetest.c b/tests/modetest/modetest.c
+index 2c83bd0..3e73505 100644
+--- a/tests/modetest/modetest.c
++++ b/tests/modetest/modetest.c
+@@ -1142,7 +1142,7 @@ static void set_gamma(struct device *dev, unsigned crtc_id, unsigned fourcc)
+ 
+ 	add_property_optional(dev, crtc_id, "DEGAMMA_LUT", 0);
+ 	add_property_optional(dev, crtc_id, "CTM", 0);
+-	if (!add_property_optional(dev, crtc_id, "GAMMA_LUT", blob_id)) {
++	if (add_property_optional(dev, crtc_id, "GAMMA_LUT", blob_id)) {
+ 		uint16_t r[256], g[256], b[256];
+ 
+ 		for (i = 0; i < 256; i++) {
+-- 
+2.7.4
+
