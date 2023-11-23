@@ -30,7 +30,7 @@ LIC_FILES_CHKSUM = " \
 
 BRANCH ?= "freeipmi-1-6-0-stable"
 SRC_URI = " \
-	git://git.savannah.gnu.org/freeipmi.git;iprotocol=https;branch=${BRANCH} \
+	git://git.savannah.gnu.org/freeipmi.git;protocol=https;branch=${BRANCH} \
 	file://0001-Add-initial-support-for-Xilinx-OEM-FRU-records.patch \
 	file://0002-ipmi-fru-fix-compilation-for-non-C99-compilation.patch \
 	"
