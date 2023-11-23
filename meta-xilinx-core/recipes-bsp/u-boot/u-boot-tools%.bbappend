@@ -1,5 +1,5 @@
 # Skip processing of this recipe if it is not explicitly specified as the
-# PREFERRED_PROVIDER for libmetal. This avoids network access required by
+# PREFERRED_PROVIDER for u-boot-tools. This avoids network access required by
 # the use of AUTOREV SRCREVs, which may be the default for some recipes.
 python () {
     if bb.data.inherits_class('native', d):
