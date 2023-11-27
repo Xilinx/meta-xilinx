@@ -28,6 +28,24 @@
 			no-map;
 			reg = <0x0 0x3ed48000 0x0 0x100000>;
 		};
+
+		rproc_1_reserved: rproc@3ef00000 {
+			no-map;
+			reg = <0x0 0x3ef00000 0x0 0x40000>;
+		};
+		rpu1vdev0vring0: rpu1vdev0vring0@3ef40000 {
+			no-map;
+			reg = <0x0 0x3ef40000 0x0 0x4000>;
+		};
+		rpu1vdev0vring1: rpu1vdev0vring1@3ef44000 {
+			no-map;
+			reg = <0x0 0x3ef44000 0x0 0x4000>;
+		};
+		rpu1vdev0buffer: rpu1vdev0buffer@3ef48000 {
+			no-map;
+			compatible = "shared-dma-pool";
+			reg = <0x0 0x3ef48000 0x0 0x100000>;
+		};
 	};
 
 	tcm_0a: tcm_0a@eba00000 {
@@ -54,6 +72,30 @@
 		power-domain = <&versal_net_firmware 0x183180cd>;
 	};
 
+	tcm_1a: tcm_0a@eba40000 {
+		no-map;
+		reg = <0x0 0xeba40000 0x0 0x10000>;
+		status = "okay";
+		compatible = "mmio-sram";
+		power-domain = <&versal_net_firmware 0x183180ce>;
+	};
+
+	tcm_1b: tcm_0b@eba50000 {
+		no-map;
+		reg = <0x0 0xeba50000 0x0 0x8000>;
+		status = "okay";
+		compatible = "mmio-sram";
+		power-domain = <&versal_net_firmware 0x183180cf>;
+	};
+
+	tcm_1c: tcm_0b@eba60000 {
+		no-map;
+		reg = <0x0 0xeba60000 0x0 0x8000>;
+		status = "okay";
+		compatible = "mmio-sram";
+		power-domain = <&versal_net_firmware 0x183180d0>;
+	};
+
 	r52ss {
 		compatible = "xlnx,versal-net-r52-remoteproc";
 		#address-cells = <0x2>;
@@ -72,7 +114,18 @@
 			mboxes = <&ipi_mailbox_rpu0 0>, <&ipi_mailbox_rpu0 1>;
 			mbox-names = "tx", "rx";
 		};
-	};
+		r52_1 {
+			compatible = "xilinx,r52";
+			#address-cells = <0x2>;
+			#size-cells = <0x2>;
+			ranges;
+			sram = <&tcm_1a>, <&tcm_1b>, <&tcm_1c>;
+			memory-region = <&rproc_1_reserved>, &rpu1vdev0buffer>, <&rpu1vdev0vring0>, <&rpu1vdev0vring1>;
+			power-domain = <&versal_net_firmware 0x181100C0>;
+			mboxes = <&ipi_mailbox_rpu0 0>, &ipi_mailbox_rpu0 1>;
+			mbox-names = "tx", "rx";
+		};
+      };
 
 	zynqmp_ipi1 {
 		compatible = "xlnx,zynqmp-ipi-mailbox";
