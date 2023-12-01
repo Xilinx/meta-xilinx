@@ -1,3 +1,8 @@
+#
+# Copyright (C) 2023, Advanced Micro Devices, Inc.  All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
 # This bbclass is inherited by flat, DFx Static and DFx RP firmware recipes.
 # dfx_user_dts.bbclass expects user to generate pl dtsi for flat, DFx Static
 # and DFx RP xsa outside of yocto.
@@ -59,7 +64,7 @@ python() {
 
         if '.bin' in d.getVar("SRC_URI") and soc_family != "versal":
             bin_found = True
-            d.setVar("BIT_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.bin' in a][0].lstrip('file://')))
+            d.setVar("BIN_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.bin' in a][0].lstrip('file://')))
 
         if '.pdi' in d.getVar("SRC_URI") and soc_family == "versal":
             pdi_found = True
@@ -129,7 +134,7 @@ python do_configure() {
     soc_family = d.getVar("SOC_FAMILY")
 
     if bb.utils.contains('MACHINE_FEATURES', 'fpga-overlay', False, True, d):
-        bb.warn("Using fpga-manager.bbclass requires fpga-overlay MACHINE_FEATURE to be enabled")
+        bb.warn("Using dfx_user_dts.bbclass requires fpga-overlay MACHINE_FEATURE to be enabled")
 
     # Renaming firmware-name using $PN as bitstream/PDI will be renamed using
     # $PN when generating the bin/pdi file.
@@ -142,7 +147,7 @@ python do_configure() {
                     if soc_family == 'versal':
                         newdtsi.write(re.sub('firmware-name.*\".*\"','firmware-name = \"'+d.getVar('PN')+'.pdi\"',line))
                     else:
-                        newdtsi.write(re.sub('firmware-name.*\".*\"','firmware-name = \"'+d.getVar('PN')+'.bit.bin\"',line))
+                        newdtsi.write(re.sub('firmware-name.*\".*\"','firmware-name = \"'+d.getVar('PN')+'.bin\"',line))
         shutil.move(new_dtsi,orig_dtsi)
 }
 
@@ -153,13 +158,14 @@ python devicetree_do_compile:append() {
     soc_family = d.getVar("SOC_FAMILY")
 
     dtbo_count = sum(1 for f in glob.iglob((d.getVar('S') + '/*.dtbo'),recursive=True) if os.path.isfile(f))
+    bin_count = sum(1 for f in glob.iglob((d.getVar('S') + '/*.bin'),recursive=True) if os.path.isfile(f))
 
-    # Skip devicetree do_compile task if input file is dtbo in SRC_URI
-    if not dtbo_count:
-        # Convert .bit to bit.bin format only if dtsi is input.
-        # In case of dtbo as input, bbclass doesn't know if firmware-name is .bit or
-        # .bit.bin format and corresponding file name. Hence we are not doing
-        # bit.bin conversion.
+    # Skip devicetree do_compile task if input file is dtbo or bin in SRC_URI
+    if not dtbo_count and not bin_count:
+        # Convert .bit to .bin format only if dtsi is input.
+        # In case of dtbo as input, bbclass doesn't know if firmware-name is .bit
+        # or .bin format and corresponding file name. Hence we are not doing .bin
+        # conversion.
         if soc_family != 'versal' and glob.glob(d.getVar('S') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE')):
             pn = d.getVar('PN')
             biffile = pn + '.bif'
@@ -168,23 +174,23 @@ python devicetree_do_compile:append() {
                 f.write('all:\n{\n\t' + glob.glob(d.getVar('S')+(d.getVar('BIT_PATH') or '') + '/*.bit')[0] + '\n}')
 
             bootgenargs = ["bootgen"] + (d.getVar("BOOTGEN_FLAGS") or "").split()
-            bootgenargs += ["-image", biffile, "-o", pn + ".bit.bin"]
+            bootgenargs += ["-image", biffile, "-o", pn + ".bin"]
             subprocess.run(bootgenargs, check = True)
 
             # In Zynq7k using both "-process_bitstream bin" and "-o" in bootgen flag,
             # to convert bit file to bin format, "-o" option will not be effective
-            # and generated output file name is ${S}+${BIT_PATH}/<bit_file_name>.bit.bin
-            # file, Hence we need to rename this file from <bit_file_name>.bit.bin to
-            # ${PN}.bit.bin which matches the firmware name in dtbo and move
-            # ${PN}.bit.bin to ${B} directory.
+            # and generated output file name is ${S}+${BIT_PATH}/<bit_file_name>.bin
+            # file, Hence we need to rename this file from <bit_file_name>.bin to
+            # ${PN}.bin which matches the firmware name in dtbo and move
+            # ${PN}.bin to ${B} directory.
             if soc_family == 'zynq':
-                src_bitbin_file = glob.glob(d.getVar('S') + (d.getVar('BIT_PATH') or '') + '/*.bit.bin')[0]
-                dst_bitbin_file = d.getVar('B') + '/' + pn + '.bit.bin'
+                src_bitbin_file = glob.glob(d.getVar('S') + (d.getVar('BIT_PATH') or '') + '/*.bin')[0]
+                dst_bitbin_file = d.getVar('B') + '/' + pn + '.bin'
                 shutil.move(src_bitbin_file, dst_bitbin_file)
 
-            if not os.path.isfile(pn + ".bit.bin"):
+            if not os.path.isfile(pn + ".bin"):
                 bb.fatal("Couldn't find %s file, Enable '-log trace' in BOOTGEN_FLAGS" \
-                    "and check bootgen_log.txt" % (d.getVar('B') + '/' + pn + '.bit.bin'))
+                    "and check bootgen_log.txt" % (d.getVar('B') + '/' + pn + '.bin'))
 }
 
 # If user inputs both dtsi and dts files then device-tree will generate dtbo
@@ -246,8 +252,8 @@ do_install() {
             install -Dm 0644 ${S}/*.bit ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
         elif [ `ls ${S}/*.bin | wc -l` -eq 1 ] && [ `ls ${S}/*.dtbo | wc -l` -eq 1 ]; then
             install -Dm 0644 ${S}/*.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
-        elif [ -f ${B}/${PN}.bit.bin ] && [ -f ${B}/${USER_DTS_FILE}.dtbo ]; then
-            install -Dm 0644 ${B}/${PN}.bit.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.bit.bin
+        elif [ -f ${B}/${PN}.bin ] && [ -f ${B}/${USER_DTS_FILE}.dtbo ]; then
+            install -Dm 0644 ${B}/${PN}.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.bin
         else
             bbfatal "A bitstream file with '.bit' or '.bin' expected but not found"
         fi
