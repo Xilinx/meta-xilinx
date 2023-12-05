@@ -9,7 +9,7 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '
 SRC_URI = "${REPO};${BRANCHARG}"
 
 BRANCH = "xlnx_rel_v2023.2"
-SRCREV = "4dbd33accb043bd92ecbec2a3507f85a22045c51"
+SRCREV = "898fe38023d15d54402c788bcbca67a29eb2dc3d"
 SOMAJOR = "1"
 SOMINOR = "0"
 SOVERSION = "${SOMAJOR}.${SOMINOR}"
@@ -22,7 +22,7 @@ S = "${WORKDIR}/git"
 
 inherit cmake update-rc.d systemd
 
-DEPENDS += " libwebsockets inotify-tools libdfx zocl libdrm"
+DEPENDS += " libwebsockets inotify-tools libdfx zocl libdrm systemd"
 RDEPENDS:${PN} += " freeipmi"
 EXTRA_OECMAKE += " \
                -DCMAKE_SYSROOT:PATH=${RECIPE_SYSROOT} \
