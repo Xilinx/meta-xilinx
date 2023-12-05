@@ -30,7 +30,7 @@ LIC_FILES_CHKSUM = " \
 
 BRANCH ?= "freeipmi-1-6-0-stable"
 SRC_URI = " \
-	git://git.savannah.gnu.org/freeipmi.git;protocol=https;branch=${BRANCH} \
+	git://git.savannah.gnu.org/git/freeipmi.git;protocol=https;branch=${BRANCH} \
 	"
 SRCREV ?= "816a69eb15a9034351381211d9cd15de81da10c7"
 
