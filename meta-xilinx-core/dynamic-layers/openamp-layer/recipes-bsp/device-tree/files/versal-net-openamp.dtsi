@@ -120,9 +120,9 @@
 			#size-cells = <0x2>;
 			ranges;
 			sram = <&tcm_1a>, <&tcm_1b>, <&tcm_1c>;
-			memory-region = <&rproc_1_reserved>, &rpu1vdev0buffer>, <&rpu1vdev0vring0>, <&rpu1vdev0vring1>;
+			memory-region = <&rproc_1_reserved>, <&rpu1vdev0buffer>, <&rpu1vdev0vring0>, <&rpu1vdev0vring1>;
 			power-domain = <&versal_net_firmware 0x181100C0>;
-			mboxes = <&ipi_mailbox_rpu0 0>, &ipi_mailbox_rpu0 1>;
+			mboxes = <&ipi_mailbox_rpu0 0>, <&ipi_mailbox_rpu0 1>;
 			mbox-names = "tx", "rx";
 		};
       };
