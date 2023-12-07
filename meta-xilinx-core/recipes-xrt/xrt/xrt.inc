@@ -3,7 +3,7 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '
 SRC_URI = "${REPO};${BRANCHARG};name=xrt"
 
 BRANCH= "master"
-SRCREV_xrt = "5a45c158a3584c52c886486a1069cadcd6b9e970"
+SRCREV_xrt = "8eefcb786750b1f0d8c6d1da5b5c28fbd0c465fa"
 PV = "202320.2.16.0"
 
 SRC_URI += "git://github.com/Xilinx/dma_ip_drivers.git;branch=master;name=dma_ip_drivers;destsuffix=git/src/runtime_src/core/pcie/driver/linux/xocl/lib/libqdma;protocol=https"
