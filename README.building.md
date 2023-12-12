@@ -39,7 +39,7 @@ $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-oe
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-python
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-filesystems
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-networking
-$ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-microbalze
+$ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-microblaze
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-core
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-bsp
