@@ -184,12 +184,12 @@ SRC_URI = " \
 2. Create recipes-firmware directory in meta layer and copy the .bit/bin/pdi,
    .dtsi/dtbo, .json and .xclbin file to these directories.
 ```
-$ mkdir -p <meta-layer>/recipes-fimrware/<recipes-firmware-app>/files
-$ cp -r <path-to-files>/*.{bit or bin or pdi, dtsi or dtbo, shell.json or accel.json and .xclbin} <meta-layer>/recipes-fimrware/<firmware-app-name>/files
+$ mkdir -p <meta-layer>/recipes-firmware/<recipes-firmware-app>/files
+$ cp -r <path-to-files>/*.{bit or bin or pdi, dtsi or dtbo, shell.json or accel.json and .xclbin} <meta-layer>/recipes-firmware/<firmware-app-name>/files
 ```
 3. Now create the recipes for flat or static or partial firmware using recipetool.
 ```
-$ recipetool create -o <meta-layer>/recipes-fimrware/<firmware-app-name>/firmware-app-name.bb file:///<meta-layer>/recipes-fimrware/<firmware-app-name>/files 
+$ recipetool create -o <meta-layer>/recipes-firmware/<firmware-app-name>/firmware-app-name.bb file:///<meta-layer>/recipes-firmware/<firmware-app-name>/files
 ```
 4. Modify the recipe and inherit dfx_user_dts bbclass as shown below.
 ```
