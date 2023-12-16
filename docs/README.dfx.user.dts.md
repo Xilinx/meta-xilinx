@@ -16,11 +16,12 @@ following use cases.
 > **Note:** Refer https://github.com/Xilinx/dfx-mgr/blob/master/README.md for
 > shell.json and accel.json file content.
 
-* **Zynq-7000 and ZynqMP**:
-  * Design: Vivado flat design.
-    * Input files to firmware recipes: .bit or .bin, .dtsi or dtbo and shell.json (optional)
+* **Zynq 7000, ZynqMP and Versal**:
+  * Design: Vivado flat or Segmented Configuration design.
+    * Input files to firmware recipes: .bit or .bin or _pld.pdi, .dtsi or dtbo and shell.json (optional)
     * Usage Examples:
 ```
+# Zynq 7000 or ZynqMP flat design
 SRC_URI = " \
     file://<flat_design_pl>.bit \
     file://<flat_design_pl>.dtsi \
@@ -29,13 +30,16 @@ SRC_URI = " \
 ```
 
 ```
+# Zynq 7000 or ZynqMP flat design
 SRC_URI = " \
     file://<flat_design_pl>.bit \
     file://<flat_design_pl>.dtbo \
     file://shell.json \
     "
 ```
+
 ```
+# Zynq 7000 or ZynqMP flat design
 SRC_URI = " \
     file://<flat_design_pl>.bin \
     file://<flat_design_pl>.dtsi \
@@ -44,9 +48,52 @@ SRC_URI = " \
 ```
 
 ```
+# Zynq 7000 or ZynqMP flat design
 SRC_URI = " \
     file://<flat_design_pl>.bin \
     file://<flat_design_pl>.dtbo \
+    file://shell.json \
+    "
+```
+
+```
+# Zynq 7000 or ZynqMP flat design
+SRC_URI = " \
+    file://<flat_design_pl>.bit \
+    file://shell.json \
+    "
+```
+
+```
+# Zynq 7000 or ZynqMP flat design
+SRC_URI = " \
+    file://<flat_design_pl>.bin \
+    file://shell.json \
+    "
+```
+
+```
+# Versal Segmented Configuration design
+SRC_URI = " \
+    file://<flat_design>_pld.pdi \
+    file://<flat_design>_pld.dtsi \
+    file://shell.json \
+    "
+```
+
+```
+# Versal Segmented Configuration design
+SRC_URI = " \
+    file://<flat_design>_pld.pdi \
+    file://<flat_design>_pld.dtbo \
+    file://shell.json \
+    "
+```
+
+```
+# Versal Segmented Configuration design
+SRC_URI = " \
+    file://<flat_design>_pld.pdi \
     file://shell.json \
     "
 ```
@@ -98,6 +145,24 @@ SRC_URI = " \
 ```
 
 ```
+# ZynqMP DFx Static
+SRC_URI = " \
+    file://<dfx_design_static_pl>.bit \
+    file://shell.json \
+    file://<dfx_design_static_pl>.xclbin \
+    "
+```
+
+```
+# ZynqMP DFx Static
+SRC_URI = " \
+    file://<dfx_design_static_pl>.bin \
+    file://shell.json \
+    file://<dfx_design_static_pl>.xclbin \
+    "
+```
+
+```
 # ZynqMP DFx RP
 SRC_URI = " \
     file://<dfx_design_rp_rm_pl>.bit \
@@ -132,6 +197,24 @@ SRC_URI = " \
 SRC_URI = " \
     file://<dfx_design_rp_rm_pl>.bin \
     file://<dfx_design_rp_rm_pl>.dtbo \
+    file://accel.json \
+    file://<dfx_design_rp_rm_pl>.xclbin \
+    "
+```
+
+```
+# ZynqMP DFx RP
+SRC_URI = " \
+    file://<dfx_design_rp_rm_pl>.bit \
+    file://accel.json \
+    file://<dfx_design_rp_rm_pl>.xclbin \
+    "
+```
+
+```
+# ZynqMP DFx RP
+SRC_URI = " \
+    file://<dfx_design_rp_rm_pl>.bin \
     file://accel.json \
     file://<dfx_design_rp_rm_pl>.xclbin \
     "
@@ -158,6 +241,15 @@ SRC_URI = " \
 ```
 
 ```
+# Versal DFx Static
+SRC_URI = " \
+    file://<dfx_design_static_pl>.pdi \
+    file://shell.json \
+    file://<dfx_design_static_pl>.xclbin \
+    "
+```
+
+```
 # Versal DFx RP
 SRC_URI = " \
     file://<dfx_design_rp_rm_pl>.pdi \
@@ -172,6 +264,15 @@ SRC_URI = " \
 SRC_URI = " \
     file://<dfx_design_rp_rm_pl>.pdi \
     file://<dfx_design_rp_rm_pl>.dtbo \
+    file://accel.json \
+    file://<dfx_design_rp_rm_pl>.xclbin \
+    "
+```
+
+```
+# Versal DFx RP
+SRC_URI = " \
+    file://<dfx_design_rp_rm_pl>.pdi \
     file://accel.json \
     file://<dfx_design_rp_rm_pl>.xclbin \
     "
