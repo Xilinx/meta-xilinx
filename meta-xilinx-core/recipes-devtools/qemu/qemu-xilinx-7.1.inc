@@ -1,6 +1,10 @@
 SUMMARY = "Xilinx's fork of a fast open source processor emulator"
 HOMEPAGE = "https://github.com/xilinx/qemu/"
 
+# This qemu fork is NOT compatible with running on a 32-bit system
+# See: https://github.com/Xilinx/qemu/issues/35
+COMPATIBLE_HOST:arm = "null"
+
 # x86_64 is needed to build nativesdks
 QEMU_TARGETS = "aarch64 arm microblaze microblazeel x86_64"
 
