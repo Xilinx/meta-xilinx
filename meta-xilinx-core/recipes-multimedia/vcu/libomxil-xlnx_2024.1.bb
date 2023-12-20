@@ -8,7 +8,7 @@ PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', 
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vcu-omx-il.git;protocol=https"
-SRCREV = "e906a887deca1286e9744dd3c128adf11e281538"
+SRCREV = "e7dcbba5bc5087f49369f10c3424ecbe3ff8b792"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
