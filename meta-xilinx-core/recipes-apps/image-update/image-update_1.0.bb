@@ -16,6 +16,7 @@ S = "${WORKDIR}/git"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
+COMPATIBLE_MACHINE:versal = "versal"
 
 PACKAGE_ARCH:zynqmp = "${SOC_FAMILY_ARCH}"
 
