@@ -262,7 +262,7 @@ do_install() {
             bbfatal "Multiple .bin found, use the right .bin in SRC_URI from the following:\n$(basename -a ${S}/*.bin)"
         elif [ `ls ${S}/*.bit | wc -l` -eq 1 ] && [ ! -f ${B}/${USER_DTS_FILE}.dtbo ]; then
             install -Dm 0644 ${S}/*.bit ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
-        elif [ `ls ${S}/*.bin | wc -l` -eq 1 ] && [ ! -f ${B}/${USER_DTS_FILE}.dtbo ]; then
+        elif [ `ls ${S}/*.bin | wc -l` -eq 1 ]; then
             install -Dm 0644 ${S}/*.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
         elif [ -f ${B}/${PN}.bin ] && [ -f ${B}/${USER_DTS_FILE}.dtbo ]; then
             install -Dm 0644 ${B}/${PN}.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.bin
