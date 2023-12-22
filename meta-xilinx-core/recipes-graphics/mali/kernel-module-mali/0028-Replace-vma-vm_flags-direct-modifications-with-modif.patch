@@ -1,0 +1,81 @@
+From e3e0f5e3fa0ddb396393d444bce6e575f7a16189 Mon Sep 17 00:00:00 2001
+From: Parth Gajjar <parth.gajjar@amd.com>
+Date: Thu, 21 Dec 2023 22:41:32 -0800
+Subject: [PATCH] Replace vma->vm_flags direct modifications with modifier
+ calls
+
+Replace direct modifications to vma->vm_flags with calls to modifier
+functions to be able to track flag changes and to keep vma locking
+correctness. (Kernel 6.3)
+
+Signed-off-by: Parth Gajjar <parth.gajjar@amd.com>
+---
+ linux/mali_memory.c     | 10 ++++++++++
+ linux/mali_memory_cow.c | 13 ++++++++++---
+ 2 files changed, 20 insertions(+), 3 deletions(-)
+
+diff --git a/linux/mali_memory.c b/linux/mali_memory.c
+index 2b2b209..c21d0b7 100644
+--- a/linux/mali_memory.c
++++ b/linux/mali_memory.c
+@@ -266,11 +266,17 @@ int mali_mmap(struct file *filp, struct vm_area_struct *vma)
+ 		 * that it's present and can never be paged out (see also previous
+ 		 * entry)
+ 		 */
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
++		vm_flags_set(vma, VM_IO | VM_DONTCOPY | VM_PFNMAP);
++#else
+ 		vma->vm_flags |= VM_IO;
+ 		vma->vm_flags |= VM_DONTCOPY;
+ 		vma->vm_flags |= VM_PFNMAP;
++#endif
+ #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 7, 0)
+ 		vma->vm_flags |= VM_RESERVED;
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
++		vm_flags_set(vma, VM_DONTDUMP | VM_DONTEXPAND);
+ #else
+ 		vma->vm_flags |= VM_DONTDUMP;
+ 		vma->vm_flags |= VM_DONTEXPAND;
+@@ -288,7 +294,11 @@ int mali_mmap(struct file *filp, struct vm_area_struct *vma)
+ 	if (!(vma->vm_flags & VM_WRITE)) {
+ 		MALI_DEBUG_PRINT(4, ("mmap allocation with read only !\n"));
+ 		/* add VM_WRITE for do_page_fault will check this when a write fault */
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
++		vm_flags_set(vma, VM_WRITE | VM_READ);
++#else
+ 		vma->vm_flags |= VM_WRITE | VM_READ;
++#endif
+ 		vma->vm_page_prot = PAGE_READONLY;
+ 		vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
+ 		mem_bkend->flags |= MALI_MEM_BACKEND_FLAG_COW_CPU_NO_WRITE;
+diff --git a/linux/mali_memory_cow.c b/linux/mali_memory_cow.c
+index 6fadd42..e631431 100644
+--- a/linux/mali_memory_cow.c
++++ b/linux/mali_memory_cow.c
+@@ -391,13 +391,20 @@ _mali_osk_errcode_t mali_memory_cow_modify_range(mali_mem_backend *backend,
+ 			}
+ 		} else {
+ 			/* used to trigger page fault for swappable cowed memory. */
+-			alloc->cpu_mapping.vma->vm_flags |= VM_PFNMAP;
+-			alloc->cpu_mapping.vma->vm_flags |= VM_MIXEDMAP;
+-
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
++			vm_flags_set(alloc->cpu_mapping.vma, VM_PFNMAP | VM_MIXEDMAP);
++#else
++			alloc->cpu_mapping.vma->vm_flags |= VM_PFNMAP;
++			alloc->cpu_mapping.vma->vm_flags |= VM_MIXEDMAP;
++#endif
+ 			zap_vma_ptes(alloc->cpu_mapping.vma, alloc->cpu_mapping.vma->vm_start + range_start, range_size);
+ 			/* delete this flag to let swappble is ummapped regard to stauct page not page frame. */
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 3, 0)
++			vm_flags_clear(alloc->cpu_mapping.vma, VM_PFNMAP | VM_MIXEDMAP);
++#else
+ 			alloc->cpu_mapping.vma->vm_flags &= ~VM_PFNMAP;
+ 			alloc->cpu_mapping.vma->vm_flags &= ~VM_MIXEDMAP;
++#endif
+ 		}
+ 	}
+ 
+-- 
+2.25.1
+
