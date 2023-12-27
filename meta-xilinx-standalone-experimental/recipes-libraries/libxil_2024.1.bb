@@ -47,4 +47,8 @@ do_compile() {
 do_install() {
     install -d ${D}${libdir}
     install -m 0755  ${B}/${ESW_COMPONENT_NAME} ${D}${libdir}
+
+    # Install Spec files for consumers of BSP
+    install -d ${D}${includedir}
+    cp -rf  ${SPECFILE_PATH} ${D}${includedir}
 }
