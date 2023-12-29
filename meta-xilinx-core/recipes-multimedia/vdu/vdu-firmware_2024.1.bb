@@ -1,7 +1,7 @@
 SUMMARY = "Firmware for VDU"
 DESCRIPTION = "Firmware binaries provider for VDU"
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=c5784f63397086d836580d8785d1deb9"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=097505cd2ff7f3f5d84f42aeea950823"
 
 XILINX_VDU_VERSION = "1.0.0"
 PV =. "${XILINX_VDU_VERSION}-xilinx-v"

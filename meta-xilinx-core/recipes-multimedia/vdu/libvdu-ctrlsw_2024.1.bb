@@ -1,7 +1,7 @@
 SUMMARY = "Control Software for VDU"
 DESCRIPTION = "Control software libraries, test applications and headers provider for VDU"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=aaf483d309243c4596f6373eb9c8325f"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ef69c2bb405668101824f0b644631e2e"
 
 XILINX_VDU_VERSION = "1.0.0"
 PV =. "${XILINX_VDU_VERSION}-xilinx-v"
