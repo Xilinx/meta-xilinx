@@ -1,0 +1,48 @@
+From 13443fe86bb100849c55b41873f48e0b121c7bc0 Mon Sep 17 00:00:00 2001
+From: Vikram Garhwal <vikram.garhwal@amd.com>
+Date: Fri, 1 Jul 2022 17:28:14 -0700
+Subject: [PATCH 08/16] accel/xen/xen-all: export xenstore_record_dm_state
+
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
+Reviewed-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
+---
+ accel/xen/xen-all.c  | 2 +-
+ include/hw/xen/xen.h | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/accel/xen/xen-all.c b/accel/xen/xen-all.c
+index 69aa7d018b..276625b78b 100644
+--- a/accel/xen/xen-all.c
++++ b/accel/xen/xen-all.c
+@@ -100,7 +100,7 @@ void xenstore_store_pv_console_info(int i, Chardev *chr)
+ }
+ 
+ 
+-static void xenstore_record_dm_state(struct xs_handle *xs, const char *state)
++void xenstore_record_dm_state(struct xs_handle *xs, const char *state)
+ {
+     char path[50];
+ 
+diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+index afdf9c436a..31e9538a5c 100644
+--- a/include/hw/xen/xen.h
++++ b/include/hw/xen/xen.h
+@@ -9,6 +9,7 @@
+  */
+ 
+ #include "exec/cpu-common.h"
++#include <xenstore.h>
+ 
+ /* xen-machine.c */
+ enum xen_mode {
+@@ -31,5 +32,6 @@ qemu_irq *xen_interrupt_controller_init(void);
+ void xenstore_store_pv_console_info(int i, Chardev *chr);
+ 
+ void xen_register_framebuffer(struct MemoryRegion *mr);
++void xenstore_record_dm_state(struct xs_handle *xs, const char *state);
+ 
+ #endif /* QEMU_HW_XEN_H */
+-- 
+2.17.1
+

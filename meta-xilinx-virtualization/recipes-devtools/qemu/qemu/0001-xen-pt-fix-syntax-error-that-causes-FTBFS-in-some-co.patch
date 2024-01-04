@@ -1,0 +1,40 @@
+From ba24456b93a205b728475d5f0880f3ec495e383a Mon Sep 17 00:00:00 2001
+From: Chuck Zmudzinski <brchuckz@aol.com>
+Date: Mon, 31 Oct 2022 17:35:52 -0400
+Subject: [PATCH] xen/pt: fix syntax error that causes FTBFS in some
+ configurations
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When Qemu is built with --enable-xen and --disable-xen-pci-passthrough
+and the target os is linux, the build fails with:
+
+meson.build:3477:2: ERROR: File xen_pt_stub.c does not exist.
+
+Fixes: 582ea95f5f93 ("meson: convert hw/xen")
+
+Signed-off-by: Chuck Zmudzinski <brchuckz@aol.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Message-Id: <5f1342a13c09af77b1a7b0aeaba5955bcea89731.1667242033.git.brchuckz@aol.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ hw/xen/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/xen/meson.build b/hw/xen/meson.build
+index 08dc1f6857..ae0ace3046 100644
+--- a/hw/xen/meson.build
++++ b/hw/xen/meson.build
+@@ -18,7 +18,7 @@ if have_xen_pci_passthrough
+     'xen_pt_msi.c',
+   ))
+ else
+-  xen_specific_ss.add('xen_pt_stub.c')
++  xen_specific_ss.add(files('xen_pt_stub.c'))
+ endif
+ 
+ specific_ss.add_all(when: ['CONFIG_XEN', xen], if_true: xen_specific_ss)
+-- 
+2.17.0
+

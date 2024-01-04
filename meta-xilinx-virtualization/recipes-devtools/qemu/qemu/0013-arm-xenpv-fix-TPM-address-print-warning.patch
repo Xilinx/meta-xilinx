@@ -1,0 +1,27 @@
+From c5b128668d9cd1e1cb4da80d5bc8aaebc6ff2e19 Mon Sep 17 00:00:00 2001
+From: Vikram Garhwal <vikram.garhwal@amd.com>
+Date: Fri, 23 Dec 2022 00:06:29 +0000
+Subject: [PATCH 13/16] arm: xenpv: fix TPM address print warning
+
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+Acked-by: Stefano Stabellini <stefano.stabellini@amd.com>
+---
+ hw/arm/xen_arm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/arm/xen_arm.c b/hw/arm/xen_arm.c
+index f248b5744a..153cedfeb4 100644
+--- a/hw/arm/xen_arm.c
++++ b/hw/arm/xen_arm.c
+@@ -118,7 +118,7 @@ static void xen_enable_tpm(void)
+     sysbus_realize_and_unref(busdev, &error_fatal);
+     sysbus_mmio_map(busdev, 0, GUEST_TPM_BASE);
+ 
+-    DPRINTF("Connected tpmdev at address 0x%lx\n", GUEST_TPM_BASE);
++    DPRINTF("Connected tpmdev at address 0x%llx\n", GUEST_TPM_BASE);
+ #endif
+ }
+ 
+-- 
+2.17.1
+

@@ -1,0 +1,106 @@
+From 4472924c800e9dbf46e4c2432565d3e406b35d27 Mon Sep 17 00:00:00 2001
+From: Vikram Garhwal <vikram.garhwal@amd.com>
+Date: Fri, 1 Jul 2022 16:32:33 -0700
+Subject: [PATCH 03/16] hw/i386/xen: rearrange xen_hvm_init_pc
+
+Move references to:
+- xen_get_vmport_regs_pfn
+- xen_suspend_notifier
+- xen_wakeup_notifier
+- xen_ram_init
+
+towards the end of the function. This is done to keep the the common
+ioreq functions in one place which will be moved to new function in next
+patch in order to make it useful to ARM machines also.
+
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
+Reviewed-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
+---
+ hw/i386/xen/xen-hvm.c | 49 ++++++++++++++++++++++---------------------
+ 1 file changed, 25 insertions(+), 24 deletions(-)
+
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index e4293d6d66..b27484ad22 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -1416,12 +1416,6 @@ void xen_hvm_init_pc(PCMachineState *pcms, MemoryRegion **ram_memory)
+     state->exit.notify = xen_exit_notifier;
+     qemu_add_exit_notifier(&state->exit);
+ 
+-    state->suspend.notify = xen_suspend_notifier;
+-    qemu_register_suspend_notifier(&state->suspend);
+-
+-    state->wakeup.notify = xen_wakeup_notifier;
+-    qemu_register_wakeup_notifier(&state->wakeup);
+-
+     /*
+      * Register wake-up support in QMP query-current-machine API
+      */
+@@ -1432,23 +1426,6 @@ void xen_hvm_init_pc(PCMachineState *pcms, MemoryRegion **ram_memory)
+         goto err;
+     }
+ 
+-    rc = xen_get_vmport_regs_pfn(xen_xc, xen_domid, &ioreq_pfn);
+-    if (!rc) {
+-        DPRINTF("shared vmport page at pfn %lx\n", ioreq_pfn);
+-        state->shared_vmport_page =
+-            xenforeignmemory_map(xen_fmem, xen_domid, PROT_READ|PROT_WRITE,
+-                                 1, &ioreq_pfn, NULL);
+-        if (state->shared_vmport_page == NULL) {
+-            error_report("map shared vmport IO page returned error %d handle=%p",
+-                         errno, xen_xc);
+-            goto err;
+-        }
+-    } else if (rc != -ENOSYS) {
+-        error_report("get vmport regs pfn returned error %d, rc=%d",
+-                     errno, rc);
+-        goto err;
+-    }
+-
+     /* Note: cpus is empty at this point in init */
+     state->cpu_by_vcpu_id = g_new0(CPUState *, max_cpus);
+ 
+@@ -1486,7 +1463,6 @@ void xen_hvm_init_pc(PCMachineState *pcms, MemoryRegion **ram_memory)
+ #else
+     xen_map_cache_init(NULL, state);
+ #endif
+-    xen_ram_init(pcms, ms->ram_size, ram_memory);
+ 
+     qemu_add_vm_change_state_handler(xen_hvm_change_state_handler, state);
+ 
+@@ -1513,6 +1489,31 @@ void xen_hvm_init_pc(PCMachineState *pcms, MemoryRegion **ram_memory)
+     QLIST_INIT(&xen_physmap);
+     xen_read_physmap(state);
+ 
++    state->suspend.notify = xen_suspend_notifier;
++    qemu_register_suspend_notifier(&state->suspend);
++
++    state->wakeup.notify = xen_wakeup_notifier;
++    qemu_register_wakeup_notifier(&state->wakeup);
++
++    rc = xen_get_vmport_regs_pfn(xen_xc, xen_domid, &ioreq_pfn);
++    if (!rc) {
++        DPRINTF("shared vmport page at pfn %lx\n", ioreq_pfn);
++        state->shared_vmport_page =
++            xenforeignmemory_map(xen_fmem, xen_domid, PROT_READ|PROT_WRITE,
++                                 1, &ioreq_pfn, NULL);
++        if (state->shared_vmport_page == NULL) {
++            error_report("map shared vmport IO page returned error %d handle=%p",
++                         errno, xen_xc);
++            goto err;
++        }
++    } else if (rc != -ENOSYS) {
++        error_report("get vmport regs pfn returned error %d, rc=%d",
++                     errno, rc);
++        goto err;
++    }
++
++    xen_ram_init(pcms, ms->ram_size, ram_memory);
++
+     /* Disable ACPI build because Xen handles it */
+     pcms->acpi_build_enabled = false;
+ 
+-- 
+2.17.1
+

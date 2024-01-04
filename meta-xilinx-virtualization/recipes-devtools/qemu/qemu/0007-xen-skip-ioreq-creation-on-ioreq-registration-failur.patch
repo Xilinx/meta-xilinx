@@ -1,0 +1,42 @@
+From fa475ec44fc78ff246e6536c8b9d408abadbb4a4 Mon Sep 17 00:00:00 2001
+From: Stefano Stabellini <stefano.stabellini@amd.com>
+Date: Fri, 1 Jul 2022 18:50:59 -0700
+Subject: [PATCH 07/16] xen: skip ioreq creation on ioreq registration failure
+
+On ARM it is possible to have a functioning xenpv machine with only the
+PV backends and no IOREQ server. If the IOREQ server creation fails
+continue to the PV backends initialization.
+
+Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
+---
+ hw/xen/xen-hvm-common.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/hw/xen/xen-hvm-common.c b/hw/xen/xen-hvm-common.c
+index 67f76f6010..7e7d23397f 100644
+--- a/hw/xen/xen-hvm-common.c
++++ b/hw/xen/xen-hvm-common.c
+@@ -780,7 +780,11 @@ void xen_register_ioreq(XenIOState *state, unsigned int max_cpus,
+         goto err;
+     }
+ 
+-    xen_create_ioreq_server(xen_domid, &state->ioservid);
++    rc = xen_create_ioreq_server(xen_domid, &state->ioservid);
++    if (rc) {
++        DPRINTF("xen: failed to create ioreq server\n");
++        goto no_ioreq;
++    }
+ 
+     state->exit.notify = xen_exit_notifier;
+     qemu_add_exit_notifier(&state->exit);
+@@ -845,6 +849,7 @@ void xen_register_ioreq(XenIOState *state, unsigned int max_cpus,
+     QLIST_INIT(&state->dev_list);
+     device_listener_register(&state->device_listener);
+ 
++no_ioreq:
+     xen_bus_init();
+ 
+     /* Initialize backend core & drivers */
+-- 
+2.17.1
+
