@@ -23,7 +23,7 @@ inherit devicetree image-artifact-names
 SYSTEM_DTFILE ??= ""
 CONFIG_DTFILE ??= "${SYSTEM_DTFILE}"
 
-BASE_DTS ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE') or '').rstrip('.dtb').rstrip('.dts') or 'system-top'}"
+BASE_DTS ?= "${@os.path.splitext(os.path.basename(d.getVar('CONFIG_DTFILE') or ''))[0] or 'system-top'}"
 
 EXTRA_DT_FILES ?= ""
 EXTRA_DTFILE_PREFIX ?= "system-top"
