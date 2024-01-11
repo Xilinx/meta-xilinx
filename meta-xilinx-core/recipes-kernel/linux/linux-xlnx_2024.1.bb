@@ -9,3 +9,11 @@ KCONF_AUDIT_LEVEL="0"
 include linux-xlnx.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
+# Workaround for:
+#  rm: cannot remove '.../tmp/work/zynqmp_generic-xilinx-linux/linux-xlnx/6.6.0-xilinx-v2024.1+gitAUTOINC+340eed5001-r0/image/lib/modules/6.6.0-xilinx-v2024.1-g340eed500130/source': No such file or directory
+# This will not be required Scarthgap
+kernel_do_install:prepend () {
+	mkdir -p "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}"
+	touch "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/source"
+}
