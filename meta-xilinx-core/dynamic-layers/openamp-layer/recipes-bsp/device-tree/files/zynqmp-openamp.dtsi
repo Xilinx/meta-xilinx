@@ -132,16 +132,25 @@
 			#mbox-cells = <1>;
 			xlnx,ipi-id = <1>;
 		};
+	};
+	zynqmp_ipi2 {
+		compatible = "xlnx,zynqmp-ipi-mailbox";
+		interrupt-parent = <&gic>;
+		interrupts = <0 30 4>;
+		xlnx,ipi-id = <8>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
 		/* APU<->RPU1 IPI mailbox controller */
-		ipi_mailbox_rpu1: mailbox@ff990640 {
-			reg = <0xff990640 0x20>,
-			      <0xff990660 0x20>,
-			      <0xff9902c0 0x20>,
-			      <0xff9902e0 0x20>;
+		ipi_mailbox_rpu1: mailbox@ff3f0b00 {
+			reg = <0xff3f0b00 0x20>,
+				<0xff3f0b20 0x20>,
+				<0xff3f0940 0x20>,
+				<0xff3f0960 0x20>;
 			reg-names = "local_request_region",
-				    "local_response_region",
-				    "remote_request_region",
-				    "remote_response_region";
+				"local_response_region",
+				"remote_request_region",
+				"remote_response_region";
 			#mbox-cells = <1>;
 			xlnx,ipi-id = <2>;
 		};
