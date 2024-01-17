@@ -281,7 +281,11 @@ SRC_URI = " \
 
 ## How to create a firmware recipe app
 
-1. Follow [Building Instructions](../README.building.md) upto step 4.
+1. Follow SDT or XSCT Build instructions whichever build method is used but not
+   both.
+    a. [SDT Building Instructions](../README.building.md) upto step 4.
+    b. [XSCT Building Instructions](../meta-xilinx-standalone-experimental/README.md)
+       upto step 4.b (With SDT overlay).
 2. Create recipes-firmware directory in meta layer and copy the .bit/bin/pdi,
    .dtsi/dtbo, .json and .xclbin file to these directories.
 ```
@@ -320,7 +324,11 @@ IMAGE_INSTALL:append = " \
   fpga-manager-script \
   "
 ```
-6. Follow [Building Instructions](../README.building.md) and continue from step 5.
+6. Follow SDT or XSCT Build instructions whichever build method is used but not
+   both.
+    a. [SDT Building Instructions](../README.building.md) and continue from step 5.
+    b. [XSCT Building Instructions](../meta-xilinx-standalone-experimental/README.md)
+       and continue from step 5.
 7. Once images are built firmware app files will be installed on target_rootfs.
 ```
 # <target_rootfs>/lib/firmware/xilinx/firmware-app-name
