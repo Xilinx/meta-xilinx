@@ -11,7 +11,7 @@ S = "${WORKDIR}/git"
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/hdmi-modules.git;protocol=https"
-SRCREV = "82209b0021a7b5d7ef71a859eed4bafeb541ed08"
+SRCREV = "edd297762e0bac3f4c5b64ef67244968e22020e2"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
