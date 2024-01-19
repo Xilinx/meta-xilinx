@@ -1,5 +1,3 @@
-require xen-xilinx.inc
-
 # Only include the sysvinit scripts if sysvinit is enabled.
 do_install:append () {
     if [ -e ${D}/usr/lib/xen/bin/pygrub ]; then

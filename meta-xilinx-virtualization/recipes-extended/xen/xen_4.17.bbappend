@@ -1,4 +1,4 @@
-require xen-xilinx.inc
+require xen-xilinx_4.17.inc
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
