@@ -1,0 +1,43 @@
+Upstream-Status: Pending
+
+diff --git a/tools/pygrub/Makefile b/tools/pygrub/Makefile
+index 4963bc89c6..c1c05eb421 100644
+--- a/tools/pygrub/Makefile
++++ b/tools/pygrub/Makefile
+@@ -13,14 +13,14 @@ setup.py = CC="$(CC)" CFLAGS="$(PY_CFLAGS)" LDSHARED="$(CC)" LDFLAGS="$(PY_LDFLA
+ all: build
+ .PHONY: build
+ build:
+-	$(setup.py) build
++	$(setup.py) build $(DISTUTILS_BUILD_ARGS)
+ 
+ .PHONY: install
+ install: all
+ 	$(INSTALL_DIR) $(DESTDIR)/$(bindir)
+ 	$(INSTALL_DIR) $(DESTDIR)/$(LIBEXEC_BIN)
+ 	$(setup.py) install --record $(INSTALL_LOG) $(PYTHON_PREFIX_ARG) \
+-		--root="$(DESTDIR)" --force
++		--root="$(DESTDIR)" --force  $(DISTUTILS_INSTALL_ARGS)
+ 	$(INSTALL_PYTHON_PROG) src/pygrub $(DESTDIR)/$(LIBEXEC_BIN)/pygrub
+ 	set -e; if [ $(bindir) != $(LIBEXEC_BIN) -a \
+ 	             "`readlink -f $(DESTDIR)/$(bindir)`" != \
+diff --git a/tools/python/Makefile b/tools/python/Makefile
+index 437431c48e..0a99c2067e 100644
+--- a/tools/python/Makefile
++++ b/tools/python/Makefile
+@@ -16,13 +16,13 @@ setup.py = CC="$(CC)" CFLAGS="$(PY_CFLAGS)" LDSHARED="$(CC)" LDFLAGS="$(PY_LDFLA
+ 
+ .PHONY: build
+ build:
+-	$(setup.py) build
++	$(setup.py) build $(DISTUTILS_BUILD_ARGS)
+ 
+ .PHONY: install
+ install:
+ 	$(INSTALL_DIR) $(DESTDIR)$(LIBEXEC_BIN)
+ 	$(setup.py) install --record $(INSTALL_LOG) $(PYTHON_PREFIX_ARG) \
+-		--root="$(DESTDIR)" --force
++		--root="$(DESTDIR)" --force $(DISTUTILS_INSTALL_ARGS)
+ 	$(INSTALL_PYTHON_PROG) scripts/convert-legacy-stream $(DESTDIR)$(LIBEXEC_BIN)
+ 	$(INSTALL_PYTHON_PROG) scripts/verify-stream-v2 $(DESTDIR)$(LIBEXEC_BIN)
+ 
