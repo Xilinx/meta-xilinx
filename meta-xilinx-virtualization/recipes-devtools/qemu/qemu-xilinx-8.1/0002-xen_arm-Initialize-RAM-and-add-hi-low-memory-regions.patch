@@ -1,0 +1,124 @@
+From 70a74795c5071bf591e6e557b7c8c492ead0e675 Mon Sep 17 00:00:00 2001
+From: Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
+Date: Tue, 29 Aug 2023 21:35:18 -0700
+Subject: [PATCH 02/11] xen_arm: Initialize RAM and add hi/low memory regions
+
+In order to use virtio backends we need to initialize RAM for the
+xen-mapcache (which is responsible for mapping guest memory using foreign
+mapping) to work. Calculate and add hi/low memory regions based on
+machine->ram_size.
+
+Use the constants defined in public header arch-arm.h to be aligned with the xen
+toolstack.
+
+While using this machine, the toolstack should then pass real ram_size using
+"-m" arg. If "-m" is not given, create a QEMU machine without IOREQ and other
+emulated devices like TPM and VIRTIO. This is done to keep this QEMU machine
+usable for /etc/init.d/xencommons.
+
+Signed-off-by: Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+Signed-off-by: Stefano Stabellini <stefano.stabellini@amd.com>
+---
+ hw/arm/xen_arm.c            | 45 +++++++++++++++++++++++++++++++++++++
+ include/hw/xen/xen_native.h |  8 +++++++
+ 2 files changed, 53 insertions(+)
+
+diff --git a/hw/arm/xen_arm.c b/hw/arm/xen_arm.c
+index 7393b37355..f83b983ec5 100644
+--- a/hw/arm/xen_arm.c
++++ b/hw/arm/xen_arm.c
+@@ -60,6 +60,8 @@ struct XenArmState {
+     } cfg;
+ };
+ 
++static MemoryRegion ram_lo, ram_hi;
++
+ /*
+  * VIRTIO_MMIO_DEV_SIZE is imported from tools/libs/light/libxl_arm.c under Xen
+  * repository.
+@@ -92,6 +94,39 @@ static void xen_create_virtio_mmio_devices(XenArmState *xam)
+     }
+ }
+ 
++static void xen_init_ram(MachineState *machine)
++{
++    MemoryRegion *sysmem = get_system_memory();
++    ram_addr_t block_len, ram_size[GUEST_RAM_BANKS];
++
++    if (machine->ram_size <= GUEST_RAM0_SIZE) {
++        ram_size[0] = machine->ram_size;
++        ram_size[1] = 0;
++        block_len = GUEST_RAM0_BASE + ram_size[0];
++    } else {
++        ram_size[0] = GUEST_RAM0_SIZE;
++        ram_size[1] = machine->ram_size - GUEST_RAM0_SIZE;
++        block_len = GUEST_RAM1_BASE + ram_size[1];
++    }
++
++    memory_region_init_ram(&ram_memory, NULL, "xen.ram", block_len,
++                           &error_fatal);
++
++    memory_region_init_alias(&ram_lo, NULL, "xen.ram.lo", &ram_memory,
++                             GUEST_RAM0_BASE, ram_size[0]);
++    memory_region_add_subregion(sysmem, GUEST_RAM0_BASE, &ram_lo);
++    DPRINTF("Initialized region xen.ram.lo: base 0x%llx size 0x%lx\n",
++            GUEST_RAM0_BASE, ram_size[0]);
++
++    if (ram_size[1] > 0) {
++        memory_region_init_alias(&ram_hi, NULL, "xen.ram.hi", &ram_memory,
++                                 GUEST_RAM1_BASE, ram_size[1]);
++        memory_region_add_subregion(sysmem, GUEST_RAM1_BASE, &ram_hi);
++        DPRINTF("Initialized region xen.ram.hi: base 0x%llx size 0x%lx\n",
++                GUEST_RAM1_BASE, ram_size[1]);
++    }
++}
++
+ void arch_handle_ioreq(XenIOState *state, ioreq_t *req)
+ {
+     hw_error("Invalid ioreq type 0x%x\n", req->type);
+@@ -141,6 +176,14 @@ static void xen_arm_init(MachineState *machine)
+ 
+     xam->state =  g_new0(XenIOState, 1);
+ 
++    if (machine->ram_size == 0) {
++        DPRINTF("ram_size not specified. QEMU machine started without IOREQ"
++                "(no emulated devices including Virtio)\n");
++        return;
++    }
++
++    xen_init_ram(machine);
++
+     xen_register_ioreq(xam->state, machine->smp.cpus, &xen_memory_listener);
+ 
+     xen_create_virtio_mmio_devices(xam);
+@@ -188,6 +231,8 @@ static void xen_arm_machine_class_init(ObjectClass *oc, void *data)
+     mc->init = xen_arm_init;
+     mc->max_cpus = 1;
+     mc->default_machine_opts = "accel=xen";
++    /* Set explicitly here to make sure that real ram_size is passed */
++    mc->default_ram_size = 0;
+ 
+ #ifdef CONFIG_TPM
+     object_class_property_add(oc, "tpm-base-addr", "uint64_t",
+diff --git a/include/hw/xen/xen_native.h b/include/hw/xen/xen_native.h
+index a4b1aa9e5d..5d2718261f 100644
+--- a/include/hw/xen/xen_native.h
++++ b/include/hw/xen/xen_native.h
+@@ -539,4 +539,12 @@ static inline int xendevicemodel_set_irq_level(xendevicemodel_handle *dmod,
+ #define GUEST_VIRTIO_MMIO_SPI_LAST    43
+ #endif
+ 
++#if defined(__i386__) || defined(__x86_64__)
++#define GUEST_RAM_BANKS   2
++#define GUEST_RAM0_BASE   0x40000000ULL /* 3GB of low RAM @ 1GB */
++#define GUEST_RAM0_SIZE   0xc0000000ULL
++#define GUEST_RAM1_BASE   0x0200000000ULL /* 1016GB of RAM @ 8GB */
++#define GUEST_RAM1_SIZE   0xfe00000000ULL
++#endif
++
+ #endif /* QEMU_HW_XEN_NATIVE_H */
+-- 
+2.39.2
+

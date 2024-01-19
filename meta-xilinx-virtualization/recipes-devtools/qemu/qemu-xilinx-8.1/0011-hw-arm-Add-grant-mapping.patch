@@ -1,0 +1,30 @@
+From b1eaba758a9000061fc53a934c348d6ef8dcdf64 Mon Sep 17 00:00:00 2001
+From: Vikram Garhwal <vikram.garhwal@amd.com>
+Date: Tue, 31 Jan 2023 21:46:43 +0000
+Subject: [PATCH 11/11] hw: arm: Add grant mapping.
+
+Enable grant ram mapping support for Xenpvh machine on ARM.
+
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/arm/xen_arm.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/hw/arm/xen_arm.c b/hw/arm/xen_arm.c
+index a5631529d0..1587e2a43b 100644
+--- a/hw/arm/xen_arm.c
++++ b/hw/arm/xen_arm.c
+@@ -127,6 +127,9 @@ static void xen_init_ram(MachineState *machine)
+         DPRINTF("Initialized region xen.ram.hi: base 0x%llx size 0x%lx\n",
+                 GUEST_RAM1_BASE, ram_size[1]);
+     }
++
++    DPRINTF("init grant ram mapping for XEN\n");
++    ram_grants = *xen_init_grant_ram();
+ }
+ 
+ void arch_handle_ioreq(XenIOState *state, ioreq_t *req)
+-- 
+2.39.2
+

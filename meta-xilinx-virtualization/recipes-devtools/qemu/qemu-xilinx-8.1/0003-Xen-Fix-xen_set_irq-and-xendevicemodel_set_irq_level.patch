@@ -1,0 +1,55 @@
+From 14b9dbd7f0261ae7a36bef251924ba211beef17a Mon Sep 17 00:00:00 2001
+From: Vikram Garhwal <vikram.garhwal@amd.com>
+Date: Wed, 1 Nov 2023 14:07:23 -0700
+Subject: [PATCH 03/11] Xen: Fix xen_set_irq() and
+ xendevicemodel_set_irq_level()
+
+Remove '=' from 'if CONFIG_XEN_CTRL_INTERFACE_VERSION <= 41500'.
+Because xendevicemodel_set_irq_level() was introduced in 4.15 version.
+
+Also, update xendevicemodel_set_irq_level() to return -1 for older versions.
+
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/arm/xen_arm.c            | 4 +++-
+ include/hw/xen/xen_native.h | 4 ++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/hw/arm/xen_arm.c b/hw/arm/xen_arm.c
+index f83b983ec5..a5631529d0 100644
+--- a/hw/arm/xen_arm.c
++++ b/hw/arm/xen_arm.c
+@@ -75,7 +75,9 @@ static MemoryRegion ram_lo, ram_hi;
+ 
+ static void xen_set_irq(void *opaque, int irq, int level)
+ {
+-    xendevicemodel_set_irq_level(xen_dmod, xen_domid, irq, level);
++    if (xendevicemodel_set_irq_level(xen_dmod, xen_domid, irq, level)) {
++        error_report("xendevicemodel_set_irq_level failed");
++    }
+ }
+ 
+ static void xen_create_virtio_mmio_devices(XenArmState *xam)
+diff --git a/include/hw/xen/xen_native.h b/include/hw/xen/xen_native.h
+index 5d2718261f..6f09c48823 100644
+--- a/include/hw/xen/xen_native.h
++++ b/include/hw/xen/xen_native.h
+@@ -523,12 +523,12 @@ static inline int xen_set_ioreq_server_state(domid_t dom,
+                                                  enable);
+ }
+ 
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION <= 41500
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 41500
+ static inline int xendevicemodel_set_irq_level(xendevicemodel_handle *dmod,
+                                                domid_t domid, uint32_t irq,
+                                                unsigned int level)
+ {
+-    return 0;
++    return -1;
+ }
+ #endif
+ 
+-- 
+2.39.2
+
