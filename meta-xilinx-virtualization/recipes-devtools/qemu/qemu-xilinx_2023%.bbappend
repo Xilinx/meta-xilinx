@@ -1,5 +1,5 @@
 require qemu-tpm.inc
-require qemu-xen.inc
+require qemu-xen_7.1.inc
 
 # We do not want QEMU, on the target to be configured with OpenGL
-PACKAGECONFIG:remove:class-target:petalinux = "virglrenderer epoxy gtk+"
+PACKAGECONFIG:remove:class-target = "virglrenderer epoxy gtk+"

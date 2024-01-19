@@ -1,4 +1,4 @@
-# Xen specific changes are only applicable on the target
+# Xen-4.17 specific changes are only applicable on the target
 SRC_URI_XEN = ""
 SRC_URI_XEN:class-target = " \
           file://0001-xen-pt-fix-syntax-error-that-causes-FTBFS-in-some-co.patch \
@@ -28,6 +28,6 @@ SRC_URI_XEN:class-target = " \
           file://0008-hw-arm-Add-grant-mapping.patch \
           "
 
-FILESEXTRAPATHS:prepend:class-target := "${THISDIR}/qemu:"
+FILESEXTRAPATHS:prepend:class-target := "${THISDIR}/qemu-xilinx-7.1:"
 
 SRC_URI .= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${SRC_URI_XEN}', '', d)}"
