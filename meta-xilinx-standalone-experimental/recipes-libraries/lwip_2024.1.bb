@@ -1,17 +1,17 @@
 inherit esw python3native
 
-ESW_COMPONENT_SRC = "/ThirdParty/sw_services/lwip213/src/"
-ESW_COMPONENT_NAME = "liblwip213.a"
+ESW_COMPONENT_SRC = "/ThirdParty/sw_services/lwip220/src/"
+ESW_COMPONENT_NAME = "liblwip220.a"
 
 DEPENDS += "libxil"
 DEPENDS:append:xilinx-freertos = "freertos10-xilinx"
 
-EXTRA_OECMAKE += "-Dlwip213_api_mode=RAW_API"
-EXTRA_OECMAKE += "-Dlwip213_dhcp_does_arp_check=ON"
-EXTRA_OECMAKE += "-Dlwip213_dhcp=ON"
-EXTRA_OECMAKE += "-Dlwip213_pbuf_pool_size=2048"
-EXTRA_OECMAKE += "-Dlwip213_ipv6_enable=OFF"
-EXTRA_OECMAKE:append:xilinx-freertos = " -Dlwip213_api_mode=SOCKET_API"
+EXTRA_OECMAKE += "-Dlwip220_api_mode=RAW_API"
+EXTRA_OECMAKE += "-Dlwip220_dhcp_does_arp_check=ON"
+EXTRA_OECMAKE += "-Dlwip220_dhcp=ON"
+EXTRA_OECMAKE += "-Dlwip220_pbuf_pool_size=2048"
+EXTRA_OECMAKE += "-Dlwip220_ipv6_enable=OFF"
+EXTRA_OECMAKE:append:xilinx-freertos = " -Dlwip220_api_mode=SOCKET_API"
 
 do_configure:prepend() {
     # This script should also not rely on relative paths and such
