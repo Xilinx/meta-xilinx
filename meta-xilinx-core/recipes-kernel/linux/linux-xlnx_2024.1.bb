@@ -1,7 +1,7 @@
 LINUX_VERSION = "6.6.0"
 YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-6.6;destsuffix=yocto-kmeta"
 KBRANCH="master"
-SRCREV = "6ceb721218b64dd2c6ef478849ec6fb464f608bd"
+SRCREV = "4a9aa5b144a6d3d77049d5f3af58fe810a130b96"
 SRCREV_meta = "5d0809d0d939c7738cb6e5391126c73fd0e4e865"
 
 KCONF_AUDIT_LEVEL="0"
