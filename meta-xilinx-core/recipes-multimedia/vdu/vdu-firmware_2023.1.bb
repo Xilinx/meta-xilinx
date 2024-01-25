@@ -25,7 +25,7 @@ COMPATIBLE_MACHINE:versal-ai-core = "versal-ai-core"
 COMPATIBLE_MACHINE:versal-ai-edge = "versal-ai-edge"
 
 PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
-EXTRA_OEMAKE +="INSTALL_PATH=${D}/lib/firmware"
+EXTRA_OEMAKE +="INSTALL_PATH=${D}/${nonarch_base_libdir}/firmware"
 
 do_compile[noexec] = "1"
 do_install[dirs] = "${S}"
@@ -33,8 +33,7 @@ do_install[dirs] = "${S}"
 # Inhibit warnings about files being stripped
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 INHIBIT_PACKAGE_STRIP = "1"
-FILES:${PN} = "/lib/firmware/*"
-
+FILES:${PN} = "${nonarch_base_libdir}/firmware/*"
 
 # These libraries shouldn't get installed in world builds unless something
 # explicitly depends upon them.
