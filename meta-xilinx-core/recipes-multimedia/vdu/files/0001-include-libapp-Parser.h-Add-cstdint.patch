@@ -1,0 +1,27 @@
+From 79eddc5c5474c9b61bf6b2e648eba8bca61469b9 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Thu, 25 Jan 2024 12:30:24 -0700
+Subject: [PATCH] include/libapp/Parser.h: Add cstdint
+
+Resolves usages of unit32_t being undefined
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ include/lib_app/Parser.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/lib_app/Parser.h b/include/lib_app/Parser.h
+index 976a835..6fa63ce 100644
+--- a/include/lib_app/Parser.h
++++ b/include/lib_app/Parser.h
+@@ -35,6 +35,7 @@
+ #include <sstream>
+ #include <vector>
+ #include <iomanip>
++#include <cstdint>
+ 
+ std::deque<Token> toReversePolish(std::deque<Token>& tokens);
+ std::string parseString(std::deque<Token>& tokens);
+-- 
+2.34.1
+

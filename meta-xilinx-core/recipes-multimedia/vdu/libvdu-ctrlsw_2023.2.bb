@@ -16,7 +16,9 @@ REPO   ?= "git://github.com/Xilinx/vdu-ctrl-sw.git;protocol=https"
 SRCREV ?= "1beb8f247d01b1a728faea36ce8f7847c895482f"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
-SRC_URI = "${REPO};${BRANCHARG}"
+SRC_URI = "${REPO};${BRANCHARG} \
+           file://0001-include-libapp-Parser.h-Add-cstdint.patch \
+          "
 
 S  = "${WORKDIR}/git"
 
