@@ -13,6 +13,7 @@ SRCREV ?= "811eefac953fd5e098c69cada97a0dd35f5e9015"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG} \
+           file://0001-libvdu-omxil-Fix-missing-definitions.patch \
 	  "
 S  = "${WORKDIR}/git"
 

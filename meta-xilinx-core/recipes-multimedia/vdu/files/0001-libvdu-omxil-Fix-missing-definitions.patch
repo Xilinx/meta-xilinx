@@ -1,0 +1,54 @@
+From 7fc63cdd6642ea84b78db62fccafc460af0ff23e Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Thu, 25 Jan 2024 12:50:18 -0700
+Subject: [PATCH] Fix missing definitions
+
+Fix issues such as:
+| module/module_structs.h:370:3: error: 'uint8_t' does not name a type
+|   370 |   uint8_t distributionMaxrgbPercentages[MAX_MAXRGB_PERCENTILES_ST2094_40];
+|       |   ^~~~~~~
+| module/module_structs.h:370:3: note: 'uint8_t' is defined in header '<cstdint>'; did you forget to '#include <cstdint>'?
+| module/module_structs.h:371:3: error: 'uint32_t' does not name a type
+|   371 |   uint32_t distributionMaxrgbPercentiles[MAX_MAXRGB_PERCENTILES_ST2094_40];
+|       |   ^~~~~~~~
+| module/module_structs.h:371:3: note: 'uint32_t' is defined in header '<cstdint>'; did you forget to '#include <cstdint>'?
+
+and
+
+| ./utility/processor_fifo.h:80:15: error: field 'name_' has incomplete type 'std::string' {aka 'std::__cxx11::basic_string<char>'}
+|    80 |   std::string name_;
+|       |               ^~~~~
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ module/module_structs.h  | 1 +
+ utility/processor_fifo.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/module/module_structs.h b/module/module_structs.h
+index 75bdff6..594076f 100644
+--- a/module/module_structs.h
++++ b/module/module_structs.h
+@@ -27,6 +27,7 @@
+ #include "module_enums.h"
+ #include <string>
+ #include <vector>
++#include <cstdint>
+ 
+ template<typename T>
+ struct InputOutput
+diff --git a/utility/processor_fifo.h b/utility/processor_fifo.h
+index e0dd47c..f047267 100644
+--- a/utility/processor_fifo.h
++++ b/utility/processor_fifo.h
+@@ -27,6 +27,7 @@
+ #include <utility/locked_queue.h>
+ #include <thread>
+ #include <functional>
++#include <string>
+ 
+ #if defined __linux__
+ #include <sys/prctl.h>
+-- 
+2.34.1
+
