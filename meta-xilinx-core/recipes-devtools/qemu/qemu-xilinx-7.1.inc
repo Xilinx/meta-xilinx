@@ -44,6 +44,10 @@ SRC_URI += "\
            file://qemu-guest-agent.udev \
            "
 
+# Workaround for 8.2 patch that doesn't apply
+SRC_URI:remove = "file://0011-linux-user-workaround-for-missing-MAP_FIXED_NOREPLAC.patch"
+SRC_URI:remove = "file://0012-linux-user-workaround-for-missing-MAP_SHARED_VALIDAT.patch"
+
 S = "${WORKDIR}/git"
 
 PACKAGECONFIG ??= " \
