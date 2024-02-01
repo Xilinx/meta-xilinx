@@ -68,14 +68,23 @@ $ export PATH=$PATH:<ABSOLUTE_PATH>/gen-machine-conf
 
    b. With SDT pl overlay:
       To generate SDT pl overlay run gen-machineconf command with
-      `-g {full|dfx-static|dfx-partial}` option. Once SDT pl overlay command is
-      executed successfully pl.dtsi will be generated under
-      <conf>/dts/${MACHINE}/pl-overlay-{full|dfx-static|dfx-partial} directory.
-      User can use this pl.dtsi as input to firmware recipes.
+      `-g {full|dfx}` option. Once SDT pl overlay command is executed successfully
+      pl.dtsi will be generated under <conf>/dts/${MACHINE}/pl-overlay-{full|dfx}
+      directory. User can use this pl.dtsi as input to full or dfx static firmware
+      recipes.
+
+> **Note:** DFx partial dtsi is not processed by gen-machineconf(lopper) tool, User
+>          needs to use the *_partial.dtsi and *_partial.pdi/bit from sdtgen output
+>          artifacts to DFx partial firmware recipes.
 
    * ZynqMP Full bitstream or Versal Segmented Configuration:
 ```
  $ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c <conf> -l conf/local.conf -g full
+```
+
+   * ZynqMP or Versal DFx:
+```
+ $ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c <conf> -l conf/local.conf -g dfx
 ```
 
 For example, zynqmp:
