@@ -10,4 +10,5 @@ RDEPENDS:${PN} += " \
     python3-anytree \
     python3-six \
     python3-pyyaml \
+    python3-packaging \
     "
