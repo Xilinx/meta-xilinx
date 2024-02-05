@@ -61,6 +61,7 @@ SRC_URI += "\
            file://0010-hw-pvrdma-Protect-against-buggy-or-malicious-guest-d.patch \
            file://0002-linux-user-Replace-use-of-lfs64-related-functions-an.patch \
            file://fixedmeson.patch \
+           file://no-pip.patch \
            file://qemu-guest-agent.init \
            file://qemu-guest-agent.udev \
            "

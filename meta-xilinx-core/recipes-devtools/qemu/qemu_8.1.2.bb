@@ -4,7 +4,7 @@ FILESEXTRAPATHS:append := ":${THISDIR}/qemu-8.1"
 
 require qemu-8.1.inc
 
-DEPENDS = "glib-2.0 zlib pixman bison-native ninja-native meson-native"
+DEPENDS += "glib-2.0 zlib pixman"
 
 DEPENDS:append:libc-musl = " libucontext"
 

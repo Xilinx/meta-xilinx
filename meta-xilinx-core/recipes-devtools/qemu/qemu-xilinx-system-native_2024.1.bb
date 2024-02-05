@@ -1,7 +1,5 @@
 BPN = "qemu-xilinx"
 
-inherit python3-dir
-
 require qemu-system-native-alt.inc
 require qemu-xilinx-2024.1.inc
 require qemu-xilinx-native-8.1.inc
@@ -9,7 +7,7 @@ require qemu-xilinx-native-8.1.inc
 # As some of the files installed by qemu-native and qemu-system-native
 # are the same, we depend on qemu-native to get the full installation set
 # and avoid file clashes
-DEPENDS = "glib-2.0-native zlib-native pixman-native qemu-native bison-native meson-native ninja-native"
+DEPENDS += "glib-2.0-native zlib-native pixman-native qemu-native"
 
 DEPENDS += "qemu-xilinx-multiarch-helper-native"
 
