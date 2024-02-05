@@ -16,15 +16,15 @@ Signed-off-by: Mark Hatle <mark.hatle@amd.com>
  libweston/pixel-formats.c | 1 -
  1 file changed, 1 deletion(-)
 
-Index: weston-11.0.1/libweston/pixel-formats.c
+Index: weston-13.0.0/libweston/pixel-formats.c
 ===================================================================
---- weston-11.0.1.orig/libweston/pixel-formats.c
-+++ weston-11.0.1/libweston/pixel-formats.c
-@@ -247,7 +247,6 @@ static const struct pixel_format_info pi
+--- weston-13.0.0.orig/libweston/pixel-formats.c
++++ weston-13.0.0/libweston/pixel-formats.c
+@@ -251,7 +251,6 @@ static const struct pixel_format_info pi
  	{
  		DRM_FORMAT(ARGB8888),
  		BITS_RGBA_FIXED(8, 8, 8, 8),
 -		.opaque_substitute = DRM_FORMAT_XRGB8888,
  		.addfb_legacy_depth = 32,
  		.bpp = 32,
- 		GL_FORMAT(GL_BGRA_EXT),
+ 		GL_INTERNALFORMAT(GL_RGBA8),
