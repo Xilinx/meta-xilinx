@@ -15,6 +15,8 @@ ESW_CFLAGS ?= ""
 
 # Cortex R5 requires an additional cflag to be passed for compatibility with the embeddedsw
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexr5', ' -DARMR5', '', d)}"
+TUNE_CCARGS:append:versal = " -Dversal"
+TUNE_CCARGS:append:versal-net = " -DVERSAL_NET"
 
 # Make sure all regular recipes are excluded from compatibility
 # Avoid using this for native, nativesdk or cross recipes
