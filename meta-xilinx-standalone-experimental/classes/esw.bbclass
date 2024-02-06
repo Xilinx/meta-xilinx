@@ -53,9 +53,9 @@ def get_xlnx_cmake_processor(tune, machine, variant, d):
             cmake_processor = 'plm_microblaze'
         else:
             cmake_processor = 'microblaze'
-    elif tune == 'cortexr5':
+    elif (tune in [ 'cortexr5', 'cortexr5hf' ]):
         cmake_processor = 'cortexr5'
-    elif tune == 'cortexr52':
+    elif (tune in [ 'cortexr52', 'cortexr52hf' ]):
         cmake_processor = 'cortexr52'
     elif tune.startswith('cortexa9'):
         cmake_processor = 'cortexa9'
