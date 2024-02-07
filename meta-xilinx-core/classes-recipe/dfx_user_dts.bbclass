@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2023, Advanced Micro Devices, Inc.  All rights reserved.
+# Copyright (C) 2023-2024, Advanced Micro Devices, Inc.  All rights reserved.
 #
 # SPDX-License-Identifier: MIT
 #
@@ -30,12 +30,23 @@ S ?= "${WORKDIR}"
 FW_DIR ?= ""
 DTSI_PATH ?= ""
 DTBO_PATH ?= ""
+BIT_PATH ?= ""
+BIN_PATH ?= ""
+PDI_PATH ?= ""
+JSON_PATH ?= ""
+XCl_PATH ?= ""
 DT_FILES_PATH = "${S}/${DTSI_PATH}"
 FIRMWARE_NAME_DT_FILE ?= ""
 USER_DTS_FILE ?= ""
 
 FIRMWARE_NAME_DT_FILE[doc] = "DT file which has firmware-name device-tree property"
 USER_DTS_FILE[doc] = "Final DTSI or DTS file which is used for packaging final DT overlay"
+DTSI_PATH[doc] = "Absolute '.dtsi' or ''.dts' file path as input to SRC_URI"
+DTBO_PATH[doc] = "Absolute '.dtbo' file path as input to SRC_URI"
+BIT_PATH[doc] = "Absolute '.bit' file path as input to SRC_URI"
+BIN_PATH[doc] = "Absolute '.bin' file path as input to SRC_URI"
+JSON_PATH[doc] = "Absolute '.json' file path as input to SRC_URI"
+XCL_PATH[doc] = "Absolute '.xclbin' file path as input to SRC_URI"
 
 python() {
     import re
@@ -50,26 +61,39 @@ python() {
         pdi_found = False
 
         # Required Inputs
-        if '.dtsi ' in d.getVar("SRC_URI") or '.dts ' in d.getVar("SRC_URI"):
-            dtsi_found = True
-            d.setVar("DTSI_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.dtsi' in a or '.dts' in a][0].lstrip('file://')))
+        for s in d.getVar("SRC_URI").split():
+            if s.endswith(('.dtsi', '.dts')):
+                dtsi_found = True
+                d.setVar("DTSI_PATH",os.path.dirname(s.lstrip('file://')))
+            if s.endswith('.dtbo'):
+                if dtbo_found:
+                    bb.warn("More then one '.dtbo' file specified in SRC_URI.")
+                dtbo_found = True
+                d.setVar("DTBO_PATH",os.path.dirname(s.lstrip('file://')))
+            if soc_family == "zynq" or soc_family == "zynqmp":
+                if s.endswith('.bit'):
+                    if bit_found:
+                        bb.warn("More then one '.bit' file specified in SRC_URI.")
+                    bit_found = True
+                    d.setVar("BIT_PATH",os.path.dirname(s.lstrip('file://')))
+                if s.endswith('.bin'):
+                    if bin_found:
+                        bb.warn("More then one '.bin' file specified in SRC_URI.")
+                    bin_found = True
+                    d.setVar("BIN_PATH",os.path.dirname(s.lstrip('file://')))
+            else:
+                if s.endswith('.pdi'):
+                    if pdi_found:
+                        bb.warn("More then one '.pdi' file specified in SRC_URI.")
+                    pdi_found = True
+                    d.setVar("PDI_PATH",os.path.dirname(s.lstrip('file://')))
 
-        if '.dtbo ' in d.getVar("SRC_URI"):
-            dtbo_found = True
-            d.setVar("DTBO_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.dtbo' in a][0].lstrip('file://')))
+            # Optional input
+            if s.endswith('.json'):
+                d.setVar("JSON_PATH",os.path.dirname(s.lstrip('file://')))
 
-        if soc_family == "zynq" or soc_family == "zynqmp":
-            if '.bit ' in d.getVar("SRC_URI"):
-                bit_found = True
-                d.setVar("BIT_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.bit' in a][0].lstrip('file://')))
-
-            if '.bin ' in d.getVar("SRC_URI"):
-                bin_found = True
-                d.setVar("BIN_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.bin' in a][0].lstrip('file://')))
-        else:
-            if '.pdi ' in d.getVar("SRC_URI"):
-                pdi_found = True
-                d.setVar("PDI_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.pdi' in a][0].lstrip('file://')))
+            if s.endswith('.xclbin'):
+                d.setVar("XCL_PATH",os.path.dirname(s.lstrip('file://')))
 
         # Check for valid combination of input files in SRC_URI
         # Skip recipe if any of the below conditions are not satisfied.
@@ -104,27 +128,14 @@ python() {
             raise bb.parse.SkipRecipe("Recipe has more than one '.dtsi' and zero '.dts' found, this is an unsupported use case")
         elif dts_count > 1:
             raise bb.parse.SkipRecipe("Recipe has more than one '.dts' and zero or more than one '.dtsi' found, this is an unsupported use case")
-
-        # Optional input
-        if '.json ' in d.getVar("SRC_URI"):
-            d.setVar("JSON_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.json' in a][0].lstrip('file://')))
-
-        if '.xclbin ' in d.getVar("SRC_URI"):
-            d.setVar("XCL_PATH",os.path.dirname([a for a in d.getVar('SRC_URI').split() if '.xclbin' in a][0].lstrip('file://')))
 }
-
-# Function to get dts or dtsi file count.
-def get_dt_count(d, dt_ext):
-    import glob
-    dt_count = sum(1 for f in glob.iglob((d.getVar('S') + (d.getVar('DTSI_PATH')) + '/*.' + dt_ext),recursive=True) if os.path.isfile(f))
-    return dt_count
 
 # Function to search for dt firmware-name property in dts or dtsi file.
 python find_firmware_file() {
     import glob
     pattern_fw = 'firmware-name'
     search_count = 0
-    for dt_files in glob.iglob((d.getVar('S') + (d.getVar('DTSI_PATH')) + '/*.dts*'),recursive=True):
+    for dt_files in glob.iglob((d.getVar('S') + '/' + (d.getVar('DTSI_PATH')) + '/*.dts*'),recursive=True):
         with open(dt_files, "r") as f:
             current_fd = f.read()
             if pattern_fw in current_fd:
@@ -147,9 +158,9 @@ python do_configure() {
 
     # Renaming firmware-name using $PN as bitstream/PDI will be renamed using
     # $PN when generating the bin/pdi file.
-    if os.path.isfile(d.getVar('S') + (d.getVar('DTSI_PATH') or '') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE')):
-        orig_dtsi = glob.glob(d.getVar('S')+ (d.getVar('DTSI_PATH') or '') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE'))[0]
-        new_dtsi = d.getVar('S') + '/pl.dtsi_firmwarename'
+    if os.path.isfile(d.getVar('S') + '/' + (d.getVar('DTSI_PATH') or '') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE')):
+        orig_dtsi = glob.glob(d.getVar('S') + '/' + (d.getVar('DTSI_PATH') or '') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE'))[0]
+        new_dtsi = d.getVar('S') + '/' + (d.getVar('DTSI_PATH') or '') + '/pl.dtsi_firmwarename'
         with open(new_dtsi, 'w') as newdtsi:
             with open(orig_dtsi) as olddtsi:
                 for line in olddtsi:
@@ -168,19 +179,17 @@ python devicetree_do_compile:append() {
 
     dtbo_count = sum(1 for f in glob.iglob((d.getVar('S') + '/*.dtbo'),recursive=True) if os.path.isfile(f))
     bin_count = sum(1 for f in glob.iglob((d.getVar('S') + '/*.bin'),recursive=True) if os.path.isfile(f))
-
     # Skip devicetree do_compile task if input file is dtbo or bin in SRC_URI
     if not dtbo_count and not bin_count:
         # Convert .bit to .bin format only if dtsi is input.
         # In case of dtbo as input, bbclass doesn't know if firmware-name is .bit
         # or .bin format and corresponding file name. Hence we are not doing .bin
         # conversion.
-        if soc_family == 'zynq' or soc_family == 'zynqmp' and glob.glob(d.getVar('S') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE')):
+        if soc_family == 'zynq' or soc_family == 'zynqmp' and glob.glob(d.getVar('S') + '/' +(d.getVar('DTSI_PATH') or '') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE')):
             pn = d.getVar('PN')
             biffile = pn + '.bif'
-
             with open(biffile, 'w') as f:
-                f.write('all:\n{\n\t' + glob.glob(d.getVar('S')+(d.getVar('BIT_PATH') or '') + '/*.bit')[0] + '\n}')
+                f.write('all:\n{\n\t' + glob.glob(d.getVar('S') + '/' + (d.getVar('BIT_PATH') or '') + '/*.bit')[0] + '\n}')
 
             bootgenargs = ["bootgen"] + (d.getVar("BOOTGEN_FLAGS") or "").split()
             bootgenargs += ["-image", biffile, "-o", pn + ".bin"]
@@ -193,7 +202,7 @@ python devicetree_do_compile:append() {
             # ${PN}.bin which matches the firmware name in dtbo and move
             # ${PN}.bin to ${B} directory.
             if soc_family == 'zynq':
-                src_bitbin_file = glob.glob(d.getVar('S') + (d.getVar('BIT_PATH') or '') + '/*.bin')[0]
+                src_bitbin_file = glob.glob(d.getVar('S') + '/' + (d.getVar('BIT_PATH') or '') + '/*.bin')[0]
                 dst_bitbin_file = d.getVar('B') + '/' + pn + '.bin'
                 shutil.move(src_bitbin_file, dst_bitbin_file)
 
@@ -207,17 +216,15 @@ python devicetree_do_compile:append() {
 # overlay file.
 python find_user_dts_overlay_file() {
     import glob
-    dtbo_count = sum(1 for f in glob.iglob((d.getVar('S') + '/*.dtbo'),recursive=True) if os.path.isfile(f))
-    dts_count = sum(1 for f in glob.iglob((d.getVar('S') + '/*.dts'),recursive=True) if os.path.isfile(f))
-    dtsi_count = sum(1 for f in glob.iglob((d.getVar('S') + '/*.dtsi'),recursive=True) if os.path.isfile(f))
+    dtbo_count = sum(1 for f in glob.iglob((d.getVar('S') + '/' + d.getVar('DTBO_PATH') + '/*.dtbo'),recursive=True) if os.path.isfile(f))
+    dts_count = sum(1 for f in glob.iglob((d.getVar('S') + '/' + d.getVar('DTSI_PATH') + '/*.dts'),recursive=True) if os.path.isfile(f))
+    dtsi_count = sum(1 for f in glob.iglob((d.getVar('S') + '/' + d.getVar('DTSI_PATH') + '/*.dtsi'),recursive=True) if os.path.isfile(f))
     # Set USER_DTS_FILE if input file is dts/dtsi in SRC_URI else skip operation.
     if not dtbo_count and dts_count or dtsi_count:
-        dts_count = get_dt_count(d, 'dts')
-        dtsi_count = get_dt_count(d, 'dtsi')
         if dtsi_count == 1 and dts_count == 0:
-            dts_file = glob.glob(d.getVar('S')+ (d.getVar('DTSI_PATH') or '') + '/*.dtsi')[0]
+            dts_file = glob.glob(d.getVar('S') + '/' + (d.getVar('DTSI_PATH') or '') + '/*.dtsi')[0]
         elif dtsi_count >=0 and dts_count == 1:
-            dts_file = glob.glob(d.getVar('S')+ (d.getVar('DTSI_PATH') or '') + '/*.dts')[0]
+            dts_file = glob.glob(d.getVar('S') + '/' + (d.getVar('DTSI_PATH') or '') + '/*.dts')[0]
         else:
             dts_file = ''
 
