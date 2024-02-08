@@ -1,10 +1,10 @@
-inherit esw deploy
+inherit esw python3native esw_apps_common
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/peripheral_tests/src/"
 
 DEPENDS += "libxil xiltimer"
 
-inherit python3native
+ESW_EXECUTABLE_NAME = "peripheral_tests"
 
 do_configure:prepend() {
     (
@@ -37,16 +37,8 @@ python do_generate_app_data() {
 addtask do_generate_app_data before do_configure after do_prepare_recipe_sysroot
 do_prepare_recipe_sysroot[rdeptask] = "do_unpack"
 
-PERIPHERAL_TEST_APP_IMAGE_NAME ??= "${BPN}"
-
-inherit image-artifact-names
-
-PERIPHERAL_TEST_BASE_NAME ?= "${PERIPHERAL_TEST_APP_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
-
-ESW_COMPONENT ??= "peripheral_tests.elf"
-
 do_compile:append() {
-    ${OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/peripheral_tests.bin
+    ${OBJCOPY} -O binary ${B}/${ESW_EXECUTABLE_NAME}.elf ${B}${ESW_EXECUTABLE_NAME}.bin
 }
 
 do_install() {
@@ -54,9 +46,8 @@ do_install() {
 }
 
 do_deploy() {
-    install -Dm 0644 ${B}/${ESW_COMPONENT} ${DEPLOYDIR}/${PERIPHERAL_TEST_BASE_NAME}.elf
-    ln -sf ${PERIPHERAL_TEST_BASE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}.elf
-    install -m 0644 ${B}/peripheral_tests.bin ${DEPLOYDIR}/${PERIPHERAL_TEST_BASE_NAME}.bin
-    ln -sf ${PERIPHERAL_TEST_BASE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}.bin
+    install -Dm 0644 ${B}/${ESW_EXECUTABLE_NAME}.elf ${DEPLOYDIR}/${APP_IMAGE_NAME}.elf
+    ln -sf ${APP_IMAGE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}-${BB_CURRENT_MC}.elf
+    install -m 0644 ${B}/${ESW_EXECUTABLE_NAME}.bin ${DEPLOYDIR}/${APP_IMAGE_NAME}.bin
+    ln -sf ${APP_IMAGE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}-${BB_CURRENT_MC}.bin
 }
-addtask deploy before do_build after do_install
