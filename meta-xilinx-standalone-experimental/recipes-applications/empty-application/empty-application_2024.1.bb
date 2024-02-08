@@ -1,10 +1,8 @@
-inherit esw deploy
+inherit esw deploy python3native
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/empty_application/src/"
 
 DEPENDS += "libxil xiltimer"
-
-inherit python3native
 
 do_configure:prepend() {
     (
@@ -24,7 +22,7 @@ EXTRA_OECMAKE = "-DCUSTOM_LINKER_FILE=${@d.getVar('ESW_CUSTOM_LINKER_FILE')}"
 
 inherit image-artifact-names
 
-CUSTOM_APP_BASE_NAME ?= "${CUSTOM_APP_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+CUSTOM_APP_BASE_NAME ?= "${CUSTOM_APP_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${BB_CURRENT_MC}${IMAGE_VERSION_SUFFIX}"
 
 ESW_COMPONENT ??= "empty_application.elf"
 
@@ -38,8 +36,8 @@ do_install() {
 
 do_deploy() {
     install -Dm 0644 ${B}/${ESW_COMPONENT} ${DEPLOYDIR}/${CUSTOM_APP_BASE_NAME}.elf
-    ln -sf ${CUSTOM_APP_BASE_NAME}.elf ${DEPLOYDIR}/${CUSTOM_APP_IMAGE_NAME}.elf
+    ln -sf ${CUSTOM_APP_BASE_NAME}.elf ${DEPLOYDIR}/${CUSTOM_APP_IMAGE_NAME}-${MACHINE}-${BB_CURRENT_MC}.elf
     install -m 0644 ${B}/empty_application.bin ${DEPLOYDIR}/${CUSTOM_APP_BASE_NAME}.bin
-    ln -sf ${CUSTOM_APP_BASE_NAME}.bin ${DEPLOYDIR}/${CUSTOM_APP_IMAGE_NAME}.bin
+    ln -sf ${CUSTOM_APP_BASE_NAME}.bin ${DEPLOYDIR}/${CUSTOM_APP_IMAGE_NAME}-${MACHINE}-${BB_CURRENT_MC}.bin
 }
 addtask deploy before do_build after do_install
