@@ -1,11 +1,11 @@
-
+# Copyright (C) 2024 Advanced Micro Devices, Inc.  All rights reserved.
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "dfeccf"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone "
+DEPENDS += "xilstandalone libmetal "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dfeccf/src/"
 ESW_COMPONENT_NAME = "libdfeccf.a"

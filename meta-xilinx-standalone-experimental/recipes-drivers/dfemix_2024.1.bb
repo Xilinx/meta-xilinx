@@ -1,11 +1,11 @@
-
+# Copyright (C) 2024 Advanced Micro Devices, Inc.  All rights reserved.
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "dfemix"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone "
+DEPENDS += "xilstandalone libmetal "
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dfemix/src/"
 ESW_COMPONENT_NAME = "libdfemix.a"
