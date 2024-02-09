@@ -29,8 +29,7 @@ COMPATIBLE_HOST ?= "${COMPATOS}"
 # Clear defaults
 PREFERRED_PROVIDER_virtual/kernel = "linux-dummy"
 PREFERRED_PROVIDER_libmetal = "libmetal-xlnx"
-
-PREFERRED_VERSION_open-amp-xlnx = "${@'standalone' if 'xilinx-standalone-exp' in d.getVar('BBFILE_COLLECTIONS').split() else ''}"
+PREFERRED_PROVIDER_open-amp = "open-amp-xlnx"
 
 # Workaround for pulling in nativesdk-mingw-w64-winpthreads
 TOOLCHAIN_HOST_TASK:append:sdkmingw32 = " nativesdk-mingw-w64-winpthreads"
