@@ -1,5 +1,5 @@
 # tag: RELEASE-4.18.0
-SRCREV ?= "d75f1e9b74314cea91ce435730d4e3539ecca77d"
+SRCREV ?= "1bdd031859c1d0a792f670d58b473f08be54e255"
 
 XEN_URI ?= "git://xenbits.xen.org/xen.git"
 XEN_REL ?= "4.18"
