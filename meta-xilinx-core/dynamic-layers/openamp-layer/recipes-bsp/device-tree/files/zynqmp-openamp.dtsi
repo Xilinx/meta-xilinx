@@ -143,10 +143,10 @@
 		ranges;
 		/* APU<->RPU1 IPI mailbox controller */
 		ipi_mailbox_rpu1: mailbox@ff3f0b00 {
-			reg = <0xff3f0b00 0x20>,
-				<0xff3f0b20 0x20>,
-				<0xff3f0940 0x20>,
-				<0xff3f0960 0x20>;
+			reg = <0xff991880 0x20>,
+			      <0xff991880 0x20>,
+			      <0xff990e00 0x20>,
+			      <0xff990e20 0x20>;
 			reg-names = "local_request_region",
 				"local_response_region",
 				"remote_request_region",
