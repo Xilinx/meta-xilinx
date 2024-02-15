@@ -142,11 +142,11 @@
 		#size-cells = <1>;
 		ranges;
 		/* APU<->RPU1 IPI mailbox controller */
-		ipi_mailbox_rpu1: mailbox@ff3f0b00 {
-			reg = <0xff991880 0x20>,
-			      <0xff991880 0x20>,
-			      <0xff990e00 0x20>,
-			      <0xff990e20 0x20>;
+		ipi_mailbox_rpu1: mailbox@ff990800 {
+			reg = <0xff990800 0x20>,
+			      <0xff990820 0x20>,
+			      <0xff990200 0x20>,
+			      <0xff990220 0x20>;
 			reg-names = "local_request_region",
 				"local_response_region",
 				"remote_request_region",
