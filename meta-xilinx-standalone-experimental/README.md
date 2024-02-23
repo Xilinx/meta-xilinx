@@ -94,23 +94,19 @@ $ gen-machineconf --soc-family zynqmp --hw-description <path_to_sdtgen_output_di
 The following will be written to the end of the conf/local.conf file:
 
 ```
-# Each multiconfig will define it's own TMPDIR, this is the new default based
-# on BASE_TMPDIR for the Linux build
-TMPDIR = "${BASE_TMPDIR}/tmp"
-
 # Use the newly generated MACHINE
 MACHINE = "xlnx-zynqmp-zcu102-rev1-0"
 
-# All of the TMPDIRs must be in a common parent directory. This is defined
-# as BASE_TMPDIR.
-# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere, such as /tmp
-BASE_TMPDIR ?= "${TOPDIR}"
+# Avoid errors in some baremetal configs as these layers may be present
+# but are not used.  Note the following lines are optional and can be
+# safetly disabled.
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
 
-# The following is the full set of multiconfigs for this configuration
-# A large list can cause a slow parse.
-#BBMULTICONFIG = " cortexa53-0-zynqmp-fsbl-baremetal cortexa53-0-zynqmp-baremetal cortexa53-0-zynqmp-freertos cortexa53-1-zynqmp-baremetal cortexa53-1-zynqmp-freertos cortexa53-2-zynqmp-baremetal cortexa53-2-zynqmp-freertos cortexa53-3-zynqmp-baremetal cortexa53-3-zynqmp-freertos cortexr5-0-zynqmp-fsbl-baremetal cortexr5-0-zynqmp-baremetal cortexr5-0-zynqmp-freertos cortexr5-1-zynqmp-baremetal cortexr5-1-zynqmp-freertos microblaze-0-pmu"
-# Alternatively trim the list to the minimum
-BBMULTICONFIG = " cortexa53-0-zynqmp-fsbl-baremetal microblaze-0-pmu"
+# Each generated multiconfig defines it's own TMPDIR, either edit the
+# multiconfig files, or uncomment and adjust MC_TMPDIR_PREFIX below
+#MC_TMPDIR_PREFIX = "${TOPDIR}/tmp"
 ```
 
 For example, versal:
@@ -121,23 +117,19 @@ $ gen-machineconf --soc-family versal --hw-description <path_to_sdtgen_output_di
 The following will be written to the end of the conf/local.conf file:
 
 ```
-# Each multiconfig will define it's own TMPDIR, this is the new default based
-# on BASE_TMPDIR for the Linux build
-TMPDIR = "${BASE_TMPDIR}/tmp"
-
 # Use the newly generated MACHINE
 MACHINE = "xlnx-versal-vmk180-rev1-1-x-ebm-01-reva"
 
-# All of the TMPDIRs must be in a common parent directory. This is defined
-# as BASE_TMPDIR.
-# Adjust BASE_TMPDIR if you want to move the tmpdirs elsewhere, such as /tmp
-BASE_TMPDIR ?= "${TOPDIR}"
+# Avoid errors in some baremetal configs as these layers may be present
+# but are not used.  Note the following lines are optional and can be
+# safetly disabled.
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
 
-# The following is the full set of multiconfigs for this configuration
-# A large list can cause a slow parse.
-#BBMULTICONFIG = " cortexa72-0-versal-baremetal cortexa72-0-versal-freertos cortexa72-1-versal-baremetal cortexa72-1-versal-freertos microblaze-0-pmc microblaze-0-psm cortexr5-0-versal-baremetal cortexr5-0-versal-freertos cortexr5-1-versal-baremetal cortexr5-1-versal-freertos"
-# Alternatively trim the list to the minimum
-BBMULTICONFIG = " microblaze-0-pmc microblaze-0-psm"
+# Each generated multiconfig defines it's own TMPDIR, either edit the
+# multiconfig files, or uncomment and adjust MC_TMPDIR_PREFIX below
+#MC_TMPDIR_PREFIX = "${TOPDIR}/tmp"
 ```
 > **Bitbake Performance Note:**
 Each BBMULTICONFIG value requires all of the recipes to be parsed for that
