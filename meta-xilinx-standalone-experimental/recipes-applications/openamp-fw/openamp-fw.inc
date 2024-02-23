@@ -12,7 +12,7 @@ FW_MACHINE:versal = "cortexr5-0-versal"
 FW_MACHINE:versal-net = "cortexr52-0-versal-net"
 FW_OS ?= "baremetal"
 
-OPENAMP_FW_DEPLOY_DIR ?= "${BASE_TMPDIR}/tmp-${FW_MACHINE}-${FW_OS}/deploy/images/${MACHINE}"
+OPENAMP_FW_DEPLOY_DIR ?= "${MC_TMPDIR_PREFIX}-${FW_MACHINE}-${FW_OS}/deploy/images/${MACHINE}"
 DEPENDS = " open-amp-xlnx "
 do_install[mcdepends] += "mc::${FW_MACHINE}-${FW_OS}:open-amp-xlnx:do_deploy"
 do_install() {
