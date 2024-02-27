@@ -8,6 +8,7 @@ PROVIDES = "qemu-system-native"
 # with this QEMU.  When we update to QEMU 8.x this won't be necessary.
 EXTRA_OECONF:remove = "--disable-download"
 EXTRA_OECONF:remove = "--disable-docs"
+EXTRA_OECONF:remove = "--disable-af-xdp"
 
 EXTRA_OECONF:append = "\
     --with-git=/bin/false \
