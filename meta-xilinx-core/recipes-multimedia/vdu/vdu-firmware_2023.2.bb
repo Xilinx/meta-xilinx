@@ -20,10 +20,6 @@ SRCREV ?= "731897772730178f6a4e77eedeb4fb53faa1ab4d"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI   = "${REPO};${BRANCHARG}"
 
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:versal-ai-core = "versal-ai-core"
-COMPATIBLE_MACHINE:versal-ai-edge = "versal-ai-edge"
-
 PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
 EXTRA_OEMAKE +="INSTALL_PATH=${D}/lib/firmware"
 
