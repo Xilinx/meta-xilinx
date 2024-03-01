@@ -12,6 +12,7 @@ SRC_URI_XEN:class-target = " \
     file://0009-memory-add-MemoryRegion-map-and-unmap-callbacks.patch \
     file://0010-xen-add-map-and-unmap-callbacks-for-grant-region.patch \
     file://0011-hw-arm-Add-grant-mapping.patch \
+    file://0001-arm-xenpvh-Introduce-virtio-pci-support.patch \
     "
 
 FILESEXTRAPATHS:prepend:class-target := "${THISDIR}/qemu-xilinx-8.1:"
