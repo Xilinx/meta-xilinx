@@ -2,6 +2,10 @@ inherit esw deploy
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilsecure/examples/"
 
+PACKAGECONFIG ??= "client server"
+PACKAGECONFIG[client]  ="-DXILSECURE_mode="client",,"
+PACKAGECONFIG[server]  ="-DXILSECURE_mode="server",,"
+
 DEPENDS += "xilsecure"
 
 do_configure:prepend() {
