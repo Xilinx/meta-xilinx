@@ -3,4 +3,6 @@ inherit esw_examples features_check
 
 REQUIRED_MACHINE_FEATURES = "dfemix"
 
+DEPENDS += " dfemix"
+
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dfemix/examples/"
