@@ -3,4 +3,6 @@ inherit esw_examples features_check
 
 REQUIRED_MACHINE_FEATURES = "rfdc"
 
+DEPENDS += " rfdc"
+
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/rfdc/examples/"
