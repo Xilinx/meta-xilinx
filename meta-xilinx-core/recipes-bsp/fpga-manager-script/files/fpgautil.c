@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Copyright (C) 2019-2022 Xilinx, Inc.  All rights reserved.
- * Copyright (C) 2022 Advanced Micro Devices, Inc.  All rights reserved.
+ * Copyright (C) 2022-2024 Advanced Micro Devices, Inc.  All rights reserved.
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -73,6 +73,20 @@ int fpga_getplatform()
         else
                 return 0;
 
+}
+
+static bool file_exists(const char *filename)
+{
+	FILE *fp = fopen(filename, "r");
+	bool is_exist = false;
+
+	if (fp != NULL)
+	{
+		is_exist = true;
+		fclose(fp); // close the file
+	}
+
+	return is_exist;
 }
 
 void print_usage(char *prg)
@@ -252,6 +266,12 @@ int main(int argc, char **argv)
 	struct stat sb;
 	double time;
         struct timeval t1, t0;
+	uid_t euid = geteuid();
+
+	if (euid) {
+		printf("Error: This binary requires root access to execute. \n");
+		return 0;
+	}
 
 	if (argc == 1) {
 		print_usage(basename(argv[0]));
@@ -262,10 +282,18 @@ int main(int argc, char **argv)
 		switch (opt) {
 		case 'o':
 			overlay = optarg;
+			if (!file_exists(overlay)) {
+				printf("Error: User provided Overlay file doesn't exist\r\n");
+				return 1;
+			}
 			flow = OVERLAY;
 			break;
 		case 'b':
 			binfile = optarg;
+			if (!file_exists(binfile)) {
+				printf("Error: User provided bitstream file doesn't exist\r\n");
+				return 1;
+			}
 			if (!(flow == OVERLAY))
 				flow = FPGA_SYSFS;
 			break;
@@ -415,7 +443,11 @@ int main(int argc, char **argv)
 		if (binfile != NULL) {
 			if (!fpga_state()) {
 				printf("Time taken to load BIN is %f Milli Seconds\n\r", time);
-				printf("BIN FILE loaded through FPGA manager successfully\n\r");
+				if (ret) {
+					printf("BIN FILE loaded through FPGA manager successfull but failed to apply Overlay\n\r");
+				} else {
+					printf("BIN FILE loaded through FPGA manager successfully\n\r");
+				}
 			} else {
 				printf("BIN FILE loading through FPGA manager failed\n\r");
 			}
