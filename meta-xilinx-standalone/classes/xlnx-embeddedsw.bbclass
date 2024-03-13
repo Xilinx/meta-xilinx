@@ -13,7 +13,7 @@ ESW_REV[git] = "${AUTOREV}"
 ESW_REV[2023.1] = "af784f742dad0ca6e69e05baf8de51152c396b9a"
 ESW_REV[2023.2] = "73f0904e41cc109f18bb19a5329d0e5a66af2434"
 ESW_REV[2024.1] = "ad038fbbeccd66f126ad80980452b8fecee60e4f"
-SRCREV ??= "${@d.getVarFlag('ESW_REV', d.getVar('ESW_VER')) or '${AUTOREV}'}"
+SRCREV ??= "${@d.getVarFlag('ESW_REV', d.getVar('ESW_VER')) or 'INVALID'}"
 
 EMBEDDEDSW_BRANCHARG ?= "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 EMBEDDEDSW_SRCURI ?= "${REPO};${EMBEDDEDSW_BRANCHARG}"
@@ -27,3 +27,13 @@ LIC_FILES_CHKSUM ??= "file://license.txt;md5=${@d.getVarFlag('LIC_FILES_CHKSUM',
 
 SRC_URI = "${EMBEDDEDSW_SRCURI}"
 PV .= "+git${SRCPV}"
+
+python() {
+    if d.getVar('BB_NO_NETWORK') == '1':
+        try:
+            # Just evaluating SRCPV / SRCREV can trigger an exception when BB_NO_NETWORK is enabled.
+            var = d.getVar('SRCPV')
+            var = d.getVar('SRCREV')
+        except:
+            raise bb.parse.SkipRecipe('BB_NO_NETWORK is enabled, can not fetch SRCREV (%s)' % d.getVar('SRCREV'))
+}
