@@ -28,8 +28,7 @@ do_image_wic[depends] += "${@' '.join('%s:do_deploy' % r for r in (d.getVar('WIC
 UBOOT_SUFFIX ?= "bin"
 
 UBOOT_BINARY ?= "u-boot.${UBOOT_SUFFIX}"
-UBOOT_ELF ?= "u-boot"
-UBOOT_ELF:aarch64 ?= "u-boot.elf"
+UBOOT_ELF ?= "u-boot.elf"
 
 # libmali is selected by DISTRO_FEATURE of libmali & MACHINE_FEATURES of mali400
 # lima is selected by DISTRO_FEATURE != libmali & MACHINE_FEATURES of mali400
