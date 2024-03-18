@@ -35,6 +35,7 @@ SRC_URI = " \
 	file://0026-Fix-gpu-driver-probe-failure.patch \
 	file://0027-Updated-clock-name-and-structure-to-match-LIMA-drive.patch \
 	file://0028-Replace-vma-vm_flags-direct-modifications-with-modif.patch \
+	file://0029-Fixed-buildpath-QA-warning.patch \
 	"
 SRC_URI[md5sum] = "85ea110dd6675c70b7d01af87ec9633c"
 SRC_URI[sha256sum] = "7a67127341d17640c1fff5dad80258fb2a37c8a2121b81525fe2327e4532ce2b"
