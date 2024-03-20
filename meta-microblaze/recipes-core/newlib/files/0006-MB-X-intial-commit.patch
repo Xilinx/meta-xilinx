@@ -3,6 +3,8 @@ From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 27 Jul 2018 16:10:36 +0530
 Subject: [PATCH 06/11] MB-X intial commit
 
+Upstream-Status: Pending
+
 ---
  libgloss/microblaze/crt0.S              | 2 +-
  libgloss/microblaze/crt1.S              | 2 +-

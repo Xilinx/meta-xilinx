@@ -6,6 +6,8 @@ Subject: [PATCH 02/11] [Patch, microblaze]: Modified _exceptional_handler
  to Superviosry call
 
 Signed-off-by:Nagaraju Mekala<nmekala@xilix.com>
+
+Upstream-Status: Pending
 ---
  libgloss/microblaze/_exception_handler.S | 1 -
  1 file changed, 1 deletion(-)

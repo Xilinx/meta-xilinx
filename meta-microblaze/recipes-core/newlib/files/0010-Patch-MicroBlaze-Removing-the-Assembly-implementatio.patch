@@ -5,6 +5,8 @@ Subject: [PATCH 10/11] [Patch,MicroBlaze] : Removing the Assembly
  implementation of 64bit string function.
 
 Revisit in next release and fix it
+
+Upstream-Status: Pending
 ---
  newlib/libc/machine/microblaze/mb_endian.h |  4 +
  newlib/libc/machine/microblaze/strcmp.c    | 95 ++++++++--------------

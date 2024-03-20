@@ -6,6 +6,8 @@ Subject: [PATCH 03/11] [LOCAL]: Add missing declarations for xil_printf to
 
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 
+Upstream-Status: Pending
+
 Conflicts:
 	newlib/libc/include/stdio.h
 ---

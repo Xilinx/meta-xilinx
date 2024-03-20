@@ -17,6 +17,9 @@ Changelog
   * microblaze/configure: Likewise.
 
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+
+Upstream-Status: Pending
+
 ---
  libgloss/config/microblaze.mt    | 30 ++++++++++++++++++++++++++++++
  libgloss/microblaze/configure    |  2 +-
@@ -24,11 +27,10 @@ Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
  3 files changed, 32 insertions(+), 2 deletions(-)
  create mode 100644 libgloss/config/microblaze.mt
 
-diff --git a/libgloss/config/microblaze.mt b/libgloss/config/microblaze.mt
-new file mode 100644
-index 000000000..e8fb922dd
+Index: git/libgloss/config/microblaze.mt
+===================================================================
 --- /dev/null
-+++ b/libgloss/config/microblaze.mt
++++ git/libgloss/config/microblaze.mt
 @@ -0,0 +1,30 @@
 +#
 +# Match default.mt to compile generic objects but continue building
@@ -60,32 +62,27 @@ index 000000000..e8fb922dd
 +	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
 +write.o: ${srcdir}/../write.c
 +	$(CC) $(CFLAGS_FOR_TARGET) -O2 $(INCLUDES) -c $(CFLAGS) $?
-diff --git a/libgloss/microblaze/configure b/libgloss/microblaze/configure
-index 05f68682c..faa23c584 100755
---- a/libgloss/microblaze/configure
-+++ b/libgloss/microblaze/configure
-@@ -2550,7 +2550,7 @@ test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
+Index: git/libgloss/configure
+===================================================================
+--- git.orig/libgloss/configure
++++ git/libgloss/configure
+@@ -2909,6 +2909,7 @@ case "${target}" in
+ 	ac_config_files="$ac_config_files microblaze/Makefile"
  
- 
- host_makefile_frag=${srcdir}/../config/default.mh
--target_makefile_frag=${srcdir}/../config/default.mt
-+target_makefile_frag=${srcdir}/../config/microblaze.mt
- 
- host_makefile_frag_path=$host_makefile_frag
- 
-diff --git a/libgloss/microblaze/configure.ac b/libgloss/microblaze/configure.ac
-index 5eda42e73..d5c789d40 100644
---- a/libgloss/microblaze/configure.ac
-+++ b/libgloss/microblaze/configure.ac
-@@ -35,7 +35,7 @@ LIB_AM_PROG_AS
- AC_SUBST(bsp_prefix)
- 
- host_makefile_frag=${srcdir}/../config/default.mh
--target_makefile_frag=${srcdir}/../config/default.mt
-+target_makefile_frag=${srcdir}/../config/microblaze.mt
- 
- dnl We have to assign the same value to other variables because autoconf
- dnl doesn't provide a mechanism to substitute a replacement keyword with
--- 
-2.37.1 (Apple Git-137.1)
-
+ 	subdirs="$subdirs microblaze"
++	target_makefile_frag=${srcdir}/config/microblaze.mt
+ 	;;
+   mt-*-*)
+ 	ac_config_files="$ac_config_files mt/Makefile"
+Index: git/libgloss/configure.ac
+===================================================================
+--- git.orig/libgloss/configure.ac
++++ git/libgloss/configure.ac
+@@ -172,6 +172,7 @@ case "${target}" in
+   microblaze*-*-*)
+ 	AC_CONFIG_FILES([microblaze/Makefile])
+ 	subdirs="$subdirs microblaze"
++	target_makefile_frag=${srcdir}/config/microblaze.mt
+ 	;;
+   mt-*-*)
+ 	AC_CONFIG_FILES([mt/Makefile])

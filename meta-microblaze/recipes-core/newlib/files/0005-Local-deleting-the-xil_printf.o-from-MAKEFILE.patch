@@ -3,6 +3,8 @@ From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 23 Jan 2017 15:44:17 +0530
 Subject: [PATCH 05/11] [Local]: deleting the xil_printf.o from MAKEFILE
 
+Upstream-Status: Pending
+
 ---
  libgloss/microblaze/Makefile.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

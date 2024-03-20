@@ -3,6 +3,8 @@ From: Nagaraju <nmekala@xilinx.com>
 Date: Tue, 14 Jan 2020 22:32:30 +0530
 Subject: [PATCH 11/11] Fixed the bug in crtinit.s for MB-64
 
+Upstream-Status: Pending
+
 ---
  libgloss/microblaze/crtinit.S | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

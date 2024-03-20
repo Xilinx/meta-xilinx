@@ -4,6 +4,8 @@ Date: Tue, 11 Sep 2018 14:32:20 +0530
 Subject: [PATCH 07/11] [Patch, Microblaze]: newlib port for microblaze m64
  flag...
 
+Upstream-Status: Pending
+
 Conflicts:
 	libgloss/microblaze/_hw_exception_handler.S
 	libgloss/microblaze/_interrupt_handler.S

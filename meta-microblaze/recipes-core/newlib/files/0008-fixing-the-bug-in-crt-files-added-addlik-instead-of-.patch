@@ -4,6 +4,8 @@ Date: Fri, 28 Sep 2018 12:07:43 +0530
 Subject: [PATCH 08/11] fixing the bug in crt files, added addlik instead of
  lli insn
 
+Upstream-Status: Pending
+
 ---
  libgloss/microblaze/crt0.S | 6 +++---
  libgloss/microblaze/crt1.S | 6 +++---

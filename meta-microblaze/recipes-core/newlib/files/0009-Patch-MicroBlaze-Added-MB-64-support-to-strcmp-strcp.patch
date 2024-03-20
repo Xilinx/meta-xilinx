@@ -4,6 +4,8 @@ Date: Tue, 17 Nov 2020 13:06:41 +0530
 Subject: [PATCH 09/11] [Patch,MicroBlaze] : Added MB-64 support to
  strcmp/strcpy/strlen files Signed-off-by:Mahesh Bodapati<mbodapat@xilinx.com>
 
+Upstream-Status: Pending
+
 ---
  newlib/libc/machine/microblaze/strcmp.c | 63 ++++++++++++++++++++++++-
  newlib/libc/machine/microblaze/strcpy.c | 57 ++++++++++++++++++++++

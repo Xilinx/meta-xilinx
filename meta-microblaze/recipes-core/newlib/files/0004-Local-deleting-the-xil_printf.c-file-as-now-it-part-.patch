@@ -4,6 +4,8 @@ Date: Mon, 23 Jan 2017 15:42:11 +0530
 Subject: [PATCH 04/11] [Local]: deleting the xil_printf.c file as now it part
  of BSP
 
+Upstream-Status: Pending
+
 ---
  libgloss/microblaze/xil_printf.c | 284 -------------------------------
  1 file changed, 284 deletions(-)
