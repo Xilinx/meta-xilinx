@@ -7,6 +7,10 @@
 
 for boot_target in ${boot_targets};
 do
+	echo "Trying to load boot images from ${boot_target}"
+	if test "${boot_target}" = "jtag" ; then
+		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
+	fi
 	if test "${boot_target}" = "xspi0" || test "${boot_target}" = "qspi" || test "${boot_target}" = "qspi0"; then
 		ubifsls @@FIT_IMAGE@@
 		if test $? = 0; then
