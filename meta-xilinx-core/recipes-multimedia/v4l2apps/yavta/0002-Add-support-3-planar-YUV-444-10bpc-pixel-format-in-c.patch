@@ -1,0 +1,41 @@
+From dedd0eb76ced425610bdd695029489f553923b2e Mon Sep 17 00:00:00 2001
+From: Rohit Visavalia <rohit.visavalia@xilinx.com>
+Date: Wed, 27 Oct 2021 02:45:39 -0700
+Subject: [PATCH 2/2] Add support 3 planar YUV 444 10bpc pixel format in
+ contiguous memory
+
+The new format X403 is added to support 3 planar YUV 444 10bpc
+30 bits per sample image data in a single contiguous buffer.
+
+Signed-off-by: Rohit Visavalia <rohit.visavalia@xilinx.com>
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ include/linux/videodev2.h | 2 ++
+ yavta.c                   | 1 +
+ 2 files changed, 3 insertions(+)
+
+Index: git/include/linux/videodev2.h
+===================================================================
+--- git.orig/include/linux/videodev2.h
++++ git/include/linux/videodev2.h
+@@ -585,6 +585,8 @@ struct v4l2_pix_format {
+ #define V4L2_PIX_FMT_YUV444M v4l2_fourcc('Y', 'M', '2', '4') /* 24  YUV444 planar */
+ #define V4L2_PIX_FMT_YVU444M v4l2_fourcc('Y', 'M', '4', '2') /* 24  YVU444 planar */
+ 
++#define V4L2_PIX_FMT_X403    v4l2_fourcc('X', '4', '0', '3') /* 32  YUV planar 4:4:4 10-bit */
++
+ /* Bayer formats - see http://www.siliconimaging.com/RGB%20Bayer.htm */
+ #define V4L2_PIX_FMT_SBGGR8  v4l2_fourcc('B', 'A', '8', '1') /*  8  BGBG.. GRGR.. */
+ #define V4L2_PIX_FMT_SGBRG8  v4l2_fourcc('G', 'B', 'R', 'G') /*  8  GBGB.. RGRG.. */
+Index: git/yavta.c
+===================================================================
+--- git.orig/yavta.c
++++ git/yavta.c
+@@ -324,6 +324,7 @@ static struct v4l2_format_info {
+ 	{ "YVU420M", V4L2_PIX_FMT_YVU420M, 3 },
+ 	{ "YVU422M", V4L2_PIX_FMT_YVU422M, 3 },
+ 	{ "YVU444M", V4L2_PIX_FMT_YVU444M, 3 },
++	{ "X403", V4L2_PIX_FMT_X403, 1 },
+ 	{ "SBGGR8", V4L2_PIX_FMT_SBGGR8, 1 },
+ 	{ "SGBRG8", V4L2_PIX_FMT_SGBRG8, 1 },
+ 	{ "SGRBG8", V4L2_PIX_FMT_SGRBG8, 1 },

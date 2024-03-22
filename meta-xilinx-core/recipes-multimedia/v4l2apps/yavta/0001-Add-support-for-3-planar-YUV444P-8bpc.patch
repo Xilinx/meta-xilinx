@@ -1,0 +1,39 @@
+From 4d8ac36340423844be76ceb506bc0e4f48772944 Mon Sep 17 00:00:00 2001
+From: Devarsh Thakkar <devarsh.thakkar@xilinx.com>
+Date: Tue, 7 Sep 2021 06:08:55 -0700
+Subject: [PATCH 1/2] Add support for 3 planar YUV444P 8bpc
+
+This patch adds support for single contiguous buffer 3 planar YUV444P
+8 bpc format.
+
+Signed-off-by: Devarsh Thakkar <devarsh.thakkar@xilinx.com>
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ include/linux/videodev2.h | 1 +
+ yavta.c                   | 1 +
+ 2 files changed, 2 insertions(+)
+
+Index: git/include/linux/videodev2.h
+===================================================================
+--- git.orig/include/linux/videodev2.h
++++ git/include/linux/videodev2.h
+@@ -545,6 +545,7 @@ struct v4l2_pix_format {
+ #define V4L2_PIX_FMT_VYUY    v4l2_fourcc('V', 'Y', 'U', 'Y') /* 16  YUV 4:2:2     */
+ #define V4L2_PIX_FMT_Y41P    v4l2_fourcc('Y', '4', '1', 'P') /* 12  YUV 4:1:1     */
+ #define V4L2_PIX_FMT_YUV444  v4l2_fourcc('Y', '4', '4', '4') /* 16  xxxxyyyy uuuuvvvv */
++#define V4L2_PIX_FMT_YUV444P v4l2_fourcc('4', '4', '4', 'P') /* 24  YUV444 planar */
+ #define V4L2_PIX_FMT_YUV555  v4l2_fourcc('Y', 'U', 'V', 'O') /* 16  YUV-5-5-5     */
+ #define V4L2_PIX_FMT_YUV565  v4l2_fourcc('Y', 'U', 'V', 'P') /* 16  YUV-5-6-5     */
+ #define V4L2_PIX_FMT_YUV32   v4l2_fourcc('Y', 'U', 'V', '4') /* 32  YUV-8-8-8-8   */
+Index: git/yavta.c
+===================================================================
+--- git.orig/yavta.c
++++ git/yavta.c
+@@ -309,6 +309,7 @@ static struct v4l2_format_info {
+ 	{ "YVYU", V4L2_PIX_FMT_YVYU, 1 },
+ 	{ "NV12", V4L2_PIX_FMT_NV12, 1 },
+ 	{ "NV12M", V4L2_PIX_FMT_NV12M, 2 },
++	{ "YUV444P", V4L2_PIX_FMT_YUV444P, 1 },
+ 	{ "NV21", V4L2_PIX_FMT_NV21, 1 },
+ 	{ "NV21M", V4L2_PIX_FMT_NV21M, 2 },
+ 	{ "NV16", V4L2_PIX_FMT_NV16, 1 },

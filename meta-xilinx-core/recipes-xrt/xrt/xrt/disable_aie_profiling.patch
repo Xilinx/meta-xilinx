@@ -1,0 +1,17 @@
+diff --git a/src/runtime_src/xdp/profile/plugin/CMakeLists.txt b/src/runtime_src/xdp/profile/plugin/CMakeLists.txt
+index 8ef7a2f..9b8baac 100644
+--- a/src/runtime_src/xdp/profile/plugin/CMakeLists.txt
++++ b/src/runtime_src/xdp/profile/plugin/CMakeLists.txt
+@@ -33,9 +33,9 @@ if (NOT WIN32)
+ # =========================================================
+ # The plugins to be built on Linux only
+ # =========================================================
+-add_subdirectory(aie_status)
+-add_subdirectory(aie_profile)
+-add_subdirectory(aie_trace)
++#add_subdirectory(aie_status)
++#add_subdirectory(aie_profile)
++#add_subdirectory(aie_trace)
+ add_subdirectory(device_offload/hw_emu)
+ add_subdirectory(noc)
+ add_subdirectory(power)

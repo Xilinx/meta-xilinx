@@ -1,5 +1,5 @@
 SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master;protocol=https"
-SRCREV = "807435ae6fa0a07e8c84b458d138f3f54614eb5c"
+SRCREV = "4b687525d2c4785eedbcbd73431bc6d236cb5bc8"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/lopper:"
 
@@ -10,4 +10,5 @@ RDEPENDS:${PN} += " \
     python3-anytree \
     python3-six \
     python3-pyyaml \
+    python3-packaging \
     "

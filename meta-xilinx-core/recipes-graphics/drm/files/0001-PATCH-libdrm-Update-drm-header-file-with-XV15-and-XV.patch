@@ -1,0 +1,37 @@
+From 7edb14622061e87bb4810fb648017b43e767d4c6 Mon Sep 17 00:00:00 2001
+From: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
+Date: Mon, 1 Nov 2021 12:59:36 -0700
+Subject: [PATCH 1/5] [PATCH] libdrm: Update drm header file with XV15 and XV20
+
+This patch updates drm header file with YUV 420 and
+YUV422 10 bit formats.
+
+Signed-off-by: Satish Kumar Nagireddy <satish.nagireddy.nagireddy@xilinx.com>
+Upstream-Status: Pending
+Signed-off-by: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
+---
+ include/drm/drm_fourcc.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/include/drm/drm_fourcc.h b/include/drm/drm_fourcc.h
+index ed0258c..c5cdaed 100644
+--- a/include/drm/drm_fourcc.h
++++ b/include/drm/drm_fourcc.h
+@@ -318,6 +318,14 @@ extern "C" {
+ #define DRM_FORMAT_Q401		fourcc_code('Q', '4', '0', '1')
+ 
+ /*
++ * 2 plane 10 bit per component YCbCr
++ * index 0 = Y plane, [31:0] x:Y2:Y1:Y0 2:10:10:10 little endian
++ * index 1 = Cb:Cr plane, [63:0] x:Cb2:Cr2:Cb1:x:Cr1:Cb0:Cr0 2:10:10:10:2:10:10:10 little endian
++ */
++#define DRM_FORMAT_XV15                fourcc_code('X', 'V', '1', '5') /* 2x2 subsampled Cb:Cr plane 2:10:10:10 */
++#define DRM_FORMAT_XV20                fourcc_code('X', 'V', '2', '0') /* 2x1 subsampled Cb:Cr plane 2:10:10:10 */
++
++/*
+  * 3 plane YCbCr
+  * index 0: Y plane, [7:0] Y
+  * index 1: Cb plane, [7:0] Cb
+-- 
+2.7.4
+

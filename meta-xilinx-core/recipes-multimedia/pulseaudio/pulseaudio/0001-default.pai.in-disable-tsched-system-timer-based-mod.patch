@@ -1,0 +1,31 @@
+From 059f28d8eae7a1ef237eccbaaa7493480f83b764 Mon Sep 17 00:00:00 2001
+From: Rohit Visavalia <rohit.visavalia@xilinx.com>
+Date: Fri, 2 Sep 2022 01:56:47 -0700
+Subject: [PATCH] default.pai.in: disable tsched (system-timer based model)
+
+With tsched enabled we see clicking noise on DisplayPort for initial 5 sec
+every time audio is played. Disabling the same fixes the issue.
+
+Upstream-Status: Inappropriate [disable feature]
+
+Signed-off-by: Rohit Visavalia <rohit.visavalia@xilinx.com>
+---
+ src/daemon/default.pa.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/daemon/default.pa.in b/src/daemon/default.pa.in
+index a3ddad9..37af3f2 100755
+--- a/src/daemon/default.pa.in
++++ b/src/daemon/default.pa.in
+@@ -55,7 +55,7 @@ ifelse(@HAVE_MKFIFO@, 1, [dnl
+ ### Automatically load driver modules depending on the hardware available
+ ifelse(@HAVE_UDEV@, 1, [dnl
+ .ifexists module-udev-detect@PA_SOEXT@
+-load-module module-udev-detect
++load-module module-udev-detect tsched=0
+ .else
+ ], @HAVE_COREAUDIO@, 1, [dnl
+ .ifexists module-coreaudio-detect@PA_SOEXT@
+-- 
+2.17.1
+

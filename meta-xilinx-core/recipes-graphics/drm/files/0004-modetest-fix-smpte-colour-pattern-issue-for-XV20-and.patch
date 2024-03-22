@@ -1,0 +1,38 @@
+From ede95ded932a8f722f339fa345c098c705f40f08 Mon Sep 17 00:00:00 2001
+From: Anil Kumar M <amamidal@xilinx.com>
+Date: Wed, 16 Sep 2020 22:42:47 +0530
+Subject: [PATCH 4/5] modetest: fix smpte colour pattern issue for XV20 and
+ XV15 formats
+
+Fix smpte colour issue for XV15 and XV20 formats.
+
+Upstream-Status: Pending
+
+Signed-off-by: Anil Kumar M <amamidal@xilinx.com>
+---
+ tests/util/pattern.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/util/pattern.c b/tests/util/pattern.c
+index e29d160..0fe2e5f 100644
+--- a/tests/util/pattern.c
++++ b/tests/util/pattern.c
+@@ -1121,11 +1121,11 @@ static void fill_smpte(const struct util_format_info *info,
+ 		return fill_smpte_yuv_packed(&info->yuv, planes[0], width,
+ 					     height, stride);
+ 	case DRM_FORMAT_XV20:
+-		return fill_tiles_xv20(info, planes[0], planes[1], planes[1],
+-		       width, height, stride);
++		return fill_smpte_yuv_semiplanar_10b(&info->yuv, planes[0], planes[1],
++					     width, height, stride);
+ 	case DRM_FORMAT_XV15:
+-		return fill_tiles_xv15(info, planes[0], planes[1], planes[2],
+-		       width, height, stride);
++		return fill_smpte_yuv_semiplanar_10b(&info->yuv, planes[0], planes[1],
++					     width, height, stride);
+ 	case DRM_FORMAT_NV12:
+ 	case DRM_FORMAT_NV21:
+ 	case DRM_FORMAT_NV16:
+-- 
+2.7.4
+

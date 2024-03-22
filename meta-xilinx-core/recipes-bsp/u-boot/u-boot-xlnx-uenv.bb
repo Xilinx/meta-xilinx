@@ -83,7 +83,7 @@ DEPENDS:append := " virtual/kernel ${@remove_task_from_depends(d)}"
 
 # bootargs, default to booting with the rootfs device being partition 2
 KERNEL_BOOTARGS:zynq = "earlyprintk console=ttyPS0,115200 root=/dev/mmcblk0p2 rw rootwait"
-KERNEL_BOOTARGS:zynqmp = "earlycon clk_ignore_unused root=/dev/mmcblk${devnum}p2 rw rootwait"
+KERNEL_BOOTARGS:zynqmp = "earlycon root=/dev/mmcblk${devnum}p2 rw rootwait"
 
 KERNEL_LOAD_ADDRESS:zynq = "0x2080000"
 KERNEL_LOAD_ADDRESS:zynqmp = "0x200000"

@@ -7,7 +7,7 @@ require u-boot-xlnx-common.inc
 
 SYSROOT_DIRS += "/boot"
 
-BASE_DTS ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE') or '').rstrip('.dtb').rstrip('.dts') or 'system-top'}"
+BASE_DTS ?= "${@os.path.splitext(os.path.basename(d.getVar('CONFIG_DTFILE') or ''))[0] or 'system-top'}"
 DTB_PATH ?= "boot/devicetree/"
 DTB_FILE_NAME ?= ""
 

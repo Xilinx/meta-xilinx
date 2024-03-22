@@ -1,0 +1,55 @@
+From ef4d512aff004c62d550cdd64329c6c1acd0f217 Mon Sep 17 00:00:00 2001
+From: Stefano Stabellini <stefano.stabellini@amd.com>
+Date: Fri, 1 Jul 2022 18:48:03 -0700
+Subject: [PATCH 01/16] xen_common: return error from xen_create_ioreq_server
+
+Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
+---
+ include/hw/xen/xen_common.h | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 77ce17d8a4..c2d2f36bde 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -467,8 +467,8 @@ static inline void xen_unmap_pcidev(domid_t dom,
+ {
+ }
+ 
+-static inline void xen_create_ioreq_server(domid_t dom,
+-                                           ioservid_t *ioservid)
++static inline int xen_create_ioreq_server(domid_t dom,
++                                          ioservid_t *ioservid)
+ {
+ }
+ 
+@@ -600,8 +600,8 @@ static inline void xen_unmap_pcidev(domid_t dom,
+                                                   PCI_FUNC(pci_dev->devfn));
+ }
+ 
+-static inline void xen_create_ioreq_server(domid_t dom,
+-                                           ioservid_t *ioservid)
++static inline int xen_create_ioreq_server(domid_t dom,
++                                          ioservid_t *ioservid)
+ {
+     int rc = xendevicemodel_create_ioreq_server(xen_dmod, dom,
+                                                 HVM_IOREQSRV_BUFIOREQ_ATOMIC,
+@@ -609,12 +609,14 @@ static inline void xen_create_ioreq_server(domid_t dom,
+ 
+     if (rc == 0) {
+         trace_xen_ioreq_server_create(*ioservid);
+-        return;
++        return rc;
+     }
+ 
+     *ioservid = 0;
+     use_default_ioreq_server = true;
+     trace_xen_default_ioreq_server();
++
++    return rc;
+ }
+ 
+ static inline void xen_destroy_ioreq_server(domid_t dom,
+-- 
+2.17.1
+
