@@ -61,18 +61,36 @@ $ sudo lsblk /dev/mmcblk<devnum> -o NAME,FSTYPE,LABEL,PARTLABEL
 $ sudo mount -L boot /mnt/boot; sudo mount -L root /mnt/rootfs` 
 ```
 3. Copy the boot images to the SD card or eMMC device FAT32 partition.
+
+* Linux
    * boot.bin
    * boot.scr
    * Image or uImage (For Zynq7000 only)
    * system.dtb
    * rootfs.cpio.gz.u-boot (If using a ramdisk)
-```
-$ cp ${DEPLOY_DIR_IMAGE}/boot.bin /mnt/boot/boot.bin
-$ cp ${DEPLOY_DIR_IMAGE}/boot.scr /mnt/boot/boot.scr
-$ cp ${DEPLOY_DIR_IMAGE}/Image /mnt/boot/Image
-$ cp ${DEPLOY_DIR_IMAGE}/system.dtb /mnt/boot/system.dtb
-$ cp ${DEPLOY_DIR_IMAGE}/<target-image>-${MACHINE}-${DATETIME}.cpio.gz.u-boot /mnt/boot/rootfs.cpio.gz.u-boot
-```
+   ```
+   $ cp ${DEPLOY_DIR_IMAGE}/boot.bin /mnt/boot/boot.bin
+   $ cp ${DEPLOY_DIR_IMAGE}/boot.scr /mnt/boot/boot.scr
+   $ cp ${DEPLOY_DIR_IMAGE}/Image /mnt/boot/Image
+   $ cp ${DEPLOY_DIR_IMAGE}/system.dtb /mnt/boot/system.dtb
+   $ cp ${DEPLOY_DIR_IMAGE}/<target-image>-${MACHINE}-${DATETIME}.cpio.gz.u-boot /mnt/boot/rootfs.cpio.gz.u-boot
+   ```
+* Xen
+   * boot.bin
+   * boot.scr
+   * Image
+   * xen
+   * system.dtb
+   * rootfs.cpio.gz (If using a ramdisk)
+   ```
+   $ cp ${DEPLOY_DIR_IMAGE}/boot.bin /mnt/boot/boot.bin
+   $ cp ${DEPLOY_DIR_IMAGE}/boot.scr /mnt/boot/boot.scr
+   $ cp ${DEPLOY_DIR_IMAGE}/Image /mnt/boot/Image
+   $ cp ${DEPLOY_DIR_IMAGE}/xen /mnt/boot/xen
+   $ cp ${DEPLOY_DIR_IMAGE}/system.dtb /mnt/boot/system.dtb
+   $ cp ${DEPLOY_DIR_IMAGE}/<target-image>-${MACHINE}-${DATETIME}.cpio.gz /mnt/boot/rootfs.cpio.gz
+   ```
+
 4. Extract `<target-image>-${MACHINE}-${DATETIME}.rootfs.tar.gz` file content to the SD
    card or eMMC device EXT4 partition.
 ```
