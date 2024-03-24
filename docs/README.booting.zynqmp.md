@@ -54,6 +54,10 @@ Deploying the images can be done in two methods.
 
 #### Using devtool boot-jtag script
 
+> **Note:** For Xen boot flow boot-jtag script doesn't include loading xen, kernel
+> and root filesystem, This step needs to be done manually as mentioned in XSDB
+> or TFTP method below.
+
 1. Run devtool command to generate the boot-jtag.tcl script.
 ```
 $ devtool boot-jtag --help
@@ -151,11 +155,22 @@ Load the images into the target DDR/PL DRR load address i.e.,
 
 Below example uses base DDR address as 0x0 which matches in vivado address editor.
 
+1. **Linux**
+
 | Image Type         | Base DDR Address | Image Offset | Load Address in DDR |
 |--------------------|------------------|--------------|---------------------|
 | Kernel             | 0x0              | 0x200000     | 0x200000            |
 | Device Tree        | 0x0              | 0x1000       | 0x1000              |
 | Rootfs             | 0x0              | 0x04000000   | 0x4000000           |
+| U-boot boot script | 0x0              | 0x20000000   | 0x20000000          |
+
+2. **Xen**
+
+| Image Type         | Base DDR Address | Image Offset | Load Address in DDR |
+|--------------------|------------------|--------------|---------------------|
+| Kernel             | 0x0              | 0xE00000     | 0xE00000            |
+| Device Tree        | 0x0              | 0xC000000    | 0xc000000           |
+| Rootfs             | 0x0              | 0x02600000   | 0x02600000          |
 | U-boot boot script | 0x0              | 0x20000000   | 0x20000000          |
 
 > **Note:** 
@@ -178,12 +193,23 @@ xsdb% stop
 ```
 2. Using the `dow` command to load the images into the target DDR/PL DDR load 
    address.
-```
-xsdb% dow -data ${DEPLOY_DIR_IMAGE}/Image 0x200000
-xsdb% dow -data ${DEPLOY_DIR_IMAGE}/system.dtb 0x100000
-xsdb% dow -data ${DEPLOY_DIR_IMAGE}/core-image-minimal-${MACHINE}.cpio.gz.u-boot 0x4000000
-xsdb% dow -data ${DEPLOY_DIR_IMAGE}/boot.scr 0x20000000
-```
+
+   * Linux XSDB
+   ```
+   xsdb% targets -set -nocase -filter {name =~ "*A53*#0"}
+   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/Image 0x200000
+   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/system.dtb 0x100000
+   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/core-image-minimal-${MACHINE}.cpio.gz.u-boot 0x4000000
+   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/boot.scr 0x20000000
+   ```
+   * Xen XSDB
+   ```
+   xsdb% targets -set -nocase -filter {name =~ "*A53*#0"}
+   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/Image 0xE00000
+   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/system.dtb 0xc000000
+   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/core-image-minimal-${MACHINE}.cpio.gz 0x02600000
+   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/boot.scr 0x20000000
+   ```
 
 ###### Using TFTP
 
@@ -216,9 +242,28 @@ xsdb% con
 xsdb% exit
 ```
 3. In the target Serial Terminal, from U-Boot prompt run `boot` command.
+
+* Linux boot
 ```
 U-Boot> boot
 ```
+
+* XEN JTAG boot
+
+   * XSDB
+   > **Note:** You need to calculate the Kernel(kernel_size) and ramdisk(ramdisk_size)
+   > image size manually from `${DEPLOY_DIR_IMAGE}` directory. For example if your
+   > kernel size is 24269312 bytes you need to convert to hex 0x1725200 and use it.
+   ```
+   U-Boot> setenv kernel_size <filesize>
+   U-Boot> setenv ramdisk_size <filesize>
+   U-Boot> boot
+   ```
+
+   * TFTP
+   ```
+   U-Boot> boot
+   ```
 
 ## Booting from SD
 
