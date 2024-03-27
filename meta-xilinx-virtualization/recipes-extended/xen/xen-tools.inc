@@ -24,7 +24,7 @@ RDEPENDS:${PN} = "\
     ${PN}-xencommons \
     ${PN}-xendomains \
     ${PN}-xenstore \
-    virtual/xenstored \
+    virtual-xenstored \
     ${PN}-xl \
     "
 
@@ -100,7 +100,7 @@ RDEPENDS:${PN}-xencommons = "\
     util-linux-prlimit \
     ${PN}-console \
     ${PN}-xenstore \
-    virtual/xenstored \
+    virtual-xenstored \
     ${PN}-xl \
     ${PN}-scripts-common \
     "
@@ -110,7 +110,7 @@ RDEPENDS:${PN}-xendomains = "\
     ${PN}-console \
     ${PN}-scripts-block \
     ${PN}-scripts-common \
-    virtual/xenstored \
+    virtual-xenstored \
     "
 
 RDEPENDS:${PN}-xenhypfs = " \
@@ -215,13 +215,13 @@ PACKAGES = " \
     "
 
 PROVIDES =+ " \
-    virtual/xenstored \
+    virtual-xenstored \
     ${@bb.utils.contains('PACKAGECONFIG', 'externalblktap', '', '${BLKTAP_PROVIDES}', d)} \
     "
 
 # There are multiple implementations of the XenStore daemon, so we use a
 # virtual package to allow for substitution.
-RPROVIDES:${PN}-xenstored = "virtual/xenstored"
+RPROVIDES:${PN}-xenstored = "virtual-xenstored"
 
 FILES:${PN}-dbg += "\
     ${libdir}/xen/bin/.debug \
