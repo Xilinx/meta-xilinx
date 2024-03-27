@@ -1,7 +1,7 @@
 SUMMARY = "A Mali 400 Linux Kernel module"
 SECTION = "kernel/modules"
 
-LICENSE = "GPL-2.0-only"
+LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = " \
 	file://linux/license/gpl/mali_kernel_license.h;md5=f5af2d61f4c1eb262cb6a557aaa1070a \
 	"
@@ -30,22 +30,19 @@ SRC_URI = " \
 	file://0021-Use-updated-timekeeping-functions-in-kernel-5.6.patch \
 	file://0022-Set-HAVE_UNLOCKED_IOCTL-default-to-true.patch \
 	file://0023-Use-PTR_ERR_OR_ZERO-instead-of-PTR_RET.patch \
-	file://0024-Use-community-device-tree-names.patch \
-	file://0025-Import-DMA_BUF-module-and-update-register_shrinker-f.patch \
-	file://0026-Fix-gpu-driver-probe-failure.patch \
-	file://0027-Updated-clock-name-and-structure-to-match-LIMA-drive.patch \
-	file://0028-Replace-vma-vm_flags-direct-modifications-with-modif.patch \
 	"
 SRC_URI[md5sum] = "85ea110dd6675c70b7d01af87ec9633c"
 SRC_URI[sha256sum] = "7a67127341d17640c1fff5dad80258fb2a37c8a2121b81525fe2327e4532ce2b"
 
-inherit features_check module
+inherit module
 
 PARALLEL_MAKE = "-j 1"
 
 S = "${WORKDIR}/DX910-SW-99002-${PV}/driver/src/devicedrv/mali"
 
-REQUIRED_MACHINE_FEATURES = "mali400"
+COMPATIBLE_MACHINE = "^$"
+COMPATIBLE_MACHINE:zynqmp-eg = "zynqmp-eg"
+COMPATIBLE_MACHINE:zynqmp-ev = "zynqmp-ev"
 
 EXTRA_OEMAKE = 'KDIR="${STAGING_KERNEL_DIR}" \
 		ARCH="${ARCH}" \
