@@ -15,7 +15,7 @@ REQUIRED_MACHINE_FEATURES = "vdu"
 
 BRANCH ?= "master"
 REPO ?= "git://github.com/Xilinx/vdu-firmware.git;protocol=https"
-SRCREV ?= "7c4662d0f5b514cbb0b9890bc3011d9450bf3661"
+SRCREV ?= "724de80630edcb87d865d69f1a6c0dc61c3f9f12"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI   = "${REPO};${BRANCHARG}"
