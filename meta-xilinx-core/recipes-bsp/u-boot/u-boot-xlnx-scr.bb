@@ -264,10 +264,11 @@ do_compile() {
 do_install() {
     install -d ${D}/boot
     install -m 0644 boot.scr ${D}/boot/${UBOOTSCR_BASE_NAME}.scr
-    ln -sf ${UBOOTSCR_BASE_NAME}.scr ${D}/boot/boot.scr
+    install -m 0644 boot.scr ${D}/boot/
     install -d ${D}/boot/pxeboot/${UBOOTPXE_CONFIG_NAME}
     install -m 0644 pxeboot.pxe ${D}/boot/pxeboot/${UBOOTPXE_CONFIG_NAME}/default
-    ln -sf pxeboot/${UBOOTPXE_CONFIG_NAME} ${D}/boot/${UBOOTPXE_CONFIG}
+    install -d ${D}/boot/${UBOOTPXE_CONFIG}/
+    install -m 0644 pxeboot.pxe ${D}/boot/${UBOOTPXE_CONFIG}/default
 }
 
 FILES:${PN} = "/boot/*"
@@ -275,10 +276,11 @@ FILES:${PN} = "/boot/*"
 do_deploy() {
     install -d ${DEPLOYDIR}
     install -m 0644 boot.scr ${DEPLOYDIR}/${UBOOTSCR_BASE_NAME}.scr
-    ln -sf ${UBOOTSCR_BASE_NAME}.scr ${DEPLOYDIR}/boot.scr
+    install -m 0644 boot.scr ${DEPLOYDIR}/
     install -d ${DEPLOYDIR}/pxeboot/${UBOOTPXE_CONFIG_NAME}
     install -m 0644 pxeboot.pxe ${DEPLOYDIR}/pxeboot/${UBOOTPXE_CONFIG_NAME}/default
-    ln -sf pxeboot/${UBOOTPXE_CONFIG_NAME} ${DEPLOYDIR}/${UBOOTPXE_CONFIG}
+    install -d ${DEPLOYDIR}/${UBOOTPXE_CONFIG}/
+    install -m 0644 pxeboot.pxe ${DEPLOYDIR}/${UBOOTPXE_CONFIG}/default
 }
 
 addtask do_deploy after do_compile before do_build

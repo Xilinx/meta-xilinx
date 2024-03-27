@@ -1,0 +1,29 @@
+From 7659ba2e251b72aa3c248d3b1f3a23971180ba41 Mon Sep 17 00:00:00 2001
+From: Parth Gajjar <parth.gajjar@amd.com>
+Date: Mon, 18 Mar 2024 13:43:30 +0000
+Subject: [PATCH] Fixed buildpath QA warning
+
+Removed KDIR from buildinfo
+WARNING: kernel-module-mali-r9p0-01rel0-r0 do_package_qa:
+QA Issue: File /lib/modules/6.6.10-xilinx-v2024.1-g2c37bbe14ced/updates/mali.ko
+ in package kernel-module-mali-6.6.10-xilinx-v2024.1-g2c37bbe14ced contains
+ reference to TMPDIR [buildpaths]" from the log file.
+
+Signed-off-by: Parth Gajjar <parth.gajjar@amd.com>
+
+diff --git a/Kbuild b/Kbuild
+index 8c6e6e0..2b8632b 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -243,7 +243,7 @@ VERSION_STRINGS += BUILD=release
+ endif
+ VERSION_STRINGS += TARGET_PLATFORM=$(TARGET_PLATFORM)
+ VERSION_STRINGS += MALI_PLATFORM=$(MALI_PLATFORM)
+-VERSION_STRINGS += KDIR=$(KDIR)
++#VERSION_STRINGS += KDIR=$(KDIR)
+ VERSION_STRINGS += OS_MEMORY_KERNEL_BUFFER_SIZE_IN_MB=$(OS_MEMORY_KERNEL_BUFFER_SIZE_IN_MB)
+ VERSION_STRINGS += USING_UMP=$(CONFIG_MALI400_UMP)
+ VERSION_STRINGS += USING_PROFILING=$(CONFIG_MALI400_PROFILING)
+-- 
+2.37.6
+
