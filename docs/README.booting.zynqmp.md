@@ -132,7 +132,10 @@ xsdb% rst -processor -clear-registers
 xsdb% dow ${DEPLOY_DIR_IMAGE}/zynqmp_fsbl.elf
 xsdb% con
 ```
-7. Now download TF-A, U-boot.elf and Device tree to APU and execute.
+7. Now download TF-A, U-boot.elf and Device tree blob to APU and execute.
+
+> **Note:** For Xen boot system.dtb load address will vary, see below table.
+
 ```
 xsdb% stop
 xsdb% dow ${DEPLOY_DIR_IMAGE}/bl31.elf
@@ -159,18 +162,24 @@ Below example uses base DDR address as 0x0 which matches in vivado address edito
 
 | Image Type         | Base DDR Address | Image Offset | Load Address in DDR |
 |--------------------|------------------|--------------|---------------------|
-| Kernel             | 0x0              | 0x200000     | 0x200000            |
-| Device Tree        | 0x0              | 0x1000       | 0x1000              |
+| Linux Kernel       | 0x0              | 0x200000     | 0x200000            |
+| Device Tree Blob   | 0x0              | 0x100000     | 0x100000            |
 | Rootfs             | 0x0              | 0x04000000   | 0x4000000           |
 | U-boot boot script | 0x0              | 0x20000000   | 0x20000000          |
 
 2. **Xen**
 
+> **Note:** Xen, Rootfs and Device Tree image offset is calculated as shown below.
+> * `Xen Rootfs = Base DDR Address + Linux Kernel Image Offset(0xE00000) + Size of Linux Kernel Image`
+> * `Xen Kernel = Base DDR Address + Xen Rootfs Image Offset (Ex: 0x2600000) + Size of Xen Rootfs`
+> * `Device Tree Blob = Base DDR Address + Xen Kernel Image Offset (Ex: 0xBA00000) + Size of Device Tree Blob`
+
 | Image Type         | Base DDR Address | Image Offset | Load Address in DDR |
 |--------------------|------------------|--------------|---------------------|
-| Kernel             | 0x0              | 0xE00000     | 0xE00000            |
-| Device Tree        | 0x0              | 0xC000000    | 0xc000000           |
-| Rootfs             | 0x0              | 0x02600000   | 0x02600000          |
+| Linux Kernel       | 0x0              | 0xE00000     | 0xE00000            |
+| Xen Rootfs         | 0x0              | 0x2600000    | 0x2600000           |
+| Xen Kernel         | 0x0              | 0xBA00000    | 0xBA00000           |
+| Device Tree Blob   | 0x0              | 0xC000000    | 0xC000000           |
 | U-boot boot script | 0x0              | 0x20000000   | 0x20000000          |
 
 > **Note:** 
@@ -202,12 +211,14 @@ xsdb% stop
    xsdb% dow -data ${DEPLOY_DIR_IMAGE}/core-image-minimal-${MACHINE}.cpio.gz.u-boot 0x4000000
    xsdb% dow -data ${DEPLOY_DIR_IMAGE}/boot.scr 0x20000000
    ```
+
    * Xen XSDB
    ```
    xsdb% targets -set -nocase -filter {name =~ "*A53*#0"}
    xsdb% dow -data ${DEPLOY_DIR_IMAGE}/Image 0xE00000
-   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/system.dtb 0xc000000
-   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/core-image-minimal-${MACHINE}.cpio.gz 0x02600000
+   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/core-image-minimal-${MACHINE}.cpio.gz 0x2600000
+   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/xen 0xBA00000
+   xsdb% dow -data ${DEPLOY_DIR_IMAGE}/system.dtb 0xC000000
    xsdb% dow -data ${DEPLOY_DIR_IMAGE}/boot.scr 0x20000000
    ```
 
@@ -221,13 +232,26 @@ ZynqMP> set serverip <host-server-ip-address>
 ZynqMP> set ipaddr <board-ip-address>
 ```
 3. Load the images to DDR address.
-```
-U-Boot> tftpboot 0x200000 Image
-U-Boot> tftpboot 0x100000 system.dtb
-U-Boot> tftpboot 0x4000000 core-image-minimal-${MACHINE}.cpio.gz.u-boot
-U-Boot> tftpboot 0x20000000 boot.scr
 
-```
+   * Linux TFTP
+   ```
+   U-Boot> tftpboot 0x200000 Image
+   U-Boot> tftpboot 0x100000 system.dtb
+   U-Boot> tftpboot 0x4000000 core-image-minimal-${MACHINE}.cpio.gz.u-boot
+   U-Boot> tftpboot 0x20000000 boot.scr
+   ```
+
+   * Xen TFTP
+   ```
+   U-Boot> tftpboot 0xE00000 Image
+   U-Boot> setenv kernel_size 0x$filesize
+   U-Boot> tftpboot 0x2600000 core-image-minimal-${MACHINE}.cpio.gz
+   U-Boot> setenv ramdisk_size 0x$filesize
+   U-Boot> tftpboot 0xBA00000 xen
+   U-Boot> tftpboot 0xC000000 system.dtb
+   U-Boot> tftpboot 0x20000000 boot.scr
+   ```
+
 ##### Booting Linux
 
 Once the images are loaded continue the execution.
