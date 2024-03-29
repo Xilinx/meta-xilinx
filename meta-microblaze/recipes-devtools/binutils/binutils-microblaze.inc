@@ -35,6 +35,8 @@ SRC_URI:append = " \
      file://0032-Patch-MicroBlaze-Double-free-with-ld-no-keep-memory.patch \
      file://0033-Patch-MB-MB-binutils-Upstream-port-issues.patch \
      file://0034-Patch-MicroBlaze-By-default-the-linker-will-generate.patch \
+     file://0035-Fix-for-objdump-issue-for-mb32-el.patch \
+     file://0036-Fix-for-missing-instructions-in-dump.patch \
      "
 
 LDGOLD_ALTS:microblaze = ""

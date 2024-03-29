@@ -1,0 +1,34 @@
+From 834cc7ca420d3fb783fb813b336e76960eb5b28e Mon Sep 17 00:00:00 2001
+From: Aayush Misra <aayushm@amd.com>
+Date: Thu, 28 Mar 2024 16:33:40 +0530
+Subject: [PATCH 36/36] Fix for missing instructions in dump
+
+---
+ opcodes/microblaze-dis.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
+index 237a6081377..a83e00e282b 100644
+--- a/opcodes/microblaze-dis.c
++++ b/opcodes/microblaze-dis.c
+@@ -266,7 +266,7 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+ 
+   inst = read_insn_microblaze (memaddr, info, &op);
+   if (inst == 0)
+-    return -1;
++    return 4;
+ 
+   if (prev_insn_vma == curr_insn_vma)
+     {
+@@ -274,7 +274,7 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+ 	{
+ 	  prev_inst = read_insn_microblaze (prev_insn_addr, info, &pop);
+ 	  if (prev_inst == 0)
+-	    return -1;
++	    return 4;
+ 	  if (pop->instr == imm)
+ 	    {
+ 	      immval = (get_int_field_imm (prev_inst) << 16) & 0xffff0000;
+-- 
+2.34.1
+

@@ -1,0 +1,37 @@
+From f070f81107d4b1e497207c1668f079dabb0b4417 Mon Sep 17 00:00:00 2001
+From: Aayush Misra <aayushm@amd.com>
+Date: Mon, 24 Jul 2023 21:49:14 +0530
+Subject: [PATCH 35/36] Fix for objdump issue for mb32-el
+
+---
+ opcodes/microblaze-dis.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
+index b76a5935a34..237a6081377 100644
+--- a/opcodes/microblaze-dis.c
++++ b/opcodes/microblaze-dis.c
+@@ -36,7 +36,7 @@
+ #define get_int_field_imml(instr)  ((instr & IMML_MASK) >> IMM_LOW)
+ #define get_int_field_r1(instr)    ((instr & RA_MASK) >> RA_LOW)
+ 
+-#define NUM_STRBUFS 3
++#define NUM_STRBUFS 4
+ #define STRBUF_SIZE 25
+ 
+ struct string_buf
+@@ -466,8 +466,9 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+ 	case INST_TYPE_NONE:
+ 	  break;
+ 	case INST_TYPE_RD_IMML:
+-	  print_func (stream, "\t%s, %s", get_field_rd (&buf, inst), get_field_imm16 (&buf, inst));
+-          break;
++      if(info->insn_type != dis_noninsn)
++	    print_func (stream, "\t%s, %s", get_field_rd (&buf, inst), get_field_imm16 (&buf, inst));
++      break;
+         /* For bit field insns.  */
+ 	case INST_TYPE_RD_R1_IMMW_IMMS:
+           print_func (stream, "\t%s, %s, %s, %s", get_field_rd (&buf, inst),get_field_r1(&buf, inst),get_field_immw (&buf, inst), get_field_imms (&buf, inst));
+-- 
+2.34.1
+
