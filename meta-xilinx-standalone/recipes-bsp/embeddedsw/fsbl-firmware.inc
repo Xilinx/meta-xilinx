@@ -20,13 +20,9 @@ B = "${S}/lib/sw_apps/${APP_DIR}/src"
 # The makefile does not handle parallelization
 PARALLEL_MAKE = "-j1"
 
-do_configure() {
-    :
-}
-
 COMPILER = "${CC}"
 COMPILER_FLAGS = "-O2 -c"
-EXTRA_COMPILER_FLAGS = "-g -Wall -Wextra -Os -flto -ffat-lto-objects"
+EXTRA_COMPILER_FLAGS = "-g -Wall -Wextra ${ESW_CFLAGS}"
 ARCHIVER = "${AR}"
 
 BSP_DIR ?= "${B}/../misc/undefined"
@@ -46,9 +42,6 @@ def bsp_make_vars(d):
 EXTRA_OEMAKE = "${@bsp_make_vars(d)}"
 
 ARM_INSTRUCTION_SET:eabi:arm = "arm"
-do_compile() {
-    oe_runmake
-}
 
 do_install() {
     :

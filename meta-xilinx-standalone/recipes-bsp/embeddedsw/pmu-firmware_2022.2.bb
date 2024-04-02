@@ -8,9 +8,3 @@ SRC_URI += " \
            "
 
 EXTRA_COMPILER_FLAGS = "-ffunction-sections -fdata-sections -Wall -Wextra -Os -flto -ffat-lto-objects"
-
-do_compile() {
-    oe_runmake
-
-    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
-}
