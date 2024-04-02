@@ -18,10 +18,6 @@ do_configure:prepend() {
     )
 }
 
-do_compile:append() {
-    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
-}
-
 do_install() {
     :
 }

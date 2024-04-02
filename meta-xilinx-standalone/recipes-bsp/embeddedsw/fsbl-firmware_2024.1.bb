@@ -1,6 +1,6 @@
 require fsbl-firmware.inc
 
-FILESPATH .= ":${FILE_DIRNAME}/embeddedsw/2023.1:${FILE_DIRNAME}/embeddedsw"
+FILESPATH .= ":${FILE_DIRNAME}/embeddedsw/2024.1:${FILE_DIRNAME}/embeddedsw"
 
 SRC_URI += " \
             file://makefile-skip-copy_bsp.sh.patch \

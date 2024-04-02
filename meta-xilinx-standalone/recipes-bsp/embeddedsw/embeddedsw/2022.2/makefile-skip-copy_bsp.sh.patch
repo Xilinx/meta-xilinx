@@ -1,0 +1,104 @@
+From d703670357546d9aab66baea1f6751ba1cbdf7ad Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Wed, 7 Dec 2022 15:30:23 -0800
+Subject: [PATCH] Prevent makefile from calling copy_bsp.sh
+
+If we call copy_bsp.sh we will undo any manual compliation steps we
+have already done.  Avoid this.
+
+YP integration specific
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ lib/sw_apps/versal_plm/src/versal/Makefile       | 4 ++--
+ lib/sw_apps/versal_plm/src/versal_net/Makefile   | 4 ++--
+ lib/sw_apps/versal_psmfw/src/versal/Makefile     | 4 ++--
+ lib/sw_apps/versal_psmfw/src/versal_net/Makefile | 6 +++---
+ lib/sw_apps/zynqmp_pmufw/src/Makefile            | 4 ++--
+ 5 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/lib/sw_apps/versal_plm/src/versal/Makefile b/lib/sw_apps/versal_plm/src/versal/Makefile
+index d1ebd1d374..bfb8c83adb 100644
+--- a/lib/sw_apps/versal_plm/src/versal/Makefile
++++ b/lib/sw_apps/versal_plm/src/versal/Makefile
+@@ -32,8 +32,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ 	$(CC) -o $@ $(OBJS) $(CC_FLAGS) $(CFLAGS) $(LN_FLAGS) $(LIBPATH) $(LSCRIPT)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../../misc/versal/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../../misc/versal/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../../misc/versal/versal_plm_bsp
+ 
+diff --git a/lib/sw_apps/versal_plm/src/versal_net/Makefile b/lib/sw_apps/versal_plm/src/versal_net/Makefile
+index 39c7aa38e3..081d8f1b2e 100644
+--- a/lib/sw_apps/versal_plm/src/versal_net/Makefile
++++ b/lib/sw_apps/versal_plm/src/versal_net/Makefile
+@@ -32,8 +32,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ 	$(CC) -o $@ $(OBJS) $(CC_FLAGS) $(CFLAGS) $(LN_FLAGS) $(LIBPATH) $(LSCRIPT)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../../misc/versal_net/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../../misc/versal_net/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../../misc/versal_net/versal_plm_bsp
+ 
+diff --git a/lib/sw_apps/versal_psmfw/src/versal/Makefile b/lib/sw_apps/versal_psmfw/src/versal/Makefile
+index 1572bbbca9..ce182acaa7 100644
+--- a/lib/sw_apps/versal_psmfw/src/versal/Makefile
++++ b/lib/sw_apps/versal_psmfw/src/versal/Makefile
+@@ -34,8 +34,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ 	$(CC) -o $@ $(OBJS) $(CC_FLAGS) $(CFLAGS) $(LN_FLAGS) $(LIBPATH) $(LSCRIPT)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../../misc/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../../misc/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../../misc/versal_psmfw_bsp
+ 
+diff --git a/lib/sw_apps/versal_psmfw/src/versal_net/Makefile b/lib/sw_apps/versal_psmfw/src/versal_net/Makefile
+index a72ffa1de2..3670310daa 100644
+--- a/lib/sw_apps/versal_psmfw/src/versal_net/Makefile
++++ b/lib/sw_apps/versal_psmfw/src/versal_net/Makefile
+@@ -34,8 +34,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ 	$(CC) -o $@ $(OBJS) $(CC_FLAGS) $(CFLAGS) $(LN_FLAGS) $(LIBPATH) $(LSCRIPT)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../../misc/versal_net/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../../misc/versal_net/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../../misc/versal_net/versal_psmfw_bsp
+ 
+@@ -44,4 +44,4 @@ $(LIBS):
+ 
+ clean:
+ 	rm -rf $(OBJS) $(LIBS) $(EXEC) *.o *.d ../common/*.o ../common/*.d
+-	rm -rf ../../misc/versal_net/versal_psmfw_bsp
+\ No newline at end of file
++	rm -rf ../../misc/versal_net/versal_psmfw_bsp
+diff --git a/lib/sw_apps/zynqmp_pmufw/src/Makefile b/lib/sw_apps/zynqmp_pmufw/src/Makefile
+index 1750c0a329..17f6a545ea 100644
+--- a/lib/sw_apps/zynqmp_pmufw/src/Makefile
++++ b/lib/sw_apps/zynqmp_pmufw/src/Makefile
+@@ -28,8 +28,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ 	$(CC) -o $@ $(OBJS) $(CC_FLAGS) $(CFLAGS) $(LN_FLAGS) $(LIBPATH) $(LSCRIPT)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../misc/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../misc/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../misc/zynqmp_pmufw_bsp
+ 
+-- 
+2.17.1
+
