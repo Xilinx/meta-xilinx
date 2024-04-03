@@ -36,6 +36,17 @@ ENABLE_XEN_UBOOT_SCR = "1"
 ENABLE_XEN_DTSI = "1"
 ENABLE_XEN_QEMU_DTSI = "1"
 
+# Default Xen Serial Console is serial0, if you are using serial1 then set as show below.
+XEN_SERIAL_CONSOLES = "serial1"
+
+# Variables for Xen JTAG or SD INITRD boot modes but this is not required for SD WIC image.
+IMAGE_FSTYPES += "cpio.gz"
+RAMDISK_IMAGE = "rootfs.cpio.gz"
+
+# Variables for Xen SD WIC image boot flow.
+IMAGE_FSTYPES += "wic"
+WKS_FILES = "xilinx-default-sd.wks"
+
 DISTRO_FEATURES:append = " multiarch security tpm virtualization vmsep xen"
 
 IMAGE_FEATURES += "ssh-server-openssh"
