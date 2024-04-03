@@ -4,6 +4,9 @@ BOOTGEN_EXTRA_ARGS += "-dump bh"
 # specify BIF common attribute for FSBL
 BIF_COMMON_ATTR ?= ""
 
+# specify BIF optional attributes
+BIF_OPTIONAL_DATA ?= ""
+
 #specify BIF partition attributes required for BOOT.bin
 BIF_FSBL_ATTR       ??= "base-pdi plmfw psmfw"
 BIF_ATF_ATTR        ??= "arm-trusted-firmware"
