@@ -2,6 +2,10 @@ PV = "${ESW_VER}"
 
 inherit python3native xlnx-embeddedsw pkgconfig cmake
 
+# It is unclear why the following is needed, but without this cmake/ninja
+# will generate: -isystem /usr/include which will cause a build failure.
+OECMAKE_ARGS:remove = "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON"
+
 SRCREV_FORMAT = "src_decouple"
 
 S = "${WORKDIR}/git"
