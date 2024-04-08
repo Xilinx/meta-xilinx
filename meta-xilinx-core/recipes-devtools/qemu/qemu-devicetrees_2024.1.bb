@@ -2,5 +2,5 @@
 require qemu-devicetrees.inc
 
 BRANCH ?= "master"
-SRCREV ?= "9d3ef6718542592cb677cbb625072e15290407f8"
+SRCREV ?= "b9c88cbfaaa0c8b8be70ea3c74f4cb69fb02a080"
 
