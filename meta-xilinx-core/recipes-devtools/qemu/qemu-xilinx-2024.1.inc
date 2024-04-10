@@ -1,3 +1,3 @@
 XILINX_QEMU_VERSION = "v8.1.0"
-BRANCH = "master"
+BRANCH = "xlnx_rel_v2024.1"
 SRCREV = "d522393f8bc2fdb39db7e7563942f571e8aaea7a"
