@@ -24,4 +24,5 @@ EXTRA_OECONF:append:xilinx-standalone:armv8r = " \
 
 EXTRA_OECONF:append:xilinx-standalone:microblaze = " \
 	--without-long-double-128 \
+	--disable-tm-clone-registry \
 	"
