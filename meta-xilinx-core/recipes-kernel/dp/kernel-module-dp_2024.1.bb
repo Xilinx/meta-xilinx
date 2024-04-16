@@ -9,7 +9,7 @@ PV = "${XLNX_DP_VERSION}+xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', Fal
 
 S = "${WORKDIR}/git"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2024.1"
 REPO   ?= "git://github.com/xilinx/dp-modules.git;protocol=https"
 SRCREV ?= "e20942b256e6fb18eaef919c7441f65ad8afcf43"
 

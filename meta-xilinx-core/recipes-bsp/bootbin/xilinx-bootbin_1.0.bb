@@ -125,6 +125,10 @@ python do_configure() {
         biffd.write("the_ROM_image:\n")
         biffd.write("{\n")
 
+        if d.getVar("BIF_OPTIONAL_DATA"):
+            opt_data = d.getVar("BIF_OPTIONAL_DATA") or ""
+            biffd.write("\toptionaldata { %s }\n" % opt_data)
+
         arch = d.getVar("SOC_FAMILY")
         bifattr = (d.getVar("BIF_COMMON_ATTR") or "").split()
         if bifattr:

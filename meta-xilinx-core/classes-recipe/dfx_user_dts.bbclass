@@ -97,12 +97,15 @@ python() {
 
         # Check for valid combination of input files in SRC_URI
         # Skip recipe if any of the below conditions are not satisfied.
-        # 1. At least one bit or bin or pdi or dts or dtsi or dtbo should exists.
+        # 1. At least one bit or bin or pdi should exists.
         # 2. More than one dtbo.
         # 3. More than one bit or bin or pdi.
         # 4. More than one dts and zero dtsi.
-        # 5. More than one dtsi and zero dts.
-        if dtsi_found or dtbo_found or bit_found or bin_found or pdi_found:
+        # 5. More than one dtsi and zero dts
+        # 6. Both bit and bin exists.
+        # 7. Both bit or bin and pdi exits.
+        # 8. Both dts or dtsi and dtbo exists.
+        if bit_found or bin_found or pdi_found:
             bb.debug(2, "dtsi or dtbo or bitstream or pdi found in SRC_URI")
             if bit_found and pdi_found :
                 raise bb.parse.SkipRecipe("Both '.bit' and '.pdi' file found in SRC_URI, this is invalid use case.")
@@ -112,8 +115,11 @@ python() {
 
             if bit_found and bin_found:
                 raise bb.parse.SkipRecipe("Both '.bit' and '.bin' file found in SRC_URI, either .bit or .bin file is supported but not both.")
+
+            if dtsi_found and dtbo_found:
+                raise bb.parse.SkipRecipe("Both '.dts or dtsi' and '.dtbo' file found in SRC_URI, either .dts/dtsi or .dtbo file is supported but not both.")
         else:
-            raise bb.parse.SkipRecipe("Need one '.dtsi' or '.dtbo' or '.bit' or '.bin' or '.pdi' file added to SRC_URI ")
+            raise bb.parse.SkipRecipe("Need one '.bit' or '.bin' or '.pdi' file added to SRC_URI.")
 
         # Check for valid combination of dtsi and dts files in SRC_URI
         # Following file combinations are not supported use case.
@@ -177,10 +183,11 @@ python devicetree_do_compile:append() {
     import glob, subprocess, shutil
     soc_family = d.getVar("SOC_FAMILY")
 
-    dtbo_count = sum(1 for f in glob.iglob((d.getVar('S') + '/*.dtbo'),recursive=True) if os.path.isfile(f))
-    bin_count = sum(1 for f in glob.iglob((d.getVar('S') + '/*.bin'),recursive=True) if os.path.isfile(f))
+    dtbo_count = sum(1 for f in glob.iglob((d.getVar('S') + '/' + (d.getVar('DTSI_PATH') or '') + '/*.dtbo'),recursive=True) if os.path.isfile(f))
+    bin_count = sum(1 for f in glob.iglob((d.getVar('S') + '/' + (d.getVar('BIN_PATH') or '') + '/*.bin'),recursive=True) if os.path.isfile(f))
+    bit_count = sum(1 for f in glob.iglob((d.getVar('S') + '/' + (d.getVar('BIT_PATH') or '') + '/*.bit'),recursive=True) if os.path.isfile(f))
     # Skip devicetree do_compile task if input file is dtbo or bin in SRC_URI
-    if not dtbo_count and not bin_count:
+    if not dtbo_count and not bin_count and bit_count:
         # Convert .bit to .bin format only if dtsi is input.
         # In case of dtbo as input, bbclass doesn't know if firmware-name is .bit
         # or .bin format and corresponding file name. Hence we are not doing .bin
