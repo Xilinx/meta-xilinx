@@ -1,7 +1,7 @@
 SUMMARY = "Xilinx AI Engine FAL(Functional Abstraction Layer)"
 DESCRIPTION = "AIE FAL provides functional abstraction APIs for runtime support of Xilinx AI Engine IP"
 
-require aie-rt-2022.inc
+require aie-rt-2023.inc
 
 SECTION	= "devel"
 
