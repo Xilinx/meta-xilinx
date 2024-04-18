@@ -3,6 +3,8 @@ DESCRIPTION = "Xilinx Runtime User Space Libraries and headers"
 
 require xrt-${PV}.inc
 
+SRC_URI += "file://xrt-cstdint.patch;striplevel=2"
+
 LICENSE = "GPL-2.0-or-later & Apache-2.0"
 LIC_FILES_CHKSUM = "file://../LICENSE;md5=da5408f748bce8a9851dac18e66f4bcf \
                     file://runtime_src/core/edge/drm/zocl/LICENSE;md5=7d040f51aae6ac6208de74e88a3795f8 \
