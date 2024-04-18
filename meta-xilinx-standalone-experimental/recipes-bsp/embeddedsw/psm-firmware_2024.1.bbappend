@@ -17,8 +17,14 @@ do_configure:prepend() {
     )
 }
 
-do_compile:append() {
-    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
+do_configure() {
+    cmake_do_configure
+}
+
+do_compile() {
+    cmake_do_compile
+
+    ${OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
 }
 
 do_install() {
