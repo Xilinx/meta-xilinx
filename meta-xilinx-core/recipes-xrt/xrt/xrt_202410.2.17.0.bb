@@ -1,7 +1,7 @@
 SUMMARY  = "Xilinx Runtime(XRT) libraries"
 DESCRIPTION = "Xilinx Runtime User Space Libraries and headers"
 
-require xrt.inc
+require xrt-${PV}.inc
 
 SRC_URI += "file://xrt-cstdint.patch;striplevel=2"
 

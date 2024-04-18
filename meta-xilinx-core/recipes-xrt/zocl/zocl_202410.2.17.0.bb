@@ -3,7 +3,7 @@ DESCRIPTION = "Xilinx Runtime driver module provides memory management and compu
 
 COMPATIBLE_MACHINE:microblaze = "none"
 
-require recipes-xrt/xrt/xrt.inc
+require recipes-xrt/xrt/xrt-${PV}.inc
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=7d040f51aae6ac6208de74e88a3795f8"
 LICENSE = "GPL-2.0-or-later & Apache-2.0"

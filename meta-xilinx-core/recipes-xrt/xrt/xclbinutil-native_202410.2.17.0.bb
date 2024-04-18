@@ -1,7 +1,7 @@
 SUMMARY  = "Xilinx Runtime(XRT) - minimal native build for xclbinutil"
 DESCRIPTION = "Native build of xclbinutil using XRT codebase"
 
-require xrt.inc
+require xrt-${PV}.inc
 
 FILESEXTRAPATHS:append := ":${THISDIR}/xrt"
 
