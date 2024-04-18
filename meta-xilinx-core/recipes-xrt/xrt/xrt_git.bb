@@ -1,7 +1,7 @@
 SUMMARY  = "Xilinx Runtime(XRT) libraries"
 DESCRIPTION = "Xilinx Runtime User Space Libraries and headers"
 
-require xrt-${PV}.inc
+require xrt.inc
 
 SRC_URI += "file://xrt-cstdint.patch;striplevel=2"
 
@@ -24,18 +24,23 @@ inherit cmake pkgconfig
 BBCLASSEXTEND = "native nativesdk"
 
 # util-linux is for libuuid-dev.
-DEPENDS = "libdrm opencl-headers ocl-icd opencl-clhpp boost util-linux git-replacement-native protobuf-native protobuf elfutils libffi rapidjson systemtap libdfx"
+DEPENDS = "libdrm opencl-headers ocl-icd opencl-clhpp boost util-linux git-replacement-native protobuf-native protobuf elfutils libffi rapidjson"
 RDEPENDS:${PN} = "bash ocl-icd boost-system boost-filesystem zocl (= ${PV})"
 
 EXTRA_OECMAKE += " \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCMAKE_EXPORT_COMPILE_COMANDS=ON \
-		-DXRT_LIBDFX=true \
 		"
 
 # Systems with AIE also require libmetal, this is implemented in the dynamic-layers
 # See: meta-xilinx-core/dynamic-layers/openamp-layer/recipes-xrt/xrt_gt.bbappend
 # Note: If meta-openamp is not available, AIE will not be enabled.
+
+EXTRA_OECMAKE:append:versal = " -DXRT_LIBDFX=true"
+EXTRA_OECMAKE:append:zynqmp = " -DXRT_LIBDFX=true"
+DEPENDS:append:versal = " libdfx"
+DEPENDS:append:zynqmp = " libdfx"
+
 
 FILES_SOLIBSDEV = ""
 FILES:${PN} += "\

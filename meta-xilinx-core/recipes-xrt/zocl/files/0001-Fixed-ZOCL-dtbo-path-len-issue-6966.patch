@@ -1,0 +1,84 @@
+From bc19f980cced50fc35f94905f2a99070871b9e93 Mon Sep 17 00:00:00 2001
+From: Saifuddin Kaijar <54270703+saifuddin-xilinx@users.noreply.github.com>
+Date: Mon, 29 Aug 2022 10:25:06 +0530
+Subject: [PATCH] Fixed ZOCL dtbo path len issue (#6966)
+
+---
+ src/runtime_src/core/edge/drm/zocl/include/zocl_xclbin.h | 3 ++-
+ src/runtime_src/core/edge/drm/zocl/zocl_xclbin.c         | 7 ++++---
+ src/runtime_src/core/edge/include/zynq_ioctl.h           | 1 +
+ src/runtime_src/core/edge/user/shim.cpp                  | 1 +
+ 4 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/src/runtime_src/core/edge/drm/zocl/include/zocl_xclbin.h b/src/runtime_src/core/edge/drm/zocl/include/zocl_xclbin.h
+index c9c9b4f9e..0335551bc 100644
+--- a/src/runtime_src/core/edge/drm/zocl/include/zocl_xclbin.h
++++ b/src/runtime_src/core/edge/drm/zocl/include/zocl_xclbin.h
+@@ -39,6 +39,7 @@ int zocl_xclbin_load_pdi(struct drm_zocl_dev *zdev, void *data,
+ 			struct drm_zocl_slot *slot);
+ int zocl_xclbin_load_pskernel(struct drm_zocl_dev *zdev, void *data);
+ bool zocl_xclbin_accel_adapter(int kds_mask);
+-int zocl_xclbin_set_dtbo_path(struct drm_zocl_slot *slot, char *dtbo_path);
++int zocl_xclbin_set_dtbo_path(struct drm_zocl_slot *slot, char *dtbo_path,
++		      uint32_t len);
+ 
+ #endif /* _ZOCL_XCLBIN_H_ */
+diff --git a/src/runtime_src/core/edge/drm/zocl/zocl_xclbin.c b/src/runtime_src/core/edge/drm/zocl/zocl_xclbin.c
+index 7de733e38..fdedb70d5 100644
+--- a/src/runtime_src/core/edge/drm/zocl/zocl_xclbin.c
++++ b/src/runtime_src/core/edge/drm/zocl/zocl_xclbin.c
+@@ -1475,7 +1475,8 @@ zocl_xclbin_read_axlf(struct drm_zocl_dev *zdev, struct drm_zocl_axlf *axlf_obj,
+ 	 */
+ 	slot->slot_xclbin->zx_refcnt = 0;
+ 	if(ZOCL_PLATFORM_ARM64)
+-		zocl_xclbin_set_dtbo_path(slot, axlf_obj->za_dtbo_path);
++		zocl_xclbin_set_dtbo_path(slot, axlf_obj->za_dtbo_path,
++			axlf_obj->za_dtbo_path_len);
+ 	zocl_xclbin_set_uuid(slot, &axlf_head.m_header.uuid);
+ 
+ 	/*
+@@ -1725,7 +1726,8 @@ zocl_xclbin_fini(struct drm_zocl_dev *zdev, struct drm_zocl_slot *slot)
+  * @return      0 on success Error code on failure.
+  */
+ int
+-zocl_xclbin_set_dtbo_path(struct drm_zocl_slot *slot, char *dtbo_path)
++zocl_xclbin_set_dtbo_path(struct drm_zocl_slot *slot, char *dtbo_path,
++		uint32_t len)
+ {
+         char *path = slot->slot_xclbin->zx_dtbo_path;
+ 
+@@ -1735,7 +1737,6 @@ zocl_xclbin_set_dtbo_path(struct drm_zocl_slot *slot, char *dtbo_path)
+         }
+ 
+ 	if(dtbo_path) {
+-		uint32_t len = strlen(dtbo_path);
+ 		path = vmalloc(len + 1);
+ 		if (!path)
+ 			return -ENOMEM;
+diff --git a/src/runtime_src/core/edge/include/zynq_ioctl.h b/src/runtime_src/core/edge/include/zynq_ioctl.h
+index a45113550..ad9ec86ab 100644
+--- a/src/runtime_src/core/edge/include/zynq_ioctl.h
++++ b/src/runtime_src/core/edge/include/zynq_ioctl.h
+@@ -429,6 +429,7 @@ struct drm_zocl_axlf {
+ 	char			*za_kernels;
+ 	uint32_t		za_slot_id;
+ 	char			*za_dtbo_path;
++	uint32_t		za_dtbo_path_len;
+ 	uint8_t		        hw_gen;
+ 	struct drm_zocl_kds	kds_cfg;
+ };
+diff --git a/src/runtime_src/core/edge/user/shim.cpp b/src/runtime_src/core/edge/user/shim.cpp
+index 11a8d86c9..058503187 100644
+--- a/src/runtime_src/core/edge/user/shim.cpp
++++ b/src/runtime_src/core/edge/user/shim.cpp
+@@ -732,6 +732,7 @@ xclLoadAxlf(const axlf *buffer)
+       .za_kernels = NULL,
+       .za_slot_id = 0, // TODO Cleanup: Once uuid interface id available we need to remove this
+       .za_dtbo_path = const_cast<char *>(dtbo_path.c_str()),
++      .za_dtbo_path_len = dtbo_path.length(),
+       .hw_gen = hw_gen,
+     };
+ 
+-- 
+2.17.1
+
