@@ -19,3 +19,20 @@ do_compile () {
         oe_runmake -C ${S} cross_tools NO_SDL=1 O=${B}
 }
 
+# mkeficapsule is not available in this version of u-boot
+PROVIDES:remove = "${MLPREFIX}u-boot-mkeficapsule"
+PROVIDES:class-native:remove = "u-boot-mkeficapsule-native"
+PACKAGES:remove = "${PN}-mkeficapsule"
+RDEPENDS:${PN}:remove = "${PN}-mkeficapsule"
+
+do_install:prepend() {
+        # Avoid do_install failure
+        mkdir -p tools
+        touch tools/mkeficapsule
+}
+
+do_install:append() {
+        # Avoid failure
+        rm -rf ${D}${bindir}/uboot-mkeficapsule
+        rm -rf ${D}${bindir}/mkeficapsule
+}
