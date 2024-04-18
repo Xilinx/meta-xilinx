@@ -4,7 +4,6 @@ SRC_URI = "${REPO};${BRANCHARG};name=xrt"
 
 BRANCH= "2023.2"
 SRCREV_xrt = "2865a62b6a417dea523d2d5646154aa94a2cbc28"
-PV = "202320.2.16.0"
 
 SRC_URI += "git://github.com/Xilinx/dma_ip_drivers.git;branch=master;name=dma_ip_drivers;destsuffix=git/src/runtime_src/core/pcie/driver/linux/xocl/lib/libqdma;protocol=https"
 SRCREV_dma_ip_drivers = "9f02769a2eddde008158c96efa39d7edb6512578"
