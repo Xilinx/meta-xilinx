@@ -1,4 +1,4 @@
-UBOOT_VERSION = "v2021.01"
+UBOOT_VERSION = "v2022.01"
 
 UBRANCH ?= "xlnx_rebase_v2022.01"
 
