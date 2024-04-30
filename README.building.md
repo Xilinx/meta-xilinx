@@ -23,15 +23,15 @@ $ mkdir sources
 $ git clone -b <release-branch> https://git.yoctoproject.org/poky.git
 $ git clone -b <release-branch> https://git.openembedded.org/meta-openembedded.git
 $ git clone -b <release-branch> https://git.yoctoproject.org/git/meta-virtualization
-$ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx.git
+$ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx.git --recurse-submodules
 $ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx-tools.git
 ```
-> **Note:** When meta-xilinx layer is cloned using git tool by default it will
-> not clone [gen-machine-conf](https://github.com/Xilinx/gen-machine-conf.git)
-> repo as submodules, make sure this repo https://github.com/Xilinx/meta-xilinx.git
-> is cloned using `--recurse-submodules` option as shown.
-> `$ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx.git --recurse-submodules`
-> Skip this step if you are using yocto-manifests https://github.com/Xilinx/yocto-manifests
+> **Note:**
+> * When meta-xilinx layer is cloned using git tool by default it will clone
+> [gen-machine-conf](https://github.com/Xilinx/gen-machine-conf.git) repo as
+> submodules, If you don't need to clone gen-machine-conf repo then remove
+> `--recurse-submodules` option.
+> * Skip this step if you are using yocto-manifests https://github.com/Xilinx/yocto-manifests
 
 3. Initialize a build environment using the `oe-init-build-env` script. 
 ```
