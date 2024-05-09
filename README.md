@@ -27,6 +27,9 @@ meta-xilinx-tools layer.
 configurations files, boot firmware, kernel configuration fragments, .scc files,
 device tree etc.
 
+* **meta-xilinx-multimedia**: layer contains AMD Xilinx specific multimedia packages
+including recipes for the fork of GStreamer.
+
 > **See:** AMD Xilinx devices:
 	https://www.xilinx.com/products/silicon-devices.html
 
