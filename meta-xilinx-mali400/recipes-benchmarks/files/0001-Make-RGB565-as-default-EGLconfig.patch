@@ -1,0 +1,31 @@
+From 43cdcd9dbb032d32e66bab9c25d5e7000797efb8 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Wed, 26 Sep 2018 14:44:11 -0700
+Subject: [PATCH 1/3] Make RGB565 as default EGLconfig
+
+Make RGB565 as default EGL config as that way user need not pass
+explicit parameters for RGB565 EGLconfig. In the orignial scenario, if
+user does not pass the gl-visual-config to RGB565 there will be color
+conversion resulting in lower performance.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Reviewed-by: Hyun Kwon <hyun.kwon@xilinx.com>
+Upstream-Status: Inappropriate [Xilinx specific]
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ src/gl-visual-config.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: git/src/gl-visual-config.h
+===================================================================
+--- git.orig/src/gl-visual-config.h
++++ git/src/gl-visual-config.h
+@@ -31,7 +31,7 @@ class GLVisualConfig
+ {
+ public:
+     GLVisualConfig():
+-        id(0), red(1), green(1), blue(1), alpha(1), depth(1), stencil(-1), buffer(1), samples(0) {}
++        id(0), red(5), green(6), blue(5), alpha(0), depth(16), stencil(0), buffer(16), samples(0) {}
+     GLVisualConfig(const std::string &s);
+ 
+     /**
