@@ -9,12 +9,10 @@ ZynqMP and Versal devices and provides related metadata.
 
 > **Variable usage examples:**
 >
-> Machine Configuration file: `MACHINE = "ultra96-zynqmp"`
+> Machine Configuration file: `MACHINE = "microzed-zynq7"`
 >
-> Reference XSA: `HDF_MACHINE = "ultra96-zynqmp"`
+> Reference XSA: `HDF_MACHINE = "microzed-zynq7"`
 >
-> HW Board Device tree: `YAML_DT_BOARD_FLAGS = "{BOARD avnet-ultra96-rev1}"`
-
 | Devices    | Vendor Evaluation Board                                                                                           | Machine Configuration file                                   | Reference XSA    | HW Board Device tree | QEMU tested | HW tested |
 |------------|-------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|------------------|----------------------|-------------|-----------|
 | MicroBlaze | NA                                                                                                                | NA                                                           | NA               | NA                   | No          | No        |
@@ -24,13 +22,12 @@ ZynqMP and Versal devices and provides related metadata.
 |            | [Avnet/Digilent ZedBoard](https://www.xilinx.com/products/boards-and-kits/1-8dyf-11.html)                         | [zedboard-zynq7](conf/machine/zedboard-zynq7.conf)           | NA               | NA                   | No          | No        |
 |            | [Digilent Zybo](https://www.xilinx.com/support/university/boards-portfolio/xup-boards/DigilentZYBO.html)          | [zybo-zynq7](conf/machine/zybo-zynq7.conf)                   | NA               | `zynq-zybo.dtb`      | No          | No        |
 |            | [Digilent Zybo Linux BD](https://www.xilinx.com/support/university/boards-portfolio/xup-boards/DigilentZYBO.html) | [zybo-linux-bd-zynq7](conf/machine/zybo-linux-bd-zynq7.conf) | NA               | NA                   | No          | No        |
-| ZynqMP     | [Avent Ultra96 v1](https://www.xilinx.com/products/boards-and-kits/1-vad4rl.html)                                 | [ultra96-zynqmp](conf/machine/ultra96-zynqmp.conf)           | `ultra96-zynqmp` | `avnet-ultra96-rev1` | Yes         | Yes       |
 | Versal     | NA                                                                                                                | NA                                                           | NA               | NA                   | NA          | NA        |
 
 > **Note:** 
 ```
 1. For Zybo Linux BD reference design refer meta-xilinx-contrib layer.
-2. Ultra96 Machine configuration file is unsupported and is compatible with v1 board only. Refer to meta-avnet for v2 board.
+2. Ultra96 v1 is no longer supported. Refer to meta-avnet for v2 board.
 ```
 
 ## Dependencies
