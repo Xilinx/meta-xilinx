@@ -10,24 +10,33 @@ be buildable, expect APIs to change on various parts and pieces.
 
 ## Build Instructions
 
-> **Note:**
+The Yocto Project setup for the System Device Tree (SDT) workflow is as follows.
+Be sure to read everything below.
+
+> **Pre-requisites:**
 > * To use this layer you must REMOVE meta-xilinx-tools from your project.
 meta-xilinx-tools is not compatible with this experimental approach. You may
 also have to remove other layers that depend on meta-xilinx-tools, such as
 meta-kria and meta-system-controller.
+> * Follow [System Device Tree Instructions](https://github.com/Xilinx/system-device-tree-xlnx/blob/master/README.md)
+>   to generate the SDT output.
 > * To use the experimental version of the embedded software (firmware) as well
 as system configuration, you must build through gen-machineconf tool. This tool
 is passed a output of system device tree directory.
 
-The Yocto Project setup for the System Device Tree (SDT) workflow is as follows.
-Be sure to read everything below.
+1. Follow [Building Instructions](../README.building.md) upto step 2.
 
-1. Follow [Building Instructions](https://github.com/Xilinx/meta-xilinx/blob/master/README.building.md)
-   upto step 4.
+2. Clone the meta-openamp repository.
 
-2. Remove meta-xilinx-tools and meta-xilinx-tools dependency layers(such as
+```
+$ git clone -b <rel-version> https://github.com/Xilinx/meta-openamp
+```
+3. Continue [Building Instructions](https://github.com/Xilinx/meta-xilinx/blob/master/README.building.md)
+   from step 3 to step 4.
+
+4. Remove meta-xilinx-tools and meta-xilinx-tools dependency layers(such as
    meta-kria and meta-system-controller if included in bblayers.conf), then add
-   the meta-xilinx-standalone-experimental layer.
+   the meta-xilinx-standalone-experimental and meta-openamp layer.
 
 > **Note:** SDT builds for following devices are not supported in 2024.1 release.
 > * Zynq 7000
@@ -40,14 +49,15 @@ $ bitbake-layers remove-layer meta-xilinx-tools
 $ bitbake-layers remove-layer meta-kria
 $ bitbake-layers remove-layer meta-system-controller
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone-experimental
+$ bitbake-layers add-layer ./<path-to-layer>/meta-openamp
 ```
 
-3. Export gen-machineconf tool.
+5. Export gen-machineconf tool.
 ```
 $ export PATH=$PATH:<ABSOLUTE_PATH>/gen-machine-conf
 ```
 
-4. Run the script from the build or ${TOPDIR} directory. This step describes
+6. Run the script from the build or ${TOPDIR} directory. This step describes
    System Device Tree (SDT) with and without pl overlays. Configruations are same
    for both SDT with and without pl overlays except for linux dts content.
 
@@ -139,11 +149,11 @@ suggested that you trim this down to only the configurations you require.
 A minimum configuration is included with the generated configuration.
 
 
-5. Build your project, You should now be able to build your project normally.
+7. Build your project, You should now be able to build your project normally.
    See the Yocto Project documentation if you have questions on how to work with
    the multiconfig recipes. The following is a simple build for testing.
 
-6. Continue [Building Instructions](https://github.com/Xilinx/meta-xilinx/blob/master/README.building.md)
+8. Continue [Building Instructions](https://github.com/Xilinx/meta-xilinx/blob/master/README.building.md)
    from step 6.
 
 ## Dependencies
