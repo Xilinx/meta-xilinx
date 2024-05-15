@@ -1,0 +1,32 @@
+From 7067fce80a6e863532a86a5aeb9d6f53e538b387 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Wed, 5 Sep 2018 14:08:16 -0700
+Subject: [PATCH 3/3] qwaylandeglwindow.cpp: Bind the context before calling
+ eglDestroySurface
+
+Call eglMakeCurrent to bind the context to the current rendering thread
+before calling eglDestroySurface to avoid a crash caused by the post
+processing activity of GPU driver.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Upstream-Status: Pending
+---
+ src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp b/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp
+index 6b5c532..77cc433 100644
+--- a/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp
++++ b/src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp
+@@ -171,6 +171,8 @@ void QWaylandEglWindow::doInvalidateSurface()
+ void QWaylandEglWindow::invalidateSurface()
+ {
+     if (m_eglSurface) {
++	eglMakeCurrent(m_clientBufferIntegration->eglDisplay(), EGL_NO_SURFACE,
++		       EGL_NO_SURFACE, EGL_NO_CONTEXT);
+         eglDestroySurface(m_clientBufferIntegration->eglDisplay(), m_eglSurface);
+         m_eglSurface = 0;
+     }
+-- 
+2.7.4
+

@@ -5,7 +5,6 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 SRC_URI = "\
     file://99-aie-device.rules \
-    file://99-mali-device.rules \
 "
 
 S = "${UNPACKDIR}"

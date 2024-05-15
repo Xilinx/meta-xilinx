@@ -1,0 +1,104 @@
+From c5de6efc463c1f8f47d37c2423da983c016b3ce8 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Thu, 27 Jun 2019 16:16:05 -0700
+Subject: [PATCH] src/options.cpp: Add options to configure bpp and depth
+
+Instead of hardcoding the depth and bpp for drm backend, application
+should have a knob to configure the same.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Upstream-Status: Inappropriate [Xilinx specific]
+---
+ src/native-state-drm.cpp |  5 +++--
+ src/options.cpp          | 10 ++++++++++
+ src/options.h            |  2 ++
+ 3 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/src/native-state-drm.cpp b/src/native-state-drm.cpp
+index 62566ee..9743575 100644
+--- a/src/native-state-drm.cpp
++++ b/src/native-state-drm.cpp
+@@ -24,6 +24,7 @@
+  */
+ #include "native-state-drm.h"
+ #include "log.h"
++#include "options.h"
+ 
+ #include <fcntl.h>
+ #include <libudev.h>
+@@ -403,7 +404,7 @@ NativeStateDRM::fb_get_from_bo(gbm_bo* bo)
+     unsigned int stride = gbm_bo_get_stride(bo);
+     unsigned int handle = gbm_bo_get_handle(bo).u32;
+     unsigned int fb_id(0);
+-    int status = drmModeAddFB(fd_, width, height, 24, 32, stride, handle, &fb_id);
++    int status = drmModeAddFB(fd_, width, height, Options::depth, Options::bpp, stride, handle, &fb_id);
+     if (status < 0) {
+         Log::error("Failed to create FB: %d\n", status);
+         return 0;
+@@ -428,7 +429,7 @@ NativeStateDRM::init_gbm()
+     }
+ 
+     surface_ = gbm_surface_create(dev_, mode_->hdisplay, mode_->vdisplay,
+-                                  GBM_FORMAT_XRGB8888,
++                                  (Options::bpp == 32) ? GBM_FORMAT_XRGB8888 : GBM_FORMAT_RGB565,
+                                   GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
+     if (!surface_) {
+         Log::error("Failed to create GBM surface\n");
+diff --git a/src/options.cpp b/src/options.cpp
+index 05cd617..7de1ddc 100644
+--- a/src/options.cpp
++++ b/src/options.cpp
+@@ -41,6 +41,8 @@ bool Options::reuse_context = false;
+ bool Options::run_forever = false;
+ bool Options::annotate = false;
+ bool Options::offscreen = false;
++int Options::depth = 16;
++int Options::bpp = 16;
+ GLVisualConfig Options::visual_config;
+ 
+ static struct option long_options[] = {
+@@ -59,6 +61,8 @@ static struct option long_options[] = {
+     {"show-all-options", 0, 0, 0},
+     {"debug", 0, 0, 0},
+     {"help", 0, 0, 0},
++    {"depth", 1, 0, 0},
++    {"bpp", 1, 0, 0},
+     {0, 0, 0, 0}
+ };
+ 
+@@ -142,6 +146,8 @@ Options::print_help()
+            "      --annotate         Annotate the benchmarks with on-screen information\n"
+            "                         (same as -b :show-fps=true:title=#info#)\n"
+            "  -d, --debug            Display debug messages\n"
++           "      --depth            Depth for drm backend\n"
++           "      --bpp              Bpp for drm backend\n"
+            "  -h, --help             Display help\n");
+ }
+ 
+@@ -193,6 +199,10 @@ Options::parse_args(int argc, char **argv)
+             Options::show_debug = true;
+         else if (c == 'h' || !strcmp(optname, "help"))
+             Options::show_help = true;
++        else if (!strcmp(optname, "depth"))
++            Options::depth = Util::fromString<int>(optarg);
++        else if (!strcmp(optname, "bpp"))
++            Options::bpp = Util::fromString<int>(optarg);
+     }
+ 
+     return true;
+diff --git a/src/options.h b/src/options.h
+index f62e02a..04bef5f 100644
+--- a/src/options.h
++++ b/src/options.h
+@@ -53,6 +53,8 @@ struct Options {
+     static bool run_forever;
+     static bool annotate;
+     static bool offscreen;
++    static int depth;
++    static int bpp;
+     static GLVisualConfig visual_config;
+ };
+ 
+-- 
+2.7.4
+
