@@ -61,7 +61,3 @@ KERNEL_FEATURES:append:zynqmp = "${@' features/xilinx/overlay_of/overlay_of.scc'
 KERNEL_FEATURES:append:versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} features/xilinx/hdmi-module/hdmi-module.scc"
 
 KERNEL_FEATURES:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' features/ocicontainer/ocicontainer.scc', '', d)}"
-
-# Enable DRM_LIMA support if DISTRO_FEATURES != 'libmali' and MACHINE_FEATURES mali400 is enabled
-MALI_FEATURE = "${@bb.utils.contains('DISTRO_FEATURES', 'libmali', '', 'features/drm-lima/drm-lima.scc', d)}"
-KERNEL_FEATURES:append = "${@bb.utils.contains('MACHINE_FEATURES', 'mali400', ' ${MALI_FEATURE}', '', d)}"

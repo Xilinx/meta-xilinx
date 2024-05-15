@@ -1,0 +1,34 @@
+From eb44571eab0036a9a1bcd7c423f0187abcbf7a37 Mon Sep 17 00:00:00 2001
+From: Johan Klokkhammer Helsing <johan.helsing@qt.io>
+Date: Thu, 30 Aug 2018 09:31:33 +0200
+Subject: [PATCH] Fix regression in QWaylandGlContext::makeCurrent for
+ offscreen surfaces
+
+[ChangeLog][QPA plugin] Fixed a bug where offscreen surfaces would get
+surfaceless EGL contexts.
+
+Fixes a regression in in bf09c7a1.
+
+The call, window->updateSurface(window->isExposed()), is problematic because
+offscreen textures are never exposed, and consequently, eglSurface will be
+EGL_NO_SURFACE, which will then create a surfaceless context in the call:
+
+    eglMakeCurrent(m_eglDisplay, eglSurface, eglSurface, m_context)
+
+This reverts to the old behavior of always trying to create an EGL surface,
+unless the window doesn't have a valid wl_surface, in which case it doesn't
+make sense (which is what bf09c7a1 fixed, QTBUG-65553).
+
+Task-number: QTBUG-70242
+Task-number: QTBUG-68605
+Task-number: QTBUG-67601
+Change-Id: I44b07bb8bf4b33c73c6379a1de8e9e5cfd220b51
+
+Signed-off-by: Johan Helsing <johan.helsing@qt.io>
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Upstream-Status: Backport
+---
+ src/hardwareintegration/client/wayland-egl/qwaylandeglwindow.cpp | 9 ++++++---
+ src/hardwareintegration/client/wayland-egl/qwaylandglcontext.cpp | 2 +-
+ 2 files changed, 7 insertions(+), 4 deletions(-)
+

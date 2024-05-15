@@ -1,0 +1,33 @@
+From 534a0f99b38f7a32fc07562bec3e992dfad448c0 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Mon, 3 Feb 2020 13:00:36 -0800
+Subject: [PATCH] src: gl-state-egl: Use native_display to load EGL funcs
+ through glad
+
+EGL_DEFAULT_DISPLAY may not be suiitable for all the backends like GBM.
+Instead, use the already initialized display and only fallback to
+EGL_DEFAULT_DISPLAY if the display is unintialized (which is already
+been taken care).
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Upstream-status: Pending
+---
+ src/gl-state-egl.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gl-state-egl.cpp b/src/gl-state-egl.cpp
+index 8d7d66e..316b856 100644
+--- a/src/gl-state-egl.cpp
++++ b/src/gl-state-egl.cpp
+@@ -317,7 +317,7 @@ GLStateEGL::init_display(void* native_display, GLVisualConfig& visual_config)
+         return false;
+     }
+ 
+-    if (gladLoadEGLUserPtr(EGL_NO_DISPLAY, load_egl_func, &egl_lib_) == 0) {
++    if (gladLoadEGLUserPtr(native_display, load_egl_func, &egl_lib_) == 0) {
+         Log::error("Loading EGL entry points failed\n");
+         return false;
+     }
+-- 
+2.7.4
+

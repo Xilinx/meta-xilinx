@@ -1,0 +1,20 @@
+From 75ac221b9d78d97c121b984ffc633c8cdbe3a92d Mon Sep 17 00:00:00 2001
+From: Giulio Camuffo <giulio.camuffo@kdab.com>
+Date: Mon, 7 May 2018 17:40:57 -0700
+Subject: [PATCH 2/3] Handle maximize/minimize/fullscreen in xdg_shell_v6
+
+[ChangeLog][QPA plugin] Implement support for maximization, minimization
+and fullscreen with xdg-shell unstable v6.
+
+Task-number: QTBUG-63417
+Task-number: QTBUG-63748
+Change-Id: I385eb3279d91f1c38d2f5d46bc63b324f0456ca4
+
+signed-off-by: Giulio Camuffo <giulio.camuffo@kdab.com>
+Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
+Upstream-Status: Backport
+---
+ src/client/qwaylandxdgshellv6.cpp | 22 ++++++++++++++++++++++
+ src/client/qwaylandxdgshellv6_p.h |  4 ++++
+ 2 files changed, 26 insertions(+)
+
