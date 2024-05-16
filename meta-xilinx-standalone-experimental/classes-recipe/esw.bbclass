@@ -1,9 +1,9 @@
-PV = "${ESW_VER}"
-
 inherit python3native xlnx-embeddedsw pkgconfig cmake
 
-# It is unclear why the following is needed, but without this cmake/ninja
-# will generate: -isystem /usr/include which will cause a build failure.
+# Poky always tries to enable EXPORT_COMPILE_COMMANDS, but ESW changes
+# behavior when this is enabled and will generate:
+#    -isystem /usr/include
+# which will cause a build failures.
 OECMAKE_ARGS:remove = "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON"
 
 SRCREV_FORMAT = "src_decouple"
