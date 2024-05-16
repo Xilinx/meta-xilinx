@@ -1,6 +1,5 @@
 BBCLASSEXTEND = "nativesdk"
 
-require qemu-xilinx-2024.1.inc
 require qemu-8.1.inc
 require qemu-xilinx-8.1.inc
 require qemu-alt.inc

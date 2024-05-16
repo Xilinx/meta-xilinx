@@ -2,7 +2,6 @@ BPN = "qemu-xilinx"
 
 DEPENDS += "glib-2.0-native zlib-native"
 
-require qemu-xilinx-2024.1.inc
 require qemu-xilinx-native-8.1.inc
 require qemu-native-alt.inc
 
