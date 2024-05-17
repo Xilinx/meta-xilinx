@@ -7,10 +7,6 @@ PV .= "+git"
 
 S  = "${WORKDIR}/git"
 
-inherit autotools features_check
-
-REQUIRED_MACHINE_FEATURES = "vdu"
-
 BRANCH ?= "xlnx_rel_v2023.2"
 REPO ?= "git://github.com/Xilinx/vdu-firmware.git;protocol=https"
 SRCREV ?= "731897772730178f6a4e77eedeb4fb53faa1ab4d"
@@ -18,12 +14,15 @@ SRCREV ?= "731897772730178f6a4e77eedeb4fb53faa1ab4d"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI   = "${REPO};${BRANCHARG}"
 
+inherit autotools features_check
+
+REQUIRED_MACHINE_FEATURES = "vdu"
+
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-EXTRA_OEMAKE +="INSTALL_PATH=${D}/${nonarch_base_libdir}/firmware"
-
 do_compile[noexec] = "1"
-do_install[dirs] = "${S}"
+
+EXTRA_OEMAKE +="INSTALL_PATH=${D}/${nonarch_base_libdir}/firmware"
 
 # Inhibit warnings about files being stripped
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"

@@ -9,13 +9,14 @@ PV .= "+git"
 S = "${WORKDIR}/git"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-BRANCH ?= "xlnx_rel_v2023.2"
-REPO ?= "git://github.com/Xilinx/vdu-modules.git;protocol=https"
-SRCREV ?= "4d5134f54006f904f0b28f00e05dd3febd5fcfd3"
+BRANCH = "xlnx_rel_v2023.2"
+REPO = "git://github.com/Xilinx/vdu-modules.git;protocol=https"
+SRCREV = "4d5134f54006f904f0b28f00e05dd3febd5fcfd3"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
-SRC_URI = "${REPO};${BRANCHARG} \
-	file://99-vdu-enc-dec.rules \
+SRC_URI = " \
+    ${REPO};${BRANCHARG} \
+    file://99-vdu-enc-dec.rules \
 "
 
 inherit module features_check

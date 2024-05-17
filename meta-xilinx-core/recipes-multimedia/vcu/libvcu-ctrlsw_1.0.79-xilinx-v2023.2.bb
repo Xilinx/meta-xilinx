@@ -25,6 +25,8 @@ inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "vcu"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 RDEPENDS:${PN} = "kernel-module-vcu"
 
 EXTRA_OEMAKE = "CC='${CC}' CXX='${CXX} ${CXXFLAGS}'"

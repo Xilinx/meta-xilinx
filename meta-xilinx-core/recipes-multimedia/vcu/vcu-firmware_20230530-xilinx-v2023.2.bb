@@ -20,6 +20,8 @@ REQUIRED_MACHINE_FEATURES = "vcu"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+do_compile[noexec] = "1"
+
 do_install() {
     install -Dm 0644 ${S}/1.0.0/lib/firmware/al5d_b.fw ${D}${nonarch_base_libdir}/firmware/al5d_b.fw
     install -Dm 0644 ${S}/1.0.0/lib/firmware/al5d.fw ${D}${nonarch_base_libdir}/firmware/al5d.fw

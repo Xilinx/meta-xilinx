@@ -26,9 +26,6 @@ RDEPENDS:${PN} = "kernel-module-vdu libvdu-ctrlsw"
 
 EXTERNAL_INCLUDE="${STAGING_INCDIR}/vdu-ctrl-sw/include"
 
-do_compile[dirs] = "${S}"
-do_install[dirs] = "${S}"
-
 EXTRA_OEMAKE = " \
     CC='${CC}' CXX='${CXX} ${CXXFLAGS}' \
     EXTERNAL_INCLUDE='${EXTERNAL_INCLUDE}' \

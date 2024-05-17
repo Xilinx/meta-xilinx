@@ -5,10 +5,6 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=aaf483d309243c4596f6373eb9c8325f"
 
 PV .= "+git"
 
-inherit autotools features_check
-
-REQUIRED_MACHINE_FEATURES = "vdu"
-
 BRANCH ?= "xlnx_rel_v2023.2"
 REPO   ?= "git://github.com/Xilinx/vdu-ctrl-sw.git;protocol=https"
 SRCREV ?= "1beb8f247d01b1a728faea36ce8f7847c895482f"
@@ -20,12 +16,13 @@ SRC_URI = "${REPO};${BRANCHARG} \
 
 S  = "${WORKDIR}/git"
 
+inherit autotools features_check
+
+REQUIRED_MACHINE_FEATURES = "vdu"
+
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 RDEPENDS:${PN} = "kernel-module-vdu"
-
-do_compile[dirs] = "${S}"
-do_install[dirs] = "${S}"
 
 EXTRA_OEMAKE = "CC='${CC}' CXX='${CXX} ${CXXFLAGS}'"
 EXTRA_OEMAKE +=" INSTALL_HDR_PATH=${D}${includedir}/vdu-ctrl-sw/include INSTALL_PATH=${D}${bindir}"
@@ -39,3 +36,6 @@ do_install:append() {
 # explicitly depends upon them.
 
 EXCLUDE_FROM_WORLD = "1"
+
+# Disable buildpaths QA check warnings.
+INSANE_SKIP:${PN} += "buildpaths"
