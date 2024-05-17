@@ -26,8 +26,8 @@ REQUIRED_MACHINE_FEATURES = "vcu"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-DEPENDS = "libvcu-xlnx"
-RDEPENDS:${PN} = "kernel-module-vcu libvcu-xlnx"
+DEPENDS = "libvcu-ctrlsw"
+RDEPENDS:${PN} = "kernel-module-vcu libvcu-ctrlsw"
 
 EXTERNAL_INCLUDE="${STAGING_INCDIR}/vcu-ctrl-sw/include"
 
