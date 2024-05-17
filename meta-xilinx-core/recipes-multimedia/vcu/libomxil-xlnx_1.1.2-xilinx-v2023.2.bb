@@ -1,14 +1,13 @@
 SUMMARY = "OpenMAX Integration layer for VCU"
 DESCRIPTION = "OMX IL Libraries,test applications and headers for VCU"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=5375796c5ae4ee85ea1f2c1603e58509"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ef69c2bb405668101824f0b644631e2e"
 
-XILINX_VCU_VERSION = "1.0.0"
-PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git"
+PV .= "+git"
 
-BRANCH ?= "xlnx_rel_v2023.1"
+BRANCH ?= "xlnx_rel_v2023.2"
 REPO   ?= "git://github.com/Xilinx/vcu-omx-il.git;protocol=https"
-SRCREV = "4773b372b72b88ccbabc122b023f042fb22a019e"
+SRCREV = "3a04b5adc661a0eced626c1373dbbfe699ae6fe0"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
@@ -39,8 +38,7 @@ do_install() {
 
     install -m 0644 ${S}/omx_header/*.h ${D}${includedir}/vcu-omx-il
 
-    install -Dm 0755 ${S}/bin/omx_decoder ${D}/${bindir}/omx_decoder
-    install -Dm 0755 ${S}/bin/omx_encoder ${D}/${bindir}/omx_encoder
+    oe_runmake install INSTALL_PATH=${D}${bindir}
 
     oe_libinstall -C ${S}/bin/ -so libOMX.allegro.core ${D}/${libdir}/
     oe_libinstall -C ${S}/bin/ -so libOMX.allegro.video_decoder ${D}/${libdir}/
