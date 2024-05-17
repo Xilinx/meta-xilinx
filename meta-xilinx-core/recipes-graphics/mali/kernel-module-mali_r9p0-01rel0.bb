@@ -6,11 +6,8 @@ LIC_FILES_CHKSUM = " \
 	file://linux/license/gpl/mali_kernel_license.h;md5=f5af2d61f4c1eb262cb6a557aaa1070a \
 	"
 
-MALI_VERSION = "r9p0-01rel0"
-PV =. "${MALI_VERSION}-v"
-
 SRC_URI = " \
-	https://developer.arm.com/-/media/Files/downloads/mali-drivers/kernel/mali-utgard-gpu/DX910-SW-99002-${MALI_VERSION}.tgz \
+	https://developer.arm.com/-/media/Files/downloads/mali-drivers/kernel/mali-utgard-gpu/DX910-SW-99002-${PV}.tgz \
 	file://0001-Change-Makefile-to-be-compatible-with-Yocto.patch \
 	file://0002-staging-mali-r8p0-01rel0-Add-the-ZYNQ-ZYNQMP-platfor.patch \
 	file://0003-staging-mali-r8p0-01rel0-Remove-unused-trace-macros.patch \
@@ -45,7 +42,7 @@ inherit features_check module
 
 PARALLEL_MAKE = "-j 1"
 
-S = "${WORKDIR}/DX910-SW-99002-${MALI_VERSION}/driver/src/devicedrv/mali"
+S = "${WORKDIR}/DX910-SW-99002-${PV}/driver/src/devicedrv/mali"
 
 REQUIRED_MACHINE_FEATURES = "mali400"
 
