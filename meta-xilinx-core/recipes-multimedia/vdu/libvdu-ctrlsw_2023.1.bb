@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=aaf483d309243c4596f6373eb9c8325f"
 
 XILINX_VDU_VERSION = "1.0.0"
 PV =. "${XILINX_VDU_VERSION}-xilinx-v"
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 inherit autotools features_check
 

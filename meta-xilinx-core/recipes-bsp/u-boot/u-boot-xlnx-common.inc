@@ -1,6 +1,6 @@
 # Use the name of the .bb for the extension
 UBOOT_VERSION_EXTENSION ?= "-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}"
-PV = "${UBOOT_VERSION}${UBOOT_VERSION_EXTENSION}+git${SRCPV}"
+PV = "${UBOOT_VERSION}${UBOOT_VERSION_EXTENSION}+git"
 
 UBOOTURI ?= "git://github.com/Xilinx/u-boot-xlnx.git;protocol=https"
 UBRANCH ?= ""
