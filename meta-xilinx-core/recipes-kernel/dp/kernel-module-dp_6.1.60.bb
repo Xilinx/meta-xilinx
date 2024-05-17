@@ -15,6 +15,8 @@ SRCREV ?= "5b0969ac09f301c33bccc140c8f60e832f5cf222"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
+SRC_URI += "file://0001-Support-both-pre-6.1.0-and-current-i2c-probing.patch"
+
 inherit module
 
 EXTRA_OEMAKE += "O=${STAGING_KERNEL_BUILDDIR}"

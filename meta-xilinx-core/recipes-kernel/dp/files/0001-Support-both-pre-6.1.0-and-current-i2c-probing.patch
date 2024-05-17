@@ -1,0 +1,252 @@
+From acda49e5baee80e8b06f7019e57e9aace4f7f923 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Thu, 16 May 2024 20:31:29 -0600
+Subject: [PATCH] Support both pre 6.1.0 and current i2c probing
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ dp/xfmc/dp141.c    |  8 ++++++++
+ dp/xfmc/fmc.c      |  8 ++++++++
+ dp/xfmc/fmc64.c    |  9 +++++++++
+ dp/xfmc/fmc65.c    |  8 ++++++++
+ dp/xfmc/idt.c      | 16 ++++++++++++----
+ dp/xfmc/mcdp6000.c |  8 ++++++++
+ dp/xfmc/tipower.c  |  8 ++++++++
+ 7 files changed, 61 insertions(+), 4 deletions(-)
+
+diff --git a/dp/xfmc/dp141.c b/dp/xfmc/dp141.c
+index 002afe8..29e6c61 100755
+--- a/dp/xfmc/dp141.c
++++ b/dp/xfmc/dp141.c
+@@ -14,6 +14,7 @@
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
+ 
+ /**************************** Type Definitions *******************************/
+ 
+@@ -135,9 +136,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void dp141_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int dp141_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver dp141_i2c_driver = {
+ 	.driver = {
+diff --git a/dp/xfmc/fmc.c b/dp/xfmc/fmc.c
+index 16767c7..9be45d9 100755
+--- a/dp/xfmc/fmc.c
++++ b/dp/xfmc/fmc.c
+@@ -14,6 +14,7 @@
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
+ 
+ /**************************** Type Definitions *******************************/
+ 
+@@ -122,9 +123,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void fmc_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int fmc_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver fmc_i2c_driver = {
+ 	.driver = {
+diff --git a/dp/xfmc/fmc64.c b/dp/xfmc/fmc64.c
+index 2d06327..c677072 100755
+--- a/dp/xfmc/fmc64.c
++++ b/dp/xfmc/fmc64.c
+@@ -14,6 +14,8 @@
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
++
+ /**************************** Type Definitions *******************************/
+ static const struct regmap_config fmc64_regmap_config = {
+ 	.reg_bits = 16,
+@@ -119,9 +121,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void fmc64_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int fmc64_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver fmc64_i2c_driver = {
+ 	.driver = {
+diff --git a/dp/xfmc/fmc65.c b/dp/xfmc/fmc65.c
+index 5eb6c81..6927f05 100755
+--- a/dp/xfmc/fmc65.c
++++ b/dp/xfmc/fmc65.c
+@@ -14,6 +14,7 @@
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
+ 
+ /**************************** Type Definitions *******************************/
+ 
+@@ -121,9 +122,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void fmc65_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int fmc65_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver fmc65_i2c_driver = {
+ 	.driver = {
+diff --git a/dp/xfmc/idt.c b/dp/xfmc/idt.c
+index 84ba521..458d685 100755
+--- a/dp/xfmc/idt.c
++++ b/dp/xfmc/idt.c
+@@ -17,6 +17,7 @@
+ #include <linux/of_gpio.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
+ 
+ #define IDT_8T49N24X_REVID 0x0    /**< Device Revision */
+ #define IDT_8T49N24X_DEVID 0x0607 /**< Device ID Code */
+@@ -38,8 +39,8 @@
+ #define IDT_8T49N24X_P_MAX pow(2, 22)  //!< Maximum P divider value
+ #define IDT_8T49N24X_M_MAX pow(2, 24)  //!< Maximum M multiplier value
+ 
+-#define TRUE 1
+-#define FALSE 0
++#define IDT_TRUE 1
++#define IDT_FALSE 0
+ #define XPAR_IIC_0_BASEADDR 0xA0080000
+ #define I2C_IDT8N49_ADDR 0x7C
+ /*
+@@ -455,7 +456,7 @@ int IDT_8T49N24x_Init(void)
+ 	int ret = 0;
+ 
+ 	msleep_range(30);
+-	ret = idt_enable(FALSE);
++	ret = idt_enable(IDT_FALSE);
+ 	if (ret)
+ 		dev_dbg(&idt->client->dev,
+ 			"IDT_8T49N24x_enable 0  I2C progmming failed\n");
+@@ -468,7 +469,7 @@ int IDT_8T49N24x_Init(void)
+ 
+ 	msleep_range(30);
+ 	/* enable DPLL and APLL calibration. */
+-	ret = idt_enable(TRUE);
++	ret = idt_enable(IDT_TRUE);
+ 	if (ret)
+ 		dev_dbg(&idt->client->dev,
+ 			"IDT_8T49N24x_enable 1 I2C progmming failed\n");
+@@ -518,9 +519,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void idt_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int idt_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver idt_i2c_driver = {
+ 	.driver = {
+diff --git a/dp/xfmc/mcdp6000.c b/dp/xfmc/mcdp6000.c
+index d14a75d..60a1fdf 100755
+--- a/dp/xfmc/mcdp6000.c
++++ b/dp/xfmc/mcdp6000.c
+@@ -14,6 +14,7 @@
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
+ 
+ #define SWAP_BYTES(u32Value) ((u32Value & 0x000000FF) << 24)\
+ |((u32Value & 0x0000FF00) << 8) \
+@@ -394,9 +395,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void mcdp6000_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int mcdp6000_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver mcdp6000_i2c_driver = {
+ 	.driver = {
+diff --git a/dp/xfmc/tipower.c b/dp/xfmc/tipower.c
+index d3536ab..ce00fff 100755
+--- a/dp/xfmc/tipower.c
++++ b/dp/xfmc/tipower.c
+@@ -14,6 +14,7 @@
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
+ 
+ /**************************** Type Definitions *******************************/
+ 
+@@ -163,9 +164,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void tipower_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int tipower_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver tipower_i2c_driver = {
+ 	.driver = {
+-- 
+2.34.1
+
