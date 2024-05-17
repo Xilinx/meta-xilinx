@@ -17,7 +17,6 @@ BRANCH ?= "xlnx_rel_v2023.2"
 SRCREV ?= "b3a772aad859cdadc8513b11c3e995546c20e75e"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 
-PV = "r9p0-01rel0"
 SRC_URI = " \
     ${REPO};${BRANCHARG} \
     file://egl.pc \
