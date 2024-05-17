@@ -1,25 +1,24 @@
 SUMMARY = "Control Software for VCU"
 DESCRIPTION = "Control software libraries, test applications and headers provider for VCU"
-LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=03a7aef7e6f6a76a59fd9b8ba450b493"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ef69c2bb405668101824f0b644631e2e"
 
-XILINX_VCU_VERSION = "1.0.0"
-PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git"
+PV .= "+git"
 
-BRANCH ?= "xlnx_rel_v2022.1"
+BRANCH ?= "xlnx_rel_v2023.2"
 REPO   ?= "git://github.com/Xilinx/vcu-ctrl-sw.git;protocol=https"
-SRCREV = "5bf158af204b181f00ac009c8745557642ecfe5f"
+SRCREV = "84b0856cad7844d69f57ac4d9447c20930875475"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
+
+SRC_URI += "file://0001-Support-updated-gcc-add-cstdint-where-necessary.patch"
 
 S  = "${WORKDIR}/git"
 
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "vcu"
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 RDEPENDS:${PN} = "kernel-module-vcu"
 
@@ -29,10 +28,7 @@ do_install() {
     install -d ${D}${libdir}
     install -d ${D}${includedir}/vcu-ctrl-sw/include
 
-    install -Dm 0755 ${S}/bin/ctrlsw_encoder ${D}/${bindir}/ctrlsw_encoder
-    install -Dm 0755 ${S}/bin/ctrlsw_decoder ${D}/${bindir}/ctrlsw_decoder
-
-    oe_runmake install_headers INSTALL_HDR_PATH=${D}${includedir}/vcu-ctrl-sw/include
+    oe_runmake install_headers INSTALL_HDR_PATH=${D}${includedir}/vcu-ctrl-sw/include INSTALL_PATH=${D}/${bindir}
     oe_libinstall -C ${S}/bin/ -so liballegro_decode ${D}/${libdir}/
     oe_libinstall -C ${S}/bin/ -so liballegro_encode ${D}/${libdir}/
 }
