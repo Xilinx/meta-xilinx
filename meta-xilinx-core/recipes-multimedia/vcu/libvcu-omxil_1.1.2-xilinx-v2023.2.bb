@@ -3,6 +3,10 @@ DESCRIPTION = "OMX IL Libraries,test applications and headers for VCU"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ef69c2bb405668101824f0b644631e2e"
 
+# Recipe has been renamed
+PROVIDES += "libomxil-xlnx"
+
+# Version from core/core_version.mk
 PV .= "+git"
 
 BRANCH ?= "xlnx_rel_v2023.2"
