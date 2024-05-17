@@ -15,6 +15,8 @@ SRCREV = "82209b0021a7b5d7ef71a859eed4bafeb541ed08"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
+SRC_URI += "file://0001-Support-both-pre-6.1.0-and-current-kernels.patch"
+
 inherit module
 
 EXTRA_OEMAKE += "O=${STAGING_KERNEL_BUILDDIR}"
