@@ -3,8 +3,7 @@ DESCRIPTION = "Firmware binaries provider for VCU"
 LICENSE = "Proprietary"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=52eb1e8f27e0e189b175c7d75f028cc6"
 
-XILINX_VCU_VERSION = "1.0.0"
-PV = "${XILINX_VCU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git"
+PV .= "+git"
 
 S  = "${WORKDIR}/git"
 
@@ -20,10 +19,10 @@ inherit features_check
 REQUIRED_MACHINE_FEATURES = "vcu"
 
 do_install() {
-    install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5d_b.fw ${D}${nonarch_base_libdir}/firmware/al5d_b.fw
-    install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5d.fw ${D}${nonarch_base_libdir}/firmware/al5d.fw
-    install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5e_b.fw ${D}${nonarch_base_libdir}/firmware/al5e_b.fw
-    install -Dm 0644 ${S}/${XILINX_VCU_VERSION}/lib/firmware/al5e.fw ${D}${nonarch_base_libdir}/firmware/al5e.fw
+    install -Dm 0644 ${S}/1.0.0/lib/firmware/al5d_b.fw ${D}${nonarch_base_libdir}/firmware/al5d_b.fw
+    install -Dm 0644 ${S}/1.0.0/lib/firmware/al5d.fw ${D}${nonarch_base_libdir}/firmware/al5d.fw
+    install -Dm 0644 ${S}/1.0.0/lib/firmware/al5e_b.fw ${D}${nonarch_base_libdir}/firmware/al5e_b.fw
+    install -Dm 0644 ${S}/1.0.0/lib/firmware/al5e.fw ${D}${nonarch_base_libdir}/firmware/al5e.fw
 }
 
 # Inhibit warnings about files being stripped
