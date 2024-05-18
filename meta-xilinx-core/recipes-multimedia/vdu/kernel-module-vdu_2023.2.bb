@@ -26,12 +26,6 @@ EXTRA_OEMAKE += "O=${STAGING_KERNEL_BUILDDIR}"
 
 RDEPENDS:${PN} = "vdu-firmware"
 
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:versal-ai-core = "versal-ai-core"
-COMPATIBLE_MACHINE:versal-ai-edge = "versal-ai-edge"
-
-PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
-
 do_install:append() {
     install -d ${D}${sysconfdir}/udev/rules.d
     install -m 0644 ${WORKDIR}/99-vdu-enc-dec.rules ${D}${sysconfdir}/udev/rules.d/

@@ -19,11 +19,7 @@ inherit autotools features_check
 
 REQUIRED_MACHINE_FEATURES = "vdu"
 
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:versal-ai-core = "versal-ai-core"
-COMPATIBLE_MACHINE:versal-ai-edge = "versal-ai-edge"
-
-PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 DEPENDS = "libvdu-ctrlsw"
 RDEPENDS:${PN} = "kernel-module-vdu libvdu-ctrlsw"

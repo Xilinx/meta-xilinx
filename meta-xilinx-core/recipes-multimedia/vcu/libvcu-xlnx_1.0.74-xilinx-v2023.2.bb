@@ -14,6 +14,8 @@ SRC_URI = "${REPO};${BRANCHARG}"
 
 SRC_URI += "file://0001-Support-updated-gcc-add-cstdint-where-necessary.patch"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 S  = "${WORKDIR}/git"
 
 inherit features_check
