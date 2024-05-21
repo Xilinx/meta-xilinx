@@ -3,7 +3,7 @@ DESCRIPTION = "OMX IL Libraries,test application and headers for VDU"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=002a0a92906100955ea6ed02dcd2c2cd"
 
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 BRANCH ?= "xlnx_rel_v2024.1"
 REPO   ?= "git://github.com/Xilinx/vdu-omx-il.git;protocol=https"
