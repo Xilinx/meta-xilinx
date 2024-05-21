@@ -1,0 +1,343 @@
+From adc957ce85d431da42dc42ed4074322d6c94932f Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Thu, 16 May 2024 20:31:29 -0600
+Subject: [PATCH] Support both pre 6.4.0 and current i2c probing
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ dp/xfmc/dp141.c                          | 13 +++++++++++++
+ dp/xfmc/fmc.c                            | 13 +++++++++++++
+ dp/xfmc/fmc64.c                          | 14 ++++++++++++++
+ dp/xfmc/fmc65.c                          | 13 +++++++++++++
+ dp/xfmc/idt.c                            | 21 +++++++++++++++++----
+ dp/xfmc/mcdp6000.c                       | 13 +++++++++++++
+ dp/xfmc/tipower.c                        | 13 +++++++++++++
+ 7 files changed, 96 insertions(+), 4 deletions(-)
+
+diff --git a/dp/xfmc/dp141.c b/dp/xfmc/dp141.c
+index dfdb6f4..5fddd2b
+--- a/dp/xfmc/dp141.c
++++ b/dp/xfmc/dp141.c
+@@ -14,6 +14,7 @@
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
+ 
+ /**************************** Type Definitions *******************************/
+ 
+@@ -105,7 +106,12 @@ static const struct i2c_device_id dp141_id[] = {
+ };
+ MODULE_DEVICE_TABLE(i2c, dp141_id);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+ static int dp141_probe(struct i2c_client *client)
++#else
++static int dp141_probe(struct i2c_client *client,
++			 const struct i2c_device_id *id)
++#endif
+ {
+ 	int ret;
+ 
+@@ -134,9 +140,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void dp141_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int dp141_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver dp141_i2c_driver = {
+ 	.driver = {
+diff --git a/dp/xfmc/fmc.c b/dp/xfmc/fmc.c
+index 3447785..2ed136c
+--- a/dp/xfmc/fmc.c
++++ b/dp/xfmc/fmc.c
+@@ -14,6 +14,7 @@
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
+ 
+ /**************************** Type Definitions *******************************/
+ 
+@@ -93,7 +94,12 @@ static const struct i2c_device_id fmc_id[] = {
+ };
+ MODULE_DEVICE_TABLE(i2c, fmc_id);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+ static int fmc_probe(struct i2c_client *client)
++#else
++static int fmc_probe(struct i2c_client *client,
++		     const struct i2c_device_id *id)
++#endif
+ {
+ 	int ret;
+ 
+@@ -121,9 +127,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void fmc_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int fmc_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver fmc_i2c_driver = {
+ 	.driver = {
+diff --git a/dp/xfmc/fmc64.c b/dp/xfmc/fmc64.c
+index 6f5562c..a0bad7a
+--- a/dp/xfmc/fmc64.c
++++ b/dp/xfmc/fmc64.c
+@@ -14,6 +14,8 @@
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
++
+ /**************************** Type Definitions *******************************/
+ static const struct regmap_config fmc64_regmap_config = {
+ 	.reg_bits = 16,
+@@ -89,7 +91,12 @@ static const struct i2c_device_id fmc64_id[] = {
+ };
+ MODULE_DEVICE_TABLE(i2c, fmc64_id);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+ static int fmc64_probe(struct i2c_client *client)
++#else
++static int fmc64_probe(struct i2c_client *client,
++		       const struct i2c_device_id *id)
++#endif
+ {
+ 	int ret;
+ 
+@@ -118,9 +125,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void fmc64_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int fmc64_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver fmc64_i2c_driver = {
+ 	.driver = {
+diff --git a/dp/xfmc/fmc65.c b/dp/xfmc/fmc65.c
+index 9f091f9..ce7f884
+--- a/dp/xfmc/fmc65.c
++++ b/dp/xfmc/fmc65.c
+@@ -14,6 +14,7 @@
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
+ 
+ /**************************** Type Definitions *******************************/
+ 
+@@ -91,7 +92,12 @@ static const struct i2c_device_id fmc65_id[] = {
+ };
+ MODULE_DEVICE_TABLE(i2c, fmc65_id);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+ static int fmc65_probe(struct i2c_client *client)
++#else
++static int fmc65_probe(struct i2c_client *client,
++		       const struct i2c_device_id *id)
++#endif
+ {
+ 	int ret;
+ 
+@@ -120,9 +126,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void fmc65_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int fmc65_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver fmc65_i2c_driver = {
+ 	.driver = {
+diff --git a/dp/xfmc/idt.c b/dp/xfmc/idt.c
+index 348c863..f332277
+--- a/dp/xfmc/idt.c
++++ b/dp/xfmc/idt.c
+@@ -17,6 +17,7 @@
+ #include <linux/of_gpio.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
+ 
+ #define IDT_8T49N24X_REVID 0x0    /**< Device Revision */
+ #define IDT_8T49N24X_DEVID 0x0607 /**< Device ID Code */
+@@ -38,8 +39,8 @@
+ #define IDT_8T49N24X_P_MAX pow(2, 22)  //!< Maximum P divider value
+ #define IDT_8T49N24X_M_MAX pow(2, 24)  //!< Maximum M multiplier value
+ 
+-#define TRUE 1
+-#define FALSE 0
++#define IDT_TRUE 1
++#define IDT_FALSE 0
+ #define XPAR_IIC_0_BASEADDR 0xA0080000
+ #define I2C_IDT8N49_ADDR 0x7C
+ /*
+@@ -455,7 +456,7 @@ int IDT_8T49N24x_Init(void)
+ 	int ret = 0;
+ 
+ 	msleep_range(30);
+-	ret = idt_enable(FALSE);
++	ret = idt_enable(IDT_FALSE);
+ 	if (ret)
+ 		dev_dbg(&idt->client->dev,
+ 			"IDT_8T49N24x_enable 0  I2C progmming failed\n");
+@@ -468,7 +469,7 @@ int IDT_8T49N24x_Init(void)
+ 
+ 	msleep_range(30);
+ 	/* enable DPLL and APLL calibration. */
+-	ret = idt_enable(TRUE);
++	ret = idt_enable(IDT_TRUE);
+ 	if (ret)
+ 		dev_dbg(&idt->client->dev,
+ 			"IDT_8T49N24x_enable 1 I2C progmming failed\n");
+@@ -489,7 +490,12 @@ static const struct i2c_device_id idt_id[] = {
+ };
+ MODULE_DEVICE_TABLE(i2c, idt_id);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+ static int idt_probe(struct i2c_client *client)
++#else
++static int idt_probe(struct i2c_client *client,
++		     const struct i2c_device_id *id)
++#endif
+ {
+ 	int ret;
+ 
+@@ -517,9 +523,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void idt_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int idt_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver idt_i2c_driver = {
+ 	.driver = {
+diff --git a/dp/xfmc/mcdp6000.c b/dp/xfmc/mcdp6000.c
+index 5a7c5b2..f13979b
+--- a/dp/xfmc/mcdp6000.c
++++ b/dp/xfmc/mcdp6000.c
+@@ -14,6 +14,7 @@
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
+ 
+ #define SWAP_BYTES(u32Value) ((u32Value & 0x000000FF) << 24)\
+ |((u32Value & 0x0000FF00) << 8) \
+@@ -363,7 +364,12 @@ static const struct i2c_device_id mcdp6000_id[] = {
+ };
+ MODULE_DEVICE_TABLE(i2c, mcdp6000_id);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+ static int mcdp6000_probe(struct i2c_client *client)
++#else
++static int mcdp6000_probe(struct i2c_client *client,
++			  const struct i2c_device_id *id)
++#endif
+ {
+ 	int ret;
+ 
+@@ -393,9 +399,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void mcdp6000_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int mcdp6000_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver mcdp6000_i2c_driver = {
+ 	.driver = {
+diff --git a/dp/xfmc/tipower.c b/dp/xfmc/tipower.c
+index 46c3de1..6d247a8
+--- a/dp/xfmc/tipower.c
++++ b/dp/xfmc/tipower.c
+@@ -14,6 +14,7 @@
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/slab.h>
++#include <linux/version.h>
+ 
+ /**************************** Type Definitions *******************************/
+ 
+@@ -131,7 +132,12 @@ static const struct i2c_device_id tipower_id[] = {
+ };
+ MODULE_DEVICE_TABLE(i2c, tipower_id);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+ static int tipower_probe(struct i2c_client *client)
++#else
++static int tipower_probe(struct i2c_client *client,
++			 const struct i2c_device_id *id)
++#endif
+ {
+ 	int ret;
+ 
+@@ -162,9 +168,16 @@ err_regmap:
+ 	return ret;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void tipower_remove(struct i2c_client *client)
+ {
+ }
++#else
++static int tipower_remove(struct i2c_client *client)
++{
++	return 0;
++}
++#endif
+ 
+ static struct i2c_driver tipower_i2c_driver = {
+ 	.driver = {
+-- 
+2.34.1
+

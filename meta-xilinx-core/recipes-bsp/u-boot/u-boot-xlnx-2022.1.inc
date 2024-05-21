@@ -1,5 +1,3 @@
-UBOOT_VERSION = "v2021.01"
-
 UBRANCH ?= "xlnx_rebase_v2022.01_2022.1_update"
 
 SRCREV = "91ad7924e7f59584d597353e1bb86794341e0a7e"
@@ -15,3 +13,5 @@ HAS_PLATFORM_INIT ?= " \
 		"
 
 DEPENDS += "bc-native dtc-native python3-setuptools-native gnutls-native"
+
+FILESEXTRAPATHS:prepend := "${THISDIR}/u-boot-v2021.01:"

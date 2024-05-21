@@ -14,9 +14,7 @@ B = "${WORKDIR}/build"
 
 SYSROOT_DIRS += "/boot"
 
-ATF_VERSION ?= "2.2"
-ATF_VERSION_EXTENSION ?= "-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}"
-PV = "${ATF_VERSION}${ATF_VERSION_EXTENSION}+git${SRCPV}"
+PV .= "+git"
 
 BRANCH ?= ""
 REPO ?= "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https"

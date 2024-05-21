@@ -1,5 +1,3 @@
-UBOOT_VERSION = "v2023.01"
-
 UBRANCH = "xlnx_rebase_v2023.01"
 
 SRCREV = "2b54ad6f1d278c419b927d10db2edf323d844578"
@@ -17,6 +15,8 @@ HAS_PLATFORM_INIT ?= " \
 DEPENDS += "bc-native dtc-native python3-setuptools-native gnutls-native"
 
 SRC_URI:append:microblaze = " file://microblaze-generic-top.h"
+
+FILESEXTRAPATHS:prepend := "${THISDIR}/u-boot-v2023.01:"
 
 do_configure:prepend:microblaze () {
     install ${WORKDIR}/microblaze-generic-top.h ${S}/include/configs/

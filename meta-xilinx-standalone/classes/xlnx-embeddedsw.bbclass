@@ -33,7 +33,7 @@ LIC_FILES_CHKSUM[xlnx_rel_v2024.1] = '0dcabd3719e5ac33f7c03f0d77d473f2'
 LIC_FILES_CHKSUM ??= "file://license.txt;md5=${@d.getVarFlag('LIC_FILES_CHKSUM', d.getVar('BRANCH')) or '0'}"
 
 SRC_URI = "${EMBEDDEDSW_SRCURI}"
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 python() {
     if d.getVar('BB_NO_NETWORK') == '1':

@@ -23,7 +23,7 @@ index fcdcaac..72e28a8 100644
  #include "mali_memory_virtual.h"
  #include "mali_pp_job.h"
  
-+#if LINUX_VERSION_CODE > KERNEL_VERSION(5, 15, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0)
 +MODULE_IMPORT_NS(DMA_BUF);
 +#endif
 +
@@ -38,7 +38,7 @@ index 7de3920..5bf08f8 100644
  	dma_set_attr(DMA_ATTR_WRITE_COMBINE, &dma_attrs_wc);
  #endif
  
-+#if LINUX_VERSION_CODE > KERNEL_VERSION(5, 15, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0)
 +	register_shrinker(&mali_mem_os_allocator.shrinker, "mali");
 +#else
  	register_shrinker(&mali_mem_os_allocator.shrinker);
@@ -55,7 +55,7 @@ index cebd1c8..a9d932f 100644
  #endif
  #include <linux/dma-buf.h>
  
-+#if LINUX_VERSION_CODE > KERNEL_VERSION(5, 15, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0)
 +MODULE_IMPORT_NS(DMA_BUF);
 +#endif
 +

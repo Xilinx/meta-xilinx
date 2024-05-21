@@ -1,6 +1,6 @@
 # This version extension should match CONFIG_LOCALVERSION in defconfig
-LINUX_VERSION_EXTENSION ?= "-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}"
-PV = "${LINUX_VERSION}${LINUX_VERSION_EXTENSION}+git${SRCPV}"
+LINUX_VERSION_EXTENSION ?= "-xilinx"
+PV = "${LINUX_VERSION}+git"
 
 # Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
 KBRANCH ?= "undefined"

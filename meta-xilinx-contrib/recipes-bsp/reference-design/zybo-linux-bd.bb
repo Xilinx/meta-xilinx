@@ -16,7 +16,7 @@ HW_BD = "linux_bd"
 SRC_URI = "git://github.com/Digilent/ZYBO.git;protocol=https;nobranch=1"
 SRCREV = "63ca49fe027da49f3b0ac636bd404fd31fbbd945"
 
-PV = "+git${SRCPV}"
+PV = "+git"
 
 S = "${WORKDIR}/git"
 

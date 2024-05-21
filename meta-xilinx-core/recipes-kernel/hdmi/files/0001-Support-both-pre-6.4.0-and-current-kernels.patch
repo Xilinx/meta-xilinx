@@ -1,0 +1,82 @@
+From e1352e6872edc2b521ad44eb776ce093553192e3 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Fri, 17 May 2024 10:44:37 -0600
+Subject: [PATCH] Support both pre 6.4.0 and current kernels
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ hdmi/xilinx_drm_hdmi.c |  3 +++
+ misc/dp159.c           | 14 ++++++++++++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/hdmi/xilinx_drm_hdmi.c b/hdmi/xilinx_drm_hdmi.c
+index 104fc3d..6ebbdca 100644
+--- a/hdmi/xilinx_drm_hdmi.c
++++ b/hdmi/xilinx_drm_hdmi.c
+@@ -17,6 +17,7 @@
+  * GNU General Public License for more details.
+  */
+ 
++#include <linux/version.h>
+ #include <drm/drm_atomic_helper.h>
+ #include <drm/drm_connector.h>
+ #include <drm/drm_crtc.h>
+@@ -27,7 +28,9 @@
+ #include <drm/drm_of.h>
+ #include <drm/drm_probe_helper.h>
+ #include <drm/drm_sysfs.h>
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ #include <drm/display/drm_hdmi_helper.h>
++#endif
+ 
+ #include <linux/clk.h>
+ #include <linux/delay.h>
+diff --git a/misc/dp159.c b/misc/dp159.c
+index 73e886f..d2c60d9 100644
+--- a/misc/dp159.c
++++ b/misc/dp159.c
+@@ -28,6 +28,7 @@
+ #include <linux/of.h>
+ #include <linux/of.h>
+ #include <linux/clk-provider.h>
++#include <linux/version.h>
+ 
+ MODULE_DESCRIPTION("i2c device driver for dp159 redriver and retimer");
+ MODULE_AUTHOR("Leon Woestenberg");
+@@ -133,7 +134,12 @@ struct clk_ops clk_tx_rate_ops = {
+ 	.round_rate		= &clk_tx_round_rate,
+ };
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+ static int dp159_probe(struct i2c_client *client)
++#else
++static int dp159_probe(struct i2c_client *client,
++		       const struct i2c_device_id *id)
++#endif
+ {
+ 	struct clk_tx_linerate *clk_tx;
+ 	struct clk *clk;
+@@ -191,12 +197,20 @@ static int dp159_probe(struct i2c_client *client)
+ 	return 0;
+ }
+ 
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
+ static void dp159_remove(struct i2c_client *client)
++#else
++static int dp159_remove(struct i2c_client *client)
++#endif
+ {
+ 	struct clk_tx_linerate *clk_tx;
+ 	clk_tx = (struct clk_tx_linerate *)i2c_get_clientdata(client);
+ 	if (clk_tx)
+ 		clk_unregister(clk_tx->clk);
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0)
++	return 0;
++#endif
+ }
+ 
+ static const struct i2c_device_id dp159_id[] = {
+-- 
+2.34.1
+

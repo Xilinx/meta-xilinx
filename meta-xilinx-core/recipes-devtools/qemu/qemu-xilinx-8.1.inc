@@ -8,12 +8,15 @@ COMPATIBLE_HOST:arm = "null"
 # x86_64 is needed to build nativesdks
 QEMU_TARGETS = "aarch64 arm microblaze microblazeel riscv32 x86_64"
 
+BRANCH = "xlnx_rel_v2024.1"
+SRCREV = "2319c870e754148ec3b9d40be0d3dbee959c3251"
+
 LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
                     file://COPYING.LIB;endline=24;md5=8c5efda6cf1e1b03dcfd0e6c0d271c7f"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/qemu-xilinx-8.1.0:"
 
-PV = "${XILINX_QEMU_VERSION}-xilinx-v${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}+git${SRCPV}"
+PV .= "+git"
 REPO ?= "gitsm://github.com/Xilinx/qemu.git;protocol=https"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"

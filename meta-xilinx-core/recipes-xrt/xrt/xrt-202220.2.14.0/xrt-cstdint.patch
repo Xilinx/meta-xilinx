@@ -1,0 +1,146 @@
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+From f97ca31fc1b9aa973a2970e9248bc19f44b6a42f Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Mon, 20 May 2024 20:32:42 -0600
+Subject: [PATCH] Add cstdint as necessary
+
+In GCC 13.1 usage of uint64 and similar will result in an error without
+ #include <cstdint>
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ src/runtime_src/core/common/time.h                               | 1 +
+ src/runtime_src/core/edge/common/aie_parser.h                    | 1 +
+ src/runtime_src/core/edge/user/aie/common_layer/adf_api_config.h | 1 +
+ src/runtime_src/core/edge/user/zynq_dev.h                        | 1 +
+ src/runtime_src/tools/xclbinutil/CBOR.h                          | 1 +
+ src/runtime_src/tools/xclbinutil/DTCStringsBlock.h               | 1 +
+ src/runtime_src/tools/xclbinutil/XclBinSignature.h               | 1 +
+ src/runtime_src/xdp/profile/database/events/vtf_event.h          | 1 +
+ src/runtime_src/xdp/profile/device/aie_trace/aie_trace_logger.h  | 1 +
+ src/runtime_src/xdp/profile/writer/vp_base/vp_writer.h           | 1 +
+ 10 files changed, 10 insertions(+)
+
+diff --git a/src/runtime_src/core/common/time.h b/src/runtime_src/core/common/time.h
+index a4a96b11d..585d38756 100644
+--- a/src/runtime_src/core/common/time.h
++++ b/src/runtime_src/core/common/time.h
+@@ -19,6 +19,7 @@
+ 
+ #include "core/common/config.h"
+ #include <string>
++#include <cstdint>
+ 
+ namespace xrt_core {
+ 
+diff --git a/src/runtime_src/core/edge/common/aie_parser.h b/src/runtime_src/core/edge/common/aie_parser.h
+index 5bc32a36a..f35e97ecd 100644
+--- a/src/runtime_src/core/edge/common/aie_parser.h
++++ b/src/runtime_src/core/edge/common/aie_parser.h
+@@ -20,6 +20,7 @@
+ #include <string>
+ #include <vector>
+ #include <unordered_map>
++#include <cstdint>
+ #include "../user/aie/common_layer/adf_api_config.h"
+ 
+ namespace xrt_core {
+diff --git a/src/runtime_src/core/edge/user/aie/common_layer/adf_api_config.h b/src/runtime_src/core/edge/user/aie/common_layer/adf_api_config.h
+index 196304765..36ce35e80 100755
+--- a/src/runtime_src/core/edge/user/aie/common_layer/adf_api_config.h
++++ b/src/runtime_src/core/edge/user/aie/common_layer/adf_api_config.h
+@@ -18,6 +18,7 @@
+ 
+ #include <string>
+ #include <vector>
++#include <cstdint>
+ 
+ namespace adf
+ {
+diff --git a/src/runtime_src/core/edge/user/zynq_dev.h b/src/runtime_src/core/edge/user/zynq_dev.h
+index 6fe36c615..2abd7473b 100644
+--- a/src/runtime_src/core/edge/user/zynq_dev.h
++++ b/src/runtime_src/core/edge/user/zynq_dev.h
+@@ -19,6 +19,7 @@
+ #include <fstream>
+ #include <string>
+ #include <vector>
++#include <cstdint>
+ 
+ class zynq_device {
+ public:
+diff --git a/src/runtime_src/tools/xclbinutil/CBOR.h b/src/runtime_src/tools/xclbinutil/CBOR.h
+index 368459f59..acbf6ebae 100644
+--- a/src/runtime_src/tools/xclbinutil/CBOR.h
++++ b/src/runtime_src/tools/xclbinutil/CBOR.h
+@@ -22,6 +22,7 @@
+ // #includes here - please keep these to a bare minimum!
+ #include <string>
+ #include <sstream>
++#include <cstdint>
+ 
+ // ------------ F O R W A R D - D E C L A R A T I O N S ----------------------
+ // Forward declarations - use these instead whenever possible...
+diff --git a/src/runtime_src/tools/xclbinutil/DTCStringsBlock.h b/src/runtime_src/tools/xclbinutil/DTCStringsBlock.h
+index 361015962..2ec16360d 100644
+--- a/src/runtime_src/tools/xclbinutil/DTCStringsBlock.h
++++ b/src/runtime_src/tools/xclbinutil/DTCStringsBlock.h
+@@ -20,6 +20,7 @@
+ // ----------------------- I N C L U D E S -----------------------------------
+ #include <sstream>
+ #include <string>
++#include <cstdint>
+ 
+ // ----------- C L A S S :   D T C S t r i n g s B l o c k -------------------
+ 
+diff --git a/src/runtime_src/tools/xclbinutil/XclBinSignature.h b/src/runtime_src/tools/xclbinutil/XclBinSignature.h
+index b19ab56a4..f1b72d4d2 100644
+--- a/src/runtime_src/tools/xclbinutil/XclBinSignature.h
++++ b/src/runtime_src/tools/xclbinutil/XclBinSignature.h
+@@ -18,6 +18,7 @@
+ #define __XclBinSignature_h_
+ 
+ #include <string>
++#include <cstdint>
+ 
+ // ----------------------- I N C L U D E S -----------------------------------
+ 
+diff --git a/src/runtime_src/xdp/profile/database/events/vtf_event.h b/src/runtime_src/xdp/profile/database/events/vtf_event.h
+index 24a755a9a..a46a43e9d 100644
+--- a/src/runtime_src/xdp/profile/database/events/vtf_event.h
++++ b/src/runtime_src/xdp/profile/database/events/vtf_event.h
+@@ -18,6 +18,7 @@
+ #define VTF_EVENT_DOT_H
+ 
+ #include <fstream>
++#include <cstdint>
+ 
+ #include "xdp/config.h"
+ 
+diff --git a/src/runtime_src/xdp/profile/device/aie_trace/aie_trace_logger.h b/src/runtime_src/xdp/profile/device/aie_trace/aie_trace_logger.h
+index 98c57de2e..6f67c43df 100644
+--- a/src/runtime_src/xdp/profile/device/aie_trace/aie_trace_logger.h
++++ b/src/runtime_src/xdp/profile/device/aie_trace/aie_trace_logger.h
+@@ -18,6 +18,7 @@
+ #define XDP_PROFILE_AIE_TRACE_LOGGER_H
+ 
+ #include<iostream>
++#include<cstdint>
+ 
+ namespace xdp {
+ 
+diff --git a/src/runtime_src/xdp/profile/writer/vp_base/vp_writer.h b/src/runtime_src/xdp/profile/writer/vp_base/vp_writer.h
+index a88597464..f392ec0e6 100644
+--- a/src/runtime_src/xdp/profile/writer/vp_base/vp_writer.h
++++ b/src/runtime_src/xdp/profile/writer/vp_base/vp_writer.h
+@@ -19,6 +19,7 @@
+ 
+ #include <fstream>
+ #include <string>
++#include <cstdint>
+ 
+ #include "xdp/config.h"
+ 
+-- 
+2.34.1
+

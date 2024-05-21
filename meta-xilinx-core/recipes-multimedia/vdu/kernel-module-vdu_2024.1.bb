@@ -4,9 +4,7 @@ SECTION = "kernel/modules"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=eb723b61539feef013de476e68b5c50a"
 
-XILINX_VDU_VERSION = "1.0.0"
-PV =. "${XILINX_VDU_VERSION}-xilinx-v"
-PV .= "+git${SRCPV}"
+PV .= "+git"
 
 S = "${WORKDIR}/git"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
@@ -17,7 +15,7 @@ SRCREV ?= "25773344ce1e539e7136c5a30cdee98a6cf490a8"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG} \
-	file://99-vdu-enc-dec.rules \
+    file://99-vdu-enc-dec.rules \
 "
 
 inherit module features_check
@@ -27,8 +25,6 @@ REQUIRED_MACHINE_FEATURES = "vdu"
 EXTRA_OEMAKE += "O=${STAGING_KERNEL_BUILDDIR}"
 
 RDEPENDS:${PN} = "vdu-firmware"
-
-PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
 
 do_install:append() {
     install -d ${D}${sysconfdir}/udev/rules.d
