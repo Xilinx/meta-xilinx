@@ -23,6 +23,10 @@ QB_DEFAULT_KERNEL:zynq ?= "${@'zImage' if \
 QB_DEFAULT_KERNEL:microblaze ?= "${@'simpleImage.mb' if \
 		d.getVar('INITRAMFS_IMAGE_BUNDLE') != '1' else 'simpleImage.mb-initramfs-${MACHINE}.bin'}"
 
+# https://docs.amd.com/r/en-US/ug1085-zynq-ultrascale-trm/Boot-Modes
+# https://docs.amd.com/r/en-US/ug1304-versal-acap-ssdg/Boot-Device-Modes
+QB_DEVICE_MODE ?= "-boot mode=5"
+
 inherit qemuboot
 
 def qemu_target_binary(data):
@@ -46,6 +50,7 @@ def qemu_add_extra_args(data):
     deploy_dir = data.getVar('DEPLOY_DIR_IMAGE') or ""
     machine_name = data.getVar('MACHINE') or ""
     soc_family = data.getVar('SOC_FAMILY') or ""
+    boot_mode = data.getVar('QB_DEVICE_MODE') or ""
     qb_extra_args = ''
     # Add kernel image and boot.scr to qemu boot command when initramfs_image supplied
     kernel_name = ''
@@ -62,10 +67,10 @@ def qemu_add_extra_args(data):
             qb_extra_args = ' -device loader,file=%s,addr=%s,force-raw=on' % (kernel_image, kernel_loadaddr)
             qb_extra_args += ' -device loader,file=%s,addr=%s,force-raw=on' % (bootscr_image, bootscr_loadaddr)
         if soc_family == 'versal':
-            qb_extra_args += ' -boot mode=5'
+            qb_extra_args += ' %s' % boot_mode
     else:
         if soc_family in ('zynqmp', 'versal'):
-            qb_extra_args = ' -boot mode=5'
+            qb_extra_args = ' %s' % boot_mode
     return qb_extra_args
 
 def qemu_rootfs_params(data, param):
