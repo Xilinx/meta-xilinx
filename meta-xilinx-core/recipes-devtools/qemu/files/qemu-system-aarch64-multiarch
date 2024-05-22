@@ -5,11 +5,11 @@ import os
 import subprocess
 import sys
 import tempfile
+import re
 import shutil
 
 binpath = os.path.dirname(os.path.abspath(__file__))
 mach_path = tempfile.mkdtemp()
-
 
 # Separate PMU and APU arguments
 APU_args = sys.argv[1:]
@@ -26,50 +26,80 @@ if '-plm-args' in APU_args:
     PLM_args = APU_args[plm_args_idx+1].split()
     del APU_args[plm_args_idx:plm_args_idx+2]
 
+if '-bootbin' in APU_args:
+    bootbin_args_idx = APU_args.index('-bootbin')
+    bootbin_arg = APU_args[bootbin_args_idx+1]
+    del APU_args[bootbin_args_idx:bootbin_args_idx+2]
+
 if PMU_args and PLM_args:
     sys.exit("\nError: -pmu-args can not be used with -plm-args\n")
 
 if ('--help' in APU_args) or (not PMU_args and not PLM_args):
-    print("AMD FPGA QEMU multiarch wrapper\n")
-    print("Version 2024.1")
-    print("")
-    print("Usage:")
-    print("  %s <APU options> [-pmu-args <pmu options>]" % (sys.argv[0]))
-    print("  %s <APU options> [-plm-args <plm options>]" % (sys.argv[0]))
-    print("")
+    print("AMD FPGA QEMU multiarch wrapper\nVersion 2024.1\n\nUsage:")
+    print(f"  {sys.argv[0]} <APU options> [-pmu-args <pmu options>]")
+    print(f"  {sys.argv[0]} <APU options> [-plm-args <plm options>]\n")
     sys.exit(1)
 
 if PMU_args:
     PMU_rom = PMU_args[PMU_args.index('-kernel')+1]
 
     if not os.path.exists(PMU_rom):
-        error_msg = '\nError: Missing PMU ROM: %s' % PMU_rom
-        error_msg += '\nSee "meta-xilinx/README.qemu.md" for more information on accquiring the PMU ROM.\n'
-        sys.exit(error_msg)
+        sys.exit(f'\nERROR: Missing PMU ROM: {PMU_rom}'
+            '\nSee "meta-xilinx/README.qemu.md" for more information on accquiring the PMU ROM.\n')
 
-# We need to switch tcp serial arguments (if they exist, e.g. qemurunner) to get the output correctly
+if bootbin_arg:
+    if not os.path.isfile(bootbin_arg):
+        print(f"\nERROR: bootbin file not found at {bootbin_arg}"
+            "       Please build and ospi_image or set QB_OSPI_BIN variable to prebuilt file\n")
+        sys.exit(1)
+
+    shutil.copyfile(bootbin_arg, f'{mach_path}/boot.bin')
+
+    bootgen_command = [f'{binpath}/bootgen', '-arch', 'versal', '-dump', 'boot.bin']
+    subprocess.run(bootgen_command + ['bh'], check=True, cwd=mach_path, stdout=subprocess.DEVNULL)
+    subprocess.run(bootgen_command + ['plm'], check=True, cwd=mach_path, stdout=subprocess.DEVNULL)
+    subprocess.run(bootgen_command + ['pmc_cdo'], check=True, cwd=mach_path, stdout=subprocess.DEVNULL)
+
+    bootgen_command = f"{binpath}/bootgen -arch versal -read {bootbin_arg}"
+    result = subprocess.check_output(bootgen_command.split())
+    bootgen_output = result.decode().splitlines()
+
+    for i, l in enumerate(bootgen_output):
+        if 'PARTITION HEADER TABLE (pmc_subsys.0.0)' in l:
+            plm_line = bootgen_output[i+4]
+        if 'BOOT HEADER' in l:
+            pmc_line = bootgen_output[i+6]
+
+    plm_load_addr = re.search(r"exec_addr_lo \(0x10\) : (0x\w*)\s*", plm_line).group(1)
+    pmc_load_addr = re.search(r"pmccdo_load_addr \(0x20\) : (0x\w*)", pmc_line).group(1)
+
+    PLM_args.append(f"-device loader,file={mach_path}/boot_bh.bin,addr=0xF201E000,force-raw=on")
+    PLM_args.append(f"-device loader,file={mach_path}/pmc_cdo.bin,addr={pmc_load_addr},force-raw=on")
+    PLM_args.append(f"-device loader,file={mach_path}/plm.bin,addr={plm_load_addr},force-raw=on")
+    PLM_args.append(f"-device loader,addr={plm_load_addr},cpu-num=1")
+
+# We need to switch tcp serial arguments (if they exist, e.g. qemurunner) to get the output
 tcp_serial_ports = [i for i, s in enumerate(APU_args) if 'tcp:127.0.0.1:' in s]
 
-#NEED TO FIX for next yocto release (dont need to switch ports anymore, they will be provided correctly upstream
+#FIXME for next yocto release (dont need to switch ports anymore, they will be provided correctly upstream
 # We can only switch these if there are exactly two, otherwise we can't assume what is being executed so we leave it as is
 if len(tcp_serial_ports) == 2:
     APU_args[tcp_serial_ports[0]],APU_args[tcp_serial_ports[1]] = APU_args[tcp_serial_ports[1]],APU_args[tcp_serial_ports[0]]
 
 mb_cmd = ""
 if PMU_args:
-    mb_cmd =  binpath + '/qemu-system-microblazeel ' + ' '.join(PMU_args) + ' -machine-path ' + mach_path
-
-    print("PMU instance cmd: %s\n" % mb_cmd)
+    pmu_args_s = ' '.join(PMU_args)
+    mb_cmd = f'{binpath}/qemu-system-microblazeel {pmu_args_s} -machine-path {mach_path}'
+    print(f"PMU instance cmd: {mb_cmd}\n")
 
 if PLM_args:
-    mb_cmd =  binpath + '/qemu-system-microblazeel ' + ' '.join(PLM_args) + ' -machine-path ' + mach_path
+    plm_args_s = ' '.join(PLM_args)
+    mb_cmd = f'{binpath}/qemu-system-microblazeel {plm_args_s} -machine-path {mach_path}'
+    print(f"PLM instance cmd: {mb_cmd}\n")
 
-    print("PLM instance cmd: %s\n" % mb_cmd)
-
-apu_cmd =  binpath + '/qemu-system-aarch64 ' + ' '.join(APU_args) + ' -machine-path ' + mach_path
-
-print("APU instance cmd: %s\n" % apu_cmd)
-
+apu_args_s = ' '.join(APU_args)
+apu_cmd = f'{binpath}/qemu-system-aarch64 {apu_args_s} -machine-path {mach_path}'
+print(f"APU instance cmd: {apu_cmd}\n")
 
 if mb_cmd:
     process_mb = subprocess.Popen(mb_cmd, shell=True, stderr=subprocess.PIPE)

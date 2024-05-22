@@ -8,7 +8,7 @@ require qemu-xilinx-native-8.1.inc
 # and avoid file clashes
 DEPENDS += "glib-2.0-native zlib-native pixman-native qemu-native"
 
-DEPENDS += "qemu-xilinx-multiarch-helper-native"
+DEPENDS += "qemu-xilinx-multiarch-helper-native bootgen-native"
 
 EXTRA_OECONF:append = " --target-list=${@get_qemu_system_target_list(d)}"
 
