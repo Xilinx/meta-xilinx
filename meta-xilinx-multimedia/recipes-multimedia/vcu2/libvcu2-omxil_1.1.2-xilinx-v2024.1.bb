@@ -24,7 +24,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 DEPENDS = "vcu2-ctrlsw"
 RDEPENDS:${PN} = "libvcu2-ctrlsw"
 
-EXTERNAL_INCLUDE="${STAGING_INCDIR}/vcu2-ctrl-sw/"
+EXTERNAL_INCLUDE="${STAGING_INCDIR}/vcu2-ctrl-sw/include"
 
 EXTRA_OEMAKE = " \
     CC='${CC}' CXX='${CXX} ${CXXFLAGS}' \

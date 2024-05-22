@@ -33,8 +33,8 @@ do_install() {
     oe_libinstall -C ${S}/bin/ -so liballegro_app ${D}/${libdir}/
     oe_libinstall -C ${S}/bin/ -so liballegro_conv_yuv ${D}/${libdir}/
 
-    install -d ${D}${includedir}/vcu2-ctrl-sw/
-    oe_runmake install_headers INSTALL_HDR_PATH=${D}${includedir}/vcu2-ctrl-sw/
+    install -d ${D}${includedir}/vcu2-ctrl-sw/include
+    oe_runmake install_headers INSTALL_HDR_PATH=${D}${includedir}/vcu2-ctrl-sw/include
 }
 
 PACKAGES =+ "libvcu2-ctrlsw"
