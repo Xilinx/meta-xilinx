@@ -21,8 +21,8 @@ REQUIRED_MACHINE_FEATURES = "vdu"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-DEPENDS = "libvdu-ctrlsw"
-RDEPENDS:${PN} = "kernel-module-vdu libvdu-ctrlsw"
+DEPENDS = "vdu-ctrlsw"
+RDEPENDS:${PN} = "libvdu-ctrlsw"
 
 EXTERNAL_INCLUDE="${STAGING_INCDIR}/vdu-ctrl-sw/include"
 
