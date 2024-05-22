@@ -1,7 +1,10 @@
 SUMMARY = "Control Software for VDU"
-DESCRIPTION = "Control software libraries, test applications and headers provider for VDU"
+DESCRIPTION = "Control software libraries, test applications and headers provider for VDU deconder software API"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=002a0a92906100955ea6ed02dcd2c2cd"
+
+# Recipe has been renamed
+PROVIDES += "libvdu-ctrlsw"
 
 PV .= "+git"
 
@@ -22,6 +25,7 @@ REQUIRED_MACHINE_FEATURES = "vdu"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 RDEPENDS:${PN} = "kernel-module-vdu"
+RDEPENDS:libvdu-ctrlsw = "kernel-module-vdu"
 
 do_compile[dirs] = "${S}"
 do_install[dirs] = "${S}"
@@ -33,6 +37,9 @@ do_install:append() {
 
     oe_libinstall -C ${S}/bin/ -so liballegro_decode ${D}/${libdir}/
 }
+
+PACKAGES =+ "libvdu-ctrlsw"
+FILES:libvdu-ctrlsw += "${libdir}/liballegro*.so.*"
 
 # These libraries shouldn't get installed in world builds unless something
 # explicitly depends upon them.
