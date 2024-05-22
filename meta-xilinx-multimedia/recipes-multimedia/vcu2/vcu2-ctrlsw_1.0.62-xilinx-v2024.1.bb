@@ -1,5 +1,5 @@
-SUMMARY = "VCU2 decoder/encoder API Includes"
-DESCRIPTION = "Include directory for VCU2 encoder/decoder software API"
+SUMMARY = "Control Software for VCU2"
+DESCRIPTION = "Control software libraries, test applications and headers provider for VCU2 encoder/decoder software API"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=003bf8ee942bb6256905b58e9b1b19c2"
 
@@ -21,18 +21,24 @@ REQUIRED_MACHINE_FEATURES = "vcu2"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 #RDEPENDS:${PN} = "kernel-module-vcu2"
+#RDEPENDS:libvcu2-ctrlsw = "kernel-module-vcu2"
 
 EXTRA_OEMAKE = "CC='${CC}' CXX='${CXX} ${CXXFLAGS}'"
 
-# skip compile (compiled as part of vcu2-app recipe)
-do_compile[noexec] = '1'
-
 do_install() {
+    install -Dm 0755 ${S}/bin/AL_Encoder.exe ${D}/${bindir}/ctrlsw_encoder
+    install -Dm 0755 ${S}/bin/AL_Decoder.exe ${D}/${bindir}/ctrlsw_decoder
+    oe_libinstall -C ${S}/bin/ -so liballegro_decode ${D}/${libdir}/
+    oe_libinstall -C ${S}/bin/ -so liballegro_encode ${D}/${libdir}/
+    oe_libinstall -C ${S}/bin/ -so liballegro_app ${D}/${libdir}/
+    oe_libinstall -C ${S}/bin/ -so liballegro_conv_yuv ${D}/${libdir}/
+
     install -d ${D}${includedir}/vcu2-ctrl-sw/
     oe_runmake install_headers INSTALL_HDR_PATH=${D}${includedir}/vcu2-ctrl-sw/
 }
 
-FILES:${PN} = "usr/include/vcu2-ctrl-sw/*"
+PACKAGES =+ "libvcu2-ctrlsw"
+FILES:libvcu2-ctrlsw += "${libdir}/liballegro*.so.*"
 
 # These libraries shouldn't get installed in world builds unless something
 # explicitly depends upon them.

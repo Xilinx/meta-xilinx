@@ -21,8 +21,8 @@ REQUIRED_MACHINE_FEATURES = "vcu2"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-DEPENDS = "libvcu2-ctrlsw vcu2-app"
-RDEPENDS:${PN} = "vcu2-app"
+DEPENDS = "vcu2-ctrlsw"
+RDEPENDS:${PN} = "libvcu2-ctrlsw"
 
 EXTERNAL_INCLUDE="${STAGING_INCDIR}/vcu2-ctrl-sw/"
 
