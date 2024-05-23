@@ -2,6 +2,6 @@
 LINKER_HASH_STYLE:xilinx-standalone = ""
 SYMVERS_CONF:xilinx-standalone = ""
 
-EXTRA_OECONF:append:xilinx-standalone:microblaze = " --disable-initfini_array"
+EXTRA_OECONF:append:microblaze:xilinx-standalone = " --disable-initfini_array"
 
-EXTRA_OECONF:append:xilinx-standalone:microblaze = " --disable-__cxa_atexit"
+EXTRA_OECONF:append:microblaze:xilinx-standalone = " --disable-__cxa_atexit"

@@ -9,11 +9,11 @@ EXTRA_OECONF:append:xilinx-standalone = " \
 "
 
 # CortexR5 and 32-bit arm are both "arm"
-EXTRA_OECONF:append:xilinx-standalone:arm = " \
+EXTRA_OECONF:append:arm:xilinx-standalone = " \
 	--enable-interwork \
 "
 
-EXTRA_OECONF:append:xilinx-standalone:microblaze = " \
+EXTRA_OECONF:append:microblaze:xilinx-standalone = " \
 	--disable-initfini-array \
 "
 
