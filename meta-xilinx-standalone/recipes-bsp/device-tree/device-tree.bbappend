@@ -1,5 +1,3 @@
-include ${@'device-tree-meta-xilinx-standalone.inc' if d.getVar('XILINX_WITH_ESW') else ''}
-
 COMPATIBLE_HOST:xilinx-standalone = "${HOST_SYS}"
 COMPATIBLE_HOST:xilinx-freertos = "${HOST_SYS}"
 
