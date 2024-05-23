@@ -7,22 +7,22 @@ EXTRA_OECONF:append:xilinx-standalone = " \
 	--disable-libitm \
 "
 
-EXTRA_OECONF:append:xilinx-standalone:aarch64 = " \
+EXTRA_OECONF:append:aarch64:xilinx-standalone = " \
 	--disable-multiarch \
 	--with-arch=armv8-a \
 	"
 
-EXTRA_OECONF:append:xilinx-standalone:armv7r = " \
+EXTRA_OECONF:append:armv7r:xilinx-standalone = " \
 	--disable-tls \
 	--disable-decimal-float \
 	"
 
-EXTRA_OECONF:append:xilinx-standalone:armv8r = " \
+EXTRA_OECONF:append:armv8r:xilinx-standalone = " \
 	--disable-tls \
 	--disable-decimal-float \
 	"
 
-EXTRA_OECONF:append:xilinx-standalone:microblaze = " \
+EXTRA_OECONF:append:microblaze:xilinx-standalone = " \
 	--without-long-double-128 \
 	--disable-tm-clone-registry \
 	"

@@ -1,13 +1,7 @@
+include ${@'device-tree-meta-xilinx-standalone.inc' if d.getVar('XILINX_WITH_ESW') else ''}
+
 COMPATIBLE_HOST:xilinx-standalone = "${HOST_SYS}"
 COMPATIBLE_HOST:xilinx-freertos = "${HOST_SYS}"
-
-COMPATIBLE_MACHINE:cortexa53-zynqmp = ".*"
-COMPATIBLE_MACHINE:cortexr5-zynqmp = ".*"
-COMPATIBLE_MACHINE:microblaze-pmu = ".*"
-COMPATIBLE_MACHINE:microblaze-plm = ".*"
-COMPATIBLE_MACHINE:cortexa72-versal = ".*"
-COMPATIBLE_MACHINE:cortexr5-versal = ".*"
-COMPATIBLE_MACHINE:cortexa9-zynq = ".*"
 
 # Enable @ flag on dtc which is required by libxil
 DTC_FLAGS:append:xilinx-standalone = " -@"
