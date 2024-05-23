@@ -1,0 +1,7 @@
+COMPATIBLE_MACHINE:cortexa53-zynqmp = ".*"
+COMPATIBLE_MACHINE:cortexr5-zynqmp = ".*"
+COMPATIBLE_MACHINE:microblaze-pmu = ".*"
+COMPATIBLE_MACHINE:microblaze-plm = ".*"
+COMPATIBLE_MACHINE:cortexa72-versal = ".*"
+COMPATIBLE_MACHINE:cortexr5-versal = ".*"
+COMPATIBLE_MACHINE:cortexa9-zynq = ".*"
