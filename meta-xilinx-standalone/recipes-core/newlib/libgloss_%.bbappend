@@ -1,5 +1,5 @@
-COMPATIBLE_HOST = ".*-elf"
-COMPATIBLE_HOST:arm = "[^-]*-[^-]*-eabi"
+COMPATIBLE_HOST:xilinx-standalone = ".*-elf"
+COMPATIBLE_HOST:arm:xilinx-standalone = "[^-]*-[^-]*-eabi"
 
 EXTRA_OECONF:append:xilinx-standalone = " \
 	--enable-newlib-io-c99-formats \

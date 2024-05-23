@@ -1,1 +1,1 @@
-COMPATIBLE_HOST = "${HOST_SYS}"
+COMPATIBLE_HOST:xilinx-standalone = "${HOST_SYS}"

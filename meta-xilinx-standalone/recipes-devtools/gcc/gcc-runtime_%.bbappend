@@ -1,8 +1,8 @@
 require gcc-configure-xilinx-standalone.inc
 
-COMPATIBLE_HOST = "${HOST_SYS}"
+COMPATIBLE_HOST:xilinx-standalone = "${HOST_SYS}"
 
-EXTRA_OECONF:append:xilinx-standalone:class-target = " \
+EXTRA_OECONF:append:class-target:xilinx-standalone = " \
 	--disable-libstdcxx-pch \
 	--with-newlib \
 	--disable-threads \
@@ -11,22 +11,22 @@ EXTRA_OECONF:append:xilinx-standalone:class-target = " \
 	--disable-libitm \
 "
 
-EXTRA_OECONF:append:xilinx-standalone:aarch64:class-target = " \
+EXTRA_OECONF:append:aarch64:class-target:xilinx-standalone = " \
 	--disable-multiarch \
 	--with-arch=armv8-a \
 	"
 
-EXTRA_OECONF:append:xilinx-standalone:armv7r:class-target = " \
+EXTRA_OECONF:append:armv7r:class-target:xilinx-standalone = " \
 	--disable-tls \
 	--disable-decimal-float \
 	"
 
-EXTRA_OECONF:append:xilinx-standalone:armv8r:class-target = " \
+EXTRA_OECONF:append:armv8r:class-target:xilinx-standalone = " \
 	--disable-tls \
 	--disable-decimal-float \
 	"
 
-EXTRA_OECONF:append:xilinx-standalone:microblaze:class-target = " \
+EXTRA_OECONF:append:microblaze:class-target:xilinx-standalone = " \
 	--without-long-double-128 \
 	--disable-tm-clone-registry \
 	"
@@ -34,13 +34,13 @@ EXTRA_OECONF:append:xilinx-standalone:microblaze:class-target = " \
 # Changes local to gcc-runtime...
 
 # Dont build libitm, etc.
-RUNTIMETARGET:xilinx-standalone:class-target = "libstdc++-v3"
+RUNTIMETARGET:class-target:xilinx-standalone = "libstdc++-v3"
 
-do_install:append:xilinx-standalone:class-target() {
+do_install:append:class-target:xilinx-standalone() {
 	# Fixup what gcc-runtime normally would do, we don't want linux directories!
 	rm -rf ${D}${includedir}/c++/${BINV}/${TARGET_ARCH}${TARGET_VENDOR}-linux
 }
 
-FILES:${PN}-dbg:append:xilinx-standalone:class-target = "\
+FILES:${PN}-dbg:append:class-target:xilinx-standalone = "\
     ${libdir}/libstdc++.a-gdb.py \
 "
