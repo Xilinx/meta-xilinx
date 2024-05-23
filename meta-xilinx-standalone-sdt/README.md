@@ -1,12 +1,7 @@
-# meta-xilinx-standalone-experimental
+# meta-xilinx-standalone-sdt
 
-This layer contains experimental items that may eventually be added to the
-meta-xilinx-standalone layer.  The components in this layer may or may not be
-buildable as they may require unreleased code.
-
-The non-Linux software components are still in development and this should be
-considered to be a preview release only.  For instance, some components may not
-be buildable, expect APIs to change on various parts and pieces.
+This layer contains System Device Tree items that are related to the
+meta-xilinx-standalone layer.
 
 ## Build Instructions
 
@@ -15,12 +10,12 @@ Be sure to read everything below.
 
 > **Pre-requisites:**
 > * To use this layer you must REMOVE meta-xilinx-tools from your project.
-meta-xilinx-tools is not compatible with this experimental approach. You may
+meta-xilinx-tools is not compatible with this SDT approach. You may
 also have to remove other layers that depend on meta-xilinx-tools, such as
 meta-kria and meta-system-controller.
 > * Follow [System Device Tree Instructions](https://github.com/Xilinx/system-device-tree-xlnx/blob/master/README.md)
 >   to generate the SDT output.
-> * To use the experimental version of the embedded software (firmware) as well
+> * To use the SDT version of the embedded software (firmware) as well
 as system configuration, you must build through gen-machineconf tool. This tool
 is passed a output of system device tree directory.
 
@@ -36,7 +31,7 @@ $ git clone -b <rel-version> https://github.com/Xilinx/meta-openamp
 
 4. Remove meta-xilinx-tools and meta-xilinx-tools dependency layers(such as
    meta-kria and meta-system-controller if included in bblayers.conf), then add
-   the meta-xilinx-standalone-experimental and meta-openamp layer.
+   the meta-xilinx-standalone-sdt and meta-openamp layer.
 
 > **Note:** SDT builds for following devices are not supported in 2024.1 release.
 > * Zynq 7000
@@ -48,7 +43,7 @@ $ git clone -b <rel-version> https://github.com/Xilinx/meta-openamp
 $ bitbake-layers remove-layer meta-xilinx-tools
 $ bitbake-layers remove-layer meta-kria
 $ bitbake-layers remove-layer meta-system-controller
-$ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone-experimental
+$ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone-sdt
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openamp
 ```
 
