@@ -1,1 +1,0 @@
-DEPENDS += "pkgconfig-native"
