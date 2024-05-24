@@ -1,1 +1,1 @@
-include ${@'pmufw-meta-xilinx-standalone.inc' if d.getVar('XILINX_WITH_ESW') else ''}
+require ${@'pmufw-meta-xilinx-standalone.inc' if d.getVar('XILINX_WITH_ESW') else ''}

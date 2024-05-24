@@ -1,0 +1,101 @@
+From 000ad45124ec9d82b2579632a896b0f9a28ee3a8 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Wed, 7 Dec 2022 15:42:15 -0800
+Subject: [PATCH] versal_fw: Fixup core makefiles
+
+The Yocto Project build environment needs to be able to override a few
+additional variables that may not be appropriate to do on the regular
+command line build version.  This patch preserves the default while
+allowing it to be overriden as necessary.
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ lib/sw_apps/versal_plm/misc/versal/Makefile     | 6 ++++--
+ lib/sw_apps/versal_plm/misc/versal_net/Makefile | 6 ++++--
+ lib/sw_apps/versal_psmfw/misc/Makefile          | 6 ++++--
+ 3 files changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/lib/sw_apps/versal_plm/misc/versal/Makefile b/lib/sw_apps/versal_plm/misc/versal/Makefile
+index 5c8e719e9c..5367ed97f8 100644
+--- a/lib/sw_apps/versal_plm/misc/versal/Makefile
++++ b/lib/sw_apps/versal_plm/misc/versal/Makefile
+@@ -2,6 +2,8 @@
+ COMPILER := mb-gcc
+ ARCHIVER := mb-gcc-ar
+ ASSEMBLER := mb-as
++COMPILER_FLAGS := -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare
++EXTRA_COMPILER_FLAGS := -g -ffunction-sections -fdata-sections -Wall -Wextra -Os -flto -ffat-lto-objects
+ DRIVER_LIB_VERSION = 1.0
+ PROCESSOR = psv_pmc_0
+ LIBRARIES = ${PROCESSOR}/lib/libxil.a
+@@ -40,11 +42,11 @@ $(PROCESSOR)/lib/libxil.a: $(PROCESSOR)/lib/libxil_init.a
+ 
+ %/make.include: $(if $(wildcard $(PROCESSOR)/lib/libxil_init.a),$(PROCESSOR)/lib/libxil.a,)
+ 	@echo "Running Make include in $(subst /make.include,,$@)"
+-	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra -Os -flto -ffat-lto-objects"
++	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=$(COMPILER_FLAGS)" "EXTRA_COMPILER_FLAGS=$(EXTRA_COMPILER_FLAGS)"
+ 
+ %/make.libs: include
+ 	@echo "Running Make libs in $(subst /make.libs,,$@)"
+-	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra -Os -flto -ffat-lto-objects"
++	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=$(COMPILER_FLAGS)" "EXTRA_COMPILER_FLAGS=$(EXTRA_COMPILER_FLAGS)"
+ 
+ %/make.clean:
+ 	$(MAKE) -C $(subst /make.clean,,$@) -s clean
+diff --git a/lib/sw_apps/versal_plm/misc/versal_net/Makefile b/lib/sw_apps/versal_plm/misc/versal_net/Makefile
+index ea1e6f4cbd..ddc27a9832 100644
+--- a/lib/sw_apps/versal_plm/misc/versal_net/Makefile
++++ b/lib/sw_apps/versal_plm/misc/versal_net/Makefile
+@@ -8,6 +8,8 @@
+ COMPILER := mb-gcc
+ ARCHIVER := mb-gcc-ar
+ ASSEMBLER := mb-as
++COMPILER_FLAGS := -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare
++EXTRA_COMPILER_FLAGS := -g -ffunction-sections -fdata-sections -Wall -Wextra -Os -flto -ffat-lto-objects
+ DRIVER_LIB_VERSION = 1.0
+ PROCESSOR = psx_pmc_0
+ LIBRARIES = ${PROCESSOR}/lib/libxil.a
+@@ -46,11 +48,11 @@ $(PROCESSOR)/lib/libxil.a: $(PROCESSOR)/lib/libxil_init.a
+ 
+ %/make.include: $(if $(wildcard $(PROCESSOR)/lib/libxil_init.a),$(PROCESSOR)/lib/libxil.a,)
+ 	@echo "Running Make include in $(subst /make.include,,$@)"
+-	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v11.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra -Os -flto -ffat-lto-objects"
++	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=$(COMPILER_FLAGS)" "EXTRA_COMPILER_FLAGS=$(EXTRA_COMPILER_FLAGS)"
+ 
+ %/make.libs: include
+ 	@echo "Running Make libs in $(subst /make.libs,,$@)"
+-	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v11.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra -Os -flto -ffat-lto-objects"
++	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=$(COMPILER_FLAGS)" "EXTRA_COMPILER_FLAGS=$(EXTRA_COMPILER_FLAGS)"
+ 
+ %/make.clean:
+ 	$(MAKE) -C $(subst /make.clean,,$@) -s clean
+diff --git a/lib/sw_apps/versal_psmfw/misc/Makefile b/lib/sw_apps/versal_psmfw/misc/Makefile
+index 02d85e492e..f6386dcbed 100644
+--- a/lib/sw_apps/versal_psmfw/misc/Makefile
++++ b/lib/sw_apps/versal_psmfw/misc/Makefile
+@@ -11,6 +11,8 @@ PAR_SUBDIRS := $(patsubst %/Makefile, %, $(BSP_PARALLEL_MAKEFILES))
+ COMPILER := mb-gcc
+ ARCHIVER := mb-ar
+ ASSEMBLER := mb-as
++COMPILER_FLAGS := -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare
++EXTRA_COMPILER_FLAGS := -g -ffunction-sections -fdata-sections -Wall -Wextra
+ 
+ ifneq (,$(findstring win,$(RDI_PLATFORM)))
+  SHELL = CMD
+@@ -41,11 +43,11 @@ $(PROCESSOR)/lib/libxil.a: $(PROCESSOR)/lib/libxil_init.a
+ 
+ %/make.include: $(if $(wildcard $(PROCESSOR)/lib/libxil_init.a),$(PROCESSOR)/lib/libxil.a,)
+ 	@echo "Running Make include in $(subst /make.include,,$@)"
+-	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra"
++	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=$(COMPILER_FLAGS)" "EXTRA_COMPILER_FLAGS=$(EXTRA_COMPILER_FLAGS)"
+ 
+ %/make.libs: include
+ 	@echo "Running Make libs in $(subst /make.libs,,$@)"
+-	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v10.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra"
++	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=$(COMPILER_FLAGS)" "EXTRA_COMPILER_FLAGS=$(EXTRA_COMPILER_FLAGS)"
+ 
+ %/make.clean:
+ 	$(MAKE) -C $(subst /make.clean,,$@) -s clean
+-- 
+2.34.1
+

@@ -1,9 +1,4 @@
-# Only should be used for development
-DEFAULT_PREFERENCE = "-1"
-
-require pmu-firmware.inc
-
-FILESPATH .= ":${FILE_DIRNAME}/embeddedsw/2023.1:${FILE_DIRNAME}/embeddedsw"
+FILESPATH .= ":${FILE_DIRNAME}/embeddedsw/${PV}:${FILE_DIRNAME}/embeddedsw"
 
 SRC_URI += " \
             file://makefile-skip-copy_bsp.sh.patch \
