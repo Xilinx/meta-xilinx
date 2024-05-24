@@ -1,0 +1,40 @@
+From 2601b201e95ea0edab89342ee7137c74e88a8a79 Mon Sep 17 00:00:00 2001
+From: Jesus De Haro <jesus.de-haro@xilinx.com>
+Date: Mon, 16 Jan 2023 20:59:06 -0800
+Subject: [PATCH] xilpm: versal: Fixed 2023.1 compile error
+
+Added NULL check for pointer Device before attempting to dereference the pointer.
+
+Signed-off-by: Jesus De Haro <jesus.de-haro@xilinx.com>
+Acked-by: Nicole Baze <nicole.baze@xilinx.com>
+---
+ lib/sw_services/xilpm/src/versal/server/xpm_domain_iso.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/lib/sw_services/xilpm/src/versal/server/xpm_domain_iso.c b/lib/sw_services/xilpm/src/versal/server/xpm_domain_iso.c
+index fa571e0552..bd0aa89e12 100644
+--- a/lib/sw_services/xilpm/src/versal/server/xpm_domain_iso.c
++++ b/lib/sw_services/xilpm/src/versal/server/xpm_domain_iso.c
+@@ -1,5 +1,6 @@
+ /******************************************************************************
+ * Copyright (c) 2018 - 2022 Xilinx, Inc.  All rights reserved.
++* Copyright 2022-2023 Advanced Micro Devices, Inc. All Rights Reserved.
+ * SPDX-License-Identifier: MIT
+ ******************************************************************************/
+ 
+@@ -721,7 +722,11 @@ XStatus XPmDomainIso_Control(u32 IsoIdx, u32 Enable)
+ done:
+ 	if ((IsoIdx <= (u32)XPM_NODEIDX_ISO_XRAM_PL_FABRIC) &&
+ 		(IsoIdx >= (u32)XPM_NODEIDX_ISO_XRAM_PL_AXI0)) {
+-		XPm_LockPcsr(Device->Node.BaseAddress);
++		if(NULL != Device) {
++			XPm_LockPcsr(Device->Node.BaseAddress);
++		} else {
++			Status = XST_DEVICE_NOT_FOUND;
++		}
+ 	}
+ 
+ 	return Status;
+-- 
+2.34.1
+
