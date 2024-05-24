@@ -1,8 +1,3 @@
-# Only should be used for development
-DEFAULT_PREFERENCE = "-1"
-
-require psm-firmware.inc
-
 # Separate build directories for versal and versal-net
 SOC_DIR = "versal"
 SOC_DIR:versal-net = "versal_net"
@@ -10,11 +5,12 @@ B = "${S}/lib/sw_apps/versal_psmfw/src/${SOC_DIR}"
 
 BSP_DIR ?= "${B}/../../misc/versal_psmfw_bsp"
 
-FILESPATH .= ":${FILE_DIRNAME}/embeddedsw/2023.1:${FILE_DIRNAME}/embeddedsw"
+FILESPATH .= ":${FILE_DIRNAME}/embeddedsw/${PV}:${FILE_DIRNAME}/embeddedsw"
 
 SRC_URI += " \
             file://makefile-skip-copy_bsp.sh.patch \
             file://0001-versal_fw-Fixup-core-makefiles.patch \
+            file://0001-xilpm-versal-Fixed-2023.1-compile-error.patch \
            "
 
 EXTRA_COMPILER_FLAGS = "-g -ffunction-sections -fdata-sections -Wall -Wextra"
