@@ -1,9 +1,3 @@
-# We WANT to default to this version when available
-DEFAULT_PREFERENCE = "100"
-
-# Reset this
-SRC_URI = "${EMBEDDEDSW_SRCURI}"
-
 inherit esw
 
 # Not compatible with Zynq
@@ -15,6 +9,9 @@ ESW_COMPONENT_SRC:zynq = "/lib/sw_apps/zynq_fsbl/src"
 ESW_COMPONENT_SRC:zynqmp = "/lib/sw_apps/zynqmp_fsbl/src"
 
 DEPENDS += "xilstandalone xiltimer xilffs xilsecure xilpm"
+
+CFLAGS:append:aarch64 = " -DARMA53_64"
+CFLAGS:append:armv7r = " -DARMR5"
 
 python() {
     psu_init_path = d.getVar('PSU_INIT_PATH')
@@ -56,11 +53,15 @@ do_install() {
     :
 }
 
-addtask deploy before do_build after do_package
+PACKAGES = ""
 
 ESW_COMPONENT = "undefined"
 ESW_COMPONENT:zynq = "zynq_fsbl.elf"
 ESW_COMPONENT:zynqmp = "zynqmp_fsbl.elf"
 
-CFLAGS:append:aarch64 = " -DARMA53_64"
-CFLAGS:append:armv7r = " -DARMR5"
+do_deploy() {
+    install -Dm 0644 ${B}/${ESW_COMPONENT} ${DEPLOYDIR}/${FSBL_BASE_NAME}.elf
+    ln -sf ${FSBL_BASE_NAME}.elf ${DEPLOYDIR}/${FSBL_IMAGE_NAME}.elf
+}
+
+addtask deploy before do_build after do_package
