@@ -1,4 +1,4 @@
-inherit python3native xlnx-embeddedsw pkgconfig cmake
+inherit check_sdt_enabled python3native xlnx-embeddedsw pkgconfig cmake
 
 # Poky always tries to enable EXPORT_COMPILE_COMMANDS, but ESW changes
 # behavior when this is enabled and will generate:
