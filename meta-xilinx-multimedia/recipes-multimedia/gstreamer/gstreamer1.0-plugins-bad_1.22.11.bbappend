@@ -1,4 +1,4 @@
-require gstreamer-xilinx-1.20.5.inc
+require gstreamer-xilinx-1.22.11.inc
 
 SRC_URI:append = " \
            file://0001-fix-maybe-uninitialized-warnings-when-compiling-with.patch \
@@ -7,6 +7,6 @@ SRC_URI:append = " \
            "
 
 PACKAGECONFIG[mediasrcbin] = "-Dmediasrcbin=enabled,-Dmediasrcbin=disabled,media-ctl"
-PACKAGECONFIG:append = " faac kms faad opusparse mediasrcbin"
+PACKAGECONFIG:append = " faac kms faad opusparse"
 
 S = "${WORKDIR}/git/subprojects/gst-plugins-bad"
