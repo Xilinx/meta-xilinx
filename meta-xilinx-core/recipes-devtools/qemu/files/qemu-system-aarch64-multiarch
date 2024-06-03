@@ -15,6 +15,7 @@ mach_path = tempfile.mkdtemp()
 APU_args = sys.argv[1:]
 PMU_args = []
 PLM_args = []
+bootbin_arg = None
 
 if '-pmu-args' in APU_args:
     pmu_args_idx = APU_args.index('-pmu-args')
