@@ -152,7 +152,7 @@ python do_generate_driver_data() {
     command = ["lopper"] + ["-f"] + [system_dt[0]] + ["--"] + ["baremetalconfig_xlnx.py"] + [machine] + [src_dir[0]]
     subprocess.run(command, check = True)
     src_file = glob.glob('*_g.c')
-    if os.path.exists(src_file[0]):
+    if src_file and os.path.exists(src_file[0]):
          bb.note("Generated config file for driver %s" % driver_name)
          command = ["install"] + ["-m"] + ["0755"] + [src_file[0]] + [src_dir[0]]
          subprocess.run(command, check = True)
