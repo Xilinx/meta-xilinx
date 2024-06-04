@@ -6,6 +6,7 @@ inherit xlnx-embeddedsw deploy
 COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "none"
 COMPATIBLE_MACHINE:versal = ".*"
+COMPATIBLE_MACHINE:versal-net = ".*"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

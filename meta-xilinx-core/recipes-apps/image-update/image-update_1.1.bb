@@ -17,8 +17,9 @@ S = "${WORKDIR}/git"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 COMPATIBLE_MACHINE:versal = "versal"
+COMPATIBLE_MACHINE:versal-net = "versal-net"
 
-PACKAGE_ARCH:zynqmp = "${SOC_FAMILY_ARCH}"
+PACKAGE_ARCH:zynqmp = "${MACHINE_ARCH}"
 
 # Force the make system to use the flags we want!
 EXTRA_OEMAKE = 'CC="${CC} ${TARGET_CFLAGS} ${TARGET_LDFLAGS}" all'

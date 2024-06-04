@@ -8,9 +8,11 @@ SECTION	= "devel"
 XAIEFAL_DIR ?= "fal"
 S = "${WORKDIR}/git"
 
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:versal-ai-core = "versal-ai-core"
-COMPATIBLE_MACHINE:versal-ai-edge = "${SOC_VARIANT_ARCH}"
+inherit features_check
+
+REQUIRED_MACHINE_FEATURES = "aie"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 IOBACKENDS ?= "Linux"
 
@@ -29,7 +31,3 @@ EXTRA_OECMAKE:append = "${@'-DWITH_EXAMPLES=ON' if d.getVar('WITH_EXAMPLES') == 
 FILES:${PN}-demos = " \
     ${bindir}/* \
 "
-
-PACKAGE_ARCH:versal-ai-core = "${SOC_VARIANT_ARCH}"
-PACKAGE_ARCH:versal-ai-edge = "${SOC_VARIANT_ARCH}"
-

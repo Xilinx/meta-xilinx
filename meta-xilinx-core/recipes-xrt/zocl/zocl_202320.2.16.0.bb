@@ -11,6 +11,7 @@ LICENSE = "GPL-2.0-or-later & Apache-2.0"
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
+COMPATIBLE_MACHINE:versal-net = ".*"
 
 S = "${WORKDIR}/git/src/runtime_src/core/edge/drm/zocl"
 

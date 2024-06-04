@@ -28,6 +28,7 @@ ATF_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
+COMPATIBLE_MACHINE:versal-net = ".*"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -47,10 +48,12 @@ LD[unexport] = "1"
 ATF_CONSOLE_DEFAULT = ""
 ATF_CONSOLE_DEFAULT:zynqmp = "cadence"
 ATF_CONSOLE_DEFAULT:versal = "pl011"
+ATF_CONSOLE_DEFAULT:versal-net = "pl011"
 ATF_CONSOLE ?= "${ATF_CONSOLE_DEFAULT}"
 
 DEBUG_ATF_DEFAULT = ""
 DEBUG_ATF_DEFAULT:versal = "1"
+DEBUG_ATF_DEFAULT:versal-net = "1"
 DEBUG_ATF ?= "${DEBUG_ATF_DEFAULT}"
 
 EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_CONSOLE=${ATF_CONSOLE}' if d.getVar('ATF_CONSOLE', True) != '' else ''}"
@@ -125,3 +128,4 @@ FILES:${PN} += "/boot/*.elf /boot/*.bin /boot/*.ub"
 
 # Disable buildpaths QA check warnings for Versal.
 INSANE_SKIP:${PN}:append:versal = " buildpaths"
+INSANE_SKIP:${PN}:append:versal-net = " buildpaths"

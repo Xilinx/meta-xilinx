@@ -7,6 +7,7 @@ PROVIDES = "virtual/base-pdi"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:microblaze = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
+COMPATIBLE_MACHINE:versal-net = ".*"
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
