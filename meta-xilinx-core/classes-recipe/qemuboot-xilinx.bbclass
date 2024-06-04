@@ -55,7 +55,7 @@ def qemu_add_extra_args(data):
     # Add kernel image and boot.scr to qemu boot command when initramfs_image supplied
     kernel_name = ''
     bootscr_image = '%s/boot.scr' % deploy_dir
-    if soc_family in ('zynqmp', 'versal'):
+    if soc_family in ('zynqmp', 'versal', 'versal-net'):
         kernel_name = 'Image'
         bootscr_loadaddr = '0x20000000'
     if initramfs_image:
@@ -66,10 +66,10 @@ def qemu_add_extra_args(data):
         if kernel_name:
             qb_extra_args = ' -device loader,file=%s,addr=%s,force-raw=on' % (kernel_image, kernel_loadaddr)
             qb_extra_args += ' -device loader,file=%s,addr=%s,force-raw=on' % (bootscr_image, bootscr_loadaddr)
-        if soc_family == 'versal':
+        if soc_family in ('versal', 'versal-net'):
             qb_extra_args += ' %s' % boot_mode
     else:
-        if soc_family in ('zynqmp', 'versal'):
+        if soc_family in ('zynqmp', 'versal', 'versal-net'):
             qb_extra_args = ' %s' % boot_mode
     return qb_extra_args
 
@@ -80,7 +80,6 @@ def qemu_rootfs_params(data, param):
     tune_features = (data.getVar('TUNE_FEATURES') or []).split()
     if 'microblaze' in tune_features:
         soc_family = 'microblaze'
-    soc_variant = data.getVar('SOC_VARIANT') or ""
 
     if param == 'rootfs':
         return 'none' if bundle_image == "1" else ''
@@ -90,7 +89,8 @@ def qemu_rootfs_params(data, param):
             "microblaze": "cpio.gz",
             "zynq": "cpio.gz",
             "zynqmp": "cpio.gz.u-boot",
-            "versal": "cpio.gz.u-boot.qemu-sd-fatimg"
+            "versal": "cpio.gz.u-boot.qemu-sd-fatimg",
+            "versal-net": "cpio.gz.u-boot.qemu-sd-fatimg"
         }
         if not initramfs_image:
             image_fs = data.getVar('IMAGE_FSTYPES')
@@ -104,7 +104,7 @@ def qemu_rootfs_params(data, param):
         sd_index = "1"
         if soc_family == 'zynq':
             sd_index = "0"
-        if soc_family == 'versal' and soc_variant == 'net':
+        if soc_family == 'versal-net':
             sd_index = "0"
 
         # Device is using a disk

@@ -1,14 +1,8 @@
 # Use libmetal for systems with AIE
-# For vck190 kind of devices
-PACKAGE_ARCH:versal-ai-core = "${SOC_VARIANT_ARCH}"
-EXTRA_OECMAKE:append:versal-ai-core = " -DXRT_AIE_BUILD=true"
-TARGET_CXXFLAGS:append:versal-ai-core = " -DXRT_ENABLE_AIE -DFAL_LINUX=on"
-DEPENDS:append:versal-ai-core = " libxaiengine aiefal"
-RDEPENDS:${PN}:append:versal-ai-core = " libxaiengine aiefal"
-
-# For vek280 kind of devices
-PACKAGE_ARCH:versal-ai-edge = "${SOC_VARIANT_ARCH}"
-EXTRA_OECMAKE:append:versal-ai-edge = " -DXRT_AIE_BUILD=true"
-TARGET_CXXFLAGS:append:versal-ai-edge = " -DXRT_ENABLE_AIE -DFAL_LINUX=on"
-DEPENDS:append:versal-ai-edge = " libxaiengine aiefal"
-RDEPENDS:${PN}:append:versal-ai-edge = " libxaiengine aiefal"
+# For versal devices with the ai-engine
+PACKAGE_ARCH_orig := "${PACKAGE_ARCH}"
+PACKAGE_ARCH = "${@bb.utils.contains('MACHINE_FEATURES', 'aie', '${MACHINE_ARCH}', '${PACKAGE_ARCH_orig}', d)}"
+EXTRA_OECMAKE .= "${@bb.utils.contains('MACHINE_FEATURES', 'aie', ' -DXRT_AIE_BUILD=true', '', d)}"
+TARGET_CXXFLAGS .= "${@bb.utils.contains('MACHINE_FEATURES', 'aie', ' -DXRT_ENABLE_AIE -DFAL_LINUX=on', '', d)}"
+DEPENDS .= "${@bb.utils.contains('MACHINE_FEATURES', 'aie', ' libxaiengine aiefal', '', d)}"
+RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'aie', ' libxaiengine aiefal', '', d)}"

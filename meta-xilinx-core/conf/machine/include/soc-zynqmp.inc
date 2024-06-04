@@ -1,27 +1,13 @@
 DEFAULTTUNE ?= "cortexa72-cortexa53"
 SOC_FAMILY ?= "zynqmp"
 
-# Available SOC_VARIANT's for zynqmp:
-# "cg" - Zynq UltraScale+  CG Devices (default lowest common denominator)
-# "eg" - Zynq UltraScale+  EG Devices
-# "ev" - Zynq UltraScale+  EV Devices
-# "dr" - Zynq UltraScale+  DR Devices
+# Available MACHINE_FETURES for zynqmp processors:
+# zynqmp-cg - (none)
+# zynqmp-eg - mali400
+# zynqmp-ev - mali400, vcu
+# zynqmp-dr - rfsoc
 
-SOC_VARIANT ?= "cg"
-
-# Add VCU feature on "ev" devices
-VCU_MACHINE_FEATURE = ""
-VCU_MACHINE_FEATURE:zynqmp-ev = " vcu"
-MACHINE_FEATURES .= "${VCU_MACHINE_FEATURE}"
-
-# Add mali400 a.k.a Mali Utgard, "ev" and "eg" devices
-MALI_MACHINE_FEATURE = ""
-MALI_MACHINE_FEATURE:zynqmp-eg = " mali400"
-MALI_MACHINE_FEATURE:zynqmp-ev = " mali400"
-MACHINE_FEATURES .= "${MALI_MACHINE_FEATURE}"
-
-require xilinx-soc-family.inc
-
+require conf/machine/include/soc-family.inc
 require soc-tune-include.inc
 
 # Linux Configuration

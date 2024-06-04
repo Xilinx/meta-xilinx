@@ -1,3 +1,2 @@
 # Older xrt requires a manual dependency on libmetal
-DEPENDS:append:versal-ai-core = " libmetal"
-DEPENDS:append:versal-ai-edge = " libmetal"
+DEPENDS .= "${@bb.utils.contains('MACHINE_FEATURES', 'aie', ' libmetal', '', d)}"

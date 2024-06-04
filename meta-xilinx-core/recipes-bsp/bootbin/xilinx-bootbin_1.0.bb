@@ -14,6 +14,7 @@ COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE:zynq = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
+COMPATIBLE_MACHINE:versal-net = ".*"
 
 PROVIDES = "virtual/boot-bin"
 
@@ -36,8 +37,11 @@ SRC_URI += "${@('file://' + d.getVar("BIF_FILE_PATH")) if d.getVar("BIF_FILE_PAT
 # zynqmp     : zynqmp
 # versal     : versal
 # versal-net : versalnet
-BOOTGEN_ARCH_DEFAULT = "${SOC_FAMILY}"
-BOOTGEN_ARCH_DEFAULT:versal-net = "${SOC_FAMILY}${SOC_VARIANT}"
+BOOTGEN_ARCH_DEFAULT = "undefined"
+BOOTGEN_ARCH_DEFAULT:zynq = "zynq"
+BOOTGEN_ARCH_DEFAULT:zynqmp = "zynqmp"
+BOOTGEN_ARCH_DEFAULT:versal = "versal"
+BOOTGEN_ARCH_DEFAULT:versal-net = "versalnet"
 BOOTGEN_ARCH ?= "${BOOTGEN_ARCH_DEFAULT}"
 BOOTGEN_EXTRA_ARGS ?= ""
 
@@ -135,7 +139,7 @@ python do_configure() {
             attrflags = d.getVarFlags("BIF_COMMON_ATTR") or {}
             if arch in ['zynq', 'zynqmp']:
                 create_zynq_bif(bifattr, attrflags,'','', 1, biffd, d)
-            elif arch in ['versal']:
+            elif arch in ['versal', 'versal-net']:
                 create_versal_bif(bifattr, attrflags,'','', 1, biffd, d)
             else:
                 create_bif(bifattr, attrflags,'','', 1, biffd, d)
@@ -147,7 +151,7 @@ python do_configure() {
             ids = d.getVarFlags("BIF_PARTITION_ID") or {}
             if arch in ['zynq', 'zynqmp']:
                 create_zynq_bif(bifpartition, attrflags, attrimage, ids, 0, biffd, d)
-            elif arch in ['versal']:
+            elif arch in ['versal', 'versal-net']:
                 create_versal_bif(bifpartition, attrflags, attrimage, ids, 0, biffd, d)
             else:
                 create_bif(bifpartition, attrflags, attrimage, ids, 0, biffd, d)
@@ -192,6 +196,12 @@ do_deploy() {
 }
 
 do_deploy:append:versal () {
+
+    install -m 0644 ${B}/BOOT_bh.bin ${DEPLOYDIR}/${BOOTBIN_BASE_NAME}_bh.bin
+    ln -sf ${BOOTBIN_BASE_NAME}_bh.bin ${DEPLOYDIR}/BOOT-${MACHINE}_bh.bin
+}
+
+do_deploy:append:versal-net () {
 
     install -m 0644 ${B}/BOOT_bh.bin ${DEPLOYDIR}/${BOOTBIN_BASE_NAME}_bh.bin
     ln -sf ${BOOTBIN_BASE_NAME}_bh.bin ${DEPLOYDIR}/BOOT-${MACHINE}_bh.bin

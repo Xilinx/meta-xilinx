@@ -9,9 +9,11 @@ AIEDIR ?= "${S}/driver"
 S = "${UNPACKDIR}/git"
 I = "${AIEDIR}/include"
 
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:versal-ai-core = "versal-ai-core"
-COMPATIBLE_MACHINE:versal-ai-edge = "${SOC_VARIANT_ARCH}"
+inherit features_check
+
+REQUIRED_MACHINE_FEATURES = "aie"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 IOBACKENDS ?= "Linux"
 
@@ -42,5 +44,3 @@ do_install(){
 	install -d ${D}${libdir}
 	cp -dr ${AIEDIR}/src/*.so* ${D}${libdir}
 }
-
-PACKAGE_ARCH:versal-ai-core = "${SOC_VARIANT_ARCH}"
