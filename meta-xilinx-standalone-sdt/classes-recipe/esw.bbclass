@@ -36,19 +36,7 @@ do_configure[depends] += "device-tree:do_deploy"
 do_compile[depends] += "device-tree:do_deploy"
 do_install[depends] += "device-tree:do_deploy"
 
-def get_xlnx_cmake_machine(fam, variant, d):
-    cmake_machine = fam
-    if (fam == 'zynqmp'):
-        cmake_machine = 'ZynqMP'
-    elif (fam == 'versal'):
-        cmake_machine = 'Versal'
-        if (variant == 'net'):
-            cmake_machine = 'VersalNet'
-    elif (fam == 'zynq'):
-        cmake_machine = 'Zynq'
-    return cmake_machine
-
-def get_xlnx_cmake_processor(tune, machine, variant, d):
+def get_xlnx_cmake_processor(tune, machine, d):
     cmake_processor = tune
     if tune.startswith('microblaze'):
         if (machine == 'psu_pmu_0'):
@@ -67,12 +55,17 @@ def get_xlnx_cmake_processor(tune, machine, variant, d):
         cmake_processor = 'cortexa53'
     elif tune == 'cortexa72':
         cmake_processor = 'cortexa72'
-        if (variant == 'net'):
-            cmake_processor = 'cortexa78'
+    elif tune == 'cortexa78':
+        cmake_processor = 'cortexa78'
     return cmake_processor
 
-XLNX_CMAKE_MACHINE = "${@get_xlnx_cmake_machine(d.getVar('SOC_FAMILY'), d.getVar('SOC_VARIANT'), d)}"
-XLNX_CMAKE_PROCESSOR = "${@get_xlnx_cmake_processor(d.getVar('DEFAULTTUNE'), d.getVar('ESW_MACHINE'), d.getVar('SOC_VARIANT'), d)}"
+XLNX_CMAKE_MACHINE = "undefined"
+XLNX_CMAKE_MACHINE:zynq = "Zynq"
+XLNX_CMAKE_MACHINE:zynqmp = "ZynqMP"
+XLNX_CMAKE_MACHINE:versal = "Versal"
+XLNX_CMAKE_MACHINE:versal-net = "VersalNet"
+
+XLNX_CMAKE_PROCESSOR = "${@get_xlnx_cmake_processor(d.getVar('DEFAULTTUNE'), d.getVar('ESW_MACHINE'), d)}"
 XLNX_CMAKE_SYSTEM_NAME ?= "Generic"
 XLNX_CMAKE_BSP_VARS ?= ""
 

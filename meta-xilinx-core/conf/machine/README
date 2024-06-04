@@ -132,8 +132,6 @@ easiy make a local change, if allowed by the machine .conf:
 
 UBOOT_MACHINE - The defconfig for u-boot.  (Note, this may be an error TBD).
 
-SOC_VARIANT - See include/soc-*.inc (Note, most machines this is fixed).
-
 
 The following variables must be set AFTER the 'require' line, using '='
 or '+='/'=+' as required.  Using ':append', ':prepend', or ':remove' will

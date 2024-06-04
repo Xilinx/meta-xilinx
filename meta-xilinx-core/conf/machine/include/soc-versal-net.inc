@@ -1,13 +1,5 @@
 DEFAULTTUNE ?= "cortexa72-cortexa53"
-SOC_FAMILY ?= "versal"
-
-# Available MACHINE_FETURES for versal processors:
-# prime   - (none)
-# premium - aie
-# hbm     - (none)
-# ai-core - aie, vdu
-# ai-edge - aie, vdu
-# net     - none
+SOC_FAMILY ?= "versal-net"
 
 require conf/machine/include/soc-family.inc
 require soc-tune-include.inc
