@@ -13,6 +13,7 @@ SRCREV = "52c1d83c72a2b2e85d256411a199ed1baed12ae1"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 COMPATIBLE_MACHINE:versal = "versal"
+COMPATIBLE_MACHINE:versal-net = "versal-net"
 
 S = "${WORKDIR}/git"
 

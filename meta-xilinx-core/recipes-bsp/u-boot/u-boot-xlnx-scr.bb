@@ -12,6 +12,7 @@ COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 COMPATIBLE_MACHINE:zynq = "zynq"
 COMPATIBLE_MACHINE:versal = "versal"
+COMPATIBLE_MACHINE:versal-net = "versal"
 COMPATIBLE_MACHINE:microblaze = "microblaze"
 
 KERNELDT = "${@os.path.basename(d.getVar('KERNEL_DEVICETREE').split(' ')[0]) if d.getVar('KERNEL_DEVICETREE') else ''}"
@@ -25,6 +26,7 @@ PXERAMDISK_IMAGE ?= "${@'${RAMDISK_IMAGE1}' if d.getVar('INITRAMFS_IMAGE') and d
 KERNEL_BOOTCMD:zynqmp ?= "booti"
 KERNEL_BOOTCMD:zynq ?= "bootm"
 KERNEL_BOOTCMD:versal ?= "booti"
+KERNEL_BOOTCMD:versal-net ?= "booti"
 KERNEL_BOOTCMD:microblaze ?= "bootm"
 
 BOOTMODE ??= "generic"
@@ -56,6 +58,7 @@ UENV_TEXTFILE ?= "uEnv.txt"
 UENV_MMC_OFFSET:zynqmp ??= "0x200000"
 UENV_MMC_OFFSET:zynq ??= "0x2080000"
 UENV_MMC_OFFSET:versal ??= "0x200000"
+UENV_MMC_OFFSET:versal-net ??= "0x200000"
 UENV_MMC_OFFSET:microblaze ??= "0x0"
 
 UENV_MMC_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('UENV_MMC_OFFSET'))}"
@@ -71,11 +74,13 @@ DEVICETREE_OFFSET:microblaze ??= "0x1e00000"
 DEVICETREE_OFFSET:zynqmp ??= "0x100000"
 DEVICETREE_OFFSET:zynq ??= "0x100000"
 DEVICETREE_OFFSET:versal ??= "0x1000"
+DEVICETREE_OFFSET:versal-net ??= "0x1000"
 
 DEVICETREE_OVERLAY_OFFSET:microblaze ??= "0x1e00000"
 DEVICETREE_OVERLAY_OFFSET:zynqmp ??= "0x100000"
 DEVICETREE_OVERLAY_OFFSET:zynq ??= "0x100000"
 DEVICETREE_OVERLAY_OFFSET:versal ??= "0x1000"
+DEVICETREE_OVERLAY_OFFSET:versal-net ??= "0x1000"
 DEVICETREE_OVERLAY_PADSIZE ??= "0xf00000"
 
 DEVICETREE_OVERLAY_ADDRESS ?= "${@hex(int(append_baseaddr(d,d.getVar('DEVICETREE_OVERLAY_OFFSET')),16) \
@@ -87,6 +92,7 @@ KERNEL_OFFSET:microblaze ??= "0x0"
 KERNEL_OFFSET:zynqmp ??= "0x200000"
 KERNEL_OFFSET:zynq ??= "0x200000"
 KERNEL_OFFSET:versal ??= "0x200000"
+KERNEL_OFFSET:versal-net ??= "0x200000"
 
 KERNEL_IMAGE ?= "${KERNEL_IMAGETYPE}"
 
@@ -96,6 +102,7 @@ RAMDISK_OFFSET:microblaze ??= "0x2e00000"
 RAMDISK_OFFSET:zynq ??= "0x4000000"
 RAMDISK_OFFSET:zynqmp ??= "0x4000000"
 RAMDISK_OFFSET:versal ??= "0x4000000"
+RAMDISK_OFFSET:versal-net ??= "0x4000000"
 
 FIT_IMAGE_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('FIT_IMAGE_OFFSET'))}"
 FIT_IMAGE_OFFSET ??= "0x10000000"
@@ -141,18 +148,25 @@ QSPI_RAMDISK_SIZE:zynqmpdr ??= "0x1D00000"
 ## For versal
 ## Load boot.scr at 0x7F80000 -> 127MB of QSPI/NAND Memory
 QSPI_KERNEL_OFFSET:versal ??= "0xF00000"
+QSPI_KERNEL_OFFSET:versal-net ??= "0xF00000"
 QSPI_RAMDISK_OFFSET:versal ??= "0x2E00000"
+QSPI_RAMDISK_OFFSET:versal-net ??= "0x2E00000"
 
 NAND_KERNEL_OFFSET:versal ??= "0x4100000"
+NAND_KERNEL_OFFSET:versal-net ??= "0x4100000"
 NAND_RAMDISK_OFFSET:versal ??= "0x8200000"
+NAND_RAMDISK_OFFSET:versal-net ??= "0x8200000"
 
 QSPI_KERNEL_SIZE:versal ??= "0x1D00000"
+QSPI_KERNEL_SIZE:versal-net ??= "0x1D00000"
 QSPI_RAMDISK_SIZE:versal ??= "0x4000000"
+QSPI_RAMDISK_SIZE:versal-net ??= "0x4000000"
 
 QSPI_KERNEL_IMAGE:microblaze ?= "image.ub"
 QSPI_KERNEL_IMAGE:zynq ?= "image.ub"
 QSPI_KERNEL_IMAGE:zynqmp ?= "image.ub"
 QSPI_KERNEL_IMAGE:versal ?= "image.ub"
+QSPI_KERNEL_IMAGE:versal-net ?= "image.ub"
 
 NAND_KERNEL_IMAGE ?= "image.ub"
 

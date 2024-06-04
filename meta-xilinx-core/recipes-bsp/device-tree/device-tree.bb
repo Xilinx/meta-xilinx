@@ -49,6 +49,7 @@ SRC_URI:append = " ${@" ".join(["file://%s" % f for f in (d.getVar('EXTRA_OVERLA
 COMPATIBLE_MACHINE:zynq   = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
+COMPATIBLE_MACHINE:versal-net = ".*"
 
 DEPENDS += "python3-dtc-native"
 

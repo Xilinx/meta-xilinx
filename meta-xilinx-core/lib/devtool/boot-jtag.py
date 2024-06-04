@@ -32,7 +32,6 @@ def bootjtag(args, config, basepath, workspace):
         machine = rd.getVar('MACHINE')
         arch =  rd.getVar('TARGET_ARCH')
         soc = rd.getVar("SOC_FAMILY")
-        soc_variant = rd.getVar("SOC_VARIANT")
         ddr_base_addr = rd.getVar('DDR_BASEADDR')
         kernel_img_name = rd.getVar('KERNEL_IMAGE')
         kernel_load_addr = rd.getVar('KERNEL_LOAD_ADDRESS')
@@ -59,7 +58,7 @@ def bootjtag(args, config, basepath, workspace):
     # MB = (DDR base address + DDR Size) - 0xe00000
     # Zynq 7000 = DDR base address + 0x3000000
     # ZynqMP = DDR base address + 0x20000000
-    # Versal = DDR base address + 0x20000000
+    # Versal & Versal-net = DDR base address + 0x20000000
     if arch == 'microblazeel':
         # Assuming DDR size is 2GB
         bootscr_addr = hex(int(ddr_base_addr, 16) + 0x80000000 - 0xe00000)
@@ -93,7 +92,7 @@ def bootjtag(args, config, basepath, workspace):
         data['atf'] = os.path.join(deploy_dir, 'arm-trusted-firmware.elf')
         data['pmufw'] = os.path.join(deploy_dir, 'pmu-firmware-' + machine + '.elf')
 
-    if soc == 'versal':
+    if soc in ('versal', 'versal-net'):
         data['bootbin'] = os.path.join(deploy_dir, 'boot.bin')
 
     data['bootscr'] = os.path.join(deploy_dir, 'boot.scr')
@@ -165,12 +164,17 @@ def bootjtag(args, config, basepath, workspace):
         lines.append('puts stderr "INFO: Downloading BOOT bin file: ' + data['bootbin'] + '"')
         lines.append('device program \"' + data['bootbin'] + '\"')
         lines.append('')
-
-        if soc_variant == 'net':
-            lines.append('targets -set -nocase -filter {name =~ \"*A78*#0\"}')
-        else:
-            lines.append('targets -set -nocase -filter {name =~ \"*A72*#0\"}')
-
+        lines.append('targets -set -nocase -filter {name =~ \"*A72*#0\"}')
+        lines.append('stop')
+        lines.append('')
+        lines.append('targets -set -nocase -filter {name =~ \"*Versal*\"}')
+    elif soc == 'versal-net':
+        # Download boot.bin to versal device
+        lines.append('targets -set -nocase -filter {name =~ \"*PMC*\"}')
+        lines.append('puts stderr "INFO: Downloading BOOT bin file: ' + data['bootbin'] + '"')
+        lines.append('device program \"' + data['bootbin'] + '\"')
+        lines.append('')
+        lines.append('targets -set -nocase -filter {name =~ \"*A78*#0\"}')
         lines.append('stop')
         lines.append('')
         lines.append('targets -set -nocase -filter {name =~ \"*Versal*\"}')
@@ -235,10 +239,10 @@ def bootjtag(args, config, basepath, workspace):
 
     # Select A72 Core 0 to load and run Versal images
     if soc == 'versal':
-        if soc_variant == 'net':
-            lines.append('targets -set -nocase -filter {name =~ \"*A78*#0\"}')
-        else:
-            lines.append('targets -set -nocase -filter {name =~ \"*A72*#0\"}')
+        lines.append('targets -set -nocase -filter {name =~ \"*A72*#0\"}')
+
+    if soc == 'versal-net':
+        lines.append('targets -set -nocase -filter {name =~ \"*A78*#0\"}')
 
     lines.append('con')
     lines.append('exit\n')
