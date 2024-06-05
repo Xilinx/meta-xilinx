@@ -25,7 +25,7 @@ QB_DEFAULT_KERNEL:microblaze ?= "${@'simpleImage.mb' if \
 
 # https://docs.amd.com/r/en-US/ug1085-zynq-ultrascale-trm/Boot-Modes
 # https://docs.amd.com/r/en-US/ug1304-versal-acap-ssdg/Boot-Device-Modes
-QB_DEVICE_MODE ?= "-boot mode=5"
+QB_BOOT_MODE ?= "-boot mode=5"
 
 inherit qemuboot
 
@@ -50,7 +50,7 @@ def qemu_add_extra_args(data):
     deploy_dir = data.getVar('DEPLOY_DIR_IMAGE') or ""
     machine_name = data.getVar('MACHINE') or ""
     soc_family = data.getVar('SOC_FAMILY') or ""
-    boot_mode = data.getVar('QB_DEVICE_MODE') or ""
+    boot_mode = data.getVar('QB_BOOT_MODE') or ""
     qb_extra_args = ''
     # Add kernel image and boot.scr to qemu boot command when initramfs_image supplied
     kernel_name = ''
