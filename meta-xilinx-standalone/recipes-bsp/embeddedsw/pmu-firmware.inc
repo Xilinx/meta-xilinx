@@ -8,7 +8,7 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 B = "${S}/lib/sw_apps/zynqmp_pmufw/src"
 
 # The makefile does not handle parallelization

@@ -23,7 +23,7 @@ EXTRA_OEMAKE:append:libc-musl = "\
 
 do_configure:prepend() {
 	if [ "${@bb.utils.filter('PACKAGECONFIG', 'python', d)}" ]; then
-		cat > ${WORKDIR}/python << EOF
+		cat > ${UNPACKDIR}/python << EOF
 #!/bin/sh
 case "\$2" in
 	--includes) echo "-I${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI}/" ;;
@@ -33,7 +33,7 @@ case "\$2" in
 esac
 exit 0
 EOF
-		chmod +x ${WORKDIR}/python
+		chmod +x ${UNPACKDIR}/python
 	fi
 }
 

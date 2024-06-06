@@ -15,7 +15,7 @@ COMPATIBLE_MACHINE:versal = "versal"
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
-B = "${WORKDIR}/build"
+B = "${UNPACKDIR}/build"
 
 BOOTGEN_CMD ?= "bootgen"
 BOOTGEN_ARGS ?= "-arch versal"

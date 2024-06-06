@@ -93,7 +93,7 @@ DEVICETREE_OVERLAY_LOAD_ADDRESS = "${@hex(int(d.getVar("DEVICETREE_LOAD_ADDRESS"
 
 python do_compile() {
     env = uenv_populate(d)
-    with open(d.expand("${WORKDIR}/uEnv.txt"), "w") as f:
+    with open(d.expand("${UNPACKDIR}/uEnv.txt"), "w") as f:
         for k, v in env.items():
             f.write("{0}={1}\n".format(k, v))
 }
@@ -101,11 +101,11 @@ python do_compile() {
 FILES:${PN} += "/boot/uEnv.txt"
 
 do_install() {
-	install -Dm 0644 ${WORKDIR}/uEnv.txt ${D}/boot/uEnv.txt
+	install -Dm 0644 ${UNPACKDIR}/uEnv.txt ${D}/boot/uEnv.txt
 }
 
 do_deploy() {
-	install -Dm 0644 ${WORKDIR}/uEnv.txt ${DEPLOYDIR}/uEnv.txt
+	install -Dm 0644 ${UNPACKDIR}/uEnv.txt ${DEPLOYDIR}/uEnv.txt
 }
 addtask do_deploy after do_compile before do_build
 

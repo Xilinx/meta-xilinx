@@ -12,7 +12,7 @@ LICENSE = "GPLv2 & Apache-2.0"
 # Patch is applied as -p 4 to the src/runtime_src/core/edge directory
 SRC_URI += "file://0001-Fixed-ZOCL-dtbo-path-len-issue-6966.patch;striplevel=5;patchdir=./../../"
 
-S = "${WORKDIR}/git/src/runtime_src/core/edge/drm/zocl"
+S = "${UNPACKDIR}/git/src/runtime_src/core/edge/drm/zocl"
 
 inherit module
 

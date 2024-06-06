@@ -162,10 +162,10 @@ do_configure[vardeps] += "BIF_PARTITION_ATTR BIF_PARTITION_IMAGE BIF_COMMON_ATTR
 do_configure[vardeps] += "BIF_FSBL_ATTR BIF_BITSTREAM_ATTR BIF_ATF_ATTR BIF_DEVICETREE_ATTR BIF_SSBL_ATTR"
 
 do_compile() {
-    cd ${WORKDIR}
+    cd ${UNPACKDIR}
     rm -f ${B}/BOOT.bin
     if [ "${BIF_FILE_PATH}" != "${B}/bootgen.bif" ];then
-        BIF_FILE_PATH="${WORKDIR}${BIF_FILE_PATH}"
+        BIF_FILE_PATH="${UNPACKDIR}${BIF_FILE_PATH}"
     fi
     bootgen -image ${BIF_FILE_PATH} -arch ${BOOTGEN_ARCH} ${BOOTGEN_EXTRA_ARGS} -w -o ${B}/BOOT.bin
     if [ ! -e ${B}/BOOT.bin ]; then

@@ -22,7 +22,7 @@ do_install() {
 
 do_deploy() {
     install -d ${DEPLOYDIR}/${BPN}/
-    install -Dm 0644 ${WORKDIR}/package/${base_libdir}/firmware/*.elf ${DEPLOYDIR}/${BPN}/
+    install -Dm 0644 ${UNPACKDIR}/package/${base_libdir}/firmware/*.elf ${DEPLOYDIR}/${BPN}/
 }
 addtask deploy before do_build after do_package
 

@@ -9,7 +9,7 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 APP_DIR = "undefined"
 APP_DIR:zynq = "zynq_fsbl"

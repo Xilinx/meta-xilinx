@@ -28,7 +28,7 @@ SRC_URI = " \
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 # If were switching at runtime, we would need all RDEPENDS needed for all backends available
 X11RDEPENDS = "libxdamage libxext libx11 libdrm libxfixes"
@@ -76,10 +76,10 @@ do_install() {
     install -m 0644 ${S}/${PV}/glesHeaders/KHR/*.h ${D}${includedir}/KHR/
 
     install -d ${D}${libdir}/pkgconfig
-    install -m 0644 ${WORKDIR}/egl.pc ${D}${libdir}/pkgconfig/egl.pc
-    install -m 0644 ${WORKDIR}/glesv2.pc ${D}${libdir}/pkgconfig/glesv2.pc
-    install -m 0644 ${WORKDIR}/glesv1.pc ${D}${libdir}/pkgconfig/glesv1.pc
-    install -m 0644 ${WORKDIR}/glesv1_cm.pc ${D}${libdir}/pkgconfig/glesv1_cm.pc
+    install -m 0644 ${UNPACKDIR}/egl.pc ${D}${libdir}/pkgconfig/egl.pc
+    install -m 0644 ${UNPACKDIR}/glesv2.pc ${D}${libdir}/pkgconfig/glesv2.pc
+    install -m 0644 ${UNPACKDIR}/glesv1.pc ${D}${libdir}/pkgconfig/glesv1.pc
+    install -m 0644 ${UNPACKDIR}/glesv1_cm.pc ${D}${libdir}/pkgconfig/glesv1_cm.pc
 
     install -d ${D}${libdir}
     install -d ${D}${includedir}
@@ -106,7 +106,7 @@ do_install() {
     fi
     if [ "${USE_WL}" = "yes" ]; then
         install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
-        install -m 0644 ${WORKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
+        install -m 0644 ${UNPACKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
         install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/wayland/${MONOLITHIC_LIBMALI} ${D}${libdir}/wayland/${MONOLITHIC_LIBMALI}
         if [ "${MALI_BACKEND_DEFAULT}" = "wayland" ]; then
             ln -snf wayland/${MONOLITHIC_LIBMALI} ${D}${libdir}/${MONOLITHIC_LIBMALI}

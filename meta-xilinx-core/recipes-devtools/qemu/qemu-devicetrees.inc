@@ -14,7 +14,7 @@ REPO ?= "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 # Don't need to do anything
 do_install() {

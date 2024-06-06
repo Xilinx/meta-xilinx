@@ -26,7 +26,7 @@ do_fetch[cleandirs] = "${B}"
 DT_PADDING_SIZE = "0x1000"
 BOOTGEN_FLAGS ?= " -arch ${SOC_FAMILY} -w ${@bb.utils.contains('SOC_FAMILY','zynqmp','','-process_bitstream bin',d)}"
 
-S ?= "${WORKDIR}"
+S ?= "${UNPACKDIR}"
 FW_DIR ?= ""
 DTSI_PATH ?= ""
 DTBO_PATH ?= ""
@@ -52,7 +52,7 @@ python() {
     import re
     soc_family = d.getVar("SOC_FAMILY")
     if "git://" in d.getVar("SRC_URI") or "https://" in d.getVar("SRC_URI"):
-        d.setVar("S",'${WORKDIR}/git/'+d.getVar("FW_DIR"))
+        d.setVar("S",'${UNPACKDIR}/git/'+d.getVar("FW_DIR"))
     else:
         dtsi_found = False
         dtbo_found = False

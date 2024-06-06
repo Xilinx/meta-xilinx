@@ -13,7 +13,7 @@ GDBPROPREFIX = "--program-prefix='${TARGET_PREFIX}'"
 
 # Overrides PACKAGECONFIG variables in gdb-common.inc
 PACKAGECONFIG ??= "readline ${@bb.utils.filter('DISTRO_FEATURES', 'debuginfod', d)}"
-PACKAGECONFIG[python] = "--with-python=${WORKDIR}/python,--without-python,nativesdk-python3, \
+PACKAGECONFIG[python] = "--with-python=${UNPACKDIR}/python,--without-python,nativesdk-python3, \
                          nativesdk-python3-core \
                          nativesdk-python3-codecs nativesdk-python3-netclient \
                          "
@@ -23,7 +23,7 @@ PACKAGECONFIG[debuginfod] = "--with-debuginfod, --without-debuginfod, nativesdk-
 SSTATE_ALLOW_OVERLAP_FILES += "${STAGING_DATADIR}/gdb"
 
 do_configure:prepend() {
-cat > ${WORKDIR}/python << EOF
+cat > ${UNPACKDIR}/python << EOF
 #! /bin/sh
 case "\$2" in
         --includes) echo "-I${STAGING_INCDIR}/${PYTHON_DIR}${PYTHON_ABI}/" ;;
@@ -33,7 +33,7 @@ case "\$2" in
 esac
 exit 0
 EOF
-        chmod +x ${WORKDIR}/python
+        chmod +x ${UNPACKDIR}/python
 }
 
 # we don't want gdb to provide bfd/iberty/opcodes, which instead will override the

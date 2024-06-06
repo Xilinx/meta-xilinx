@@ -9,7 +9,7 @@ COMPATIBLE_MACHINE:versal = ".*"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 B = "${S}/lib/sw_apps/versal_plm/src"
 
 # The makefile does not handle parallelization

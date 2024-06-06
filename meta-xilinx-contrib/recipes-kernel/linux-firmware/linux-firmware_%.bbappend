@@ -14,9 +14,9 @@ do_install:append:minized-zynq7() {
 
        install -d ${D}${bindir}
 
-       install -m 0644 ${WORKDIR}/cyw-fmac-nvram/brcmfmac43430-sdio.txt ${D}${nonarch_base_libdir}/firmware/brcm/
-       install -m 0644 ${WORKDIR}/cyw-bt-patch/CYW43430A1.1DX.hcd ${D}${nonarch_base_libdir}/firmware/brcm/
-       install -m 0644 ${WORKDIR}/cyw-fmac-utils-imx32/wl ${D}${bindir}
+       install -m 0644 ${UNPACKDIR}/cyw-fmac-nvram/brcmfmac43430-sdio.txt ${D}${nonarch_base_libdir}/firmware/brcm/
+       install -m 0644 ${UNPACKDIR}/cyw-bt-patch/CYW43430A1.1DX.hcd ${D}${nonarch_base_libdir}/firmware/brcm/
+       install -m 0644 ${UNPACKDIR}/cyw-fmac-utils-imx32/wl ${D}${bindir}
 }
 
 PACKAGES:prepend:minized-zynq7 = "\

@@ -70,8 +70,8 @@ do_configure:prepend () {
     fi
 
     for f in ${EXTRA_DT_FILES} ${EXTRA_OVERLAYS}; do
-        if [ "$(realpath ${WORKDIR}/${f})" != "$(realpath ${DT_FILES_PATH}/`basename ${f}`)" ]; then
-            cp ${WORKDIR}/${f} ${DT_FILES_PATH}/
+        if [ "$(realpath ${UNPACKDIR}/${f})" != "$(realpath ${DT_FILES_PATH}/`basename ${f}`)" ]; then
+            cp ${UNPACKDIR}/${f} ${DT_FILES_PATH}/
         fi
     done
 }

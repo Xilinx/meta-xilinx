@@ -8,8 +8,8 @@ OECMAKE_ARGS:remove = "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON"
 
 SRCREV_FORMAT = "src_decouple"
 
-S = "${WORKDIR}/git"
-B = "${WORKDIR}/build"
+S = "${UNPACKDIR}/git"
+B = "${UNPACKDIR}/build"
 OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
 LICFILENAME = "license.txt"
 
@@ -77,7 +77,7 @@ XLNX_CMAKE_SYSTEM_NAME ?= "Generic"
 XLNX_CMAKE_BSP_VARS ?= ""
 
 cmake_do_generate_toolchain_file:append() {
-    cat >> ${WORKDIR}/toolchain.cmake <<EOF
+    cat >> ${UNPACKDIR}/toolchain.cmake <<EOF
     include(CMakeForceCompiler)
     CMAKE_FORCE_C_COMPILER("${OECMAKE_C_COMPILER}" GNU)
     CMAKE_FORCE_CXX_COMPILER("${OECMAKE_CXX_COMPILER}" GNU)

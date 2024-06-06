@@ -9,8 +9,8 @@ inherit deploy
 
 DEPENDS += "u-boot-mkimage-native"
 
-S = "${WORKDIR}/git"
-B = "${WORKDIR}/build"
+S = "${UNPACKDIR}/git"
+B = "${UNPACKDIR}/build"
 
 SYSROOT_DIRS += "/boot"
 

@@ -1,8 +1,8 @@
 # Can't depend on esw since this is needed for setup!
 inherit xlnx-embeddedsw
 
-S = "${WORKDIR}/git"
-B = "${WORKDIR}/build"
+S = "${UNPACKDIR}/git"
+B = "${UNPACKDIR}/build"
 
 INHIBIT_DEFAULT_DEPS = "1"
 

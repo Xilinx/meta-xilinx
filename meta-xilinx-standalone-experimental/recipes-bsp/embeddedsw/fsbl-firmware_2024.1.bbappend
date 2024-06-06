@@ -38,14 +38,14 @@ python() {
 }
 
 do_configure:prepend() {
-    if [ -e ${WORKDIR}/psu_init.c ]; then
-        install -m 0644 ${WORKDIR}/psu_init.c ${S}/${ESW_COMPONENT_SRC}
+    if [ -e ${UNPACKDIR}/psu_init.c ]; then
+        install -m 0644 ${UNPACKDIR}/psu_init.c ${S}/${ESW_COMPONENT_SRC}
     else
         bbwarn "Using the default psu_init.c, this may not work correctly."
     fi
 
-    if [ -e ${WORKDIR}/psu_init.h ]; then
-        install -m 0644 ${WORKDIR}/psu_init.h ${S}/${ESW_COMPONENT_SRC}
+    if [ -e ${UNPACKDIR}/psu_init.h ]; then
+        install -m 0644 ${UNPACKDIR}/psu_init.h ${S}/${ESW_COMPONENT_SRC}
     else
         bbwarn "Using the default psu_init.h, this may not work correctly."
     fi

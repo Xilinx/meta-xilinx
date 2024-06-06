@@ -69,7 +69,7 @@ include ${@bb.utils.contains('PACKAGECONFIG', 'perl', 'perf-perl.inc', '', d)}
 
 inherit kernelsrc
 
-S = "${WORKDIR}/${BP}"
+S = "${UNPACKDIR}/${BP}"
 SPDX_S = "${S}/tools/perf"
 
 # The LDFLAGS is required or some old kernels fails due missing
@@ -99,7 +99,7 @@ EXTRA_OEMAKE = '\
     AR="${AR}" \
     LD="${LD}" \
     EXTRA_CFLAGS="-ldw -I${S}" \
-    YFLAGS='-y --file-prefix-map=${WORKDIR}=${TARGET_DBGSRC_DIR}' \
+    YFLAGS='-y --file-prefix-map=${UNPACKDIR}=${TARGET_DBGSRC_DIR}' \
     EXTRA_LDFLAGS="${PERF_EXTRA_LDFLAGS}" \
     perfexecdir=${libexecdir} \
     NO_GTK2=1 \
@@ -169,7 +169,7 @@ do_install() {
 	if ${@bb.utils.contains('PACKAGECONFIG', 'python', 'true', 'false', d)} && grep -q install-python_ext ${S}/tools/perf/Makefile*; then
 	    oe_runmake DESTDIR=${D} install-python_ext
 	    if [ -e ${D}${libdir}/python*/site-packages/perf-*/SOURCES.txt ]; then
-		sed -i -e 's#${WORKDIR}##g' ${D}${libdir}/python*/site-packages/perf-*/SOURCES.txt
+		sed -i -e 's#${UNPACKDIR}##g' ${D}${libdir}/python*/site-packages/perf-*/SOURCES.txt
 	    fi
 	fi
 }

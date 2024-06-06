@@ -20,7 +20,7 @@ PACKAGECONFIG ??= "fdt alsa kvm pie slirp png gcrypt \
 PACKAGECONFIG:remove = "${@'kvm' if not os.path.exists('/usr/include/linux/kvm.h') else ''}"
 
 do_install:append() {
-    install -Dm 0755 ${WORKDIR}/powerpc_rom.bin ${D}${datadir}/qemu-xilinx
+    install -Dm 0755 ${UNPACKDIR}/powerpc_rom.bin ${D}${datadir}/qemu-xilinx
 
     # The following is also installed by qemu-native
     rm -f ${D}${datadir}/qemu-xilinx/trace-events-all
