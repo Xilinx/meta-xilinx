@@ -5,10 +5,15 @@ boot modes.
 
 * [Setting Up the Target](#setting-up-the-target)
 * [Booting from JTAG](#booting-from-jtag)
-  * [Loading boot components using XSCT](#loading-boot-components-using-xsct)
-  * [Loading Kernel, Root Filesystem and U-boot boot script](#loading-kernel-root-filesystem-and-u-boot-boot-script)
-    * [Using XSCT](#using-xsct)
-    * [Using TFTP](#using-tftp)
+  * [Sourcing the XSDB tools](#sourcing-the-xsdb-tools)
+  * [Deploying the images to target](#deploying-the-images-to-target)
+    * [Using devtool boot-jtag script](#using-devtool-boot-jtag-script)
+    * [Manually executing xsdb commands](#manually-executing-xsdb-commands)
+      * [Loading boot components using XSDB](#loading-boot-components-using-xsdb)
+      * [Loading Kernel, Root Filesystem and U-boot boot script](#loading-kernel-root-filesystem-and-u-boot-boot-script)
+        * [Using XSDB](#using-xsdb)
+        * [Using TFTP](#using-tftp)
+      * [Booting Linux](#booting-linux)
 * [Booting from SD](#booting-from-sd)
 * [Booting from QSPI](#booting-from-qspi)
 
@@ -35,37 +40,58 @@ boot modes.
 ---
 ## Booting from JTAG
 
-This boot flow requires the use of the AMD Xilinx tools, specifically XSCT and 
+This boot flow requires the use of the AMD Xilinx tools, specifically XSDB and
 the associated JTAG device drivers. This also requires access to the JTAG interface
 on the board, a number of AMD Xilinx and third-party boards come with on-board JTAG
 modules.
 
-1. Source the Vivado or Vitis tools `settings.sh` scripts.
-2. Power on the board, Open the XSCT console in the Vitis IDE by clicking the
-   XSCT button. Alternatively, you can also open the XSCT console by selecting
-   Xilinx -> XSCT Console.
+### Sourcing the XSDB tools
+
+Source the Vivado or Vitis tools `settings.sh` scripts.
+
+### Deploying the images to target
+
+Deploying the images can be done in two methods.
+
+#### Using devtool boot-jtag script
+
+1. Run devtool command to generate the boot-jtag.tcl script.
 ```
-$ xsct
+$ devtool boot-jtag --help
+$ devtool boot-jtag --image core-image-minimal --hw_server TCP:<hostname/ip-addr>:3121
 ```
-3. In the XSCT console, connect to the target over JTAG using the connect command.
+2. Script will be generated under ${DEPLOY_DIR_IMAGE}/boot-jtag.tcl
+3. Execute this script using xsdb tool as shown below.
+```
+$ xsdb <absolute-path-to-deploy-dir-image>/boot-jtag.tcl
+```
+
+#### Manually executing xsdb commands
+
+1. Power on the board, Launch the XSDB shell from command line as shown below.
+```
+$ xsdb
+```
+2. In the XSDB console, connect to the target over JTAG using the connect command.
    Optionally user can use `-url` to specify the local/remote hw_server. The 
    connect command returns the channel ID of the connection.
 ```
-xsct% connect
+xsdb% connect
 ```
-4. The targets command lists the available targets and allows you to select a
+3. The targets command lists the available targets and allows you to select a
    target using its ID. The targets are assigned IDs as they are discovered on
    the JTAG chain, so the IDs can change from session to session.
 ```
-xsct% targets
+xsdb% targets
 ```
 
 > **Note:** For non-interactive usage such as scripting, you can use the `-filter`
    option to select a target instead of selecting the target using its ID.
----
-### Loading boot components using XSCT
 
-1. Download the boot images for the target using XSCT with the `fpga` and `dow` 
+---
+##### Loading boot components using XSDB
+
+1. Download the boot images for the target using XSDB with the `fpga` and `dow`
    command. Zynq boot images will be located in the `${DEPLOY_DIR_IMAGE}`
    directory. 
 
@@ -74,24 +100,24 @@ xsct% targets
 
 2. Program the bitstream or skip this step if you are loading from u-boot or linux.
 ```
-xsct% fpga -no-revision-check ${DEPLOY_DIR_IMAGE}/download.bit
+xsdb% fpga -no-revision-check ${DEPLOY_DIR_IMAGE}/download.bit
 ```
 3. Select APU Cortex-A9 Core 0 to load and execute FSBL.
 ```
-xsct% targets -set -nocase -filter {name =~ "arm*#0"}
-xsct% catch {stop}
+xsdb% targets -set -nocase -filter {name =~ "arm*#0"}
+xsdb% catch {stop}
 ```
 5. Download and run FSBL from APU Cortex-A9 Core 0
 ```
-xsct% dow ${DEPLOY_DIR_IMAGE}/zynq_fsbl.elf
-xsct% con
+xsdb% dow ${DEPLOY_DIR_IMAGE}/zynq_fsbl.elf
+xsdb% con
 ```
 7. Now download U-boot.elf and Device tree to APU and execute.
 ```
-xsct% stop
-xsct% dow ${DEPLOY_DIR_IMAGE}/u-boot.elf
-xsct% dow -data ${DEPLOY_DIR_IMAGE}/system.dtb 0x100000
-xsct% con
+xsdb% stop
+xsdb% dow ${DEPLOY_DIR_IMAGE}/u-boot.elf
+xsdb% dow -data ${DEPLOY_DIR_IMAGE}/system.dtb 0x100000
+xsdb% con
 ```
 
 8. In the target Serial Terminal, press any key to stop the U-Boot auto-boot.
@@ -101,7 +127,7 @@ Hit any key to stop autoboot: 0
 U-Boot>
 ```
 ---
-### Loading Kernel, Root Filesystem and U-boot boot script
+##### Loading Kernel, Root Filesystem and U-boot boot script
 
 Load the images into the target DDR load address i.e.,
 `DDR base address + <image_offset>`. 
@@ -127,53 +153,56 @@ using U-Boot.
 > 4. If common ${DEPLOY_DIR_IMAGE}/system.dtb is used by u-boot and kernel, this
 > is already part of boot.bin we can skip loading dtb, else load kernel dtb.
 ---
-#### Using XSCT
+###### Using XSDB
 
-1. Suspend the execution of active target using `stop` command in XSCT.
+1. Suspend the execution of active target using `stop` command in XSDB.
 ```
-xsct% stop
+xsdb% stop
 ```
 2. Using the `dow` command to load the images into the target DDR/PL DDR load 
    address.
 ```
-xsct% dow -data ${DEPLOY_DIR_IMAGE}/uImage 0x200000
-xsct% dow -data ${DEPLOY_DIR_IMAGE}/system.dtb 0x100000
-xsct% dow -data ${DEPLOY_DIR_IMAGE}/core-image-minimal-${MACHINE}.cpio.gz.u-boot 0x4000000
-xsct% dow -data ${DEPLOY_DIR_IMAGE}/boot.scr 0x3000000
+xsdb% dow -data ${DEPLOY_DIR_IMAGE}/uImage 0x200000
+xsdb% dow -data ${DEPLOY_DIR_IMAGE}/system.dtb 0x100000
+xsdb% dow -data ${DEPLOY_DIR_IMAGE}/core-image-minimal-${MACHINE}.cpio.gz.u-boot 0x4000000
+xsdb% dow -data ${DEPLOY_DIR_IMAGE}/boot.scr 0x3000000
 ```
 ---
-#### Using TFTP
+###### Using TFTP
 
-1. Configure the `ipaddr` and `serverip` of the U-Boot environment. 
+1. Setup TFTP directory on host machine and copy the images to your TFTP directory
+   so that you can load them from U-Boot.
+2. Configure the `ipaddr` and `serverip` of the U-Boot environment.
 ```
 Versal> set serverip <server ip>
 Versal> set ipaddr <board ip>
 ```
-2. Load the images to DDR address. Make sure images are copied to tftp directory.
+3. Load the images to DDR address.
 ```
-U-Boot> tftpboot 0x200000 ${TFTPDIR}/uImage
-U-Boot> tftpboot 0x100000 ${TFTPDIR}/system.dtb
-U-Boot> tftpboot 0x4000000 ${TFTPDIR}/core-image-minimal-${MACHINE}.cpio.gz.u-boot
-U-Boot> tftpboot 0x3000000 ${TFTPDIR}/boot.scr
+U-Boot> tftpboot 0x200000 uImage
+U-Boot> tftpboot 0x100000 system.dtb
+U-Boot> tftpboot 0x4000000 core-image-minimal-${MACHINE}.cpio.gz.u-boot
+U-Boot> tftpboot 0x3000000 boot.scr
 ```
 ---
-### Booting Linux
+##### Booting Linux
 
 Once the images are loaded continue the execution.
 
 1. After loading images resume the execution of active target using the `con`
-command in XSCT shell, Skip step 1 for if you have used TFTP to load images.
+command in XSDB shell, Skip step 1 for if you have used TFTP to load images.
 ```
-xsct% con
+xsdb% con
 ```
-2. Terminate xsct shell.
+2. Terminate xsdb shell.
 ```
-xsct% exit
+xsdb% exit
 ```
 3. In the target Serial Terminal, from U-Boot prompt run `boot` command.
 ```
 U-Boot> boot
 ```
+
 ---
 ## Booting from SD
 
@@ -181,12 +210,13 @@ U-Boot> boot
 2. Configure the ZC702 board to boot in SD-Boot mode (1-OFF, 2-OFF, 3-ON, 4-ON, 5-OFF)
    by setting the SW6. Refer [Setting Up the Target](#setting-up-the-target).
 3. Follow SD boot instructions [README](README.booting.storage.md) for more details.
+
 ---
 ## Booting from QSPI
 
 1. To boot ZC702 board in QSPI boot mode, Power on the ZCU102 board and boot 
    using JTAG or SD boot mode, to ensure that U-Boot is running and also have 
-   boot.bin copied to DDR location using XSCT `dow` or `tftpboot` or `fatload`
+   boot.bin copied to DDR location using XSDB `dow` or `tftpboot` or `fatload`
    command.
 2. Follow Flash boot instructions [README](README.booting.flash.md) for more details.
 3. After flashing the images, turn off the power switch on the board, and change

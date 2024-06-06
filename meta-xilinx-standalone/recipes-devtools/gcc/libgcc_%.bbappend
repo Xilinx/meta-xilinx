@@ -2,6 +2,10 @@ require gcc-configure-xilinx-standalone.inc
 
 COMPATIBLE_HOST = "${HOST_SYS}"
 
+EXTRA_OECONF:append:xilinx-standalone:microblaze:class-target = " \
+        --disable-tm-clone-registry \
+        "
+
 python do_multilib_install:xilinx-standalone:class-target () {
     pass
 }

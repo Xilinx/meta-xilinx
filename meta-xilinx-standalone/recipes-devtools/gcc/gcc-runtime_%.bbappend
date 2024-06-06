@@ -28,6 +28,7 @@ EXTRA_OECONF:append:xilinx-standalone:armv8r:class-target = " \
 
 EXTRA_OECONF:append:xilinx-standalone:microblaze:class-target = " \
 	--without-long-double-128 \
+	--disable-tm-clone-registry \
 	"
 
 # Changes local to gcc-runtime...

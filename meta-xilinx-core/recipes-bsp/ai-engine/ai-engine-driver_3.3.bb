@@ -1,7 +1,7 @@
 SUMMARY = "Xilinx AI Engine runtime"
 DESCRIPTION = "This library provides APIs for the runtime support of the Xilinx AI Engine IP"
 
-require aie-rt.inc
+require aie-rt-2022.inc
 
 SECTION	= "libs"
 
@@ -12,7 +12,6 @@ I = "${AIEDIR}/include"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:versal-ai-core = "versal-ai-core"
 COMPATIBLE_MACHINE:versal-ai-edge = "${SOC_VARIANT_ARCH}"
-PV = "3.3"
 
 IOBACKENDS ?= "Linux"
 

@@ -1,0 +1,117 @@
+From 82139e7e4bdcf5ca51b2ac90c63e4af699e3eb6f Mon Sep 17 00:00:00 2001
+From: Juergen Gross <jgross@suse.com>
+Date: Thu, 20 May 2021 11:54:48 +0200
+Subject: [PATCH 07/11] softmmu: let qemu_map_ram_ptr() use
+ qemu_ram_ptr_length()
+
+qemu_map_ram_ptr() and qemu_ram_ptr_length() share quite some code, so
+modify qemu_ram_ptr_length() a little bit and use it for
+qemu_map_ram_ptr(), too.
+
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ softmmu/physmem.c | 58 +++++++++++++++++++----------------------------
+ 1 file changed, 23 insertions(+), 35 deletions(-)
+
+diff --git a/softmmu/physmem.c b/softmmu/physmem.c
+index f73629733e..a934e44fe7 100644
+--- a/softmmu/physmem.c
++++ b/softmmu/physmem.c
+@@ -2123,38 +2123,8 @@ void qemu_ram_remap(ram_addr_t addr, ram_addr_t length)
+ }
+ #endif /* !_WIN32 */
+ 
+-/* Return a host pointer to ram allocated with qemu_ram_alloc.
+- * This should not be used for general purpose DMA.  Use address_space_map
+- * or address_space_rw instead. For local memory (e.g. video ram) that the
+- * device owns, use memory_region_get_ram_ptr.
+- *
+- * Called within RCU critical section.
+- */
+-void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr)
+-{
+-    RAMBlock *block = ram_block;
+-
+-    if (block == NULL) {
+-        block = qemu_get_ram_block(addr);
+-        addr -= block->offset;
+-    }
+-
+-    if (xen_enabled() && block->host == NULL) {
+-        /* We need to check if the requested address is in the RAM
+-         * because we don't want to map the entire memory in QEMU.
+-         * In that case just map until the end of the page.
+-         */
+-        if (block->offset == 0) {
+-            return xen_map_cache(addr, 0, 0, false);
+-        }
+-
+-        block->host = xen_map_cache(block->offset, block->max_length, 1, false);
+-    }
+-    return ramblock_ptr(block, addr);
+-}
+-
+-/* Return a host pointer to guest's ram. Similar to qemu_map_ram_ptr
+- * but takes a size argument.
++/*
++ * Return a host pointer to guest's ram.
+  *
+  * Called within RCU critical section.
+  */
+@@ -2162,7 +2132,9 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
+                                  hwaddr *size, bool lock)
+ {
+     RAMBlock *block = ram_block;
+-    if (*size == 0) {
++    hwaddr len = 0;
++
++    if (size && *size == 0) {
+         return NULL;
+     }
+ 
+@@ -2170,7 +2142,10 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
+         block = qemu_get_ram_block(addr);
+         addr -= block->offset;
+     }
+-    *size = MIN(*size, block->max_length - addr);
++    if (size) {
++        *size = MIN(*size, block->max_length - addr);
++        len = *size;
++    }
+ 
+     if (xen_enabled() && block->host == NULL) {
+         /* We need to check if the requested address is in the RAM
+@@ -2178,7 +2153,7 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
+          * In that case just map the requested area.
+          */
+         if (block->offset == 0) {
+-            return xen_map_cache(addr, *size, lock, lock);
++            return xen_map_cache(addr, len, lock, lock);
+         }
+ 
+         block->host = xen_map_cache(block->offset, block->max_length, 1, lock);
+@@ -2187,6 +2162,19 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
+     return ramblock_ptr(block, addr);
+ }
+ 
++/*
++ * Return a host pointer to ram allocated with qemu_ram_alloc.
++ * This should not be used for general purpose DMA.  Use address_space_map
++ * or address_space_rw instead. For local memory (e.g. video ram) that the
++ * device owns, use memory_region_get_ram_ptr.
++ *
++ * Called within RCU critical section.
++ */
++void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr)
++{
++    return qemu_ram_ptr_length(ram_block, addr, NULL, false);
++}
++
+ /* Return the offset of a hostpointer within a ramblock */
+ ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host)
+ {
+-- 
+2.39.2
+

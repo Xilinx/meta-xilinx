@@ -22,7 +22,7 @@ This section describes how to manually prepare and populate an SD card image.
 There are automation tools in OpenEmbedded that can generate disk images already
 formatted and prepared such that they can be written directly to a disk. Refer
 to the Yocto Project Manual for more details:
-https://docs.yoctoproject.org/4.1.2/singleindex.html#creating-partitioned-images-using-wic
+https://docs.yoctoproject.org/4.1.4/singleindex.html#creating-partitioned-images-using-wic
 
 ## Writing image to SD or eMMC device
 
@@ -33,11 +33,17 @@ There are two ways to write the images to SD card or eMMC device.
 2. To write image to eMMC device make sure you need to boot Linux from JTAG or 
    SD or QSPI first, then copy the wic image to `<target_rootfs>/tmp` directory.
 
+> **Note:** `<target-image>` refers to core-image-minimal or petalinux-image-minimal
+
 ### Using Wic file
 
-Write wic image file to the SD card or eMMC device.
+Write wic image file to the SD card or eMMC device. Use dd command or balena
+etcher to flash the wic image file to SD card. WIC image will be
+build/tmp/deploy/${MACHINE}/<target-image>-${MACHINE}-${DATETIME}.rootfs.wic, See
+[Flashing Images Using bmaptool](https://docs.yoctoproject.org/singleindex.html#flashing-images-using-bmaptool)
+for fast and easy way to flash the image
 ```
-$ sudo dd if=xilinx-default-sd-${DATETIME}-sda.direct of=/dev/mmcblk<devnum> bs=4M 
+$ sudo dd if=<target-image>-${MACHINE}-${DATETIME}.rootfs.wic of=/dev/mmcblk<devnum> bs=4M
 ```
 
 ### Using Yocto images
@@ -55,22 +61,40 @@ $ sudo lsblk /dev/mmcblk<devnum> -o NAME,FSTYPE,LABEL,PARTLABEL
 $ sudo mount -L boot /mnt/boot; sudo mount -L root /mnt/rootfs` 
 ```
 3. Copy the boot images to the SD card or eMMC device FAT32 partition.
+
+* Linux
    * boot.bin
    * boot.scr
    * Image or uImage (For Zynq7000 only)
    * system.dtb
    * rootfs.cpio.gz.u-boot (If using a ramdisk)
-```
-$ cp ${DEPLOY_DIR_IMAGE}/boot.bin /mnt/boot/boot.bin
-$ cp ${DEPLOY_DIR_IMAGE}/boot.scr /mnt/boot/boot.scr
-$ cp ${DEPLOY_DIR_IMAGE}/Image /mnt/boot/Image
-$ cp ${DEPLOY_DIR_IMAGE}/system.dtb /mnt/boot/system.dtb
-$ cp ${DEPLOY_DIR_IMAGE}/core-image-minimal-${MACHINE}.cpio.gz.u-boot /mnt/boot/rootfs.cpio.gz.u-boot
-```
-4. Extract `core-image-minimal-${MACHINE}-${DATETIME}.rootfs.tar.gz` file content to the SD 
+   ```
+   $ cp ${DEPLOY_DIR_IMAGE}/boot.bin /mnt/boot/boot.bin
+   $ cp ${DEPLOY_DIR_IMAGE}/boot.scr /mnt/boot/boot.scr
+   $ cp ${DEPLOY_DIR_IMAGE}/Image /mnt/boot/Image
+   $ cp ${DEPLOY_DIR_IMAGE}/system.dtb /mnt/boot/system.dtb
+   $ cp ${DEPLOY_DIR_IMAGE}/<target-image>-${MACHINE}-${DATETIME}.cpio.gz.u-boot /mnt/boot/rootfs.cpio.gz.u-boot
+   ```
+* Xen
+   * boot.bin
+   * boot.scr
+   * Image
+   * xen
+   * system.dtb
+   * rootfs.cpio.gz (If using a ramdisk)
+   ```
+   $ cp ${DEPLOY_DIR_IMAGE}/boot.bin /mnt/boot/boot.bin
+   $ cp ${DEPLOY_DIR_IMAGE}/boot.scr /mnt/boot/boot.scr
+   $ cp ${DEPLOY_DIR_IMAGE}/Image /mnt/boot/Image
+   $ cp ${DEPLOY_DIR_IMAGE}/xen /mnt/boot/xen
+   $ cp ${DEPLOY_DIR_IMAGE}/system.dtb /mnt/boot/system.dtb
+   $ cp ${DEPLOY_DIR_IMAGE}/<target-image>-${MACHINE}-${DATETIME}.cpio.gz /mnt/boot/rootfs.cpio.gz
+   ```
+
+4. Extract `<target-image>-${MACHINE}-${DATETIME}.rootfs.tar.gz` file content to the SD
    card or eMMC device EXT4 partition.
 ```
-$ sudo tar -xf ${DEPLOY_DIR_IMAGE}/core-image-minimal-${MACHINE}-${DATETIME}.rootfs.tar.gz -C /mnt/rootfs
+$ sudo tar -xf ${DEPLOY_DIR_IMAGE}/<target-image>-${MACHINE}-${DATETIME}.rootfs.tar.gz -C /mnt/rootfs
 $ sync
 ```
 5. Unmount the SD Card or eMMC device and boot from SD or eMMC boot modes.
@@ -97,10 +121,10 @@ $ sudo lsblk /dev/sd<X> -o NAME,FSTYPE,LABEL,PARTLABEL
 ```
 $ sudo mount -L root /mnt/rootfs` 
 ```
-3. Extract `core-image-minimal-${MACHINE}-${DATETIME}.rootfs.tar.gz` file content
+3. Extract `<target-image>-${MACHINE}-${DATETIME}.rootfs.tar.gz` file content
    to the USB or SATA device EXT4 partition.
 ```
-$ sudo tar -xf ${DEPLOY_DIR_IMAGE}/core-image-minimal-${MACHINE}-${DATETIME}.rootfs.tar.gz -C /mnt/rootfs
+$ sudo tar -xf ${DEPLOY_DIR_IMAGE}/<target-image>-${MACHINE}-${DATETIME}.rootfs.tar.gz -C /mnt/rootfs
 $ sync
 ```
 4. Unmount the USB or SATA device.

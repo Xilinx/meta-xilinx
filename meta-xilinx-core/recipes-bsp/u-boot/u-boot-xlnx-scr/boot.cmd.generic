@@ -39,25 +39,25 @@ do
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@KERNEL_LOAD_ADDRESS@@ ${kernel_name};
 		fi
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /system.dtb; then
-			fatload ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_ADDRESS@@ system.dtb;
-			setenv fdtcontroladdr @@DEVICETREE_ADDRESS@@
+			fatload ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_ADDRESS_SD@@ system.dtb;
+			setenv fdtcontroladdr @@DEVICETREE_ADDRESS_SD@@
 		fi
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /devicetree/openamp.dtbo; then
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_OVERLAY_ADDRESS@@ devicetree/openamp.dtbo;
-			fdt addr @@DEVICETREE_ADDRESS@@
+			fdt addr @@DEVICETREE_ADDRESS_SD@@
 			fdt resize 8192
 			fdt apply @@DEVICETREE_OVERLAY_ADDRESS@@
 		fi
 		run update_bootargs
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /${ramdisk_name} && test "${skip_tinyramdisk}" != "yes"; then
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${ramdisk_name};
-			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
+			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS_SD@@
 		fi
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /${rootfs_name} && test "${skip_ramdisk}" != "yes"; then
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${rootfs_name};
-			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
+			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS_SD@@
 		fi
-		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ - @@DEVICETREE_ADDRESS@@
+		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ - @@DEVICETREE_ADDRESS_SD@@
 	fi
 	if test "${boot_target}" = "xspi0" || test "${boot_target}" = "xspi1" || test "${boot_target}" = "qspi" || test "${boot_target}" = "qspi0"; then
 		sf probe 0 0 0;

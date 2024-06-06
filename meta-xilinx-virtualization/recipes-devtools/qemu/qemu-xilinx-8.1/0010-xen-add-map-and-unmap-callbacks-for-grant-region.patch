@@ -1,0 +1,262 @@
+From 90496d4c71e3b9334aebca118661bf72631ed0f0 Mon Sep 17 00:00:00 2001
+From: Juergen Gross <jgross@suse.com>
+Date: Fri, 26 Aug 2022 13:57:06 +0200
+Subject: [PATCH 10/11] xen: add map and unmap callbacks for grant region
+
+Add the callbacks for mapping/unmapping guest memory via grants to the
+special grant memory region.
+
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+---
+ hw/xen/xen-mapcache.c | 176 +++++++++++++++++++++++++++++++++++++++++-
+ softmmu/physmem.c     |  11 ++-
+ 2 files changed, 182 insertions(+), 5 deletions(-)
+
+diff --git a/hw/xen/xen-mapcache.c b/hw/xen/xen-mapcache.c
+index 8a61c7dde6..e071328fc5 100644
+--- a/hw/xen/xen-mapcache.c
++++ b/hw/xen/xen-mapcache.c
+@@ -9,6 +9,8 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/queue.h"
++#include "qemu/thread.h"
+ #include "qemu/units.h"
+ #include "qemu/error-report.h"
+ 
+@@ -23,6 +25,8 @@
+ #include "sysemu/xen-mapcache.h"
+ #include "trace.h"
+ 
++#include <xenevtchn.h>
++#include <xengnttab.h>
+ 
+ //#define MAPCACHE_DEBUG
+ 
+@@ -385,7 +389,7 @@ uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
+     return p;
+ }
+ 
+-ram_addr_t xen_ram_addr_from_mapcache(void *ptr)
++static ram_addr_t xen_ram_addr_from_mapcache_try(void *ptr)
+ {
+     MapCacheEntry *entry = NULL;
+     MapCacheRev *reventry;
+@@ -594,10 +598,179 @@ uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
+     return p;
+ }
+ 
++struct XENMappedGrantRegion {
++    void *addr;
++    unsigned int pages;
++    unsigned int refs;
++    unsigned int prot;
++    uint32_t idx;
++    QLIST_ENTRY(XENMappedGrantRegion) list;
++};
++
++static xengnttab_handle *xen_region_gnttabdev;
++static QLIST_HEAD(GrantRegionList, XENMappedGrantRegion) xen_grant_mappings =
++    QLIST_HEAD_INITIALIZER(xen_grant_mappings);
++static QemuMutex xen_map_mutex;
++
++static void *xen_map_grant_dyn(MemoryRegion **mr, hwaddr addr, hwaddr *plen,
++                               bool is_write, MemTxAttrs attrs)
++{
++    unsigned int page_off = addr & (XC_PAGE_SIZE - 1);
++    unsigned int i;
++    unsigned int total_grants = 0;
++    unsigned int nrefs = (page_off + *plen + XC_PAGE_SIZE - 1) >> XC_PAGE_SHIFT;
++    uint32_t ref = (addr - XEN_GRANT_ADDR_OFF) >> XC_PAGE_SHIFT;
++    uint32_t *refs = NULL;
++    unsigned int prot = PROT_READ;
++    struct XENMappedGrantRegion *mgr = NULL;
++
++    if (is_write) {
++        prot |= PROT_WRITE;
++    }
++
++    qemu_mutex_lock(&xen_map_mutex);
++
++    QLIST_FOREACH(mgr, &xen_grant_mappings, list) {
++        if (mgr->idx == ref &&
++            mgr->pages == nrefs &&
++            (mgr->prot & prot) == prot) {
++            break;
++        }
++
++        total_grants += mgr->pages;
++    }
++
++    if (!mgr) {
++        if (nrefs + total_grants >= XEN_MAX_VIRTIO_GRANTS) {
++            qemu_mutex_unlock(&xen_map_mutex);
++            return NULL;
++        }
++
++        mgr = g_new(struct XENMappedGrantRegion, 1);
++
++        if (nrefs == 1) {
++            refs = &ref;
++        } else {
++            refs = g_new(uint32_t, nrefs);
++            for (i = 0; i < nrefs; i++) {
++                refs[i] = ref + i;
++            }
++        }
++        mgr->addr = xengnttab_map_domain_grant_refs(xen_region_gnttabdev, nrefs,
++                                                    xen_domid, refs, prot);
++        if (mgr->addr) {
++            mgr->pages = nrefs;
++            mgr->refs = 1;
++            mgr->prot = prot;
++            mgr->idx = ref;
++
++            QLIST_INSERT_HEAD(&xen_grant_mappings, mgr, list);
++        } else {
++            g_free(mgr);
++            mgr = NULL;
++        }
++    } else {
++        mgr->refs++;
++    }
++
++    qemu_mutex_unlock(&xen_map_mutex);
++
++    if (nrefs > 1) {
++        g_free(refs);
++    }
++
++    return mgr ? mgr->addr + page_off : NULL;
++}
++
++static void xen_unmap_grant_dyn(MemoryRegion *mr, void *buffer, ram_addr_t addr,
++                                hwaddr len, bool is_write, hwaddr access_len)
++{
++    unsigned int page_off = (unsigned long)buffer & (XC_PAGE_SIZE - 1);
++    unsigned int nrefs = (page_off + len + XC_PAGE_SIZE - 1) >> XC_PAGE_SHIFT;
++    unsigned int prot = PROT_READ;
++    struct XENMappedGrantRegion *mgr = NULL;
++
++    if (is_write) {
++        prot |= PROT_WRITE;
++    }
++
++    qemu_mutex_lock(&xen_map_mutex);
++
++    QLIST_FOREACH(mgr, &xen_grant_mappings, list) {
++        if (mgr->addr == buffer - page_off &&
++            mgr->pages == nrefs &&
++            (mgr->prot & prot) == prot) {
++            break;
++        }
++    }
++    if (mgr) {
++        mgr->refs--;
++        if (!mgr->refs) {
++            xengnttab_unmap(xen_region_gnttabdev, mgr->addr, nrefs);
++
++            QLIST_REMOVE(mgr, list);
++            g_free(mgr);
++        }
++    } else {
++        error_report("xen_unmap_grant_dyn() trying to unmap unknown buffer");
++    }
++
++    qemu_mutex_unlock(&xen_map_mutex);
++}
++
++static ram_addr_t xen_ram_addr_from_grant_cache(void *ptr)
++{
++    unsigned int page_off = (unsigned long)ptr & (XC_PAGE_SIZE - 1);
++    struct XENMappedGrantRegion *mgr = NULL;
++    ram_addr_t raddr = RAM_ADDR_INVALID;
++
++    qemu_mutex_lock(&xen_map_mutex);
++
++    QLIST_FOREACH(mgr, &xen_grant_mappings, list) {
++        if (mgr->addr == ptr - page_off) {
++            break;
++        }
++    }
++
++    if (mgr) {
++        raddr = (mgr->idx << XC_PAGE_SHIFT) + page_off + XEN_GRANT_ADDR_OFF;
++    }
++
++    qemu_mutex_unlock(&xen_map_mutex);
++
++    return raddr;
++}
++
++ram_addr_t xen_ram_addr_from_mapcache(void *ptr)
++{
++    ram_addr_t raddr;
++
++    raddr = xen_ram_addr_from_mapcache_try(ptr);
++    if (raddr == RAM_ADDR_INVALID) {
++        raddr = xen_ram_addr_from_grant_cache(ptr);
++    }
++
++    return raddr;
++}
++
++static const struct MemoryRegionOps xen_grant_mr_ops = {
++    .map = xen_map_grant_dyn,
++    .unmap = xen_unmap_grant_dyn,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++};
++
+ MemoryRegion *xen_init_grant_ram(void)
+ {
+     RAMBlock *block;
+ 
++    qemu_mutex_init(&xen_map_mutex);
++
++    xen_region_gnttabdev = xengnttab_open(NULL, 0);
++    if (xen_region_gnttabdev == NULL) {
++        fprintf(stderr, "can't open gnttab device\n");
++        return NULL;
++    }
++
+     memory_region_init(&ram_grants, NULL, "xen.grants",
+                        XEN_MAX_VIRTIO_GRANTS * XC_PAGE_SIZE);
+     block = g_malloc0(sizeof(*block));
+@@ -612,6 +785,7 @@ MemoryRegion *xen_init_grant_ram(void)
+     ram_grants.ram_block = block;
+     ram_grants.ram = true;
+     ram_grants.terminates = true;
++    ram_grants.ops = &xen_grant_mr_ops;
+     ram_block_add_list(block);
+     memory_region_add_subregion(get_system_memory(), XEN_GRANT_ADDR_OFF,
+                                 &ram_grants);
+diff --git a/softmmu/physmem.c b/softmmu/physmem.c
+index a1e2030424..e1057304f1 100644
+--- a/softmmu/physmem.c
++++ b/softmmu/physmem.c
+@@ -2210,13 +2210,16 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
+ 
+     if (xen_enabled()) {
+         ram_addr_t ram_addr;
++
+         RCU_READ_LOCK_GUARD();
+         ram_addr = xen_ram_addr_from_mapcache(ptr);
+-        block = qemu_get_ram_block(ram_addr);
+-        if (block) {
+-            *offset = ram_addr - block->offset;
++        if (ram_addr != RAM_ADDR_INVALID) {
++            block = qemu_get_ram_block(ram_addr);
++            if (block) {
++                *offset = ram_addr - block->offset;
++            }
++            return block;
+         }
+-        return block;
+     }
+ 
+     RCU_READ_LOCK_GUARD();
+-- 
+2.39.2
+

@@ -1,0 +1,70 @@
+From 02507086b3ad9beb9c669aae54fcb4857cd61ef8 Mon Sep 17 00:00:00 2001
+From: Juergen Gross <jgross@suse.com>
+Date: Tue, 16 Mar 2021 14:00:33 +0100
+Subject: [PATCH 04/11] xen: when unplugging emulated devices skip virtio
+ devices
+
+Virtio devices should never be unplugged at boot time, as they are
+similar to pci passthrough devices.
+
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+---
+ docs/system/i386/xen.rst   |  3 ---
+ hw/i386/xen/xen_platform.c | 10 ++++++++--
+ 2 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/docs/system/i386/xen.rst b/docs/system/i386/xen.rst
+index f06765e88c..b86d57af6e 100644
+--- a/docs/system/i386/xen.rst
++++ b/docs/system/i386/xen.rst
+@@ -52,9 +52,6 @@ It is necessary to use the pc machine type, as the q35 machine uses AHCI instead
+ of legacy IDE, and AHCI disks are not unplugged through the Xen PV unplug
+ mechanism.
+ 
+-VirtIO devices can also be used; Linux guests may need to be dissuaded from
+-umplugging them by adding 'xen_emul_unplug=never' on their command line.
+-
+ Properties
+ ----------
+ 
+diff --git a/hw/i386/xen/xen_platform.c b/hw/i386/xen/xen_platform.c
+index 17457ff3de..0187b73eeb 100644
+--- a/hw/i386/xen/xen_platform.c
++++ b/hw/i386/xen/xen_platform.c
+@@ -28,6 +28,7 @@
+ #include "hw/ide/pci.h"
+ #include "hw/pci/pci.h"
+ #include "migration/vmstate.h"
++#include "hw/virtio/virtio-bus.h"
+ #include "net/net.h"
+ #include "trace.h"
+ #include "sysemu/xen.h"
+@@ -129,10 +130,11 @@ static bool pci_device_is_passthrough(PCIDevice *d)
+ 
+ static void unplug_nic(PCIBus *b, PCIDevice *d, void *o)
+ {
+-    /* We have to ignore passthrough devices */
++    /* We have to ignore passthrough devices  and virtio devices. */
+     if (pci_get_word(d->config + PCI_CLASS_DEVICE) ==
+             PCI_CLASS_NETWORK_ETHERNET
+-            && !pci_device_is_passthrough(d)) {
++            && !pci_device_is_passthrough(d)
++            && !qdev_get_child_bus(&d->qdev, TYPE_VIRTIO_BUS)) {
+         object_unparent(OBJECT(d));
+     }
+ }
+@@ -208,6 +210,10 @@ static void unplug_disks(PCIBus *b, PCIDevice *d, void *opaque)
+     /* We have to ignore passthrough devices */
+     if (pci_device_is_passthrough(d))
+         return;
++    /* Ignore virtio devices */
++    if (qdev_get_child_bus(&d->qdev, TYPE_VIRTIO_BUS)) {
++        return;
++    }
+ 
+     switch (pci_get_word(d->config + PCI_CLASS_DEVICE)) {
+     case PCI_CLASS_STORAGE_IDE:
+-- 
+2.39.2
+

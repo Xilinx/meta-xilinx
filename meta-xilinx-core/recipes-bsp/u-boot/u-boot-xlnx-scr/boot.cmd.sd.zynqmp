@@ -1,7 +1,7 @@
 @@PRE_BOOTENV@@
 
 setenv sdbootdev @@SDBOOTDEV@@
-setenv bootargs $bootargs root=/dev/mmcblk${sdbootdev}p2 rw rootwait earlycon clk_ignore_unused
+setenv bootargs $bootargs root=/dev/mmcblk${sdbootdev}p2 rw rootwait earlycon
 if test -n "@@BITSTREAM@@"; then
    fatload mmc $sdbootdev @@BITSTREAM_LOAD_ADDRESS@@ @@BITSTREAM_IMAGE@@ && fpga @@BITSTREAM_LOAD_TYPE@@ 0 @@BITSTREAM_LOAD_ADDRESS@@ ${filesize}
 fi

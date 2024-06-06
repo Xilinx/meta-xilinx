@@ -20,10 +20,6 @@ SRC_URI = "${REPO};${BRANCHARG}"
 
 S  = "${WORKDIR}/git"
 
-COMPATIBLE_MACHINE = "^$"
-COMPATIBLE_MACHINE:versal-ai-core = "versal-ai-core"
-COMPATIBLE_MACHINE:versal-ai-edge = "versal-ai-edge"
-
 PACKAGE_ARCH = "${SOC_FAMILY_ARCH}"
 
 RDEPENDS:${PN} = "kernel-module-vdu"

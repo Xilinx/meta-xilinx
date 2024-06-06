@@ -1,0 +1,153 @@
+From 637d10471fef76a7ab0e8f5631ea3c85ff5ce9db Mon Sep 17 00:00:00 2001
+From: Juergen Gross <jgross@suse.com>
+Date: Thu, 20 May 2021 11:19:58 +0200
+Subject: [PATCH 06/11] xen: add pseudo RAM region for grant mappings
+
+Add a memory region which can be used to automatically map granted
+memory. It is starting at 0x8000000000000000ULL in order to be able to
+distinguish it from normal RAM.
+
+For this reason the xen.ram memory region is expanded, which has no
+further impact as it is used just as a container of the real RAM
+regions and now the grant region.
+
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/i386/xen/xen-hvm.c           |  3 +++
+ hw/xen/xen-hvm-common.c         |  4 ++--
+ hw/xen/xen-mapcache.c           | 27 +++++++++++++++++++++++++++
+ include/hw/xen/xen-hvm-common.h |  2 ++
+ include/hw/xen/xen_pvdev.h      |  3 +++
+ include/sysemu/xen-mapcache.h   |  3 +++
+ 6 files changed, 40 insertions(+), 2 deletions(-)
+
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index f42621e674..67a55558a6 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -172,6 +172,9 @@ static void xen_ram_init(PCMachineState *pcms,
+                                  x86ms->above_4g_mem_size);
+         memory_region_add_subregion(sysmem, 0x100000000ULL, &ram_hi);
+     }
++
++    /* Add grant mappings as a pseudo RAM region. */
++    ram_grants = *xen_init_grant_ram();
+ }
+ 
+ static XenPhysmap *get_physmapping(hwaddr start_addr, ram_addr_t size)
+diff --git a/hw/xen/xen-hvm-common.c b/hw/xen/xen-hvm-common.c
+index 565dc39c8f..b7255977a5 100644
+--- a/hw/xen/xen-hvm-common.c
++++ b/hw/xen/xen-hvm-common.c
+@@ -9,7 +9,7 @@
+ #include "hw/boards.h"
+ #include "hw/xen/arch_hvm.h"
+ 
+-MemoryRegion ram_memory;
++MemoryRegion ram_memory, ram_grants;
+ 
+ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size, MemoryRegion *mr,
+                    Error **errp)
+@@ -26,7 +26,7 @@ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size, MemoryRegion *mr,
+         return;
+     }
+ 
+-    if (mr == &ram_memory) {
++    if (mr == &ram_memory || mr == &ram_grants) {
+         return;
+     }
+ 
+diff --git a/hw/xen/xen-mapcache.c b/hw/xen/xen-mapcache.c
+index f7d974677d..8115c44c00 100644
+--- a/hw/xen/xen-mapcache.c
++++ b/hw/xen/xen-mapcache.c
+@@ -14,7 +14,9 @@
+ 
+ #include <sys/resource.h>
+ 
++#include "hw/xen/xen-hvm-common.h"
+ #include "hw/xen/xen_native.h"
++#include "hw/xen/xen_pvdev.h"
+ #include "qemu/bitmap.h"
+ 
+ #include "sysemu/runstate.h"
+@@ -597,3 +599,28 @@ uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
+     mapcache_unlock();
+     return p;
+ }
++
++MemoryRegion *xen_init_grant_ram(void)
++{
++    RAMBlock *block;
++
++    memory_region_init(&ram_grants, NULL, "xen.grants",
++                       XEN_MAX_VIRTIO_GRANTS * XC_PAGE_SIZE);
++    block = g_malloc0(sizeof(*block));
++    block->mr = &ram_grants;
++    block->used_length = XEN_MAX_VIRTIO_GRANTS * XC_PAGE_SIZE;
++    block->max_length = XEN_MAX_VIRTIO_GRANTS * XC_PAGE_SIZE;
++    block->fd = -1;
++    block->page_size = XC_PAGE_SIZE;
++    block->host = (void *)XEN_GRANT_ADDR_OFF;
++    block->offset = XEN_GRANT_ADDR_OFF;
++    block->flags = RAM_PREALLOC;
++    ram_grants.ram_block = block;
++    ram_grants.ram = true;
++    ram_grants.terminates = true;
++    ram_block_add_list(block);
++    memory_region_add_subregion(get_system_memory(), XEN_GRANT_ADDR_OFF,
++                                &ram_grants);
++
++    return &ram_grants;
++}
+diff --git a/include/hw/xen/xen-hvm-common.h b/include/hw/xen/xen-hvm-common.h
+index 4e9904f1a6..0d300ba898 100644
+--- a/include/hw/xen/xen-hvm-common.h
++++ b/include/hw/xen/xen-hvm-common.h
+@@ -17,6 +17,8 @@
+ #include <xen/hvm/ioreq.h>
+ 
+ extern MemoryRegion ram_memory;
++
++extern MemoryRegion ram_grants;
+ extern MemoryListener xen_io_listener;
+ extern DeviceListener xen_device_listener;
+ 
+diff --git a/include/hw/xen/xen_pvdev.h b/include/hw/xen/xen_pvdev.h
+index ddad4b9f36..0f1b5edfa9 100644
+--- a/include/hw/xen/xen_pvdev.h
++++ b/include/hw/xen/xen_pvdev.h
+@@ -80,4 +80,7 @@ int xen_pv_send_notify(struct XenLegacyDevice *xendev);
+ void xen_pv_printf(struct XenLegacyDevice *xendev, int msg_level,
+                    const char *fmt, ...)  G_GNUC_PRINTF(3, 4);
+ 
++#define XEN_GRANT_ADDR_OFF    0x8000000000000000ULL
++#define XEN_MAX_VIRTIO_GRANTS 65536
++
+ #endif /* QEMU_HW_XEN_PVDEV_H */
+diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
+index c8e7c2f6cf..f4bedb1c11 100644
+--- a/include/sysemu/xen-mapcache.h
++++ b/include/sysemu/xen-mapcache.h
+@@ -10,6 +10,7 @@
+ #define XEN_MAPCACHE_H
+ 
+ #include "exec/cpu-common.h"
++#include "exec/ram_addr.h"
+ 
+ typedef hwaddr (*phys_offset_to_gaddr_t)(hwaddr phys_offset,
+                                          ram_addr_t size);
+@@ -25,6 +26,8 @@ void xen_invalidate_map_cache(void);
+ uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
+                                  hwaddr new_phys_addr,
+                                  hwaddr size);
++MemoryRegion *xen_init_grant_ram(void);
++
+ #else
+ 
+ static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
+-- 
+2.39.2
+

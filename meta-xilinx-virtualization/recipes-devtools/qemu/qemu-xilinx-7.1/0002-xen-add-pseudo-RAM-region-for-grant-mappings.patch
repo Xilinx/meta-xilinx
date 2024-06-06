@@ -1,0 +1,252 @@
+From e18daac2f6d3f60c8217f44189a91cf8240a591f Mon Sep 17 00:00:00 2001
+From: Juergen Gross <jgross@suse.com>
+Date: Thu, 20 May 2021 11:19:58 +0200
+Subject: [PATCH 2/8] xen: add pseudo RAM region for grant mappings
+
+Add a memory region which can be used to automatically map granted
+memory. It is starting at 0x8000000000000000ULL in order to be able to
+distinguish it from normal RAM.
+
+For this reason the xen.ram memory region is expanded, which has no
+further impact as it is used just as a container of the real RAM
+regions and now the grant region.
+
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+Acked-by: Stefano Stabellini <stefano.stabellini@amd.com>
+---
+ hw/i386/xen/xen-hvm.c           |  3 ++
+ hw/xen/xen-hvm-common.c         |  4 +--
+ hw/xen/xen-mapcache.c           | 28 +++++++++++++++
+ include/exec/ram_addr.h         |  1 +
+ include/hw/xen/xen-hvm-common.h |  2 ++
+ include/hw/xen/xen_pvdev.h      |  3 ++
+ include/sysemu/xen-mapcache.h   |  3 ++
+ softmmu/physmem.c               | 61 ++++++++++++++++++++-------------
+ 8 files changed, 80 insertions(+), 25 deletions(-)
+
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 36d87555a9..2dcc2e1179 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -171,6 +171,9 @@ static void xen_ram_init(PCMachineState *pcms,
+                                  x86ms->above_4g_mem_size);
+         memory_region_add_subregion(sysmem, 0x100000000ULL, &ram_hi);
+     }
++
++    /* Add grant mappings as a pseudo RAM region. */
++    ram_grants = *xen_init_grant_ram();
+ }
+ 
+ static XenPhysmap *get_physmapping(hwaddr start_addr, ram_addr_t size)
+diff --git a/hw/xen/xen-hvm-common.c b/hw/xen/xen-hvm-common.c
+index 7e7d23397f..abd6e379d3 100644
+--- a/hw/xen/xen-hvm-common.c
++++ b/hw/xen/xen-hvm-common.c
+@@ -10,7 +10,7 @@
+ #include "hw/boards.h"
+ #include "hw/xen/arch_hvm.h"
+ 
+-MemoryRegion ram_memory;
++MemoryRegion ram_memory, ram_grants;
+ 
+ MemoryListener xen_io_listener = {
+     .name = "xen-io",
+@@ -742,7 +742,7 @@ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size, MemoryRegion *mr,
+         return;
+     }
+ 
+-    if (mr == &ram_memory) {
++    if (mr == &ram_memory || mr == &ram_grants) {
+         return;
+     }
+ 
+diff --git a/hw/xen/xen-mapcache.c b/hw/xen/xen-mapcache.c
+index a2f93096e7..0b75f1633a 100644
+--- a/hw/xen/xen-mapcache.c
++++ b/hw/xen/xen-mapcache.c
+@@ -14,7 +14,10 @@
+ 
+ #include <sys/resource.h>
+ 
++#include "hw/xen/xen-hvm-common.h"
+ #include "hw/xen/xen-legacy-backend.h"
++#include "hw/xen/xen_pvdev.h"
++
+ #include "qemu/bitmap.h"
+ 
+ #include "sysemu/runstate.h"
+@@ -597,3 +600,28 @@ uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
+     mapcache_unlock();
+     return p;
+ }
++
++MemoryRegion *xen_init_grant_ram(void)
++{
++    RAMBlock *block;
++
++    memory_region_init(&ram_grants, NULL, "xen.grants",
++                       XEN_MAX_VIRTIO_GRANTS * XC_PAGE_SIZE);
++    block = g_malloc0(sizeof(*block));
++    block->mr = &ram_grants;
++    block->used_length = XEN_MAX_VIRTIO_GRANTS * XC_PAGE_SIZE;
++    block->max_length = XEN_MAX_VIRTIO_GRANTS * XC_PAGE_SIZE;
++    block->fd = -1;
++    block->page_size = XC_PAGE_SIZE;
++    block->host = (void *)XEN_GRANT_ADDR_OFF;
++    block->offset = XEN_GRANT_ADDR_OFF;
++    block->flags = RAM_PREALLOC;
++    ram_grants.ram_block = block;
++    ram_grants.ram = true;
++    ram_grants.terminates = true;
++    ram_block_add_list(block);
++    memory_region_add_subregion(get_system_memory(), XEN_GRANT_ADDR_OFF,
++                                &ram_grants);
++
++    return &ram_grants;
++}
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index f3e0c78161..e60b055867 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -137,6 +137,7 @@ void qemu_ram_free(RAMBlock *block);
+ int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp);
+ 
+ void qemu_ram_msync(RAMBlock *block, ram_addr_t start, ram_addr_t length);
++void ram_block_add_list(RAMBlock *new_block);
+ 
+ /* Clear whole block of mem */
+ static inline void qemu_ram_block_writeback(RAMBlock *block)
+diff --git a/include/hw/xen/xen-hvm-common.h b/include/hw/xen/xen-hvm-common.h
+index 2979f84ee2..6f7cc05d38 100644
+--- a/include/hw/xen/xen-hvm-common.h
++++ b/include/hw/xen/xen-hvm-common.h
+@@ -16,6 +16,8 @@
+ #include <xen/hvm/ioreq.h>
+ 
+ extern MemoryRegion ram_memory;
++
++extern MemoryRegion ram_grants;
+ extern MemoryListener xen_io_listener;
+ extern DeviceListener xen_device_listener;
+ 
+diff --git a/include/hw/xen/xen_pvdev.h b/include/hw/xen/xen_pvdev.h
+index 7cd4bc2b82..36cd3ec1d4 100644
+--- a/include/hw/xen/xen_pvdev.h
++++ b/include/hw/xen/xen_pvdev.h
+@@ -78,4 +78,7 @@ int xen_pv_send_notify(struct XenLegacyDevice *xendev);
+ void xen_pv_printf(struct XenLegacyDevice *xendev, int msg_level,
+                    const char *fmt, ...)  G_GNUC_PRINTF(3, 4);
+ 
++#define XEN_GRANT_ADDR_OFF    0x8000000000000000ULL
++#define XEN_MAX_VIRTIO_GRANTS 65536
++
+ #endif /* QEMU_HW_XEN_PVDEV_H */
+diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
+index c8e7c2f6cf..f4bedb1c11 100644
+--- a/include/sysemu/xen-mapcache.h
++++ b/include/sysemu/xen-mapcache.h
+@@ -10,6 +10,7 @@
+ #define XEN_MAPCACHE_H
+ 
+ #include "exec/cpu-common.h"
++#include "exec/ram_addr.h"
+ 
+ typedef hwaddr (*phys_offset_to_gaddr_t)(hwaddr phys_offset,
+                                          ram_addr_t size);
+@@ -25,6 +26,8 @@ void xen_invalidate_map_cache(void);
+ uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
+                                  hwaddr new_phys_addr,
+                                  hwaddr size);
++MemoryRegion *xen_init_grant_ram(void);
++
+ #else
+ 
+ static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
+diff --git a/softmmu/physmem.c b/softmmu/physmem.c
+index dc3c3e5f2e..63ba5f7495 100644
+--- a/softmmu/physmem.c
++++ b/softmmu/physmem.c
+@@ -1971,12 +1971,46 @@ static void dirty_memory_extend(ram_addr_t old_ram_size,
+     }
+ }
+ 
++static void ram_block_add_list_locked(RAMBlock *new_block)
++ {
++     RAMBlock *block;
++     RAMBlock *last_block = NULL;
++
++    /* Keep the list sorted from biggest to smallest block.  Unlike QTAILQ,
++     * QLIST (which has an RCU-friendly variant) does not have insertion at
++     * tail, so save the last element in last_block.
++     */
++    RAMBLOCK_FOREACH(block) {
++        last_block = block;
++        if (block->max_length < new_block->max_length) {
++            break;
++        }
++    }
++    if (block) {
++        QLIST_INSERT_BEFORE_RCU(block, new_block, next);
++    } else if (last_block) {
++        QLIST_INSERT_AFTER_RCU(last_block, new_block, next);
++    } else { /* list is empty */
++        QLIST_INSERT_HEAD_RCU(&ram_list.blocks, new_block, next);
++    }
++    ram_list.mru_block = NULL;
++
++    /* Write list before version */
++    smp_wmb();
++    ram_list.version++;
++}
++
++void ram_block_add_list(RAMBlock *new_block)
++{
++    qemu_mutex_lock_ramlist();
++    ram_block_add_list_locked(new_block);
++    qemu_mutex_unlock_ramlist();
++}
++
+ static void ram_block_add(RAMBlock *new_block, Error **errp)
+ {
+     const bool noreserve = qemu_ram_is_noreserve(new_block);
+     const bool shared = qemu_ram_is_shared(new_block);
+-    RAMBlock *block;
+-    RAMBlock *last_block = NULL;
+     ram_addr_t old_ram_size, new_ram_size;
+     Error *err = NULL;
+ 
+@@ -2014,28 +2048,9 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
+     if (new_ram_size > old_ram_size) {
+         dirty_memory_extend(old_ram_size, new_ram_size);
+     }
+-    /* Keep the list sorted from biggest to smallest block.  Unlike QTAILQ,
+-     * QLIST (which has an RCU-friendly variant) does not have insertion at
+-     * tail, so save the last element in last_block.
+-     */
+-    RAMBLOCK_FOREACH(block) {
+-        last_block = block;
+-        if (block->max_length < new_block->max_length) {
+-            break;
+-        }
+-    }
+-    if (block) {
+-        QLIST_INSERT_BEFORE_RCU(block, new_block, next);
+-    } else if (last_block) {
+-        QLIST_INSERT_AFTER_RCU(last_block, new_block, next);
+-    } else { /* list is empty */
+-        QLIST_INSERT_HEAD_RCU(&ram_list.blocks, new_block, next);
+-    }
+-    ram_list.mru_block = NULL;
+ 
+-    /* Write list before version */
+-    smp_wmb();
+-    ram_list.version++;
++    ram_block_add_list_locked(new_block);
++
+     qemu_mutex_unlock_ramlist();
+ 
+     cpu_physical_memory_set_dirty_range(new_block->offset,
+-- 
+2.25.1
+

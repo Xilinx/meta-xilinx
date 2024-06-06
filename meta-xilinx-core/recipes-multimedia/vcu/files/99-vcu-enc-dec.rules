@@ -5,3 +5,6 @@ SUBSYSTEM=="allegro_decode_class", KERNEL=="allegroDecodeIP", MODE="0660", GROUP
 # Xilinx Video DMA driver
 SUBSYSTEM=="char", KERNEL=="dmaproxy", MODE="0660", GROUP="video"
 
+# Xilinx SyncIP driver
+SUBSYSTEM=="xlnxsync", KERNEL=="xlnxsync0", MODE="0660", GROUP="video"
+

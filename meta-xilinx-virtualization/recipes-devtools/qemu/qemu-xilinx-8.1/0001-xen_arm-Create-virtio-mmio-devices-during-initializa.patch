@@ -1,0 +1,116 @@
+From b9291457ca2eb4340c71d2eed08fde83916c9fa4 Mon Sep 17 00:00:00 2001
+From: Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
+Date: Tue, 29 Aug 2023 21:35:17 -0700
+Subject: [PATCH 01/11] xen_arm: Create virtio-mmio devices during
+ initialization
+
+In order to use virtio backends we need to allocate virtio-mmio
+parameters (irq and base) and register corresponding buses.
+
+Use the constants defined in public header arch-arm.h to be
+aligned with the toolstack. So the number of current supported
+virtio-mmio devices is 10.
+
+For the interrupts triggering use already existing on Arm
+device-model hypercall.
+
+The toolstack should then insert the same amount of device nodes
+into guest device-tree.
+
+Signed-off-by: Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+Signed-off-by: Stefano Stabellini <stefano.stabellini@amd.com>
+---
+ hw/arm/xen_arm.c            | 35 +++++++++++++++++++++++++++++++++++
+ include/hw/xen/xen_native.h | 16 ++++++++++++++++
+ 2 files changed, 51 insertions(+)
+
+diff --git a/hw/arm/xen_arm.c b/hw/arm/xen_arm.c
+index 1d3e6d481a..7393b37355 100644
+--- a/hw/arm/xen_arm.c
++++ b/hw/arm/xen_arm.c
+@@ -26,6 +26,7 @@
+ #include "qapi/qapi-commands-migration.h"
+ #include "qapi/visitor.h"
+ #include "hw/boards.h"
++#include "hw/irq.h"
+ #include "hw/sysbus.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/tpm_backend.h"
+@@ -59,6 +60,38 @@ struct XenArmState {
+     } cfg;
+ };
+ 
++/*
++ * VIRTIO_MMIO_DEV_SIZE is imported from tools/libs/light/libxl_arm.c under Xen
++ * repository.
++ *
++ * Origin: git://xenbits.xen.org/xen.git 2128143c114c
++ */
++#define VIRTIO_MMIO_DEV_SIZE   0x200
++
++#define NR_VIRTIO_MMIO_DEVICES   \
++   (GUEST_VIRTIO_MMIO_SPI_LAST - GUEST_VIRTIO_MMIO_SPI_FIRST)
++
++static void xen_set_irq(void *opaque, int irq, int level)
++{
++    xendevicemodel_set_irq_level(xen_dmod, xen_domid, irq, level);
++}
++
++static void xen_create_virtio_mmio_devices(XenArmState *xam)
++{
++    int i;
++
++    for (i = 0; i < NR_VIRTIO_MMIO_DEVICES; i++) {
++        hwaddr base = GUEST_VIRTIO_MMIO_BASE + i * VIRTIO_MMIO_DEV_SIZE;
++        qemu_irq irq = qemu_allocate_irq(xen_set_irq, NULL,
++                                         GUEST_VIRTIO_MMIO_SPI_FIRST + i);
++
++        sysbus_create_simple("virtio-mmio", base, irq);
++
++        DPRINTF("Created virtio-mmio device %d: irq %d base 0x%lx\n",
++                i, GUEST_VIRTIO_MMIO_SPI_FIRST + i, base);
++    }
++}
++
+ void arch_handle_ioreq(XenIOState *state, ioreq_t *req)
+ {
+     hw_error("Invalid ioreq type 0x%x\n", req->type);
+@@ -110,6 +143,8 @@ static void xen_arm_init(MachineState *machine)
+ 
+     xen_register_ioreq(xam->state, machine->smp.cpus, &xen_memory_listener);
+ 
++    xen_create_virtio_mmio_devices(xam);
++
+ #ifdef CONFIG_TPM
+     if (xam->cfg.tpm_base_addr) {
+         xen_enable_tpm(xam);
+diff --git a/include/hw/xen/xen_native.h b/include/hw/xen/xen_native.h
+index 4dce905fde..a4b1aa9e5d 100644
+--- a/include/hw/xen/xen_native.h
++++ b/include/hw/xen/xen_native.h
+@@ -523,4 +523,20 @@ static inline int xen_set_ioreq_server_state(domid_t dom,
+                                                  enable);
+ }
+ 
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION <= 41500
++static inline int xendevicemodel_set_irq_level(xendevicemodel_handle *dmod,
++                                               domid_t domid, uint32_t irq,
++                                               unsigned int level)
++{
++    return 0;
++}
++#endif
++
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION <= 41700
++#define GUEST_VIRTIO_MMIO_BASE   xen_mk_ullong(0x02000000)
++#define GUEST_VIRTIO_MMIO_SIZE   xen_mk_ullong(0x00100000)
++#define GUEST_VIRTIO_MMIO_SPI_FIRST   33
++#define GUEST_VIRTIO_MMIO_SPI_LAST    43
++#endif
++
+ #endif /* QEMU_HW_XEN_NATIVE_H */
+-- 
+2.39.2
+

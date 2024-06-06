@@ -1,0 +1,155 @@
+From 364a11be6274336ec9b0f06f3272f964d27c9349 Mon Sep 17 00:00:00 2001
+From: Juergen Gross <jgross@suse.com>
+Date: Thu, 27 May 2021 15:27:55 +0200
+Subject: [PATCH 09/11] memory: add MemoryRegion map and unmap callbacks
+
+In order to support mapping and unmapping guest memory dynamically to
+and from qemu during address_space_[un]map() operations add the map()
+and unmap() callbacks to MemoryRegionOps.
+
+Those will be used e.g. for Xen grant mappings when performing guest
+I/Os.
+
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+---
+ include/exec/memory.h | 21 ++++++++++++++++++
+ softmmu/physmem.c     | 50 +++++++++++++++++++++++++++++++++----------
+ 2 files changed, 60 insertions(+), 11 deletions(-)
+
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 68284428f8..55414417ab 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -274,6 +274,27 @@ struct MemoryRegionOps {
+                                     unsigned size,
+                                     MemTxAttrs attrs);
+ 
++    /*
++     * Dynamically create mapping. @addr is the guest address to map; @plen
++     * is the pointer to the usable length of the buffer.
++     * @mr contents can be changed in case a new memory region is created for
++     * the mapping.
++     * Returns the buffer address for accessing the data.
++     */
++    void *(*map)(MemoryRegion **mr,
++                 hwaddr addr,
++                 hwaddr *plen,
++                 bool is_write,
++                 MemTxAttrs attrs);
++
++    /* Unmap an area obtained via map() before. */
++    void (*unmap)(MemoryRegion *mr,
++                  void *buffer,
++                  ram_addr_t addr,
++                  hwaddr len,
++                  bool is_write,
++                  hwaddr access_len);
++
+     enum device_endian endianness;
+     /* Guest-visible constraints: */
+     struct {
+diff --git a/softmmu/physmem.c b/softmmu/physmem.c
+index a934e44fe7..a1e2030424 100644
+--- a/softmmu/physmem.c
++++ b/softmmu/physmem.c
+@@ -3070,6 +3070,7 @@ void *address_space_map(AddressSpace *as,
+     hwaddr len = *plen;
+     hwaddr l, xlat;
+     MemoryRegion *mr;
++    void *ptr = NULL;
+     FlatView *fv;
+ 
+     if (len == 0) {
+@@ -3103,12 +3104,20 @@ void *address_space_map(AddressSpace *as,
+         return bounce.buffer;
+     }
+ 
+-
+     memory_region_ref(mr);
++
++    if (mr->ops && mr->ops->map) {
++        ptr = mr->ops->map(&mr, addr, plen, is_write, attrs);
++    }
++
+     *plen = flatview_extend_translation(fv, addr, len, mr, xlat,
+                                         l, is_write, attrs);
+     fuzz_dma_read_cb(addr, *plen, mr);
+-    return qemu_ram_ptr_length(mr->ram_block, xlat, plen, true);
++    if (ptr == NULL) {
++        ptr = qemu_ram_ptr_length(mr->ram_block, xlat, plen, true);
++    }
++
++    return ptr;
+ }
+ 
+ /* Unmaps a memory region previously mapped by address_space_map().
+@@ -3124,11 +3133,16 @@ void address_space_unmap(AddressSpace *as, void *buffer, hwaddr len,
+ 
+         mr = memory_region_from_host(buffer, &addr1);
+         assert(mr != NULL);
+-        if (is_write) {
+-            invalidate_and_set_dirty(mr, addr1, access_len);
+-        }
+-        if (xen_enabled()) {
+-            xen_invalidate_map_cache_entry(buffer);
++
++        if (mr->ops && mr->ops->unmap) {
++            mr->ops->unmap(mr, buffer, addr1, len, is_write, access_len);
++        } else {
++            if (is_write) {
++                invalidate_and_set_dirty(mr, addr1, access_len);
++            }
++            if (xen_enabled()) {
++                xen_invalidate_map_cache_entry(buffer);
++            }
+         }
+         memory_region_unref(mr);
+         return;
+@@ -3201,10 +3215,18 @@ int64_t address_space_cache_init(MemoryRegionCache *cache,
+          * doing this if we found actual RAM, which behaves the same
+          * regardless of attributes; so UNSPECIFIED is fine.
+          */
++        if (mr->ops && mr->ops->map) {
++            cache->ptr = mr->ops->map(&mr, addr, &l, is_write,
++                                      MEMTXATTRS_UNSPECIFIED);
++        }
++
+         l = flatview_extend_translation(cache->fv, addr, len, mr,
+                                         cache->xlat, l, is_write,
+                                         MEMTXATTRS_UNSPECIFIED);
+-        cache->ptr = qemu_ram_ptr_length(mr->ram_block, cache->xlat, &l, true);
++        if (!cache->ptr) {
++            cache->ptr = qemu_ram_ptr_length(mr->ram_block, cache->xlat, &l,
++                                             true);
++        }
+     } else {
+         cache->ptr = NULL;
+     }
+@@ -3226,14 +3248,20 @@ void address_space_cache_invalidate(MemoryRegionCache *cache,
+ 
+ void address_space_cache_destroy(MemoryRegionCache *cache)
+ {
+-    if (!cache->mrs.mr) {
++    MemoryRegion *mr = cache->mrs.mr;
++
++    if (!mr) {
+         return;
+     }
+ 
+-    if (xen_enabled()) {
++    if (mr->ops && mr->ops->unmap) {
++            mr->ops->unmap(mr, cache->ptr, cache->xlat, cache->len,
++                           cache->is_write, cache->len);
++    } else if (xen_enabled()) {
+         xen_invalidate_map_cache_entry(cache->ptr);
+     }
+-    memory_region_unref(cache->mrs.mr);
++
++    memory_region_unref(mr);
+     flatview_unref(cache->fv);
+     cache->mrs.mr = NULL;
+     cache->fv = NULL;
+-- 
+2.39.2
+

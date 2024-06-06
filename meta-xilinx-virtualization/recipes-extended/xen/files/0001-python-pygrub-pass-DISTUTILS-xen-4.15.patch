@@ -1,0 +1,73 @@
+From 6db88791d923167f160afbcadeffad84a4cbdbc5 Mon Sep 17 00:00:00 2001
+Message-Id: <6db88791d923167f160afbcadeffad84a4cbdbc5.1612262706.git.bertrand.marquis@arm.com>
+From: Maciej Pijanowski <maciej.pijanowski@3mdeb.com>
+Date: Fri, 19 Oct 2018 11:01:37 +0200
+Subject: [PATCH] python,pygrub: pass DISTUTILS env vars as setup.py args
+
+Upstream-Status: Xen: Inappropriate [oe specific, python install issues]
+
+Allow to respect the target install dir (PYTHON_SITEPACKAGES_DIR)
+as well as other parameters set by the OpenEmbedded build system.
+This is especially useful when the target libdir is not the default one
+(/usr/lib), but for example /usr/lib64.
+
+Signed-off-by: Maciej Pijanowski <maciej.pijanowski@3mdeb.com>
+
+Forward-ported to Xen 4.12.0
+Signed-off-by: Christopher Clark <christopher.clark6@baesystems.com>
+
+Modified to support pygrub installation with python 3
+Signed-off-by: Christopher Clark <christopher.clark6@baesystems.com>
+
+Forward-ported to Xen 4.14.0
+Signed-off-by: Christopher Clark <christopher.clark6@baesystems.com>
+
+Forward-ported to Xen 4.15.0
+Signed-off-by: Bertrand Marquis <bertrand.marquis@arm.com>
+
+---
+ tools/pygrub/Makefile | 7 +++++--
+ tools/python/Makefile | 2 +-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/tools/pygrub/Makefile b/tools/pygrub/Makefile
+index 37b2146214..ffb9270065 100644
+--- a/tools/pygrub/Makefile
++++ b/tools/pygrub/Makefile
+@@ -10,7 +10,7 @@ INSTALL_LOG = build/installed_files.txt
+ all: build
+ .PHONY: build
+ build:
+-	CC="$(CC)" CFLAGS="$(PY_CFLAGS)" LDSHARED="$(CC)" LDFLAGS="$(PY_LDFLAGS)" $(PYTHON) setup.py build
++	CC="$(CC)" CFLAGS="$(PY_CFLAGS)" LDSHARED="$(CC)" LDFLAGS="$(PY_LDFLAGS)" $(PYTHON) setup.py build $(DISTUTILS_BUILD_ARGS)
+ 
+ .PHONY: install
+ install: all
+@@ -18,7 +18,10 @@ install: all
+ 	CC="$(CC)" CFLAGS="$(PY_CFLAGS)" LDSHARED="$(CC)" \
+ 		LDFLAGS="$(PY_LDFLAGS)" $(PYTHON) setup.py install \
+ 		--record $(INSTALL_LOG) $(PYTHON_PREFIX_ARG) \
+-		 --root="$(DESTDIR)" --install-scripts=$(LIBEXEC_BIN) --force
++		 --root="$(DESTDIR)" --install-scripts=$(LIBEXEC_BIN) --force \
++		 $(DISTUTILS_INSTALL_ARGS)
++	rm -f $(DESTDIR)/$(LIBEXEC_BIN)/pygrub
++	$(INSTALL_PYTHON_PROG) src/pygrub $(DESTDIR)/$(LIBEXEC_BIN)/pygrub
+ 	set -e; if [ $(bindir) != $(LIBEXEC_BIN) -a \
+ 	             "`readlink -f $(DESTDIR)/$(bindir)`" != \
+ 	             "`readlink -f $(LIBEXEC_BIN)`" ]; then \
+diff --git a/tools/python/Makefile b/tools/python/Makefile
+index cc76423647..5cb11ae453 100644
+--- a/tools/python/Makefile
++++ b/tools/python/Makefile
+@@ -12,7 +12,7 @@ setup.py = CC="$(CC)" CFLAGS="$(PY_CFLAGS)" LDSHARED="$(CC)" LDFLAGS="$(PY_LDFLA
+            SHLIB_libxenctrl="$(SHLIB_libxenctrl)" \
+            SHLIB_libxenguest="$(SHLIB_libxenguest)" \
+            SHLIB_libxenstore="$(SHLIB_libxenstore)" \
+-           $(PYTHON) setup.py
++           $(PYTHON) setup.py $(DISTUTILS_BUILD_ARGS)
+ 
+ .PHONY: build
+ build:
+-- 
+2.17.1
+

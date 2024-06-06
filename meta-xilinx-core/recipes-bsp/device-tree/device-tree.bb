@@ -23,7 +23,7 @@ inherit devicetree image-artifact-names
 SYSTEM_DTFILE ??= ""
 CONFIG_DTFILE ??= "${SYSTEM_DTFILE}"
 
-BASE_DTS ?= "${@os.path.basename(d.getVar('CONFIG_DTFILE') or '').rstrip('.dtb').rstrip('.dts') or 'system-top'}"
+BASE_DTS ?= "${@os.path.splitext(os.path.basename(d.getVar('CONFIG_DTFILE') or ''))[0] or 'system-top'}"
 
 EXTRA_DT_FILES ?= ""
 EXTRA_DTFILE_PREFIX ?= "system-top"
@@ -130,7 +130,7 @@ devicetree_do_install:append() {
         fi
         if [ -e "${D}/boot/devicetree/${DTB_FILE_NAME}" ]; then
             # We need the output to be system.dtb for WIC setup to match XSCT flow
-            ln -sf devicetree/${DTB_FILE_NAME} ${D}/boot/system.dtb
+            cp ${D}/boot/devicetree/${DTB_FILE_NAME} ${D}/boot/system.dtb
         else
             bberror "Expected filename ${DTB_FILE_NAME} doesn't exist in ${DEPLOYDIR}/devicetree"
         fi

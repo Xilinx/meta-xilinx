@@ -65,6 +65,7 @@ UBOOTPXE_CONFIG ?= "pxelinux.cfg"
 UBOOTPXE_CONFIG_NAME = "${UBOOTPXE_CONFIG}${IMAGE_VERSION_SUFFIX}"
 
 DEVICETREE_ADDRESS ?= "${@append_baseaddr(d,d.getVar('DEVICETREE_OFFSET'))}"
+DEVICETREE_ADDRESS_SD ?= "${DEVICETREE_ADDRESS}"
 
 DEVICETREE_OFFSET:microblaze ??= "0x1e00000"
 DEVICETREE_OFFSET:zynqmp ??= "0x100000"
@@ -214,6 +215,7 @@ do_compile() {
         -e 's/@@KERNEL_LOAD_ADDRESS@@/${KERNEL_LOAD_ADDRESS}/' \
         -e 's/@@DEVICE_TREE_NAME@@/${DEVICE_TREE_NAME}/' \
         -e 's/@@DEVICETREE_ADDRESS@@/${DEVICETREE_ADDRESS}/' \
+	-e 's/@@DEVICETREE_ADDRESS_SD@@/${DEVICETREE_ADDRESS_SD}/' \
         -e 's/@@DEVICETREE_OVERLAY_ADDRESS@@/${DEVICETREE_OVERLAY_ADDRESS}/' \
         -e 's/@@RAMDISK_IMAGE@@/${RAMDISK_IMAGE}/' \
         -e 's/@@RAMDISK_IMAGE_ADDRESS@@/${RAMDISK_IMAGE_ADDRESS}/' \
@@ -262,10 +264,11 @@ do_compile() {
 do_install() {
     install -d ${D}/boot
     install -m 0644 boot.scr ${D}/boot/${UBOOTSCR_BASE_NAME}.scr
-    ln -sf ${UBOOTSCR_BASE_NAME}.scr ${D}/boot/boot.scr
+    install -m 0644 boot.scr ${D}/boot/
     install -d ${D}/boot/pxeboot/${UBOOTPXE_CONFIG_NAME}
     install -m 0644 pxeboot.pxe ${D}/boot/pxeboot/${UBOOTPXE_CONFIG_NAME}/default
-    ln -sf pxeboot/${UBOOTPXE_CONFIG_NAME} ${D}/boot/${UBOOTPXE_CONFIG}
+    install -d ${D}/boot/${UBOOTPXE_CONFIG}/
+    install -m 0644 pxeboot.pxe ${D}/boot/${UBOOTPXE_CONFIG}/default
 }
 
 FILES:${PN} = "/boot/*"
@@ -273,10 +276,11 @@ FILES:${PN} = "/boot/*"
 do_deploy() {
     install -d ${DEPLOYDIR}
     install -m 0644 boot.scr ${DEPLOYDIR}/${UBOOTSCR_BASE_NAME}.scr
-    ln -sf ${UBOOTSCR_BASE_NAME}.scr ${DEPLOYDIR}/boot.scr
+    install -m 0644 boot.scr ${DEPLOYDIR}/
     install -d ${DEPLOYDIR}/pxeboot/${UBOOTPXE_CONFIG_NAME}
     install -m 0644 pxeboot.pxe ${DEPLOYDIR}/pxeboot/${UBOOTPXE_CONFIG_NAME}/default
-    ln -sf pxeboot/${UBOOTPXE_CONFIG_NAME} ${DEPLOYDIR}/${UBOOTPXE_CONFIG}
+    install -d ${DEPLOYDIR}/${UBOOTPXE_CONFIG}/
+    install -m 0644 pxeboot.pxe ${DEPLOYDIR}/${UBOOTPXE_CONFIG}/default
 }
 
 addtask do_deploy after do_compile before do_build

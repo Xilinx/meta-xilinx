@@ -15,6 +15,9 @@ ESW_CFLAGS ?= ""
 
 # Cortex R5 requires an additional cflag to be passed for compatibility with the embeddedsw
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexr5', ' -DARMR5', '', d)}"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexr52', ' -DARMR5 -DARMR52', '', d)}"
+TUNE_CCARGS:append:versal = " -Dversal"
+TUNE_CCARGS:append:versal-net = " -DVERSAL_NET"
 
 # Make sure all regular recipes are excluded from compatibility
 # Avoid using this for native, nativesdk or cross recipes
@@ -25,9 +28,8 @@ COMPATIBLE_HOST ?= "${COMPATOS}"
 
 # Clear defaults
 PREFERRED_PROVIDER_virtual/kernel = "linux-dummy"
-
-PREFERRED_VERSION_libmetal-xlnx = "${@'standalone' if 'xilinx-standalone-exp' in d.getVar('BBFILE_COLLECTIONS').split() else ''}"
-PREFERRED_VERSION_open-amp-xlnx = "${@'standalone' if 'xilinx-standalone-exp' in d.getVar('BBFILE_COLLECTIONS').split() else ''}"
+PREFERRED_PROVIDER_libmetal = "libmetal-xlnx"
+PREFERRED_PROVIDER_open-amp = "open-amp-xlnx"
 
 # Workaround for pulling in nativesdk-mingw-w64-winpthreads
 TOOLCHAIN_HOST_TASK:append:sdkmingw32 = " nativesdk-mingw-w64-winpthreads"
