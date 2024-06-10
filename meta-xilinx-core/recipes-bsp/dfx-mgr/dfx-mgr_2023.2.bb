@@ -22,7 +22,7 @@ S = "${UNPACKDIR}/git"
 
 inherit cmake update-rc.d systemd
 
-DEPENDS += " libwebsockets inotify-tools libdfx kernel-module-zocl libdrm systemd"
+DEPENDS += " libwebsockets inotify-tools libdfx zocl libdrm systemd"
 RDEPENDS:${PN} += " freeipmi"
 EXTRA_OECMAKE += " \
                -DCMAKE_SYSROOT:PATH=${RECIPE_SYSROOT} \

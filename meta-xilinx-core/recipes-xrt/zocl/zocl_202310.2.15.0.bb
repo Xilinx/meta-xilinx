@@ -3,8 +3,6 @@ DESCRIPTION = "Xilinx Runtime driver module provides memory management and compu
 
 COMPATIBLE_MACHINE:microblaze = "none"
 
-PROVIDES += "zocl"
-
 require recipes-xrt/xrt/xrt-${PV}.inc
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=7d040f51aae6ac6208de74e88a3795f8"
