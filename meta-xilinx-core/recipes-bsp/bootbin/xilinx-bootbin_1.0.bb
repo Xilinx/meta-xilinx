@@ -32,6 +32,8 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 SRC_URI += "${@('file://' + d.getVar("BIF_FILE_PATH")) if d.getVar("BIF_FILE_PATH") != (d.getVar('B') + '/bootgen.bif') else ''}"
 
+S = "${UNPACKDIR}"
+
 # bootgen command -arch option for different SOC architectures
 # zynq7000   : zynq
 # zynqmp     : zynqmp
