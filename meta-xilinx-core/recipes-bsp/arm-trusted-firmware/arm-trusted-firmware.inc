@@ -129,3 +129,19 @@ FILES:${PN} += "/boot/*.elf /boot/*.bin /boot/*.ub"
 # Disable buildpaths QA check warnings for Versal.
 INSANE_SKIP:${PN}:append:versal = " buildpaths"
 INSANE_SKIP:${PN}:append:versal-net = " buildpaths"
+
+python() {
+    soc_family = d.getVar('SOC_FAMILY')
+    atf_console = d.getVar('ATF_CONSOLE')
+
+    # See plat/xilinx/<soc_family>/platform.mk 
+    if soc_family and soc_family == "zynqmp":
+        if not atf_console in [ 'cadence', 'cadence0', 'cadence1', 'dcc' ]:
+            raise bb.parse.SkipRecipe('ATF_CONSOLE (%s) is not configured properly for ZynqMP, only cadence, cadence0, cadence1, and dcc are valid options.' % (atf_console))
+    elif soc_family and soc_family == "versal":
+        if not atf_console in [ 'pl011', 'pl011_0', 'pl011_1', 'dcc' ]:
+            raise bb.parse.SkipRecipe('ATF_CONSOLE (%s) is not configured properly for Versal, only pl011, pl011_0, pl011_1, and dcc are valid options.' % (atf_console))
+    elif soc_family and soc_family == "versal-net":
+        if not atf_console in [ 'pl011', 'pl011_0', 'pl011_1', 'dcc' ]:
+            raise bb.parse.SkipRecipe('ATF_CONSOLE (%s) is not configured properly for Versal-Net, only pl011, pl011_0, pl011_1, and dcc are valid options.' % (atf_console))
+}
