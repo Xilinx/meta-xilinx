@@ -26,7 +26,7 @@ python xilinx_variables_config_eventhandler () {
 
     # Verify 'xilinx' is in LICENSE_FLAGS_ACCEPTED
     license_flags = d.getVar('LICENSE_FLAGS_ACCEPTED') or ""
-    if 'xilinx' not in license_flags.split():
+    if all(license not in license_flags.split() for license in ['xilinx', 'xilinx_pmu-rom-native']) :
         bb.warn("The ZynqMP pmu-rom is not enabled, qemu may not be able to emulate a ZynqMP system without it. " \
                 "To enable this you must add 'xilinx' to the LICENSE_FLAGS_ACCEPTED to indicate you accept the software license.")
 }
