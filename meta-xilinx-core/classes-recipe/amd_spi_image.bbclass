@@ -5,6 +5,8 @@
 #
 
 QSPI_SIZE ?= "0x2280000"
+QSPI_VERSION ?= ""
+QSPI_IMAGE_VERSION ?= ""
 
 # Register values
 IDN_REG ?= "0x4D554241"
@@ -116,12 +118,8 @@ def generate_spi_image(d):
     qspi_data.write(imgrcry)
 
     # Version string and checksum
-    version = d.getVar("QSPI_IMAGE_VERSION")
-    date = time.strftime("%m%d%H%M")
-    machine = d.getVar("MACHINE")[:3]
-    image_name = d.getVar("QSPI_IMAGE_NAME")
-
-    qspi_version = f"{image_name}-{machine}-v{version}-{date}\x00"
+    version = d.getVar('QSPI_IMAGE_VERSION')
+    qspi_version = f"{version}\x00"
     qspi_data.seek(version_offset)
     qspi_data.write(qspi_version.encode())
 
