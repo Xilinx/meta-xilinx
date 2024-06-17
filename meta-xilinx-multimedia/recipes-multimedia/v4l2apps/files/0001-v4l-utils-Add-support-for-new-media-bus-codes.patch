@@ -34,26 +34,6 @@ index f05f747e..45f6707d 100644
  /* Bayer - next is	0x3021 */
  #define MEDIA_BUS_FMT_SBGGR8_1X8		0x3001
  #define MEDIA_BUS_FMT_SGBRG8_1X8		0x3013
-diff --git a/utils/media-ctl/libv4l2subdev.c b/utils/media-ctl/libv4l2subdev.c
-index a989efb..a37541f 100644
---- a/utils/media-ctl/libv4l2subdev.c
-+++ b/utils/media-ctl/libv4l2subdev.c
-@@ -34,6 +34,16 @@
+-- 
+2.34.1
 
- #include <linux/v4l2-subdev.h>
-
-+/* YUV: Xilinx Specific - next is 0x2108 */
-+#define MEDIA_BUS_FMT_VYYUYY8_1X24	(0x2100)
-+#define MEDIA_BUS_FMT_VYYUYY10_4X20	(0x2101)
-+#define MEDIA_BUS_FMT_VUY10_1X30	(0x2102)
-+#define MEDIA_BUS_FMT_UYYVYY12_4X24	(0x2103)
-+#define MEDIA_BUS_FMT_VUY12_1X36	(0x2104)
-+#define MEDIA_BUS_FMT_UYYVYY16_4X32	(0x2105)
-+#define MEDIA_BUS_FMT_VUY16_1X48	(0x2106)
-+#define MEDIA_BUS_FMT_UYVY16_2X32	(0x2107)
-+
- #include "mediactl.h"
- #include "mediactl-priv.h"
- #include "tools.h"
---
-2.7.4
