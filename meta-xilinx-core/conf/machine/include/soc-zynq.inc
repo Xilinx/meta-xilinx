@@ -8,9 +8,6 @@ require soc-tune-include.inc
 KERNEL_IMAGETYPE ?= "uImage"
 KERNEL_IMAGETYPES += "zImage"
 
-# WIC Specific dependencies
-WIC_DEPENDS ?= "virtual/kernel virtual/bootloader virtual/boot-bin"
-
 UBOOT_ELF ?= "u-boot.elf"
 
 # Default, if multiconfig is off, the fsbl is in the regular deploydir, otherwise
