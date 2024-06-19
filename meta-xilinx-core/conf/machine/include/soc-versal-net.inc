@@ -7,8 +7,6 @@ require soc-tune-include.inc
 # Linux Configuration
 KERNEL_IMAGETYPE ?= "Image"
 
-WIC_DEPENDS ?= "virtual/kernel virtual/bootloader virtual/boot-bin virtual/arm-trusted-firmware"
-
 UBOOT_ELF ?= "u-boot.elf"
 
 # Default, if multiconfig is off, call plm/psm-firmware directly, otherwise call the versal-fw multiconfig version
