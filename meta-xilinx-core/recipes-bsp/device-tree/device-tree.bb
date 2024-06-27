@@ -87,7 +87,7 @@ do_configure:append () {
             fi
             exit 1
         fi
-        echo "/include/ \"$f\"" >> ${DT_FILES_PATH}/${BASE_DTS}.dts
+        echo "#include \"$f\"" >> ${DT_FILES_PATH}/${BASE_DTS}.dts
     done
 }
 
