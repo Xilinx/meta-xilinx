@@ -89,6 +89,10 @@ do_install() {
     install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/headless/${MONOLITHIC_LIBMALI} ${D}${libdir}/headless/${MONOLITHIC_LIBMALI}
     ln -snf headless/${MONOLITHIC_LIBMALI} ${D}${libdir}/${MONOLITHIC_LIBMALI}
 
+    # install gbm
+    install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
+    install -m 0644 ${WORKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
+
     if [ "${USE_FB}" = "yes" ]; then
         install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/fbdev/${MONOLITHIC_LIBMALI} ${D}${libdir}/fbdev/${MONOLITHIC_LIBMALI}
         if [ "${MALI_BACKEND_DEFAULT}" = "fbdev" ]; then
@@ -105,8 +109,6 @@ do_install() {
         sed -i -e 's/^#if defined(MESA_EGL_NO_X11_HEADERS)$/#if (1)/' ${D}${includedir}/EGL/eglplatform.h
     fi
     if [ "${USE_WL}" = "yes" ]; then
-        install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
-        install -m 0644 ${WORKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
         install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/wayland/${MONOLITHIC_LIBMALI} ${D}${libdir}/wayland/${MONOLITHIC_LIBMALI}
         if [ "${MALI_BACKEND_DEFAULT}" = "wayland" ]; then
             ln -snf wayland/${MONOLITHIC_LIBMALI} ${D}${libdir}/${MONOLITHIC_LIBMALI}
