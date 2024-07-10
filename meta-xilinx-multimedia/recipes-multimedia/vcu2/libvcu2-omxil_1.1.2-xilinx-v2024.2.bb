@@ -6,9 +6,9 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=002a0a92906100955ea6ed02dcd2c2cd"
 # Version from core/core_version.mk
 PV .= "+git"
 
-BRANCH ?= "xlnx_rel_v2024.1"
+BRANCH ?= "xlnx_rel_v2024.2"
 REPO   ?= "git://github.com/Xilinx/vcu2-omx-il.git;protocol=https"
-SRCREV = "da9554a071f20d5376bb1e2ef8dfd4551efccf60"
+SRCREV = "59ab2ae5ec8d8732aa7c5f0181216da1ea9a54aa"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
