@@ -15,6 +15,7 @@ LIC_FILES_CHKSUM = "file://../LICENSE;md5=da5408f748bce8a9851dac18e66f4bcf \
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
+COMPATIBLE_MACHINE:versal-net = ".*"
 
 S = "${UNPACKDIR}/git/src"
 
