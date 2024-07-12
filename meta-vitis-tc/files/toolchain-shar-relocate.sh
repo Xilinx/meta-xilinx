@@ -1,11 +1,14 @@
-if ! xargs --version > /dev/null 2>&1; then
-	echo "xargs is required by the relocation script, please install it first. Abort!"
-	exit 1
-fi
+for cmd in xargs file; do
+	if ! command -v $cmd > /dev/null 2>&1; then
+		echo "The command '$cmd' is required by the relocation script, please install it first. Abort!"
+		exit 1
+	fi
+done
 
 # fix dynamic loader paths in all ELF SDK binaries
+# allow symlinks to be accessed via the find command too
 native_sysroot=$($SUDO_EXEC cat $env_setup_script |grep 'OECORE_NATIVE_SYSROOT='|cut -d'=' -f2|tr -d '"')
-dl_path=$($SUDO_EXEC find $native_sysroot/lib -maxdepth 1 -name "ld-linux*")
+dl_path=$($SUDO_EXEC find $native_sysroot/lib/ -maxdepth 1 -name "ld-linux*")
 if [ "$dl_path" = "" ] ; then
 	echo "SDK could not be set up. Relocate script unable to find ld-linux.so. Abort!"
 	exit 1
@@ -51,13 +54,19 @@ if [ $relocate = 1 -o $relocate = 2 ] ; then
 	fi
 fi
 if [ $relocate = 2 ] ; then
-	$SUDO_EXEC ${PYTHON} ${env_setup_script%/*}/relocate-wrapper.py $target_sdk_dir > relocate.log 2>&1
-	if [ $? -ne 0 ]; then
-                cat relocate.log
-		echo "SDK could not be set up. Runtime-Relocate script failed. Abort!"
+	tdir=`mktemp -d`
+	if [ x$tdir = x ] ; then
+		echo "SDK relocate failed, could not create a temporary directory"
 		exit 1
 	fi
-        rm -f relocate.log
+	$SUDO_EXEC ${PYTHON} ${env_setup_script%/*}/relocate-wrapper.py $target_sdk_dir > $tdir/relocate.log 2>&1
+	if [ $? -ne 0 ]; then
+		cat $tdir/relocate.log
+		echo "SDK could not be set up. Runtime-Relocate script failed. Abort!"
+		rm -rf $tdir
+		exit 1
+	fi
+	rm -rf $tdir
 
 	for env_setup_scripts in `ls $target_sdk_dir/environment-setup-*`; do
 		cat << EOF > ${env_setup_scripts}.new
