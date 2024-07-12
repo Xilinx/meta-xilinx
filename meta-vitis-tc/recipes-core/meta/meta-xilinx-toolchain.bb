@@ -18,6 +18,8 @@ HOST_DEPENDS = " \
   nativesdk-sdk-provides-dummy \
 "
 
+S = "${UNPACKDIR}"
+
 PLNX_ADD_VAI_SDK = ""
 
 TOOLCHAIN_HOST_TASK = "${HOST_DEPENDS} packagegroup-cross-canadian-${MACHINE}"
@@ -27,7 +29,7 @@ TOOLCHAIN_SHAR_EXT_TMPL = "${VITIS_TC_PATH}/files/toolchain-shar-extract.sh"
 TOOLCHAIN_SHAR_REL_TMPL = "${VITIS_TC_PATH}/files/toolchain-shar-relocate.sh"
 
 create_sdk_files:append () {
-        cp ${WORKDIR}/relocate-wrapper.py ${SDK_OUTPUT}/${SDKPATH}/
+        cp ${S}/relocate-wrapper.py ${SDK_OUTPUT}/${SDKPATH}/
 }
 
 # The wrappers don't do anything, remove them!
