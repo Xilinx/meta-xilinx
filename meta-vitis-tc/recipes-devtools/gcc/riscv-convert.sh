@@ -27,7 +27,7 @@ sed -e 's,;, ,' |
     fi
 
     cflags=$(echo $args | sed -e 's,@, -,g')
-    multilib="lib$(echo $mlib | sed -e 's,/,,g')"
+    multilib="lib$(echo $mlib | sed -e 's,/,,g' -e 's,_,,g')"
     tune="$(echo $mlib | sed -e 's,/,,g')"
     case $mlib in
         .)  arch="riscv32" ;;
