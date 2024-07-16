@@ -83,4 +83,15 @@ do
 		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@;
 		echo "Booting using Separate images failed"
 	fi
+	if test "${boot_target}" = "nor" || test "${boot_target}" = "nor0"; then
+		cp.b @@FIT_IMAGE_LOAD_ADDRESS@@ @@QSPI_FIT_IMAGE_OFFSET@@ @@QSPI_FIT_IMAGE_SIZE@@
+		bootm @@FIT_IMAGE_LOAD_ADDRESS@@;
+		echo "Booting using Fit image failed"
+
+		cp.b @@KERNEL_LOAD_ADDRESS@@ @@QSPI_KERNEL_OFFSET@@ @@QSPI_KERNEL_SIZE@@
+		cp.b @@RAMDISK_IMAGE_ADDRESS@@ @@QSPI_RAMDISK_OFFSET@@ @@QSPI_RAMDISK_SIZE@@
+		run update_bootargs
+		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@;
+		echo "Booting using Separate images failed"
+fi
 done
