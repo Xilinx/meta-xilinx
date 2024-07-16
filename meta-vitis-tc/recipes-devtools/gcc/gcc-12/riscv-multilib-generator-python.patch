@@ -1,5 +1,7 @@
 Use python3 instead of python when calling the mutlib-generator
 
+Upstream-Status: Backport
+
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 
 --- gcc-12.2.0/gcc/config/riscv/multilib-generator.orig	2024-02-22 19:23:07.166805418 -0700

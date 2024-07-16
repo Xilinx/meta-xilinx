@@ -54,6 +54,8 @@ le/m64/bs/p/m/fpd;@mlittle-endian@m64@mxl-barrel-shift@mxl-pattern-compare@mno-x
 As part of this the order of the multilibs was changes from upstream to make
 it easier to avoid big-endian m64, which is not supported by the toolchain.
 
+Upstream-Status: Inappropriate [AMD Microblaze specific]
+
 Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
 
 Index: gcc-12.2.0/gcc/config/microblaze/t-microblaze
