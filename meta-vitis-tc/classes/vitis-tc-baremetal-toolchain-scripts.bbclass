@@ -3,7 +3,8 @@
 #
 # SPDX-License-Identifier: MIT
 #
-# Based on the version in oe-core Langdale
+# Based on the version in oe-core as commit
+# a725df1839a23b11ae1bace531d242bfc1ab98e0
 #
 # This is optimized specifically for baremetal builds where we have a single
 # common toolchain for each multilib.  This configuration is unique to
@@ -108,7 +109,8 @@ EOF
 
 #####
 # Following is copied from meta-mingw/classes/toolchain-scripts-mingw32.bbclass
-# Based off of the oe-core meta/classes/toolchain-scripts.bbclass version
+# Based off of the oe-core meta/classes/toolchain-scripts.bbclass version as of
+# commit acbba477893ef87388effc4679b7f40ee49fc852
 toolchain_create_sdk_env_script:sdkmingw32:xilinx-standalone () {
 	# Create environment setup script
 	sdkpathnative=${7:-${SDKPATHNATIVE}}
@@ -122,6 +124,7 @@ toolchain_create_sdk_env_script:sdkmingw32:xilinx-standalone () {
 	touch $script
 	# Be sure to use the 'short' path, so we can have deeper directories.
 	echo 'set SDKROOT=%~sdp0%' >> $script
+	echo 'IF %SDKROOT:~-1%==\ set SDKROOT=%SDKROOT:~0,-1%' >> $script
 
 	# Convert to mingw32 subpaths
 	sysroot='%SDKROOT%'${sysroot##${SDKPATH}}

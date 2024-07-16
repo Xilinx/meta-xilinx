@@ -1,7 +1,7 @@
 # If this is a baremetal build, we want to further optimize the toolchain
 # scripts
 BAREMETAL_ENV = ""
-BAREMETAL_ENV:xilinx-standalone:baremetal-multilib-tc = "plnx-baremetal-toolchain-scripts"
+BAREMETAL_ENV:xilinx-standalone:baremetal-multilib-tc = "vitis-tc-baremetal-toolchain-scripts"
 
 inherit ${BAREMETAL_ENV}
 
