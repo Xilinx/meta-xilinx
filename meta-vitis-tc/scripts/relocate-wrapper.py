@@ -209,9 +209,9 @@ for root, _, files in os.walk(process_path):
                             print('')
 
                             wrapperf.write('#!/bin/bash\n')
-                            wrapperf.write('# Written by Mark Hatle <mhatle@xilinx.com>\n')
+                            wrapperf.write('# Written by Mark Hatle <mark.hatle@amd.com>\n')
                             wrapperf.write('# Copyright (C) 2019-2020, Xilinx, Inc.  All rights reserved\n')
-                            wrapperf.write('# Copyright (C) 2023, Advanced Micro Devices, Inc.  All rights reserved\n')
+                            wrapperf.write('# Copyright (C) 2023-2024, Advanced Micro Devices, Inc.  All rights reserved\n')
                             wrapperf.write('#\n')
                             wrapperf.write('# SPDX-License-Identifier: GPL-2.0-only\n')
                             wrapperf.write('LDSO=%s\n' % ldso)
