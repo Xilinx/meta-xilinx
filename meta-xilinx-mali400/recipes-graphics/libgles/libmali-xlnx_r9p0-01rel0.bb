@@ -55,6 +55,7 @@ USE_FB = "${@bb.utils.contains("DISTRO_FEATURES", "fbdev", "yes", "no", d)}"
 USE_WL = "${@bb.utils.contains("DISTRO_FEATURES", "wayland", "yes", "no", d)}"
 
 MONOLITHIC_LIBMALI = "libMali.so.9.0"
+MONOLITHIC_LIBMALI_MVL = "libMali.so.9"
 
 do_install() {
     #Identify the ARCH type
@@ -88,6 +89,7 @@ do_install() {
 
     install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/headless/${MONOLITHIC_LIBMALI} ${D}${libdir}/headless/${MONOLITHIC_LIBMALI}
     ln -snf headless/${MONOLITHIC_LIBMALI} ${D}${libdir}/${MONOLITHIC_LIBMALI}
+    ln -snf ${MONOLITHIC_LIBMALI} ${D}${libdir}/headless/${MONOLITHIC_LIBMALI_MVL}
 
     # install gbm
     install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
