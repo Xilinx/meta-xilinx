@@ -1,4 +1,4 @@
-require gstreamer-xilinx-1.22.11.inc
+require gstreamer-xilinx-1.22.%.inc
 
 SRC_URI:append = " \
            file://run-ptest \

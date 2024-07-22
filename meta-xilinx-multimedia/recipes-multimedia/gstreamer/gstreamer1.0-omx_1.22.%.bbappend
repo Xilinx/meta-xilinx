@@ -1,4 +1,4 @@
-require gstreamer-xilinx-1.22.11.inc
+require gstreamer-xilinx-1.22.%.inc
 
 S = "${WORKDIR}/git/subprojects/gst-omx"
 
