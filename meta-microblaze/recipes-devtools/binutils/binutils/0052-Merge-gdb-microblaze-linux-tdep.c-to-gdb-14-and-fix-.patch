@@ -1,0 +1,42 @@
+From 2e4370f257fae84d18d1f6ef3a756795d77d5707 Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 23 May 2024 16:02:59 +0530
+Subject: [PATCH 52/53] Merge gdb/microblaze-linux-tdep.c to gdb-14 and fix
+ compilation issues.
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/microblaze-linux-tdep.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
+index babc9020f0f..00112b8f540 100644
+--- a/gdb/microblaze-linux-tdep.c
++++ b/gdb/microblaze-linux-tdep.c
+@@ -48,10 +48,12 @@ microblaze_debug (const char *fmt, ...)
+   if (microblaze_debug_flag)
+     {
+        va_list args;
++       string_file file (gdb_stdout->can_emit_style_escape ());
+ 
+        va_start (args, fmt);
+        printf_unfiltered ("MICROBLAZE LINUX: ");
+-       vprintf_unfiltered (fmt, args);
++       file.vprintf (fmt, args);
++       gdb_stdout->puts_unfiltered (file.string ().c_str ());
+        va_end (args);
+     }
+ }
+@@ -145,7 +147,7 @@ static void
+ microblaze_linux_init_abi (struct gdbarch_info info,
+ 			   struct gdbarch *gdbarch)
+ {
+-  struct microblaze_gdbarch_tdep *tdep =(microblaze_gdbarch_tdep *)  gdbarch_tdep (gdbarch);
++  struct microblaze_gdbarch_tdep *tdep = gdbarch_tdep<microblaze_gdbarch_tdep> (gdbarch);
+ 
+   tdep->sizeof_gregset = 200;
+ 
+-- 
+2.34.1
+

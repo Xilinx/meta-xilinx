@@ -1,0 +1,110 @@
+From d3fd5a77fa218f8f6c296337758d45cab61483fe Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 2 Nov 2021 17:28:24 +0530
+Subject: [PATCH 26/53] [Patch,MicroBlaze : Adding new relocation to support
+ 64bit rodata.
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gas/config/tc-microblaze.c | 49 ++++++++++++++++++++++++++++++++++----
+ 1 file changed, 45 insertions(+), 4 deletions(-)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 544732649a5..c9757796ae8 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -1090,6 +1090,13 @@ md_assemble (char * str)
+ 	    as_fatal (_("smi pseudo instruction should not use a label in imm field"));
+           if(streq (name, "lli") || streq (name, "sli"))
+             opc = str_microblaze_64;
++          else if ((microblaze_arch_size == 64) && ((streq (name, "lbui")
++			|| streq (name, "lhui") || streq (name, "lwi") || streq (name, "sbi")
++			|| streq (name, "shi") || streq (name, "swi"))))
++	    {
++              opc = str_microblaze_64;
++	      subtype = opcode->inst_offset_type;
++	    }
+ 	  else if (reg2 == REG_ROSDP)
+ 	    opc = str_microblaze_ro_anchor;
+ 	  else if (reg2 == REG_RWSDP)
+@@ -1157,7 +1164,10 @@ md_assemble (char * str)
+               inst |= (immed << IMM_LOW) & IMM_MASK;
+             }
+ 	}
+-      else if (streq (name, "lli") || streq (name, "sli"))
++      else if (streq (name, "lli") || streq (name, "sli") || ((microblaze_arch_size == 64)
++		&& ((streq (name, "lbui")) || streq (name, "lhui")
++		|| streq (name, "lwi") || streq (name, "sbi")
++                || streq (name, "shi") || streq (name, "swi"))))
+         {
+           temp = immed & 0xFFFFFF8000;
+           if (temp != 0 && temp != 0xFFFFFF8000)
+@@ -1773,6 +1783,11 @@ md_assemble (char * str)
+ 
+ 	  if (exp.X_md != 0)
+ 	    subtype = get_imm_otype(exp.X_md);
++          else if (streq (name, "brealid") || streq (name, "breaid") || streq (name, "breai"))
++            {
++              opc = str_microblaze_64;
++	      subtype = opcode->inst_offset_type;
++	    }
+ 	  else
+ 	    subtype = opcode->inst_offset_type;
+ 
+@@ -1790,6 +1805,31 @@ md_assemble (char * str)
+           output = frag_more (isize);
+           immed = exp.X_add_number;
+         }
++      if (streq (name, "brealid") || streq (name, "breaid") || streq (name, "breai"))
++        {
++          temp = immed & 0xFFFFFF8000;
++          if (temp != 0 && temp != 0xFFFFFF8000)
++            {
++              /* Needs an immediate inst.  */
++              opcode1 = (struct op_code_struct *) str_hash_find (opcode_hash_control, "imml");
++              if (opcode1 == NULL)
++                {
++                  as_bad (_("unknown opcode \"%s\""), "imml");
++                  return;
++                }
++              inst1 = opcode1->bit_sequence;
++	      inst1 |= ((immed & 0xFFFFFFFFFFFF0000L) >> 16) & IMML_MASK;
++              output[0] = INST_BYTE0 (inst1);
++              output[1] = INST_BYTE1 (inst1);
++              output[2] = INST_BYTE2 (inst1);
++              output[3] = INST_BYTE3 (inst1);
++              output = frag_more (isize);
++            }
++      	  inst |= (reg1 << RD_LOW) & RD_MASK;
++          inst |= (immed << IMM_LOW) & IMM_MASK;
++         }
++       else 
++	 {
+ 
+       temp = immed & 0xFFFF8000;
+       if ((temp != 0) && (temp != 0xFFFF8000))
+@@ -1815,6 +1855,7 @@ md_assemble (char * str)
+ 
+       inst |= (reg1 << RD_LOW) & RD_MASK;
+       inst |= (immed << IMM_LOW) & IMM_MASK;
++        }
+       break;
+ 
+     case INST_TYPE_R2:
+@@ -3060,10 +3101,10 @@ cons_fix_new_microblaze (fragS * frag,
+           r = BFD_RELOC_32;
+           break;
+         case 8:
+-          /*if (microblaze_arch_size == 64)
+-            r = BFD_RELOC_32;
+-          else*/
++          if (microblaze_arch_size == 64)
+             r = BFD_RELOC_MICROBLAZE_EA64;
++          else
++            r = BFD_RELOC_64;
+           break;
+         default:
+           as_bad (_("unsupported BFD relocation size %u"), size);
+-- 
+2.34.1
+

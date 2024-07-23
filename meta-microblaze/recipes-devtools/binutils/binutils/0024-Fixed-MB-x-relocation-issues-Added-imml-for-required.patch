@@ -1,0 +1,52 @@
+From 88f7a313f8e21021dacfc8da2c490a433f596fd8 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Fri, 28 Sep 2018 12:04:55 +0530
+Subject: [PATCH 24/53] -Fixed MB-x relocation issues -Added imml for required
+ MB-x instructions
+
+Conflicts:
+	bfd/elf64-microblaze.c
+	gas/config/tc-microblaze.c
+
+Conflicts:
+	gas/config/tc-microblaze.c
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gas/config/tc-microblaze.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 29fb6360169..e43ea82a2cc 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -363,7 +363,7 @@ microblaze_s_weakext (int ignore ATTRIBUTE_UNUSED)
+    Integer arg to pass to the function.  */
+ /* If the pseudo-op is not found in this table, it searches in the obj-elf.c,
+    and then in the read.c table.  */
+-pseudo_typeS md_pseudo_table[] =
++const pseudo_typeS md_pseudo_table[] =
+ {
+   {"lcomm", microblaze_s_lcomm, 1},
+   {"data8", cons, 1},      /* Same as byte.  */
+@@ -2357,7 +2357,7 @@ md_apply_fix (fixS *   fixP,
+ 
+            inst1 = opcode1->bit_sequence;
+            if (fixP->fx_addsy == NULL || S_IS_DEFINED (fixP->fx_addsy))
+-	     inst1 |= ((val & 0xFFFFFFFFFFFF0000L) >> 16) & IMML_MASK;
++	     inst1 |= ((val & 0xFFFFFF0000L) >> 16) & IMML_MASK;
+            if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64)
+              fixP->fx_r_type = BFD_RELOC_64; 
+            if (fixP->fx_r_type == BFD_RELOC_MICROBLAZE_64_PCREL)
+@@ -2946,6 +2946,8 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
+     case OPTION_M64:
+       //if (arg != NULL && strcmp (arg, "64") == 0)
+       microblaze_arch_size = 64;
++      // UPSTREAM/REVISIT - md_pseudo_table is const
++      // md_pseudo_table[7].poc_val = 8;
+       break;
+     default:
+       return 0;
+-- 
+2.34.1
+

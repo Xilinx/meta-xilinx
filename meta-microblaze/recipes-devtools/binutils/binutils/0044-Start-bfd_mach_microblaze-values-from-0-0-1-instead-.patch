@@ -1,0 +1,32 @@
+From 70d94c8a627a91b7a59d99abf5c137f650a687d3 Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 28 Mar 2024 11:36:32 +0530
+Subject: [PATCH 44/53] Start bfd_mach_microblaze values from 0 (0,1) instead
+ of (1,2)
+
+Before 64-bit support there was only bfd_mach_microblaze (implicitly set to 0),
+setting microblaze_mach_microblaze64 to 1
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/archures.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/bfd/archures.c b/bfd/archures.c
+index b9db26627ea..604e65b7256 100644
+--- a/bfd/archures.c
++++ b/bfd/archures.c
+@@ -515,8 +515,8 @@ DESCRIPTION
+ .  bfd_arch_lm32,      {* Lattice Mico32.  *}
+ .#define bfd_mach_lm32		1
+ .  bfd_arch_microblaze,{* Xilinx MicroBlaze.  *}
+-.#define bfd_mach_microblaze	1
+-.#define bfd_mach_microblaze64	2
++.#define bfd_mach_microblaze	0
++.#define bfd_mach_microblaze64	1
+ .  bfd_arch_kvx,        {* Kalray VLIW core of the MPPA processor family *}
+ .#define bfd_mach_kv3_unknown       0
+ .#define bfd_mach_kv3_1             1
+-- 
+2.34.1
+

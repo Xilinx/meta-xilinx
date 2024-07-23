@@ -1,0 +1,160 @@
+From 585f95d1510385ed3f67e76e2ad8f9a27b3ee32a Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Tue, 9 Oct 2018 10:14:22 +0530
+Subject: [PATCH 25/53] - Fixed address computation issues with 64bit address -
+ Fixed imml dissassamble issue
+
+Conflicts:
+	gas/config/tc-microblaze.c
+	opcodes/microblaze-dis.c
+
+Conflicts:
+	bfd/elf64-microblaze.c
+
+Conflicts:
+	bfd/elf64-microblaze.c
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/elf64-microblaze.c     |  2 +-
+ gas/config/tc-microblaze.c | 74 +++++++++++++++++++++++++++++++++-----
+ 2 files changed, 67 insertions(+), 9 deletions(-)
+
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index ca92df647c9..9f542f55ebd 100755
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -2131,7 +2131,7 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		efix = calc_fixup (target_address, 0, sec);
+ 
+             /* Validate the in-band val.  */
+-            val = bfd_get_32 (abfd, contents + irel->r_offset);
++            val = bfd_get_64 (abfd, contents + irel->r_offset);
+             if (val != irel->r_addend && ELF64_R_TYPE (irel->r_info) == R_MICROBLAZE_32_NONE) {
+                fprintf(stderr, "%d: CORRUPT relax reloc %x %lx\n", __LINE__, val, irel->r_addend);
+             }
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index e43ea82a2cc..544732649a5 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -372,7 +372,6 @@ const pseudo_typeS md_pseudo_table[] =
+   {"ent", s_func, 0}, /* Treat ent as function entry point.  */
+   {"end", microblaze_s_func, 1}, /* Treat end as function end point.  */
+   {"gpword", s_rva, 4}, /* gpword label => store resolved label address in data section.  */
+-   {"gpdword", s_rva, 8}, /* gpword label => store resolved label address in data section.  */
+   {"weakext", microblaze_s_weakext, 0},
+   {"rodata", microblaze_s_rdata, 0},
+   {"sdata2", microblaze_s_rdata, 1},
+@@ -2317,18 +2316,74 @@ md_apply_fix (fixS *   fixP,
+     case BFD_RELOC_RVA:
+     case BFD_RELOC_32_PCREL:
+     case BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM:
++      /* Don't do anything if the symbol is not defined.  */
++      if (fixP->fx_addsy == NULL || S_IS_DEFINED (fixP->fx_addsy))
++	{
++	  if ((fixP->fx_r_type == BFD_RELOC_RVA) && (microblaze_arch_size == 64))
++            {
++	      if (target_big_endian)
++	        {
++	          buf[0] |= ((val >> 56) & 0xff);
++	          buf[1] |= ((val >> 48) & 0xff);
++	          buf[2] |= ((val >> 40) & 0xff);
++	          buf[3] |= ((val >> 32) & 0xff);
++	          buf[4] |= ((val >> 24) & 0xff);
++	          buf[5] |= ((val >> 16) & 0xff);
++	          buf[6] |= ((val >> 8) & 0xff);
++	          buf[7] |= (val & 0xff);
++	        }
++	      else
++	        {
++	          buf[7] |= ((val >> 56) & 0xff);
++	          buf[6] |= ((val >> 48) & 0xff);
++	          buf[5] |= ((val >> 40) & 0xff);
++	          buf[4] |= ((val >> 32) & 0xff);
++	          buf[3] |= ((val >> 24) & 0xff);
++	          buf[2] |= ((val >> 16) & 0xff);
++	          buf[1] |= ((val >> 8) & 0xff);
++	          buf[0] |= (val & 0xff);
++	        }
++	    }
++	  else {
++	    if (target_big_endian)
++	      {
++	        buf[0] |= ((val >> 24) & 0xff);
++	        buf[1] |= ((val >> 16) & 0xff);
++	        buf[2] |= ((val >> 8) & 0xff);
++	        buf[3] |= (val & 0xff);
++	      }
++	    else
++	      {
++	        buf[3] |= ((val >> 24) & 0xff);
++	        buf[2] |= ((val >> 16) & 0xff);
++	        buf[1] |= ((val >> 8) & 0xff);
++	        buf[0] |= (val & 0xff);
++	      }
++	  }
++	}
++      break;
++    
++    case BFD_RELOC_MICROBLAZE_EA64:
+       /* Don't do anything if the symbol is not defined.  */
+       if (fixP->fx_addsy == NULL || S_IS_DEFINED (fixP->fx_addsy))
+ 	{
+ 	  if (target_big_endian)
+ 	    {
+-	      buf[0] |= ((val >> 24) & 0xff);
+-	      buf[1] |= ((val >> 16) & 0xff);
+-	      buf[2] |= ((val >> 8) & 0xff);
+-	      buf[3] |= (val & 0xff);
++	      buf[0] |= ((val >> 56) & 0xff);
++	      buf[1] |= ((val >> 48) & 0xff);
++	      buf[2] |= ((val >> 40) & 0xff);
++	      buf[3] |= ((val >> 32) & 0xff);
++	      buf[4] |= ((val >> 24) & 0xff);
++	      buf[5] |= ((val >> 16) & 0xff);
++	      buf[6] |= ((val >> 8) & 0xff);
++	      buf[7] |= (val & 0xff);
+ 	    }
+ 	  else
+ 	    {
++	      buf[7] |= ((val >> 56) & 0xff);
++	      buf[6] |= ((val >> 48) & 0xff);
++	      buf[5] |= ((val >> 40) & 0xff);
++	      buf[4] |= ((val >> 32) & 0xff);
+ 	      buf[3] |= ((val >> 24) & 0xff);
+ 	      buf[2] |= ((val >> 16) & 0xff);
+ 	      buf[1] |= ((val >> 8) & 0xff);
+@@ -2449,6 +2504,8 @@ md_apply_fix (fixS *   fixP,
+ 	fixP->fx_r_type = BFD_RELOC_MICROBLAZE_64_NONE;
+       else if (fixP->fx_r_type == BFD_RELOC_32)
+ 	fixP->fx_r_type = BFD_RELOC_MICROBLAZE_32_NONE;
++      else if(fixP->fx_r_type == BFD_RELOC_MICROBLAZE_EA64)
++        fixP->fx_r_type = BFD_RELOC_MICROBLAZE_EA64;
+       else
+ 	fixP->fx_r_type = BFD_RELOC_NONE;
+       fixP->fx_addsy = section_symbol (absolute_section);
+@@ -2719,6 +2776,7 @@ tc_gen_reloc (asection * section ATTRIBUTE_UNUSED, fixS * fixp)
+     case BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM:
+     case BFD_RELOC_MICROBLAZE_64_GOTPC:
+     case BFD_RELOC_MICROBLAZE_64_GPC:
++    case BFD_RELOC_MICROBLAZE_EA64:
+     case BFD_RELOC_MICROBLAZE_64:
+     case BFD_RELOC_MICROBLAZE_64_PCREL:
+     case BFD_RELOC_MICROBLAZE_64_GOT:
+@@ -3002,10 +3060,10 @@ cons_fix_new_microblaze (fragS * frag,
+           r = BFD_RELOC_32;
+           break;
+         case 8:
+-          if (microblaze_arch_size == 64)
++          /*if (microblaze_arch_size == 64)
+             r = BFD_RELOC_32;
+-          else
+-            r = BFD_RELOC_64;
++          else*/
++            r = BFD_RELOC_MICROBLAZE_EA64;
+           break;
+         default:
+           as_bad (_("unsupported BFD relocation size %u"), size);
+-- 
+2.34.1
+

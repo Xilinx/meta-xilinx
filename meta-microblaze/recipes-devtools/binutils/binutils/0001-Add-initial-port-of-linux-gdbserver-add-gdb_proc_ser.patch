@@ -1,0 +1,42 @@
+From add4545f804219232f16f96e3a83af2fadf41463 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 10 Oct 2022 15:07:22 +0530
+Subject: [PATCH 01/53] Add initial port of linux gdbserver add
+ gdb_proc_service_h to gdbserver microblaze-linux
+
+gdbserver needs to initialise the microblaze registers
+
+other archs use this step to run a *_arch_setup() to carry out all
+architecture specific setup - may need to add in future
+
+ * add linux-ptrace.o to gdbserver configure
+ * Update breakpoint opcode
+ * fix segfault on connecting gdbserver
+ * add microblaze_linux_memory_remove_breakpoint
+ * add set_solib_svr4_fetch_link_map_offsets
+ * add set_gdbarch_fetch_tls_load_module_address
+ * Force reading of r0 as 0, prevent stores
+
+Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
+Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdbserver/Makefile.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gdbserver/Makefile.in b/gdbserver/Makefile.in
+index d12f8746611..ee606908bae 100644
+--- a/gdbserver/Makefile.in
++++ b/gdbserver/Makefile.in
+@@ -180,6 +180,7 @@ SFILES = \
+ 	$(srcdir)/linux-loongarch-low.cc \
+ 	$(srcdir)/linux-low.cc \
+ 	$(srcdir)/linux-m68k-low.cc \
++        $(srcdir)/linux-microblaze-low.cc \
+ 	$(srcdir)/linux-mips-low.cc \
+ 	$(srcdir)/linux-nios2-low.cc \
+ 	$(srcdir)/linux-or1k-low.cc \
+-- 
+2.34.1
+
