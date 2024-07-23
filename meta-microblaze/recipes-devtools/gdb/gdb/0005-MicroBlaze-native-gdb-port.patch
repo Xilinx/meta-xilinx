@@ -1,13 +1,11 @@
-From 8d05b79cda7617f228fa4bb6e5147689b662699e Mon Sep 17 00:00:00 2001
+From 2e84106b932f40eeaa4ae40b441b9eb7b713b2fa Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 10 Oct 2022 18:53:46 +0530
-Subject: [PATCH 4/8] [Patch,MicroBlaze] : MicroBlaze native gdb port.
+Subject: [PATCH 05/54] MicroBlaze native gdb port.
 
 signed-off-by : Mahesh Bodapati <mbodapat@amd.com>
-Upstream-Status: Pending
 
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
+Signed-off-by: Aayush Misra <aayushm@amd.com>
 ---
  gdb/Makefile.in                 |   2 +
  gdb/configure.nat               |   4 +
@@ -23,10 +21,10 @@ Signed-off-by: Mark Hatle <mark.hatle@amd.com>
  create mode 100644 gdb/microblaze-linux-tdep.h
 
 diff --git a/gdb/Makefile.in b/gdb/Makefile.in
-index aecab41eeb8..fb63e1662c1 100644
+index 9c0a0bff2cd..1ad975b50ae 100644
 --- a/gdb/Makefile.in
 +++ b/gdb/Makefile.in
-@@ -1374,6 +1374,7 @@ HFILES_NO_SRCDIR = \
+@@ -1406,6 +1406,7 @@ HFILES_NO_SRCDIR = \
  	memory-map.h \
  	memrange.h \
  	microblaze-tdep.h \
@@ -34,7 +32,7 @@ index aecab41eeb8..fb63e1662c1 100644
  	mips-linux-tdep.h \
  	mips-netbsd-tdep.h \
  	mips-tdep.h \
-@@ -2249,6 +2250,7 @@ ALLDEPFILES = \
+@@ -1754,6 +1755,7 @@ ALLDEPFILES = \
  	m68k-linux-nat.c \
  	m68k-linux-tdep.c \
  	m68k-tdep.c \
@@ -43,10 +41,10 @@ index aecab41eeb8..fb63e1662c1 100644
  	microblaze-tdep.c \
  	mingw-hdep.c \
 diff --git a/gdb/configure.nat b/gdb/configure.nat
-index b45519fd116..256c666e760 100644
+index 1dc4206b69c..05003e57020 100644
 --- a/gdb/configure.nat
 +++ b/gdb/configure.nat
-@@ -270,6 +270,10 @@ case ${gdb_host} in
+@@ -274,6 +274,10 @@ case ${gdb_host} in
  		# Host: Motorola m68k running GNU/Linux.
  		NATDEPFILES="${NATDEPFILES} m68k-linux-nat.o"
  		;;
@@ -144,7 +142,7 @@ index 00000000000..267e12f6d59
 +}
 diff --git a/gdb/microblaze-linux-nat.c b/gdb/microblaze-linux-nat.c
 new file mode 100755
-index 00000000000..6b9daa23120
+index 00000000000..a348001a3e2
 --- /dev/null
 +++ b/gdb/microblaze-linux-nat.c
 @@ -0,0 +1,366 @@
@@ -515,7 +513,7 @@ index 00000000000..6b9daa23120
 +  add_inf_child_target (linux_target);
 +}
 diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
-index d6197c49dfd..fc52adffb72 100644
+index 17bcb50fd4f..5b57bb4d3ba 100644
 --- a/gdb/microblaze-linux-tdep.c
 +++ b/gdb/microblaze-linux-tdep.c
 @@ -37,6 +37,7 @@
@@ -563,7 +561,7 @@ index 00000000000..a2c744e2961
 + 
 +#endif /* MICROBLAZE_LINUX_TDEP_H */
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index ccd37d085d6..ccb6b730d64 100644
+index 6ab36bd746b..066602b385a 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
 @@ -285,6 +285,7 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
@@ -595,7 +593,7 @@ index ccd37d085d6..ccb6b730d64 100644
    if (ostart_pc > start_pc)
      return ostart_pc;
    return start_pc;
-@@ -453,6 +456,7 @@ microblaze_frame_cache (struct frame_info *next_frame, void **this_cache)
+@@ -453,6 +456,7 @@ microblaze_frame_cache (frame_info_ptr next_frame, void **this_cache)
    struct microblaze_frame_cache *cache;
    struct gdbarch *gdbarch = get_frame_arch (next_frame);
    int rn;
@@ -603,7 +601,7 @@ index ccd37d085d6..ccb6b730d64 100644
  
    if (*this_cache)
      return (struct microblaze_frame_cache *) *this_cache;
-@@ -466,10 +470,17 @@ microblaze_frame_cache (struct frame_info *next_frame, void **this_cache)
+@@ -466,10 +470,17 @@ microblaze_frame_cache (frame_info_ptr next_frame, void **this_cache)
      cache->register_offsets[rn] = -1;
  
    /* Call for side effects.  */
@@ -625,7 +623,7 @@ index ccd37d085d6..ccb6b730d64 100644
    return cache;
  }
  
-@@ -494,6 +505,25 @@ microblaze_frame_prev_register (struct frame_info *this_frame,
+@@ -494,6 +505,25 @@ microblaze_frame_prev_register (frame_info_ptr this_frame,
    struct microblaze_frame_cache *cache =
      microblaze_frame_cache (this_frame, this_cache);
  
@@ -651,7 +649,7 @@ index ccd37d085d6..ccb6b730d64 100644
    if (cache->frameless_p)
      {
        if (regnum == MICROBLAZE_PC_REGNUM)
-@@ -506,7 +536,9 @@ microblaze_frame_prev_register (struct frame_info *this_frame,
+@@ -506,7 +536,9 @@ microblaze_frame_prev_register (frame_info_ptr this_frame,
    else
      return trad_frame_get_prev_register (this_frame, cache->saved_regs,
  					 regnum);
@@ -662,8 +660,8 @@ index ccd37d085d6..ccb6b730d64 100644
  }
  
  static const struct frame_unwind microblaze_frame_unwind =
-@@ -622,7 +654,106 @@ microblaze_stabs_argument_has_addr (struct gdbarch *gdbarch, struct type *type)
-   return (TYPE_LENGTH (type) == 16);
+@@ -621,7 +653,106 @@ microblaze_stabs_argument_has_addr (struct gdbarch *gdbarch, struct type *type)
+   return (type->length () == 16);
  }
  
 -
@@ -770,7 +768,7 @@ index ccd37d085d6..ccb6b730d64 100644
  static int dwarf2_to_reg_map[78] =
  { 0  /* r0  */,   1  /* r1  */,   2  /* r2  */,   3  /* r3  */,  /*  0- 3 */
    4  /* r4  */,   5  /* r5  */,   6  /* r6  */,   7  /* r7  */,  /*  4- 7 */
-@@ -790,6 +921,8 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -788,6 +919,8 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  				       microblaze_breakpoint::bp_from_kind);
    set_gdbarch_memory_remove_breakpoint (gdbarch, microblaze_linux_memory_remove_breakpoint);
  
@@ -780,7 +778,7 @@ index ccd37d085d6..ccb6b730d64 100644
  
    set_gdbarch_unwind_pc (gdbarch, microblaze_unwind_pc);
 diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
-index 2e853d84d72..2415acfe7b6 100644
+index 738da4f0531..21f206777f0 100644
 --- a/gdb/microblaze-tdep.h
 +++ b/gdb/microblaze-tdep.h
 @@ -60,11 +60,11 @@ enum microblaze_regnum
@@ -832,5 +830,5 @@ index 2e853d84d72..2415acfe7b6 100644
    int frameless_p;
  
 -- 
-2.37.1 (Apple Git-137.1)
+2.34.1
 

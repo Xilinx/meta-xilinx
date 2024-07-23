@@ -1,0 +1,177 @@
+From 03df31becbc7dc6d35189fec3b4b2c7dfd3a8103 Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 28 Mar 2024 10:59:40 +0530
+Subject: [PATCH 43/54] microblaze_gdbarch_init: set microblaze_abi based on
+ wanted_abi and found_abi
+
+Earlier found_abi was declared but not set, instead gdbarch_info info
+was checked every time. Also, microblaze_abi remained undefined for 32-bit
+machines. As a result, gdb would show 64-bit registers when connecting
+to 32-bit targets with all register values garbled (r5 ended up in r2).
+This defect is fixed. found_abi is set from gdbarch_info, microblaze_abi
+is set based on wanted_abi and found_abi. Now upon connecting to a 32-bit
+remote target (mb-qemu) registers have the correct 32-bit size.
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/microblaze-tdep.c | 73 +++++++++++++++++++------------------------
+ 1 file changed, 33 insertions(+), 40 deletions(-)
+
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 818306f2197..47863819724 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -116,7 +116,7 @@ show_microblaze_abi (struct ui_file *file,
+                const char *ignored_value)
+ {
+       enum microblaze_abi global_abi = global_microblaze_abi ();
+-      enum microblaze_abi actual_abi = microblaze_abi (target_gdbarch ());
++      enum microblaze_abi actual_abi = microblaze_abi (current_inferior ()->arch ());
+       const char *actual_abi_str = microblaze_abi_strings[actual_abi];
+ 
+ #if 1 
+@@ -203,6 +203,13 @@ microblaze_register_name (struct gdbarch *gdbarch, int regnum)
+ static struct type *
+ microblaze_register_type (struct gdbarch *gdbarch, int regnum)
+ {
++
++  int mb_reg_size = microblaze_abi_regsize(gdbarch);
++
++  if (gdbarch_debug)
++    gdb_printf (gdb_stdlog, "microblaze_register_type: reg_size = %d\n",
++                        mb_reg_size);
++
+   if (regnum == MICROBLAZE_SP_REGNUM)
+     return builtin_type (gdbarch)->builtin_data_ptr;
+ 
+@@ -980,34 +987,38 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   enum microblaze_abi microblaze_abi, found_abi, wanted_abi;
+   const struct target_desc *tdesc = info.target_desc;
+ 
++  /* If there is already a candidate, use it.  */
++  arches = gdbarch_list_lookup_by_info (arches, &info);
++  if ((arches != NULL) && (microblaze_abi != MICROBLAZE_ABI_M64))
++    return arches->gdbarch;
++
+  /* What has the user specified from the command line?  */
+   wanted_abi = global_microblaze_abi ();
+   if (gdbarch_debug)
+     gdb_printf (gdb_stdlog, "microblaze_gdbarch_init: wanted_abi = %d\n",
+                         wanted_abi);
++
++  found_abi = MICROBLAZE_ABI_AUTO;
++
++  if (info.bfd_arch_info->mach == bfd_mach_microblaze64) 
++    found_abi = MICROBLAZE_ABI_M64;
++
+   if (wanted_abi != MICROBLAZE_ABI_AUTO)
+     microblaze_abi = wanted_abi;
+-
+-  /* If there is already a candidate, use it.  */
+-  arches = gdbarch_list_lookup_by_info (arches, &info);
+-  if ((arches != NULL) && (microblaze_abi != MICROBLAZE_ABI_M64))
+-    return arches->gdbarch;
++  else
++    microblaze_abi = found_abi;
+ 
+   if (microblaze_abi == MICROBLAZE_ABI_M64)
+     {
+-          tdesc = tdesc_microblaze64;
+-          reg_size = 8;
++      tdesc = tdesc_microblaze64;
++      reg_size = 8;
+     }
+-  if (tdesc == NULL)
++  else 
+     {
+-      if ((info.bfd_arch_info->mach == bfd_mach_microblaze64) || (microblaze_abi == MICROBLAZE_ABI_M64)) 
+-        {
+-    	  tdesc = tdesc_microblaze64;
+-          reg_size = 8;
+-   	}
+-      else
+-    	tdesc = tdesc_microblaze;
++      tdesc = tdesc_microblaze;
++      reg_size = 4;
+     }
++
+   /* Check any target description for validity.  */
+   if (tdesc_has_registers (tdesc))
+     {
+@@ -1015,7 +1026,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+       int valid_p;
+       int i;
+ 
+-      if ((info.bfd_arch_info->mach == bfd_mach_microblaze64) || (microblaze_abi == MICROBLAZE_ABI_M64))
++      if (microblaze_abi == MICROBLAZE_ABI_M64)
+         feature = tdesc_find_feature (tdesc,
+                                     "org.gnu.gdb.microblaze64.core");
+       else
+@@ -1029,7 +1040,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+       for (i = 0; i < MICROBLAZE_NUM_REGS; i++)
+         valid_p &= tdesc_numbered_register (feature, tdesc_data.get(), i,
+                                             microblaze_register_names[i]);
+-      if ((info.bfd_arch_info->mach == bfd_mach_microblaze64) || (microblaze_abi == MICROBLAZE_ABI_M64))
++      if (microblaze_abi == MICROBLAZE_ABI_M64)
+         feature = tdesc_find_feature (tdesc,
+                                     "org.gnu.gdb.microblaze64.stack-protect");
+       else
+@@ -1075,15 +1086,11 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   
+   /* Register set.  
+   make_regs (gdbarch); */
+-  switch (info.bfd_arch_info->mach)
+-    {
+-    case bfd_mach_microblaze64:
+-      set_gdbarch_ptr_bit (gdbarch, 64);
+-    break;
+-    }
+-  if(microblaze_abi == MICROBLAZE_ABI_M64)
++  if (microblaze_abi == MICROBLAZE_ABI_M64)
+     set_gdbarch_ptr_bit (gdbarch, 64);
+-  
++  else
++    set_gdbarch_ptr_bit (gdbarch, 32);
++
+   /* Map Dwarf2 registers to GDB registers.  */
+   set_gdbarch_dwarf2_reg_to_regnum (gdbarch, microblaze_dwarf2_reg_to_regnum);
+ 
+@@ -1105,8 +1112,6 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+ 				       microblaze_breakpoint::bp_from_kind);
+ //  set_gdbarch_memory_remove_breakpoint (gdbarch, microblaze_linux_memory_remove_breakpoint);
+ 
+-//  set_gdbarch_software_single_step (gdbarch, microblaze_software_single_step);
+-
+   set_gdbarch_software_single_step (gdbarch, microblaze_software_single_step);
+ 
+   set_gdbarch_frame_args_skip (gdbarch, 8);
+@@ -1145,9 +1150,6 @@ _initialize_microblaze_tdep ()
+ 
+   gdbarch_register (bfd_arch_microblaze, microblaze_gdbarch_init);
+ 
+-// static struct cmd_list_element *setmicroblazecmdlist = NULL;
+-// static struct cmd_list_element *showmicroblazecmdlist = NULL;
+-
+   /* Add root prefix command for all "set microblaze"/"show microblaze" commands.  */
+  
+   add_setshow_prefix_cmd ("microblaze", no_class,
+@@ -1155,15 +1157,6 @@ _initialize_microblaze_tdep ()
+ 			 _("Various microblaze specific commands."),
+ 			 &setmicroblazecmdlist,&showmicroblazecmdlist,
+ 			 &setlist,&showlist);
+-#if 0
+-  add_prefix_cmd ("microblaze", no_class, set_microblaze_command,
+-                  _("Various microblaze specific commands."),
+-                  &setmicroblazecmdlist, "set microblaze ", 0, &setlist);
+-
+-  add_prefix_cmd ("microblaze", no_class, show_microblaze_command,
+-                  _("Various microblaze specific commands."),
+-                  &showmicroblazecmdlist, "show microblaze ", 0, &showlist);
+-#endif
+ 
+   /* Allow the user to override the ABI.  */
+   add_setshow_enum_cmd ("abi", class_obscure, microblaze_abi_strings,
+-- 
+2.34.1
+

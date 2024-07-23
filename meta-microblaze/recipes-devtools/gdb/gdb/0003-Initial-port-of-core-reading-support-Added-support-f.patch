@@ -1,16 +1,14 @@
-From 7da397cae8c0f8826184d6e12fda9ccd11f92753 Mon Sep 17 00:00:00 2001
+From 118ce6c252a56ca592a7fdd40919522be00d5fb4 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 10 Oct 2022 16:37:53 +0530
-Subject: [PATCH 2/8] [Patch,MicroBlaze]: Initial port of core reading support
- Added support for reading notes in linux core dumps Support for reading of
- PRSTATUS and PSINFO information for rebuilding ".reg" sections of core dumps
- at run time.
-
-Upstream-Status: Pending
+Subject: [PATCH 03/54] Initial port of core reading support Added support for
+ reading notes in linux core dumps Support for reading of PRSTATUS and PSINFO
+ information for rebuilding ".reg" sections of core dumps at run time.
 
 Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
 Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
 ---
  bfd/elf32-microblaze.c      | 84 +++++++++++++++++++++++++++++++++++++
  gdb/configure.tgt           |  2 +-
@@ -20,10 +18,10 @@ Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
  5 files changed, 177 insertions(+), 2 deletions(-)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index d09b3f7095d..d3b3c66cf00 100644
+index a7e81c70fc8..487ddeafc5a 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
-@@ -713,6 +713,87 @@ microblaze_elf_is_local_label_name (bfd *abfd, const char *name)
+@@ -754,6 +754,87 @@ microblaze_elf_is_local_label_name (bfd *abfd, const char *name)
    return _bfd_elf_is_local_label_name (abfd, name);
  }
  
@@ -111,7 +109,7 @@ index d09b3f7095d..d3b3c66cf00 100644
  /* ELF linker hash entry.  */
  
  struct elf32_mb_link_hash_entry
-@@ -3434,4 +3515,7 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
+@@ -3480,4 +3561,7 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
  #define elf_backend_size_dynamic_sections	microblaze_elf_size_dynamic_sections
  #define elf_backend_add_symbol_hook		microblaze_elf_add_symbol_hook
  
@@ -120,10 +118,10 @@ index d09b3f7095d..d3b3c66cf00 100644
 +
  #include "elf32-target.h"
 diff --git a/gdb/configure.tgt b/gdb/configure.tgt
-index 0705ccf32b8..7ea186481f3 100644
+index 47a674201f9..d0673abd2b8 100644
 --- a/gdb/configure.tgt
 +++ b/gdb/configure.tgt
-@@ -400,7 +400,7 @@ mep-*-*)
+@@ -415,7 +415,7 @@ mep-*-*)
  
  microblaze*-linux-*|microblaze*-*-linux*)
  	# Target: Xilinx MicroBlaze running Linux
@@ -133,7 +131,7 @@ index 0705ccf32b8..7ea186481f3 100644
  	;;
  microblaze*-*-*)
 diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
-index 5748556a556..d6197c49dfd 100644
+index 9160b4ad464..17bcb50fd4f 100644
 --- a/gdb/microblaze-linux-tdep.c
 +++ b/gdb/microblaze-linux-tdep.c
 @@ -36,6 +36,7 @@
@@ -179,10 +177,10 @@ index 5748556a556..d6197c49dfd 100644
    set_gdbarch_fetch_tls_load_module_address (gdbarch,
                                               svr4_fetch_objfile_link_map);
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index 3e8e8fe35b9..ccd37d085d6 100644
+index 28a647e940b..6ab36bd746b 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
-@@ -666,6 +666,43 @@ microblaze_register_g_packet_guesses (struct gdbarch *gdbarch)
+@@ -665,6 +665,43 @@ microblaze_register_g_packet_guesses (struct gdbarch *gdbarch)
  				  tdesc_microblaze_with_stack_protect);
  }
  
@@ -226,9 +224,9 @@ index 3e8e8fe35b9..ccd37d085d6 100644
  static struct gdbarch *
  microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  {
-@@ -718,6 +755,10 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
-   microblaze_gdbarch_tdep *tdep = new microblaze_gdbarch_tdep;
-   gdbarch = gdbarch_alloc (&info, tdep);
+@@ -716,6 +753,10 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   gdbarch *gdbarch
+     = gdbarch_alloc (&info, gdbarch_tdep_up (new microblaze_gdbarch_tdep));
  
 +  tdep->gregset = NULL;
 +  tdep->sizeof_gregset = 0;
@@ -237,7 +235,7 @@ index 3e8e8fe35b9..ccd37d085d6 100644
    set_gdbarch_long_double_bit (gdbarch, 128);
  
    set_gdbarch_num_regs (gdbarch, MICROBLAZE_NUM_REGS);
-@@ -766,6 +807,13 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -764,6 +805,13 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
    frame_base_append_sniffer (gdbarch, dwarf2_frame_base_sniffer);
    if (tdesc_data != NULL)
      tdesc_use_registers (gdbarch, tdesc, std::move (tdesc_data));
@@ -252,7 +250,7 @@ index 3e8e8fe35b9..ccd37d085d6 100644
    return gdbarch;
  }
 diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
-index 53fcb2297e6..2e853d84d72 100644
+index e9f57e97c26..738da4f0531 100644
 --- a/gdb/microblaze-tdep.h
 +++ b/gdb/microblaze-tdep.h
 @@ -23,8 +23,23 @@
@@ -267,7 +265,7 @@ index 53fcb2297e6..2e853d84d72 100644
 +   unsigned int pregs[16];
 +};
 +
- struct microblaze_gdbarch_tdep : gdbarch_tdep
+ struct microblaze_gdbarch_tdep : gdbarch_tdep_base
  {
 +  int dummy;		// declare something.
 +
@@ -299,5 +297,5 @@ index 53fcb2297e6..2e853d84d72 100644
  
  #endif /* microblaze-tdep.h */
 -- 
-2.37.1 (Apple Git-137.1)
+2.34.1
 

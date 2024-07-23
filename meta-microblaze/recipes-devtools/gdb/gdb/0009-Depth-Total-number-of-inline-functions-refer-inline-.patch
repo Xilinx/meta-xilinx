@@ -1,32 +1,41 @@
-From 0532b1db08b9d8efc670f7288fe2d8168b8ed0d1 Mon Sep 17 00:00:00 2001
+From c37f307714121981fa91766c539913f7912643b7 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 21 Jul 2022 11:45:01 +0530
-Subject: [PATCH 8/8] =?UTF-8?q?[Patch,MicroBlaze]:=20Depth:=20=20Total=20n?=
- =?UTF-8?q?umber=20of=20inline=20functions=20[refer=20inline-frame.c]=20st?=
- =?UTF-8?q?ate->skipped=5Fframes=20:=20Number=20of=20inline=20functions=20?=
- =?UTF-8?q?skipped.=20the=20current=20unwind=5Fpc=20is=20causing=20an=20is?=
- =?UTF-8?q?sue=20when=20we=20try=20to=20step=20into=20inline=20functions[D?=
- =?UTF-8?q?epth=20is=20becoming=200].=20It=E2=80=99s=20incrementing=20pc?=
- =?UTF-8?q?=20by=208=20even=20with=20si=20instruction.?=
+Subject: [PATCH 09/54] =?UTF-8?q?Depth:=20Total=20number=20of=20inline=20f?=
+ =?UTF-8?q?unctions=20[refer=20inline-frame.c]=20state->skipped=5Fframes?=
+ =?UTF-8?q?=20:=20Number=20of=20inline=20functions=20skipped.=20the=20curr?=
+ =?UTF-8?q?ent=20unwind=5Fpc=20is=20causing=20an=20issue=20when=20we=20try?=
+ =?UTF-8?q?=20to=20step=20into=20inline=20functions[Depth=20is=20becoming?=
+ =?UTF-8?q?=200].=20It=E2=80=99s=20incrementing=20pc=20by=208=20even=20wit?=
+ =?UTF-8?q?h=20si=20instruction.?=
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
+Signed-off-by: Aayush Misra <aayushm@amd.com>
 ---
- gdb/microblaze-tdep.c | 14 +++-----------
- 1 file changed, 3 insertions(+), 11 deletions(-)
+ gdb/features/microblaze64.xml |  1 +
+ gdb/microblaze-tdep.c         | 14 +++-----------
+ 2 files changed, 4 insertions(+), 11 deletions(-)
 
+diff --git a/gdb/features/microblaze64.xml b/gdb/features/microblaze64.xml
+index 515d18e65cf..9c1b7d22003 100644
+--- a/gdb/features/microblaze64.xml
++++ b/gdb/features/microblaze64.xml
+@@ -7,5 +7,6 @@
+ 
+ <!DOCTYPE target SYSTEM "gdb-target.dtd">
+ <target>
++  <architecture>microblaze64</architecture>
+   <xi:include href="microblaze64-core.xml"/>
+ </target>
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index d83072cdaef..38ba38e8c7d 100644
+index f265e8fc608..3e541789fac 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
 @@ -513,16 +513,8 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
  static CORE_ADDR
- microblaze_unwind_pc (struct gdbarch *gdbarch, struct frame_info *next_frame)
+ microblaze_unwind_pc (struct gdbarch *gdbarch, frame_info_ptr next_frame)
  {
 -  gdb_byte buf[4];
    CORE_ADDR pc;
@@ -61,5 +70,5 @@ index d83072cdaef..38ba38e8c7d 100644
  
  static CORE_ADDR
 -- 
-2.37.1 (Apple Git-137.1)
+2.34.1
 

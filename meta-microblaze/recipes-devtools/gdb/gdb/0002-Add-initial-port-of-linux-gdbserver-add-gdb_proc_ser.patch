@@ -1,7 +1,7 @@
-From baac387700a72407b3994bfd0a03825112c9745f Mon Sep 17 00:00:00 2001
+From fa91dbd8c23e519760213f32de572cbf98ad6bc3 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 10 Oct 2022 15:07:22 +0530
-Subject: [PATCH 1/8] Add initial port of linux gdbserver add
+Subject: [PATCH 02/54] Add initial port of linux gdbserver add
  gdb_proc_service_h to gdbserver microblaze-linux
 
 gdbserver needs to initialise the microblaze registers
@@ -17,11 +17,10 @@ architecture specific setup - may need to add in future
  * add set_gdbarch_fetch_tls_load_module_address
  * Force reading of r0 as 0, prevent stores
 
-Upstream-Status: Pending
-
 Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
 Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
 Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
 ---
  gdb/configure.host                  |   2 +
  gdb/features/Makefile               |   1 +
@@ -31,10 +30,9 @@ Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
  gdb/microblaze-tdep.h               |   4 +-
  gdb/regformats/microblaze-linux.dat |  64 +++++++
  gdb/regformats/reg-microblaze.dat   |  41 +++++
- gdbserver/Makefile.in               |   1 +
  gdbserver/configure.srv             |  10 ++
  gdbserver/linux-microblaze-low.cc   | 269 ++++++++++++++++++++++++++++
- 11 files changed, 466 insertions(+), 3 deletions(-)
+ 10 files changed, 465 insertions(+), 3 deletions(-)
  create mode 100644 gdb/features/microblaze-linux.xml
  create mode 100644 gdb/regformats/microblaze-linux.dat
  create mode 100644 gdb/regformats/reg-microblaze.dat
@@ -61,7 +59,7 @@ index da71675b201..877537d06ef 100644
  mips*-*-netbsdaout* | mips*-*-knetbsd*-gnu)
  			gdb_host=nbsd ;;
 diff --git a/gdb/features/Makefile b/gdb/features/Makefile
-index 68e17d0085d..fc3196864c9 100644
+index 32341f71815..0af9d67c2f7 100644
 --- a/gdb/features/Makefile
 +++ b/gdb/features/Makefile
 @@ -46,6 +46,7 @@
@@ -92,7 +90,7 @@ index 00000000000..688a3f83d1e
 +  <xi:include href="microblaze-core.xml"/>
 +</target>
 diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
-index daa7ddf7e4d..5748556a556 100644
+index ae33cb5c014..9160b4ad464 100644
 --- a/gdb/microblaze-linux-tdep.c
 +++ b/gdb/microblaze-linux-tdep.c
 @@ -37,6 +37,22 @@
@@ -152,7 +150,7 @@ index daa7ddf7e4d..5748556a556 100644
  
  void _initialize_microblaze_linux_tdep ();
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index 3d5dd669341..3e8e8fe35b9 100644
+index f254a54305c..28a647e940b 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
 @@ -128,7 +128,38 @@ microblaze_fetch_instruction (CORE_ADDR pc)
@@ -195,7 +193,7 @@ index 3d5dd669341..3e8e8fe35b9 100644
  
  /* Allocate and initialize a frame cache.  */
  
-@@ -716,6 +747,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -714,6 +745,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  				       microblaze_breakpoint::kind_from_pc);
    set_gdbarch_sw_breakpoint_from_kind (gdbarch,
  				       microblaze_breakpoint::bp_from_kind);
@@ -203,14 +201,14 @@ index 3d5dd669341..3e8e8fe35b9 100644
  
    set_gdbarch_frame_args_skip (gdbarch, 8);
  
-@@ -756,4 +788,5 @@ When non-zero, microblaze specific debugging is enabled."),
+@@ -754,4 +786,5 @@ When non-zero, microblaze specific debugging is enabled."),
  			     NULL,
  			     &setdebuglist, &showdebuglist);
  
 +
  }
 diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
-index 4d90e8785dc..53fcb2297e6 100644
+index 892e5b3b849..e9f57e97c26 100644
 --- a/gdb/microblaze-tdep.h
 +++ b/gdb/microblaze-tdep.h
 @@ -118,6 +118,8 @@ struct microblaze_frame_cache
@@ -340,23 +338,11 @@ index 00000000000..bd8a4384424
 +32:fsr
 +32:slr
 +32:shr
-diff --git a/gdbserver/Makefile.in b/gdbserver/Makefile.in
-index 47648b8d962..55a5f5b81ae 100644
---- a/gdbserver/Makefile.in
-+++ b/gdbserver/Makefile.in
-@@ -178,6 +178,7 @@ SFILES = \
- 	$(srcdir)/linux-ia64-low.cc \
- 	$(srcdir)/linux-low.cc \
- 	$(srcdir)/linux-m68k-low.cc \
-+	$(srcdir)/linux-microblaze-low.cc \
- 	$(srcdir)/linux-mips-low.cc \
- 	$(srcdir)/linux-nios2-low.cc \
- 	$(srcdir)/linux-or1k-low.cc \
 diff --git a/gdbserver/configure.srv b/gdbserver/configure.srv
-index 6e09b0eeb79..1817f1f04fb 100644
+index 9e861a75088..11ce617e72f 100644
 --- a/gdbserver/configure.srv
 +++ b/gdbserver/configure.srv
-@@ -145,6 +145,16 @@ case "${gdbserver_host}" in
+@@ -159,6 +159,16 @@ case "${gdbserver_host}" in
  			srv_linux_regsets=yes
  			srv_linux_thread_db=yes
  			;;
@@ -649,5 +635,5 @@ index 00000000000..bf9eecc41ab
 +}
 +
 -- 
-2.37.1 (Apple Git-137.1)
+2.34.1
 

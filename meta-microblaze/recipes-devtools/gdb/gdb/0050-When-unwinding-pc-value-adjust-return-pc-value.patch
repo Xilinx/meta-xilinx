@@ -1,0 +1,92 @@
+From d8b25fd6d8cac000bb8f5ad65ada949447322fca Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Wed, 1 May 2024 11:12:32 +0530
+Subject: [PATCH 50/54] When unwinding pc value, adjust return pc value
+
+A call (branch and link) instruction can include a delay slot, the
+value of pc stored in the link register for Microblaze architecture
+is the pc value corresponding to last executed instruction (call)
+in the caller. The return instruction (branch reg) includes an
+offset of 8 so that when function returns execution continues from
+the address at : link register + 8, as the instruction in delay slot
+(link register + 4) is already executed at the time of call.
+
+Handle this by adjusting pc value during unwind-pc.
+
+Basically restoring code to do this that seems to have been removed
+as part of a gdb patch (gdb patch #8, Xilinx Yocto 2023.2)
+
+That patch caused hundreds of regressions in gdb testuite, including
+gdb.base/advance.exp, which is now fixed.
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/microblaze-tdep.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
+
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 47863819724..f87e406ada0 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -523,6 +523,12 @@ microblaze_unwind_pc (struct gdbarch *gdbarch, frame_info_ptr next_frame)
+ {
+   CORE_ADDR pc;
+   pc=frame_unwind_register_unsigned (next_frame, MICROBLAZE_PC_REGNUM);
++  /* For sentinel frame, return address is actual PC.  For other frames,
++     return address is pc+8.  This is a workaround because gcc does not
++     generate correct return address in CIE.  */
++  if (frame_relative_level (next_frame) >= 0)
++    pc = pc + 8;
++  microblaze_debug ("unwind pc = 0x%x\n", (int) pc);
+   return pc;
+ }
+ 
+@@ -615,6 +621,7 @@ microblaze_frame_prev_register (frame_info_ptr this_frame,
+   struct microblaze_frame_cache *cache =
+     microblaze_frame_cache (this_frame, this_cache);
+ 
++#if 1
+ if ((regnum == MICROBLAZE_SP_REGNUM &&
+       cache->register_offsets[MICROBLAZE_SP_REGNUM])
+       || (regnum == MICROBLAZE_FP_REGNUM &&
+@@ -625,15 +632,22 @@ if ((regnum == MICROBLAZE_SP_REGNUM &&
+ 
+ if (regnum == MICROBLAZE_PC_REGNUM)
+ {
+-      regnum = 15;
++      regnum = MICROBLAZE_PREV_PC_REGNUM;
++
++      microblaze_debug ("prev pc is r15 @ frame offset 0x%x\n",
++                         (int) cache->register_offsets[regnum] );
++
+       return frame_unwind_got_memory (this_frame, regnum,
+                                       cache->register_offsets[MICROBLAZE_PREV_PC_REGNUM]);
+-
+ }
++
+ if (regnum == MICROBLAZE_SP_REGNUM)
+         regnum = 1;
+-#if 0
+ 
++  return trad_frame_get_prev_register (this_frame, cache->saved_regs,
++ regnum);
++
++#else
+   if (cache->frameless_p)
+     {
+       if (regnum == MICROBLAZE_PC_REGNUM)
+@@ -646,9 +660,7 @@ if (regnum == MICROBLAZE_SP_REGNUM)
+   else
+     return trad_frame_get_prev_register (this_frame, cache->saved_regs,
+ 					 regnum);
+-#endif
+-  return trad_frame_get_prev_register (this_frame, cache->saved_regs,
+-					regnum); 
++#endif 
+ }
+ 
+ static const struct frame_unwind microblaze_frame_unwind =
+-- 
+2.34.1
+

@@ -1,0 +1,27 @@
+From bf491bdb2e4d30c14968be096969da700dedfc64 Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Wed, 17 Apr 2024 16:14:14 +0530
+Subject: [PATCH 49/54] Add back R_MICROBLAZE_NONE for linker relaxation
+ processing
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/elf32-microblaze.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index 554a80ae0e4..ec6613b6572 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -2102,6 +2102,7 @@ microblaze_elf_relax_section (bfd *abfd,
+ 	                                           irel->r_addend);
+ 	      }
+ 	      break;
++	    case R_MICROBLAZE_NONE:
+ 	    case R_MICROBLAZE_32_NONE:
+ 	      {
+ 		/* This was a PC-relative instruction that was
+-- 
+2.34.1
+
