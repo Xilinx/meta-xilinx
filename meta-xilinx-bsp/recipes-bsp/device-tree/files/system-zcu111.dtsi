@@ -1,0 +1,11 @@
+/ {
+/* Add Board specific PL gpio-line-names wrt design to have sdfec functional */
+	amba_pl: pl-bus {
+		axi_gpio: gpio@a00c0000 {
+			gpio-line-names = "LED0","LED1";
+		};
+		gpio_reset: gpio@a00c1000 {
+			gpio-line-names = "RESET";
+		};
+	};
+};
