@@ -7,6 +7,8 @@ FILESEXTRAPATHS:append := ":${THISDIR}/gdb"
 # Our changes are all local, no real patch-status
 ERROR_QA:remove = "patch-status"
 
+LDFLAGS:append:class-target:microblaze = " -latomic"
+
 SRC_URI:append:microblaze = " \
      file://0001-Add-initial-port-of-linux-gdbserver-add-gdb_proc_ser.patch \
      file://0002-Add-initial-port-of-linux-gdbserver-add-gdb_proc_ser.patch \
@@ -51,4 +53,5 @@ SRC_URI:append:microblaze = " \
      file://0052-Wrong-target-description-accepted-by-microblaze-arch.patch \
      file://0053-Merge-gdb-microblaze-linux-tdep.c-to-gdb-14-and-fix-.patch \
      file://0054-Roll-back-an-improvement-which-inlines-target_gdbarc.patch \
+     file://0055-fix-microblaze-linux-nat.patch \
      "
