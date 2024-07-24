@@ -17,10 +17,10 @@ COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 COMPATIBLE_MACHINE:versal = "versal"
 COMPATIBLE_MACHINE:versal-net = "versal-net"
 
-DEPENDS += " packagegroup-petalinux-jupyter \
+DEPENDS += " packagegroup-xilinx-jupyter \
              packagegroup-openamp"
 
-RDEPENDS:${PN} = " packagegroup-petalinux-jupyter \
+RDEPENDS:${PN} = " packagegroup-xilinx-jupyter \
                    packagegroup-openamp"
 
 do_install() {

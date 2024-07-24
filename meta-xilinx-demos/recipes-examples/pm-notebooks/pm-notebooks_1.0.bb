@@ -17,7 +17,7 @@ COMPATIBLE_MACHINE:versal = "versal"
 COMPATIBLE_MACHINE:versal-net = "versal-net"
 
 RDEPENDS:${PN} = " \
-    packagegroup-petalinux-jupyter \
+    packagegroup-xilinx-jupyter \
     python3-ipywidgets \
     python3-pydot \
     graphviz \
