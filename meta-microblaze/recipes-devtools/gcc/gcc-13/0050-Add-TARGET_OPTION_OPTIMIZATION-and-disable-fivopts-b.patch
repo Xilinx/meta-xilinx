@@ -1,0 +1,50 @@
+From b7fb925d6277d11e4014aa1731fc58813e30761f Mon Sep 17 00:00:00 2001
+From: Nagaraju <nmekala@xilinx.com>
+Date: Wed, 8 May 2019 14:12:03 +0530
+Subject: [PATCH 50/54] Add TARGET_OPTION_OPTIMIZATION and disable fivopts by
+ default
+
+Added TARGET_OPTION_OPTIMIZATIONS and Turn off ivopts by default.
+
+ * gcc/common/config/microblaze/microblaze-common.c
+   (microblaze_option_optimization_table): Disable fivopts by default.
+
+Signed-off-by: Nagaraju Mekala <nmekala@xilinx.com>
+	       Mahesh Bodapati <mbodapat@xilinx.com>
+Conflicts:
+	gcc/common/config/microblaze/microblaze-common.c
+
+Conflicts:
+	gcc/common/config/microblaze/microblaze-common.c
+---
+ gcc/common/config/microblaze/microblaze-common.cc | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/gcc/common/config/microblaze/microblaze-common.cc b/gcc/common/config/microblaze/microblaze-common.cc
+index 8750b022447..8a924e8a997 100644
+--- a/gcc/common/config/microblaze/microblaze-common.cc
++++ b/gcc/common/config/microblaze/microblaze-common.cc
+@@ -24,7 +24,20 @@
+ #include "common/common-target.h"
+ #include "common/common-target-def.h"
+ 
++/* Implement TARGET_OPTION_OPTIMIZATION_TABLE.  */
++static const struct default_options microblaze_option_optimization_table[] =
++  {
++    /* Turn off ivopts by default. It messes up cse.
++    { OPT_LEVELS_1_PLUS, OPT_fomit_frame_pointer, NULL, 1 }, */
++    { OPT_LEVELS_ALL, OPT_fivopts, NULL, 0 },
++    { OPT_LEVELS_NONE, 0, NULL, 0 }
++  };
++
++
+ #undef TARGET_DEFAULT_TARGET_FLAGS
+ #define TARGET_DEFAULT_TARGET_FLAGS	TARGET_DEFAULT
+ 
++#undef TARGET_OPTION_OPTIMIZATION_TABLE
++#define TARGET_OPTION_OPTIMIZATION_TABLE microblaze_option_optimization_table
++
+ struct gcc_targetm_common targetm_common = TARGETM_COMMON_INITIALIZER;
+-- 
+2.34.1
+

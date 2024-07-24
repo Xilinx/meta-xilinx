@@ -1,0 +1,36 @@
+From 68bc05ae258334f591c336dbed6dc907969e90fc Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 11 Jan 2017 16:20:01 +0530
+Subject: [PATCH 05/54] Update MicroBlaze strings test for new scan-assembly
+ output resulting in use of $LC label
+
+ChangeLog/testsuite
+
+2014-02-14  David Holsgrove <david.holsgrove@xilinx.com>
+
+ * gcc/testsuite/gcc.target/microblaze/others/strings1.c: Update
+   to include $LC label.
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+---
+ gcc/testsuite/gcc.target/microblaze/others/strings1.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/gcc/testsuite/gcc.target/microblaze/others/strings1.c b/gcc/testsuite/gcc.target/microblaze/others/strings1.c
+index efaf3c660ea..347872360d3 100644
+--- a/gcc/testsuite/gcc.target/microblaze/others/strings1.c
++++ b/gcc/testsuite/gcc.target/microblaze/others/strings1.c
+@@ -3,6 +3,10 @@
+ /* { dg-final { scan-assembler "addik\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),\\\$LC.*" } } */
+ /* { dg-final { scan-assembler "\lwi\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),*" } } */
+ 
++/* { dg-final { scan-assembler "\.rodata*" } } */
++/* { dg-final { scan-assembler "addik\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),\\\$LC.*" } } */
++/* { dg-final { scan-assembler "\lwi\tr(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),r(\[0-9]\|\[1-2]\[0-9]\|3\[0-1]),*" } } */
++
+ #include <string.h>
+ 
+ extern void somefunc (char *);
+-- 
+2.34.1
+
