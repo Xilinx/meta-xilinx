@@ -6,10 +6,6 @@ Subject: [PATCH 25/53] Fixing the issue with the builtin_alloc. register r18
  available register
 
 signed-off-by:nagaraju mekala <nmekala@xilinx.com>
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
 ---
  gcc/config/microblaze/microblaze.md | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)

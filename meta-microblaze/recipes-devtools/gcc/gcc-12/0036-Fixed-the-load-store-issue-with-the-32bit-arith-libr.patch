@@ -4,10 +4,6 @@ Date: Sat, 13 Oct 2018 21:12:43 +0530
 Subject: [PATCH 36/53] Fixed the load store issue with the 32bit arith
  libraries
 
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
 ---
  libgcc/config/microblaze/divsi3.S  | 25 ++++++++++++++++++++++++-
  libgcc/config/microblaze/modsi3.S  | 26 +++++++++++++++++++++++++-

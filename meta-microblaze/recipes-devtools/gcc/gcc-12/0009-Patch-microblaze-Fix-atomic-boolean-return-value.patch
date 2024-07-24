@@ -5,8 +5,6 @@ Subject: [PATCH 09/53] [Patch, microblaze]: Fix atomic boolean return value.
  In atomic_compare_and_swapsi, fix boolean return value. Previously, it
  contained zero if successful and non-zero if unsuccessful.
 
-Upstream-Status: Pending
-
 Signed-off-by: Kirk Meyer <kirk.meyer@sencore.com>
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 ---

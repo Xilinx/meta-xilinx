@@ -6,10 +6,6 @@ Subject: [PATCH 20/53] [Patch, microblaze]: 8-stage pipeline for microblaze
  pipeline reduces the latencies of float & integer division drastically
 
 Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
 ---
  gcc/config/microblaze/microblaze.cc  | 11 ++++
  gcc/config/microblaze/microblaze.h   |  3 +-

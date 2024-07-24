@@ -2,8 +2,6 @@ From 12d7e086376916ef61e2c48639671fd0f7c8fbbf Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 10:57:19 +0530
 Subject: [PATCH 12/53] [Patch, microblaze]: Use bralid for profiler calls
-Upstream-Status: Pending
-
  Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 
 ---

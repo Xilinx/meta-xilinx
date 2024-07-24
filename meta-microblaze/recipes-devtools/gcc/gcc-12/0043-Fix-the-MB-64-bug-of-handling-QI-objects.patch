@@ -3,10 +3,6 @@ From: Nagaraju <nmekala@xilinx.com>
 Date: Thu, 14 Mar 2019 18:11:04 +0530
 Subject: [PATCH 43/53] Fix the MB-64 bug of handling QI objects
 
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
 ---
  gcc/config/microblaze/microblaze.md | 14 +++++++-------
  1 file changed, 7 insertions(+), 7 deletions(-)

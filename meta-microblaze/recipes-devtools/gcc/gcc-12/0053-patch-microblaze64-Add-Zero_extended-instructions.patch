@@ -9,8 +9,6 @@ Subject: [PATCH 53/53] [patch, microblaze64]: Add Zero_extended instructions
 
     [CR/TSR]: TSR-974519
 
-Upstream-Status: Pending
-
     Signed-off-by: Nagaraju Mekala<nmekala@xilinx.com>
 		   Mahesh Bodapati<mbodapat@xilinx.com>
 ---

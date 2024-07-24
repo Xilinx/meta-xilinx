@@ -4,10 +4,6 @@ Date: Mon, 4 Jun 2018 10:10:18 +0530
 Subject: [PATCH 26/53] [Patch,Microblaze] : Removed fsqrt generation for
  double values.
 
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
 ---
  gcc/config/microblaze/microblaze.md | 14 --------------
  1 file changed, 14 deletions(-)

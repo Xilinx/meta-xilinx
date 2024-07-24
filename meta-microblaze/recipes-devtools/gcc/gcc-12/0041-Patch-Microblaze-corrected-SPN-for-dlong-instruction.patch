@@ -4,10 +4,6 @@ Date: Wed, 24 Oct 2018 18:31:04 +0530
 Subject: [PATCH 41/53] [Patch,Microblaze] : corrected SPN for dlong
  instruction mapping.
 
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
 ---
  gcc/config/microblaze/microblaze.md | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)

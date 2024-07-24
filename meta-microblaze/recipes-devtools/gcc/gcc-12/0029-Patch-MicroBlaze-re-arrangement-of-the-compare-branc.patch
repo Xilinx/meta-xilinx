@@ -4,10 +4,6 @@ Date: Tue, 13 Sep 2022 14:45:15 +0530
 Subject: [PATCH 29/53] [Patch,MicroBlaze] : re-arrangement of the compare
  branches
 
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
 ---
  gcc/config/microblaze/microblaze.cc |  28 ++----
  gcc/config/microblaze/microblaze.md | 141 +++++++++++++---------------

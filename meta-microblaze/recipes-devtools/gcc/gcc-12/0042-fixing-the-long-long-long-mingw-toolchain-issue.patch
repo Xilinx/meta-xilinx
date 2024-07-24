@@ -3,10 +3,6 @@ From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Thu, 29 Nov 2018 17:55:08 +0530
 Subject: [PATCH 42/53] fixing the long & long long mingw toolchain issue
 
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
 ---
  gcc/config/microblaze/constraints.md | 2 +-
  gcc/config/microblaze/microblaze.md  | 8 ++++----

@@ -17,8 +17,6 @@ ChangeLog/testsuite
 
  * gcc/testsuite/gcc.target/microblaze/others/lshrsi_Os_1.c: New test.
 
-Upstream-Status: Pending
-
 Signed-off-by:Nagaraju <nmekala@xilix.com>
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 ---

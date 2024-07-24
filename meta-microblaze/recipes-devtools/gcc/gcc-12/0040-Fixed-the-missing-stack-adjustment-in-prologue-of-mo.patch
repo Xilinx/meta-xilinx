@@ -4,10 +4,6 @@ Date: Fri, 19 Oct 2018 14:26:25 +0530
 Subject: [PATCH 40/53] Fixed the missing stack adjustment in prologue of
  modsi3 function
 
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
 ---
  libgcc/config/microblaze/modsi3.S | 1 +
  1 file changed, 1 insertion(+)

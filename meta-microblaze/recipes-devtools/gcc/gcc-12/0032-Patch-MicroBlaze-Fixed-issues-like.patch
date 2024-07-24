@@ -4,10 +4,6 @@ Date: Tue, 13 Sep 2022 15:24:25 +0530
 Subject: [PATCH 32/53] [Patch,MicroBlaze]: Fixed issues like:     1 Interrupt
  alignment issue     2 Sign extension issue
 
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
 ---
  gcc/config/microblaze/microblaze.cc | 16 ++++++++++------
  gcc/config/microblaze/microblaze.md |  2 +-

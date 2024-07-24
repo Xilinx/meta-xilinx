@@ -7,10 +7,6 @@ Subject: [PATCH 33/53] [Patch,MicroBlaze]: fixed below issues:     - Floating
 
     Conflicts:
         gcc/config/microblaze/microblaze.md
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
 ---
  gcc/config/microblaze/microblaze.cc | 12 +++-
  gcc/config/microblaze/microblaze.h  |  7 +++

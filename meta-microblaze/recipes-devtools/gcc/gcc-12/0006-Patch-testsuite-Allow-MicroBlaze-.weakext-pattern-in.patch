@@ -13,8 +13,6 @@ ChangeLog/testsuite
    pattern to take optional ext after .weak.
  * gcc/testsuite/g++.dg/abi/thunk4.C: Likewise.
 
-Upstream-Status: Pending
-
 Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
 
 Conflicts:

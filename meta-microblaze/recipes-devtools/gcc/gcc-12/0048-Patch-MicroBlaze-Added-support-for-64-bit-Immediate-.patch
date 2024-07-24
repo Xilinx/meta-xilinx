@@ -4,10 +4,6 @@ Date: Mon, 26 Aug 2019 15:55:22 +0530
 Subject: [PATCH 48/53] [Patch,MicroBlaze] : Added support for 64 bit Immediate
  values.
 
-Upstream-Status: Pending
-
-Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
 ---
  gcc/config/microblaze/constraints.md | 4 ++--
  gcc/config/microblaze/microblaze.md  | 3 +--
