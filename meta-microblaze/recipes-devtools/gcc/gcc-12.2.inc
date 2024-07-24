@@ -111,4 +111,4 @@ EXTRA_OECONF_PATHS = "\
 "
 
 # Is a binutils 2.26 issue, not gcc
-CVE_STATUS[CVE-2021-37322] = "cpe-incorrect: Is a binutils 2.26 issue, not gcc"
+CVE_CHECK_IGNORE += "CVE-2021-37322"
