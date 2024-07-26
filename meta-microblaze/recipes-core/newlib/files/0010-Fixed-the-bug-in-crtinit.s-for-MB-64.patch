@@ -1,10 +1,9 @@
-From bab2eafd2d4ca1f2caacd50120e8ac94aca1b7c4 Mon Sep 17 00:00:00 2001
+From 3790e623bec70441d7d34f9390760b611a968e9d Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Tue, 14 Jan 2020 22:32:30 +0530
-Subject: [PATCH 11/11] Fixed the bug in crtinit.s for MB-64
+Subject: [PATCH 10/11] Fixed the bug in crtinit.s for MB-64
 
-Upstream-Status: Pending
-
+(cherry picked from commit bab2eafd2d4ca1f2caacd50120e8ac94aca1b7c4)
 ---
  libgloss/microblaze/crtinit.S | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -23,5 +22,5 @@ index 854117536..f79140734 100644
  	beagti	r18, .Lloopsbss
  .Lendsbss:
 -- 
-2.37.1 (Apple Git-137.1)
+2.34.1
 

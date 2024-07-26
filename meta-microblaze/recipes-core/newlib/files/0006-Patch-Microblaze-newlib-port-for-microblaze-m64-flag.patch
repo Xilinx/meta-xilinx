@@ -1,14 +1,14 @@
-From e7b0c93274c2f51adc7c20c24a28d3cd5974fddc Mon Sep 17 00:00:00 2001
+From 9fcd09b603d8deb2bbd3557aae6faba311dbdf12 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 11 Sep 2018 14:32:20 +0530
-Subject: [PATCH 07/11] [Patch, Microblaze]: newlib port for microblaze m64
+Subject: [PATCH 06/11] [Patch, Microblaze]: newlib port for microblaze m64
  flag...
-
-Upstream-Status: Pending
 
 Conflicts:
 	libgloss/microblaze/_hw_exception_handler.S
 	libgloss/microblaze/_interrupt_handler.S
+
+(cherry picked from commit e7b0c93274c2f51adc7c20c24a28d3cd5974fddc)
 ---
  libgloss/microblaze/_exception_handler.S    |   6 +-
  libgloss/microblaze/_hw_exception_handler.S |   7 +-
@@ -1135,5 +1135,5 @@ index cdd87c76f..971862bcb 100644
 +#endif
  .end setjmp    
 -- 
-2.37.1 (Apple Git-137.1)
+2.34.1
 

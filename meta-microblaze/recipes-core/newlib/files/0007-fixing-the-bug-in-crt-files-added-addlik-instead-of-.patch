@@ -1,11 +1,10 @@
-From 924721fdb8eed60fe58c8a7976955bac02efc200 Mon Sep 17 00:00:00 2001
+From eb41f08c22949726576d001e27ec8be3531d947a Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 28 Sep 2018 12:07:43 +0530
-Subject: [PATCH 08/11] fixing the bug in crt files, added addlik instead of
+Subject: [PATCH 07/11] fixing the bug in crt files, added addlik instead of
  lli insn
 
-Upstream-Status: Pending
-
+(cherry picked from commit 924721fdb8eed60fe58c8a7976955bac02efc200)
 ---
  libgloss/microblaze/crt0.S | 6 +++---
  libgloss/microblaze/crt1.S | 6 +++---
@@ -100,5 +99,5 @@ index 54ba473ea..a25c84734 100644
          brealid	r15, _crtinit               /* Initialize BSS and run program */
  	nop
 -- 
-2.37.1 (Apple Git-137.1)
+2.34.1
 

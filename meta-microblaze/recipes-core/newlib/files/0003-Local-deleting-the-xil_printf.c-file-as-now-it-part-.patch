@@ -1,11 +1,10 @@
-From edf132aae14fadd15630916781a14a29cafd37ef Mon Sep 17 00:00:00 2001
+From 471a4a4ee556af3274b6d3652cfd4f35801b9b57 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 23 Jan 2017 15:42:11 +0530
-Subject: [PATCH 04/11] [Local]: deleting the xil_printf.c file as now it part
+Subject: [PATCH 03/11] [Local]: deleting the xil_printf.c file as now it part
  of BSP
 
-Upstream-Status: Pending
-
+(cherry picked from commit edf132aae14fadd15630916781a14a29cafd37ef)
 ---
  libgloss/microblaze/xil_printf.c | 284 -------------------------------
  1 file changed, 284 deletions(-)
@@ -302,5 +301,5 @@ index f18ee8446..000000000
 -
 -/*---------------------------------------------------*/
 -- 
-2.37.1 (Apple Git-137.1)
+2.34.1
 

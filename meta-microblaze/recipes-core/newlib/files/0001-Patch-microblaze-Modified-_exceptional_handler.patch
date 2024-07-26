@@ -1,13 +1,12 @@
-From c96521b00af5259e1404c921cc6a22fbb16c1ace Mon Sep 17 00:00:00 2001
+From e2293e32df22089aa9a9fb3727aba4faa3774b7c Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 23 Jan 2017 15:30:02 +0530
-Subject: [PATCH 02/11] [Patch, microblaze]: Modified _exceptional_handler
+Subject: [PATCH 01/11] [Patch, microblaze]: Modified _exceptional_handler
  Modified the _exceptional_handler to support the changes made in GCC related
  to Superviosry call
 
 Signed-off-by:Nagaraju Mekala<nmekala@xilix.com>
-
-Upstream-Status: Pending
+(cherry picked from commit c96521b00af5259e1404c921cc6a22fbb16c1ace)
 ---
  libgloss/microblaze/_exception_handler.S | 1 -
  1 file changed, 1 deletion(-)
@@ -23,5 +22,5 @@ index 59385ad9b..7a91a781e 100644
 -	addi r11,r11,8
  	bra r11
 -- 
-2.37.1 (Apple Git-137.1)
+2.34.1
 

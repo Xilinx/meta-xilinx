@@ -1,12 +1,12 @@
-From 6b8e5c7a773de4609f9c855aa714eca5a3f8b4ab Mon Sep 17 00:00:00 2001
+From 5a7955b68f5066b00413e751d1de967181c88b94 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 9 Nov 2021 22:53:44 +0530
-Subject: [PATCH 10/11] [Patch,MicroBlaze] : Removing the Assembly
+Subject: [PATCH 09/11] [Patch,MicroBlaze] : Removing the Assembly
  implementation of 64bit string function.
 
 Revisit in next release and fix it
 
-Upstream-Status: Pending
+(cherry picked from commit 6b8e5c7a773de4609f9c855aa714eca5a3f8b4ab)
 ---
  newlib/libc/machine/microblaze/mb_endian.h |  4 +
  newlib/libc/machine/microblaze/strcmp.c    | 95 ++++++++--------------
@@ -337,5 +337,5 @@ index b6f2d3c13..940753996 100644
  #endif  /* ! HAVE_HW_PCMP */
  }
 -- 
-2.37.1 (Apple Git-137.1)
+2.34.1
 

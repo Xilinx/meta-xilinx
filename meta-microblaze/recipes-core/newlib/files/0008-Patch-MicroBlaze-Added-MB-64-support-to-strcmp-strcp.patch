@@ -1,11 +1,10 @@
-From e7a5086bc3e38cf5bc5c5943de6cf5135ed6a77b Mon Sep 17 00:00:00 2001
+From 82e5a92af613455cb7aed4eee7da3d723e5f5011 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Nov 2020 13:06:41 +0530
-Subject: [PATCH 09/11] [Patch,MicroBlaze] : Added MB-64 support to
+Subject: [PATCH 08/11] [Patch,MicroBlaze] : Added MB-64 support to
  strcmp/strcpy/strlen files Signed-off-by:Mahesh Bodapati<mbodapat@xilinx.com>
 
-Upstream-Status: Pending
-
+(cherry picked from commit e7a5086bc3e38cf5bc5c5943de6cf5135ed6a77b)
 ---
  newlib/libc/machine/microblaze/strcmp.c | 63 ++++++++++++++++++++++++-
  newlib/libc/machine/microblaze/strcpy.c | 57 ++++++++++++++++++++++
@@ -228,5 +227,5 @@ index acb4464bc..b6f2d3c13 100644
  #endif  /* ! HAVE_HW_PCMP */
  }
 -- 
-2.37.1 (Apple Git-137.1)
+2.34.1
 
