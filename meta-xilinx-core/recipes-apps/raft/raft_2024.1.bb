@@ -36,7 +36,7 @@ RDEPENDS:${PN} += "python3 \
 #        python3-async \
 #
 
-PACKAGECONFIG[raftnotebooks] = "enabled,disabled,,packagegroup-petalinux-jupyter"
+PACKAGECONFIG[raftnotebooks] = "enabled,disabled,,packagegroup-xilinx-jupyter"
 PACKAGECONFIG[raftstartup] = "enabled,disabled,,rfdc rfclk libmetal"
 PACKAGECONFIG[raftstartupsc] = "enabled,disabled,,python3-psutil python3-periphery"
 
