@@ -23,9 +23,25 @@ QB_DEFAULT_KERNEL:zynq ?= "${@'zImage' if \
 QB_DEFAULT_KERNEL:microblaze ?= "${@'simpleImage.mb' if \
 		d.getVar('INITRAMFS_IMAGE_BUNDLE') != '1' else 'simpleImage.mb-initramfs-${MACHINE}.bin'}"
 
+# https://docs.amd.com/r/en-US/ug585-zynq-7000-SoC-TRM/Boot-Mode-Pin-Settings
 # https://docs.amd.com/r/en-US/ug1085-zynq-ultrascale-trm/Boot-Modes
 # https://docs.amd.com/r/en-US/ug1304-versal-acap-ssdg/Boot-Device-Modes
 QB_BOOT_MODE ?= "-boot mode=5"
+
+
+# ZynqMP or Versal SD and eMMC drive index.
+# Note: Do not set drive index based on boot mode some boards may have primary
+#       boot mode as QSPI/OSPI and secondary boot mode as SD/eMMC.
+#
+# SoC                         Device                      Drive Index
+# Zynq-7000, ZynqMP, Versal   SD0                         0
+# ZynqMP, Versal              SD1                         1
+# ZynqMP, Versal              eMMC0(secondary boot only)  2
+# ZynqMP, Versal              eMMC1                       3
+
+QB_SD_DRIVE_INDEX ?= "1"
+QB_SD_DRIVE_INDEX:zynq ?= "0"
+QB_SD_DRIVE_INDEX:versal-net ?= "0"
 
 inherit qemuboot
 
@@ -78,6 +94,7 @@ def qemu_rootfs_params(data, param):
     bundle_image = data.getVar('INITRAMFS_IMAGE_BUNDLE') or ""
     soc_family = data.getVar('SOC_FAMILY') or ""
     tune_features = (data.getVar('TUNE_FEATURES') or []).split()
+    sd_index = data.getVar('QB_SD_DRIVE_INDEX') or ""
     if 'microblaze' in tune_features:
         soc_family = 'microblaze'
 
@@ -101,12 +118,6 @@ def qemu_rootfs_params(data, param):
         return fstype_dict[soc_family]
 
     elif param == 'rootfs-opt':
-        sd_index = "1"
-        if soc_family == 'zynq':
-            sd_index = "0"
-        if soc_family == 'versal-net':
-            sd_index = "0"
-
         # Device is using a disk
         if not initramfs_image:
             return ' -drive if=sd,index=%s,file=@ROOTFS@,format=raw' % (sd_index)
