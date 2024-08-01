@@ -22,4 +22,4 @@ IMAGE_CLASSES += "qemuboot-xilinx"
 # emulated boards that may not match the standard Linux behavior.
 #
 QB_XILINX_SERIAL ?= ""
-QB_OPT_APPEND += "${QB_XILINX_SERIAL}"
+QB_OPT_APPEND += "${QB_XILINX_SERIAL} -nodefaults"
