@@ -39,6 +39,9 @@ DDR_BASEADDR ?= "0x0"
 DDR_BASEADDR:microblaze ?= "0x80000000"
 PRE_BOOTENV ?= ""
 
+# Set debfault SD boot device to mmc 0 interface
+SDBOOTDEV ?= "0"
+
 SRC_URI = " \
     file://boot.cmd.sd.zynq \
     file://boot.cmd.sd.zynqmp \
