@@ -45,6 +45,8 @@ BOOTGEN_ARCH_DEFAULT:versal-net = "versalnet"
 BOOTGEN_ARCH ?= "${BOOTGEN_ARCH_DEFAULT}"
 BOOTGEN_EXTRA_ARGS ?= ""
 
+QEMU_FLASH_TYPE ?= "qspi"
+
 do_patch[noexec] = "1"
 
 def create_bif(config, attrflags, attrimage, ids, common_attr, biffd, d):
@@ -184,7 +186,7 @@ do_install() {
 
 inherit image-artifact-names
 
-QEMUQSPI_BASE_NAME ?= "QEMU_qspi-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+QEMU_FLASH_IMAGE_NAME ?= "qemu-${QEMU_FLASH_TYPE}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 BOOTBIN_BASE_NAME ?= "BOOT-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
