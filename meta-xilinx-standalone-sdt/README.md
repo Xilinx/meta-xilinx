@@ -33,26 +33,22 @@ $ git clone -b <rel-version> https://github.com/Xilinx/meta-openamp
    meta-kria and meta-system-controller if included in bblayers.conf), then add
    the meta-xilinx-standalone-sdt and meta-openamp layer.
 
-> **Note:** SDT builds for following devices are not supported in 2024.1 release.
-> * Zynq 7000
-> * MicoBlaze
-> * Kria
-> * System Controller
+> **Note:** SDT builds for following devices are not supported in 2024.2 release.
+> * MicroBlaze
+
 
 ```
 $ bitbake-layers remove-layer meta-xilinx-tools
-$ bitbake-layers remove-layer meta-kria
-$ bitbake-layers remove-layer meta-system-controller
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone-sdt
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openamp
 ```
 
-5. Export gen-machineconf tool.
+1. Export gen-machineconf tool.
 ```
 $ export PATH=$PATH:<ABSOLUTE_PATH>/gen-machine-conf
 ```
 
-6. Run the script from the build or ${TOPDIR} directory. This step describes
+1. Run the script from the build or ${TOPDIR} directory. This step describes
    System Device Tree (SDT) with and without pl overlays. Configruations are same
    for both SDT with and without pl overlays except for linux dts content.
 
@@ -82,7 +78,7 @@ $ export PATH=$PATH:<ABSOLUTE_PATH>/gen-machine-conf
 >          needs to use the *_partial.dtsi and *_partial.pdi/bit from sdtgen output
 >          artifacts to DFx partial firmware recipes.
 
-   * ZynqMP Full bitstream or Versal Segmented Configuration:
+   * Zynq-700 or ZynqMP Full bitstream or Versal Segmented Configuration:
 ```
  $ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c <conf> -l conf/local.conf -g full
 ```
@@ -92,9 +88,27 @@ $ export PATH=$PATH:<ABSOLUTE_PATH>/gen-machine-conf
  $ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c <conf> -l conf/local.conf -g dfx
 ```
 
-For example, zynqmp:
+For example, Zynq-7000:
 ```
-$ gen-machineconf --soc-family zynqmp --hw-description <path_to_sdtgen_output_directory> -c conf/ -l conf/local.conf
+$ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c conf/ -l conf/local.conf
+```
+The following will be written to the end of the conf/local.conf file:
+
+```
+# Use the newly generated MACHINE
+MACHINE = "xlnx-zynq-zc702"
+
+# Avoid errors in some baremetal configs as these layers may be present
+# but are not used.  Note the following lines are optional and can be
+# safetly disabled.
+SKIP_META_VIRT_SANITY_CHECK = "1"
+SKIP_META_SECURITY_SANITY_CHECK = "1"
+SKIP_META_TPM_SANITY_CHECK = "1"
+```
+
+For example, ZynqMP:
+```
+$ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c conf/ -l conf/local.conf
 ```
 The following will be written to the end of the conf/local.conf file:
 
@@ -108,15 +122,11 @@ MACHINE = "xlnx-zynqmp-zcu102-rev1-0"
 SKIP_META_VIRT_SANITY_CHECK = "1"
 SKIP_META_SECURITY_SANITY_CHECK = "1"
 SKIP_META_TPM_SANITY_CHECK = "1"
-
-# Each generated multiconfig defines it's own TMPDIR, either edit the
-# multiconfig files, or uncomment and adjust MC_TMPDIR_PREFIX below
-#MC_TMPDIR_PREFIX = "${TOPDIR}/tmp"
 ```
 
-For example, versal:
+For example, Versal:
 ```
-$ gen-machineconf --soc-family versal --hw-description <path_to_sdtgen_output_directory> -c conf/ -l conf/local.conf
+$ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c conf/ -l conf/local.conf
 ```
 
 The following will be written to the end of the conf/local.conf file:
@@ -131,11 +141,8 @@ MACHINE = "xlnx-versal-vmk180-rev1-1-x-ebm-01-reva"
 SKIP_META_VIRT_SANITY_CHECK = "1"
 SKIP_META_SECURITY_SANITY_CHECK = "1"
 SKIP_META_TPM_SANITY_CHECK = "1"
-
-# Each generated multiconfig defines it's own TMPDIR, either edit the
-# multiconfig files, or uncomment and adjust MC_TMPDIR_PREFIX below
-#MC_TMPDIR_PREFIX = "${TOPDIR}/tmp"
 ```
+
 > **Bitbake Performance Note:**
 Each BBMULTICONFIG value requires all of the recipes to be parsed for that
 configuration.  Thus each multiconfig will add more parsing time.  A long list
