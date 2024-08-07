@@ -6,9 +6,9 @@ SUMMARY = "Image update is used to update alternate image on compatible firmware
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/git/LICENSES/MIT;md5=2ac09a7a37dd6ee0ba23ce497d57d09b"
 
-BRANCH = "xlnx_rel_v2024.1"
+BRANCH = "master"
 SRC_URI = "git://github.com/Xilinx/linux-image_update.git;branch=${BRANCH};protocol=https"
-SRCREV = "a68308f329578d3585fd335071a9184aa7f46d2e"
+SRCREV = "35dba5304b3c7328e5761c83df2b825bf5cf7c8f"
 
 RDEPENDS:${PN} += "freeipmi"
 
