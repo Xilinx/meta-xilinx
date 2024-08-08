@@ -38,7 +38,7 @@ addtask do_generate_app_data before do_configure after do_prepare_recipe_sysroot
 do_prepare_recipe_sysroot[rdeptask] = "do_unpack"
 
 do_compile:append() {
-    ${OBJCOPY} -O binary ${B}/${ESW_EXECUTABLE_NAME}.elf ${B}${ESW_EXECUTABLE_NAME}.bin
+    ${OBJCOPY} -O binary ${B}/${ESW_EXECUTABLE_NAME}.elf ${B}/${ESW_EXECUTABLE_NAME}.bin
 }
 
 do_install() {
