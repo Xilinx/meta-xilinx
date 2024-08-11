@@ -24,13 +24,20 @@ BITSTREAM_PATH ?= ""
 
 inherit deploy
 
+BITSTREAM_NAME ?= "download"
+BITSTREAM_NAME:microblaze ?= "system"
+
+BITSTREAM_BASE_NAME ?= "${BITSTREAM_NAME}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+
+SYSROOT_DIRS += "/boot/bitstream"
+
 do_install() {
     if [ ! -e ${BITSTREAM_PATH} ]; then
         echo "Unable to find BITSTREAM_PATH (${BITSTREAM_PATH})"
         exit 1
     fi
-
-    install -Dm 0644 ${BITSTREAM_PATH} ${D}/boot/.
+    install -d ${D}/boot/bitstream/
+    install -Dm 0644 ${BITSTREAM_PATH} ${D}/boot/bitstream/${BITSTREAM_BASE_NAME}.bit
 }
 
 # If the item is already in OUR deploy_image_dir, nothing to deploy!
@@ -38,9 +45,13 @@ SHOULD_DEPLOY = "${@'false' if (d.getVar('BITSTREAM_PATH')).startswith(d.getVar(
 do_deploy() {
     # If the item is already in OUR deploy_image_dir, nothing to deploy!
     if ${SHOULD_DEPLOY}; then
-        install -Dm 0644 ${BITSTREAM_PATH} ${DEPLOYDIR}/.
+        install -Dm 0644 ${BITSTREAM_PATH} ${DEPLOYDIR}/${BITSTREAM_BASE_NAME}.bit
     fi
 }
+
+addtask deploy before do_build after do_install
+
+FILES:${PN} += "/boot/bitstream/*.bit"
 
 def check_bitstream_vars(d):
    # If BITSTREAM_PATH is not defined, we error and instruct the user
