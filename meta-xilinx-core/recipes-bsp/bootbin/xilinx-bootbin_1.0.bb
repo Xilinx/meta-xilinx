@@ -50,6 +50,8 @@ BOOTSCR_DEP = ''
 BOOTSCR_DEP:versal = 'u-boot-xlnx-scr:do_deploy'
 BOOTSCR_DEP:versal-net = 'u-boot-xlnx-scr:do_deploy'
 
+BIF_BITSTREAM_ATTR ?= "${@bb.utils.contains('MACHINE_FEATURES', 'fpga-overlay', '', 'bitstream', d)}"
+
 do_patch[noexec] = "1"
 
 do_compile[depends] .= " ${BOOTSCR_DEP}"
