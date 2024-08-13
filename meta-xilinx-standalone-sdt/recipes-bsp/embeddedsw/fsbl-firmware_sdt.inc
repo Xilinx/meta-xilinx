@@ -11,19 +11,19 @@ ESW_FSBL_DEPENDS = "xilstandalone xiltimer xilffs"
 ESW_FSBL_DEPENDS:append:zynq = " xilrsa"
 ESW_FSBL_DEPENDS:append:zynqmp = " xilsecure xilpm"
 
-USE_SDT_ARTIFACTS ?= ""
-USE_SDT_ARTIFACTS[doc] = "Set this to "1" in machine file, if SDT artifacts are used from repo"
-
-DEPENDS += "${@'sdt-artifacts' if d.getVar('USE_SDT_ARTIFACTS') == '1' else ''} ${ESW_FSBL_DEPENDS}"
+DEPENDS += "${PSU_INIT_DEPENDS} ${ESW_FSBL_DEPENDS}"
 
 CFLAGS:append:aarch64 = " -DARMA53_64"
 CFLAGS:append:armv7r = " -DARMR5"
 
+# These files usually come in from sdt-artifacts (SYSTEM_DTFILE_DEPENDS)
 FSBL_PS_INIT_C:zynq = "ps7_init.c"
 FSBL_PS_INIT_C:zynqmp = "psu_init.c"
 FSBL_PS_INIT_H:zynq = "ps7_init.h"
 FSBL_PS_INIT_H:zynqmp = "psu_init.h"
 
+SYSTEM_DTFILE_DEPENDS ??= ""
+PSU_INIT_DEPENDS ?= "${SYSTEM_DTFILE_DEPENDS}"
 PSU_INIT_PATH ?= "${SYSTEM_DTFILE_DIR}"
 PSU_INIT_PATH[doc] = "Path to psu_init or ps7_init files, defaults to system device tree output directory"
 
@@ -31,13 +31,13 @@ do_configure:prepend() {
     if [ -e ${PSU_INIT_PATH}/${FSBL_PS_INIT_C} ]; then
         install -m 0644 ${PSU_INIT_PATH}/${FSBL_PS_INIT_C} ${S}/${ESW_COMPONENT_SRC}
     else
-        bbwarn "Using the default ${FSBL_PS_INIT_C}, this may not work correctly."
+        bbfatal "Using the default ${FSBL_PS_INIT_C}, this may not work correctly.  Looking for ${PSU_INIT_PATH}/${FSBL_PS_INIT_C}"
     fi
 
     if [ -e ${PSU_INIT_PATH}/${FSBL_PS_INIT_H} ]; then
         install -m 0644 ${PSU_INIT_PATH}/${FSBL_PS_INIT_H} ${S}/${ESW_COMPONENT_SRC}
     else
-        bbwarn "Using the default ${FSBL_PS_INIT_H}, this may not work correctly."
+        bbfatal "Using the default ${FSBL_PS_INIT_H}, this may not work correctly.  Looking for ${PSU_INIT_PATH}/${FSBL_PS_INIT_H}"
     fi
     install -m 0644 ${S}/cmake/UserConfig.cmake ${S}/${ESW_COMPONENT_SRC}
 }
