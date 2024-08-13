@@ -17,13 +17,12 @@ FW_OS ?= "baremetal"
 
 FW_TARGET ?= "${MACHINE}-${FW_MACHINE}-${FW_OS}"
 
-OPENAMP_FW_DEPLOY_DIR ?= "tmp-${FW_TARGET}/deploy/images/${MACHINE}"
-#OPENAMP_FW_DEPLOY_DIR ?= "tmp-${FW_TARGET}/deploy/"
+OPENAMP_FW_DEPLOY_DIR ?= "-${FW_TARGET}/deploy/images/${MACHINE}/open-amp-xlnx"
 
 DEPENDS = " open-amp-xlnx "
 do_install[mcdepends] += "mc::${FW_TARGET}:open-amp-xlnx:do_deploy"
 do_install() {
-	src=${TOPDIR}/${OPENAMP_FW_DEPLOY_DIR}/${OPENAMP_FW_SRC_NAME}
+	src=${TMPDIR}${OPENAMP_FW_DEPLOY_DIR}/${OPENAMP_FW_SRC_NAME}
 	dest=${D}${FW_LIB_DIR}/${OPENAMP_FW_NAME}
 	if [ ! -e $src ]; then
 		bberror "Multiconfig firmware $src is not found.  Set OPENAMP_FW_DEPLOY_DIR:pn-${PN} if necessary."
