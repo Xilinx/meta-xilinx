@@ -14,5 +14,6 @@ python xilinx_deprecated_config_eventhandler () {
         if msg_source == "doc":
             continue
         msg = d.getVarFlag('XILINX_DEPRECATED', msg_source) or ""
-        bb.warn('%s: %s' % (msg_source, msg))
+        if msg:
+            bb.warn('%s: %s' % (msg_source, msg))
 }
