@@ -88,7 +88,7 @@ do_compile[noexec] = "1"
 
 do_install() {
 
-    if [ -d ${S}/${SDT_FILE_NAME} ]; then
+    if [ -n ${SDT_FILE_NAME} -a -d ${S}/${SDT_FILE_NAME} ]; then
         install -d ${D}${datadir}/sdt/${SDT_MACHINE}/${SDT_FILE_NAME}
         cp --preserve=mode,timestamps -R ${S}/${SDT_FILE_NAME}/* ${D}${datadir}/sdt/${SDT_MACHINE}/${SDT_FILE_NAME}
     else
