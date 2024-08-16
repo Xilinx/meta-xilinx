@@ -53,7 +53,7 @@
 		reg = <0x0 0xeba00000 0x0 0x10000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_net_firmware 0x183180cb>;
+		power-domains = <&versal_net_firmware 0x183180cb>;
 	};
 
 	tcm_0b: tcm_0b@eba10000 {
@@ -61,7 +61,7 @@
 		reg = <0x0 0xeba10000 0x0 0x8000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_net_firmware 0x183180cc>;
+		power-domains = <&versal_net_firmware 0x183180cc>;
 	};
 
 	tcm_0c: tcm_0b@eba20000 {
@@ -69,7 +69,7 @@
 		reg = <0x0 0xeba20000 0x0 0x8000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_net_firmware 0x183180cd>;
+		power-domains = <&versal_net_firmware 0x183180cd>;
 	};
 
 	tcm_1a: tcm_0a@eba40000 {
@@ -77,7 +77,7 @@
 		reg = <0x0 0xeba40000 0x0 0x10000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_net_firmware 0x183180ce>;
+		power-domains = <&versal_net_firmware 0x183180ce>;
 	};
 
 	tcm_1b: tcm_0b@eba50000 {
@@ -85,7 +85,7 @@
 		reg = <0x0 0xeba50000 0x0 0x8000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_net_firmware 0x183180cf>;
+		power-domains = <&versal_net_firmware 0x183180cf>;
 	};
 
 	tcm_1c: tcm_0b@eba60000 {
@@ -93,7 +93,7 @@
 		reg = <0x0 0xeba60000 0x0 0x8000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_net_firmware 0x183180d0>;
+		power-domains = <&versal_net_firmware 0x183180d0>;
 	};
 
 	r52ss {
@@ -110,7 +110,7 @@
 			ranges;
 			sram = <&tcm_0a>, <&tcm_0b>, <&tcm_0c>;
 			memory-region = <&rproc_0_reserved>, <&rpu0vdev0buffer>, <&rpu0vdev0vring0>, <&rpu0vdev0vring1>;
-			power-domain = <&versal_net_firmware 0x181100BF>;
+			power-domains = <&versal_net_firmware 0x181100BF>;
 			mboxes = <&ipi_mailbox_rpu0 0>, <&ipi_mailbox_rpu0 1>;
 			mbox-names = "tx", "rx";
 		};
@@ -121,7 +121,7 @@
 			ranges;
 			sram = <&tcm_1a>, <&tcm_1b>, <&tcm_1c>;
 			memory-region = <&rproc_1_reserved>, <&rpu1vdev0buffer>, <&rpu1vdev0vring0>, <&rpu1vdev0vring1>;
-			power-domain = <&versal_net_firmware 0x181100C0>;
+			power-domains = <&versal_net_firmware 0x181100C0>;
 			mboxes = <&ipi_mailbox_rpu1 0>, <&ipi_mailbox_rpu1 1>;
 			mbox-names = "tx", "rx";
 		};
