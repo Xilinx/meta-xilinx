@@ -1,0 +1,110 @@
+From 83047c38b0a9e8cc535eba580ca28497f1bee544 Mon Sep 17 00:00:00 2001
+From: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
+Date: Fri, 19 Jul 2024 14:10:22 -0700
+Subject: [PATCH] xf86-video-armosc: Option to control acceleration
+
+Add xorg config option to enable / disable GPU accelerated picture
+composition. Enable acceleration by default.
+
+Signed-off-by: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
+---
+ man/armsoc.man      |  6 ++++++
+ src/armsoc_driver.c | 20 +++++++++++++++-----
+ src/armsoc_driver.h |  3 +++
+ 3 files changed, 24 insertions(+), 5 deletions(-)
+
+diff --git a/man/armsoc.man b/man/armsoc.man
+index d85c2fa..cdeb19e 100644
+--- a/man/armsoc.man
++++ b/man/armsoc.man
+@@ -69,6 +69,12 @@ Default: NULL
+ Use the umplock module for cross-process access synchronization. It should be only enabled for Mali400
+ .IP
+ Default: Umplock is Disabled
++.TP
++.BI "Option \*qAccelerateComposition\*q \*q" boolean \*q
++Accelerate picture composition on GPU.
++.IP
++Default: Accelerated composition is Enabled
++
+ 
+ .SH DRM DEVICE SELECTION
+ 
+diff --git a/src/armsoc_driver.c b/src/armsoc_driver.c
+index f5b8f21..15cc620 100644
+--- a/src/armsoc_driver.c
++++ b/src/armsoc_driver.c
+@@ -110,6 +110,7 @@ enum {
+ 	OPTION_DRI_NUM_BUF,
+ 	OPTION_INIT_FROM_FBDEV,
+ 	OPTION_UMP_LOCK,
++	OPTION_ACCELERATE_COMPOSITION,
+ };
+ 
+ /** Supported options. */
+@@ -122,6 +123,8 @@ static const OptionInfoRec ARMSOCOptions[] = {
+ 	{ OPTION_DRI_NUM_BUF, "DRI2MaxBuffers", OPTV_INTEGER, {-1}, FALSE },
+ 	{ OPTION_INIT_FROM_FBDEV, "InitFromFBDev", OPTV_STRING, {0}, FALSE },
+ 	{ OPTION_UMP_LOCK,   "UMP_LOCK",   OPTV_BOOLEAN, {0}, FALSE },
++	{ OPTION_ACCELERATE_COMPOSITION, "AccelerateComposition", OPTV_BOOLEAN,
++		{0}, FALSE },
+ 	{ -1,                NULL,         OPTV_NONE,    {0}, FALSE }
+ };
+ 
+@@ -871,6 +874,10 @@ ARMSOCPreInit(ScrnInfoPtr pScrn, int flags)
+ 	armsocDebug = xf86ReturnOptValBool(pARMSOC->pOptionInfo,
+ 					OPTION_DEBUG, FALSE);
+ 
++	/* Should we enable GPU accelerated picture composition? */
++	pARMSOC->enable_repulsion = xf86ReturnOptValBool(pARMSOC->pOptionInfo,
++					OPTION_ACCELERATE_COMPOSITION, TRUE);
++
+ 	if (!xf86GetOptValInteger(pARMSOC->pOptionInfo, OPTION_DRI_NUM_BUF,
+ 			&driNumBufs)) {
+ 		/* Default to double buffering */
+@@ -1119,7 +1126,6 @@ ARMSOCScreenInit(SCREEN_INIT_ARGS_DECL)
+ 	struct ARMSOCRec *pARMSOC = ARMSOCPTR(pScrn);
+ 	VisualPtr visual;
+ 	xf86CrtcConfigPtr xf86_config;
+-	PictureScreenPtr ps;
+ 	int j;
+ 	const char *fbdev;
+ 	int depth;
+@@ -1308,12 +1314,16 @@ ARMSOCScreenInit(SCREEN_INIT_ARGS_DECL)
+ 		pARMSOC->lockFD = -1;
+ 	}
+ 
+-	pARMSOC->repulsion = armsoc_repulsion_init();
++	if (pARMSOC->enable_repulsion) {
++		PictureScreenPtr ps;
++
++		pARMSOC->repulsion = armsoc_repulsion_init();
+ 
+-	ps = GetPictureScreen(pScreen);
+-	pARMSOC->composite_proc = ps->Composite;
++		ps = GetPictureScreen(pScreen);
++		pARMSOC->composite_proc = ps->Composite;
+ 
+-	ps->Composite = ARMSOCComposite;
++		ps->Composite = ARMSOCComposite;
++	}
+ 
+ 	TRACE_EXIT();
+ 	return TRUE;
+diff --git a/src/armsoc_driver.h b/src/armsoc_driver.h
+index 20b0f80..27e978e 100644
+--- a/src/armsoc_driver.h
++++ b/src/armsoc_driver.h
+@@ -185,6 +185,9 @@ struct ARMSOCRec {
+ 	 * driNumBufs if early display enabled, otherwise driNumBufs-1 */
+ 	unsigned int                       swap_chain_size;
+ 
++	/* Enable GPU accelerated picture compositor? */
++	Bool								enable_repulsion;
++
+ 	/* GPU accelerated picture compositor, AKA Repulsion */
+ 	struct ARMSOCRepulsion				*repulsion;
+ 
+-- 
+2.25.1
+
