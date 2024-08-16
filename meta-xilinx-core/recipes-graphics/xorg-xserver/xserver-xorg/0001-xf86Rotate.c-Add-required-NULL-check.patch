@@ -1,0 +1,35 @@
+From e94754360160cfe4faada7b9a523e57004b39e74 Mon Sep 17 00:00:00 2001
+From: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
+Date: Thu, 15 Aug 2024 15:48:21 -0700
+Subject: [PATCH] xf86Rotate.c: Add required NULL check
+
+Add missing NULL check on BlockHandler callback before invoking it. There
+is no guarantee that said callback is always defined.
+
+Fixes xorg crash on startup when screen rotation is specified in the config
+file.
+
+Upstream-Status: Pending
+
+Signed-off-by: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
+---
+ hw/xfree86/modes/xf86Rotate.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/hw/xfree86/modes/xf86Rotate.c b/hw/xfree86/modes/xf86Rotate.c
+index ea9c43c..43eab53 100644
+--- a/hw/xfree86/modes/xf86Rotate.c
++++ b/hw/xfree86/modes/xf86Rotate.c
+@@ -230,7 +230,8 @@ xf86RotateBlockHandler(ScreenPtr pScreen, void *pTimeout)
+ 
+     xf86RotateRedisplay(pScreen);
+ 
+-    (*pScreen->BlockHandler) (pScreen, pTimeout);
++    if (pScreen->BlockHandler)
++        (*pScreen->BlockHandler) (pScreen, pTimeout);
+ 
+     /* Re-wrap if we still need this hook */
+     if (xf86_config->rotation_damage != NULL) {
+-- 
+2.25.1
+
