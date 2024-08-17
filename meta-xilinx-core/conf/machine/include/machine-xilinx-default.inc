@@ -14,7 +14,7 @@ IMAGE_FSTYPES ?= "tar.gz cpio cpio.gz cpio.gz.u-boot"
 PREFERRED_PROVIDER_virtual/kernel ??= "linux-xlnx"
 
 # Device tree Configuration
-PREFERRED_PROVIDER_virtual/dtb ??= "device-tree"
+PREFERRED_PROVIDER_virtual/dtb ??= "${@'device-tree' if d.getVar('XILINX_WITH_ESW') else ''}"
 
 # U-Boot Configuration
 PREFERRED_PROVIDER_virtual/bootloader ??= "u-boot-xlnx"
@@ -82,6 +82,17 @@ IMAGE_BOOT_FILES ?= "${@get_default_image_boot_files(d)}"
 def get_default_image_boot_files(d):
     files = []
 
+    esw_type = d.getVar('XILINX_WITH_ESW') or ''
+    if esw_type:
+        if 'zynq' in d.getVar('OVERRIDES').split(':'):
+            files.append('boot.bin')
+        if 'zynqmp' in d.getVar('OVERRIDES').split(':'):
+            files.append('boot.bin')
+        if 'versal' in d.getVar('OVERRIDES').split(':'):
+            files.append('boot.bin')
+        if 'versal-net' in d.getVar('OVERRIDES').split(':'):
+            files.append('boot.bin')
+
     # kernel images
     kerneltypes = set((d.getVar("KERNEL_IMAGETYPE") or "").split())
     kerneltypes |= set((d.getVar("KERNEL_IMAGETYPES") or "").split())
@@ -95,6 +106,7 @@ def get_default_image_boot_files(d):
 
     # device trees (device-tree only), these are first as they are likely desired over the kernel ones
     if "device-tree" in (d.getVar("PREFERRED_PROVIDER_virtual/dtb") or ""):
+        files.append("system.dtb")
         files.append("devicetree/*.dtb;devicetree/")
         files.append("devicetree/*.dtbo;devicetree/")
 
@@ -106,6 +118,34 @@ def get_default_image_boot_files(d):
             files.append(dtb)
 
     return " ".join(files)
+
+EXTRA_IMAGEDEPENDS += "${@get_default_extra_imagedepends(d)}"
+
+def get_default_extra_imagedepends(d):
+    depends = []
+
+    # Add firmware dependencies
+    esw_type = d.getVar('XILINX_WITH_ESW') or ''
+    if esw_type:
+        depends.append('libyaml-native')
+        depends.append('python3-cython-native')
+        depends.append('python3-pyyaml-native')
+        if 'microblaze' in d.getVar('OVERRIDES').split(':'):
+            depends.append('virtual/bitstream')
+        if 'zynq' in d.getVar('OVERRIDES').split(':'):
+            depends.append('virtual/boot-bin')
+        if 'zynqmp' in d.getVar('OVERRIDES').split(':'):
+            depends.append('virtual/boot-bin')
+        if 'versal' in d.getVar('OVERRIDES').split(':'):
+            depends.append('virtual/boot-bin')
+            depends.append('virtual/cdo:do_deploy')
+        if 'versal-net' in d.getVar('OVERRIDES').split(':'):
+            depends.append('virtual/boot-bin')
+            depends.append('virtual/cdo:do_deploy')
+
+    return " ".join(depends)
+
+
 
 XSERVER_EXT ?= ""
 
