@@ -6,15 +6,6 @@ xilinx_variables_config_eventhandler[eventmask] = "bb.event.ConfigParsed"
 # It's up to the base sytem to define the variables being used here, we're
 # only going to check them.
 python xilinx_variables_config_eventhandler () {
-    # Verify HDF_MACHINE
-    hdf_prior = d.getVar('HDF_MACHINE_PRIOR')
-    hdf_final = d.getVar('HDF_MACHINE')
-
-    if hdf_prior and hdf_prior != hdf_final:
-        bb.fatal("HDF_MACHINE is set to %s, it appears you intended %s. " \
-                 "This is usually as a result of specifying it in the local.conf or before the 'require' in the machine .conf file. " \
-                 "See meta-xilinx-core/conf/machine/README." % (hdf_final, hdf_prior))
-
     # Verify DEFAULTTUNE
     tune_prior = d.getVar('DEFAULTTUNE_PRIOR')
     tune_final = d.getVar('DEFAULTTUNE')
