@@ -138,10 +138,10 @@ def get_default_extra_imagedepends(d):
             depends.append('virtual/boot-bin')
         if 'versal' in d.getVar('OVERRIDES').split(':'):
             depends.append('virtual/boot-bin')
-            depends.append('virtual/cdo:do_deploy')
+            depends.append('virtual/cdo')
         if 'versal-net' in d.getVar('OVERRIDES').split(':'):
             depends.append('virtual/boot-bin')
-            depends.append('virtual/cdo:do_deploy')
+            depends.append('virtual/cdo')
 
     return " ".join(depends)
 
