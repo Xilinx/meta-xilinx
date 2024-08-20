@@ -5,8 +5,6 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 SRC_URI = " \
-    file://zynq-openamp.dtsi \
-    file://zynq-openamp-overlay.dts \
     file://zynqmp-openamp.dtsi \
     file://zynqmp-openamp-overlay.dts \
     file://versal-openamp.dtsi \
@@ -18,7 +16,6 @@ SRC_URI = " \
 # We don't have anything to include from the kernel
 KERNEL_INCLUDE = ""
 
-COMPATIBLE_MACHINE:zynq = "${MACHINE}"
 COMPATIBLE_MACHINE:zynqmp = "${MACHINE}"
 COMPATIBLE_MACHINE:versal = "${MACHINE}"
 COMPATIBLE_MACHINE:versal-net = "${MACHINE}"

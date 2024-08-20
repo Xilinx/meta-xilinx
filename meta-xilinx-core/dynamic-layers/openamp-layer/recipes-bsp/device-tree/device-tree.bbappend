@@ -5,7 +5,7 @@ DT_INCLUDE:append = " ${WORKDIR}"
 
 do_configure[vardeps] += "ENABLE_OPENAMP_DTSI OPENAMP_EXTRA_OVERLAYS"
 
-OPENAMP_EXTRA_OVERLAYS:zynq = "zynq-openamp.dtsi"
+OPENAMP_EXTRA_OVERLAYS ?= ""
 OPENAMP_EXTRA_OVERLAYS:zynqmp = "zynqmp-openamp.dtsi"
 OPENAMP_EXTRA_OVERLAYS:versal = "versal-openamp.dtsi"
 OPENAMP_EXTRA_OVERLAYS:versal-net = "versal-net-openamp.dtsi"
