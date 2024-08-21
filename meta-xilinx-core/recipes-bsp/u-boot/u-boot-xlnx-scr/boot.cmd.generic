@@ -11,7 +11,7 @@ rootfs_name=@@RAMDISK_IMAGE@@
 
 
 setenv get_bootargs 'fdt addr $fdtcontroladdr;fdt get value bootargs /chosen bootargs;'
-setenv update_bootargs 'if test -n ${launch_ramdisk_init} && test ${bootargs} = "";then if run get_bootargs;then setenv bootargs "\$bootargs launch_ramdisk_init=${launch_ramdisk_init} $extrabootargs";fi;fi'
+setenv update_bootargs 'if test -n ${launch_ramdisk_init} && test ${bootargs} = "";then if run get_bootargs;then setenv bootargs "\$bootargs launch_ramdisk_init=${launch_ramdisk_init} $extrabootargs $select_rootfs";fi; else if run get_bootargs; then setenv bootargs "\$bootargs $select_rootfs"; fi; fi'
 
 
 for boot_target in ${boot_targets};
