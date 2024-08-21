@@ -17,7 +17,7 @@ FW_OS ?= "baremetal"
 
 FW_TARGET ?= "${MACHINE}-${FW_MACHINE}-${FW_OS}"
 
-OPENAMP_FW_DEPLOY_DIR ?= "-${FW_TARGET}/deploy/images/${MACHINE}/open-amp-xlnx"
+OPENAMP_FW_DEPLOY_DIR ?= "-${FW_TARGET}/deploy/images/${MACHINE}/"
 
 DEPENDS = " open-amp-xlnx "
 do_install[mcdepends] += "mc::${FW_TARGET}:open-amp-xlnx:do_deploy"
