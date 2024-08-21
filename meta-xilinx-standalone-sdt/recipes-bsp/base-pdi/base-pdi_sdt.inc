@@ -2,7 +2,8 @@
 
 SRC_URI = ""
 
-DEPENDS += "sdt-artifacts"
+PDI_PATH_DEPENDS ??= ""
+DEPENDS += "${PDI_PATH_DEPENDS}"
 
 PDI_SKIP_CHECK = "1"
 
