@@ -62,7 +62,7 @@ def generate_spi_image(d):
     qspi_data.write(b'\xFF' * qspi_size)
 
     # Image Selector - Primary, Backup, Image A and Image B
-    imgsel_file = d.getVar("DEPLOY_DIR_IMAGE")+"/imgsel-"+d.getVar("MACHINE")+".bin"
+    imgsel_file = d.getVar("DEPLOY_DIR_IMAGE")+"/image-selector-"+d.getVar("MACHINE")+".bin"
     try:
         with open(imgsel_file, "rb") as il:
             imgsel = il.read(-1)
