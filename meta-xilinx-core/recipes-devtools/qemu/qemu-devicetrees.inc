@@ -14,6 +14,8 @@ REPO ?= "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
+SRC_URI += "file://0001-versal-Reorder-serial-ports.patch"
+
 S = "${WORKDIR}/git"
 
 # Don't need to do anything
