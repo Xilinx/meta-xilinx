@@ -1,9 +1,9 @@
-BRANCH ?= "xlnx-rebase-v1.22.11"
+BRANCH ?= "xlnx-rebase-v1.22.12"
 REPO   ?= "git://github.com/Xilinx/gstreamer.git;protocol=https"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 
-PV = "1.22.11+git"
+PV = "1.22.12+git"
 
 # We need a common PRSERV_PV_AUTOINC for all variations of gstreamer packages
 # Need to inject a custom setting, so based on package.bbclass version
@@ -24,5 +24,5 @@ SRC_URI = " \
     ${REPO};${BRANCHARG};name=gstreamer-xlnx \
 "
 
-SRCREV_gstreamer-xlnx = "4af9bb3e0fb96f3f4a7c78bc216fb78fad196d0a"
+SRCREV_gstreamer-xlnx = "ff96286074adfcb91883a21e5993f98765241569"
 SRCREV_FORMAT = "gstreamer-xlnx"
