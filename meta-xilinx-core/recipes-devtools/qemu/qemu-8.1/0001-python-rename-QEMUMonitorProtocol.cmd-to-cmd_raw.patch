@@ -1,0 +1,81 @@
+From 84986d94277de2ac853cb613c37dbafe485f0981 Mon Sep 17 00:00:00 2001
+From: Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>
+Date: Fri, 6 Oct 2023 18:41:14 +0300
+Subject: [PATCH 1/2] python: rename QEMUMonitorProtocol.cmd() to cmd_raw()
+
+Having cmd() and command() methods in one class doesn't look good.
+Rename cmd() to cmd_raw(), to show its meaning better.
+
+We also want to rename command() to cmd() in future, so this commit is
+a necessary step.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 20231006154125.1068348-5-vsementsov@yandex-team.ru
+Signed-off-by: John Snow <jsnow@redhat.com>
+
+Upstream-Status: Backport (37274707f6f3868fae7e0055d9a703006fc142d0)
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ python/qemu/machine/machine.py | 2 +-
+ python/qemu/qmp/legacy.py      | 8 ++------
+ tests/qemu-iotests/iotests.py  | 2 +-
+ 3 files changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/python/qemu/machine/machine.py b/python/qemu/machine/machine.py
+index c16a0b6fed..82fa8cdddf 100644
+--- a/python/qemu/machine/machine.py
++++ b/python/qemu/machine/machine.py
+@@ -686,7 +686,7 @@ def qmp(self, cmd: str,
+             conv_keys = True
+ 
+         qmp_args = self._qmp_args(conv_keys, args)
+-        ret = self._qmp.cmd(cmd, args=qmp_args)
++        ret = self._qmp.cmd_raw(cmd, args=qmp_args)
+         if cmd == 'quit' and 'error' not in ret and 'return' in ret:
+             self._quit_issued = True
+         return ret
+diff --git a/python/qemu/qmp/legacy.py b/python/qemu/qmp/legacy.py
+index e1e9383978..e5fa1ce9c4 100644
+--- a/python/qemu/qmp/legacy.py
++++ b/python/qemu/qmp/legacy.py
+@@ -194,21 +194,17 @@ def cmd_obj(self, qmp_cmd: QMPMessage) -> QMPMessage:
+             )
+         )
+ 
+-    def cmd(self, name: str,
+-            args: Optional[Dict[str, object]] = None,
+-            cmd_id: Optional[object] = None) -> QMPMessage:
++    def cmd_raw(self, name: str,
++                args: Optional[Dict[str, object]] = None) -> QMPMessage:
+         """
+         Build a QMP command and send it to the QMP Monitor.
+ 
+         :param name: command name (string)
+         :param args: command arguments (dict)
+-        :param cmd_id: command id (dict, list, string or int)
+         """
+         qmp_cmd: QMPMessage = {'execute': name}
+         if args:
+             qmp_cmd['arguments'] = args
+-        if cmd_id:
+-            qmp_cmd['id'] = cmd_id
+         return self.cmd_obj(qmp_cmd)
+ 
+     def command(self, cmd: str, **kwds: object) -> QMPReturnValue:
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index ef66fbd62b..8ffd9fb660 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -460,7 +460,7 @@ def __init__(self, *args: str, instance_id: str = 'a', qmp: bool = False):
+     def qmp(self, cmd: str, args: Optional[Dict[str, object]] = None) \
+             -> QMPMessage:
+         assert self._qmp is not None
+-        return self._qmp.cmd(cmd, args)
++        return self._qmp.cmd_raw(cmd, args)
+ 
+     def get_qmp(self) -> QEMUMonitorProtocol:
+         assert self._qmp is not None
+-- 
+2.34.1
+

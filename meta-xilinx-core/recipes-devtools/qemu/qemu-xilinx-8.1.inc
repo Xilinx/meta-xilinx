@@ -72,6 +72,13 @@ SRC_URI += "\
 # Patch doesn't apply to 8.1.0
 #           file://fixmips.patch 
 
+# Additional patches to match Scarthgap, which requires a slightly newer qmp interface
+SRC_URI += "\
+           file://0001-python-rename-QEMUMonitorProtocol.cmd-to-cmd_raw.patch \
+           file://0002-python-qemu-rename-command-to-cmd.patch \
+           "
+
+
 S = "${WORKDIR}/git"
 
 # Based on qemu settings in poky/meta/conf/distro/include/no-static-libs.inc
