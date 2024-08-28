@@ -1,9 +1,11 @@
 SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master;protocol=https"
-SRCREV = "b6cd9f4b50769de9260760a5b40969de0f04ae49"
+SRCREV = "3c69852c71aba0bf5711b8463fb9ab38345faa42"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/lopper:"
 
-BASEVERSION = "1.1.0"
+SRC_URI += "file://0001-openamp-xlnx-Fix-typo-in-comparison.patch"
+
+BASEVERSION = "1.2.0"
 
 RDEPENDS:${PN} += " \
     python3-ruamel-yaml \
