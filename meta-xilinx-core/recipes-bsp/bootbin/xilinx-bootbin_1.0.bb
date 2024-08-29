@@ -7,6 +7,8 @@ LICENSE = "BSD"
 
 include machine-xilinx-${SOC_FAMILY}.inc
 
+BOOTBIN_INCLUDE ?= ""
+
 inherit deploy
 
 # Don't allow building for microblaze MACHINE
