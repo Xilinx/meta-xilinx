@@ -5,6 +5,9 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 INHIBIT_DEFAULT_DEPS = "1"
 
+BITSTREAM_PATH_DEPENDS ??= ""
+DEPENDS += "${BITSTREAM_PATH_DEPENDS}"
+
 # We never want to prefer this over another provider
 DEFAULT_PREFERENCE = "-1"
 
@@ -54,17 +57,17 @@ addtask deploy before do_build after do_install
 FILES:${PN} += "/boot/bitstream/*.bit"
 
 def check_bitstream_vars(d):
-   # If BITSTREAM_PATH is not defined, we error and instruct the user
-   # Don't cache this, as the items on disk can change!
-   d.setVar('BB_DONT_CACHE', '1')
-   if d.getVar('BITSTREAM_PATH') and not os.path.exists(d.getVar('BITSTREAM_PATH')):
-        raise bb.parse.SkipRecipe("The expected bitstream file %s is not available.\nSee the meta-xilinx-core README.")
+    # Assuming if BITSTREAM_PATH_DEPENDS exists, that the file will be available later.
+    if not d.getVar('BITSTREAM_PATH_DEPENDS'):
+        # Don't cache this, as the items on disk can change!
+        d.setVar('BB_DONT_CACHE', '1')
 
-   if not d.getVar('BITSTREAM_PATH'):
-        if os.path.exists(d.expand('${TOPDIR}/download-${MACHINE}.bit')):
-            d.setVar('BITSTREAM_PATH', '${TOPDIR}/download-${MACHINE}.bit')
-        else:
+        # If BITSTREAM_PATH is not found or defined, we error and instruct the user
+        if not d.getVar('BITSTREAM_PATH'):
             raise bb.parse.SkipRecipe("Something is depending on virtual/bitstream and you have not provided a bitstream using BITSTREAM_PATH variable.\n See the meta-xilinx-core README.")
+
+        if d.getVar('BITSTREAM_PATH') and not os.path.exists(d.getVar('BITSTREAM_PATH')):
+            raise bb.parse.SkipRecipe("The expected bitstream file %s is not available.\nSee the meta-xilinx-core README." % d.getVar('BITSTREAM_PATH'))
 
 python() {
     # Need to allow bbappends to change the check
