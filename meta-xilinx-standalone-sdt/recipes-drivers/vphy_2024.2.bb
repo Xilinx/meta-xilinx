@@ -5,7 +5,7 @@ REQUIRED_MACHINE_FEATURES = "vphy"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone "
+DEPENDS += "xilstandalone video-common"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/vphy/src/"
 ESW_COMPONENT_NAME = "libvphy.a"

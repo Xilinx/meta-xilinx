@@ -1,14 +1,14 @@
 
 inherit features_check
 
-REQUIRED_MACHINE_FEATURES = "v-hdmiphy1"
+REQUIRED_MACHINE_FEATURES = "dp21txss"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone video-common"
+DEPENDS += "xilstandalone "
 
-ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/v_hdmiphy1/src/"
-ESW_COMPONENT_NAME = "libv_hdmiphy1.a"
+ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dp21txss/src/"
+ESW_COMPONENT_NAME = "libdp21txss.a"
 
 addtask do_generate_driver_data before do_configure after do_prepare_recipe_sysroot
 do_prepare_recipe_sysroot[rdeptask] = "do_unpack"

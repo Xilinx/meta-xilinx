@@ -5,7 +5,7 @@ REQUIRED_MACHINE_FEATURES = "dp14"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone "
+DEPENDS += "xilstandalone video-common"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dp14/src/"
 ESW_COMPONENT_NAME = "libdp14.a"
