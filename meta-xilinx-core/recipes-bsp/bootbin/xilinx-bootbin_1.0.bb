@@ -23,7 +23,8 @@ PROVIDES = "virtual/boot-bin"
 DEPENDS += "bootgen-native u-boot-xlnx-scr"
 
 # There is no bitstream recipe, so really depend on virtual/bitstream
-DEPENDS += "${@(d.getVar('BIF_PARTITION_ATTR') or "").replace('bitstream', 'virtual/bitstream')}"
+# We need to refer to virtual/arm-trusted-firmware and not arm-trusted-firmware as there may be multiple providers
+DEPENDS += "${@(d.getVar('BIF_PARTITION_ATTR') or "").replace('bitstream', 'virtual/bitstream').replace('arm-trusted-firmware', 'virtual/arm-trusted-firmware')}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
