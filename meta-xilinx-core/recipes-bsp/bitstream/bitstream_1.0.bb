@@ -61,7 +61,10 @@ def check_bitstream_vars(d):
         raise bb.parse.SkipRecipe("The expected bitstream file %s is not available.\nSee the meta-xilinx-core README.")
 
    if not d.getVar('BITSTREAM_PATH'):
-        raise bb.parse.SkipRecipe("Something is depending on virtual/bitstream and you have not provided a bitstream using BITSTREAM_PATH variable.\n See the meta-xilinx-core README.")
+        if os.path.exists(d.expand('${TOPDIR}/download-${MACHINE}.bit')):
+            d.setVar('BITSTREAM_PATH', '${TOPDIR}/download-${MACHINE}.bit')
+        else:
+            raise bb.parse.SkipRecipe("Something is depending on virtual/bitstream and you have not provided a bitstream using BITSTREAM_PATH variable.\n See the meta-xilinx-core README.")
 
 python() {
     # Need to allow bbappends to change the check
