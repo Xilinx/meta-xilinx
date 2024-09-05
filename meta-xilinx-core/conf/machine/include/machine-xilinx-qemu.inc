@@ -21,5 +21,5 @@ IMAGE_CLASSES += "qemuboot-xilinx"
 # QB_XILINX_SERIAL that will allow us to define serial ports for qemu
 # emulated boards that may not match the standard Linux behavior.
 #
-QB_XILINX_SERIAL ?= ""
+QB_XILINX_SERIAL ??= ""
 QB_OPT_APPEND += "${QB_XILINX_SERIAL} -nodefaults"
