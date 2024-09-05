@@ -12,7 +12,10 @@ inherit deploy image-artifact-names
 # they may also define SDT_URI[S] to define the unpacking path.
 SDT_URI[doc] = "URI for the System Device Tree file(s), usually a tarball bundle of files"
 
-SDT_URI ??= ""
+# Add compatibility with previous gen-machine-conf output
+SYSTEM_DTFILE_DIR ??= ""
+
+SDT_URI ??= "${@'file://${SYSTEM_DTFILE_DIR}' if d.getVar('SYSTEM_DTFILE_DIR') else ''}"
 
 SRC_URI = "${SDT_URI}"
 SRC_URI[sha256sum] = "${@d.getVarFlag('SDT_URI', 'sha256sum') or 'undefined'}"
