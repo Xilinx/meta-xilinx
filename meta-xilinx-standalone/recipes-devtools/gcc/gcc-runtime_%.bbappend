@@ -9,6 +9,7 @@ EXTRA_OECONF:append:class-target:xilinx-standalone = " \
 	--enable-plugins \
 	--with-gnu-as \
 	--disable-libitm \
+	--disable-tm-clone-registry \
 "
 
 EXTRA_OECONF:append:aarch64:class-target:xilinx-standalone = " \
@@ -28,7 +29,6 @@ EXTRA_OECONF:append:armv8r:class-target:xilinx-standalone = " \
 
 EXTRA_OECONF:append:microblaze:class-target:xilinx-standalone = " \
 	--without-long-double-128 \
-	--disable-tm-clone-registry \
 	"
 
 # Changes local to gcc-runtime...
