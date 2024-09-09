@@ -1,5 +1,9 @@
 require recipes-bsp/trusted-firmware-a/trusted-firmware-a.inc
 
+DEPENDS:remove:zynqmp:qemuall = " optee-os"
+DEPENDS:remove:versal:qemuall = " optee-os"
+DEPENDS:remove:versal-net:qemuall = " optee-os"
+
 # Xilinx TF-A v2.10
 SRC_URI_TRUSTED_FIRMWARE_A = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https"
 SRCREV_tfa = "4127ddee61619bc9663e9d4f421717cc725ab27e"
