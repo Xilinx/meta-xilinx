@@ -9,6 +9,10 @@ ramdisk_name=@@RAMDISK_IMAGE1@@
 rootfs_name=@@RAMDISK_IMAGE@@
 @@PRE_BOOTENV@@
 
+# check part uuid based on device type
+setenv mmc_part_uuid 'if mmc dev ${devnum}; then devtype=mmc; part uuid ${devtype} ${devnum}:@@PARTNUM@@ root_uuid; setenv select_rootfs "root=PARTUUID=$root_uuid ro rootwait"; fi'
+setenv usb_part_uuid 'usb start; if usb dev ${devnum}; then devtype=usb; part uuid ${devtype} ${devnum}:@@PARTNUM@@ root_uuid; setenv select_rootfs "root=PARTUUID=$root_uuid ro rootwait"; fi'
+
 for boot_target in ${boot_targets};
 do
 	echo "Trying to load boot images from ${boot_target}"
@@ -21,9 +25,15 @@ do
 	if test "${boot_target}" = "mmc0" || test "${boot_target}" = "mmc1" || test "${boot_target}" = "usb0" || test "${boot_target}" = "usb1"; then
 		if test "${boot_target}" = "mmc0" || test "${boot_target}" = "mmc1"; then
 			setenv bootdev mmcblk${devnum}p
+			if test -n "${enable_bootmenu}"; then
+                                run mmc_part_uuid
+                        fi
 		fi
 		if test "${boot_target}" = "usb0" || test "${boot_target}" = "usb1"; then
 			setenv bootdev sda
+			if test -n "${enable_bootmenu}"; then
+                                run usb_part_uuid
+                        fi
 		fi
 
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@UENV_TEXTFILE@@; then
