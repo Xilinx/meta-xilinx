@@ -2,8 +2,7 @@ inherit esw python3native esw_apps_common deploy
 
 DEPENDS += "libxil xiltimer bootgen-native"
 
-PROVIDES = "virtual/imgsel"
-RCONFLICTS:${PN} = "imgsel"
+RCONFLICTS:${PN} = "image-selector-xsct"
 
 ESW_COMPONENT_SRC = "/src/"
 ESW_EXECUTABLE_NAME = "imgsel"
