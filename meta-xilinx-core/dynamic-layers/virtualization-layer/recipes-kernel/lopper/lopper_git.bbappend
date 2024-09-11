@@ -1,9 +1,7 @@
 SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master;protocol=https"
-SRCREV = "3c69852c71aba0bf5711b8463fb9ab38345faa42"
+SRCREV = "4644625b8665b190e03b97e3a0e2017b1015e430"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/lopper:"
-
-SRC_URI += "file://0001-openamp-xlnx-Fix-typo-in-comparison.patch"
 
 BASEVERSION = "1.2.0"
 
