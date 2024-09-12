@@ -5,7 +5,9 @@ REQUIRED_MACHINE_FEATURES = "dp14rxss"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone video-common dp14 iic iicps hdcp1x hdcp22-rx-dp"
+DEPENDS += "xilstandalone video-common dp14 iic iicps"
+DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "hdcp1x", "hdcp1x", "",d)}"
+DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "hdcp22-rx-dp", "hdcp22-rx-dp", "",d)}"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dp14rxss/src/"
 ESW_COMPONENT_NAME = "libdp14rxss.a"

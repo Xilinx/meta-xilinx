@@ -6,6 +6,7 @@ REQUIRED_MACHINE_FEATURES = "dp12txss"
 inherit esw python3native
 
 DEPENDS += "xilstandalone dual-splitter vtc dp12 tmrctr"
+DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "hdcp1x", "hdcp1x", "",d)}"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dp12txss/src/"
 ESW_COMPONENT_NAME = "libdp12txss.a"

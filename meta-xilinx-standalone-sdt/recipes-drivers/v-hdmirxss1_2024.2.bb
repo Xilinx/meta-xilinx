@@ -5,7 +5,9 @@ REQUIRED_MACHINE_FEATURES = "v-hdmirxss1"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone v-hdmi-common v-hdmirx1 tmrctr hdcp1x hdcp22-rx"
+DEPENDS += "xilstandalone v-hdmi-common v-hdmirx1 tmrctr"
+DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "hdcp1x", "hdcp1x", "",d)}"
+DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "hdcp22-rx", "hdcp22-rx", "",d)}"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/v_hdmirxss1/src/"
 ESW_COMPONENT_NAME = "libv_hdmirxss1.a"
