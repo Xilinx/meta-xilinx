@@ -1,7 +1,7 @@
 SUMMARY = "Firmware for VCU2"
 DESCRIPTION = "Firmware binaries provider for VCU2"
 LICENSE = "Proprietary"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=323caf712b1e8006fbec07506fe71db0"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=19975964707b2e6e3baf7acf31d2bef0"
 
 PV .= "+git"
 
@@ -9,7 +9,7 @@ S  = "${WORKDIR}/git"
 
 BRANCH ?="xlnx_rel_v2024.2"
 REPO ?= "git://github.com/Xilinx/vcu2-firmware.git;protocol=https"
-SRCREV = "28388eda4eb2068155cda9e9841d9fa0286eeee9"
+SRCREV = "83190f880978648c981d06778317985fc893eac4"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI   = "${REPO};${BRANCHARG}"
