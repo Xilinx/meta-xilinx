@@ -9,9 +9,6 @@ ramdisk_name=@@RAMDISK_IMAGE1@@
 rootfs_name=@@RAMDISK_IMAGE@@
 @@PRE_BOOTENV@@
 
-# check part uuid based on device type
-setenv mmc_part_uuid 'if mmc dev ${devnum}; then devtype=mmc; part uuid ${devtype} ${devnum}:@@PARTNUM@@ root_uuid; setenv select_rootfs "root=PARTUUID=$root_uuid ro rootwait"; fi'
-setenv usb_part_uuid 'usb start; if usb dev ${devnum}; then devtype=usb; part uuid ${devtype} ${devnum}:@@PARTNUM@@ root_uuid; setenv select_rootfs "root=PARTUUID=$root_uuid ro rootwait"; fi'
 
 for boot_target in ${boot_targets};
 do
@@ -25,15 +22,9 @@ do
 	if test "${boot_target}" = "mmc0" || test "${boot_target}" = "mmc1" || test "${boot_target}" = "usb0" || test "${boot_target}" = "usb1"; then
 		if test "${boot_target}" = "mmc0" || test "${boot_target}" = "mmc1"; then
 			setenv bootdev mmcblk${devnum}p
-			if test -n "${enable_bootmenu}"; then
-                                run mmc_part_uuid
-                        fi
 		fi
 		if test "${boot_target}" = "usb0" || test "${boot_target}" = "usb1"; then
 			setenv bootdev sda
-			if test -n "${enable_bootmenu}"; then
-                                run usb_part_uuid
-                        fi
 		fi
 
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /@@UENV_TEXTFILE@@; then
@@ -75,7 +66,7 @@ do
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${ramdisk_name};
 			fdt addr @@DEVICETREE_ADDRESS@@
 			fdt get value bootargs /chosen bootargs
-			setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@ ${select_rootfs}
+			setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@
 			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
 		fi
 		echo "Checking for /${rootfs_name}"
@@ -84,7 +75,7 @@ do
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${rootfs_name};
 			fdt addr @@DEVICETREE_ADDRESS@@
 			fdt get value bootargs /chosen bootargs
-			setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@ ${select_rootfs}
+			setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@
 			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
 		fi
 		fdt addr @@DEVICETREE_ADDRESS@@
