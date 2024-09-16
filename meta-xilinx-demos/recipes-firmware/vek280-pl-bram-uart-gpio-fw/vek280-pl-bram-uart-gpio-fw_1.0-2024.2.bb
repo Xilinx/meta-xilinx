@@ -18,8 +18,11 @@ COMPATIBLE_MACHINE:versal-vek280-sdt-seg-ospi = "${MACHINE}"
 # name so set the FW_DIR pointing to pdi and dtsi files.
 FW_DIR = "vek280-pl-bram-gpio-fw"
 
-# Workaround for CR-1205774
-do_configure[prefuncs] += "copy_fw_files"
+# fw files doesn't install on rootfs using dfx_user_dts bbclass using artifactory
+# method. To workaround this issue we are using copy_fw_files pre-functions.
+# copy_fw_files prefuncs needs to be called before find_firmware_file to update
+# the firmware-name to ${PN}.
+do_configure[prefuncs] =+ "copy_fw_files"
 python copy_fw_files () {
     import shutil
     fw_file_src = d.getVar('WORKDIR') + '/' + d.getVar("FW_DIR")
