@@ -11,7 +11,7 @@ def check_imgsel_variables(d):
         d.setVar('BB_DONT_CACHE', '1')
 
         if not os.path.exists(d.getVar('IMGSEL_FILE') + ".bin"):
-            raise bb.parse.SkipRecipe("Could not open image selector file: %s" % d.getVar('IMGSEL_FILE'))
+            raise bb.parse.SkipRecipe("Could not open image selector file: %s.bin" % d.getVar('IMGSEL_FILE'))
         else:
             # We found the file, so be sure to track it
             d.setVar('SRC_URI', 'file://${IMGSEL_FILE}.bin')

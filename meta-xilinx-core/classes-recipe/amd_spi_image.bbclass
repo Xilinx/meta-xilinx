@@ -105,7 +105,7 @@ def generate_spi_image(d):
     qspi_data.write(bootbin)
 
     # Recovery Image & Recovery Image Backup
-    imgrcry_file = d.getVar("DEPLOY_DIR_IMAGE")+"/imgrcry-"+d.getVar("MACHINE")+".bin"
+    imgrcry_file = d.getVar("DEPLOY_DIR_IMAGE")+"/image-recovery-"+d.getVar("MACHINE")+".bin"
     try:
         with open(imgrcry_file, "rb") as iy:
             imgrcry = iy.read(-1)
