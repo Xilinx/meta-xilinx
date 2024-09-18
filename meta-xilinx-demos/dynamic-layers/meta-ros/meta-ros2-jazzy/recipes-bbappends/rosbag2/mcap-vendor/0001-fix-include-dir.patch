@@ -1,0 +1,27 @@
+From f15236807f0b5ac96979840a12cd0be0c115f055 Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <trevor.woerner@amd.com>
+Date: Thu, 12 Sep 2024 15:21:33 -0400
+Subject: [PATCH] fix include dir
+
+Upstream-Status: inappropriate
+Signed-off-by: Trevor Woerner <trevor.woerner@amd.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d5789b292025..e5e97fa9fa0f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -43,7 +43,7 @@ macro(build_mcap_vendor)
+     src/main.cpp
+   )
+ 
+-  set(_mcap_include_dir ${mcap_SOURCE_DIR}/cpp/mcap/include)
++  set(_mcap_include_dir ${mcap_vendor_SOURCE_DIR}/mcap/cpp/mcap/include)
+   file(GLOB _mcap_installed_headers ${_mcap_include_dir}/mcap/*.hpp)
+ 
+   target_include_directories(mcap PUBLIC
+-- 
+2.44.0.478.g7774cfed6261
+
