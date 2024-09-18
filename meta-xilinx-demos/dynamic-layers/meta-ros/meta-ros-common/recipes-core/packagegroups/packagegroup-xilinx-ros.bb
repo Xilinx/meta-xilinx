@@ -137,9 +137,9 @@ ROS_CONTROL_PACKAGES = "\
     transmission-interface \
 "
 
-#RDEPENDS:${PN}-base:aarch64 = "\
-#    ${ROS_BASE_PACKAGES} \
-#"
+RDEPENDS:${PN}-base:aarch64 = "\
+    ${ROS_BASE_PACKAGES} \
+"
 
 #RDEPENDS:${PN}-demo:aarch64 = "\
 #    ${ROS_BASE_PACKAGES} \
