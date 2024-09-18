@@ -157,10 +157,10 @@ RDEPENDS:${PN}-dev:aarch64 = "\
 
 # TODO
 # 1. Due to failing hardware-interfaces disable ${PN}-control
-# 2. qt packages are failing to build hence remove rqt-runtime-monitor
 
 RDEPENDS:${PN}:aarch64 = "\
     ${PN}-demo \
+    rqt-runtime-monitor \
 "
 
 IMAGE_LINGUAS = "en-us"
