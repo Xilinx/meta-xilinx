@@ -141,25 +141,27 @@ RDEPENDS:${PN}-base:aarch64 = "\
     ${ROS_BASE_PACKAGES} \
 "
 
-#RDEPENDS:${PN}-demo:aarch64 = "\
-#    ${ROS_BASE_PACKAGES} \
-#    ${ROS_DEMO_PACKAGES} \
-#"
+RDEPENDS:${PN}-demo:aarch64 = "\
+    ${ROS_BASE_PACKAGES} \
+    ${ROS_DEMO_PACKAGES} \
+"
 
 #RDEPENDS:${PN}-control:aarch64 = "\
 #    ${ROS_BASE_PACKAGES} \
 #    ${ROS_CONTROL_PACKAGES} \
 #"
 
-#RDEPENDS:${PN}-dev:aarch64 = "\
-#    ${ROS_BUILDESSENTIAL_PACKAGES} \
-#"
+RDEPENDS:${PN}-dev:aarch64 = "\
+    ${ROS_BUILDESSENTIAL_PACKAGES} \
+"
 
-#RDEPENDS:${PN}:aarch64 = "\
-#    ${PN}-demo \
-#    ${PN}-control \
-#    rqt-runtime-monitor \
-#"
+# TODO
+# 1. Due to failing hardware-interfaces disable ${PN}-control
+# 2. qt packages are failing to build hence remove rqt-runtime-monitor
+
+RDEPENDS:${PN}:aarch64 = "\
+    ${PN}-demo \
+"
 
 IMAGE_LINGUAS = "en-us"
 GLIBC_GENERATE_LOCALES = "en_US.UTF-8"
