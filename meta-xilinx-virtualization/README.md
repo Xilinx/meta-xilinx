@@ -19,7 +19,7 @@ $ git clone -b <release-branch> https://git.yoctoproject.org/meta-security
 3. Continue [Building Instructions](../README.building.md) from step 4.
 
 > **Note:**
-> * For System Device Tree(SDT) workflow see [SDT Building Instructions](../meta-xilinx-standalone-experimental/README.md)
+> * For System Device Tree(SDT) workflow see [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.md)
 
 4. Add meta-xilinx-virtualization layer to bblayers.conf as shown below.
 
