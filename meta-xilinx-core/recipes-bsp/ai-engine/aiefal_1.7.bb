@@ -8,12 +8,6 @@ SECTION	= "devel"
 XAIEFAL_DIR ?= "fal"
 S = "${WORKDIR}/git"
 
-inherit features_check
-
-REQUIRED_MACHINE_FEATURES = "aie"
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-
 IOBACKENDS ?= "Linux"
 
 PROVIDES = "aiefal"

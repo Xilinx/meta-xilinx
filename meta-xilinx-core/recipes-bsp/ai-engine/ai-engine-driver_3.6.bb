@@ -9,12 +9,6 @@ AIEDIR ?= "${S}/driver"
 S = "${WORKDIR}/git"
 I = "${AIEDIR}/include"
 
-inherit features_check
-
-REQUIRED_MACHINE_FEATURES = "aie"
-
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-
 IOBACKENDS ?= "Linux"
 
 DEPENDS = "${@bb.utils.contains('IOBACKENDS', 'metal', 'libmetal', '', d)}"
