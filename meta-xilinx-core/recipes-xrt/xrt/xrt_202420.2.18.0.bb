@@ -11,16 +11,17 @@ LIC_FILES_CHKSUM = "file://../LICENSE;md5=de2c993ac479f02575bcbfb14ef9b485 \
                     file://runtime_src/core/tools/xbutil2/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57 \
                     file://runtime_src/core/common/elf/LICENSE.txt;md5=b996e8b74af169e7e72e22d9e7d05b06 "
 
-COMPATIBLE_MACHINE ?= "^$"
-COMPATIBLE_MACHINE:zynqmp = ".*"
-COMPATIBLE_MACHINE:versal = ".*"
-COMPATIBLE_MACHINE:versal-net = ".*"
+COMPATIBLE_HOST = "^$"
+COMPATIBLE_HOST:aarch64 = ".*"
 
 S = "${WORKDIR}/git/src"
 
 inherit cmake pkgconfig
 
 BBCLASSEXTEND = "native nativesdk"
+
+PACKAGECONFIG ??= "aie"
+PACKAGECONFIG[aie] = ",,libxaiengine aiefal,libxaiengine aiefal"
 
 # util-linux is for libuuid-dev.
 DEPENDS = "libdrm opencl-headers ocl-icd opencl-clhpp boost util-linux git-replacement-native protobuf-native protobuf elfutils libffi rapidjson systemtap libdfx"
@@ -31,6 +32,9 @@ EXTRA_OECMAKE += " \
 		-DCMAKE_EXPORT_COMPILE_COMANDS=ON \
 		-DXRT_LIBDFX=true \
 		"
+
+EXTRA_OECMAKE .= "${@bb.utils.contains('PACKAGECONFIG', 'aie', ' -DXRT_AIE_BUILD=true', '', d)}"
+TARGET_CXXFLAGS .= "${@bb.utils.contains('PACKAGECONFIG', 'aie', ' -DXRT_ENABLE_AIE -DFAL_LINUX=on', '', d)}"
 
 # Systems with AIE also require libmetal, this is implemented in the dynamic-layers
 # See: meta-xilinx-core/dynamic-layers/openamp-layer/recipes-xrt/xrt_gt.bbappend
