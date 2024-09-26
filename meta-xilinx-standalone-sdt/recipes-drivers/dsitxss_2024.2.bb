@@ -5,7 +5,7 @@ REQUIRED_MACHINE_FEATURES = "dsitxss"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone dsi dphy"
+DEPENDS += "xilstandalone dsi dphy mipi-tx-phy"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dsitxss/src/"
 ESW_COMPONENT_NAME = "libdsitxss.a"

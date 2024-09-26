@@ -5,7 +5,9 @@ REQUIRED_MACHINE_FEATURES = "mipicsiss"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone csi iic dphy"
+DEPENDS += "xilstandalone csi iic"
+DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "dphy", "dphy", "",d)}"
+DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "mipi-rx-phy", "mipi-rx-phy", "",d)}"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/mipicsiss/src/"
 ESW_COMPONENT_NAME = "libmipicsiss.a"
