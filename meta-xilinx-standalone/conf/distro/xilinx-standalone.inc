@@ -49,3 +49,10 @@ BB_SIGNATURE_HANDLER ?= "OEEquivHash"
 BB_HASHSERVE ??= "auto"
 
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc qemu-usermode"
+
+# Prevent warnings about 'buildpaths'
+# After investigation it appears a debuginfo directory path to the build
+# directory is being inserted into the objects.  This path is not actually
+# being referred to by any components.  Why this is happening is unknown,
+# so we avoid the warning as we know this is not an actual issue.
+WARN_QA:remove = "buildpaths"
