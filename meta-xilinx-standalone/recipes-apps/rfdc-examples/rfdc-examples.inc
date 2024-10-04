@@ -6,8 +6,8 @@ REQUIRED_MACHINE_FEATURES = "rfsoc"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-DEPENDS = "rfdc"
-RDEPENDS:${PN} = "rfdc"
+DEPENDS = "librfdc"
+RDEPENDS:${PN} = "librfdc"
 
 PACKAGES = "${PN}-dbg ${PN}"
 
