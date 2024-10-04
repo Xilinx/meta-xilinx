@@ -27,17 +27,16 @@ SYSTEMD_AUTO_ENABLE:${PN}="enable"
 
 DEPENDS += "libmetal"
 
-RDEPENDS:${PN} += "python3 \
-        python3-pyro4 \
-	python3-cffi \
-        python3-serpent \
-        bash \
-"
-#        python3-async \
-#
+RDEPENDS:${PN} += "\
+    python3 \
+    python3-pyro4 \
+    python3-cffi \
+    python3-serpent \
+    bash \
+    "
 
 PACKAGECONFIG[raftnotebooks] = "enabled,disabled,,packagegroup-xilinx-jupyter"
-PACKAGECONFIG[raftstartup] = "enabled,disabled,,rfdc rfclk libmetal"
+PACKAGECONFIG[raftstartup] = "enabled,disabled,,librfdc librfclk libmetal"
 PACKAGECONFIG[raftstartupsc] = "enabled,disabled,,python3-psutil python3-periphery"
 
 do_install() {
