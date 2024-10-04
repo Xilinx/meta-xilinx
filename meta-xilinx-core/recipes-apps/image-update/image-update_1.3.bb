@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/git/LICENSES/MIT;md5=2ac09a7a37dd6ee0ba23c
 
 BRANCH = "master"
 SRC_URI = "git://github.com/Xilinx/linux-image_update.git;branch=${BRANCH};protocol=https"
-SRCREV = "35dba5304b3c7328e5761c83df2b825bf5cf7c8f"
+SRCREV = "1bd7d7405b484d808176c6e711691a846c18b4f0"
 
 RDEPENDS:${PN} += "freeipmi"
 
