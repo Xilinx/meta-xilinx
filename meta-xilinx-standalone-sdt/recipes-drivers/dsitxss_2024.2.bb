@@ -5,7 +5,9 @@ REQUIRED_MACHINE_FEATURES = "dsitxss"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone dsi dphy mipi-tx-phy"
+DEPENDS += "xilstandalone dsi"
+DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "dphy", "dphy", "",d)}"
+DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "mipi-tx-phy", "mipi-tx-phy", "",d)}"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dsitxss/src/"
 ESW_COMPONENT_NAME = "libdsitxss.a"
