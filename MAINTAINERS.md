@@ -8,10 +8,10 @@ the [meta-xilinx mailing list](https://lists.yoctoproject.org/g/meta-xilinx):
 When sending patches, please make sure the email subject line includes
 `[meta-xilinx][<BRANCH_NAME>][PATCH]` and cc'ing the maintainers.
 
-For more details follow the OE community patch submission guidelines, as described in:
+For more details follow the Yocto Project community patch submission guidelines,
+as described in:
 
-https://www.openembedded.org/wiki/Commit_Patch_Message_Guidelines
-https://www.openembedded.org/wiki/How_to_submit_a_patch_to_OpenEmbedded
+https://docs.yoctoproject.org/dev/contributor-guide/submit-changes.html#
 
 `git send-email --to meta-xilinx@lists.yoctoproject.org *.patch`
 
@@ -24,13 +24,14 @@ https://www.openembedded.org/wiki/How_to_submit_a_patch_to_OpenEmbedded
 `git format-patch -s --subject-prefix="meta-xilinx][<BRANCH_NAME>][PATCH" -1`
 
 **Example:**
-`git format-patch -s --subject-prefix="meta-xilinx][langdale][PATCH" -1`
+`git format-patch -s --subject-prefix="meta-xilinx][scarthgap][PATCH" -1`
 
 **Maintainers:**
 
 	Mark Hatle <mark.hatle@amd.com>
 	Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
 	John Toomey <john.toomey@amd.com>
+	Trevor Woerner <trevor.woerner@amd.com>
 
 > **Note:**
 
@@ -43,3 +44,4 @@ https://www.openembedded.org/wiki/How_to_submit_a_patch_to_OpenEmbedded
 	Mark Hatle <mark.hatle@xilinx.com>
 	Sandeep Gundlupet Raju <sandeep.gundlupet-raju@xilinx.com>
 	John Toomey <john.toomey@xilinx.com>
+	Trevor Woerner <trevor.woerner@amd.com>
