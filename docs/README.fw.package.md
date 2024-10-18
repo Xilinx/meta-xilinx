@@ -1,4 +1,4 @@
-# How to package and depoly firmware elf or bin to linux root filesystem
+# How to package and deploy firmware elf or bin to linux root filesystem
 
 * [Introduction](#introduction)
 * [How to create and install firmware package recipe](#how-to-create-and-install-firmware-package-recipe)
@@ -14,7 +14,7 @@ filesystem.
 
 ## How to create and install firmware package recipe
 
-1. Follow [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.md ) upto step 4.
+1. Follow [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.bsp.md) upto step 5.
 
 2. Create recipes-firmware directory in distribution meta layer.
 ```
@@ -34,7 +34,7 @@ $ recipetool create -o <meta-layer>/recipes-firmware/<firmware-package-name>/fir
 >                recipe name.
 > * **TARGET_MC:** Variable to define one of the multiconfig target name
 >                  (ex: cortexr5-0-zynqmp-baremetal) from the BBMULTICONFIG list
->                  generated at [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.md )
+>                  generated at [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.bsp.md)
 >                  step 4.
 
 ```
@@ -57,5 +57,5 @@ IMAGE_INSTALL:append = " \
     firmware-package-name \
     "
 ```
-6. Follow [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.md ) and continue from
-   step 5.
+6. Follow [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.bsp.md) and continue from
+   step 7.
