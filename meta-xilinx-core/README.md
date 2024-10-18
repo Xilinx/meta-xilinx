@@ -10,11 +10,15 @@ This layer depends on:
 
 	URI: https://git.yoctoproject.org/poky
 	layers: meta, meta-poky
-	branch: langdale
+	branch: scarthgap
 
 	URI: https://git.openembedded.org/meta-openembedded
 	layers: meta-oe
-	branch: langdale
+	branch: scarthgap
+
+	URI: https://git.yoctoproject.org/meta-arm
+	layers: meta-arm, meta-arm-toolchain
+	branch: scarthgap
 ---
 
 ## Configuring Machines
