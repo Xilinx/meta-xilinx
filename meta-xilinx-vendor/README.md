@@ -1,7 +1,7 @@
 # meta-xilinx-vendor
 
-This layer enables third party vendor boards for AMD Xilinx MicroBlaze, Zynq,
-ZynqMP and Versal devices and provides related metadata.
+This layer enables third party vendor boards for AMD MicroBlaze, Zynq, ZynqMP and
+Versal devices and provides related metadata.
 
 ## Supported Boards/Machines
 
@@ -11,8 +11,7 @@ ZynqMP and Versal devices and provides related metadata.
 >
 > Machine Configuration file: `MACHINE = "microzed-zynq7"`
 >
-> Reference XSA: `HDF_MACHINE = "microzed-zynq7"`
->
+
 | Devices    | Vendor Evaluation Board                                                                                           | Machine Configuration file                                   | Reference XSA    | HW Board Device tree | QEMU tested | HW tested |
 |------------|-------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|------------------|----------------------|-------------|-----------|
 | MicroBlaze | NA                                                                                                                | NA                                                           | NA               | NA                   | No          | No        |
@@ -27,8 +26,12 @@ ZynqMP and Versal devices and provides related metadata.
 > **Note:** 
 ```
 1. For Zybo Linux BD reference design refer meta-xilinx-contrib layer.
-2. Ultra96 v1 is no longer supported. Refer to meta-avnet for v2 board.
+2. Ultra96 v1 is no longer supported. Refer to https://github.com/Avnet/meta-avnet for v2 board.
 ```
+
+## AMD Vendor board XSCT Build Instructions
+
+Follow [XSCT Build Instructions](https://github.com/Xilinx/meta-xilinx-tools/blob/master/README.xsct.bsp.md)
 
 ## Dependencies
 
@@ -36,14 +39,18 @@ This layer depends on:
 
 	URI: https://git.yoctoproject.org/poky
 	layers: meta, meta-poky
-	branch: langdale
+	branch: scarthgap
 
 	URI: https://git.openembedded.org/meta-openembedded
 	layers: meta-oe
-	branch: langdale
+	branch: scarthgap
+
+	URI: https://git.yoctoproject.org/meta-arm
+	layers: meta-arm, meta-arm-toolchain
+	branch: scarthgap
 
 	URI:
         https://git.yoctoproject.org/meta-xilinx (official version)
-        https://github.com/Xilinx/meta-xilinx (development and amd xilinx release)
+        https://github.com/Xilinx/meta-xilinx (development and AMD release)
 	layers: meta-xilinx-microblaze, meta-xilinx-core
-	branch: langdale or amd xilinx release version (e.g. rel-v2023.1)
+	branch: scarthgap or AMD release version (e.g. rel-v2024.2)
