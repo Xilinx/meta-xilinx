@@ -9,17 +9,27 @@ This layer depends on:
 
 	URI: https://git.yoctoproject.org/poky
 	layers: meta, meta-poky
-	branch: master
+	branch: scarthgap
 
-	URI: https://git.openembedded.org/meta-xilinx
-	layers: meta-xilinx-core, meta-microblaze, meta-xilinx-standalone
-	branch: master
+	URI: https://git.openembedded.org/meta-openembedded
+	layers: meta-oe
+	branch: scarthgap
+
+	URI:
+        https://git.yoctoproject.org/meta-xilinx (official version)
+        https://github.com/Xilinx/meta-xilinx (development and AMD release)
+	layers: meta-xilinx-microblaze, meta-xilinx-core, meta-xilinx-standalone
+	branch: scarthgap or AMD release version (e.g. rel-v2024.2)
+
+	URI: https://git.yoctoproject.org/meta-arm
+	layers: meta-arm, meta-arm-toolchain
+	branch: scarthgap
 
 optionally, you may alwys want to include:
 
 	URI: https://git.yoctoproject.org/meta-mingw
 	layers: meta-mingw
-	branch: master
+	branch: scarthgap
 
 ---
 
@@ -27,7 +37,9 @@ optionally, you may alwys want to include:
 
 Baremetal toolchains can be built using:
 
-MACHINE=<toolchain> DISTRO=xilinx-standalone bitbake meta-xilinx-toolchain
+```
+$ MACHINE=<toolchain> DISTRO=xilinx-standalone bitbake meta-xilinx-toolchain
+```
 
 The <toolchain> value should be one of:
   aarch32-tc    - 32-bit Cortex-A toolchains
@@ -36,7 +48,8 @@ The <toolchain> value should be one of:
   microblaze-tc - Microblaze toolchains
   riscv-tc      - Risc-V toolchains
 
-
 Also there is a standalone QEMU SDK:
 
-MACHINE=zynqmp-generic bitbake meta-qemu-xilinx
+```
+$ MACHINE=zynqmp-generic bitbake meta-qemu-xilinx
+```
