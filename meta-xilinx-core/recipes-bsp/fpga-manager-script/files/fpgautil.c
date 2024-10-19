@@ -311,7 +311,7 @@ int main(int argc, char **argv)
 
 			ret = isvalid_flags(argc, name, false);
 			if (ret) {
-				printf("Error: Invalid arugments :%s\n", strerror(1));
+				printf("Error: Invalid argumentss :%s\n", strerror(1));
 				print_usage(basename(argv[0]));
 				return -EINVAL;
                         }
@@ -329,7 +329,7 @@ int main(int argc, char **argv)
 
 			ret = isvalid_flags(argc, name, true);
 			if (ret) {
-				printf("Error: Invalid arugments :%s\n", strerror(1));
+				printf("Error: Invalid argumentss :%s\n", strerror(1));
 				print_usage(basename(argv[0]));
 				return -EINVAL;
 			}
@@ -488,7 +488,7 @@ int main(int argc, char **argv)
 		}
 	} else if (flow == READBACK) {
 		if (readback_type > 1) {
-			printf("Invalid arugments :%s\n", strerror(1));
+			printf("Invalid argumentss :%s\n", strerror(1));
 			printf("For more information run %s -h\n", basename(argv[0]));
 			return -EINVAL;	
 		}
