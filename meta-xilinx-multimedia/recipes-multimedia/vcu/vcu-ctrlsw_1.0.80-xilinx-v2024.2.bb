@@ -8,7 +8,7 @@ PROVIDES += "libvcu-xlnx"
 
 PV .= "+git"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2024.2"
 REPO   ?= "git://github.com/Xilinx/vcu-ctrl-sw.git;protocol=https"
 SRCREV = "bcb5ff5f77f2a8ea8222eb64b69c1f9f730cc6b1"
 

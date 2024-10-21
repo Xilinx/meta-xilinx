@@ -9,7 +9,7 @@ PROVIDES += "libomxil-xlnx"
 # Version from core/core_version.mk
 PV .= "+git"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2024.2"
 REPO   ?= "git://github.com/Xilinx/vcu-omx-il.git;protocol=https"
 SRCREV = "b259cf0b3eaa1b0b17d2e807f233bfef5b9dbddd"
 
