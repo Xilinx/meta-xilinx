@@ -8,7 +8,7 @@ COMPATIBLE_HOST:arm = "null"
 # x86_64 is needed to build nativesdks
 QEMU_TARGETS = "aarch64 arm microblaze microblazeel riscv32 x86_64"
 
-BRANCH = "master"
+BRANCH = "xlnx_rel_v2024.2"
 SRCREV = "01482fa113dcbfa785feb7d513df50d15ec4c5df"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
