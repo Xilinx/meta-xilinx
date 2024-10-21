@@ -8,7 +8,7 @@ PROVIDES += "libvdu-ctrlsw"
 
 PV .= "+git"
 
-BRANCH ?= "master"
+BRANCH ?= "xlnx_rel_v2024.2"
 REPO   ?= "git://github.com/Xilinx/vdu-ctrl-sw.git;protocol=https"
 SRCREV ?= "361a822a223dc430ca44641be148fe1cbc13dd10"
 
