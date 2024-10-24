@@ -13,29 +13,20 @@ Be sure to read everything below.
 > * To use the SDT version of the embedded software (firmware) as well as system
 >   configuration, you must build through gen-machineconf tool. This tool is passed
 >   a output of system device tree directory.
+> * meta-xilinx-standalone-sdt layer depends on meta-openamp layer make sure
+>   meta-openamp is cloned and add using `bitbake-layers` command.
 
 > **Note:** SDT builds for following devices are not supported in 2024.2 release.
 > * MicroBlaze
 
 1. Follow [Building Instructions](../README.building.md) upto step 6.
 
-2. Clone the meta-openamp repository.
-```
-$ cd ../sources
-$ git clone -b <rel-version> https://github.com/Xilinx/meta-openamp
-$ cd -
-```
-3. Add meta-openamp layer.
-```
-$ bitbake-layers add-layer ./<path-to-layer>/meta-openamp
-```
-
-4. Export gen-machineconf tool.
+2. Export gen-machineconf tool.
 ```
 $ export PATH=$PATH:<ABSOLUTE_PATH>/gen-machine-conf
 ```
 
-5. Run the script from the build or ${TOPDIR} directory. This step describes
+3. Run the script from the build or ${TOPDIR} directory. This step describes
    System Device Tree (SDT) with and without pl overlays. Configruations are same
    for both SDT with and without pl overlays except for linux dts content.
 
@@ -154,11 +145,11 @@ can lead to a very slow parse (many minutes).  To speed up parsing, it is
 suggested that you trim this down to only the configurations you require.
 A minimum configuration is included with the generated configuration.
 
-6. Build your project, You should now be able to build your project normally.
+4. Build your project, You should now be able to build your project normally.
    See the Yocto Project documentation if you have questions on how to work with
    the multiconfig recipes. The following is a simple build for testing.
 
-7. Continue [Building Instructions](https://github.com/Xilinx/meta-xilinx/blob/master/README.building.md)
+5. Continue [Building Instructions](https://github.com/Xilinx/meta-xilinx/blob/master/README.building.md)
    from step 8.
 
 >**Note:** Only AMD eval boards have the dtsi in System Device Tree repo, for custom
