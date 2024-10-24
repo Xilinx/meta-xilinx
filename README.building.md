@@ -27,12 +27,13 @@ $ cd sources
 
 ```
 $ mkdir sources
-$ git clone -b <release-branch> https://git.yoctoproject.org/poky.git
-$ git clone -b <release-branch> https://git.openembedded.org/meta-openembedded.git
-$ git clone -b <release-branch> https://git.yoctoproject.org/git/meta-virtualization
-$ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx.git --recurse-submodules
-$ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx-tools.git
-$ git clone -b <rel-version> https://github.com/Xilinx/meta-arm.git
+$ git clone -b <release-branch> https://git.yoctoproject.org/poky
+$ git clone -b <release-branch> https://git.openembedded.org/meta-openembedded
+$ git clone -b <release-branch> https://git.yoctoproject.org/meta-virtualization
+$ git clone -b <release-branch> https://git.yoctoproject.org/meta-arm
+$ git clone -b <release-branch> https://github.com/OpenAMP/meta-openamp
+$ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx --recurse-submodules
+$ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx-tools
 ```
 > **Note:**
 > * When meta-xilinx layer is cloned using git tool by default it will clone
@@ -55,17 +56,18 @@ $ source poky/oe-init-build-env
 ```
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-oe
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-python
-$ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-filesystems
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-networking
+$ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-filesystems
 $ bitbake-layers add-layer ./<path-to-layer>/meta-virtualization
+$ bitbake-layers add-layer ./<path-to-layer>/meta-arm/meta-arm-toolchain
+$ bitbake-layers add-layer ./<path-to-layer>/meta-arm/meta-arm
+$ bitbake-layers add-layer ./<path-to-layer>/meta-openamp
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-microblaze
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-core
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone-sdt
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-bsp
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-tools
-$ bitbake-layers add-layer ./<path-to-layer>/meta-arm/meta-arm
-$ bitbake-layers add-layer ./<path-to-layer>/meta-arm/meta-arm-toolchain
 ```
 > **Note:**
 > 1. For SDT build flow user can remove meta-xilinx-tools as this layer is
