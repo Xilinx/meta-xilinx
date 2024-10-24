@@ -131,7 +131,7 @@ $ bitbake qemu-helper-native
    be able to see all the interfaces by running ifconfig command.
 
 ```
-$ sudo ./<path-to-layer>/poky/scripts/runqemu-gen-tapdevs $(id -u $USER) $(id -g $USER) 4 tmp/sysroots-components/x86_64/qemu-helper-native/usr/bin
+$ sudo ./<path-to-layer>/poky/scripts/runqemu-gen-tapdevs $(id -g $USER) 4
 ```
 
 13. Build an OS image for the target using `bitbake` command.
