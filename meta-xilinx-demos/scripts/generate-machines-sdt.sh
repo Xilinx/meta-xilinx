@@ -3,6 +3,7 @@
 ### The following table controls the automatic generated of the firmware demos
 ### Machine                 Recipe
 #M# vek280-pl-bram-gpio-fw  recipes-firmware/vek280-pl-bram-uart-gpio-fw/vek280-pl-bram-uart-gpio-fw_1.0-2024.2.bb
+#M# zcu104-pl-vcu-fw        recipes-firmware/zcu104-pl-vcu-fw/zcu104-pl-vcu-fw_1.0-2024.2.bb
 
 this=$(realpath $0)
 
