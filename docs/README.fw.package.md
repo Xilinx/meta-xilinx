@@ -14,16 +14,19 @@ filesystem.
 
 ## How to create and install firmware package recipe
 
-1. Follow [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.bsp.md) upto step 3.
+1. Follow [SDT Mulitconfig Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.mc.build.md)
+   upto step 3.
 
 2. Create recipes-firmware directory in distribution meta layer.
 ```
 $ mkdir -p <meta-layer>/recipes-firmware/<firmware-package-name>/
 ```
+
 3. Now create the recipes firmware package using recipetool.
 ```
 $ recipetool create -o <meta-layer>/recipes-firmware/<firmware-package-name>/firmware-package-name.bb 
 ```
+
 4. Modify the recipe and inherit fw-package bbclass as shown below.
 
 > **Note:** 
@@ -33,9 +36,9 @@ $ recipetool create -o <meta-layer>/recipes-firmware/<firmware-package-name>/fir
 > * **FW_NAME:** Variable to define firmware baremetal or freertos application
 >                recipe name.
 > * **TARGET_MC:** Variable to define one of the multiconfig target name
->                  (ex: cortexr5-0-zynqmp-baremetal) from the BBMULTICONFIG list
->                  generated at [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.bsp.md)
->                  step 4.
+>                  (ex: <soc-family>-<board-name>-sdt-<design-name>-cortexr5-0-baremetal)
+>                  from the BBMULTICONFIG list generated at [SDT Mulitconfig Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.mc.build.md)
+>                  step 2.
 
 ```
 SUMMARY = "Recipe to package and deploy baremetal or freertos elf or bin to linux rootfs"
@@ -45,7 +48,7 @@ inherit fw-package
 
 FW_NAME = "hello-world"
 
-TARGET_MC = "cortexr5-0-zynqmp-baremetal"
+TARGET_MC = "<soc-family>-<board-name>-sdt-<design-name>-cortexr5-0-baremetal"
 
 FW_MCDEPENDS := "mc::${TARGET_MC}:${FW_NAME}:do_deploy"
 FW_DEPLOY_DIR := "${TOPDIR}/tmp-${TARGET_MC}/deploy/images/${MACHINE}"
