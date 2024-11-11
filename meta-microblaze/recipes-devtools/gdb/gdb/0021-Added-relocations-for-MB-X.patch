@@ -1,0 +1,69 @@
+From 818a103460da557761aacc0d21b9b087721d2d3e Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Tue, 11 Sep 2018 17:30:17 +0530
+Subject: [PATCH 21/54] Added relocations for MB-X
+
+Conflicts:
+	bfd/bfd-in2.h
+	gas/config/tc-microblaze.c
+
+Conflicts:
+	gas/config/tc-microblaze.c
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/reloc.c                | 26 ++++++++++++++------------
+ gas/config/tc-microblaze.c | 11 +++++++++++
+ 2 files changed, 25 insertions(+), 12 deletions(-)
+
+Index: gdb-14.2/bfd/reloc.c
+===================================================================
+--- gdb-14.2.orig/bfd/reloc.c
++++ gdb-14.2/bfd/reloc.c
+@@ -6703,12 +6703,6 @@ ENUMDOC
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_NONE
+ ENUMDOC
+-  This is a 32 bit reloc that stores the 32 bit pc relative
+-  value in two words (with an imml instruction).  No relocation is
+-  done here - only used for relaxing
+-ENUM
+-  BFD_RELOC_MICROBLAZE_64
+-ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  No relocation is
+   done here - only used for relaxing
+@@ -6716,12 +6710,6 @@ ENUM
+   BFD_RELOC_MICROBLAZE_64_GOTPC
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+-  value in two words (with an imml instruction).  No relocation is
+-  done here - only used for relaxing
+-ENUM
+-  BFD_RELOC_MICROBLAZE_64_GPC
+-ENUMDOC
+-  This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  The relocation is
+   PC-relative GOT offset
+ ENUM
+@@ -7976,6 +7964,20 @@ ENUMX
+ ENUMDOC
+   Linux eBPF relocations.
+ 
++  This is a 64 bit reloc that stores 64-bit thread pointer relative offset
++  to two words (uses imml instruction).
++ENUM
++BFD_RELOC_MICROBLAZE_64,
++ENUMDOC
++ This is a 64 bit reloc that stores the 64 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
++ENUM
++BFD_RELOC_MICROBLAZE_64_PCREL,
++ENUMDOC
++ This is a 32 bit reloc that stores the 32 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
+ ENUM
+   BFD_RELOC_EPIPHANY_SIMM8
+ ENUMDOC

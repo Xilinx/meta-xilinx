@@ -2,18 +2,20 @@
 
 Booting OS images on MicroBlaze target boards can be done using JTAG and QSPI boot modes.
 
-* [Setting Up the Target](#setting-up-the-target)
-* [Booting from JTAG](#booting-from-jtag)
-  * [Sourcing the XSDB tools](#sourcing-the-xsdb-tools)
-  * [Deploying the images to target](#deploying-the-images-to-target)
-    * [Using devtool boot-jtag script](#using-devtool-boot-jtag-script)
-    * [Manually executing xsdb commands](#manually-executing-xsdb-commands)
-      * [Loading Bitstream using XSDB](#loading-bitstream-using-xsdb)
-      * [Loading U-boot using XSDB](#loading-u-boot-using-xsdb)
-      * [Loading Kernel, Device tree, Root Filesystem and U-boot boot script](#loading-kernel-device-tree-root-filesystem-and-u-boot-boot-script)
-        * [Using XSDB](#using-xsdb)
-        * [Using TFTP](#using-tftp)
-      * [Booting Linux](#booting-linux)
+- [Booting OS Images on MicroBlaze target boards](#booting-os-images-on-microblaze-target-boards)
+  - [Setting Up the Target](#setting-up-the-target)
+  - [Booting from JTAG](#booting-from-jtag)
+    - [Sourcing the XSDB tools](#sourcing-the-xsdb-tools)
+    - [Deploying the images to target](#deploying-the-images-to-target)
+      - [Using devtool boot-jtag script](#using-devtool-boot-jtag-script)
+      - [Manually executing xsdb commands](#manually-executing-xsdb-commands)
+        - [Loading Bitstream using XSDB](#loading-bitstream-using-xsdb)
+        - [Loading U-boot using XSDB](#loading-u-boot-using-xsdb)
+        - [Loading Kernel, Device tree, Root Filesystem and U-boot boot script](#loading-kernel-device-tree-root-filesystem-and-u-boot-boot-script)
+          - [Using XSDB](#using-xsdb)
+          - [Using TFTP](#using-tftp)
+        - [Booting Linux](#booting-linux)
+  - [Limitation](#limitation)
 
 ## Setting Up the Target
 
@@ -194,4 +196,28 @@ xsdb% exit
 3. In the target Serial Terminal, from U-Boot prompt run `boot` command.
 ```
 U-Boot> boot
+```
+
+## Limitation
+
+1. Booting core-image-minimal or other image target excluding
+   petalinux-image-minimal you can observe below error message.
+
+```
+Error: argument "/en*" is wrong: "dev" not a valid ifname
+Starting syslogd/klogd: done
+
+Poky (Yocto Project Reference Distro) 5.0.2 kcu105-microblazeel ttyUL0
+
+INIT: Id "1" respawning too fast: disabled for 5 minutes
+
+kcu105-microblazeel login:
+```
+
+This is due to pni-names distro feature is not enabled by default and eudev uses
+classic network interface naming scheme. To resolve this issue add pni-names
+distro feature from <distro>.conf or local.file.
+
+```
+DISTRO_FEATURES:append:microblaze = " pni-names"
 ```

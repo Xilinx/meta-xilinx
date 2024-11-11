@@ -9,6 +9,7 @@ ramdisk_name=@@RAMDISK_IMAGE1@@
 rootfs_name=@@RAMDISK_IMAGE@@
 @@PRE_BOOTENV@@
 
+
 for boot_target in ${boot_targets};
 do
 	echo "Trying to load boot images from ${boot_target}"
@@ -43,17 +44,17 @@ do
 		fi
 		echo "Checking for /${kernel_name}"
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /${kernel_name}; then
-			echo "Loading ${kernel_name}";
+			echo "Loading ${kernel_name} at @@KERNEL_LOAD_ADDRESS@@";
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@KERNEL_LOAD_ADDRESS@@ ${kernel_name};
 		fi
 		echo "Checking for /system.dtb"
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /system.dtb; then
-			echo "Loading system.dtb";
+			echo "Loading system.dtb at @@DEVICETREE_ADDRESS@@";
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_ADDRESS@@ system.dtb;
 		fi
 		echo "Checking for /devicetree/openamp.dtbo"
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /devicetree/openamp.dtbo; then
-			echo "Loading and merging openamp.dtbo into device tree";
+			echo "Loading and merging openamp.dtbo into device tree at @@DEVICETREE_OVERLAY_ADDRESS@@";
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_OVERLAY_ADDRESS@@ devicetree/openamp.dtbo;
 			fdt addr @@DEVICETREE_ADDRESS@@
 			fdt resize 8192
@@ -61,7 +62,7 @@ do
 		fi
 		echo "Checking for /${ramdisk_name}"
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /${ramdisk_name} && test "${skip_tinyramdisk}" != "yes"; then
-			echo "Loading ${ramdisk_name}";
+			echo "Loading ${ramdisk_name} at @@RAMDISK_IMAGE_ADDRESS@@";
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${ramdisk_name};
 			fdt addr @@DEVICETREE_ADDRESS@@
 			fdt get value bootargs /chosen bootargs
@@ -70,7 +71,7 @@ do
 		fi
 		echo "Checking for /${rootfs_name}"
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /${rootfs_name} && test "${skip_ramdisk}" != "yes"; then
-			echo "Loading ${rootfs_name}";
+			echo "Loading ${rootfs_name} at @@RAMDISK_IMAGE_ADDRESS@@";
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${rootfs_name};
 			fdt addr @@DEVICETREE_ADDRESS@@
 			fdt get value bootargs /chosen bootargs

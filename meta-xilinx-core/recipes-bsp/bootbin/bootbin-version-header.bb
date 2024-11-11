@@ -9,7 +9,6 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 BOOTBIN_VER_MAIN ?= ""
 
-BOOTBIN_VER_SUFFIX ?= "${@(d.getVar('XILINX_VER_BUILD') or '')[:8] if d.getVar('XILINX_VER_UPDATE') != 'release' and not d.getVar('XILINX_VER_UPDATE').startswith('update') else ''}"
 BOOTBIN_VER_FILE = "bootbin-version-header.txt"
 BOOTBIN_VER_MAX_LEN = "36"
 
@@ -17,12 +16,16 @@ BOOTBIN_MANIFEST_FILE ?= "bootbin-version-header.manifest"
 
 inherit deploy image-artifact-names
 
+IMAGE_NAME_SUFFIX = ""
+
 python do_configure() {
-    if d.getVar("BOOTBIN_VER_SUFFIX"):
-        version = version + "-" + d.getVar("BOOTBIN_VER_SUFFIX")
+
+    if not 'version' in locals():
+        version = d.getVar("MACHINE") + "-v" + d.getVar("BOOTBIN_VER_MAIN")
+    version += d.getVar("IMAGE_VERSION_SUFFIX")
 
     if len(version) > int(d.getVar("BOOTBIN_VER_MAX_LEN")):
-        bb.error("version string too long")
+        bb.fatal("version string too long")
 
     with open(d.expand("${B}/${BOOTBIN_VER_FILE}"), "w") as f:
         f.write(version.encode("utf-8").hex())

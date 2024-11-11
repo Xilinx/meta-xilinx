@@ -5,6 +5,8 @@
 #
 
 QSPI_SIZE ?= "0x2280000"
+QSPI_VERSION ?= ""
+QSPI_IMAGE_VERSION ?= ""
 
 # Register values
 IDN_REG ?= "0x4D554241"
@@ -60,7 +62,7 @@ def generate_spi_image(d):
     qspi_data.write(b'\xFF' * qspi_size)
 
     # Image Selector - Primary, Backup, Image A and Image B
-    imgsel_file = d.getVar("DEPLOY_DIR_IMAGE")+"/imgsel-"+d.getVar("MACHINE")+".bin"
+    imgsel_file = d.getVar("DEPLOY_DIR_IMAGE")+"/image-selector-"+d.getVar("MACHINE")+".bin"
     try:
         with open(imgsel_file, "rb") as il:
             imgsel = il.read(-1)
@@ -103,7 +105,7 @@ def generate_spi_image(d):
     qspi_data.write(bootbin)
 
     # Recovery Image & Recovery Image Backup
-    imgrcry_file = d.getVar("DEPLOY_DIR_IMAGE")+"/imgrcry-"+d.getVar("MACHINE")+".bin"
+    imgrcry_file = d.getVar("DEPLOY_DIR_IMAGE")+"/image-recovery-"+d.getVar("MACHINE")+".bin"
     try:
         with open(imgrcry_file, "rb") as iy:
             imgrcry = iy.read(-1)
@@ -116,12 +118,8 @@ def generate_spi_image(d):
     qspi_data.write(imgrcry)
 
     # Version string and checksum
-    version = d.getVar("QSPI_IMAGE_VERSION")
-    date = time.strftime("%m%d%H%M")
-    machine = d.getVar("MACHINE")[:3]
-    image_name = d.getVar("QSPI_IMAGE_NAME")
-
-    qspi_version = f"{image_name}-{machine}-v{version}-{date}\x00"
+    version = d.getVar('QSPI_IMAGE_VERSION')
+    qspi_version = f"{version}\x00"
     qspi_data.seek(version_offset)
     qspi_data.write(qspi_version.encode())
 

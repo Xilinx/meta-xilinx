@@ -1,5 +1,3 @@
-# HDF_MACHINE should be set _AFTER_ this has been loaded
-HDF_MACHINE_PRIOR := "${HDF_MACHINE}"
 INHERIT += "xilinx-vars"
 INHERIT += "xilinx-deprecated"
 
@@ -14,7 +12,7 @@ IMAGE_FSTYPES ?= "tar.gz cpio cpio.gz cpio.gz.u-boot"
 PREFERRED_PROVIDER_virtual/kernel ??= "linux-xlnx"
 
 # Device tree Configuration
-PREFERRED_PROVIDER_virtual/dtb ??= "device-tree"
+PREFERRED_PROVIDER_virtual/dtb ??= "${@'device-tree' if d.getVar('XILINX_WITH_ESW') else ''}"
 
 # U-Boot Configuration
 PREFERRED_PROVIDER_virtual/bootloader ??= "u-boot-xlnx"
@@ -26,8 +24,6 @@ PREFERRED_PROVIDER_nativesdk-u-boot-tools ??= "nativesdk-u-boot-tools-xlnx"
 # Libmetal and OpenAMP Configuration
 PREFERRED_PROVIDER_libmetal ?= "libmetal-xlnx"
 PREFERRED_PROVIDER_open-amp ?= "open-amp-xlnx"
-
-do_image_wic[depends] += "${@' '.join('%s:do_deploy' % r for r in (d.getVar('WIC_DEPENDS') or "").split())}"
 
 UBOOT_SUFFIX ?= "bin"
 
@@ -61,12 +57,9 @@ WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'boot.bi
 WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'system.dtb',   ' virtual/dtb', '', d)}"
 WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'boot.scr',     ' u-boot-xlnx-scr', '', d)}"
 WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'uEnv.txt',     ' u-boot-xlnx-uenv', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'atf-uboot.ub', ' arm-trusted-firmware', '', d)}"
 WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'Image',        ' virtual/kernel', '', d)}"
 WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'uImage',       ' virtual/kernel', '', d)}"
 WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'zImage',       ' virtual/kernel', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'u-boot.bin',   ' virtual/bootloader', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'u-boot.elf',   ' virtual/bootloader', '', d)}"
 WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', '${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot', ' ${INITRAMFS_IMAGE}', '', d)}"
 
 # Automatically add IMAGE_BOOT_FILES to /boot via packages
@@ -74,9 +67,6 @@ MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INST
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'system.dtb',   ' ${PREFERRED_PROVIDER_virtual/dtb}', '', d)}"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'boot.scr',     ' u-boot-xlnx-scr', '', d)}"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'uEnv.txt',     ' u-boot-xlnx-uenv', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'atf-uboot.ub', ' arm-trusted-firmware', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'u-boot.bin',   ' ${PREFERRED_PROVIDER_virtual/bootloader}-bin', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'u-boot.elf',   ' ${PREFERRED_PROVIDER_virtual/bootloader}-elf', '', d)}"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'Image',        ' kernel-image-image', '', d)}"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'uImage',       ' kernel-image-uimage', '', d)}"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'zImage',       ' kernel-image-zimage', '', d)}"
@@ -89,6 +79,17 @@ IMAGE_BOOT_FILES ?= "${@get_default_image_boot_files(d)}"
 
 def get_default_image_boot_files(d):
     files = []
+
+    esw_type = d.getVar('XILINX_WITH_ESW') or ''
+    if esw_type:
+        if 'zynq' in d.getVar('OVERRIDES').split(':'):
+            files.append('boot.bin')
+        if 'zynqmp' in d.getVar('OVERRIDES').split(':'):
+            files.append('boot.bin')
+        if 'versal' in d.getVar('OVERRIDES').split(':'):
+            files.append('boot.bin')
+        if 'versal-net' in d.getVar('OVERRIDES').split(':'):
+            files.append('boot.bin')
 
     # kernel images
     kerneltypes = set((d.getVar("KERNEL_IMAGETYPE") or "").split())
@@ -103,6 +104,7 @@ def get_default_image_boot_files(d):
 
     # device trees (device-tree only), these are first as they are likely desired over the kernel ones
     if "device-tree" in (d.getVar("PREFERRED_PROVIDER_virtual/dtb") or ""):
+        files.append("system.dtb")
         files.append("devicetree/*.dtb;devicetree/")
         files.append("devicetree/*.dtbo;devicetree/")
 
@@ -114,6 +116,34 @@ def get_default_image_boot_files(d):
             files.append(dtb)
 
     return " ".join(files)
+
+EXTRA_IMAGEDEPENDS += "${@get_default_extra_imagedepends(d)}"
+
+def get_default_extra_imagedepends(d):
+    depends = []
+
+    # Add firmware dependencies
+    esw_type = d.getVar('XILINX_WITH_ESW') or ''
+    if esw_type:
+        depends.append('libyaml-native')
+        depends.append('python3-cython-native')
+        depends.append('python3-pyyaml-native')
+        if 'microblaze' in d.getVar('OVERRIDES').split(':'):
+            depends.append('virtual/bitstream')
+        if 'zynq' in d.getVar('OVERRIDES').split(':'):
+            depends.append('virtual/boot-bin')
+        if 'zynqmp' in d.getVar('OVERRIDES').split(':'):
+            depends.append('virtual/boot-bin')
+        if 'versal' in d.getVar('OVERRIDES').split(':'):
+            depends.append('virtual/boot-bin')
+            depends.append('virtual/cdo')
+        if 'versal-net' in d.getVar('OVERRIDES').split(':'):
+            depends.append('virtual/boot-bin')
+            depends.append('virtual/cdo')
+
+    return " ".join(depends)
+
+
 
 XSERVER_EXT ?= ""
 

@@ -13,7 +13,6 @@ rootfs_name=@@RAMDISK_IMAGE@@
 setenv get_bootargs 'fdt addr $fdtcontroladdr;fdt get value bootargs /chosen bootargs;'
 setenv update_bootargs 'if test -n ${launch_ramdisk_init} && test ${bootargs} = "";then if run get_bootargs;then setenv bootargs "\$bootargs launch_ramdisk_init=${launch_ramdisk_init} $extrabootargs";fi;fi'
 
-
 for boot_target in ${boot_targets};
 do
 	echo "Trying to load boot images from ${boot_target}"
@@ -83,4 +82,15 @@ do
 		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@;
 		echo "Booting using Separate images failed"
 	fi
+	if test "${boot_target}" = "nor" || test "${boot_target}" = "nor0"; then
+		cp.b @@QSPI_FIT_IMAGE_OFFSET@@ @@FIT_IMAGE_LOAD_ADDRESS@@ @@QSPI_FIT_IMAGE_SIZE@@
+		bootm @@FIT_IMAGE_LOAD_ADDRESS@@;
+		echo "Booting using Fit image failed"
+
+		cp.b @@QSPI_KERNEL_OFFSET@@ @@KERNEL_LOAD_ADDRESS@@ @@QSPI_KERNEL_SIZE@@
+		cp.b @@QSPI_RAMDISK_OFFSET@@ @@RAMDISK_IMAGE_ADDRESS@@ @@QSPI_RAMDISK_SIZE@@
+		run update_bootargs
+		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@;
+		echo "Booting using Separate images failed"
+fi
 done

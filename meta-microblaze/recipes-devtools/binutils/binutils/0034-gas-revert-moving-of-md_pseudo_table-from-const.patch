@@ -1,0 +1,62 @@
+From ec4fac4177c4364f52d1bc6ba53ffd971323cc22 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 8 Nov 2021 21:57:13 +0530
+Subject: [PATCH 34/53] gas: revert moving of md_pseudo_table from const
+
+The base system expect md_pseudo_table to be constant, Changing the
+definition will break other architectures when compiled with a
+unified source code.
+
+Patch reverts the change away from const, and implements a newer
+dynamic handler that passes the correct argument value based on word
+size.
+
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gas/config/tc-microblaze.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index dc87429a4e8..faa458af3a0 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -356,6 +356,17 @@ microblaze_s_weakext (int ignore ATTRIBUTE_UNUSED)
+   demand_empty_rest_of_line ();
+ }
+ 
++/* Handle the .gpword pseudo-op, Pass to s_rva */
++
++static void
++microblaze_s_gpword (int ignore ATTRIBUTE_UNUSED)
++{
++  int size = 4;
++  if (microblaze_arch_size == 64)
++    size = 8;
++  s_rva(size);
++}
++
+ /* This table describes all the machine specific pseudo-ops the assembler
+    has to support.  The fields are:
+    Pseudo-op name without dot
+@@ -371,7 +382,7 @@ const pseudo_typeS md_pseudo_table[] =
+   {"data32", cons, 4},     /* Same as word.  */
+   {"ent", s_func, 0}, /* Treat ent as function entry point.  */
+   {"end", microblaze_s_func, 1}, /* Treat end as function end point.  */
+-  {"gpword", s_rva, 4}, /* gpword label => store resolved label address in data section.  */
++  {"gpword", microblaze_s_gpword, 0}, /* gpword label => store resolved label address in data section.  */
+   {"weakext", microblaze_s_weakext, 0},
+   {"rodata", microblaze_s_rdata, 0},
+   {"sdata2", microblaze_s_rdata, 1},
+@@ -3425,8 +3436,6 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
+     case OPTION_M64:
+       //if (arg != NULL && strcmp (arg, "64") == 0)
+       microblaze_arch_size = 64;
+-      // UPSTREAM/REVISIT - md_pseudo_table is const
+-      // md_pseudo_table[7].poc_val = 8;
+       break;
+     default:
+       return 0;
+-- 
+2.34.1
+

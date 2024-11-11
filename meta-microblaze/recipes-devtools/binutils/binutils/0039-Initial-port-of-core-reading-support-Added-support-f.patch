@@ -1,0 +1,89 @@
+From ac87f4a6b9e35083a0403f188b61a317b53cfdbc Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 10 Oct 2022 16:37:53 +0530
+Subject: [PATCH 39/53] Initial port of core reading support Added support for
+ reading notes in linux core dumps Support for reading of PRSTATUS and PSINFO
+ information for rebuilding ".reg" sections of core dumps at run time.
+
+Signed-off-by: David Holsgrove <david.holsgrove@petalogix.com>
+Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/microblaze-linux-tdep.c | 11 +++++++++++
+ gdb/microblaze-tdep.c       | 37 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+)
+
+diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
+index f34b0fa9fd4..babc9020f0f 100644
+--- a/gdb/microblaze-linux-tdep.c
++++ b/gdb/microblaze-linux-tdep.c
+@@ -193,6 +193,17 @@ microblaze_linux_init_abi (struct gdbarch_info info,
+   set_gdbarch_skip_trampoline_code (gdbarch, find_solib_trampoline_target);
+   set_gdbarch_skip_solib_resolver (gdbarch, glibc_skip_solib_resolver);
+ 
++  /* BFD target for core files.  */
++  if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
++    set_gdbarch_gcore_bfd_target (gdbarch, "elf32-microblaze");
++  else
++    set_gdbarch_gcore_bfd_target (gdbarch, "elf32-microblazeel");
++
++
++  /* Shared library handling.  */
++  set_gdbarch_skip_trampoline_code (gdbarch, find_solib_trampoline_target);
++  set_gdbarch_skip_solib_resolver (gdbarch, glibc_skip_solib_resolver);
++
+   /* Enable TLS support.  */
+   set_gdbarch_fetch_tls_load_module_address (gdbarch,
+                                              svr4_fetch_objfile_link_map);
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index f9cb3dfda33..fdea9721b17 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -957,6 +957,43 @@ make_regs (struct gdbarch *arch)
+ }
+ #endif
+ 
++void
++microblaze_supply_gregset (const struct regset *regset,
++                        struct regcache *regcache,
++                        int regnum, const void *gregs)
++{
++  const unsigned int *regs = (const unsigned int *)gregs;
++  if (regnum >= 0)
++    regcache->raw_supply (regnum, regs + regnum);
++
++  if (regnum == -1) {
++    int i;
++
++    for (i = 0; i < 50; i++) {
++      regcache->raw_supply (i, regs + i);
++    }
++  }
++}
++
++
++/* Return the appropriate register set for the core section identified
++   by SECT_NAME and SECT_SIZE.  */
++
++static void
++microblaze_iterate_over_regset_sections (struct gdbarch *gdbarch,
++                                     iterate_over_regset_sections_cb *cb,
++                                     void *cb_data,
++                                     const struct regcache *regcache)
++{
++  struct microblaze_gdbarch_tdep *tdep =(microblaze_gdbarch_tdep *) gdbarch_tdep (gdbarch);
++
++  cb(".reg", tdep->sizeof_gregset, tdep->sizeof_gregset, tdep->gregset, NULL, cb_data);
++
++  cb(".reg2", tdep->sizeof_fpregset, tdep->sizeof_fpregset, tdep->fpregset, NULL, cb_data);
++}
++
++
++
+ static struct gdbarch *
+ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+ {
+-- 
+2.34.1
+

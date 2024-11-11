@@ -1,0 +1,108 @@
+From 39ba1e8a13828ac3c860a72b95c3abae024044b5 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Tue, 11 Sep 2018 17:30:17 +0530
+Subject: [PATCH 21/53] Added relocations for MB-X
+
+Conflicts:
+	bfd/bfd-in2.h
+	gas/config/tc-microblaze.c
+
+Conflicts:
+	gas/config/tc-microblaze.c
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/reloc.c                | 26 ++++++++++++++------------
+ gas/config/tc-microblaze.c | 11 +++++++++++
+ 2 files changed, 25 insertions(+), 12 deletions(-)
+
+diff --git a/bfd/reloc.c b/bfd/reloc.c
+index 3e8647f601e..c5c0ce5d060 100644
+--- a/bfd/reloc.c
++++ b/bfd/reloc.c
+@@ -6661,12 +6661,6 @@ ENUMDOC
+   the form "Symbol Op Symbol".
+ ENUM
+   BFD_RELOC_MICROBLAZE_32_NONE
+-ENUMDOC
+-  This is a 32 bit reloc that stores the 32 bit pc relative value in
+-  two words (with an imm instruction).  No relocation is done here -
+-  only used for relaxing.
+-ENUM
+-  BFD_RELOC_MICROBLAZE_32_NONE
+ ENUMDOC
+   This is a 32 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  No relocation is
+@@ -6685,12 +6679,6 @@ ENUMDOC
+   done here - only used for relaxing
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_GOTPC
+-ENUMDOC
+-  This is a 64 bit reloc that stores the 32 bit pc relative
+-  value in two words (with an imml instruction).  No relocation is
+-  done here - only used for relaxing
+-ENUM
+-  BFD_RELOC_MICROBLAZE_64_GPC
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  The relocation is
+@@ -7929,6 +7917,20 @@ ENUMX
+ ENUMDOC
+   Linux eBPF relocations.
+ 
++  This is a 64 bit reloc that stores 64-bit thread pointer relative offset
++  to two words (uses imml instruction).
++ENUM
++BFD_RELOC_MICROBLAZE_64,
++ENUMDOC
++ This is a 64 bit reloc that stores the 64 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
++ENUM
++BFD_RELOC_MICROBLAZE_64_PCREL,
++ENUMDOC
++ This is a 32 bit reloc that stores the 32 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
+ ENUM
+   BFD_RELOC_EPIPHANY_SIMM8
+ ENUMDOC
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index f13efcae979..9b8b129e309 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -91,6 +91,8 @@ const char FLT_CHARS[] = "rRsSfFdDxXpP";
+ #define TLSTPREL_OFFSET      16
+ #define TEXT_OFFSET	     17
+ #define TEXT_PC_OFFSET       18
++#define DEFINED_64_OFFSET   19
++#define DEFINED_64_PC_OFFSET 20 
+ 
+ /* Initialize the relax table.  */
+ const relax_typeS md_relax_table[] =
+@@ -114,6 +116,8 @@ const relax_typeS md_relax_table[] =
+   { 0x7fffffff, 0x80000000, INST_WORD_SIZE*2, 0 },  /* 16: TLSTPREL_OFFSET.  */
+   { 0x7fffffff, 0x80000000, INST_WORD_SIZE*2, 0 },  /* 17: TEXT_OFFSET.  */
+   { 0x7fffffff, 0x80000000, INST_WORD_SIZE*2, 0 }   /* 18: TEXT_PC_OFFSET.  */
++  { 0x7fffffffffffffff, 0x8000000000000000, INST_WORD_SIZE, 0 },   /* 19: DEFINED_64_OFFSET.  */
++  { 0x7fffffffffffffff, 0x8000000000000000, INST_WORD_SIZE*2, 0 }   /* 20: DEFINED_64_PC_OFFSET.  */
+ };
+ 
+ static htab_t  opcode_hash_control;	/* Opcode mnemonics.  */
+@@ -2330,6 +2334,13 @@ md_estimate_size_before_relax (fragS * fragP,
+ 	      /* Variable part does not change.  */
+ 	      fragP->fr_var = INST_WORD_SIZE*2;
+ 	    }
++	  else if (streq (fragP->fr_opcode, str_microblaze_64))
++	    {
++              /* Used as an absolute value.  */
++              fragP->fr_subtype = DEFINED_64_OFFSET;
++              /* Variable part does not change.  */
++              fragP->fr_var = INST_WORD_SIZE;
++            }
+ 	  else if (streq (fragP->fr_opcode, str_microblaze_ro_anchor))
+ 	    {
+               /* It is accessed using the small data read only anchor.  */
+-- 
+2.34.1
+

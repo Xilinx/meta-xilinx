@@ -1,8 +1,8 @@
 SRCBRANCH ?= "2024"
-SRCREV = "dbf0857389190f4c4cedfb77bd1f9bdd7ab404f3"
+SRCREV = "699ad2c5b9236d61aae1b89e2857361db1bfeb95"
 BRANCH = "xlnx_rel_v2024.1"
 LIC_FILES_CHKSUM ?= "file://LICENSE.md;md5=ab88daf995c0bd0071c2e1e55f3d3505"
-PV = "${SRCBRANCH}+git"
+PV .= "+git"
 REPO = "git://github.com/Xilinx/open-amp.git;protocol=https"
 
 include ${LAYER_PATH_openamp-layer}/recipes-openamp/open-amp/open-amp.inc

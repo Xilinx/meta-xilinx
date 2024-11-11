@@ -35,14 +35,45 @@ if '-bootbin' in APU_args:
 if PMU_args and PLM_args:
     sys.exit("\nError: -pmu-args can not be used with -plm-args\n")
 
-if ('--help' in APU_args) or (not PMU_args and not PLM_args):
-    print("AMD FPGA QEMU multiarch wrapper\nVersion 2024.1\n\nUsage:")
+help_options = ['-h', '-help', '--help']
+def help(status):
+    print("AMD FPGA QEMU multiarch wrapper\nVersion 2024.2\n\nUsage:")
     print(f"  {sys.argv[0]} <APU options> [-pmu-args <pmu options>]")
     print(f"  {sys.argv[0]} <APU options> [-plm-args <plm options>]\n")
-    sys.exit(1)
+    if status == 0:
+        print(f"\n")
+        if set(PMU_args).intersection(set(help_options)):
+            print(f"PMU Options:\n")
+            pmu_args_s = ' '.join(PMU_args)
+            help_cmd = f'{binpath}/qemu-system-microblazeel {pmu_args_s}'
+        elif set(PLM_args).intersection(set(help_options)):
+            print(f"PLM Options:\n")
+            plm_args_s = ' '.join(PLM_args)
+            help_cmd = f'{binpath}/qemu-system-microblazeel {plm_args_s}'
+        else:
+            if not set(APU_args).intersection(set(help_options)):
+                APU_args.append('-help')
+            print(f"APU Options:\n")
+            print(f"    -bootbin <boot.bin> - Use a boot.bin instead of individual firmware, device trees and bootloader\n")
+            apu_args_s = ' '.join(APU_args)
+            help_cmd = f'{binpath}/qemu-system-aarch64 {apu_args_s}'
+
+        print(f"{help_cmd}\n")
+        process = subprocess.Popen(help_cmd, shell=True, stderr=subprocess.PIPE)
+        status = process.wait()
+    sys.exit(status)
+
+if set(APU_args).intersection(set(help_options)) or set(PMU_args).intersection(set(help_options)) or set(PLM_args).intersection(set(help_options)):
+    help(0)
+
+if not PMU_args and not PLM_args:
+    help(1)
 
 if PMU_args:
-    PMU_rom = PMU_args[PMU_args.index('-kernel')+1]
+    try:
+        PMU_rom = PMU_args[PMU_args.index('-kernel')+1]
+    except:
+        PMU_rom = ""
 
     if not os.path.exists(PMU_rom):
         sys.exit(f'\nERROR: Missing PMU ROM: {PMU_rom}'

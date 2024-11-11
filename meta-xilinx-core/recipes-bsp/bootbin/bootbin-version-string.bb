@@ -15,9 +15,14 @@ BOOTBIN_VER_FILE = "bootbin-version-string.txt"
 
 inherit deploy image-artifact-names
 
+IMAGE_NAME_SUFFIX = ""
+
 python do_configure() {
-    if d.getVar("BOOTBIN_VER_SUFFIX"):
-        version = version + "-" + d.getVar("BOOTBIN_VER_SUFFIX")
+
+    if not 'version' in locals():
+        version = d.getVar("MACHINE") + "-v" + d.getVar("BOOTBIN_VER_MAIN")
+    version += d.getVar("IMAGE_VERSION_SUFFIX")
+
     with open(d.expand("${B}/${BOOTBIN_VER_FILE}"), "w") as f:
         f.write(version)
 }

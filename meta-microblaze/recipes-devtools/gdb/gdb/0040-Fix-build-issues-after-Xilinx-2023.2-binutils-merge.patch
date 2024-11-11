@@ -1,0 +1,185 @@
+From 73b456c4d8f64ec01b170a49330e6de66716eb1a Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 14 Mar 2024 10:41:33 +0530
+Subject: [PATCH 40/54] Fix build issues after Xilinx 2023.2 binutils merge
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/bfd-in2.h            | 10 ------
+ gdb/microblaze-tdep.c    | 71 ++++++++++++++--------------------------
+ opcodes/microblaze-dis.c | 10 ------
+ 3 files changed, 25 insertions(+), 66 deletions(-)
+
+diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
+index 9dcf233f19f..4b022dbfba1 100644
+--- a/bfd/bfd-in2.h
++++ b/bfd/bfd-in2.h
+@@ -6473,11 +6473,6 @@ done here - only used for relaxing  */
+  *   +done here - only used for relaxing  */
+     BFD_RELOC_MICROBLAZE_64_PCREL,
+ 
+-/* This is a 64 bit reloc that stores the 32 bit relative
+- *  +value in two words (with an imml instruction).  No relocation is
+- *   +done here - only used for relaxing  */
+-    BFD_RELOC_MICROBLAZE_64,
+-
+ /* This is a 64 bit reloc that stores the 32 bit relative
+  *  +value in two words (with an imml instruction).  No relocation is
+  *   +done here - only used for relaxing  */
+@@ -6503,11 +6498,6 @@ value in two words (with an imml instruction).  The relocation is
+ PC-relative GOT offset  */
+   BFD_RELOC_MICROBLAZE_64_GPC,
+ 
+-/* This is a 64 bit reloc that stores the 32 bit pc relative
+-value in two words (with an imml instruction).  The relocation is
+-PC-relative GOT offset  */
+-  BFD_RELOC_MICROBLAZE_64_GPC,
+-
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imm instruction).  The relocation is
+ GOT offset  */
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 363fee34040..818306f2197 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -70,6 +70,7 @@ static const char *microblaze_abi_string;
+ static const char *const microblaze_abi_strings[] = {
+   "auto",
+   "m64",
++  NULL
+ };
+ 
+ enum microblaze_abi
+@@ -105,7 +106,7 @@ global_microblaze_abi (void)
+     if (microblaze_abi_strings[i] == microblaze_abi_string)
+       return (enum microblaze_abi) i;
+ 
+-//  internal_error (__FILE__, __LINE__, _("unknown ABI string"));
++  internal_error (__FILE__, __LINE__, _("unknown ABI string"));
+ }
+ 
+ static void
+@@ -894,16 +895,31 @@ microblaze_dwarf2_reg_to_regnum (struct gdbarch *gdbarch, int reg)
+ }
+ 
+ static void
+-microblaze_register_g_packet_guesses (struct gdbarch *gdbarch)
++microblaze_register_g_packet_guesses (struct gdbarch *gdbarch, enum microblaze_abi abi)
+ {
+ 
+-  register_remote_g_packet_guess (gdbarch,
+-				  4 * MICROBLAZE_NUM_CORE_REGS,
+-				  tdesc_microblaze64);
++  if (abi == MICROBLAZE_ABI_M64) 
++    {
++
++      register_remote_g_packet_guess (gdbarch,
++  				      8 * MICROBLAZE_NUM_CORE_REGS,
++				      tdesc_microblaze64);
++
++      register_remote_g_packet_guess (gdbarch,
++				      8 * MICROBLAZE_NUM_REGS,
++				      tdesc_microblaze64_with_stack_protect);
++    } 
++  else 
++    {
++
++      register_remote_g_packet_guess (gdbarch,
++  				      4 * MICROBLAZE_NUM_CORE_REGS,
++				      tdesc_microblaze);
+ 
+-  register_remote_g_packet_guess (gdbarch,
+-				  4 * MICROBLAZE_NUM_REGS,
+-				  tdesc_microblaze64_with_stack_protect);
++      register_remote_g_packet_guess (gdbarch,
++				      4 * MICROBLAZE_NUM_REGS,
++				      tdesc_microblaze_with_stack_protect);
++    }
+ }
+ 
+ void
+@@ -957,43 +973,6 @@ make_regs (struct gdbarch *arch)
+ }
+ #endif
+ 
+-void
+-microblaze_supply_gregset (const struct regset *regset,
+-                        struct regcache *regcache,
+-                        int regnum, const void *gregs)
+-{
+-  const unsigned int *regs = (const unsigned int *)gregs;
+-  if (regnum >= 0)
+-    regcache->raw_supply (regnum, regs + regnum);
+-
+-  if (regnum == -1) {
+-    int i;
+-
+-    for (i = 0; i < 50; i++) {
+-      regcache->raw_supply (i, regs + i);
+-    }
+-  }
+-}
+-
+-
+-/* Return the appropriate register set for the core section identified
+-   by SECT_NAME and SECT_SIZE.  */
+-
+-static void
+-microblaze_iterate_over_regset_sections (struct gdbarch *gdbarch,
+-                                     iterate_over_regset_sections_cb *cb,
+-                                     void *cb_data,
+-                                     const struct regcache *regcache)
+-{
+-  struct microblaze_gdbarch_tdep *tdep =(microblaze_gdbarch_tdep *) gdbarch_tdep (gdbarch);
+-
+-  cb(".reg", tdep->sizeof_gregset, tdep->sizeof_gregset, tdep->gregset, NULL, cb_data);
+-
+-  cb(".reg2", tdep->sizeof_fpregset, tdep->sizeof_fpregset, tdep->fpregset, NULL, cb_data);
+-}
+-
+-
+-
+ static struct gdbarch *
+ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+ {
+@@ -1134,7 +1113,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+ 
+   set_gdbarch_unwind_pc (gdbarch, microblaze_unwind_pc);
+ 
+-  //microblaze_register_g_packet_guesses (gdbarch);
++  // microblaze_register_g_packet_guesses (gdbarch, microblaze_abi);
+ 
+   frame_base_set_default (gdbarch, &microblaze_frame_base);
+ 
+diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
+index 540ddecafd4..00712d5eaf1 100644
+--- a/opcodes/microblaze-dis.c
++++ b/opcodes/microblaze-dis.c
+@@ -466,10 +466,6 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+ 	  print_func (stream, "\t%s, %s", get_field_r1 (&buf, inst),
+ 		      get_field_r2 (&buf, inst));
+           break;
+-        case INST_TYPE_IMML:
+-	  print_func (stream, "\t%s", get_field_imml (&buf, inst));
+-          /* TODO: Also print symbol */
+-	  break;
+ 	case INST_TYPE_RD_IMM15:
+ 	  print_func (stream, "\t%s, %s", get_field_rd (&buf, inst),
+ 		      get_field_imm15 (&buf, inst));
+@@ -484,12 +480,6 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+ 	case INST_TYPE_RD_IMML:
+ 	  print_func (stream, "\t%s, %s", get_field_rd (&buf, inst), get_field_imm16 (&buf, inst));
+           break;
+-        /* For bit field insns.  */
+-	case INST_TYPE_RD_R1_IMMW_IMMS:
+-	  print_func (stream, "\t%s, %s, %s, %s", get_field_rd (&buf, inst), get_field_r1(&buf, inst),
+-		   get_field_immw (&buf, inst), get_field_imms (&buf, inst));
+-	  break;
+-        /* For bit field insns.  */
+ 	case INST_TYPE_RD_R1_IMMW_IMMS:
+           print_func (stream, "\t%s, %s, %s, %s", get_field_rd (&buf, inst),get_field_r1(&buf, inst),get_field_immw (&buf, inst), get_field_imms (&buf, inst));
+ 	     break;
+-- 
+2.34.1
+

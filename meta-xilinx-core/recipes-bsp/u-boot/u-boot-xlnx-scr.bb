@@ -39,6 +39,9 @@ DDR_BASEADDR ?= "0x0"
 DDR_BASEADDR:microblaze ?= "0x80000000"
 PRE_BOOTENV ?= ""
 
+# Set debfault SD boot device to mmc 0 interface
+SDBOOTDEV ?= "0"
+
 SRC_URI = " \
     file://boot.cmd.sd.zynq \
     file://boot.cmd.sd.zynqmp \
@@ -81,7 +84,7 @@ DEVICETREE_OVERLAY_OFFSET:zynqmp ??= "0x100000"
 DEVICETREE_OVERLAY_OFFSET:zynq ??= "0x100000"
 DEVICETREE_OVERLAY_OFFSET:versal ??= "0x1000"
 DEVICETREE_OVERLAY_OFFSET:versal-net ??= "0x1000"
-DEVICETREE_OVERLAY_PADSIZE ??= "0xf00000"
+DEVICETREE_OVERLAY_PADSIZE ??= "0x1f00000"
 
 DEVICETREE_OVERLAY_ADDRESS ?= "${@hex(int(append_baseaddr(d,d.getVar('DEVICETREE_OVERLAY_OFFSET')),16) \
 				+ int(d.getVar('DEVICETREE_OVERLAY_PADSIZE'),16))}"

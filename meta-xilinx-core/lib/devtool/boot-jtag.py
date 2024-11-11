@@ -8,12 +8,9 @@
 # yocto generated images on HW via jtag boot mode.
 
 import os
-import logging
-import argparse
-from devtool import setup_tinfoil, parse_recipe, DevtoolError
-import yaml
-import sys
 import glob
+import logging
+from devtool import setup_tinfoil
 
 logger = logging.getLogger('devtool')
 
@@ -24,8 +21,8 @@ def bootjtag(args, config, basepath, workspace):
         print('\nINFO: Please specify the target image name. \n\nExample: --image core-image-minimal or petalinux-image-minimal')
         return
 
-    # Get required boot variables
     tinfoil = setup_tinfoil(basepath=basepath)
+    # Get required boot variables
     try:
         rd = tinfoil.parse_recipe('u-boot-xlnx-scr')
         deploy_dir = rd.getVar('DEPLOY_DIR_IMAGE')
@@ -39,6 +36,7 @@ def bootjtag(args, config, basepath, workspace):
         rootfs_load_addr = rd.getVar('RAMDISK_IMAGE_ADDRESS')
         machine_features = rd.getVar('MACHINE_FEATURES')
         boot_mode = rd.getVar('BOOTMODE')
+        image_name_suffix = rd.getVar('IMAGE_NAME_SUFFIX')
     finally:
         tinfoil.shutdown()
 
@@ -99,7 +97,7 @@ def bootjtag(args, config, basepath, workspace):
     data['kernel'] = os.path.join(deploy_dir, kernel_img_name)
 
     if not args.norootfs:
-        data['rfs'] = os.path.join(deploy_dir, args.image + '-' + machine + '.cpio.gz.u-boot')
+        data['rfs'] = os.path.join(deploy_dir, args.image + '-' + machine + image_name_suffix + '.cpio.gz.u-boot')
 
     # Check if all the required boot images exists
     for key in data:
@@ -258,19 +256,19 @@ def bootjtag(args, config, basepath, workspace):
 
 def register_commands(subparsers, context):
     """Register devtool subcommands from this plugin"""
-    parser_bootjtag = subparsers.add_parser('boot-jtag', 
+    parser_bootjtag = subparsers.add_parser('boot-jtag',
                                             help='Script to deploy target images on HW via JTAG boot mode.',
                                             description='Script to deploy target images on HW via JTAG boot mode. \
                                                 Example command: MACHINE=zcu102-zynqmp devtool boot-jtag --image ${image_name} --hw_server ${hw_server}')
     required = parser_bootjtag.add_argument_group('required arguments')
-    required.add_argument('--image', 
+    required.add_argument('--image',
                           help='Specify target image name. Example: core-image-minimal or petalinux-image-minimal')
     parser_bootjtag.add_argument('--hw_server', nargs='?', default='TCP:localhost:3121',
                                  help='URL description of hw_server/TCF agent and port number. (default: %(default)s) \
                                      Example: --hw_server TCP:puffball12:3121')
 
-    parser_bootjtag.add_argument('-v', '--verbose',  
+    parser_bootjtag.add_argument('-v', '--verbose',
                                  help='verbose mode', action="store_true")
-    parser_bootjtag.add_argument('-n', '--norootfs', 
+    parser_bootjtag.add_argument('-n', '--norootfs',
                                  help='Don\'t include rootfs', action='store_true')
     parser_bootjtag.set_defaults(func=bootjtag, no_workspace=True)

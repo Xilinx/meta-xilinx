@@ -1,0 +1,84 @@
+From e89c2729322ce147e8a5a5e7842944593b4dd474 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Wed, 27 Feb 2019 15:12:32 +0530
+Subject: [PATCH 27/53] Revert "ld: Remove unused expression state" --defsym
+ symbol=expression Create a global symbol in the output file, containing the
+ absolute address given by expression.
+
+This reverts commit 65f14869fd3fbee8ed4c4ca49de8aaa86dbc66cb.
+
+Conflicts:
+	ld/ChangeLog
+
+Conflicts:
+	ld/ldexp.c
+	ld/ldexp.h
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ ld/ldexp.c | 8 +++++---
+ ld/ldexp.h | 1 +
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/ld/ldexp.c b/ld/ldexp.c
+index 3c8ab2d3589..525f3e4262c 100644
+--- a/ld/ldexp.c
++++ b/ld/ldexp.c
+@@ -1402,6 +1402,7 @@ static etree_type *
+ exp_assop (const char *dst,
+ 	   etree_type *src,
+ 	   enum node_tree_enum class,
++	   bool defsym,
+ 	   bool hidden)
+ {
+   etree_type *n;
+@@ -1413,6 +1414,7 @@ exp_assop (const char *dst,
+   n->assign.type.node_class = class;
+   n->assign.src = src;
+   n->assign.dst = dst;
++  n->assign.defsym = defsym;
+   n->assign.hidden = hidden;
+   return n;
+ }
+@@ -1422,7 +1424,7 @@ exp_assop (const char *dst,
+ etree_type *
+ exp_assign (const char *dst, etree_type *src, bool hidden)
+ {
+-  return exp_assop (dst, src, etree_assign, hidden);
++  return exp_assop (dst, src, etree_assign, false, hidden);
+ }
+ 
+ /* Handle --defsym command-line option.  */
+@@ -1430,7 +1432,7 @@ exp_assign (const char *dst, etree_type *src, bool hidden)
+ etree_type *
+ exp_defsym (const char *dst, etree_type *src)
+ {
+-  return exp_assop (dst, src, etree_assign, false);
++  return exp_assop (dst, src, etree_assign, true, false);
+ }
+ 
+ /* Handle PROVIDE.  */
+@@ -1438,7 +1440,7 @@ exp_defsym (const char *dst, etree_type *src)
+ etree_type *
+ exp_provide (const char *dst, etree_type *src, bool hidden)
+ {
+-  return exp_assop (dst, src, etree_provide, hidden);
++  return exp_assop (dst, src, etree_provide, false, hidden);
+ }
+ 
+ /* Handle ASSERT.  */
+diff --git a/ld/ldexp.h b/ld/ldexp.h
+index c779729e900..6d583e1b15a 100644
+--- a/ld/ldexp.h
++++ b/ld/ldexp.h
+@@ -66,6 +66,7 @@ typedef union etree_union {
+     node_type type;
+     const char *dst;
+     union etree_union *src;
++    bool defsym;
+     bool hidden;
+   } assign;
+   struct {
+-- 
+2.34.1
+

@@ -1,0 +1,1466 @@
+From 2da2588a1dda1fd7fd2f6fc89db13cc5694d793e Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Sat, 24 Aug 2024 11:23:18 -0600
+Subject: [PATCH] versal: Reorder serial ports
+
+This change affects the order of the serial ports when calling qemu.
+Previously the serial ports 0 & 1 were the PMC (firmware) uartlite,
+while the standard serial pors were 2 & 3.  Reverse this order to
+ensure that the first two serial ports are the ones used by Linux.
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ board-versal-pmc-virt-alt.dts  | 230 ++++++++++++++++
+ board-versal-ps-vck190-alt.dts |  58 ++++
+ board-versal-ps-virt-alt.dts   | 354 +++++++++++++++++++++++++
+ versal-pmc-alt.dtsi            |  40 +++
+ versal-pmc-ppu-alt.dtsi        | 252 ++++++++++++++++++
+ versal-ps-iou-alt.dtsi         | 467 +++++++++++++++++++++++++++++++++
+ 6 files changed, 1401 insertions(+)
+ create mode 100644 board-versal-pmc-virt-alt.dts
+ create mode 100644 board-versal-ps-vck190-alt.dts
+ create mode 100644 board-versal-ps-virt-alt.dts
+ create mode 100644 versal-pmc-alt.dtsi
+ create mode 100644 versal-pmc-ppu-alt.dtsi
+ create mode 100644 versal-ps-iou-alt.dtsi
+
+diff --git a/board-versal-pmc-virt-alt.dts b/board-versal-pmc-virt-alt.dts
+new file mode 100644
+index 00000000..52d23c83
+--- /dev/null
++++ b/board-versal-pmc-virt-alt.dts
+@@ -0,0 +1,230 @@
++/*
++ * Versal Virtual PMC board device tree
++ *
++ * Copyright (c) 2016, Xilinx Inc
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above copyright
++ *       notice, this list of conditions and the following disclaimer in the
++ *       documentation and/or other materials provided with the distribution.
++ *     * Neither the name of the <organization> nor the
++ *       names of its contributors may be used to endorse or promote products
++ *       derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++/dts-v1/;
++
++#ifndef VERSAL_NPI_OVERRIDE
++ #include "versal-npi-memmap.dtsh"
++#endif
++
++#define VERSAL_NPI_GENERIC
++
++#include "versal.dtsh"
++
++#ifndef MULTI_ARCH
++#include "versal-pmc-alt.dtsi"
++#include "versal-psm.dtsi"
++#include "versal-ddrmc.dtsi"
++#include "versal-ps-iou-alt.dtsi"
++#include "versal-pmc-ppu-cpus.dtsi"
++#include "versal-psm-cpu.dtsi"
++
++/ {
++	/* FIXME: Once we add the NOC, these should be attached to it.  */
++	MEM_REGION(ddr, 0x0, MM_TOP_DDR, 0x00000000, MM_TOP_DDR_SIZE, &ddr_mem)  // 2 GB
++	MEM_SPEC(ddr_2, MM_TOP_DDR_2_H, MM_TOP_DDR_2_L, MM_TOP_DDR_2,
++                 MM_TOP_DDR_2_SIZE_H, MM_TOP_DDR_2_SIZE_L, &ddr_2_mem) // 32 GB
++
++	/* Dummy APUs.  */
++	cpu0: apu@0 {
++	};
++	cpu1: apu@1 {
++	};
++	rpu_cpu0: rpu_cpu0 {
++	};
++	rpu_cpu1: rpu_cpu1 {
++	};
++#ifndef HAVE_DDRMC_CPUS
++	ddrmc_ub0: ddrmc_ub@0 {
++		#interrupt-cells = <1>;
++		interrupt-controller;
++	};
++	ddrmc_ub1: ddrmc_ub@1 {
++		#interrupt-cells = <1>;
++		interrupt-controller;
++	};
++#endif
++	/* Dummy GIC.  */
++	gic: apu_gic@0 {
++		#interrupt-cells = <3>;
++		interrupt-controller;
++	};
++};
++
++&pmc_qspi_0 {
++	SPI_FLASH(qspi_flash_lcs_lb,"m25qu02gcbb", 0x02000000, 0x0 0x0)
++	SPI_FLASH(qspi_flash_lcs_ub,"m25qu02gcbb", 0x02000000, 0x2 0x1)
++	SPI_FLASH(qspi_flash_ucs_lb,"m25qu02gcbb", 0x02000000, 0x1 0x0)
++	SPI_FLASH(qspi_flash_ucs_ub,"m25qu02gcbb", 0x02000000, 0x3 0x1)
++};
++
++&ospi {
++	SPI_FLASH(ospi_flash_lcs_lb, "mt35xu01gbba", 0x02000000, 0x0 0x0)
++	SPI_FLASH(ospi_flash_lcs_ub, "mt35xu01gbba", 0x02000000, 0x1 0x0)
++	SPI_FLASH(ospi_flash_ucs_lb, "mt35xu01gbba", 0x02000000, 0x2 0x0)
++	SPI_FLASH(ospi_flash_ucs_ub, "mt35xu01gbba", 0x02000000, 0x3 0x0)
++};
++
++#else
++#include "versal-icnt.dtsi"
++#include "versal-rams.dtsi"
++#include "versal-pmc-ppu-cpus.dtsi"
++#include "versal-psm-cpu.dtsi"
++
++/ {
++	/* FIXME: Once we add the NOC, these should be attached to it.  */
++	MEM_REGION(ddr, 0x0, 0x00000000, 0x00000000, 0x80000000, &ddr_mem)
++
++	ps_pmc_rp: ps_pmc_rp@0 {
++		doc-name = "Remote-port PMC-PS";
++		compatible = "remote-port";
++		chrdev-id = "ps-pmc-rp";
++	};
++	rp_pmc_ppu0: rp_pmc_ppu0@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 1>;
++		interrupts-extended = < &pmc_ppu0 0 >;
++	};
++	rp_pmc_ppu1: rp_pmc_ppu1@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 2>;
++		interrupts-extended = < &pmc_ppu1 0 >;
++	};
++	pmc_global: rp_pmc_global@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 3>;
++		#gpio-cells = <1>;
++		num-gpios = <16>;
++	};
++	lmb_pmc_ppu0: lmb_pmc_ppu0@0 {
++		rp_lmb_pmc_ppu0@0 {
++			compatible = "remote-port-memory-master";
++			remote-ports = <&ps_pmc_rp 4>;
++			reg = < 0x0 0x0 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF /* -1 */ >;
++		};
++	};
++	lmb_pmc_ppu1: lmb_pmc_ppu1@0 {
++		rp_lmb_pmc_ppu1@0 {
++			compatible = "remote-port-memory-master";
++			remote-ports = <&ps_pmc_rp 5>;
++			reg = < 0x0 0x0 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF /* -1 */ >;
++		};
++	};
++	crl: crl@MM_CRL {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 6>;
++		#gpio-cells = <1>;
++		num-gpios = <35>;
++	};
++	pmc_clk_rst: pmc_clk_rst@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 7>;
++		#gpio-cells = <1>;
++		num-gpios = <30>;
++	};
++	rp_psm0: rp_psm0@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 8>;
++		interrupts-extended = < &psm0 0 >;
++	};
++#ifdef MM_NPI_DDRMC_MAIN_0
++	rp_ddrmc_ub0: rp_ddrmc_ub@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 9>;
++# ifdef HAVE_DDRMC_CPUS
++		interrupts-extended = < &ddrmc_ub0 0 >;
++# endif
++	};
++
++	npi_ddrmc_ub0: rp_npi_ddrmc_ub@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 11>;
++		#gpio-cells = <1>;
++	};
++#endif
++#ifdef MM_NPI_DDRMC_MAIN_1
++	rp_ddrmc_ub1: rp_ddrmc_ub@1 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 10>;
++ # ifdef HAVE_DDRMC_CPUS
++		interrupts-extended = < &ddrmc_ub1 0 >;
++ # endif
++	};
++
++	npi_ddrmc_ub1: rp_npi_ddrmc_ub@1 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 12>;
++		#gpio-cells = <1>;
++	};
++#endif
++	lmb_psm: lmb_psm@0 {
++		rp_lmb_psm@0 {
++			compatible = "remote-port-memory-master";
++			remote-ports = <&ps_pmc_rp 13>;
++			reg = < 0x0 0x0 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF /* -1 */ >;
++		};
++	};
++
++	/* Dummy stub to avoid ifdefs in the interrupt-map.  */
++	pmc_gic_proxy: pmc_gic_proxy {
++		doc-ignore = <1>;
++		#interrupt-cells = <3>;
++		interrupt-controller;
++	};
++	psm_gic_proxy: psm_gic_proxy {
++		doc-ignore = <1>;
++		#interrupt-cells = <3>;
++		interrupt-controller;
++	};
++	psm0_io_intc: psm0_io_intc {
++		doc-ignore = <1>;
++		#interrupt-cells = <1>;
++		interrupt-controller;
++	};
++	pmc_ppu1_io_intc: pmc_ppu1_io_intc {
++		doc-ignore = <1>;
++		#interrupt-cells = <1>;
++		interrupt-controller;
++	};
++};
++#endif
++
++/ {
++	/*
++	 * FIXME: This legacy hook will reset the entire PMC instance
++	 * meaning PSM and PMC MicroBlazes for multi-arch and all
++	 * devices for single-arch.
++	 * Once the CPU reset infrastructure is improved, we should
++	 * remove this.
++	 */
++	pmc_reset: pmc_reset@ {
++		compatible = "qemu,reset-device";
++		gpios = <&pmc_clk_rst CRP_RST_PS_PMC_SRST>;
++	};
++};
+diff --git a/board-versal-ps-vck190-alt.dts b/board-versal-ps-vck190-alt.dts
+new file mode 100644
+index 00000000..b61d3d5c
+--- /dev/null
++++ b/board-versal-ps-vck190-alt.dts
+@@ -0,0 +1,58 @@
++/*
++ * Versal Virtual vck190 board device tree
++ *
++ * Copyright (c) 2020, Xilinx Inc
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above copyright
++ *       notice, this list of conditions and the following disclaimer in the
++ *       documentation and/or other materials provided with the distribution.
++ *     * Neither the name of the <organization> nor the
++ *       names of its contributors may be used to endorse or promote products
++ *       derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++#include "board-versal-ps-virt-alt.dts"
++#include "versal-silicon-freq.dtsi"
++
++/{
++	MEM_REGION64(ddr_3, MM_TOP_DDR_CH1_H, MM_TOP_DDR_CH1_L, MM_TOP_DDR_CH1,
++                 0x2, 0x0, &ddr_3_mem) // 8 GB
++};
++
++&ps_i2c1 {
++	i2cswitch@74 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		compatible = "nxp,pca9548";
++		reg = <0x74>;
++		chip-enable = <0x1>;
++		i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++			eeprom@54 {
++				compatible = "at,24c08";
++				reg = <0x54>;
++			};
++		};
++	};
++};
++
++&ospi_flash_lcs_lb {
++	compatible = "mt35xu02gbba";
++};
+diff --git a/board-versal-ps-virt-alt.dts b/board-versal-ps-virt-alt.dts
+new file mode 100644
+index 00000000..7585d196
+--- /dev/null
++++ b/board-versal-ps-virt-alt.dts
+@@ -0,0 +1,354 @@
++/*
++ * Versal Virtual PS board device tree
++ *
++ * Copyright (c) 2016-2022, Xilinx Inc.
++ * Copyright (C) 2022-2024, Advanced Micro Devices, Inc.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above copyright
++ *       notice, this list of conditions and the following disclaimer in the
++ *       documentation and/or other materials provided with the distribution.
++ *     * Neither the name of the <organization> nor the
++ *       names of its contributors may be used to endorse or promote products
++ *       derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++#ifndef __BOARD_VERSAL_PS_VIRT__
++#define __BOARD_VERSAL_PS_VIRT__
++
++/dts-v1/;
++#ifndef VERSAL_NPI_OVERRIDE
++ #include "versal-npi-memmap.dtsh"
++#endif
++
++#ifndef NUM_APUS
++/* Base platform has 2 APUs.  */
++#define NUM_APUS 2
++#endif
++
++#define HAS_SMMU
++#define HAVE_APU_GIC
++
++#ifndef RPU_GIC_INTERRUPT_TARGET_STEM
++#ifdef MULTI_ARCH
++	#define RPU_GIC_INTERRUPT_TARGET_STEM rpu_intc_redirect_
++#else
++	#define RPU_GIC_INTERRUPT_TARGET_STEM rpu_cpu
++#endif
++#endif
++
++#define VERSAL_NPI_GENERIC
++
++#include "versal.dtsh"
++
++#include "versal-pmc.dtsi"
++#include "versal-psm.dtsi"
++#include "versal-ddrmc.dtsi"
++#ifdef VERSAL_PSX
++#include "versal-psx-apu.dtsi"
++#else
++#include "versal-ps-apu.dtsi"
++#include "versal-ps-rpu.dtsi"
++#include "versal-boot-init.dtsi"
++#endif
++#include "versal-ps-iou-alt.dtsi"
++#include "versal-virtio-mmio.dtsi"
++#include "versal-boot-init.dtsi"
++#include "versal-gty.dtsi"
++#include "versal-silicon-freq.dtsi"
++
++/ {
++#ifdef MULTI_ARCH
++	ps_pmc_rp: ps_pmc_rp@0 {
++		doc-status = "complete";
++		doc-name = "Remote-port PMC";
++		doc-subdtb = "board-versal-pmc-virt.dtb";
++		compatible = "remote-port";
++		chrdev-id = "ps-pmc-rp";
++	};
++	pmc_ppu0: rp_pmc_ppu0@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 1>;
++		#interrupt-cells = <1>;
++		interrupt-controller;
++	};
++	pmc_ppu1: rp_pmc_ppu1@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 2>;
++		#interrupt-cells = <1>;
++		interrupt-controller;
++	};
++	rp_pmc_global: rp_pmc_global@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 3>;
++		gpio-controller;
++		#gpio-cells = <1>;
++		num-gpios = <16>;
++
++		/* We only need to proxy GPIO 1 and 2 (PPU1 RST and WAKE).  */
++		gpios = < &dummy1 0
++			  &pmc_global 1
++			  &pmc_global 2 >;
++	};
++	rp_lmb_pmc_ppu0: rp_lmb_pmc_ppu0@0 {
++		compatible = "remote-port-memory-slave";
++		remote-ports = <&ps_pmc_rp 4>;
++		mr = <&lmb_pmc_ppu0>;
++	};
++	rp_lmb_pmc_ppu1: rp_lmb_pmc_ppu1@0 {
++		compatible = "remote-port-memory-slave";
++		remote-ports = <&ps_pmc_rp 5>;
++		mr = <&lmb_pmc_ppu1>;
++	};
++	rp_crl: rp_crl@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 6>;
++		gpio-controller;
++		#gpio-cells = <1>;
++		num-gpios = <35>;
++
++		gpios = <
++			  &crl 0
++			  &crl 1
++			  &crl 2
++			  &crl 3
++			  &crl 4
++			  &crl 5
++			  &crl 6
++			  &crl 7
++			  &crl 8
++			  &crl 9
++			  &crl 10
++			  &crl 11
++			  &crl 12
++			  &crl 13
++			  &crl 14
++			  &crl 15
++			  &crl 16
++			  &crl 17
++			  &crl 18
++			  &crl 19
++			  &crl 20
++			  &crl 21
++			  &crl 22
++			  &crl 23
++			  &crl 24
++			  &crl 25
++			  &crl 26
++			  &crl 27
++			  &crl 28
++			  &crl 29
++			  &crl 30
++			  &crl 31
++			  &dummy1 0
++			  &dummy1 0
++			  &crl 34 >;
++	};
++	rp_pmc_clk_rst: rp_pmc_clk_rst@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 7>;
++		gpio-controller;
++		#gpio-cells = <1>;
++		num-gpios = <30>;
++
++		gpios = < &pmc_clk_rst 0 &pmc_clk_rst 1
++			  &pmc_clk_rst 2 &pmc_clk_rst 3
++			  &pmc_clk_rst 4 &pmc_clk_rst 5
++			  &pmc_clk_rst 6 &pmc_clk_rst 7
++			  &pmc_clk_rst 8 &pmc_clk_rst 9
++			  &pmc_clk_rst 10 &pmc_clk_rst 11
++			  &pmc_clk_rst 12 &pmc_clk_rst 13
++			  &pmc_clk_rst 14 &pmc_clk_rst 15
++			  &pmc_clk_rst 16 &pmc_clk_rst 17
++			  &pmc_clk_rst 18 &pmc_clk_rst 19
++			  &pmc_clk_rst 20 &pmc_clk_rst 21
++			  &pmc_clk_rst 22 &pmc_clk_rst 23
++			  &pmc_clk_rst 24 &pmc_clk_rst 25
++			  &pmc_clk_rst 26 &pmc_clk_rst 27
++			  &pmc_clk_rst 28 &pmc_clk_rst 29
++			>;
++	};
++	psm0: rp_psm0@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 8>;
++		#interrupt-cells = <1>;
++		interrupt-controller;
++	};
++#ifdef MM_NPI_DDRMC_MAIN_0
++	ddrmc_ub0: rp_ddrmc@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 9>;
++		#interrupt-cells = <1>;
++		interrupt-controller;
++	};
++	rp_npi_ddrmc_ub0: rp_npi_ddrmc_ub@0 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 11>;
++		gpios = < &npi_ddrmc_ub0 0 >;
++	};
++#endif
++#ifdef MM_NPI_DDRMC_MAIN_1
++	ddrmc_ub1: rp_ddrmc@1 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 10>;
++		#interrupt-cells = <1>;
++		interrupt-controller;
++	};
++	rp_npi_ddrmc_ub1: rp_npi_ddrmc_ub@1 {
++		compatible = "remote-port-gpio";
++		remote-ports = <&ps_pmc_rp 12>;
++		gpios = < &npi_ddrmc_ub1 0 >;
++	};
++#endif
++	rp_lmb_psm: rp_lmb_psm@0 {
++		compatible = "remote-port-memory-slave";
++		remote-ports = <&ps_pmc_rp 13>;
++		mr = <&lmb_psm>;
++	};
++
++#define RPU_INTC_REDIRECT(NCPU, PSMOUT, RPUN)							\
++glue(rpu_intc_redirect_, NCPU): glue(rpu_intc_redirect, NCPU)@NCPU {	\
++	#interrupt-cells = <1>;									\
++	compatible = "xlnx,zynqmp-intc-redirect";						\
++	interrupt-controller;									\
++	interrupts-extended = <glue(&rpu_cpu,NCPU) 0>;						\
++	gpios = <&psm_global PSMOUT &rpu_ctrl RPUN>;						\
++};
++
++	amba_rpu: amba_rpu@0 {
++		RPU_INTC_REDIRECT(0, 4, 6)
++		RPU_INTC_REDIRECT(1, 5, 7)
++	};
++
++#else
++	/* Single ARCH PS board has no PPU MicroBlazes.  */
++	pmc_ppu0: dummy_ppu0@0 {
++		#interrupt-cells = <1>;
++	};
++	pmc_ppu1: dummy_ppu1@0 {
++		#interrupt-cells = <1>;
++	};
++	psm0: dummy_ppu0@0 {
++		#interrupt-cells = <1>;
++	};
++	ddrmc_ub0: dummy_ddrmc0@0 {
++		#interrupt-cells = <1>;
++	};
++	ddrmc_ub1: dummy_ddrmc1@0 {
++		#interrupt-cells = <1>;
++	};
++#endif
++
++	/* FIXME: Once we add the NOC, these should be attached to it.  */
++	MEM_REGION(ddr, 0x0, MM_TOP_DDR, 0x00000000, MM_TOP_DDR_SIZE, &ddr_mem)  // 2 GB
++	MEM_SPEC(ddr_2, MM_TOP_DDR_2_H, MM_TOP_DDR_2_L, MM_TOP_DDR_2,
++                 MM_TOP_DDR_2_SIZE_H, MM_TOP_DDR_2_SIZE_L, &ddr_2_mem) // 32 GB
++	mdio0: mdio {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		#priority-cells = <0>;
++		compatible="mdio";
++		phy0: phy@1 {
++			compatible = "dp83867";
++			device_type = "ethernet-phy";
++			reg = <1>;
++		};
++		phy1: phy@2 {
++			compatible = "88e1118r";
++			device_type = "ethernet-phy";
++			reg = <2>;
++		};
++	};
++};
++
++/*
++ * One flash for each SPI-master to match prebuilt system.dtb in BSP
++ * xilinx-versal-virt-2019.1
++ */
++#define BDEV_SPI_FLASH(_NAME, _COMPAT, _SIZEM, _REGVAL)	\
++_NAME: _NAME@0 {							\
++	#address-cells = <1>;						\
++	#size-cells = <1>;						\
++	#priority-cells = <0>;						\
++	#bus-cells = <1>;						\
++	compatible = _COMPAT, "st,m25p80";				\
++	spi-max-frequency = <50000000>;					\
++	reg = <_REGVAL>;						\
++	blockdev-node-name = #_NAME;					\
++	_NAME@0x00000000 {						\
++		label = #_NAME;						\
++		reg = <0x00000000 _SIZEM>;				\
++	};								\
++};
++
++&spi0 {
++	BDEV_SPI_FLASH(spi0_flash0, "m25p80", 0x00100000, 0x0 0x0)
++};
++
++&spi1 {
++	BDEV_SPI_FLASH(spi1_flash0, "m25p80", 0x00100000, 0x0 0x0)
++};
++
++/*
++ * Use 2Gbit QSPI flashes to allow verification of Image-searching
++ * in ROM upto 256MB.
++ */
++#define DI_SPI_FLASH(_DI, _NAME, _COMPAT, _SIZEM, _REGVAL) \
++_NAME: _NAME@0 {							\
++	#address-cells = <1>;						\
++	#size-cells = <1>;						\
++	#priority-cells = <0>;						\
++	#bus-cells = <1>;						\
++	compatible = _COMPAT, "st,m25p80";				\
++	spi-max-frequency = <50000000>;					\
++	reg = <_REGVAL>;						\
++	drive-index = <_DI>;						\
++	_NAME@0x00000000 {						\
++		label = #_NAME;						\
++		reg = <0x00000000 _SIZEM>;				\
++	};								\
++};
++
++&pmc_qspi_0 {
++	DI_SPI_FLASH(0, qspi_flash_lcs_lb, "m25qu02gcbb", 0x02000000, 0x0 0x0)
++	DI_SPI_FLASH(1, qspi_flash_lcs_ub, "m25qu02gcbb", 0x02000000, 0x2 0x1)
++	DI_SPI_FLASH(2, qspi_flash_ucs_lb, "m25qu02gcbb", 0x02000000, 0x1 0x0)
++	DI_SPI_FLASH(3, qspi_flash_ucs_ub, "m25qu02gcbb", 0x02000000, 0x3 0x1)
++};
++
++&ospi {
++	DI_SPI_FLASH(4, ospi_flash_lcs_lb, "mt35xu01gbba", 0x02000000, 0x0 0x0)
++	DI_SPI_FLASH(5, ospi_flash_lcs_ub, "mt35xu01gbba", 0x02000000, 0x1 0x0)
++	DI_SPI_FLASH(6, ospi_flash_ucs_lb, "mt35xu01gbba", 0x02000000, 0x2 0x0)
++	DI_SPI_FLASH(7, ospi_flash_ucs_ub, "mt35xu01gbba", 0x02000000, 0x3 0x0)
++};
++
++&gem0 {
++	mdio = <&mdio0>;
++};
++
++&gem1 {
++	mdio = <&mdio0>;
++};
++
++&pmc_tap {
++	/*
++	 * Default device: xcvc1902
++	 */
++	idcode = <0x14CA8093>;
++};
++#endif
+diff --git a/versal-pmc-alt.dtsi b/versal-pmc-alt.dtsi
+new file mode 100644
+index 00000000..8236911b
+--- /dev/null
++++ b/versal-pmc-alt.dtsi
+@@ -0,0 +1,40 @@
++/*
++ * Versal PMC
++ *
++ * Copyright (c) 2016, Xilinx Inc.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above copyright
++ *       notice, this list of conditions and the following disclaimer in the
++ *       documentation and/or other materials provided with the distribution.
++ *     * Neither the name of the <organization> nor the
++ *       names of its contributors may be used to endorse or promote products
++ *       derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include "versal.dtsh"
++
++#include "versal-icnt.dtsi"
++#include "versal-rams.dtsi"
++#include "versal-pmc-ppu-alt.dtsi"
++#include "versal-pmc-iou.dtsi"
++#include "versal-pmc-sys.dtsi"
++#include "versal-pmc-sec.dtsi"
++#include "versal-pmc-npi.dtsi"
++#include "versal-pmc-pl.dtsi"
++#include "versal-pmc-bat.dtsi"
+diff --git a/versal-pmc-ppu-alt.dtsi b/versal-pmc-ppu-alt.dtsi
+new file mode 100644
+index 00000000..726413f4
+--- /dev/null
++++ b/versal-pmc-ppu-alt.dtsi
+@@ -0,0 +1,252 @@
++/*
++ * Versal PMC PPU block
++ *
++ * Copyright (c) 2016, Xilinx Inc.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above copyright
++ *       notice, this list of conditions and the following disclaimer in the
++ *       documentation and/or other materials provided with the distribution.
++ *     * Neither the name of the <organization> nor the
++ *       names of its contributors may be used to endorse or promote products
++ *       derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include "versal.dtsh"
++
++#define CREATE_PPU_IOMOD(X)						\
++	pmc_ppu ## X ## _io_module: io-module@00 {			\
++		doc-status = "complete";				\
++		#address-cells = <2>;					\
++		#size-cells = <1>;					\
++		#priority-cells = <0>;					\
++		compatible = "xlnx,iomodule-1.02.a", "syscon", "simple-bus"; \
++		container = <&lmb_pmc_ppu ## X>;			\
++		priority = <0xffffffff>;				\
++		xlnx,freq = <0x47868c0>;				\
++		xlnx,instance = "iomodule_1";				\
++		xlnx,io-mask = <0xfffe0000>;				\
++		xlnx,lmb-awidth = <0x20>;				\
++		xlnx,lmb-dwidth = <0x20>;				\
++		xlnx,mask = <0xffffff80>;				\
++		xlnx,use-io-bus = <0x1>;				\
++									\
++		pmc_ppu ## X ## _io_intc: pmc_ppu ## X ## _intc@0C {	\
++			#interrupt-cells = <1>;				\
++			compatible = "xlnx,io-intc-1.02.a", "xlnx,io_intc"; \
++			interrupt-controller ;				\
++			interrupts-extended = <&pmc_ppu ## X 0>;	\
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(0C) 0x4 0x0 MM_PMC_PPU ## X ## _IOM(30) 0x10 0x0 MM_PMC_PPU ## X ## _IOM(80) 0x7C>; \
++			xlnx,intc-addr-width = <0x20>;			\
++			xlnx,intc-base-vectors = <0x0>;			\
++			xlnx,intc-has-fast = <0x0>;			\
++			xlnx,intc-intr-size = <0x10>;			\
++			xlnx,intc-level-edge = <0x0>;			\
++			xlnx,intc-positive = <0xffff>;			\
++			xlnx,intc-use-ext-intr = <0x1>;			\
++		};							\
++									\
++		pmc_ppu ## X ## _io_gpi1: pmc_ppu ## X ## _gpi@20 {	\
++			#gpio-cells = <1>;				\
++			gpio-controller;				\
++			compatible = "xlnx,io-gpi-1.02.a", "xlnx,io_gpi"; \
++			interrupt-parent = <&pmc_ppu ## X ## _io_intc>;	\
++			interrupts = <11>;				\
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(20) 0x4>;	\
++			xlnx,gpi-interrupt = <0x1>;			\
++			xlnx,gpi-size = <0x20>;				\
++			xlnx,use-gpi = <0x1>;				\
++		};							\
++		pmc_ppu ## X ## _io_gpi2: pmc_ppu ## X ## _gpi@24 {	\
++			#gpio-cells = <1>;				\
++			gpio-controller;				\
++			compatible = "xlnx,io-gpi-1.02.a", "xlnx,io_gpi"; \
++			interrupt-parent = <&pmc_ppu ## X ## _io_intc>;	\
++			interrupts = <12>;				\
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(24) 0x4>;	\
++			xlnx,gpi-interrupt = <0x1>;			\
++			xlnx,gpi-size = <0x20>;				\
++			xlnx,use-gpi = <0x1>;				\
++		};							\
++		pmc_ppu ## X ## _io_gpi3: pmc_ppu ## X ## _gpi@28 {	\
++			#gpio-cells = <1>;				\
++			gpio-controller;				\
++			compatible = "xlnx,io-gpi-1.02.a", "xlnx,io_gpi"; \
++			interrupt-parent = <&pmc_ppu ## X ## _io_intc>;	\
++			interrupts = <13>;				\
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(28) 0x4>;	\
++			xlnx,gpi-interrupt = <0x1>;			\
++			xlnx,gpi-size = <0x20>;				\
++			xlnx,use-gpi = <0x1>;				\
++		};							\
++		pmc_ppu ## X ## _io_gpi4: pmc_ppu ## X ## _gpi@2c {	\
++			#gpio-cells = <1>;				\
++			gpio-controller;				\
++			compatible = "xlnx,io-gpi-1.02.a", "xlnx,io_gpi"; \
++			interrupt-parent = <&pmc_ppu ## X ## _io_intc>;	\
++			interrupts = <14>;				\
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(2c) 0x4>;	\
++			xlnx,gpi-interrupt = <0x1>;			\
++			xlnx,gpi-size = <0x20>;				\
++			xlnx,use-gpi = <0x1>;				\
++		};							\
++									\
++		pmc_ppu ## X ## _io_gpo1: pmc_ppu ## X ## _gpo@10 {	\
++			#gpio-cells = <1>;				\
++			gpio-controller;				\
++			compatible = "xlnx,io-gpo-1.02.a", "xlnx,io_gpo"; \
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(10) 0x4>;	\
++			xlnx,gpo-init = <0x0>;				\
++			xlnx,gpo-size = <0x9>;				\
++			xlnx,use-gpo = <0x1>;				\
++		};							\
++		pmc_ppu ## X ## _io_gpo2: pmc_ppu ## X ## _gpo@14 {	\
++			#gpio-cells = <1>;				\
++			gpio-controller;				\
++			compatible = "xlnx,io-gpo-1.02.a", "xlnx,io_gpo"; \
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(14) 0x4>;	\
++			xlnx,gpo-init = <0x0>;				\
++			xlnx,gpo-size = <0x20>;				\
++			xlnx,use-gpo = <0x1>;				\
++		};							\
++		pmc_ppu ## X ## _io_gpo3: pmc_ppu ## X ## _gpo@18 {	\
++			#gpio-cells = <1>;				\
++			gpio-controller;				\
++			compatible = "xlnx,io-gpo-1.02.a", "xlnx,io_gpo"; \
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(18) 0x4>;	\
++			xlnx,gpo-init = <0x0>;				\
++			xlnx,gpo-size = <0x20>;				\
++			xlnx,use-gpo = <0x1>;				\
++		};							\
++		pmc_ppu ## X ## _io_gpo4: pmc_ppu ## X ## _gpo@1c {	\
++			#gpio-cells = <1>;				\
++			gpio-controller;				\
++			compatible = "xlnx,io-gpo-1.02.a", "xlnx,io_gpo"; \
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(1c) 0x4>;	\
++			xlnx,gpo-init = <0x0>;				\
++			xlnx,gpo-size = <0x20>;				\
++			xlnx,use-gpo = <0x1>;				\
++		};							\
++									\
++		pmc_ppu ## X ## _io_pit1: pmc_ppu ## X ## _pit@40 {	\
++			compatible = "xlnx,io-pit-1.02.a", "xlnx,io_pit"; \
++			interrupt-parent = <&pmc_ppu ## X ## _io_intc>;	\
++			interrupts = <3>;				\
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(40) 0xc>;	\
++			xlnx,pit-interrupt = <0x1>;			\
++			xlnx,pit-prescaler = <0x9>;			\
++			xlnx,pit-readable = <0x1>;			\
++			xlnx,pit-size = <0x20>;				\
++			xlnx,use-pit = <0x1>;				\
++			frequency = <460000000>;			\
++			gpios = <&pmc_ppu ## X ## _io_gpo1 1 &pmc_ppu ## X ## _io_pit2 0>; \
++			gpio-names = "ps_config","ps_hit_in";		\
++			gpio-controller;				\
++			#gpio-cells = <1>;				\
++		};							\
++		pmc_ppu ## X ## _io_pit2: pmc_ppu ## X ## _pit@50 {	\
++			compatible = "xlnx,io-pit-1.02.a", "xlnx,io_pit"; \
++			interrupt-parent = <&pmc_ppu ## X ## _io_intc>;	\
++			interrupts = <4>;				\
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(50) 0xc>;	\
++			xlnx,pit-interrupt = <0x1>;			\
++			xlnx,pit-prescaler = <0x9>;			\
++			xlnx,pit-readable = <0x1>;			\
++			xlnx,pit-size = <0x20>;				\
++			xlnx,use-pit = <0x1>;				\
++			frequency = <460000000>;			\
++			gpio-controller;				\
++			#gpio-cells = <1>;				\
++		};							\
++		pmc_ppu ## X ## _io_pit3: pmc_ppu ## X ## _pit@60 {	\
++			compatible = "xlnx,io-pit-1.02.a", "xlnx,io_pit"; \
++			interrupt-parent = <&pmc_ppu ## X ## _io_intc>;	\
++			interrupts = <5>;				\
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(60) 0xc>;	\
++			xlnx,pit-interrupt = <0x1>;			\
++			xlnx,pit-prescaler = <0x9>;			\
++			xlnx,pit-readable = <0x1>;			\
++			xlnx,pit-size = <0x20>;				\
++			xlnx,use-pit = <0x1>;				\
++			frequency = <460000000>;			\
++			gpios = <&pmc_ppu ## X ## _io_gpo1 6 &pmc_ppu ## X ## _io_pit4 0>; \
++			gpio-names = "ps_config","ps_hit_in";		\
++			gpio-controller;				\
++			#gpio-cells = <1>;				\
++		};							\
++		pmc_ppu ## X ## _io_pit4: pmc_ppu ## X ## _pit@70 {	\
++			compatible = "xlnx,io-pit-1.02.a", "xlnx,io_pit"; \
++			interrupt-parent = <&pmc_ppu ## X ## _io_intc>;	\
++			interrupts = <6>;				\
++			reg = <0x0 MM_PMC_PPU ## X ## _IOM(70) 0xc>;	\
++			xlnx,pit-interrupt = <0x1>;			\
++			xlnx,pit-prescaler = <0x9>;			\
++			xlnx,pit-readable = <0x1>;			\
++			xlnx,pit-size = <0x20>;				\
++			xlnx,use-pit = <0x1>;				\
++			frequency = <460000000>;			\
++			gpio-controller;				\
++			#gpio-cells = <1>;				\
++		};							\
++	}
++
++/ {
++	/* MDM UARTs. We put them here for instantiation ordering purposes
++         * making sure that -serial command line options refer to these
++	 * first.
++         */
++	ppu0_mdm_uart@MM_PMC_PPU0_MDM_HSD {
++		doc-status = "complete";
++		compatible = "xlnx,xps-uartlite";
++		reg-extended = <&lmb_pmc_ppu0 0x0 MM_PMC_PPU0_MDM_HSD 0x0 0x10 0x1>;
++		chardev = "serial2";
++	};
++
++	ppu1_mdm_uart@MM_PMC_PPU1_MDM_HSD {
++		doc-status = "complete";
++		compatible = "xlnx,xps-uartlite";
++		reg-extended = <&lmb_pmc_ppu1 0x0 MM_PMC_PPU1_MDM_HSD 0x0 0x10 0x1>;
++		chardev = "serial3";
++	};
++};
++
++&lmb_pmc_ppu0 {
++	doc-name = "LMB PPU0";
++	doc-status = "complete";
++	CREATE_PPU_IOMOD(0);
++};
++
++&lmb_pmc_ppu1 {
++	doc-name = "LMB PPU1";
++	doc-status = "complete";
++	CREATE_PPU_IOMOD(1);
++};
++
++&amba_pmc_ppu {
++	pmc_gic_proxy: pmc_gic_proxy@0 {
++		doc-status = "complete";
++		#interrupt-cells = <3>;
++		interrupt-controller;
++
++		compatible = "xlnx,zynqmp-gicp";
++		reg = <0x0 MM_PMC_GIC_PROXY 0x0 MM_PMC_GIC_PROXY_SIZE 0x0>;
++		interrupt-parent = <&pmc_ppu1_io_intc>;
++		interrupts = <IRQ_PPU1_INTC_PMC_GICP>;
++	};
++};
++
+diff --git a/versal-ps-iou-alt.dtsi b/versal-ps-iou-alt.dtsi
+new file mode 100644
+index 00000000..a6c22b86
+--- /dev/null
++++ b/versal-ps-iou-alt.dtsi
+@@ -0,0 +1,467 @@
++/*
++ * Versal PS IOU
++ *
++ * Copyright (C) 2016-2022, Xilinx, Inc.
++ * Copyright (C) 2023, Advanced Micro Devices, Inc.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above copyright
++ *       notice, this list of conditions and the following disclaimer in the
++ *       documentation and/or other materials provided with the distribution.
++ *     * Neither the name of the <organization> nor the
++ *       names of its contributors may be used to endorse or promote products
++ *       derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include "versal.dtsh"
++
++#define GEM(g_name, g_base, g_size, g_dma, g_irq, rst_idx, pwr_idx)	\
++g_name: ethernet@g_base {						\
++	#address-cells = <1>;						\
++	#size-cells = <0>;						\
++	#priority-cells = <0>;						\
++	compatible = "cdns,gem";					\
++	interrupts = <g_irq g_irq>;					\
++	dma = <g_dma>;							\
++	memattr = <& ## g_name ## _memattr_smid>;				\
++	memattr-write = <& ## g_name ## _w_memattr_smid>;			\
++	reg = <0x0 g_base 0x0 g_size 0x0>;				\
++	num-priority-queues = <2>;					\
++	reset-gpios = <&crl rst_idx>;					\
++	power-gpios = <&psm_local pwr_idx>;				\
++}
++
++// FIXME: Add support for SMIDs
++#define ZDMA_CHANNEL(zname, zdomain, zbase, zirq, zbuswidth, zdma, mid, num)	\
++zname ## _mattr: zname ## mattr {					\
++	compatible = "qemu:memory-transaction-attr";			\
++	requester-id = <mid>;						\
++};									\
++									\
++zname: dma-controller@zbase {							\
++	compatible = "xlnx,zdma";					\
++	reg = <0x0 zbase 0x0 MM_ADMA_CH0_SIZE 0x0>;			\
++	bus-width = <zbuswidth>;					\
++	has-parity = <1>;							\
++	interrupts = <zirq>;						\
++	#stream-id-cells = <0x1>;					\
++	dma = <zdma>;							\
++	memattr = <& ## zname ## _mattr>;				\
++	reset-gpios = < &crl CRL_RST_ADMA >;				\
++	#gpio-cells = <1>;	\
++	gpio-names = "memattr-secure";	\
++	gpios = <&lpd_slcr_secure num>;	\
++}
++
++/*
++ * Our XRAM model only has the correctable interrupt line.
++ * All instances connect to a single line in the GIC.
++ *
++ * To support shared memories for co-sim, we provide the
++ * actual RAMs externally and not from the XRAMC model.
++ */
++#define XRAM_CTRL(n) xram_ctrl_ ## n {	\
++	compatible = "xlnx,versal-xramc";		\
++	reg = <0x0 (MM_XRAM + 0x## n ##0000) 0 0x10000 0x0 >;	\
++	interrupts = <XRAM_IRQ_0>;			\
++	alloc-ram = <0>;				\
++}
++
++&amba_fpd {
++#ifdef MM_FPD_FPD_APU
++	apu_ctrl: apu_ctrl@MM_FPD_FPD_APU {
++		compatible = "xlnx,versal-apu-ctrl";
++		reg = <0x0 MM_FPD_FPD_APU 0x0 MM_FPD_FPD_APU_SIZE 0x0>;
++		cpu0 = <&cpu0>;
++		cpu1 = <&cpu1>;
++		#gpio-cells = <1>;
++	};
++#endif
++
++	afi_fm@MM_FPD_FPD_AFIFM0 {
++		compatible = "xlnx,versal-afi-fm";
++		reg = <0x0 MM_FPD_FPD_AFIFM0 0x0 MM_FPD_FPD_AFIFM0_SIZE 0x0>;
++	};
++
++	afi_fm@MM_FPD_FPD_AFIFM2 {
++		compatible = "xlnx,versal-afi-fm";
++		reg = <0x0 MM_FPD_FPD_AFIFM2 0x0 MM_FPD_FPD_AFIFM2_SIZE 0x0>;
++	};
++
++#ifdef MM_FPD_FPD_GPCCI
++	cci_reg@MM_FPD_FPD_GPCCI {
++		compatible = "xlnx,cci_reg";
++		reg = <0x0 MM_FPD_FPD_GPCCI 0x0 MM_FPD_FPD_MAINCCI_SIZE 0x0>;
++	};
++#endif
++
++#ifdef MM_FPD_FPD_MAINCCI
++	cci500@MM_FPD_FPD_MAINCCI {
++		compatible = "xlnx,cci500";
++		reg = <0x0 MM_FPD_FPD_MAINCCI 0x0 MM_FPD_FPD_MAINCCI_SIZE 0x0>;
++	};
++#endif
++
++	cpm_crcpm@MM_CPM_CPM_CRCPM {
++		compatible = "xlnx,versal_cpm_crcpm";
++		reg = <0x0 MM_CPM_CPM_CRCPM 0x0 MM_CPM_CPM_CRCPM_SIZE 0x0>;
++	};
++
++	cpm_pcsr@MM_CPM_CPM_PCSR {
++		compatible = "xlnx,versal_cpm_pcsr";
++		reg = <0x0 MM_CPM_CPM_PCSR 0x0 MM_CPM_CPM_PCSR_SIZE 0x0>;
++	};
++
++	cpm_slcr_secure@MM_CPM_CPM_SLCR_SECURE {
++		compatible = "xlnx.cpm_slcr_secure";
++		reg = <0x0 MM_CPM_CPM_SLCR_SECURE 0x0 MM_CPM_CPM_SLCR_SECURE_SIZE 0x0>;
++	};
++
++	fpd_slcr@MM_FPD_FPD_SLCR {
++		compatible = "xlnx,versal-fpd-slcr";
++		interrupts = <SLCR_FPD_APB_IRQ_0>;
++		reg = <0x0 MM_FPD_FPD_SLCR 0x0 MM_FPD_FPD_SLCR_SIZE 0x0>;
++	};
++
++	fpd_slcr_secure@MM_FPD_FPD_SLCR {
++		compatible = "xlnx,versal-fpd-slcr-secure";
++		interrupts = <SLCR_SECURE_FPD_APB_IRQ_0>;
++		reg = <0x0 MM_FPD_FPD_SLCR_SECURE 0x0 MM_FPD_FPD_SLCR_SECURE_SIZE 0x0>;
++	};
++
++#ifdef MM_FPD_FPD_WWDT
++	wwdt0: watchdog@MM_FPD_FPD_WWDT {
++		compatible = "xlnx,versal-wwdt";
++		reg = <0x0 MM_FPD_FPD_WWDT 0x0 MM_FPD_FPD_WWDT_SIZE 0x0>;
++		/* IRQ order must match the QEMU model */
++		interrupts = <FP_WDT_IRQ_0
++					FPD_WWDT_RST_PENDING_IRQ_0
++					FPD_GWDT_WS0_IRQ_0
++					FPD_GWDT_WS1_IRQ_0>;
++		pclk = <100000000>;
++		reset-gpios = <&crf 27>;
++	};
++#endif
++#ifdef MM_FPD_INTFPD_CONFIG
++	intfpd: intfpd@MM_FPD_INTFPD_CONFIG {
++		compatible = "xlnx-intfpd-config";
++		reg = <0x0 MM_FPD_INTFPD_CONFIG 0x0 MM_FPD_INTFPD_CONFIG_SIZE 0x0>;
++		interrupts = <
++		#if FPD_APB_INT_IRQ_0
++				FPD_APB_INT_IRQ_0
++		#elif  INT_FPD_IRQ_0
++				INT_FPD_IRQ_0
++		#endif
++		>;
++	};
++#endif
++};
++
++&amba_lpd {
++	GEM(gem0, MM_GEM0, MM_GEM0_SIZE, &smmu_tbu0, GEM0_IRQ_0, CRL_RST_GEM0, PLR_PWR_GEM0);
++	GEM(gem1, MM_GEM1, MM_GEM1_SIZE, &smmu_tbu0, GEM1_IRQ_0, CRL_RST_GEM1, PLR_PWR_GEM1);
++
++	serial0: serial@MM_UART0 {
++		compatible = "pl011";
++		interrupts = <UART0_IRQ_0>;
++		reg = <0x0 MM_UART0 0x0 MM_UART0_SIZE 0x0 >;
++		reset-gpios = < &crl CRL_RST_UART0 >;
++		chardev = "serial0";
++	};
++	serial1: serial@MM_UART1 {
++		compatible = "pl011";
++		interrupts = <UART1_IRQ_0>;
++		reg = <0x0 MM_UART1 0x0 MM_UART1_SIZE 0x0 >;
++		reset-gpios = < &crl CRL_RST_UART1 >;
++		chardev = "serial1";
++	};
++
++	canfdbus0: canfdbus@0 {
++		compatible = "can-bus";
++	};
++
++	can0: can@MM_CANFD0 {
++		compatible = "xlnx,versal-canfd";
++		rx-fifo0 = <0x40>;
++		rx-fifo1 = <0x40>;
++		enable-rx-fifo1 = <0x1>;
++		canfdbus = <&canfdbus0>;
++		interrupts = <CAN0_IRQ_0>;
++		reg = <0x0 MM_CANFD0 0x0 MM_CANFD0_SIZE 0x0>;
++		reset-gpios = <&crl CRL_RST_CAN0>;
++	};
++	can1: can@MM_CANFD1 {
++		compatible = "xlnx,versal-canfd";
++		rx-fifo0 = <0x40>;
++		rx-fifo1 = <0x40>;
++		enable-rx-fifo1 = <0x1>;
++		canfdbus = <&canfdbus0>;
++		interrupts = <CAN1_IRQ_0>;
++		reg = <0x0 MM_CANFD1 0x0 MM_CANFD1_SIZE 0x0>;
++		reset-gpios = <&crl CRL_RST_CAN1>;
++	};
++
++	crl: crl@MM_CRL {
++		compatible = "xlnx,versal-crl";
++		reg = <0x0 MM_CRL 0x0 MM_CRL_SIZE 0x0>;
++		gpio-controller;
++		#gpio-cells = <1>;
++	};
++
++	lpd_iou_slcr: slcr@MM_LPD_IOU_SLCR {
++		compatible = "xlnx,versal-lpd-iou-slcr";
++		reg = <0x0 MM_LPD_IOU_SLCR 0x0 MM_LPD_IOU_SLCR_SIZE 0x0>;
++	};
++
++#ifdef MM_RPU
++	rpu_ctrl: rpu_ctrl@MM_RPU {
++		compatible = "xlnx,versal-rpu";
++		reg-extended = <&amba_lpd 0x0 MM_RPU 0x0 MM_RPU_SIZE 0x0
++                                &amba_r5_0 0x0 0x0 0x0 0x80000 0x0
++                                &amba 0x0 MM_R5_0_ATCM 0x0 0x60000 0x0
++                                &amba_r5_1 0x0 0x0 0x0 0x80000 0x0
++                                &amba 0x0 0xFFE90000 0x0 0x50000 0x0>;
++		rpu0 = <&rpu_cpu0>;
++		rpu1 = <&rpu_cpu1>;
++
++		gpio-controller;
++		#gpio-cells = <1>;
++
++		gpios = < &crl CRL_RST_CPU_R5_0 &crl CRL_RST_CPU_R5_1
++			  &psm_local 42 &psm_local 43
++			>;
++	};
++#endif
++
++	ipi: ipi@MM_IPI {
++		compatible = "xlnx,versal-ipi";
++		reg = <0x0 MM_IPI 0x0 MM_IPI_SIZE 0x0>;
++
++		/* Interrupt ordering here needs to match
++		 * QEMU's sysbus-irq output order.  */
++		interrupts = <IPI_PSM_IRQ_0
++			      IPI_PMC_IRQ_0
++			      IPI0_IRQ_0 IPI1_IRQ_0
++			      IPI2_IRQ_0 IPI3_IRQ_0
++			      IPI4_IRQ_0 IPI5_IRQ_0
++			      IPI6_IRQ_0
++			      IPI_PMC_NOBUF_IRQ_0
++			      IPI_APB_IRQ_0>;
++		reset-gpios = <&crl CRL_RST_IPI>;
++	};
++
++	spi0: spi@MM_SPI0 {
++		compatible = "cdns,spi-r1p6";
++		interrupts = <SPI0_IRQ_0>;
++		num-ss-bits = <4>;
++		reg = <0x0 MM_SPI0 0x0 MM_SPI0_SIZE 0x0 >;
++
++		#address-cells = <1>; /* For child; must match SPI_FLASH() */
++		#size-cells = <0>;
++		#bus-cells = <1>;
++		reset-gpios = <&crl CRL_RST_SPI0>;
++	};
++	spi1: spi@MM_SPI1 {
++		compatible = "cdns,spi-r1p6";
++		interrupts = <SPI1_IRQ_0>;
++		num-ss-bits = <4>;
++		reg = <0x0 MM_SPI1 0x0 MM_SPI1_SIZE 0x0 >;
++
++		#address-cells = <1>; /* For child; must match SPI_FLASH() */
++		#size-cells = <0>;
++		#bus-cells = <1>;
++		reset-gpios = <&crl CRL_RST_SPI1>;
++	};
++
++	dwc3_0: usb2@USB2_0_XHCI {
++		compatible = "usb_dwc3";
++		reg = <0x0 MM_USB_DWC3_0 0x0 MM_USB_DWC3_0_SIZE 0x0 0x0 MM_USB_XHCI 0x0 MM_USB_XHCI_SIZE 0x0>;
++		interrupts = <USB2_IRQ_0 USB2_IRQ_1 USB2_IRQ_2 USB2_IRQ_3>;
++		dma = <&smmu_tbu0>;
++		memattr = <&usb0_memattr>;
++		reset-gpios = <&crl CRL_RST_USB0>;
++		intrs = <4>;
++		slots = <2>;
++	};
++
++	ttc0: timer@MM_TTC0 {
++		compatible = "xlnx,ps7-ttc-1.00.a";
++		interrupts = <TTC0_IRQ_0 TTC0_IRQ_1 TTC0_IRQ_2>;
++		reg = <0x0 MM_TTC0 0x0 MM_TTC0_SIZE 0x0>;
++		width = <32>;
++		reset-gpios = < &crl CRL_RST_TTC0 >;
++	};
++	ttc1: timer@MM_TTC1 {
++		compatible = "xlnx,ps7-ttc-1.00.a";
++		interrupts = <TTC1_IRQ_0 TTC1_IRQ_1 TTC1_IRQ_2>;
++		reg = <0x0 MM_TTC1 0x0 MM_TTC1_SIZE 0x0>;
++		width = <32>;
++		reset-gpios = < &crl CRL_RST_TTC1 >;
++	};
++	ttc2: timer@MM_TTC2 {
++		compatible = "xlnx,ps7-ttc-1.00.a";
++		interrupts = <TTC2_IRQ_0 TTC2_IRQ_1 TTC2_IRQ_2>;
++		reg = <0x0 MM_TTC2 0x0 MM_TTC2_SIZE 0x0>;
++		width = <32>;
++		reset-gpios = < &crl CRL_RST_TTC2 >;
++	};
++	ttc3: timer@MM_TTC3 {
++		compatible = "xlnx,ps7-ttc-1.00.a";
++		interrupts = <TTC3_IRQ_0 TTC3_IRQ_1 TTC3_IRQ_2>;
++		reg = <0x0 MM_TTC3 0x0 MM_TTC3_SIZE 0x0>;
++		width = <32>;
++		reset-gpios = < &crl CRL_RST_TTC3 >;
++	};
++
++	ZDMA_CHANNEL(adma0, adma, MM_ADMA_CH0, ADMA_IRQ_0, 128, &smmu_tbu0, SMID_DMA0_CH0, 0x0);
++	ZDMA_CHANNEL(adma1, adma, MM_ADMA_CH1, ADMA_IRQ_1, 128, &smmu_tbu0, SMID_DMA0_CH1, 0x1);
++	ZDMA_CHANNEL(adma2, adma, MM_ADMA_CH2, ADMA_IRQ_2, 128, &smmu_tbu0, SMID_DMA0_CH2, 0x2);
++	ZDMA_CHANNEL(adma3, adma, MM_ADMA_CH3, ADMA_IRQ_3, 128, &smmu_tbu0, SMID_DMA0_CH3, 0x3);
++	ZDMA_CHANNEL(adma4, adma, MM_ADMA_CH4, ADMA_IRQ_4, 128, &smmu_tbu0, SMID_DMA0_CH4, 0x4);
++	ZDMA_CHANNEL(adma5, adma, MM_ADMA_CH5, ADMA_IRQ_5, 128, &smmu_tbu0, SMID_DMA0_CH5, 0x5);
++	ZDMA_CHANNEL(adma6, adma, MM_ADMA_CH6, ADMA_IRQ_6, 128, &smmu_tbu0, SMID_DMA0_CH6, 0x6);
++	ZDMA_CHANNEL(adma7, adma, MM_ADMA_CH7, ADMA_IRQ_7, 128, &smmu_tbu0, SMID_DMA0_CH7, 0x7);
++
++	afi_fm@MM_LPD_AFIFM4 {
++		compatible = "xlnx,versal-afi-fm";
++		reg = <0x0 MM_LPD_AFIFM4 0x0 MM_LPD_AFIFM4_SIZE 0x0>;
++	};
++
++	lpd_i2c_wrapper {
++#ifdef MM_PS_I2C0
++		ps_i2c0: ps_i2c0@MM_PS_I2C0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "xlnx,ps7-i2c-1.00.a", "cdns,i2c-r1p10";
++			interrupts = <I2C0_IRQ_0>;
++			reg-extended = <&amba_lpd 0x0 MM_PS_I2C0 0x0 MM_PS_I2C0_SIZE 0x0>;
++			reset-gpios = <&crl CRL_RST_I2C0>;
++		};
++		ps_i2c1: ps_i2c0@MM_PS_I2C1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			compatible = "xlnx,ps7-i2c-1.00.a", "cdns,i2c-r1p10";
++			interrupts = <I2C1_IRQ_0>;
++			reg-extended = <&amba_lpd 0x0 MM_PS_I2C1 0x0 MM_PS_I2C1_SIZE 0x0>;
++			reset-gpios = <&crl CRL_RST_I2C1>;
++		};
++#endif
++	};
++
++	ocm_ctrl0: ocm_ctrl@OCM {
++		compatible = "xlnx,zynqmp-ocmc";
++		interrupts = <OCMINTR_IRQ_0>;
++		memsize = <MM_OCM_MEM_SIZE>;
++		reg = <0x0 MM_OCM 0x0 MM_OCM_SIZE 0x0>;
++		reset-gpios = <&crl CRL_RST_OCM>;
++	};
++
++#ifdef MM_XRAM_SLCR
++	xram_slcr@MM_XRAM_SLCR {
++		compatible = "xlnx,xram_slcr";
++		reg = <0x0 MM_XRAM_SLCR 0x0 MM_XRAM_SLCR_SIZE 0x0>;
++	};
++#endif
++
++	lpd_slcr@MM_LPD_SLCR {
++		compatible = "xlnx,versal-lpd-slcr";
++		reg = <0x0 MM_LPD_SLCR 0x0 MM_LPD_SLCR_SIZE 0x0>;
++	};
++
++	lpd_slcr_secure: lpd_slcr_secure@MM_LPD_SLCR_SECURE {
++		compatible = "xlnx,versal-lpd-slcr-secure";
++		reg = <0x0 MM_LPD_SLCR_SECURE 0x0 MM_LPD_SLCR_SECURE_SIZE 0x0>;
++		gpio-controller;
++		#gpio-cells = <1>;
++	};
++
++	lpd_iou_slcr_secure: lpd_iou_slcr_secure@MM_LPD_IOU_SECURE_SLCR {
++		compatible = "xlnx,versal-lpd-iou-slcr-secure";
++		reg = <0x0 MM_LPD_IOU_SECURE_SLCR 0x0 MM_LPD_IOU_SECURE_SLCR_SIZE 0x0>;
++		memattr-gem0 = <&gem0_memattr_smid>;
++		memattr-write-gem0 = <&gem0_w_memattr_smid>;
++		memattr-gem1 = <&gem1_memattr_smid>;
++		memattr-write-gem1 = <&gem1_w_memattr_smid>;
++	};
++
++#ifdef MM_WWDT
++	lpd_wwdt: wwdt@MM_WWDT {
++		compatible = "xlnx,versal-wwdt";
++		reg = <0x0 MM_WWDT 0x0 MM_WWDT_SIZE 0x0>;
++		/* IRQ order must match the QEMU model */
++		interrupts = <WWDT_IRQ_0
++					WWDT_RST_PENDING_IRQ_0
++					GWDT_WS0_IRQ_0
++					GWDT_WS1_IRQ_0>;
++		pclk = <100000000>;
++		reset-gpios = <&crl CRL_RST_SWDT>;
++	};
++#endif
++
++	lpd_gpio: lpd_gpio@MM_PS_GPIO {
++		#gpio-cells = <1>;
++		compatible = "xlnx,zynqmp-gpio";
++		gpio-controller;
++		interrupts = <GPIO_IRQ_0>;
++		reg = <0x0 MM_PS_GPIO 0x0 MM_PS_GPIO_SIZE 0x0>;
++		reset-gpios = < &crl CRL_RST_GPIO >;
++	};
++#ifdef MM_INTLPD_CONFIG
++	intlpd: intlpd@MM_INTLPD_CONFIG {
++		compatible = "xlnx-intlpd-config";
++		reg = <0x0 MM_INTLPD_CONFIG 0x0 MM_INTLPD_CONFIG_SIZE 0x0>;
++		interrupts = <INT_LPD_IRQ_0>;
++	};
++#endif
++};
++
++&amba_xram {
++	XRAM_CTRL(0);
++	XRAM_CTRL(1);
++	XRAM_CTRL(2);
++	XRAM_CTRL(3);
++};
++
++&amba_root {
++	/* These devices need to be created before the CPUs.  */
++	crf: crf@MM_FPD_CRF {
++		compatible = "xlnx,versal-crf";
++		reg-extended = <&amba_fpd 0x0 MM_FPD_CRF 0x0 MM_FPD_CRF_SIZE 0x0>;
++		gpio-controller;
++		#gpio-cells = <1>;
++	};
++};
++
++/ {
++	/* Reset domains.  */
++	lpd_reset_domain@0 {
++		compatible = "qemu,reset-domain";
++		mr0 = <&amba_lpd>;
++		reset-gpios = < &pmc_clk_rst CRP_RST_PS_PS_SRST
++				&pmc_clk_rst CRP_RST_PS_PS_POR >;
++	};
++
++	fpd_reset_domain@0 {
++		compatible = "qemu,reset-domain";
++		mr0 = <&amba_fpd>;
++		reset-gpios = < &pmc_clk_rst CRP_RST_PS_PS_SRST
++				&pmc_clk_rst CRP_RST_PS_PS_POR
++				&crl CRL_RST_FPD_POR
++				&crl CRL_RST_FPD_SRST >;
++	};
++};
+-- 
+2.34.1
+

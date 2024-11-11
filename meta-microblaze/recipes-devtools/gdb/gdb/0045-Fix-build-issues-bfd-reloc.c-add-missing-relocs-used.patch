@@ -1,0 +1,61 @@
+From b2377a83918c814fd3b6ee2cd46a5f413f97a08e Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 28 Mar 2024 15:37:11 +0530
+Subject: [PATCH 45/54] Fix build issues - bfd/reloc.c add missing relocs used
+ elsewhere
+
+	BFD_RELOC_MICROBLAZE_EA64
+	BFD_RELOC_MICROBLAZE_64_GPC
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/reloc.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/bfd/reloc.c b/bfd/reloc.c
+index fc28e27662f..5afe1518cd0 100644
+--- a/bfd/reloc.c
++++ b/bfd/reloc.c
+@@ -6672,13 +6672,19 @@ ENUMDOC
+   This is a 64 bit reloc that stores 64-bit thread pointer relative offset
+   to two words (uses imml instruction).
+ ENUM
+-BFD_RELOC_MICROBLAZE_64,
++BFD_RELOC_MICROBLAZE_64
+ ENUMDOC
+  This is a 64 bit reloc that stores the 64 bit pc relative
+  value in two words (with an imml instruction).  No relocation is
+  done here - only used for relaxing
+ ENUM
+-BFD_RELOC_MICROBLAZE_64_PCREL,
++BFD_RELOC_MICROBLAZE_EA64
++ENUMDOC
++ This is a 64 bit reloc that stores the 64 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
++ENUM
++BFD_RELOC_MICROBLAZE_64_PCREL
+ ENUMDOC
+  This is a 32 bit reloc that stores the 32 bit pc relative
+  value in two words (with an imml instruction).  No relocation is
+@@ -6721,13 +6727,13 @@ ENUMDOC
+   value in two words (with an imml instruction).  No relocation is
+   done here - only used for relaxing
+ ENUM
+-BFD_RELOC_MICROBLAZE_64_PCREL,
++BFD_RELOC_MICROBLAZE_64_GOTPC
+ ENUMDOC
+- This is a 32 bit reloc that stores the 32 bit pc relative
++ This is a 64 bit reloc that stores the 32 bit pc relative
+  value in two words (with an imml instruction).  No relocation is
+  done here - only used for relaxing
+ ENUM
+-  BFD_RELOC_MICROBLAZE_64_GOTPC
++  BFD_RELOC_MICROBLAZE_64_GPC
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imml instruction).  No relocation is
+-- 
+2.34.1
+

@@ -13,8 +13,8 @@ PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl virtual/libgbm"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 REPO ?= "git://github.com/Xilinx/mali-userspace-binaries.git;protocol=https"
-BRANCH ?= "xlnx_rel_v2024.1"
-SRCREV ?= "b3a772aad859cdadc8513b11c3e995546c20e75e"
+BRANCH ?= "xlnx_rel_v2024.2"
+SRCREV ?= "644dc96597172e3cf15aea63b4ee947d421810aa"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 
 SRC_URI = " \
@@ -55,6 +55,7 @@ USE_FB = "${@bb.utils.contains("DISTRO_FEATURES", "fbdev", "yes", "no", d)}"
 USE_WL = "${@bb.utils.contains("DISTRO_FEATURES", "wayland", "yes", "no", d)}"
 
 MONOLITHIC_LIBMALI = "libMali.so.9.0"
+MONOLITHIC_LIBMALI_MVL = "libMali.so.9"
 
 do_install() {
     #Identify the ARCH type
@@ -88,6 +89,11 @@ do_install() {
 
     install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/headless/${MONOLITHIC_LIBMALI} ${D}${libdir}/headless/${MONOLITHIC_LIBMALI}
     ln -snf headless/${MONOLITHIC_LIBMALI} ${D}${libdir}/${MONOLITHIC_LIBMALI}
+    ln -snf ${MONOLITHIC_LIBMALI} ${D}${libdir}/headless/${MONOLITHIC_LIBMALI_MVL}
+
+    # install gbm
+    install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
+    install -m 0644 ${WORKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
 
     if [ "${USE_FB}" = "yes" ]; then
         install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/fbdev/${MONOLITHIC_LIBMALI} ${D}${libdir}/fbdev/${MONOLITHIC_LIBMALI}
@@ -105,8 +111,6 @@ do_install() {
         sed -i -e 's/^#if defined(MESA_EGL_NO_X11_HEADERS)$/#if (1)/' ${D}${includedir}/EGL/eglplatform.h
     fi
     if [ "${USE_WL}" = "yes" ]; then
-        install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
-        install -m 0644 ${WORKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
         install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/wayland/${MONOLITHIC_LIBMALI} ${D}${libdir}/wayland/${MONOLITHIC_LIBMALI}
         if [ "${MALI_BACKEND_DEFAULT}" = "wayland" ]; then
             ln -snf wayland/${MONOLITHIC_LIBMALI} ${D}${libdir}/${MONOLITHIC_LIBMALI}

@@ -1,0 +1,39 @@
+From 1e1afa48034869d4a1520c405b56c3a574b3f4ba Mon Sep 17 00:00:00 2001
+From: Anil Kumar M <amamidal@xilinx.com>
+Date: Mon, 24 Feb 2020 14:45:46 +0530
+Subject: [PATCH] v4l-utils: Add support for new media bus codes
+
+Add new media bus format codes for supporting xilinx
+specific formats.
+
+Signed-off-by: Anil Kumar M <amamidal@xilinx.com>
+Signed-off-by: Adrian Fiergolski <Adrian.Fiergolski@fastree3d.com>
+---
+ include/linux/media-bus-format.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/include/linux/media-bus-format.h b/include/linux/media-bus-format.h
+index f05f747e..45f6707d 100644
+--- a/include/linux/media-bus-format.h
++++ b/include/linux/media-bus-format.h
+@@ -121,6 +121,17 @@
+ #define MEDIA_BUS_FMT_YUV16_1X48		0x202a
+ #define MEDIA_BUS_FMT_UYYVYY16_0_5X48		0x202b
+ 
++/* YUV: Xilinx Specific - next is       0x2108 */
++#define MEDIA_BUS_FMT_VYYUYY8_1X24		0x2100
++#define MEDIA_BUS_FMT_VYYUYY10_4X20		0x2101
++#define MEDIA_BUS_FMT_VUY10_1X30		0x2102
++#define MEDIA_BUS_FMT_UYYVYY12_4X24		0x2103
++#define MEDIA_BUS_FMT_VUY12_1X36		0x2104
++#define MEDIA_BUS_FMT_UYYVYY16_4X32		0x2105
++#define MEDIA_BUS_FMT_VUY16_1X48		0x2106
++#define MEDIA_BUS_FMT_UYVY16_2X32		0x2107
++
++
+ /* Bayer - next is	0x3021 */
+ #define MEDIA_BUS_FMT_SBGGR8_1X8		0x3001
+ #define MEDIA_BUS_FMT_SGBRG8_1X8		0x3013
+-- 
+2.34.1
+

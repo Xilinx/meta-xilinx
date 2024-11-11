@@ -283,7 +283,7 @@ SRC_URI = " \
 
 1. Follow SDT or XSCT Build instructions whichever build method is used but not
    both.
-    a. [SDT Building Instructions](../meta-xilinx-standalone-experimental/README.md) upto step 4.
+    a. [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.md) upto step 4.
     b. [XSCT Building Instructions](../README.building.md)
        upto step 4.b (With SDT overlay).
 2. Create recipes-firmware directory in meta layer and copy the .bit/bin/pdi,
@@ -326,7 +326,7 @@ IMAGE_INSTALL:append = " \
 ```
 6. Follow SDT or XSCT Build instructions whichever build method is used but not
    both.
-    a. [SDT Building Instructions](../meta-xilinx-standalone-experimental/README.md ) and continue from step 5.
+    a. [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.md ) and continue from step 5.
     b. [XSCT Building Instructions](../README.building.md)
        and continue from step 5.
 7. Once images are built firmware app files will be installed on target_rootfs.

@@ -1,0 +1,16 @@
+Use python3 instead of python when calling the mutlib-generator
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
+Index: gcc-13.3.0/gcc/config/riscv/multilib-generator
+===================================================================
+--- gcc-13.3.0.orig/gcc/config/riscv/multilib-generator
++++ gcc-13.3.0/gcc/config/riscv/multilib-generator
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # RISC-V multilib list generator.
+ # Copyright (C) 2011-2023 Free Software Foundation, Inc.

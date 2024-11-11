@@ -1,0 +1,82 @@
+From 8ec9b2fe49c8e1e367213fa0b8d6b6f0fedc3456 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 1 Nov 2021 19:06:53 +0530
+Subject: [PATCH 20/54] initial support for MicroBlaze 64 bit [-m64]
+
+Conflicts:
+	bfd/elf32-microblaze.c
+	include/elf/common.h
+	ld/Makefile.am
+	ld/Makefile.in
+signed-off-by:Nagaraju Mekala<nmekala@xilinx.com>
+	      Mahesh Bodapati<mbodapat@xilinx.com>
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ ld/emulparams/elf64microblaze.sh   | 23 +++++++++++++++++++++++
+ ld/emulparams/elf64microblazeel.sh | 23 +++++++++++++++++++++++
+ 2 files changed, 46 insertions(+)
+ create mode 100644 ld/emulparams/elf64microblaze.sh
+ create mode 100644 ld/emulparams/elf64microblazeel.sh
+
+diff --git a/ld/emulparams/elf64microblaze.sh b/ld/emulparams/elf64microblaze.sh
+new file mode 100644
+index 00000000000..9c7b0eb7080
+--- /dev/null
++++ b/ld/emulparams/elf64microblaze.sh
+@@ -0,0 +1,23 @@
++SCRIPT_NAME=elfmicroblaze
++OUTPUT_FORMAT="elf64-microblazeel"
++#BIG_OUTPUT_FORMAT="elf64-microblaze"
++LITTLE_OUTPUT_FORMAT="elf64-microblazeel"
++#TEXT_START_ADDR=0
++NONPAGED_TEXT_START_ADDR=0x28
++ALIGNMENT=4
++MAXPAGESIZE=4
++ARCH=microblaze
++EMBEDDED=yes
++
++NOP=0x80000000
++
++# Hmmm, there's got to be a better way.  This sets the stack to the
++# top of the simulator memory (2^19 bytes).
++#PAGE_SIZE=0x1000
++#DATA_ADDR=0x10000
++#OTHER_RELOCATING_SECTIONS='.stack 0x7000 : { _stack = .; *(.stack) }'
++#$@{RELOCATING+ PROVIDE (__stack = 0x7000);@}
++#OTHER_RELOCATING_SECTIONS='PROVIDE (_stack = _end + 0x1000);'
++
++TEMPLATE_NAME=elf32
++#GENERATE_SHLIB_SCRIPT=yes
+diff --git a/ld/emulparams/elf64microblazeel.sh b/ld/emulparams/elf64microblazeel.sh
+new file mode 100644
+index 00000000000..9c7b0eb7080
+--- /dev/null
++++ b/ld/emulparams/elf64microblazeel.sh
+@@ -0,0 +1,23 @@
++SCRIPT_NAME=elfmicroblaze
++OUTPUT_FORMAT="elf64-microblazeel"
++#BIG_OUTPUT_FORMAT="elf64-microblaze"
++LITTLE_OUTPUT_FORMAT="elf64-microblazeel"
++#TEXT_START_ADDR=0
++NONPAGED_TEXT_START_ADDR=0x28
++ALIGNMENT=4
++MAXPAGESIZE=4
++ARCH=microblaze
++EMBEDDED=yes
++
++NOP=0x80000000
++
++# Hmmm, there's got to be a better way.  This sets the stack to the
++# top of the simulator memory (2^19 bytes).
++#PAGE_SIZE=0x1000
++#DATA_ADDR=0x10000
++#OTHER_RELOCATING_SECTIONS='.stack 0x7000 : { _stack = .; *(.stack) }'
++#$@{RELOCATING+ PROVIDE (__stack = 0x7000);@}
++#OTHER_RELOCATING_SECTIONS='PROVIDE (_stack = _end + 0x1000);'
++
++TEMPLATE_NAME=elf32
++#GENERATE_SHLIB_SCRIPT=yes
+-- 
+2.34.1
+

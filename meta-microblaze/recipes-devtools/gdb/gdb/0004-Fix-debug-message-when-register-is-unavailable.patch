@@ -1,0 +1,45 @@
+From a027a1ce861f93bd00d814d6aef28414069330a1 Mon Sep 17 00:00:00 2001
+From: Nathan Rossi <nathan.rossi@petalogix.com>
+Date: Tue, 8 May 2012 18:11:17 +1000
+Subject: [PATCH 04/54] Fix debug message when register is unavailable
+
+Signed-off-by: Nathan Rossi <nathan.rossi@petalogix.com>
+
+Conflicts:
+	gdb/frame.c
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/frame.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/gdb/frame.c b/gdb/frame.c
+index 87fb3d7a2d5..c4d967e01d5 100644
+--- a/gdb/frame.c
++++ b/gdb/frame.c
+@@ -1313,12 +1313,20 @@ frame_unwind_register_value (frame_info_ptr next_frame, int regnum)
+ 	  else
+ 	    {
+ 	      int i;
+-	      gdb::array_view<const gdb_byte> buf = value->contents ();
++
++	      const gdb_byte *buf = NULL;
++	      if (value_entirely_available(value)) {
++	        gdb::array_view<const gdb_byte> buf = value->contents ();
++	      }
+ 
+ 	      gdb_printf (&debug_file, " bytes=");
+ 	      gdb_printf (&debug_file, "[");
+-	      for (i = 0; i < register_size (gdbarch, regnum); i++)
+-		gdb_printf (&debug_file, "%02x", buf[i]);
++	      if (buf != NULL) {
++	        for (i = 0; i < register_size (gdbarch, regnum); i++)
++		  gdb_printf (&debug_file, "%02x", buf[i]);
++	      } else {
++	        gdb_printf (&debug_file, "unavailable");
++	      }
+ 	      gdb_printf (&debug_file, "]");
+ 	    }
+ 	}
+-- 
+2.34.1
+

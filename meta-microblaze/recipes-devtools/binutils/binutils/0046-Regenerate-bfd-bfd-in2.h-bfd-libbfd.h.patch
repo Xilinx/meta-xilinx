@@ -1,0 +1,116 @@
+From 84bb72aa81dddd5f21ac49ddf7b38bce74942cdf Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 28 Mar 2024 15:47:56 +0530
+Subject: [PATCH 46/53] Regenerate - bfd/bfd-in2.h bfd/libbfd.h
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/bfd-in2.h | 70 +++++++++++++++++++++++++--------------------------
+ 1 file changed, 35 insertions(+), 35 deletions(-)
+
+diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
+index cfab5c99b76..96949605e50 100644
+--- a/bfd/bfd-in2.h
++++ b/bfd/bfd-in2.h
+@@ -1771,8 +1771,8 @@ enum bfd_architecture
+   bfd_arch_lm32,      /* Lattice Mico32.  */
+ #define bfd_mach_lm32          1
+   bfd_arch_microblaze,/* Xilinx MicroBlaze.  */
+-#define bfd_mach_microblaze    1
+-#define bfd_mach_microblaze64  2
++#define bfd_mach_microblaze    0
++#define bfd_mach_microblaze64  1
+   bfd_arch_kvx,        /* Kalray VLIW core of the MPPA processor family */
+ #define bfd_mach_kv3_unknown       0
+ #define bfd_mach_kv3_1             1
+@@ -6426,8 +6426,23 @@ enum bfd_reloc_code_real
+   /* Address of a GOT entry.  */
+   BFD_RELOC_MACH_O_ARM64_POINTER_TO_GOT,
+ 
+-  /* This is a 32 bit reloc for the microblaze that stores the low 16
+-     bits of a value.  */
++  /* This is a 64 bit reloc that stores the 64 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing  */
++  BFD_RELOC_MICROBLAZE_64,
++
++  /* This is a 64 bit reloc that stores the 64 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing  */
++  BFD_RELOC_MICROBLAZE_EA64,
++
++  /* This is a 32 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing  */
++  BFD_RELOC_MICROBLAZE_64_PCREL,
++
++  /* This is a 32 bit reloc for the microblaze that stores the
++  low 16 bits of a value  */
+   BFD_RELOC_MICROBLAZE_32_LO,
+ 
+   /* This is a 32 bit pc-relative reloc for the microblaze that stores
+@@ -6446,44 +6461,29 @@ enum bfd_reloc_code_real
+      the form "Symbol Op Symbol".  */
+   BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM,
+ 
+-/* This is a 32 bit reloc that stores the 32 bit pc relative
+-value in two words (with an imm instruction).  No relocation is
+-done here - only used for relaxing  */
++  /* This is a 32 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imm instruction).  No relocation is
++  done here - only used for relaxing  */
+   BFD_RELOC_MICROBLAZE_32_NONE,
+ 
+-/* This is a 64 bit reloc that stores the 32 bit pc relative
+- *  +value in two words (with an imml instruction).  No relocation is
+- *   +done here - only used for relaxing  */
+-    BFD_RELOC_MICROBLAZE_64_PCREL,
+-
+-/* This is a 64 bit reloc that stores the 32 bit relative
+- *  +value in two words (with an imml instruction).  No relocation is
+- *   +done here - only used for relaxing  */
+-    BFD_RELOC_MICROBLAZE_EA64,
+-
+-/* This is a 64 bit reloc that stores the 32 bit pc relative
+- *  +value in two words (with an imm instruction).  No relocation is
+- *   +done here - only used for relaxing  */
+-    BFD_RELOC_MICROBLAZE_64_NONE,
+-
+-  /* This is a 64 bit reloc that stores the 32 bit pc relative value in
+-     two words (with an imm instruction).  No relocation is done here
+-     only used for relaxing  */
+-    BFD_RELOC_MICROBLAZE_64,
++  /* This is a 32 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing  */
++  BFD_RELOC_MICROBLAZE_64_NONE,
+ 
+-/* This is a 64 bit reloc that stores the 32 bit pc relative
+-value in two words (with an imm instruction).  The relocation is
+-PC-relative GOT offset  */
++  /* This is a 64 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imm instruction).  The relocation is
++  PC-relative GOT offset  */
+   BFD_RELOC_MICROBLAZE_64_GOTPC,
+ 
+-/* This is a 64 bit reloc that stores the 32 bit pc relative
+-value in two words (with an imml instruction).  The relocation is
+-PC-relative GOT offset  */
++  /* This is a 64 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing  */
+   BFD_RELOC_MICROBLAZE_64_GPC,
+ 
+-/* This is a 64 bit reloc that stores the 32 bit pc relative
+-value in two words (with an imm instruction).  The relocation is
+-GOT offset  */
++  /* This is a 64 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imm instruction).  The relocation is
++  GOT offset  */
+   BFD_RELOC_MICROBLAZE_64_GOT,
+ 
+   /* This is a 64 bit reloc that stores the 32 bit pc relative value in
+-- 
+2.34.1
+

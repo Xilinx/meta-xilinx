@@ -5,6 +5,7 @@ EXTRA_OECONF:append:xilinx-standalone = " \
 	--enable-plugins \
 	--with-gnu-as \
 	--disable-libitm \
+	--disable-tm-clone-registry \
 "
 
 EXTRA_OECONF:append:aarch64:xilinx-standalone = " \
@@ -24,5 +25,4 @@ EXTRA_OECONF:append:armv8r:xilinx-standalone = " \
 
 EXTRA_OECONF:append:microblaze:xilinx-standalone = " \
 	--without-long-double-128 \
-	--disable-tm-clone-registry \
 	"

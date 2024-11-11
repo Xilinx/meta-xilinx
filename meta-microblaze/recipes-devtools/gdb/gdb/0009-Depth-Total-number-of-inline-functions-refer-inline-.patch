@@ -1,0 +1,74 @@
+From c37f307714121981fa91766c539913f7912643b7 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Thu, 21 Jul 2022 11:45:01 +0530
+Subject: [PATCH 09/54] =?UTF-8?q?Depth:=20Total=20number=20of=20inline=20f?=
+ =?UTF-8?q?unctions=20[refer=20inline-frame.c]=20state->skipped=5Fframes?=
+ =?UTF-8?q?=20:=20Number=20of=20inline=20functions=20skipped.=20the=20curr?=
+ =?UTF-8?q?ent=20unwind=5Fpc=20is=20causing=20an=20issue=20when=20we=20try?=
+ =?UTF-8?q?=20to=20step=20into=20inline=20functions[Depth=20is=20becoming?=
+ =?UTF-8?q?=200].=20It=E2=80=99s=20incrementing=20pc=20by=208=20even=20wit?=
+ =?UTF-8?q?h=20si=20instruction.?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/features/microblaze64.xml |  1 +
+ gdb/microblaze-tdep.c         | 14 +++-----------
+ 2 files changed, 4 insertions(+), 11 deletions(-)
+
+diff --git a/gdb/features/microblaze64.xml b/gdb/features/microblaze64.xml
+index 515d18e65cf..9c1b7d22003 100644
+--- a/gdb/features/microblaze64.xml
++++ b/gdb/features/microblaze64.xml
+@@ -7,5 +7,6 @@
+ 
+ <!DOCTYPE target SYSTEM "gdb-target.dtd">
+ <target>
++  <architecture>microblaze64</architecture>
+   <xi:include href="microblaze64-core.xml"/>
+ </target>
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index f265e8fc608..3e541789fac 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -513,16 +513,8 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+ static CORE_ADDR
+ microblaze_unwind_pc (struct gdbarch *gdbarch, frame_info_ptr next_frame)
+ {
+-  gdb_byte buf[4];
+   CORE_ADDR pc;
+-
+-  frame_unwind_register (next_frame, MICROBLAZE_PC_REGNUM, buf);
+-  pc = extract_typed_address (buf, builtin_type (gdbarch)->builtin_func_ptr);
+-  /* For sentinel frame, return address is actual PC.  For other frames,
+-     return address is pc+8.  This is a workaround because gcc does not
+-     generate correct return address in CIE.  */
+-  if (frame_relative_level (next_frame) >= 0)
+-    pc += 8;
++  pc=frame_unwind_register_unsigned (next_frame, MICROBLAZE_PC_REGNUM);
+   return pc;
+ }
+ 
+@@ -553,7 +545,6 @@ microblaze_skip_prologue (struct gdbarch *gdbarch, CORE_ADDR start_pc)
+   ostart_pc = microblaze_analyze_prologue (gdbarch, func_start, 0xffffffffUL, 
+ 					   &cache);
+ 
+-
+   if (ostart_pc > start_pc)
+     return ostart_pc;
+   return start_pc;
+@@ -660,7 +651,8 @@ static const struct frame_unwind microblaze_frame_unwind =
+   microblaze_frame_this_id,
+   microblaze_frame_prev_register,
+   NULL,
+-  default_frame_sniffer
++  default_frame_sniffer,
++  NULL,
+ };
+ 
+ static CORE_ADDR
+-- 
+2.34.1
+

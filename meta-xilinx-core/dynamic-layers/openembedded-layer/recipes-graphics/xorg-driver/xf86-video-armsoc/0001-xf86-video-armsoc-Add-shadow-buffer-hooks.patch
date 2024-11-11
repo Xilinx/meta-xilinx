@@ -1,0 +1,141 @@
+From 8c62932a848c3c9eef8b663a24d90026687d5b02 Mon Sep 17 00:00:00 2001
+From: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
+Date: Thu, 13 Jun 2024 17:37:46 -0700
+Subject: [PATCH] xf86-video-armsoc: Add shadow buffer hooks
+
+Add shadow buffer management callbacks. These callbacks are required for
+RandR extension to operate. Implement the shadow buffer as a dumb DRM
+framebuffer. Use the shadow buffer as page flip souce. Fix armsoc_dri2.c
+file mode (drop exec bits).
+
+Signed-off-by: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
+---
+ src/armsoc_dri2.c     |  3 ++
+ src/armsoc_driver.h   |  3 ++
+ src/drmmode_display.c | 65 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 71 insertions(+)
+ mode change 100755 => 100644 src/armsoc_dri2.c
+
+diff --git a/src/armsoc_dri2.c b/src/armsoc_dri2.c
+old mode 100755
+new mode 100644
+index dc502e4..af5d074
+--- a/src/armsoc_dri2.c
++++ b/src/armsoc_dri2.c
+@@ -853,6 +853,9 @@ ARMSOCDRI2ScheduleSwap(ClientPtr client, DrawablePtr pDraw,
+ 			(armsoc_bo_height(src_bo) == armsoc_bo_height(dst_bo));
+ 
+ 	if (do_flip) {
++		if (pARMSOC->shadow)
++			src_fb_id = armsoc_bo_get_fb(pARMSOC->shadow);
++
+ 		DEBUG_MSG("FLIPPING:  FB%d -> FB%d", src_fb_id, dst_fb_id);
+ 		cmd->type = DRI2_FLIP_COMPLETE;
+ 
+diff --git a/src/armsoc_driver.h b/src/armsoc_driver.h
+index ef2836f..eae76ca 100644
+--- a/src/armsoc_driver.h
++++ b/src/armsoc_driver.h
+@@ -149,6 +149,9 @@ struct ARMSOCRec {
+ 	/** Scan-out buffer. */
+ 	struct armsoc_bo		*scanout;
+ 
++	/** Rotation shadow buffer */
++	struct armsoc_bo		*shadow;
++
+ 	/** Pointer to the options for this screen. */
+ 	OptionInfoPtr		pOptionInfo;
+ 
+diff --git a/src/drmmode_display.c b/src/drmmode_display.c
+index 39fa75c..f054b3a 100644
+--- a/src/drmmode_display.c
++++ b/src/drmmode_display.c
+@@ -333,6 +333,9 @@ drmmode_set_mode_major(xf86CrtcPtr crtc, DisplayModePtr mode,
+ 		goto cleanup;
+ 	}
+ 
++	if (pARMSOC->shadow)
++		fb_id = armsoc_bo_get_fb(pARMSOC->shadow);
++
+ 	if (crtc->funcs->gamma_set)
+ 		crtc->funcs->gamma_set(crtc, crtc->gamma_red, crtc->gamma_green,
+ 				       crtc->gamma_blue, crtc->gamma_size);
+@@ -860,6 +863,65 @@ drmmode_gamma_set(xf86CrtcPtr crtc, CARD16 *red, CARD16 *green, CARD16 *blue,
+ }
+ #endif
+ 
++static void*
++drmmode_shadow_allocate(xf86CrtcPtr crtc, int width, int height)
++{
++	ScrnInfoPtr pScrn = crtc->scrn;
++	struct ARMSOCRec *pARMSOC = ARMSOCPTR(pScrn);
++	struct armsoc_bo *bo;
++	int ret;
++
++	bo = armsoc_bo_new_with_dim(pARMSOC->dev, width, height,
++			pScrn->bitsPerPixel, pScrn->bitsPerPixel, ARMSOC_BO_SCANOUT);
++	if (!bo)
++		return NULL;
++
++	/* We will use this bo as a scanout, so add it as a framebuffer */
++	ret = armsoc_bo_add_fb(bo);
++	if (ret) {
++		xf86DrvMsg(pScrn->scrnIndex, X_ERROR,
++			"failed to add framebuffer: %s\n", strerror(-ret));
++		armsoc_bo_unreference(bo);
++		return NULL;
++	}
++
++	pARMSOC->shadow = bo;
++
++	return bo;
++}
++
++static PixmapPtr
++drmmode_shadow_create(xf86CrtcPtr crtc, void *data, int width, int height)
++{
++	ScrnInfoPtr pScrn = crtc->scrn;
++	ScreenPtr pScreen = pScrn->pScreen;
++	struct armsoc_bo *bo = data;
++	PixmapPtr pixmap;
++
++	pixmap = (*pScreen->CreatePixmap)(pScreen, 0, 0, armsoc_bo_depth(bo), 0);
++	if (!pixmap) {
++		xf86DrvMsg(pScrn->scrnIndex, X_ERROR, "failed to create pixmap.\n");
++		return NULL;
++	}
++	(*pScreen->ModifyPixmapHeader)(pixmap, armsoc_bo_width(bo),
++		armsoc_bo_height(bo), armsoc_bo_depth(bo), armsoc_bo_bpp(bo),
++		armsoc_bo_pitch(bo), armsoc_bo_map(bo));
++
++	return pixmap;
++}
++
++static void
++drmmode_shadow_destroy(xf86CrtcPtr crtc, PixmapPtr rotate_pixmap, void *data)
++{
++	ScrnInfoPtr pScrn = crtc->scrn;
++	struct ARMSOCRec *pARMSOC = ARMSOCPTR(pScrn);
++	struct armsoc_bo *bo = data;
++
++	armsoc_bo_unreference(bo);
++
++	pARMSOC->shadow = NULL;
++}
++
+ static const xf86CrtcFuncsRec drmmode_crtc_funcs = {
+ 		.dpms = drmmode_crtc_dpms,
+ 		.set_mode_major = drmmode_set_mode_major,
+@@ -870,6 +932,9 @@ static const xf86CrtcFuncsRec drmmode_crtc_funcs = {
+ #if 1 == ARMSOC_SUPPORT_GAMMA
+ 		.gamma_set = drmmode_gamma_set,
+ #endif
++		.shadow_allocate = drmmode_shadow_allocate,
++		.shadow_create = drmmode_shadow_create,
++		.shadow_destroy = drmmode_shadow_destroy,
+ };
+ 
+ 
+-- 
+2.25.1
+

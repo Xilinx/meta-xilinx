@@ -1,0 +1,26 @@
+From a96aee31c41e4d851531100a0716401c3464f6ef Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 14 Mar 2024 15:44:56 +0530
+Subject: [PATCH 41/54] disable truncated register warning (gdb/remote.c)
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/remote.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gdb/remote.c b/gdb/remote.c
+index ae08c980efc..8055c8f62e6 100644
+--- a/gdb/remote.c
++++ b/gdb/remote.c
+@@ -8678,7 +8678,7 @@ remote_target::process_g_packet (struct regcache *regcache)
+ 	  if (rsa->regs[i].pnum == -1)
+ 	    continue;
+ 
+-	  if (offset >= sizeof_g_packet)
++	  if (offset >= sizeof_g_packet || (offset + reg_size > sizeof_g_packet))
+ 	    rsa->regs[i].in_g_packet = 0;
+ 	  else if (offset + reg_size > sizeof_g_packet)
+ 	    error (_("Truncated register %d in remote 'g' packet"), i);
+-- 
+2.34.1
+

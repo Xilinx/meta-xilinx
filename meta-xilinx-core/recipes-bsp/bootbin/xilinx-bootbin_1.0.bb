@@ -7,6 +7,8 @@ LICENSE = "BSD"
 
 include machine-xilinx-${SOC_FAMILY}.inc
 
+BOOTBIN_INCLUDE ?= ""
+
 inherit deploy
 
 # Don't allow building for microblaze MACHINE
@@ -18,10 +20,11 @@ COMPATIBLE_MACHINE:versal-net = ".*"
 
 PROVIDES = "virtual/boot-bin"
 
-DEPENDS += "bootgen-native"
+DEPENDS += "bootgen-native u-boot-xlnx-scr"
 
 # There is no bitstream recipe, so really depend on virtual/bitstream
-DEPENDS += "${@(d.getVar('BIF_PARTITION_ATTR') or "").replace('bitstream', 'virtual/bitstream')}"
+# We need to refer to virtual/arm-trusted-firmware and not arm-trusted-firmware as there may be multiple providers
+DEPENDS += "${@(d.getVar('BIF_PARTITION_ATTR') or "").replace('bitstream', 'virtual/bitstream').replace('arm-trusted-firmware', 'virtual/arm-trusted-firmware')}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -45,7 +48,16 @@ BOOTGEN_ARCH_DEFAULT:versal-net = "versalnet"
 BOOTGEN_ARCH ?= "${BOOTGEN_ARCH_DEFAULT}"
 BOOTGEN_EXTRA_ARGS ?= ""
 
+QEMU_FLASH_TYPE ?= "qspi"
+BOOTSCR_DEP = ''
+BOOTSCR_DEP:versal = 'u-boot-xlnx-scr:do_deploy'
+BOOTSCR_DEP:versal-net = 'u-boot-xlnx-scr:do_deploy'
+
+BIF_BITSTREAM_ATTR ?= "${@bb.utils.contains('MACHINE_FEATURES', 'fpga-overlay', '', 'bitstream', d)}"
+
 do_patch[noexec] = "1"
+
+do_compile[depends] .= " ${BOOTSCR_DEP}"
 
 def create_bif(config, attrflags, attrimage, ids, common_attr, biffd, d):
     arch = d.getVar("SOC_FAMILY")
@@ -177,6 +189,18 @@ do_compile() {
     fi
 }
 
+do_compile:append:versal() {
+    dd if=/dev/zero bs=256M count=1  > ${B}/qemu-${QEMU_FLASH_TYPE}.bin
+    dd if=${B}/BOOT.bin of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=0 conv=notrunc
+    dd if=${DEPLOY_DIR_IMAGE}/boot.scr of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=66584576 conv=notrunc
+}
+
+do_compile:append:versal-net() {
+    dd if=/dev/zero bs=256M count=1  > ${B}/qemu-${QEMU_FLASH_TYPE}.bin
+    dd if=${B}/BOOT.bin of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=0 conv=notrunc
+    dd if=${DEPLOY_DIR_IMAGE}/boot.scr of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=66584576 conv=notrunc
+}
+
 do_install() {
     install -d ${D}/boot
     install -m 0644 ${B}/BOOT.bin ${D}/boot/BOOT.bin
@@ -184,7 +208,7 @@ do_install() {
 
 inherit image-artifact-names
 
-QEMUQSPI_BASE_NAME ?= "QEMU_qspi-${MACHINE}${IMAGE_VERSION_SUFFIX}"
+QEMU_FLASH_IMAGE_NAME ?= "qemu-${QEMU_FLASH_TYPE}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 BOOTBIN_BASE_NAME ?= "BOOT-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
@@ -199,12 +223,18 @@ do_deploy:append:versal () {
 
     install -m 0644 ${B}/BOOT_bh.bin ${DEPLOYDIR}/${BOOTBIN_BASE_NAME}_bh.bin
     ln -sf ${BOOTBIN_BASE_NAME}_bh.bin ${DEPLOYDIR}/BOOT-${MACHINE}_bh.bin
+
+    install -m 0644 ${B}/qemu-${QEMU_FLASH_TYPE}.bin ${DEPLOYDIR}/${QEMU_FLASH_IMAGE_NAME}.bin
+    ln -sf ${QEMU_FLASH_IMAGE_NAME}.bin ${DEPLOYDIR}/qemu-${QEMU_FLASH_TYPE}-${MACHINE}.bin
 }
 
 do_deploy:append:versal-net () {
 
     install -m 0644 ${B}/BOOT_bh.bin ${DEPLOYDIR}/${BOOTBIN_BASE_NAME}_bh.bin
     ln -sf ${BOOTBIN_BASE_NAME}_bh.bin ${DEPLOYDIR}/BOOT-${MACHINE}_bh.bin
+
+    install -m 0644 ${B}/qemu-${QEMU_FLASH_TYPE}.bin ${DEPLOYDIR}/${QEMU_FLASH_IMAGE_NAME}.bin
+    ln -sf ${QEMU_FLASH_IMAGE_NAME}.bin ${DEPLOYDIR}/qemu-${QEMU_FLASH_TYPE}-${MACHINE}.bin
 }
 
 FILES:${PN} += "/boot/BOOT.bin"

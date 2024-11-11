@@ -9,7 +9,6 @@ IMPORT_CC_DTBS ?= ""
 CC_DTBS_DUP ?= ""
 IMPORT_CC_UBOOT_DTBS ?= ""
 
-DEPENDS:append:eval-brd-sc-zynqmp = " uboot-device-tree"
 MKIMAGE_DTBLOB_OPTS ?= "-E -B 0x8"
 
 # Everything is swtiched on with UBOOT_IMAGE_BLOB = '1'

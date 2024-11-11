@@ -4,6 +4,8 @@ LICENSE = "CLOSED"
 
 PROVIDES = "virtual/base-pdi"
 
+INHIBIT_DEFAULT_DEPS = "1"
+
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:microblaze = ".*"
 COMPATIBLE_MACHINE:versal = ".*"

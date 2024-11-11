@@ -1,0 +1,150 @@
+From 45f177e5de751f11c2d084c4d836d7f8ef754cb4 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 1 Nov 2021 19:06:53 +0530
+Subject: [PATCH 19/54] initial support for MicroBlaze 64 bit [-m64]
+
+Conflicts:
+	bfd/elf32-microblaze.c
+	include/elf/common.h
+	ld/Makefile.am
+	ld/Makefile.in
+signed-off-by:Nagaraju Mekala<nmekala@xilinx.com>
+	      Mahesh Bodapati<mbodapat@xilinx.com>
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/bfd-in2.h              | 10 ++++++++++
+ bfd/libbfd.h               |  2 ++
+ bfd/reloc.c                | 12 ++++++++++++
+ gas/config/tc-microblaze.h |  4 +++-
+ ld/Makefile.am             |  2 ++
+ ld/configure.tgt           |  3 +++
+ opcodes/microblaze-dis.c   |  8 ++++++--
+ opcodes/microblaze-opc.h   | 11 +++++++----
+ 8 files changed, 45 insertions(+), 7 deletions(-)
+
+Index: gdb-14.2/bfd/bfd-in2.h
+===================================================================
+--- gdb-14.2.orig/bfd/bfd-in2.h
++++ gdb-14.2/bfd/bfd-in2.h
+@@ -6489,12 +6489,22 @@ done here - only used for relaxing  */
+     BFD_RELOC_MICROBLAZE_64_NONE,
+ 
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
++ *  +value in two words (with an imml instruction).  No relocation is
++ *   +done here - only used for relaxing  */
++    BFD_RELOC_MICROBLAZE_64,
++
++/* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imm instruction).  The relocation is
+ PC-relative GOT offset  */
+   BFD_RELOC_MICROBLAZE_64_GOTPC,
+ 
+ /* This is a 64 bit reloc that stores the 32 bit pc relative
+ value in two words (with an imml instruction).  The relocation is
++PC-relative GOT offset  */
++  BFD_RELOC_MICROBLAZE_64_GPC,
++
++/* This is a 64 bit reloc that stores the 32 bit pc relative
++value in two words (with an imml instruction).  The relocation is
+ PC-relative GOT offset  */
+   BFD_RELOC_MICROBLAZE_64_GPC,
+ 
+Index: gdb-14.2/bfd/libbfd.h
+===================================================================
+--- gdb-14.2.orig/bfd/libbfd.h
++++ gdb-14.2/bfd/libbfd.h
+@@ -3012,7 +3012,9 @@ static const char *const bfd_reloc_code_
+   "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
+   "BFD_RELOC_MICROBLAZE_32_NONE",
+   "BFD_RELOC_MICROBLAZE_64_NONE",
++  "BFD_RELOC_MICROBLAZE_64",
+   "BFD_RELOC_MICROBLAZE_64_GOTPC",
++  "BFD_RELOC_MICROBLAZE_64_GPC",
+   "BFD_RELOC_MICROBLAZE_64_GOT",
+   "BFD_RELOC_MICROBLAZE_64_PLT",
+   "BFD_RELOC_MICROBLAZE_64_GOTOFF",
+Index: gdb-14.2/bfd/reloc.c
+===================================================================
+--- gdb-14.2.orig/bfd/reloc.c
++++ gdb-14.2/bfd/reloc.c
+@@ -6703,6 +6703,12 @@ ENUMDOC
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_NONE
+ ENUMDOC
++  This is a 32 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing
++ENUM
++  BFD_RELOC_MICROBLAZE_64
++ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  No relocation is
+   done here - only used for relaxing
+@@ -6710,6 +6716,12 @@ ENUM
+   BFD_RELOC_MICROBLAZE_64_GOTPC
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing
++ENUM
++  BFD_RELOC_MICROBLAZE_64_GPC
++ENUMDOC
++  This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  The relocation is
+   PC-relative GOT offset
+ ENUM
+Index: gdb-14.2/opcodes/microblaze-dis.c
+===================================================================
+--- gdb-14.2.orig/opcodes/microblaze-dis.c
++++ gdb-14.2/opcodes/microblaze-dis.c
+@@ -457,6 +457,10 @@ print_insn_microblaze (bfd_vma memaddr,
+ 	case INST_TYPE_R1_R2_SPECIAL:
+ 	  print_func (stream, "\t%s, %s", get_field_r1 (&buf, inst),
+ 		      get_field_r2 (&buf, inst));
++          break;
++        case INST_TYPE_IMML:
++	  print_func (stream, "\t%s", get_field_imml (&buf, inst));
++          /* TODO: Also print symbol */
+ 	  break;
+ 	case INST_TYPE_RD_IMM15:
+ 	  print_func (stream, "\t%s, %s", get_field_rd (&buf, inst),
+@@ -475,8 +479,8 @@ print_insn_microblaze (bfd_vma memaddr,
+ 		   get_field_immw (&buf, inst), get_field_imms (&buf, inst));
+ 	  break;
+         /* For bit field insns.  */
+-	case INST_TYPE_RD_R1_IMM5_IMM5:
+-          print_func (stream, "\t%s, %s, %s, %s", get_field_rd (&buf, inst),get_field_r1(&buf, inst),get_field_imm5width (&buf, inst), get_field_imm5 (&buf, inst));
++	case INST_TYPE_RD_R1_IMMW_IMMS:
++          print_func (stream, "\t%s, %s, %s, %s", get_field_rd (&buf, inst),get_field_r1(&buf, inst),get_field_immw (&buf, inst), get_field_imms (&buf, inst));
+ 	     break;
+ 	/* For tuqula instruction */
+ 	case INST_TYPE_RD:
+Index: gdb-14.2/opcodes/microblaze-opc.h
+===================================================================
+--- gdb-14.2.orig/opcodes/microblaze-opc.h
++++ gdb-14.2/opcodes/microblaze-opc.h
+@@ -69,7 +69,13 @@
+ #define INST_TYPE_RD_R1_IMMW_IMMS  21
+ 
+ /* For bsefi and bsifi */
+-#define INST_TYPE_RD_R1_IMM5_IMM5  21
++#define INST_TYPE_RD_R1_IMMW_IMMS  21
++
++/* For 64-bit instructions */
++#define INST_TYPE_IMML 22
++#define INST_TYPE_RD_R1_IMML 23
++#define INST_TYPE_R1_IMML 24
++#define INST_TYPE_RD_R1_IMMW_IMMS  21
+ 
+ #define INST_TYPE_NONE 25
+ 
+@@ -590,8 +596,5 @@ char pvr_register_prefix[] = "rpvr";
+ #define MIN_IMML  ((long) 0xffffff8000000000L)
+ #define MAX_IMML  ((long) 0x0000007fffffffffL)
+ 
+-#define MIN_IMM_WIDTH  ((int) 0x00000001)
+-#define MAX_IMM_WIDTH  ((int) 0x00000020)
+-
+ #endif /* MICROBLAZE_OPC */
+ 

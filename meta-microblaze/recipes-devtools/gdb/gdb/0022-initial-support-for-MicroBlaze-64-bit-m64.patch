@@ -1,0 +1,113 @@
+From 587d5179ce81a4f67ebec321063f6c3c9b1673cb Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 1 Nov 2021 19:06:53 +0530
+Subject: [PATCH 22/54] initial support for MicroBlaze 64 bit [-m64]
+
+Conflicts:
+	bfd/elf32-microblaze.c
+	include/elf/common.h
+	ld/Makefile.am
+	ld/Makefile.in
+signed-off-by:Nagaraju Mekala<nmekala@xilinx.com>
+	      Mahesh Bodapati<mbodapat@xilinx.com>
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/elf64-microblaze.c     |   8 +
+ bfd/reloc.c                |  42 ++-
+ gas/config/tc-microblaze.c | 558 ++++++++++++++++++++++++++++++++-----
+ 3 files changed, 507 insertions(+), 101 deletions(-)
+
+Index: gdb-14.2/bfd/elf64-microblaze.c
+===================================================================
+--- gdb-14.2.orig/bfd/elf64-microblaze.c
++++ gdb-14.2/bfd/elf64-microblaze.c
+@@ -1666,6 +1666,14 @@ microblaze_elf_relocate_section (bfd *ou
+ 			    outrel.r_info = ELF64_R_INFO (0, R_MICROBLAZE_REL);
+ 			    outrel.r_addend = relocation + addend;
+ 			  }
++			unsigned long insn = bfd_get_32 (input_bfd, contents + offset +endian);
++                        if (insn == 0xb2000000 || insn == 0xb2ffffff)
++                          {
++                            insn &= ~0x00ffffff;
++                            insn |= (relocation >> 16) & 0xffffff;
++                            bfd_put_32 (input_bfd, insn,
++                                    contents + offset + endian);
++                          }
+ 			else
+ 			  {
+ 			    BFD_FAIL ();
+Index: gdb-14.2/bfd/reloc.c
+===================================================================
+--- gdb-14.2.orig/bfd/reloc.c
++++ gdb-14.2/bfd/reloc.c
+@@ -6703,13 +6703,31 @@ ENUMDOC
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_NONE
+ ENUMDOC
++  This is a 32 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing
++ENUM
++  BFD_RELOC_MICROBLAZE_64
++ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  No relocation is
+   done here - only used for relaxing
+ ENUM
++BFD_RELOC_MICROBLAZE_64_PCREL,
++ENUMDOC
++ This is a 32 bit reloc that stores the 32 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
++ENUM
+   BFD_RELOC_MICROBLAZE_64_GOTPC
+ ENUMDOC
+   This is a 64 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imml instruction).  No relocation is
++  done here - only used for relaxing
++ENUM
++  BFD_RELOC_MICROBLAZE_64_GPC
++ENUMDOC
++  This is a 64 bit reloc that stores the 32 bit pc relative
+   value in two words (with an imm instruction).  The relocation is
+   PC-relative GOT offset
+ ENUM
+@@ -7942,18 +7960,6 @@ ENUMDOC
+   This is a 64 bit reloc that stores 64-bit thread pointer relative offset
+   to two words (uses imml instruction).
+ ENUM
+-BFD_RELOC_MICROBLAZE_64,
+-ENUMDOC
+- This is a 64 bit reloc that stores the 64 bit pc relative
+- value in two words (with an imml instruction).  No relocation is
+- done here - only used for relaxing
+-ENUM
+-BFD_RELOC_MICROBLAZE_64_PCREL,
+-ENUMDOC
+- This is a 32 bit reloc that stores the 32 bit pc relative
+- value in two words (with an imml instruction).  No relocation is
+- done here - only used for relaxing
+-ENUM
+   BFD_RELOC_BPF_64
+ ENUMX
+   BFD_RELOC_BPF_DISP32
+@@ -7967,18 +7973,6 @@ ENUMDOC
+   This is a 64 bit reloc that stores 64-bit thread pointer relative offset
+   to two words (uses imml instruction).
+ ENUM
+-BFD_RELOC_MICROBLAZE_64,
+-ENUMDOC
+- This is a 64 bit reloc that stores the 64 bit pc relative
+- value in two words (with an imml instruction).  No relocation is
+- done here - only used for relaxing
+-ENUM
+-BFD_RELOC_MICROBLAZE_64_PCREL,
+-ENUMDOC
+- This is a 32 bit reloc that stores the 32 bit pc relative
+- value in two words (with an imml instruction).  No relocation is
+- done here - only used for relaxing
+-ENUM
+   BFD_RELOC_EPIPHANY_SIMM8
+ ENUMDOC
+   Adapteva EPIPHANY - 8 bit signed pc-relative displacement

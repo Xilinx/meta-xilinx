@@ -75,9 +75,6 @@ EXTRA_OEMAKE:append:versal = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.get
 EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
 EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
 
-ATF_PROVENCORE = "SPD=pncd SPD_PNCD_NS_IRQ=51 ZYNQMP_BL32_MEM_BASE=0x70000000 ZYNQMP_BL32_MEM_SIZE=0x0FF00000"
-EXTRA_OEMAKE:append = "${@bb.utils.contains('MACHINE_FEATURES', 'provencore', ' ${ATF_PROVENCORE}', '', d)}"
-
 TFA_BL33_LOAD ?= ""
 EXTRA_OEMAKE:append = "${@' PRELOADED_BL33_BASE=${TFA_BL33_LOAD}' if d.getVar('TFA_BL33_LOAD', True) != '' else ''}"
 
@@ -129,3 +126,19 @@ FILES:${PN} += "/boot/*.elf /boot/*.bin /boot/*.ub"
 # Disable buildpaths QA check warnings for Versal.
 INSANE_SKIP:${PN}:append:versal = " buildpaths"
 INSANE_SKIP:${PN}:append:versal-net = " buildpaths"
+
+python() {
+    soc_family = d.getVar('SOC_FAMILY')
+    atf_console = d.getVar('ATF_CONSOLE')
+
+    # See plat/xilinx/<soc_family>/platform.mk 
+    if soc_family and soc_family == "zynqmp":
+        if not atf_console in [ 'cadence', 'cadence0', 'cadence1', 'dcc' ]:
+            raise bb.parse.SkipRecipe('ATF_CONSOLE (%s) is not configured properly for ZynqMP, only cadence, cadence0, cadence1, and dcc are valid options.' % (atf_console))
+    elif soc_family and soc_family == "versal":
+        if not atf_console in [ 'pl011', 'pl011_0', 'pl011_1', 'dcc' ]:
+            raise bb.parse.SkipRecipe('ATF_CONSOLE (%s) is not configured properly for Versal, only pl011, pl011_0, pl011_1, and dcc are valid options.' % (atf_console))
+    elif soc_family and soc_family == "versal-net":
+        if not atf_console in [ 'pl011', 'pl011_0', 'pl011_1', 'dcc' ]:
+            raise bb.parse.SkipRecipe('ATF_CONSOLE (%s) is not configured properly for Versal-Net, only pl011, pl011_0, pl011_1, and dcc are valid options.' % (atf_console))
+}

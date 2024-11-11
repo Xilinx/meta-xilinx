@@ -3,6 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI += " \
     file://monitor-hotplug.sh \
     file://99-monitor-hotplug.rules \
+    file://0001-xf86Rotate.c-Add-required-NULL-check.patch \
     "
 
 do_install:append() {

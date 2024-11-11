@@ -52,7 +52,7 @@
 		reg = <0x0 0xffe00000 0x0 0x10000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_firmware 0x1831800b>;
+		power-domains = <&versal_firmware 0x1831800b>;
 	};
 
 	tcm_0b: tcm_0b@ffe20000 {
@@ -60,7 +60,7 @@
 		reg = <0x0 0xffe20000 0x0 0x10000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_firmware 0x1831800c>;
+		power-domains = <&versal_firmware 0x1831800c>;
 	};
 
 	tcm_1a: tcm_1a@ffe90000 {
@@ -68,7 +68,7 @@
 		reg = <0x0 0xffe90000 0x0 0x10000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_firmware 0x1831800d>;
+		power-domains = <&versal_firmware 0x1831800d>;
 	};
 
 	tcm_1b: tcm_1b@ffeb0000 {
@@ -76,7 +76,7 @@
 		reg = <0x0 0xffeb0000 0x0 0x10000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&versal_firmware 0x1831800e>;
+		power-domains = <&versal_firmware 0x1831800e>;
 	};
 
 	rf5ss@ff9a0000 {
@@ -94,7 +94,7 @@
 			ranges;
 			sram = <&tcm_0a>, <&tcm_0b>;
 			memory-region = <&rproc_0_reserved>, <&rpu0vdev0buffer>, <&rpu0vdev0vring0>, <&rpu0vdev0vring1>;
-			power-domain = <&versal_firmware 0x18110005>;
+			power-domains = <&versal_firmware 0x18110005>;
 			mboxes = <&ipi_mailbox_rpu0 0>, <&ipi_mailbox_rpu0 1>;
 			mbox-names = "tx", "rx";
 		};
@@ -105,7 +105,7 @@
 			ranges;
 			sram = <&tcm_1a>, <&tcm_1b>;
 			memory-region = <&rproc_1_reserved>, <&rpu1vdev0buffer>, <&rpu1vdev0vring0>, <&rpu1vdev0vring1>;
-			power-domain = <&versal_firmware 0x18110006>;
+			power-domains = <&versal_firmware 0x18110006>;
 			mboxes = <&ipi_mailbox_rpu1 0>, <&ipi_mailbox_rpu1 1>;
 			mbox-names = "tx", "rx";
 		};

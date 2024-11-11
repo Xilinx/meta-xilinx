@@ -1,0 +1,83 @@
+From 06e678ebb6c136c85f73ba8a4a064f9050ae47ce Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Sun, 28 Nov 2021 17:17:15 +0530
+Subject: [PATCH 38/54] MB binutils Upstream port issues.
+
+It's resolving the seg faults with ADDLIK
+Conflicts:
+	bfd/elf64-microblaze.c
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gas/config/tc-microblaze.c |  2 +-
+ opcodes/microblaze-dis.c   | 12 ++++++------
+ opcodes/microblaze-opc.h   |  2 +-
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+Index: gdb-14.2/opcodes/microblaze-dis.c
+===================================================================
+--- gdb-14.2.orig/opcodes/microblaze-dis.c
++++ gdb-14.2/opcodes/microblaze-dis.c
+@@ -153,7 +153,7 @@ get_field_imm16 (struct string_buf *buf,
+ 
+ static char *
+ get_field_special (struct string_buf *buf, long instr,
+-		   const struct op_code_struct *op)
++		   struct op_code_struct *op)
+ {
+   char *p = strbuf (buf);
+   char *spr;
+@@ -226,11 +226,11 @@ get_field_special (struct string_buf *bu
+ static unsigned long
+ read_insn_microblaze (bfd_vma memaddr,
+ 		      struct disassemble_info *info,
+-		      const struct op_code_struct **opr)
++		      struct op_code_struct **opr)
+ {
+   unsigned char       ibytes[4];
+   int                 status;
+-  const struct op_code_struct *op;
++  struct op_code_struct *op;
+   unsigned long inst;
+ 
+   status = info->read_memory_func (memaddr, ibytes, 4, info);
+@@ -266,7 +266,7 @@ print_insn_microblaze (bfd_vma memaddr,
+   fprintf_ftype print_func = info->fprintf_func;
+   void *stream = info->stream;
+   unsigned long inst, prev_inst;
+-  const struct op_code_struct *op, *pop;
++  struct op_code_struct *op, *pop;
+   int immval = 0;
+   bool immfound = false;
+   static bfd_vma prev_insn_addr = -1;	/* Init the prev insn addr.  */
+@@ -518,7 +518,7 @@ get_insn_microblaze (long inst,
+   		     enum microblaze_instr_type *insn_type,
+   		     short *delay_slots)
+ {
+-  const struct op_code_struct *op;
++  struct op_code_struct *op;
+   *isunsignedimm = false;
+ 
+   /* Just a linear search of the table.  */
+@@ -560,7 +560,7 @@ microblaze_get_target_address (long inst
+ 			       bool *targetvalid,
+ 			       bool *unconditionalbranch)
+ {
+-  const struct op_code_struct *op;
++  struct op_code_struct *op;
+   long targetaddr = 0;
+ 
+   *unconditionalbranch = false;
+Index: gdb-14.2/opcodes/microblaze-opc.h
+===================================================================
+--- gdb-14.2.orig/opcodes/microblaze-opc.h
++++ gdb-14.2/opcodes/microblaze-opc.h
+@@ -154,7 +154,7 @@
+ 
+ #define MAX_OPCODES 424
+ 
+-const struct op_code_struct
++struct op_code_struct
+ {
+   const char * name;
+   short inst_type;            /* Registers and immediate values involved.  */

@@ -1,0 +1,33 @@
+From b7b5423f937e63dcb09dbd2d14566e82ff7adc67 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 23 Jan 2017 15:39:45 +0530
+Subject: [PATCH 02/11] [LOCAL]: Add missing declarations for xil_printf to
+ stdio.h for inclusion in toolchain and use in c++ apps
+
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+
+Conflicts:
+	newlib/libc/include/stdio.h
+
+(cherry picked from commit 765f715f4077780395d381bf25870b61008f8013)
+---
+ newlib/libc/include/stdio.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/newlib/libc/include/stdio.h b/newlib/libc/include/stdio.h
+index 77966578d..fda52fdba 100644
+--- a/newlib/libc/include/stdio.h
++++ b/newlib/libc/include/stdio.h
+@@ -251,6 +251,9 @@ int	sprintf (char *__restrict, const char *__restrict, ...)
+                _ATTRIBUTE ((__format__ (__printf__, 2, 3)));
+ int	remove (const char *);
+ int	rename (const char *, const char *);
++void	xil_printf (const char*, ...);
++void	putnum (unsigned int );
++void	print (const char* );
+ #ifdef _LIBC
+ int	_rename (const char *, const char *);
+ #endif
+-- 
+2.34.1
+

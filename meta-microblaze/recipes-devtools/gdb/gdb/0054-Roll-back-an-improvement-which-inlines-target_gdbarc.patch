@@ -1,0 +1,29 @@
+From 8a7a8b724a87c532096004f43b987c352474a905 Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Fri, 19 Jul 2024 12:39:24 +0530
+Subject: [PATCH 54/54] Roll back an improvement which inlines target_gdbarch
+ () inherited from binutils 2.42 merge that causes compilation issues on gdb
+ 14.2
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/microblaze-tdep.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 4d8c76bcf4c..cb6697654b0 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -116,7 +116,7 @@ show_microblaze_abi (struct ui_file *file,
+                const char *ignored_value)
+ {
+       enum microblaze_abi global_abi = global_microblaze_abi ();
+-      enum microblaze_abi actual_abi = microblaze_abi (current_inferior ()->arch ());
++      enum microblaze_abi actual_abi = microblaze_abi ( target_gdbarch () );
+       const char *actual_abi_str = microblaze_abi_strings[actual_abi];
+ 
+ #if 1 
+-- 
+2.34.1
+

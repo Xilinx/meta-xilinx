@@ -1,0 +1,48 @@
+From 965a464418e8c8968453206f27763043fb38dc64 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 8 Nov 2016 11:54:08 +0530
+Subject: [PATCH 14/53] Fix relaxation of assembler resolved references,Fixup
+ debug_loc sections after linker relaxation Adds a new reloctype
+ R_MICROBLAZE_32_NONE, used for passing reloc info from the assembler to the
+ linker when the linker manages to fully resolve a local symbol reference.
+
+This is a workaround for design flaws in the assembler to
+linker interface with regards to linker relaxation.
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+
+Conflicts:
+	bfd/elf32-microblaze.c
+	binutils/readelf.c
+	include/elf/microblaze.h
+
+Conflicts:
+	binutils/readelf.c
+
+Conflicts:
+	bfd/elf32-microblaze.c
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ binutils/readelf.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/binutils/readelf.c b/binutils/readelf.c
+index 5e4ad6ea6ad..3ca9f3697d1 100644
+--- a/binutils/readelf.c
++++ b/binutils/readelf.c
+@@ -15288,6 +15288,11 @@ is_8bit_abs_reloc (Filedata * filedata, unsigned int reloc_type)
+ 	      || reloc_type == 9 /* R_MICROBLAZE_64_NONE.  */);
+     default:
+       return false;
++    /* REVISIT microblaze-binutils-merge */
++    case EM_MICROBLAZE:
++      return reloc_type == 33 /* R_MICROBLAZE_32_NONE.  */
++             || reloc_type == 0 /* R_MICROBLAZE_NONE.  */
++             || reloc_type == 9; /* R_MICROBLAZE_64_NONE.  */
+     }
+ }
+ 
+-- 
+2.34.1
+

@@ -1,0 +1,99 @@
+From d703670357546d9aab66baea1f6751ba1cbdf7ad Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Wed, 7 Dec 2022 15:30:23 -0800
+Subject: [PATCH] Prevent makefile from calling copy_bsp.sh
+
+If we call copy_bsp.sh we will undo any manual compliation steps we
+have already done.  Avoid this.
+
+YP integration specific
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ lib/sw_apps/versal_plm/src/versal/Makefile       | 4 ++--
+ lib/sw_apps/versal_plm/src/versal_net/Makefile   | 4 ++--
+ lib/sw_apps/versal_psmfw/src/versal/Makefile     | 4 ++--
+ lib/sw_apps/versal_psmfw/src/versal_net/Makefile | 6 +++---
+ lib/sw_apps/zynqmp_pmufw/src/Makefile            | 4 ++--
+ 5 files changed, 11 insertions(+), 11 deletions(-)
+
+Index: git/lib/sw_apps/versal_plm/src/versal/Makefile
+===================================================================
+--- git.orig/lib/sw_apps/versal_plm/src/versal/Makefile
++++ git/lib/sw_apps/versal_plm/src/versal/Makefile
+@@ -35,8 +35,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ $(OBJS): $(LIBS)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../../misc/versal/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../../misc/versal/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../../misc/versal/versal_plm_bsp
+ 
+Index: git/lib/sw_apps/versal_plm/src/versal_net/Makefile
+===================================================================
+--- git.orig/lib/sw_apps/versal_plm/src/versal_net/Makefile
++++ git/lib/sw_apps/versal_plm/src/versal_net/Makefile
+@@ -35,8 +35,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ $(OBJS): $(LIBS)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../../misc/versal_net/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../../misc/versal_net/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../../misc/versal_net/versal_plm_bsp
+ 
+Index: git/lib/sw_apps/versal_psmfw/src/versal/Makefile
+===================================================================
+--- git.orig/lib/sw_apps/versal_psmfw/src/versal/Makefile
++++ git/lib/sw_apps/versal_psmfw/src/versal/Makefile
+@@ -37,8 +37,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ $(OBJS): $(LIBS)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../../misc/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../../misc/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../../misc/versal_psmfw_bsp
+ 
+Index: git/lib/sw_apps/versal_psmfw/src/versal_net/Makefile
+===================================================================
+--- git.orig/lib/sw_apps/versal_psmfw/src/versal_net/Makefile
++++ git/lib/sw_apps/versal_psmfw/src/versal_net/Makefile
+@@ -37,8 +37,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ $(OBJS): $(LIBS)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../../misc/versal_net/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../../misc/versal_net/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../../misc/versal_net/versal_psmfw_bsp
+ 
+@@ -47,4 +47,3 @@ $(LIBS):
+ 
+ clean:
+ 	rm -rf $(OBJS) $(LIBS) $(EXEC) *.o *.d ../common/*.o ../common/*.d
+-	rm -rf ../../misc/versal_net/versal_psmfw_bsp
+Index: git/lib/sw_apps/zynqmp_pmufw/src/Makefile
+===================================================================
+--- git.orig/lib/sw_apps/zynqmp_pmufw/src/Makefile
++++ git/lib/sw_apps/zynqmp_pmufw/src/Makefile
+@@ -30,8 +30,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ $(OBJS): $(LIBS)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../misc/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../misc/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../misc/zynqmp_pmufw_bsp
+ 

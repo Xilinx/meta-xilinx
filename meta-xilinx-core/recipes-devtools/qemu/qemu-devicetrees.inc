@@ -14,12 +14,12 @@ REPO ?= "git://github.com/Xilinx/qemu-devicetrees.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
+SRC_URI += "file://0001-versal-Reorder-serial-ports.patch"
+SRC_URI += "file://0001-versal-net-Reorder-serial-port.patch"
+
 S = "${WORKDIR}/git"
 
-# Don't need to do anything
-do_install() {
-	:
-}
+do_install[noexec] = '1'
 
 do_deploy() {
 	# single-arch dtbs
@@ -33,4 +33,7 @@ do_deploy() {
 	done
 }
 
-addtask deploy after do_install
+addtask deploy after do_install before do_build
+
+COMPATIBLE_HOST:class-target = "none"
+BBCLASSEXTEND = "native nativesdk"
