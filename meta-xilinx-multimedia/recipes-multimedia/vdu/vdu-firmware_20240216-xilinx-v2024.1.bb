@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=722a9d20bf58ac06585a6d91ee36e60e"
 
 PV .= "+git"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 B = "${S}"
 
 BRANCH ?= "xlnx_rel_v2024.1"

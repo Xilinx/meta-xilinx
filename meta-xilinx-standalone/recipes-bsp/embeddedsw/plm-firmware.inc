@@ -10,7 +10,7 @@ COMPATIBLE_MACHINE:versal-net = ".*"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 # This is the default in most BSPs.  A MACHINE.conf can override this!
 PLM_IMAGE_NAME ??= "plm-${MACHINE}"

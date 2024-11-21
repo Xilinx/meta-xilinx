@@ -7,4 +7,4 @@ SRC_URI:append = " \
 
 PACKAGECONFIG:append = " vpx"
 
-S = "${WORKDIR}/git/subprojects/gst-plugins-good"
+S = "${UNPACKDIR}/git/subprojects/gst-plugins-good"

@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=17e31b2e971eed6471a361c7dc4faa18"
 
 require gstreamer-multimedia-notebooks_0.1.inc
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 inherit features_check
 

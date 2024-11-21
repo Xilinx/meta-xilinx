@@ -21,10 +21,10 @@ do_install() {
 
 do_deploy() {
     # We need to deploy the stripped elf, hence why not doing it from ${D}
-    install -Dm 0644 ${WORKDIR}/package/${base_libdir}/firmware/${ESW_EXECUTABLE_NAME}.elf ${DEPLOYDIR}/${APP_IMAGE_NAME}.elf
+    install -Dm 0644 ${PKGD}/${base_libdir}/firmware/${ESW_EXECUTABLE_NAME}.elf ${DEPLOYDIR}/${APP_IMAGE_NAME}.elf
     ln -sf ${APP_IMAGE_NAME}.elf ${DEPLOYDIR}/${BPN}-${MACHINE}-${BB_CURRENT_MC}.elf
-    ${OBJCOPY} -O binary ${WORKDIR}/package/${base_libdir}/firmware/${ESW_EXECUTABLE_NAME}.elf ${WORKDIR}/package/${base_libdir}/firmware/${ESW_EXECUTABLE_NAME}.bin
-    install -m 0644 ${WORKDIR}/package/${base_libdir}/firmware/${ESW_EXECUTABLE_NAME}.bin ${DEPLOYDIR}/${APP_IMAGE_NAME}.bin
+    ${OBJCOPY} -O binary ${PKGD}/${base_libdir}/firmware/${ESW_EXECUTABLE_NAME}.elf ${PKGD}/${base_libdir}/firmware/${ESW_EXECUTABLE_NAME}.bin
+    install -m 0644 ${PKGD}/${base_libdir}/firmware/${ESW_EXECUTABLE_NAME}.bin ${DEPLOYDIR}/${APP_IMAGE_NAME}.bin
     ln -sf ${APP_IMAGE_NAME}.bin ${DEPLOYDIR}/${BPN}-${MACHINE}-${BB_CURRENT_MC}.bin
 }
 

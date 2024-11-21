@@ -17,7 +17,7 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 
-S = "${WORKDIR}/git/src"
+S = "${UNPACKDIR}/git/src"
 
 inherit cmake pkgconfig
 

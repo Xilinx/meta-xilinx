@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 SRC_URI = "file://gpio-demo.c \
            file://Makefile \
         "
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 CFLAGS:prepend = "-I ${S}/include"
 do_compile() {
         oe_runmake

@@ -14,7 +14,7 @@ NO_GENERIC_LICENSE[Firmware-ti-bt] = "LICENSE.ti-bt"
 SRC_URI = "git://git.ti.com/ti-bt/service-packs.git;protocol=https;branch=master"
 SRCREV = "c290f8af9e388f37e509ecb111a1b64572b7c225"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 inherit allarch
 

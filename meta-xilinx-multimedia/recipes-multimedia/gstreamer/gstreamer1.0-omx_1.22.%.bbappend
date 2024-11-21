@@ -1,6 +1,6 @@
 require gstreamer-xilinx-1.22.%.inc
 
-S = "${WORKDIR}/git/subprojects/gst-omx"
+S = "${UNPACKDIR}/git/subprojects/gst-omx"
 
 RDEPENDS:${PN} .= "${@bb.utils.contains('MACHINE_FEATURES', 'vcu', ' libvcu-omxil', '', d)}"
 DEPENDS .= "${@bb.utils.contains('MACHINE_FEATURES', 'vcu', ' libvcu-omxil', '', d)}"

@@ -13,7 +13,7 @@ SRCBRANCH ?= "master"
 SRCREV = "814982ecd735e42ff2d14ce7c43039c259ec928b"
 SRC_URI = "gitsm://github.com/RidgeRun/gst-interpipe.git;protocol=https;branch=${SRCBRANCH}"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 FILES:${PN} += "${libdir}/gstreamer-1.0/libgstinterpipe.so"
 

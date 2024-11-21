@@ -1,7 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-# openamp.dtsi is in the WORKDIR
-DT_INCLUDE:append = " ${WORKDIR}"
+# openamp.dtsi is in the UNPACKDIR
+DT_INCLUDE:append = " ${UNPACKDIR}"
 
 do_configure[vardeps] += "ENABLE_OPENAMP_DTSI OPENAMP_EXTRA_DT_INCLUDE_FILES"
 

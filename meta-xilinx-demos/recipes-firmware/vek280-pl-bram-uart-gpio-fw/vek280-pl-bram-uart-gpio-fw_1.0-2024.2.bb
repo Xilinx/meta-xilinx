@@ -23,7 +23,7 @@ FW_DIR = "vek280-pl-bram-gpio-fw"
 do_configure[prefuncs] =+ "copy_fw_files"
 python copy_fw_files () {
     import shutil
-    fw_file_src = d.getVar('WORKDIR') + '/' + d.getVar("FW_DIR")
+    fw_file_src = d.getVar('UNPACKDIR') + '/' + d.getVar("FW_DIR")
     fw_file_dest = d.getVar('S')
     shutil.copytree(fw_file_src, fw_file_dest, dirs_exist_ok=True)
 }

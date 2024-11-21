@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=9bef8aa9d1eba8aca1b7dffdef500262"
 
 PV .= "+git"
 
-S  = "${WORKDIR}/git"
+S  = "${UNPACKDIR}/git"
 
 BRANCH ?= "xlnx_rel_v2024.2"
 REPO ?= "git://github.com/Xilinx/vcu-firmware.git;protocol=https"

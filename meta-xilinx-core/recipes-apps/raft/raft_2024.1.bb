@@ -1,8 +1,8 @@
 SUMMARY = "RAFT python application"
 LICENSE = "MIT & BSD-3-Clause"
 LIC_FILES_CHKSUM = " \
-    file://${WORKDIR}/git/LICENSE;md5=cc21c526211d34984839aa67dd16f172 \
-    file://${WORKDIR}/git/docs/LICENSE;md5=d8f0ffdbc8d019bc821a5a07bdca1406 \
+    file://LICENSE;md5=cc21c526211d34984839aa67dd16f172 \
+    file://docs/LICENSE;md5=d8f0ffdbc8d019bc821a5a07bdca1406 \
 "
 BRANCH = "2024.1"
 SRC_URI = "git://github.com/Xilinx/RAFT;protocol=https;branch=${BRANCH}"
@@ -10,7 +10,7 @@ SRCREV = "87ea8f4c5ac52fcbc465f41e681fc77aaee9a285"
 
 inherit update-rc.d systemd
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zcu208-zynqmp = "${MACHINE}"
 COMPATIBLE_MACHINE:zcu216-zynqmp = "${MACHINE}"

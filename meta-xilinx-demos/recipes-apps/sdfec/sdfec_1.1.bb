@@ -16,7 +16,7 @@ REQUIRED_MACHINE_FEATURES = "rfsoc"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-S = "${WORKDIR}/git/sd-fec-1.1"
+S = "${UNPACKDIR}/git/sd-fec-1.1"
 
 DEPENDS += "libgpiod"
 

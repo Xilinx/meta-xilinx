@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = "file://../LICENSE;md5=de2c993ac479f02575bcbfb14ef9b485 \
 COMPATIBLE_HOST = "^$"
 COMPATIBLE_HOST:aarch64 = ".*"
 
-S = "${WORKDIR}/git/src"
+S = "${UNPACKDIR}/git/src"
 
 inherit cmake pkgconfig
 

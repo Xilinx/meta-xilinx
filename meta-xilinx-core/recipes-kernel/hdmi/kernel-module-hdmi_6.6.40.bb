@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=b34277fe156508fd5a650609dc36d1fe"
 
 PV .= "+git"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 BRANCH ?= "xlnx_rel_v2024.2"
 REPO   ?= "git://github.com/Xilinx/hdmi-modules.git;protocol=https"

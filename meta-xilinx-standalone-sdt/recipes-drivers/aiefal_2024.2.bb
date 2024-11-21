@@ -4,7 +4,7 @@ COMPATIBLE_HOST = "aarch64-xilinx-elf"
 
 require ../../meta-xilinx-core/recipes-bsp/ai-engine/aie-rt-2024.2.inc
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 B = "${WORKDIR}/build"
  
 EXTRA_OECMAKE += "-DYOCTO=ON"

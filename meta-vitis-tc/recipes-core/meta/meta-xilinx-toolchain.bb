@@ -8,6 +8,8 @@ SRC_URI += " \
 "
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
+S = "${UNPACKDIR}"
+
 inherit populate_sdk
 
 COMPATIBLE_HOST = "${HOST_SYS}"
@@ -27,7 +29,7 @@ TOOLCHAIN_SHAR_EXT_TMPL = "${VITIS_TC_PATH}/files/toolchain-shar-extract.sh"
 TOOLCHAIN_SHAR_REL_TMPL = "${VITIS_TC_PATH}/files/toolchain-shar-relocate.sh"
 
 create_sdk_files:append () {
-        cp ${WORKDIR}/relocate-wrapper.py ${SDK_OUTPUT}/${SDKPATH}/
+        cp ${S}/relocate-wrapper.py ${SDK_OUTPUT}/${SDKPATH}/
 }
 
 # The wrappers don't do anything, remove them!

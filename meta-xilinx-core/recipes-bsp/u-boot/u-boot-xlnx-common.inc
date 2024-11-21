@@ -6,7 +6,7 @@ UBRANCHARG = "${@['nobranch=1', 'branch=${UBRANCH}'][d.getVar('UBRANCH', True) !
 
 SRC_URI = "${UBOOTURI};${UBRANCHARG}"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 B = "${WORKDIR}/build"
 
 UBOOT_MB_INC = ""

@@ -11,7 +11,7 @@ RDEPENDS:${PN} = "librfdc"
 
 PACKAGES = "${PN}-dbg ${PN}"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 B = "${WORKDIR}/build"
 
 FLAG = ""

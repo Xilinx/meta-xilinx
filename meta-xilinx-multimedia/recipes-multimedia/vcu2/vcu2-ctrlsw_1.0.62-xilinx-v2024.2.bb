@@ -12,7 +12,7 @@ SRCREV = "95b5e23881359964e7fbbf97fd754a91b6975a9b"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-S  = "${WORKDIR}/git"
+S  = "${UNPACKDIR}/git"
 
 inherit features_check
 

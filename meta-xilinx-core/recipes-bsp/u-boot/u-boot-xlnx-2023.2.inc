@@ -19,5 +19,5 @@ SRC_URI:append:microblaze = " file://microblaze-generic-top.h"
 FILESEXTRAPATHS:prepend := "${THISDIR}/u-boot-v2023.01:"
 
 do_configure:prepend:microblaze () {
-    install ${WORKDIR}/microblaze-generic-top.h ${S}/include/configs/
+    install ${UNPACKDIR}/microblaze-generic-top.h ${S}/include/configs/
 }

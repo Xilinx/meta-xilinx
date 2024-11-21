@@ -10,7 +10,7 @@ BRANCH ?= "main"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 PV .= "+git"
-S = "${WORKDIR}/git/openamp"
+S = "${UNPACKDIR}/git/openamp"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"

@@ -9,4 +9,4 @@ SRC_URI:append = " \
 PACKAGECONFIG[mediasrcbin] = "-Dmediasrcbin=enabled,-Dmediasrcbin=disabled,media-ctl"
 PACKAGECONFIG:append = " faac kms faad opusparse mediasrcbin"
 
-S = "${WORKDIR}/git/subprojects/gst-plugins-bad"
+S = "${UNPACKDIR}/git/subprojects/gst-plugins-bad"

@@ -4,6 +4,8 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 DEPENDS = "u-boot-mkimage-native"
 
+S = "${UNPACKDIR}"
+
 inherit deploy image-wic-utils
 
 INHIBIT_DEFAULT_DEPS = "1"
@@ -268,14 +270,14 @@ do_compile() {
         -e 's:@@KERNEL_ROOT_RAMDISK@@:${KERNEL_ROOT_RAMDISK}:' \
         -e 's:@@KERNEL_COMMAND_APPEND@@:${KERNEL_COMMAND_APPEND}:' \
         ${SCRIPT_SED_ADDENDUM} \
-        "${WORKDIR}/boot.cmd.${BOOTMODE}${BOOTFILE_EXT}" > "${WORKDIR}/boot.cmd"
+        "${S}/boot.cmd.${BOOTMODE}${BOOTFILE_EXT}" > boot.cmd
 
-    mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
+    mkimage -A arm -T script -C none -n "Boot script" -d boot.cmd boot.scr
 
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
         -e 's/@@DEVICE_TREE_NAME@@/${DEVICE_TREE_NAME}/' \
         -e 's/@@RAMDISK_IMAGE@@/${PXERAMDISK_IMAGE}/' \
-        "${WORKDIR}/pxeboot.pxe" > "pxeboot.pxe"
+        "${S}/pxeboot.pxe" > "pxeboot.pxe"
 }
 
 do_install() {

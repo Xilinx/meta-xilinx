@@ -6,7 +6,7 @@ require aie-rt-2022.inc
 SECTION	= "devel"
 
 XAIEFAL_DIR ?= "fal"
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 inherit features_check
 

@@ -20,7 +20,7 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 inherit cmake update-rc.d systemd
 

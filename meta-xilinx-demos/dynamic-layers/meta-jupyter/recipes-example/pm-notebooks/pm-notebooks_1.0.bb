@@ -10,7 +10,7 @@ SRC_URI = "git://github.com/Xilinx/platform-management-notebooks.git;branch=xlnx
 
 SRCREV = "c502be361b6857e21ab903f31c9ead69e3a0d9ba"
 
-S = "${WORKDIR}/git/pm-notebooks"
+S = "${UNPACKDIR}/git/pm-notebooks"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:versal = "versal"

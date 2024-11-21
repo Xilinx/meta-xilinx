@@ -8,9 +8,11 @@ SRC_URI[sha256sum] = "37f0ff251a606c2dcfa26c19fe6bf843234b4e7a8889cfab50bc26f644
 
 inherit allarch
 
+S = "${UNPACKDIR}"
+
 do_install() {
     install -d ${D}${datadir}/movies
-    install -m 0644 ${WORKDIR}/bbb_sunflower_2160p_30fps_normal.mp4 ${D}${datadir}/movies/
+    install -m 0644 ${S}/bbb_sunflower_2160p_30fps_normal.mp4 ${D}${datadir}/movies/
 }
 
 FILES:${PN} += "${datadir}/movies"

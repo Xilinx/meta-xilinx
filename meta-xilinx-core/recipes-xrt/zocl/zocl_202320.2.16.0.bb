@@ -13,7 +13,7 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 
-S = "${WORKDIR}/git/src/runtime_src/core/edge/drm/zocl"
+S = "${UNPACKDIR}/git/src/runtime_src/core/edge/drm/zocl"
 
 inherit module
 

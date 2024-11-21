@@ -18,6 +18,8 @@ do_compile[noexec] = "1"
 PDI_PATH ?= ""
 SRC_URI += "${@['file://'+d.getVar('PDI_PATH'),''][d.getVar('PDI_PATH') == '']}"
 
+S = "${UNPACKDIR}"
+
 python() {
     if d.getVar('PDI_SKIP_CHECK') != "1" and not d.getVar('PDI_PATH'):
         raise bb.parse.SkipRecipe("PDI_PATH is not configured with the base design pdi")
@@ -27,9 +29,9 @@ python() {
 #will need to bbappend to this in meta-xilinx-tools to use xsct to extract pdi from xsa and install
 do_install() {
 
-    if [ -f ${WORKDIR}/${PDI_PATH} ];then
+    if [ -f ${S}/${PDI_PATH} ];then
         install -d ${D}/boot
-        install -m 0644 ${WORKDIR}/${PDI_PATH} ${D}/boot/base-design.pdi
+        install -m 0644 ${S}/${PDI_PATH} ${D}/boot/base-design.pdi
     else
         bbfatal "No base pdi supplied"
     fi
