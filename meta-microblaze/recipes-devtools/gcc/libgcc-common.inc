@@ -58,7 +58,7 @@ do_install:append:libc-newlib () {
 DEV_PKG_DEPENDENCY:libc-baremetal = ""
 DEV_PKG_DEPENDENCY:libc-newlib = ""
 
-#BBCLASSEXTEND = "nativesdk"
+BBCLASSEXTEND = "nativesdk"
 
 addtask multilib_install after do_install before do_package do_populate_sysroot
 # this makes multilib gcc files findable for target gcc

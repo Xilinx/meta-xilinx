@@ -4,8 +4,6 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 DEPENDS = "u-boot-mkimage-native"
 
-S = "${UNPACKDIR}"
-
 inherit deploy image-wic-utils
 
 INHIBIT_DEFAULT_DEPS = "1"
@@ -40,6 +38,9 @@ SKIP_APPEND_BASEADDR ?= "0"
 DDR_BASEADDR ?= "0x0"
 DDR_BASEADDR:microblaze ?= "0x80000000"
 PRE_BOOTENV ?= ""
+
+# Set debfault SD boot device to mmc 0 interface
+SDBOOTDEV ?= "0"
 
 SRC_URI = " \
     file://boot.cmd.sd.zynq \
@@ -83,7 +84,7 @@ DEVICETREE_OVERLAY_OFFSET:zynqmp ??= "0x100000"
 DEVICETREE_OVERLAY_OFFSET:zynq ??= "0x100000"
 DEVICETREE_OVERLAY_OFFSET:versal ??= "0x1000"
 DEVICETREE_OVERLAY_OFFSET:versal-net ??= "0x1000"
-DEVICETREE_OVERLAY_PADSIZE ??= "0xf00000"
+DEVICETREE_OVERLAY_PADSIZE ??= "0x1f00000"
 
 DEVICETREE_OVERLAY_ADDRESS ?= "${@hex(int(append_baseaddr(d,d.getVar('DEVICETREE_OVERLAY_OFFSET')),16) \
 				+ int(d.getVar('DEVICETREE_OVERLAY_PADSIZE'),16))}"
@@ -267,14 +268,14 @@ do_compile() {
         -e 's:@@KERNEL_ROOT_RAMDISK@@:${KERNEL_ROOT_RAMDISK}:' \
         -e 's:@@KERNEL_COMMAND_APPEND@@:${KERNEL_COMMAND_APPEND}:' \
         ${SCRIPT_SED_ADDENDUM} \
-        "${UNPACKDIR}/boot.cmd.${BOOTMODE}${BOOTFILE_EXT}" > "${UNPACKDIR}/boot.cmd"
+        "${WORKDIR}/boot.cmd.${BOOTMODE}${BOOTFILE_EXT}" > "${WORKDIR}/boot.cmd"
 
-    mkimage -A arm -T script -C none -n "Boot script" -d "${UNPACKDIR}/boot.cmd" boot.scr
+    mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
 
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
         -e 's/@@DEVICE_TREE_NAME@@/${DEVICE_TREE_NAME}/' \
         -e 's/@@RAMDISK_IMAGE@@/${PXERAMDISK_IMAGE}/' \
-        "${UNPACKDIR}/pxeboot.pxe" > "pxeboot.pxe"
+        "${WORKDIR}/pxeboot.pxe" > "pxeboot.pxe"
 }
 
 do_install() {

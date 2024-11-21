@@ -1,0 +1,32 @@
+From 2a1036ac7639aa3b67b1f1ad7e1a6e7c4c22704b Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 28 Mar 2024 16:32:22 +0530
+Subject: [PATCH 47/54] gdb/remote.c - revert earlier change to
+ process_g_packet
+
+When connecting to remote target, gdb (microblaze-xilinx-elf) was
+generating Truncated register 29 error when parsing the g packet,
+workaround added being reverted.
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/remote.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gdb/remote.c b/gdb/remote.c
+index 8055c8f62e6..ae08c980efc 100644
+--- a/gdb/remote.c
++++ b/gdb/remote.c
+@@ -8678,7 +8678,7 @@ remote_target::process_g_packet (struct regcache *regcache)
+ 	  if (rsa->regs[i].pnum == -1)
+ 	    continue;
+ 
+-	  if (offset >= sizeof_g_packet || (offset + reg_size > sizeof_g_packet))
++	  if (offset >= sizeof_g_packet)
+ 	    rsa->regs[i].in_g_packet = 0;
+ 	  else if (offset + reg_size > sizeof_g_packet)
+ 	    error (_("Truncated register %d in remote 'g' packet"), i);
+-- 
+2.34.1
+

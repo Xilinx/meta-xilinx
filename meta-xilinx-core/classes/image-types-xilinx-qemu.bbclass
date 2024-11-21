@@ -39,18 +39,18 @@ CONVERSION_CMD:qemu-sd-fatimg () {
 	parted -s ${QEMU_IMG} set 1 boot on
 	parted ${QEMU_IMG} print
 	BOOT_BLOCKS=$(LC_ALL=C parted -s ${QEMU_IMG} unit b print | awk '/ 1 / { print substr($4, 1, length($4 -1)) / 512 /2 }')
-	rm -f ${UNPACKDIR}/${BOOT_VOLUME_ID}.img
-	mkfs.vfat -n "${BOOT_VOLUME_ID}" -S 512 -C ${UNPACKDIR}/${BOOT_VOLUME_ID}.img $BOOT_BLOCKS
+	rm -f ${WORKDIR}/${BOOT_VOLUME_ID}.img
+	mkfs.vfat -n "${BOOT_VOLUME_ID}" -S 512 -C ${WORKDIR}/${BOOT_VOLUME_ID}.img $BOOT_BLOCKS
 	if [ -e ${DEPLOY_DIR_IMAGE}/boot.bin ]; then
-		mcopy -i ${UNPACKDIR}/${BOOT_VOLUME_ID}.img -s  ${DEPLOY_DIR_IMAGE}/boot.bin ::/
+		mcopy -i ${WORKDIR}/${BOOT_VOLUME_ID}.img -s  ${DEPLOY_DIR_IMAGE}/boot.bin ::/
 	fi
 	if [ -e ${DEPLOY_DIR_IMAGE}/boot.scr ]; then
-		mcopy -i ${UNPACKDIR}/${BOOT_VOLUME_ID}.img -s  ${DEPLOY_DIR_IMAGE}/boot.scr ::/
+		mcopy -i ${WORKDIR}/${BOOT_VOLUME_ID}.img -s  ${DEPLOY_DIR_IMAGE}/boot.scr ::/
 	fi
 	if [ ${INITRAMFS_IMAGE} = ${IMAGE_BASENAME} ] && [ x"${INITRAMFS_IMAGE_BUNDLE}" != "x1" ]; then
-		mcopy -i ${UNPACKDIR}/${BOOT_VOLUME_ID}.img -s  ${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type} ::rootfs.cpio.gz.u-boot
+		mcopy -i ${WORKDIR}/${BOOT_VOLUME_ID}.img -s  ${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type} ::rootfs.cpio.gz.u-boot
 	fi
-	dd if=${UNPACKDIR}/${BOOT_VOLUME_ID}.img of=${QEMU_IMG} conv=notrunc seek=1 bs=$(expr ${IMAGE_ALIGNMENT} \* 1024)
+	dd if=${WORKDIR}/${BOOT_VOLUME_ID}.img of=${QEMU_IMG} conv=notrunc seek=1 bs=$(expr ${IMAGE_ALIGNMENT} \* 1024)
 }
 
 CONVERSION_DEPENDS_qemu-sd = "qemu-system-native"

@@ -6,7 +6,7 @@ require aie-rt-2022.inc
 SECTION	= "libs"
 
 AIEDIR ?= "${S}/driver"
-S = "${UNPACKDIR}/git"
+S = "${WORKDIR}/git"
 I = "${AIEDIR}/include"
 
 inherit features_check

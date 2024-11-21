@@ -1,0 +1,8 @@
+# common environment file for sysvinit and systemd
+
+LD_LIBRARY_PATH=/usr/lib/headless:${LD_LIBRARY_PATH}
+XSERVER=/usr/bin/Xorg
+DISPLAY=:0
+ARGS=" -br -pn @BLANK_ARGS@ @NO_CURSOR_ARG@ "
+HOME=@HOME@
+USER=@USER@

@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://../LICENSE;md5=da5408f748bce8a9851dac18e66f4bcf \
                     file://runtime_src/core/pcie/tools/xbutil/LICENSE;md5=d273d63619c9aeaf15cdaf76422c4f87 \
                     file://runtime_src/core/edge/tools/xbutil/LICENSE;md5=d273d63619c9aeaf15cdaf76422c4f87 "
 
-S = "${UNPACKDIR}/git/src"
+S = "${WORKDIR}/git/src"
 
 inherit cmake pkgconfig
 

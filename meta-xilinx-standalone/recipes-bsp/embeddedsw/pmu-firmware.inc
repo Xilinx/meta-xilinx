@@ -8,7 +8,7 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-S = "${UNPACKDIR}/git"
+S = "${WORKDIR}/git"
 
 # This is the default in most BSPs.  A MACHINE.conf can override this!
 PMU_FIRMWARE_IMAGE_NAME ??= "pmu-firmware-${MACHINE}"

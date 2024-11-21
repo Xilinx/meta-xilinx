@@ -1,0 +1,35 @@
+From 33e22262c6c43af6e7e075df0665838b5b3859a6 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Tue, 9 Oct 2018 10:14:22 +0530
+Subject: [PATCH 25/54] - Fixed address computation issues with 64bit address -
+ Fixed imml dissassamble issue
+
+Conflicts:
+	gas/config/tc-microblaze.c
+	opcodes/microblaze-dis.c
+
+Conflicts:
+	bfd/elf64-microblaze.c
+
+Conflicts:
+	bfd/elf64-microblaze.c
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/elf64-microblaze.c     |  2 +-
+ gas/config/tc-microblaze.c | 74 +++++++++++++++++++++++++++++++++-----
+ 2 files changed, 67 insertions(+), 9 deletions(-)
+
+Index: gdb-14.2/bfd/elf64-microblaze.c
+===================================================================
+--- gdb-14.2.orig/bfd/elf64-microblaze.c
++++ gdb-14.2/bfd/elf64-microblaze.c
+@@ -2131,7 +2131,7 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		efix = calc_fixup (target_address, 0, sec);
+ 
+             /* Validate the in-band val.  */
+-            val = bfd_get_32 (abfd, contents + irel->r_offset);
++            val = bfd_get_64 (abfd, contents + irel->r_offset);
+             if (val != irel->r_addend && ELF64_R_TYPE (irel->r_info) == R_MICROBLAZE_32_NONE) {
+                fprintf(stderr, "%d: CORRUPT relax reloc %x %lx\n", __LINE__, val, irel->r_addend);
+             }

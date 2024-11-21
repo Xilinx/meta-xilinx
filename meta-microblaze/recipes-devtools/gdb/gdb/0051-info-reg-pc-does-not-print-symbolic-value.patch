@@ -1,0 +1,116 @@
+From 66c0cc9a030667111d4b632314502e868e5e8e37 Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 9 May 2024 11:30:22 +0530
+Subject: [PATCH 51/54] info reg pc does not print symbolic value
+
+Problem - Test gdb.base/pc-fp.exp fails
+Fix - Change feature/microblaze-core.xml add type=code_ptr for pc
+
+Files changed
+	features/microblaze-core.xml
+	features/microblaze.c (generated)
+	features/microblaze-with-stack-protect.c (generated)
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/features/microblaze-core.xml             |  4 ++--
+ gdb/features/microblaze-with-stack-protect.c | 10 ++++++----
+ gdb/features/microblaze.c                    |  8 ++++----
+ 3 files changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/gdb/features/microblaze-core.xml b/gdb/features/microblaze-core.xml
+index ac052365773..205cdf94a27 100644
+--- a/gdb/features/microblaze-core.xml
++++ b/gdb/features/microblaze-core.xml
+@@ -8,7 +8,7 @@
+ <!DOCTYPE feature SYSTEM "gdb-target.dtd">
+ <feature name="org.gnu.gdb.microblaze.core">
+   <reg name="r0" bitsize="32" regnum="0"/>
+-  <reg name="r1" bitsize="32"/>
++  <reg name="r1" bitsize="32" type="data_ptr"/>
+   <reg name="r2" bitsize="32"/>
+   <reg name="r3" bitsize="32"/>
+   <reg name="r4" bitsize="32"/>
+@@ -39,7 +39,7 @@
+   <reg name="r29" bitsize="32"/>
+   <reg name="r30" bitsize="32"/>
+   <reg name="r31" bitsize="32"/>
+-  <reg name="rpc" bitsize="32"/>
++  <reg name="rpc" bitsize="32" type="code_ptr"/>
+   <reg name="rmsr" bitsize="32"/>
+   <reg name="rear" bitsize="32"/>
+   <reg name="resr" bitsize="32"/>
+diff --git a/gdb/features/microblaze-with-stack-protect.c b/gdb/features/microblaze-with-stack-protect.c
+index 8ab9565a047..95e3eed1a4e 100644
+--- a/gdb/features/microblaze-with-stack-protect.c
++++ b/gdb/features/microblaze-with-stack-protect.c
+@@ -14,7 +14,7 @@ initialize_tdesc_microblaze_with_stack_protect (void)
+ 
+   feature = tdesc_create_feature (result.get (), "org.gnu.gdb.microblaze.core");
+   tdesc_create_reg (feature, "r0", 0, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "data_ptr");
+   tdesc_create_reg (feature, "r2", 2, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r3", 3, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r4", 4, 1, NULL, 32, "int");
+@@ -45,7 +45,7 @@ initialize_tdesc_microblaze_with_stack_protect (void)
+   tdesc_create_reg (feature, "r29", 29, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r30", 30, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r31", 31, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "code_ptr");
+   tdesc_create_reg (feature, "rmsr", 33, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rear", 34, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "resr", 35, 1, NULL, 32, "int");
+@@ -70,10 +70,12 @@ initialize_tdesc_microblaze_with_stack_protect (void)
+   tdesc_create_reg (feature, "rtlbsx", 54, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rtlblo", 55, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
+-
+-  feature = tdesc_create_feature (result.get (), "org.gnu.gdb.microblaze.stack-protect");
+   tdesc_create_reg (feature, "slr", 57, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "shr", 58, 1, NULL, 32, "int");
+ 
++  feature = tdesc_create_feature (result.get (), "org.gnu.gdb.microblaze.stack-protect");
++  tdesc_create_reg (feature, "slr", 59, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "shr", 60, 1, NULL, 32, "int");
++
+   tdesc_microblaze_with_stack_protect = result.release ();
+ }
+diff --git a/gdb/features/microblaze.c b/gdb/features/microblaze.c
+index ed12e5bcfd2..ff4865b2acc 100644
+--- a/gdb/features/microblaze.c
++++ b/gdb/features/microblaze.c
+@@ -14,7 +14,7 @@ initialize_tdesc_microblaze (void)
+ 
+   feature = tdesc_create_feature (result.get (), "org.gnu.gdb.microblaze.core");
+   tdesc_create_reg (feature, "r0", 0, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "data_ptr");
+   tdesc_create_reg (feature, "r2", 2, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r3", 3, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r4", 4, 1, NULL, 32, "int");
+@@ -45,7 +45,7 @@ initialize_tdesc_microblaze (void)
+   tdesc_create_reg (feature, "r29", 29, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r30", 30, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r31", 31, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "code_ptr");
+   tdesc_create_reg (feature, "rmsr", 33, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rear", 34, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "resr", 35, 1, NULL, 32, "int");
+@@ -70,8 +70,8 @@ initialize_tdesc_microblaze (void)
+   tdesc_create_reg (feature, "rtlbsx", 54, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rtlblo", 55, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
+-  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "slr", 57, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "shr", 58, 1, NULL, 32, "int");
+ 
+   tdesc_microblaze = result.release ();
+ }
+-- 
+2.34.1
+

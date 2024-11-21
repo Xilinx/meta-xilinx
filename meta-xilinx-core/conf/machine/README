@@ -44,7 +44,6 @@ MACHINEOVERRIDES =. "${@['', 'my-example:']['my-example' != '${MACHINE}']}"
 
 require conf/machine/zynqmp-generic.conf
 
-HDF_MACHINE = "zcu102-zynqmp"
 MACHINE_FEATURES += "pci"
 
 #### No additional settings should be after the Postamble
@@ -67,7 +66,6 @@ DEFAULTTUNE ?= "aarch64"
 
 require conf/machine/zynqmp-generic.conf
 
-HDF_MACHINE = "zcu102-zynqmp"
 MACHINE_FEATURES += "pci"
 
 #### No additional settings should be after the Postamble
@@ -88,7 +86,6 @@ TUNE_FEATURES:tune-microblaze ?= "microblaze v8.50 barrel-shift reorder pattern-
 
 require conf/machine/microblaze-generic.conf
 
-HDF_MACHINE = "ml605"
 SERIAL_CONSOLE = "115200,ttyUL0"
 
 #### No additional settings should be after the Postamble
@@ -149,12 +146,17 @@ local.conf
 System wide setting:
 TUNE_FEATURES:tune-<tune> - Specific tune features
 
+XILINX_WITH_ESW = "xsct" or "sdt" - Specify xsct or sdt workflow
+
 external-hdf recipe from meta-xilinx-tools:
-HDF_MACHINE - Machine to load from reference defign xsa using hdf-examples recipe
-HDF_EXT - Only ".xsa" externsion is supported, legacy variable.
-HDF_BASE - Download protocol (file://, git://, http:// or https://) protocol if
-    not using the default external-hdf repository.
-HDF_PATH - Path to the repository or XSA file
+XILINX_XSCT_VERSION - Version of the XSCT tool and associated ESW software
+HDF_URI - URL for the .xsa file
+HDF_URI[sha256sum] - sha256sum of the .xsa
+
+sdt-artifacts recipe from meta-xilinx-standalone-sdt:
+SDT_URI - URI for the system device tree artifacts (usually a tarball)
+SDT_URI[sha256sum] - sha256sum of the SDT artifacts file
+SDT_URI[S] - the 'S' (source) directory where the artifacts are extracted
 
 fs-boot recipe from meta-xilinx-tools:
 YAML_SERIAL_CONSOLE_STDIN:pn-fs-boot - YAML based uart stdin configuration for
@@ -208,15 +210,3 @@ HAS_PLATFORM_INIT - List of defconfig files available for u-boot only for SPL bo
 u-boot-xlnx-scr recipe from meta-xilinx-core:
 DDR_BASEADDR - Base address for DDR used for loading the images from u-boot env.
 SKIP_APPEND_BASEADDR - Skip appending ${DDR_BASEADDR} for image offsets.
-
-Varibable set after required inclusion file:
-Varibables that does not intend to change must be set before required inclusion
-file.
-
-external-hdf recipe from meta-xilinx-tools:
-HDF_MACHINE - Used by the  recipe to find the correct XSA
-HDF_EXT - only xsa is supported, legacy variable
-HDF_BASE - protocol if not using the default external-hdf repository
-HDF_PATH - path to the repository or XSA file
-
-...and more...

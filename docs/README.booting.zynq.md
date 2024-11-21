@@ -3,19 +3,21 @@
 Booting OS images on Zynq boards can be done using JTAG, SD, eMMC, QSPI and NAND
 boot modes.
 
-* [Setting Up the Target](#setting-up-the-target)
-* [Booting from JTAG](#booting-from-jtag)
-  * [Sourcing the XSDB tools](#sourcing-the-xsdb-tools)
-  * [Deploying the images to target](#deploying-the-images-to-target)
-    * [Using devtool boot-jtag script](#using-devtool-boot-jtag-script)
-    * [Manually executing xsdb commands](#manually-executing-xsdb-commands)
-      * [Loading boot components using XSDB](#loading-boot-components-using-xsdb)
-      * [Loading Kernel, Root Filesystem and U-boot boot script](#loading-kernel-root-filesystem-and-u-boot-boot-script)
-        * [Using XSDB](#using-xsdb)
-        * [Using TFTP](#using-tftp)
-      * [Booting Linux](#booting-linux)
-* [Booting from SD](#booting-from-sd)
-* [Booting from QSPI](#booting-from-qspi)
+- [Booting OS Images on Zynq target boards](#booting-os-images-on-zynq-target-boards)
+  - [Setting Up the Target](#setting-up-the-target)
+  - [Booting from JTAG](#booting-from-jtag)
+    - [Sourcing the XSDB tools](#sourcing-the-xsdb-tools)
+    - [Deploying the images to target](#deploying-the-images-to-target)
+      - [Using devtool boot-jtag script](#using-devtool-boot-jtag-script)
+      - [Manually executing xsdb commands](#manually-executing-xsdb-commands)
+        - [Loading boot components using XSDB](#loading-boot-components-using-xsdb)
+        - [Loading Kernel, Root Filesystem and U-boot boot script](#loading-kernel-root-filesystem-and-u-boot-boot-script)
+          - [Using XSDB](#using-xsdb)
+          - [Using TFTP](#using-tftp)
+        - [Booting Linux](#booting-linux)
+  - [Booting from SD](#booting-from-sd)
+  - [Booting from QSPI](#booting-from-qspi)
+  - [Limitation](#limitation)
 
 ## Setting Up the Target
 1. Connect a USB cable between the CP210x USB-to-UART bridge USB Mini-B on
@@ -214,7 +216,7 @@ U-Boot> boot
 ---
 ## Booting from QSPI
 
-1. To boot ZC702 board in QSPI boot mode, Power on the ZCU102 board and boot 
+1. To boot ZC702 board in QSPI boot mode, Power on the ZC702 board and boot
    using JTAG or SD boot mode, to ensure that U-Boot is running and also have 
    boot.bin copied to DDR location using XSDB `dow` or `tftpboot` or `fatload`
    command.
@@ -222,3 +224,25 @@ U-Boot> boot
 3. After flashing the images, turn off the power switch on the board, and change
    the SW16 boot mode pin settings to QSPI boot mode (1-OFF, 2-ON, 3-OFF, 4-OFF, 5-OFF)
    by setting the SW16. Refer [Setting Up the Target](#setting-up-the-target).
+
+## Limitation
+
+1. Booting core-image-minimal or other image target excluding
+   petalinux-image-minimal you can observe below error message.
+
+```
+Error: argument "/en*" is wrong: "dev" not a valid ifname
+Starting syslogd/klogd: done
+
+Poky (Yocto Project Reference Distro) 5.0.2 zc702-zynq7 ttyPS0
+
+zc702-zynq7 login:
+```
+
+This is due to pni-names distro feature is not enabled by default and eudev uses
+classic network interface naming scheme. To resolve this issue add pni-names
+distro feature from <distro>.conf or local.file.
+
+```
+DISTRO_FEATURES:append:zynq = " pni-names"
+```

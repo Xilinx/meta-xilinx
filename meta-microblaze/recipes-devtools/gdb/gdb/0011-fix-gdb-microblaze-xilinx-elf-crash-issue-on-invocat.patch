@@ -1,0 +1,28 @@
+From 389711a13933a60323d368d5e5f1f54bd171b16b Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 29 Feb 2024 10:55:16 +0530
+Subject: [PATCH 11/54] fix gdb microblaze-xilinx-elf crash issue on invocation
+ Regression from merging microblaze 64-bit support
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/microblaze-tdep.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index f7d9d6419ce..d4b9ef837e5 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -1124,6 +1124,9 @@ void _initialize_microblaze_tdep ();
+ void
+ _initialize_microblaze_tdep ()
+ {
++  //Setting abi to auto manually, should be able to modify in 'arch'_gdbarch_init function
++  microblaze_abi_string = microblaze_abi_strings[0]; 
++
+   gdbarch_register (bfd_arch_microblaze, microblaze_gdbarch_init);
+ 
+ // static struct cmd_list_element *setmicroblazecmdlist = NULL;
+-- 
+2.34.1
+

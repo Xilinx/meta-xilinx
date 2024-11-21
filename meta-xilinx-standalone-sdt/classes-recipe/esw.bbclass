@@ -8,8 +8,8 @@ OECMAKE_ARGS:remove = "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON"
 
 SRCREV_FORMAT = "src_decouple"
 
-S = "${UNPACKDIR}/git"
-B = "${UNPACKDIR}/build"
+S = "${WORKDIR}/git"
+B = "${WORKDIR}/build"
 OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
 LICFILENAME = "license.txt"
 
@@ -70,7 +70,7 @@ XLNX_CMAKE_SYSTEM_NAME ?= "Generic"
 XLNX_CMAKE_BSP_VARS ?= ""
 
 cmake_do_generate_toolchain_file:append() {
-    cat >> ${UNPACKDIR}/toolchain.cmake <<EOF
+    cat >> ${WORKDIR}/toolchain.cmake <<EOF
     include(CMakeForceCompiler)
     CMAKE_FORCE_C_COMPILER("${OECMAKE_C_COMPILER}" GNU)
     CMAKE_FORCE_CXX_COMPILER("${OECMAKE_CXX_COMPILER}" GNU)
@@ -142,11 +142,6 @@ python do_generate_driver_data() {
         bb.error("Couldn't find source dir %s" % d.getVar('OECMAKE_SOURCEPATH'))
 
     os.chdir(d.getVar('B'))
-    command = ["lopper"] + ["-f"] + [system_dt[0]] + ["--"] + ["baremetalconfig_xlnx.py"] + [machine] + [src_dir[0]]
+    command = ["lopper"] + ["-f"] + ["-O"] + [src_dir[0]] + [system_dt[0]] + ["--"] + ["baremetalconfig_xlnx.py"] + [machine] + [src_dir[0]]
     subprocess.run(command, check = True)
-    src_file = glob.glob('*_g.c')
-    if src_file and os.path.exists(src_file[0]):
-         bb.note("Generated config file for driver %s" % driver_name)
-         command = ["install"] + ["-m"] + ["0755"] + [src_file[0]] + [src_dir[0]]
-         subprocess.run(command, check = True)
 }

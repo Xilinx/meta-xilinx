@@ -1,9 +1,9 @@
-SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=v0.2024.x;protocol=https"
-SRCREV = "4fb08575157d7712e0cd50e9e9c07620bc9f8b4b"
+SRC_URI = "git://github.com/devicetree-org/lopper.git;branch=master;protocol=https"
+SRCREV = "c0facd087263a24a83f7fad917884348db03175d"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/lopper:"
 
-BASEVERSION = "1.1.0"
+BASEVERSION = "1.2.0"
 
 RDEPENDS:${PN} += " \
     python3-ruamel-yaml \

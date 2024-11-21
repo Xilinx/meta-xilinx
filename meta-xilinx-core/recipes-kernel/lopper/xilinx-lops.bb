@@ -13,7 +13,7 @@ SRC_URI = " \
 
 LIC_FILES_CHKSUM = "file://lop-microblaze-yocto.dts;endline=10;md5=27139f9b862dc6fe466c7157aba7ed9c"
 
-S = "${UNPACKDIR}"
+S = "${WORKDIR}"
 
 inherit python3-dir
 

@@ -26,7 +26,7 @@ MB_OUT_FORMAT  ??= "mcs"
 BOOT_EXT = "${@d.getVar('MB_OUT_FORMAT').lower()}"
 
 BITSTREAM_FILE ?= "${RECIPE_SYSROOT}/boot/bitstream/download.bit"
-B = "${UNPACKDIR}/build"
+B = "${WORKDIR}/build"
 WR_CFGMEM_MISC ?= "-loadbit \" up 0 ${BITSTREAM_FILE}\""
 
 do_check_for_vivado() {

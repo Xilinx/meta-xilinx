@@ -2,7 +2,7 @@ require gcc-configure-xilinx-standalone.inc
 
 COMPATIBLE_HOST:xilinx-standalone = "${HOST_SYS}"
 
-EXTRA_OECONF:append:xilinx-standalone:microblaze:class-target = " \
+EXTRA_OECONF:append:xilinx-standalone:class-target = " \
         --disable-tm-clone-registry \
         "
 

@@ -1,0 +1,46 @@
+From 05a5677c1b5cd7f109c49e6697b6716f7ac0fb97 Mon Sep 17 00:00:00 2001
+From: nagaraju <nmekala@xilix.com>
+Date: Tue, 19 Mar 2013 17:18:23 +0530
+Subject: [PATCH 12/53] Add mlittle-endian and mbig-endian flags
+
+Added support in gas for mlittle-endian and mbig-endian flags
+as options.
+
+Updated show usage for MicroBlaze specific assembler options
+to include new entries.
+
+Signed-off-by:nagaraju <nmekala@xilix.com>
+Signed-off-by: David Holsgrove <david.holsgrove@xilinx.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gas/config/tc-microblaze.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index c971d187095..62238646a52 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -37,6 +37,8 @@
+ 
+ #define OPTION_EB (OPTION_MD_BASE + 0)
+ #define OPTION_EL (OPTION_MD_BASE + 1)
++#define OPTION_LITTLE (OPTION_MD_BASE + 2)
++#define OPTION_BIG (OPTION_MD_BASE + 3)
+ 
+ void microblaze_generate_symbol (char *sym);
+ static bool check_spl_reg (unsigned *);
+@@ -2565,9 +2567,11 @@ md_parse_option (int c, const char * arg ATTRIBUTE_UNUSED)
+   switch (c)
+     {
+     case OPTION_EB:
++    case OPTION_BIG:
+       target_big_endian = 1;
+       break;
+     case OPTION_EL:
++    case OPTION_LITTLE:
+       target_big_endian = 0;
+       break;
+     default:
+-- 
+2.34.1
+

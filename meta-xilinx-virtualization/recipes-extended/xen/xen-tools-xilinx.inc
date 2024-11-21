@@ -1,3 +1,5 @@
+QEMU_SYSTEM:aarch64 = "qemu-system-aarch64"
+
 # Only include the sysvinit scripts if sysvinit is enabled.
 do_install:append () {
     if [ -e ${D}/usr/lib/xen/bin/pygrub ]; then

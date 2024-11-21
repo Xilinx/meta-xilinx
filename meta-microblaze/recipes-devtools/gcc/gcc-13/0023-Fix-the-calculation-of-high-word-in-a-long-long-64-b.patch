@@ -1,0 +1,36 @@
+From f9871617fe69a105ebc4aa4838c682bfe40e4f2c Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 13 Sep 2022 12:03:08 +0530
+Subject: [PATCH 23/54] Fix the calculation of high word in a long long 64-bit
+
+    This patch will change the calculation of high word in a long long 64-bit.
+    Earlier to this patch the high word of long long word (0xF0000000ULL) is
+    coming to be 0xFFFFFFFF and low word is 0xF0000000. Instead the high word
+    should be 0x00000000 and the low word should be 0xF0000000. This patch
+    removes the condition of checking high word = 0 & low word < 0.
+    This check is not required for the correctness of calculating 32-bit high
+    and low words in a 64-bit long long.
+
+    Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+                   Ajit Agarwal  <ajitkum@xilinx.com>
+---
+ gcc/config/microblaze/microblaze.cc | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
+index 4967d6a0133..2d516724acc 100644
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
+@@ -2474,9 +2474,6 @@ print_operand (FILE * file, rtx op, int letter)
+         {
+ 	  val[0] = (INTVAL (op) & 0xffffffff00000000LL) >> 32;
+ 	  val[1] = INTVAL (op) & 0x00000000ffffffffLL;
+-	  if (val[0] == 0 && val[1] < 0)
+-	    val[0] = -1;
+-	    
+         }
+       fprintf (file, "0x%8.8lx", (letter == 'h') ? val[0] : val[1]);
+     }
+-- 
+2.34.1
+

@@ -36,6 +36,7 @@ def bootjtag(args, config, basepath, workspace):
         rootfs_load_addr = rd.getVar('RAMDISK_IMAGE_ADDRESS')
         machine_features = rd.getVar('MACHINE_FEATURES')
         boot_mode = rd.getVar('BOOTMODE')
+        image_name_suffix = rd.getVar('IMAGE_NAME_SUFFIX')
     finally:
         tinfoil.shutdown()
 
@@ -96,7 +97,7 @@ def bootjtag(args, config, basepath, workspace):
     data['kernel'] = os.path.join(deploy_dir, kernel_img_name)
 
     if not args.norootfs:
-        data['rfs'] = os.path.join(deploy_dir, args.image + '-' + machine + '.cpio.gz.u-boot')
+        data['rfs'] = os.path.join(deploy_dir, args.image + '-' + machine + image_name_suffix + '.cpio.gz.u-boot')
 
     # Check if all the required boot images exists
     for key in data:

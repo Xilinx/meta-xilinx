@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=eb723b61539feef013de476e68b5c50a"
 
 PV .= "+git"
 
-S = "${UNPACKDIR}/git"
+S = "${WORKDIR}/git"
 
 BRANCH ?= "xlnx_rel_v2024.1"
 REPO   ?= "git://github.com/xilinx/dp-modules.git;protocol=https"
@@ -23,4 +23,3 @@ EXTRA_OEMAKE += "O=${STAGING_KERNEL_BUILDDIR}"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 COMPATIBLE_MACHINE:versal = "versal"
-COMPATIBLE_MACHINE:versal-net = "versal-net"

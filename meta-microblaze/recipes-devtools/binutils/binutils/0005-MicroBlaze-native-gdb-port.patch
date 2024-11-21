@@ -1,0 +1,834 @@
+From 5b633480eb0b45dc15b6416c54535c54c062d23c Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 10 Oct 2022 18:53:46 +0530
+Subject: [PATCH 05/53] MicroBlaze native gdb port.
+
+signed-off-by : Mahesh Bodapati <mbodapat@amd.com>
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/Makefile.in                 |   2 +
+ gdb/configure.nat               |   4 +
+ gdb/features/microblaze-linux.c |  79 +++++++
+ gdb/microblaze-linux-nat.c      | 366 ++++++++++++++++++++++++++++++++
+ gdb/microblaze-linux-tdep.c     |   2 +
+ gdb/microblaze-linux-tdep.h     |  24 +++
+ gdb/microblaze-tdep.c           | 151 ++++++++++++-
+ gdb/microblaze-tdep.h           |  15 +-
+ 8 files changed, 629 insertions(+), 14 deletions(-)
+ create mode 100755 gdb/features/microblaze-linux.c
+ create mode 100755 gdb/microblaze-linux-nat.c
+ create mode 100644 gdb/microblaze-linux-tdep.h
+
+diff --git a/gdb/Makefile.in b/gdb/Makefile.in
+index 0e0f19c40c9..056588d88d0 100644
+--- a/gdb/Makefile.in
++++ b/gdb/Makefile.in
+@@ -1409,6 +1409,7 @@ HFILES_NO_SRCDIR = \
+ 	memory-map.h \
+ 	memrange.h \
+ 	microblaze-tdep.h \
++	microblaze-linux-tdep.h \
+ 	mips-linux-tdep.h \
+ 	mips-netbsd-tdep.h \
+ 	mips-tdep.h \
+@@ -1757,6 +1758,7 @@ ALLDEPFILES = \
+ 	m68k-linux-nat.c \
+ 	m68k-linux-tdep.c \
+ 	m68k-tdep.c \
++	microblaze-linux-nat.c \
+ 	microblaze-linux-tdep.c \
+ 	microblaze-tdep.c \
+ 	mingw-hdep.c \
+diff --git a/gdb/configure.nat b/gdb/configure.nat
+index 8b98511cef7..c9f0fb25010 100644
+--- a/gdb/configure.nat
++++ b/gdb/configure.nat
+@@ -274,6 +274,10 @@ case ${gdb_host} in
+ 		# Host: Motorola m68k running GNU/Linux.
+ 		NATDEPFILES="${NATDEPFILES} m68k-linux-nat.o"
+ 		;;
++	    microblaze)
++		# Host: Microblaze running GNU/Linux.
++		NATDEPFILES="${NATDEPFILES} microblaze-linux-nat.o"
++		;;
+ 	    mips)
+ 		# Host: Linux/MIPS
+ 		NATDEPFILES="${NATDEPFILES} linux-nat-trad.o \
+diff --git a/gdb/features/microblaze-linux.c b/gdb/features/microblaze-linux.c
+new file mode 100755
+index 00000000000..267e12f6d59
+--- /dev/null
++++ b/gdb/features/microblaze-linux.c
+@@ -0,0 +1,79 @@
++/* THIS FILE IS GENERATED.  -*- buffer-read-only: t -*- vi:set ro:
++  Original: microblaze.xml */
++
++#include "defs.h"
++#include "osabi.h"
++#include "target-descriptions.h"
++
++struct target_desc *tdesc_microblaze_linux;
++static void
++initialize_tdesc_microblaze_linux (void)
++{
++  target_desc_up result = allocate_target_description ();
++  struct tdesc_feature *feature;
++  set_tdesc_architecture (result.get(), bfd_scan_arch ("microblaze"));
++  set_tdesc_osabi (result.get(), osabi_from_tdesc_string ("GNU/Linux"));
++
++  feature = tdesc_create_feature (result.get(), "org.gnu.gdb.microblaze.core");
++  tdesc_create_reg (feature, "r0", 0, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r2", 2, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r3", 3, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r4", 4, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r5", 5, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r6", 6, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r7", 7, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r8", 8, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r9", 9, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r10", 10, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r11", 11, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r12", 12, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r13", 13, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r14", 14, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r15", 15, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r16", 16, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r17", 17, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r18", 18, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r19", 19, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r20", 20, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r21", 21, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r22", 22, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r23", 23, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r24", 24, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r25", 25, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r26", 26, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r27", 27, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r28", 28, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r29", 29, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r30", 30, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "r31", 31, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rmsr", 33, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rear", 34, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "resr", 35, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rfsr", 36, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rbtr", 37, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr0", 38, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr1", 39, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr2", 40, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr3", 41, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr4", 42, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr5", 43, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr6", 44, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr7", 45, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr8", 46, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr9", 47, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr10", 48, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr11", 49, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "redr", 50, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpid", 51, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rzpr", 52, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbx", 53, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbsx", 54, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlblo", 55, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
++
++  tdesc_microblaze_linux = result.release();
++}
+diff --git a/gdb/microblaze-linux-nat.c b/gdb/microblaze-linux-nat.c
+new file mode 100755
+index 00000000000..a348001a3e2
+--- /dev/null
++++ b/gdb/microblaze-linux-nat.c
+@@ -0,0 +1,366 @@
++/* Native-dependent code for GNU/Linux MicroBlaze.
++   Copyright (C) 2021 Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++#include "defs.h"
++#include "arch-utils.h"
++#include "dis-asm.h"
++#include "frame.h"
++#include "trad-frame.h"
++#include "symtab.h"
++#include "value.h"
++#include "gdbcmd.h"
++#include "breakpoint.h"
++#include "inferior.h"
++#include "gdbthread.h"
++#include "gdbcore.h"
++#include "regcache.h"
++#include "regset.h"
++#include "target.h"
++#include "frame.h"
++#include "frame-base.h"
++#include "frame-unwind.h"
++#include "osabi.h"
++#include "gdbsupport/gdb_assert.h"
++#include <string.h>
++#include "target-descriptions.h"
++#include "opcodes/microblaze-opcm.h"
++#include "opcodes/microblaze-dis.h"
++#include "gregset.h"
++
++#include "linux-nat.h"
++#include "linux-tdep.h"
++#include "target-descriptions.h"
++
++#include <sys/user.h>
++#include <sys/ioctl.h>
++#include <sys/uio.h>
++#include "gdbsupport/gdb_wait.h"
++#include <fcntl.h>
++#include <sys/procfs.h>
++#include "nat/gdb_ptrace.h"
++#include "nat/linux-ptrace.h"
++#include "inf-ptrace.h"
++#include <algorithm>
++#include <unordered_map>
++#include <list>
++#include <sys/ptrace.h>
++
++/* Prototypes for supply_gregset etc. */
++#include "gregset.h"
++
++#include "microblaze-tdep.h"
++#include "microblaze-linux-tdep.h"
++#include "inferior.h"
++
++#include "elf/common.h"
++
++#include "auxv.h"
++#include "linux-tdep.h"
++
++#include <sys/ptrace.h>
++
++
++//int have_ptrace_getsetregs=1;
++
++/* MicroBlaze Linux native additions to the default linux support.  */
++
++class microblaze_linux_nat_target final : public linux_nat_target
++{
++public:
++  /* Add our register access methods.  */
++  void fetch_registers (struct regcache *regcache, int regnum) override;
++  void store_registers (struct regcache *regcache, int regnum) override;
++
++  /* Read suitable target description.  */
++  const struct target_desc *read_description () override;
++};
++
++static microblaze_linux_nat_target the_microblaze_linux_nat_target;
++
++static int
++microblaze_register_u_addr (struct gdbarch *gdbarch, int regno)
++{
++  int u_addr = -1;
++  struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
++  /* NOTE: cagney/2003-11-25: This is the word size used by the ptrace
++ *      interface, and not the wordsize of the program's ABI.  */
++  int wordsize = sizeof (long);
++
++  /* General purpose registers occupy 1 slot each in the buffer.  */
++  if (regno >= MICROBLAZE_R0_REGNUM
++      && regno <= MICROBLAZE_FSR_REGNUM)
++    u_addr = ((regno - MICROBLAZE_R0_REGNUM)* wordsize);
++
++  return u_addr;
++}
++
++/* Copy general purpose register REGNUM (or all gp regs if REGNUM == -1)
++   from regset GREGS into REGCACHE.  */
++
++static void
++supply_gregset_regnum (struct regcache *regcache, const prgregset_t *gregs,
++		       int regnum)
++{
++  int i;
++  const elf_greg_t *regp = *gregs;
++  /* Access all registers */
++  if (regnum == -1)
++    {
++      /* We fill the general purpose registers.  */
++      for (i = MICROBLAZE_R0_REGNUM + 1; i < MICROBLAZE_FSR_REGNUM; i++)
++	regcache->raw_supply (i, regp + i);
++
++      /* Supply MICROBLAZE_PC_REGNUM from index 32.  */
++      regcache->raw_supply (MICROBLAZE_PC_REGNUM, regp + 32);
++
++      /* Fill the inaccessible zero register with zero.  */
++      regcache->raw_supply_zeroed (0);
++    }
++  else if (regnum == MICROBLAZE_R0_REGNUM)
++    regcache->raw_supply_zeroed (0);
++  else if (regnum == MICROBLAZE_PC_REGNUM)
++    regcache->raw_supply (MICROBLAZE_PC_REGNUM, regp + 32);
++  else if (regnum > MICROBLAZE_R0_REGNUM && regnum < MICROBLAZE_FSR_REGNUM)
++    regcache->raw_supply (regnum, regp + regnum);
++}
++
++/* Copy all general purpose registers from regset GREGS into REGCACHE.  */
++
++void
++supply_gregset (struct regcache *regcache, const prgregset_t *gregs)
++{
++  supply_gregset_regnum (regcache, gregs, -1);
++}
++
++/* Copy general purpose register REGNUM (or all gp regs if REGNUM == -1)
++   from REGCACHE into regset GREGS.  */
++
++void
++fill_gregset (const struct regcache *regcache, prgregset_t *gregs, int regnum)
++{
++  elf_greg_t *regp = *gregs;
++  if (regnum == -1)
++    {
++      /* We fill the general purpose registers.  */
++      for (int i = MICROBLAZE_R0_REGNUM + 1; i < MICROBLAZE_FSR_REGNUM; i++)
++	regcache->raw_collect (i, regp + i);
++
++      regcache->raw_collect (MICROBLAZE_PC_REGNUM, regp + 32);
++    }
++  else if (regnum == MICROBLAZE_R0_REGNUM)
++    /* Nothing to do here.  */
++    ;
++  else if (regnum > MICROBLAZE_R0_REGNUM && regnum < MICROBLAZE_FSR_REGNUM)
++    regcache->raw_collect (regnum, regp + regnum);
++  else if (regnum == MICROBLAZE_PC_REGNUM)
++    regcache->raw_collect (MICROBLAZE_PC_REGNUM, regp + 32);
++}
++
++/* Transfering floating-point registers between GDB, inferiors and cores.
++   Since MicroBlaze floating-point registers are the same as GPRs these do
++   nothing.  */
++
++void
++supply_fpregset (struct regcache *regcache, const gdb_fpregset_t *fpregs)
++{
++}
++
++void
++fill_fpregset (const struct regcache *regcache,
++	       gdb_fpregset_t *fpregs, int regno)
++{
++}
++
++
++static void
++fetch_register (struct regcache *regcache, int tid, int regno)
++{
++  struct gdbarch *gdbarch = regcache->arch ();
++  struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
++  /* This isn't really an address.  But ptrace thinks of it as one.  */
++  CORE_ADDR regaddr = microblaze_register_u_addr (gdbarch, regno);
++  int bytes_transferred;
++  char buf[MICROBLAZE_MAX_REGISTER_SIZE];
++
++  if (regaddr == -1)
++  {
++    memset (buf, '\0', register_size (gdbarch, regno));   /* Supply zeroes */
++    regcache->raw_supply (regno, buf);
++    return;
++  }
++
++  /* Read the raw register using sizeof(long) sized chunks.  On a
++ *      32-bit platform, 64-bit floating-point registers will require two
++ *           transfers.  */
++  for (bytes_transferred = 0;
++       bytes_transferred < register_size (gdbarch, regno);
++       bytes_transferred += sizeof (long))
++  {
++    long l;
++
++    errno = 0;
++    l = ptrace (PTRACE_PEEKUSER, tid, (PTRACE_TYPE_ARG3) regaddr, 0);
++    if (errno == EIO)
++    {
++      printf("ptrace io error\n");
++    }
++    regaddr += sizeof (long);
++    if (errno != 0)
++    {
++      char message[128];
++      sprintf (message, "reading register %s (#%d)",
++               gdbarch_register_name (gdbarch, regno), regno);
++      perror_with_name (message);
++    }
++    memcpy (&buf[bytes_transferred], &l, sizeof (l));
++  }
++
++  /* Now supply the register.  Keep in mind that the regcache's idea
++ *      of the register's size may not be a multiple of sizeof
++ *           (long).  */
++  if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_LITTLE)
++  {
++    /* Little-endian values are always found at the left end of the
++ *        bytes transferred.  */
++    regcache->raw_supply (regno, buf);
++  }
++  else if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
++  {
++    /* Big-endian values are found at the right end of the bytes
++ *        transferred.  */
++    size_t padding = (bytes_transferred - register_size (gdbarch, regno));
++    regcache->raw_supply (regno, buf + padding);
++  }
++  else
++    internal_error (__FILE__, __LINE__,
++                    _("fetch_register: unexpected byte order: %d"),
++                    gdbarch_byte_order (gdbarch));
++}
++
++
++/* This is a wrapper for the fetch_all_gp_regs function.  It is
++ * responsible for verifying if this target has the ptrace request
++ * that can be used to fetch all general-purpose registers at one
++ * shot.  If it doesn't, then we should fetch them using the
++ * old-fashioned way, which is to iterate over the registers and
++ * request them one by one.  */
++static void
++fetch_gp_regs (struct regcache *regcache, int tid)
++{
++  int i;
++/* If we've hit this point, it doesn't really matter which
++   architecture we are using.  We just need to read the
++   registers in the "old-fashioned way".  */
++  for (i = MICROBLAZE_R0_REGNUM; i <= MICROBLAZE_FSR_REGNUM; i++)
++    fetch_register (regcache, tid, i);
++}
++
++/* Return a target description for the current target.  */
++
++const struct target_desc *
++microblaze_linux_nat_target::read_description ()
++{
++  return tdesc_microblaze_linux;
++}
++
++/* Fetch REGNUM (or all registers if REGNUM == -1) from the target
++   into REGCACHE using PTRACE_GETREGSET.  */
++
++void
++microblaze_linux_nat_target::fetch_registers (struct regcache * regcache,
++                                              int regno)
++{
++  /* Get the thread id for the ptrace call.  */
++  int tid = regcache->ptid ().lwp ();
++//int tid = get_ptrace_pid (regcache->ptid());
++#if 1 
++  if (regno == -1)
++#endif
++    fetch_gp_regs (regcache, tid);
++#if 1
++  else
++    fetch_register (regcache, tid, regno);
++#endif
++}
++
++
++/* Store REGNUM (or all registers if REGNUM == -1) to the target
++   from REGCACHE using PTRACE_SETREGSET.  */
++
++void
++microblaze_linux_nat_target::store_registers (struct regcache *regcache, int regno)
++{
++  int tid;
++
++  tid = get_ptrace_pid (regcache->ptid ());
++
++ struct gdbarch *gdbarch = regcache->arch ();
++  /* This isn't really an address.  But ptrace thinks of it as one.  */
++  CORE_ADDR regaddr = microblaze_register_u_addr (gdbarch, regno);
++  int i;
++  size_t bytes_to_transfer;
++  char buf[MICROBLAZE_MAX_REGISTER_SIZE];
++
++  if (regaddr == -1)
++    return;
++
++  /* First collect the register.  Keep in mind that the regcache's
++ *      idea of the register's size may not be a multiple of sizeof
++ *           (long).  */
++  memset (buf, 0, sizeof buf);
++  bytes_to_transfer = align_up (register_size (gdbarch, regno), sizeof (long));
++  if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_LITTLE)
++  {
++    /* Little-endian values always sit at the left end of the buffer.  */
++    regcache->raw_collect (regno, buf);
++  }
++  else if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
++  {
++    /* Big-endian values sit at the right end of the buffer.  */
++    size_t padding = (bytes_to_transfer - register_size (gdbarch, regno));
++    regcache->raw_collect (regno, buf + padding);
++  }
++
++ for (i = 0; i < bytes_to_transfer; i += sizeof (long))
++  { 
++    long l;
++
++    memcpy (&l, &buf[i], sizeof (l));
++    errno = 0;
++    ptrace (PTRACE_POKEUSER, tid, (PTRACE_TYPE_ARG3) regaddr, l);
++    regaddr += sizeof (long);
++
++    if (errno != 0)
++    { 
++      char message[128];
++      sprintf (message, "writing register %s (#%d)",
++               gdbarch_register_name (gdbarch, regno), regno);
++      perror_with_name (message);
++    }
++  }
++}
++
++void _initialize_microblaze_linux_nat (void);
++
++void
++_initialize_microblaze_linux_nat (void)
++{
++  /* Register the target.  */
++  linux_target = &the_microblaze_linux_nat_target;
++  add_inf_child_target (linux_target);
++}
+diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
+index eef09bacec0..d086debc4f8 100644
+--- a/gdb/microblaze-linux-tdep.c
++++ b/gdb/microblaze-linux-tdep.c
+@@ -37,6 +37,7 @@
+ #include "tramp-frame.h"
+ #include "linux-tdep.h"
+ #include "glibc-tdep.h"
++#include "features/microblaze-linux.c"
+ 
+ static int microblaze_debug_flag = 0;
+ 
+@@ -179,4 +180,5 @@ _initialize_microblaze_linux_tdep ()
+ {
+   gdbarch_register_osabi (bfd_arch_microblaze, 0, GDB_OSABI_LINUX, 
+ 			  microblaze_linux_init_abi);
++  initialize_tdesc_microblaze_linux ();
+ }
+diff --git a/gdb/microblaze-linux-tdep.h b/gdb/microblaze-linux-tdep.h
+new file mode 100644
+index 00000000000..a2c744e2961
+--- /dev/null
++++ b/gdb/microblaze-linux-tdep.h
+@@ -0,0 +1,24 @@
++/* Target-dependent code for GNU/Linux on OpenRISC.
++
++   Copyright (C) 2021 Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++#ifndef MICROBLAZE_LINUX_TDEP_H
++#define MICROBLAZE_LINUX_TDEP_H
++ /* Target descriptions.  */
++ extern struct target_desc *tdesc_microblaze_linux;
++ 
++#endif /* MICROBLAZE_LINUX_TDEP_H */
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 7c98331f8a9..b0b4c1b2614 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -285,6 +285,7 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+ 	  cache->frameless_p = 0; /* Frame found.  */
+ 	  save_hidden_pointer_found = 0;
+ 	  non_stack_instruction_found = 0;
++          cache->register_offsets[rd] = -imm;
+ 	  continue;
+ 	}
+       else if (IS_SPILL_SP(op, rd, ra))
+@@ -431,15 +432,17 @@ microblaze_skip_prologue (struct gdbarch *gdbarch, CORE_ADDR start_pc)
+   if (find_pc_partial_function (start_pc, NULL, &func_start, &func_end))
+     {
+       sal = find_pc_line (func_start, 0);
+-
+-      if (sal.end < func_end
+-	  && start_pc <= sal.end)
++ 
++      if (sal.line !=0 && sal.end <= func_end  && start_pc <= sal.end) {
+ 	start_pc = sal.end;
++    microblaze_debug("start_pc is %d\t sal.end is %d\t func_end is %d\t",start_pc,sal.end,func_end);
++    }
+     }
+ 
+   ostart_pc = microblaze_analyze_prologue (gdbarch, func_start, 0xffffffffUL, 
+ 					   &cache);
+ 
++
+   if (ostart_pc > start_pc)
+     return ostart_pc;
+   return start_pc;
+@@ -453,6 +456,7 @@ microblaze_frame_cache (frame_info_ptr next_frame, void **this_cache)
+   struct microblaze_frame_cache *cache;
+   struct gdbarch *gdbarch = get_frame_arch (next_frame);
+   int rn;
++  CORE_ADDR current_pc;
+ 
+   if (*this_cache)
+     return (struct microblaze_frame_cache *) *this_cache;
+@@ -466,10 +470,17 @@ microblaze_frame_cache (frame_info_ptr next_frame, void **this_cache)
+     cache->register_offsets[rn] = -1;
+ 
+   /* Call for side effects.  */
+-  get_frame_func (next_frame);
+-
+-  cache->pc = get_frame_address_in_block (next_frame);
+-
++  cache->pc = get_frame_func (next_frame);
++
++//  cache->pc = get_frame_address_in_block (next_frame);
++  current_pc = get_frame_pc (next_frame);
++  if (cache->pc)
++     microblaze_analyze_prologue (gdbarch, cache->pc, current_pc, cache);
++  
++  cache->saved_sp = cache->base + cache->framesize;
++  cache->register_offsets[MICROBLAZE_PREV_PC_REGNUM] = cache->base;
++  cache->register_offsets[MICROBLAZE_SP_REGNUM] = cache->saved_sp;
++  
+   return cache;
+ }
+ 
+@@ -494,6 +505,25 @@ microblaze_frame_prev_register (frame_info_ptr this_frame,
+   struct microblaze_frame_cache *cache =
+     microblaze_frame_cache (this_frame, this_cache);
+ 
++if ((regnum == MICROBLAZE_SP_REGNUM &&
++      cache->register_offsets[MICROBLAZE_SP_REGNUM])
++      || (regnum == MICROBLAZE_FP_REGNUM &&
++      cache->register_offsets[MICROBLAZE_SP_REGNUM]))
++
++     return frame_unwind_got_constant (this_frame, regnum,
++                                       cache->register_offsets[MICROBLAZE_SP_REGNUM]);
++
++if (regnum == MICROBLAZE_PC_REGNUM)
++{
++      regnum = 15;
++      return frame_unwind_got_memory (this_frame, regnum,
++                                      cache->register_offsets[MICROBLAZE_PREV_PC_REGNUM]);
++
++}
++if (regnum == MICROBLAZE_SP_REGNUM)
++        regnum = 1;
++#if 0
++
+   if (cache->frameless_p)
+     {
+       if (regnum == MICROBLAZE_PC_REGNUM)
+@@ -506,7 +536,9 @@ microblaze_frame_prev_register (frame_info_ptr this_frame,
+   else
+     return trad_frame_get_prev_register (this_frame, cache->saved_regs,
+ 					 regnum);
+-
++#endif
++  return trad_frame_get_prev_register (this_frame, cache->saved_regs,
++					regnum); 
+ }
+ 
+ static const struct frame_unwind microblaze_frame_unwind =
+@@ -621,7 +653,106 @@ microblaze_stabs_argument_has_addr (struct gdbarch *gdbarch, struct type *type)
+   return (type->length () == 16);
+ }
+ 
+-
++#if 1 
++static std::vector<CORE_ADDR>
++microblaze_software_single_step (struct regcache *regcache)
++{
++  struct gdbarch *arch = regcache->arch ();
++  //struct gdbarch_tdep *tdep = gdbarch_tdep (arch);
++  static int le_breakp[] = MICROBLAZE_BREAKPOINT_LE;
++  static int be_breakp[] = MICROBLAZE_BREAKPOINT;
++  enum bfd_endian byte_order = gdbarch_byte_order (arch);
++  int *breakp = byte_order == BFD_ENDIAN_BIG ? be_breakp : le_breakp;
++//  std::vector<CORE_ADDR> ret = NULL;
++
++ /* Save the address and the values of the next_pc and the target */
++  static struct sstep_breaks
++  {
++    CORE_ADDR address;
++    bfd_boolean valid;
++    /* Shadow contents.  */
++    char data[INST_WORD_SIZE];
++  } stepbreaks[2];
++ int ii;
++
++      CORE_ADDR pc;
++      std::vector<CORE_ADDR> next_pcs;
++      long insn;
++      enum microblaze_instr minstr;
++      bfd_boolean isunsignednum;
++      enum microblaze_instr_type insn_type;
++      short delay_slots;
++      int imm;
++      bfd_boolean immfound = FALSE;
++
++     /* Set a breakpoint at the next instruction */
++      /* If the current instruction is an imm, set it at the inst after */
++      /* If the instruction has a delay slot, skip the delay slot */
++      pc = regcache_read_pc (regcache);
++      insn = microblaze_fetch_instruction (pc);
++      minstr = get_insn_microblaze (insn, &isunsignednum, &insn_type, &delay_slots);
++      if (insn_type == immediate_inst)
++	{
++	  int rd, ra, rb;
++	  immfound = TRUE;
++	  minstr = microblaze_decode_insn (insn, &rd, &ra, &rb, &imm);
++	  pc = pc + INST_WORD_SIZE;
++	  insn = microblaze_fetch_instruction (pc);
++	  minstr = get_insn_microblaze (insn, &isunsignednum, &insn_type, &delay_slots);
++	}
++      stepbreaks[0].address = pc + (delay_slots * INST_WORD_SIZE) + INST_WORD_SIZE;
++      if (insn_type != return_inst) {
++	stepbreaks[0].valid = TRUE;
++      } else {
++	stepbreaks[0].valid = FALSE;
++      }
++
++      microblaze_debug ("single-step insn_type=%x insn=%x\n", insn_type, insn);
++      /* Now check for branch or return instructions */
++      if (insn_type == branch_inst || insn_type == return_inst) {
++	int limm;
++	int lrd, lra, lrb;
++	int ra, rb;
++	bfd_boolean targetvalid;
++	bfd_boolean unconditionalbranch;
++	microblaze_decode_insn(insn, &lrd, &lra, &lrb, &limm);
++	if (lra >= 0 && lra < MICROBLAZE_NUM_REGS)
++	  ra = regcache_raw_get_unsigned(regcache, lra);
++	else
++	  ra = 0;
++	if (lrb >= 0 && lrb < MICROBLAZE_NUM_REGS)
++	  rb = regcache_raw_get_unsigned(regcache, lrb);
++	else
++	  rb = 0;
++	stepbreaks[1].address = microblaze_get_target_address (insn, immfound, imm, pc, ra, rb, &targetvalid, &unconditionalbranch);
++        microblaze_debug ("single-step uncondbr=%d targetvalid=%d target=%x\n", unconditionalbranch, targetvalid, stepbreaks[1].address);
++	if (unconditionalbranch)
++	  stepbreaks[0].valid = FALSE; /* This is a unconditional branch: will not come to the next address */
++	if (targetvalid && (stepbreaks[0].valid == FALSE ||
++			    (stepbreaks[0].address != stepbreaks[1].address))
++	                && (stepbreaks[1].address != pc)) {
++	  stepbreaks[1].valid = TRUE;
++	} else {
++	  stepbreaks[1].valid = FALSE;
++	}
++      } else {
++	stepbreaks[1].valid = FALSE;
++      }
++
++      /* Insert the breakpoints */
++      for (ii = 0; ii < 2; ++ii)
++        {
++
++          /* ignore invalid breakpoint. */
++          if (stepbreaks[ii].valid) {
++           // VEC_safe_push (CORE_ADDR, next_pcs, stepbreaks[ii].address);;
++            next_pcs.push_back (stepbreaks[ii].address);
++	  }
++	}
++    return next_pcs;
++}
++#endif
++
+ static int dwarf2_to_reg_map[78] =
+ { 0  /* r0  */,   1  /* r1  */,   2  /* r2  */,   3  /* r3  */,  /*  0- 3 */
+   4  /* r4  */,   5  /* r5  */,   6  /* r6  */,   7  /* r7  */,  /*  4- 7 */
+@@ -788,6 +919,8 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+ 				       microblaze_breakpoint::bp_from_kind);
+   set_gdbarch_memory_remove_breakpoint (gdbarch, microblaze_linux_memory_remove_breakpoint);
+ 
++  set_gdbarch_software_single_step (gdbarch, microblaze_software_single_step);
++
+   set_gdbarch_frame_args_skip (gdbarch, 8);
+ 
+   set_gdbarch_unwind_pc (gdbarch, microblaze_unwind_pc);
+diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
+index 07a160a463c..c4c8098308f 100644
+--- a/gdb/microblaze-tdep.h
++++ b/gdb/microblaze-tdep.h
+@@ -60,11 +60,11 @@ enum microblaze_regnum
+   MICROBLAZE_R12_REGNUM,
+   MICROBLAZE_R13_REGNUM,
+   MICROBLAZE_R14_REGNUM,
+-  MICROBLAZE_R15_REGNUM,
++  MICROBLAZE_R15_REGNUM,MICROBLAZE_PREV_PC_REGNUM = MICROBLAZE_R15_REGNUM,
+   MICROBLAZE_R16_REGNUM,
+   MICROBLAZE_R17_REGNUM,
+   MICROBLAZE_R18_REGNUM,
+-  MICROBLAZE_R19_REGNUM,
++  MICROBLAZE_R19_REGNUM,MICROBLAZE_FP_REGNUM = MICROBLAZE_R19_REGNUM,
+   MICROBLAZE_R20_REGNUM,
+   MICROBLAZE_R21_REGNUM,
+   MICROBLAZE_R22_REGNUM,
+@@ -77,7 +77,8 @@ enum microblaze_regnum
+   MICROBLAZE_R29_REGNUM,
+   MICROBLAZE_R30_REGNUM,
+   MICROBLAZE_R31_REGNUM,
+-  MICROBLAZE_PC_REGNUM,
++  MICROBLAZE_MAX_GPR_REGS,
++  MICROBLAZE_PC_REGNUM=32,
+   MICROBLAZE_MSR_REGNUM,
+   MICROBLAZE_EAR_REGNUM,
+   MICROBLAZE_ESR_REGNUM,
+@@ -102,17 +103,21 @@ enum microblaze_regnum
+   MICROBLAZE_RTLBSX_REGNUM,
+   MICROBLAZE_RTLBLO_REGNUM,
+   MICROBLAZE_RTLBHI_REGNUM,
+-  MICROBLAZE_SLR_REGNUM, MICROBLAZE_NUM_CORE_REGS = MICROBLAZE_SLR_REGNUM,
++  MICROBLAZE_SLR_REGNUM,
+   MICROBLAZE_SHR_REGNUM,
+-  MICROBLAZE_NUM_REGS
++  MICROBLAZE_NUM_REGS, MICROBLAZE_NUM_CORE_REGS = MICROBLAZE_NUM_REGS
+ };
+ 
++/* Big enough to hold the size of the largest register in bytes.  */
++#define MICROBLAZE_MAX_REGISTER_SIZE   64
++
+ struct microblaze_frame_cache
+ {
+   /* Base address.  */
+   CORE_ADDR base;
+   CORE_ADDR pc;
+ 
++  CORE_ADDR saved_sp;
+   /* Do we have a frame?  */
+   int frameless_p;
+ 
+-- 
+2.34.1
+

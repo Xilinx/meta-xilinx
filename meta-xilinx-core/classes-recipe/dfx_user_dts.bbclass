@@ -26,7 +26,7 @@ do_fetch[cleandirs] = "${B}"
 DT_PADDING_SIZE = "0x1000"
 BOOTGEN_FLAGS ?= " -arch ${SOC_FAMILY} -w ${@bb.utils.contains('SOC_FAMILY','zynqmp','','-process_bitstream bin',d)}"
 
-S ?= "${UNPACKDIR}"
+S ?= "${WORKDIR}"
 FW_DIR ?= ""
 DTSI_PATH ?= ""
 DTBO_PATH ?= ""
@@ -52,7 +52,7 @@ python() {
     import re
     soc_family = d.getVar("SOC_FAMILY")
     if "git://" in d.getVar("SRC_URI") or "https://" in d.getVar("SRC_URI"):
-        d.setVar("S",'${UNPACKDIR}/git/'+d.getVar("FW_DIR"))
+        d.setVar("S",'${WORKDIR}/git/'+d.getVar("FW_DIR"))
     else:
         dtsi_found = False
         dtbo_found = False
@@ -255,8 +255,12 @@ do_install() {
     # doesn't have any driver then user can load pdi/bit/bin file.
     if [ `ls ${S}/*.dtbo | wc -l` -eq 1 ]; then
         install -Dm 0644 ${S}/*.dtbo ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+    elif [ `ls ${S}/${DTBO_PATH}/*.dtbo | wc -l` -eq 1 ]; then
+        install -Dm 0644 ${S}/${DTBO_PATH}/*.dtbo ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
     elif [ `ls ${S}/*.dtbo | wc -l` -gt 1 ]; then
         bbfatal "Multiple DTBO found, use the right DTBO in SRC_URI from the following:\n$(basename -a ${S}/*.dtbo)"
+    elif [ `ls ${S}/${DTBO_PATH}/*.dtbo | wc -l` -gt 1 ]; then
+        bbfatal "Multiple DTBO found, use the right DTBO in SRC_URI from the following:\n$(basename -a ${S}/${DTBO_PATH}/*.dtbo)"
     elif [ -f ${B}/${USER_DTS_FILE}.dtbo ]; then
         install -Dm 0644 ${B}/${USER_DTS_FILE}.dtbo ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.dtbo
     else
@@ -272,12 +276,20 @@ do_install() {
     if [ "${SOC_FAMILY}" = "zynq" ] || [ "${SOC_FAMILY}" = "zynqmp" ]; then
         if [ `ls ${S}/*.bit | wc -l` -gt 1 ]; then
             bbfatal "Multiple .bit found, use the right .bit in SRC_URI from the following:\n$(basename -a ${S}/*.bit)"
+        elif [ `ls ${S}/${BIT_PATH}/*.bit | wc -l` -gt 1 ]; then
+            bbfatal "Multiple .bit found, use the right .bit in SRC_URI from the following:\n$(basename -a ${S}/${BIT_PATH}/*.bit)"
         elif [ `ls ${S}/*.bin | wc -l` -gt 1 ]; then
             bbfatal "Multiple .bin found, use the right .bin in SRC_URI from the following:\n$(basename -a ${S}/*.bin)"
+        elif [ `ls ${S}/${BIN_PATH}/*.bin | wc -l` -gt 1 ]; then
+            bbfatal "Multiple .bin found, use the right .bin in SRC_URI from the following:\n$(basename -a ${S}/${BIN_PATH}/*.bin)"
         elif [ `ls ${S}/*.bit | wc -l` -eq 1 ] && [ ! -f ${B}/${USER_DTS_FILE}.dtbo ]; then
             install -Dm 0644 ${S}/*.bit ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+        elif [ `ls ${S}/${BIT_PATH}/*.bit | wc -l` -eq 1 ] && [ ! -f ${B}/${USER_DTS_FILE}.dtbo ]; then
+            install -Dm 0644 ${S}/${BIT_PATH}/*.bit ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
         elif [ `ls ${S}/*.bin | wc -l` -eq 1 ]; then
             install -Dm 0644 ${S}/*.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+        elif [ `ls ${S}/${BIN_PATH}/*.bin | wc -l` -eq 1 ]; then
+            install -Dm 0644 ${S}/${BIN_PATH}/*.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
         elif [ -f ${B}/${PN}.bin ] && [ -f ${B}/${USER_DTS_FILE}.dtbo ]; then
             install -Dm 0644 ${B}/${PN}.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.bin
         else
@@ -295,10 +307,16 @@ do_install() {
     if [ "${SOC_FAMILY}" != "zynq" ] && [ "${SOC_FAMILY}" != "zynqmp" ]; then
         if [ `ls ${S}/*.pdi | wc -l` -eq 1 ] && [ ! -f ${B}/${USER_DTS_FILE}.dtbo ]; then
             install -Dm 0644 ${S}/*.pdi ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+        elif [ `ls ${S}/${PDI_PATH}/*.pdi | wc -l` -eq 1 ] && [ ! -f ${B}/${USER_DTS_FILE}.dtbo ]; then
+            install -Dm 0644 ${S}/${PDI_PATH}/*.pdi ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
         elif [ `ls ${S}/*.pdi | wc -l` -gt 1 ]; then
             bbfatal "Multiple PDI found, use the right PDI in SRC_URI from the following:\n$(basename -a ${S}/*.pdi)"
+        elif [ `ls ${S}/${PDI_PATH}/*.pdi | wc -l` -gt 1 ]; then
+            bbfatal "Multiple PDI found, use the right PDI in SRC_URI from the following:\n$(basename -a ${S}/${PDI_PATH}/*.pdi)"
         elif [ `ls ${S}/*.pdi | wc -l` -eq 1 ] && [ -f ${B}/${USER_DTS_FILE}.dtbo ]; then
             install -Dm 0644 ${S}/*.pdi ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.pdi
+        elif [ `ls ${S}/${PDI_PATH}/*.pdi | wc -l` -eq 1 ] && [ -f ${B}/${USER_DTS_FILE}.dtbo ]; then
+            install -Dm 0644 ${S}/${PDI_PATH}/*.pdi ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.pdi
         else
             bbwarn "A PDI file with '.pdi' expected but not found"
         fi

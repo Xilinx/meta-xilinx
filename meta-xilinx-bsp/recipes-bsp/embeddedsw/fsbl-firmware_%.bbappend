@@ -7,14 +7,10 @@ PMU_CONF_BASE_NAME ?= "${PMU_CONF_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAG
 DEPENDS:append:zynqmp = " virtual/${TARGET_PREFIX}binutils"
 
 do_compile:append:zynqmp () {
-    if [ -z "${SYSTEM_DTFILE}" ]; then
-        ${OBJCOPY} --dump-section .sys_cfg_data=${B}/${PMU_CONF_NAME}.bin ${B}/${ESW_COMPONENT}
-    fi
+    ${OBJCOPY} --dump-section .sys_cfg_data=${B}/${PMU_CONF_NAME}.bin ${B}/${ESW_COMPONENT}
 }
 
 do_deploy:append:zynqmp () {
-    if [ -z "${SYSTEM_DTFILE}" ]; then
-        install -Dm 0644 ${B}/${PMU_CONF_NAME}.bin ${DEPLOYDIR}/${PMU_CONF_BASE_NAME}.bin
-        ln -s ${PMU_CONF_BASE_NAME}.bin ${DEPLOYDIR}/${PMU_CONF_NAME}.bin
-    fi
+    install -Dm 0644 ${B}/${PMU_CONF_NAME}.bin ${DEPLOYDIR}/${PMU_CONF_BASE_NAME}.bin
+    ln -s ${PMU_CONF_BASE_NAME}.bin ${DEPLOYDIR}/${PMU_CONF_NAME}.bin
 }

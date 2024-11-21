@@ -9,7 +9,7 @@ PREFERRED_PROVIDER_nativesdk-qemu = "nativesdk-qemu-xilinx"
 MACHINEOVERRIDES =. "qemuboot-xilinx:"
 
 # depend on qemu-helper-native, which will depend on QEMU
-EXTRA_IMAGEDEPENDS += "qemu-system-native qemu-helper-native:do_addto_recipe_sysroot"
+EXTRA_IMAGEDEPENDS += "qemu-devicetrees-native qemu-system-native qemu-helper-native:do_addto_recipe_sysroot"
 
 # Use the xilinx specific version for these users
 IMAGE_CLASSES += "qemuboot-xilinx"
@@ -21,5 +21,5 @@ IMAGE_CLASSES += "qemuboot-xilinx"
 # QB_XILINX_SERIAL that will allow us to define serial ports for qemu
 # emulated boards that may not match the standard Linux behavior.
 #
-QB_XILINX_SERIAL ?= ""
-QB_OPT_APPEND += "${QB_XILINX_SERIAL}"
+QB_XILINX_SERIAL ??= ""
+QB_OPT_APPEND += "${QB_XILINX_SERIAL} -nodefaults"

@@ -52,7 +52,7 @@
 		reg = <0x0 0xffe00000 0x0 0x10000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&zynqmp_firmware 15>;
+		power-domains = <&zynqmp_firmware 15>;
 	};
 
 	tcm_0b: tcm_0b@ffe20000 {
@@ -60,14 +60,14 @@
 		reg = <0x0 0xffe20000 0x0 0x10000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&zynqmp_firmware 16>;
+		power-domains = <&zynqmp_firmware 16>;
 	};
 	tcm_1a: tcm_0a@ffe90000 {
 		no-map;
 		reg = <0x0 0xffe90000 0x0 0x10000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&zynqmp_firmware 17>;
+		power-domains = <&zynqmp_firmware 17>;
 	};
 
 	tcm_1b: tcm_0b@ffeb0000 {
@@ -75,7 +75,7 @@
 		reg = <0x0 0xffeb0000 0x0 0x10000>;
 		status = "okay";
 		compatible = "mmio-sram";
-		power-domain = <&zynqmp_firmware 18>;
+		power-domains = <&zynqmp_firmware 18>;
 	};
 	rf5ss@ff9a0000 {
 		compatible = "xlnx,zynqmp-r5-remoteproc";
@@ -92,7 +92,7 @@
 			ranges;
 			sram = <&tcm_0a>, <&tcm_0b>;
 			memory-region = <&rproc_0_reserved>, <&rpu0vdev0buffer>, <&rpu0vdev0vring0>, <&rpu0vdev0vring1>;
-			power-domain = <&zynqmp_firmware 7>;
+			power-domains = <&zynqmp_firmware 7>;
 			mboxes = <&ipi_mailbox_rpu0 0>, <&ipi_mailbox_rpu0 1>;
 			mbox-names = "tx", "rx";
 		};
@@ -103,7 +103,7 @@
 			ranges;
 			sram = <&tcm_1a>, <&tcm_1b>;
 			memory-region = <&rproc_1_reserved>, <&rpu1vdev0buffer>, <&rpu1vdev0vring0>, <&rpu1vdev0vring1>;
-			power-domain = <&zynqmp_firmware 8>;
+			power-domains = <&zynqmp_firmware 8>;
 			mboxes = <&ipi_mailbox_rpu1 0>, <&ipi_mailbox_rpu1 1>;
 			mbox-names = "tx", "rx";
 		};

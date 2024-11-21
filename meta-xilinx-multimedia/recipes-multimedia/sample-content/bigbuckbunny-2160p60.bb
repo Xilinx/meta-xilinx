@@ -10,7 +10,7 @@ inherit allarch
 
 do_install() {
     install -d ${D}${datadir}/movies
-    install -m 0644 ${UNPACKDIR}/bbb_sunflower_2160p_60fps_normal.mp4 ${D}${datadir}/movies/
+    install -m 0644 ${WORKDIR}/bbb_sunflower_2160p_60fps_normal.mp4 ${D}${datadir}/movies/
 }
 
 FILES:${PN} += "${datadir}/movies"

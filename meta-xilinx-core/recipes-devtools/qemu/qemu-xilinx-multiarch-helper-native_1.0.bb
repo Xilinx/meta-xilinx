@@ -9,14 +9,12 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI = "file://qemu-system-aarch64-multiarch"
 
-S = "${UNPACKDIR}"
-
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 
 SYSROOT_DIRS += "${bindir}/qemu-xilinx"
 
 do_install() {
-	install -Dm 0755 ${UNPACKDIR}/qemu-system-aarch64-multiarch ${D}${bindir}/qemu-system-aarch64-multiarch
+	install -Dm 0755 ${WORKDIR}/qemu-system-aarch64-multiarch ${D}${bindir}/qemu-system-aarch64-multiarch
 }
 

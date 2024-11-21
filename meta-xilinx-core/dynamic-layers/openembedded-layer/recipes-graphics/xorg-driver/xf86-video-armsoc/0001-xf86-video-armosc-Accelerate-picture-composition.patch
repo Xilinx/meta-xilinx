@@ -1,0 +1,1058 @@
+From 015f8a54f7e5a754e1cefba1aa7b1f6992a8aa9b Mon Sep 17 00:00:00 2001
+From: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
+Date: Tue, 16 Jul 2024 19:48:47 +0000
+Subject: [PATCH] xf86-video-armosc: Accelerate picture composition
+
+Introduce Repulsion - simplistic GPU accelerated compositor to back RandR
+display manipulation features. This library is inspired by Glamor extension
+https://www.freedesktop.org/wiki/Software/Glamor/. Unfortunately Glamor
+doesn't work as is on ARM Mali-400 MP due to the lack of required features
+and several bugs in Mali EGL/GLES implementation.
+
+Install and manage picture compositor hooks.
+
+Provide access to dma-buf fd from ARSOC buffer object.
+
+Attach shadow buffer object to corresponding pixmap.
+
+Signed-off-by: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
+---
+ src/Makefile.am        |   3 +-
+ src/armsoc_driver.c    | 145 ++++++++++
+ src/armsoc_driver.h    |   7 +
+ src/armsoc_dumb.c      |   8 +
+ src/armsoc_dumb.h      |   1 +
+ src/armsoc_exa.c       |  18 +-
+ src/armsoc_repulsion.c | 624 +++++++++++++++++++++++++++++++++++++++++
+ src/armsoc_repulsion.h |  67 +++++
+ 8 files changed, 867 insertions(+), 6 deletions(-)
+ create mode 100644 src/armsoc_repulsion.c
+ create mode 100644 src/armsoc_repulsion.h
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index db5f110..cd4f795 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -38,7 +38,7 @@ ERROR_CFLAGS = -Werror -Wall -Wdeclaration-after-statement -Wvla \
+ AM_CFLAGS = @XORG_CFLAGS@ $(ERROR_CFLAGS)
+ armsoc_drv_la_LTLIBRARIES = armsoc_drv.la
+ armsoc_drv_la_LDFLAGS = -module -avoid-version -no-undefined
+-armsoc_drv_la_LIBADD = @XORG_LIBS@
++armsoc_drv_la_LIBADD = -lMali @XORG_LIBS@
+ armsoc_drv_ladir = @moduledir@/drivers
+ DRMMODE_SRCS = drmmode_exynos/drmmode_exynos.c \
+ 	drmmode_pl111/drmmode_pl111.c \
+@@ -54,4 +54,5 @@ armsoc_drv_la_SOURCES = \
+          armsoc_dri2.c \
+          armsoc_driver.c \
+          armsoc_dumb.c \
++         armsoc_repulsion.c \
+          $(DRMMODE_SRCS)
+diff --git a/src/armsoc_driver.c b/src/armsoc_driver.c
+index a4a1ba3..f5b8f21 100644
+--- a/src/armsoc_driver.c
++++ b/src/armsoc_driver.c
+@@ -42,6 +42,7 @@
+ #include <pixman.h>
+ 
+ #include "armsoc_driver.h"
++#include "armsoc_repulsion.h"
+ 
+ #include "micmap.h"
+ 
+@@ -971,6 +972,138 @@ ARMSOCAccelInit(ScreenPtr pScreen)
+ 		pARMSOC->dri = FALSE;
+ }
+ 
++#define ARMSOC_ACCEL_MIN_DIMS	200
++
++/**
++ * Classify compositor input to figure out if we can accelerate composition
++ */
++static Bool
++ARMSOCCanAccelerateComposition(CARD8 op,
++							   PicturePtr src,
++							   PicturePtr mask,
++							   PicturePtr dest,
++							   CARD16 width,
++							   CARD16 height)
++{
++	/* We only support source to destination pixmap copy */
++	if (op != PictOpSrc)
++		return FALSE;
++
++	/*
++	 * Don't accelerate small picture compositions, e.g. toolbars, cursor,
++	 * icons, etc.
++	 */
++	if (width < ARMSOC_ACCEL_MIN_DIMS || height < ARMSOC_ACCEL_MIN_DIMS)
++		return FALSE;
++
++	/* Check source picture */
++	if (!src || !src->pDrawable)
++		return FALSE;
++
++	/* Check destination picture constraints */
++	if (!dest || !dest->pDrawable || dest->pDrawable->type != DRAWABLE_PIXMAP)
++		return FALSE;
++
++	/* We don't support masking */
++	if (mask)
++		return FALSE;
++
++	/*
++	 * We expect source transform to be assigned, otherwise there is not much
++	 * to accelerate
++	 */
++	if (!src->transform)
++		return FALSE;
++
++	/* We expect buffer object to be assigned to source */
++	if (!draw2pix(src->pDrawable))
++		return FALSE;
++
++	/* We expect buffer object to be assigned to destination */
++	if (!draw2pix(dest->pDrawable))
++		return FALSE;
++
++	return TRUE;
++}
++
++/**
++ * This callback will be invoked every time xserver needs to combine  2
++ * pictures. Our special interest is the case when we need to blit draw buffer
++ * into shadow buffer while performing rotation or reflection. Without
++ * acceleration such composition will end up in tons of matrix multiplications
++ * for every pixel, which is obviously very slow. Here we need to detect such
++ * cases and accelerate the composition on the GPU.
++ */
++static void
++ARMSOCComposite(CARD8 op,
++				PicturePtr src,
++				PicturePtr mask,
++				PicturePtr dest,
++				INT16 x_src,
++				INT16 y_src,
++				INT16 x_mask,
++				INT16 y_mask,
++				INT16 x_dest,
++				INT16 y_dest,
++				CARD16 width,
++				CARD16 height)
++{
++	ScreenPtr pScreen = dest->pDrawable->pScreen;
++	PictureScreenPtr ps = GetPictureScreen(pScreen);
++	ScrnInfoPtr pScrn = xf86ScreenToScrn(pScreen);
++	struct ARMSOCRec *pARMSOC = ARMSOCPTR(pScrn);
++    struct armsoc_bo *src_bo = NULL, *dest_bo = NULL;
++	float xform_matrix[3][3] = {};
++
++	Bool can_accelerate =
++		ARMSOCCanAccelerateComposition(op, src, mask, dest, width, height);
++
++
++	if (can_accelerate) {
++		/* Transpose, scale & adjust transformation matrix */
++		int x, y;
++		for (y = 0; y < 3; ++y)
++			for (x = 0; x < 3; ++x)
++				xform_matrix[x][y] =
++					(float)src->transform->matrix[y][x] / 65536.f;
++		/*
++		 * TODO: Figure out coordinate system where these sins make sence,
++		 * insted of just reversing them
++		 */
++		xform_matrix[0][1] = -xform_matrix[0][1];
++		xform_matrix[1][0] = -xform_matrix[1][0];
++	}
++
++	/* Extract source buffer object */
++	if (can_accelerate) {
++		PixmapPtr pm = draw2pix(src->pDrawable);
++		src_bo = ARMSOCPixmapBo(pm);
++	}
++
++	/* Extract destination buffer object */
++	if (can_accelerate) {
++		PixmapPtr pm = draw2pix(dest->pDrawable);
++		dest_bo = ARMSOCPixmapBo(pm);
++	}
++
++	if (can_accelerate &&
++		armsoc_repulsion_composite(pARMSOC->repulsion,
++								   src_bo,
++								   dest_bo,
++								   xform_matrix)) {
++	} else {
++		/* Fallback to saved compositor if accelerated composition fails */
++		pARMSOC->composite_proc(op, src, mask, dest,
++								x_src, y_src, x_mask, y_mask,
++								x_dest, y_dest, width, height);
++	}
++
++	if (ps->Composite != ARMSOCComposite) {
++		pARMSOC->composite_proc = ps->Composite;
++		ps->Composite = ARMSOCComposite;
++	}
++}
++
+ /**
+  * The driver's ScreenInit() function, called at the start of each server
+  * generation. Fill in pScreen, map the frame buffer, save state,
+@@ -986,6 +1119,7 @@ ARMSOCScreenInit(SCREEN_INIT_ARGS_DECL)
+ 	struct ARMSOCRec *pARMSOC = ARMSOCPTR(pScrn);
+ 	VisualPtr visual;
+ 	xf86CrtcConfigPtr xf86_config;
++	PictureScreenPtr ps;
+ 	int j;
+ 	const char *fbdev;
+ 	int depth;
+@@ -1174,6 +1308,13 @@ ARMSOCScreenInit(SCREEN_INIT_ARGS_DECL)
+ 		pARMSOC->lockFD = -1;
+ 	}
+ 
++	pARMSOC->repulsion = armsoc_repulsion_init();
++
++	ps = GetPictureScreen(pScreen);
++	pARMSOC->composite_proc = ps->Composite;
++
++	ps->Composite = ARMSOCComposite;
++
+ 	TRACE_EXIT();
+ 	return TRUE;
+ 
+@@ -1250,6 +1391,8 @@ ARMSOCCloseScreen(CLOSE_SCREEN_ARGS_DECL)
+ 
+ 	TRACE_ENTER();
+ 
++	armsoc_repulsion_release(pARMSOC->repulsion);
++
+ 	drmmode_screen_fini(pScrn);
+ 	drmmode_cursor_fini(pScreen);
+ 
+@@ -1294,6 +1437,8 @@ ARMSOCCloseScreen(CLOSE_SCREEN_ARGS_DECL)
+ 		pARMSOC->lockFD = -1;
+ 	}
+ 
++	armsoc_repulsion_release(pARMSOC->repulsion);
++
+ 	TRACE_EXIT();
+ 
+ 	return ret;
+diff --git a/src/armsoc_driver.h b/src/armsoc_driver.h
+index eae76ca..20b0f80 100644
+--- a/src/armsoc_driver.h
++++ b/src/armsoc_driver.h
+@@ -38,6 +38,7 @@
+ #include "xf86drm.h"
+ #include <errno.h>
+ #include "armsoc_exa.h"
++#include "armsoc_repulsion.h"
+ 
+ /* Apparently not used by X server */
+ #define ARMSOC_VERSION		1000
+@@ -183,6 +184,12 @@ struct ARMSOCRec {
+ 	/* Size of the swap chain. Set to 1 if DRI2SwapLimit unsupported,
+ 	 * driNumBufs if early display enabled, otherwise driNumBufs-1 */
+ 	unsigned int                       swap_chain_size;
++
++	/* GPU accelerated picture compositor, AKA Repulsion */
++	struct ARMSOCRepulsion				*repulsion;
++
++	/* SW (pixman based) picture compositor fallback */
++	CompositeProcPtr composite_proc;
+ };
+ 
+ /*
+diff --git a/src/armsoc_dumb.c b/src/armsoc_dumb.c
+index 7e6dbd9..3c16ed2 100644
+--- a/src/armsoc_dumb.c
++++ b/src/armsoc_dumb.c
+@@ -130,6 +130,14 @@ int armsoc_bo_has_dmabuf(struct armsoc_bo *bo)
+ 	return bo->dmabuf >= 0;
+ }
+ 
++int armsoc_bo_get_dmabuf(struct armsoc_bo *bo)
++{
++	if (!armsoc_bo_has_dmabuf(bo))
++		armsoc_bo_set_dmabuf(bo);
++
++	return bo->dmabuf;
++}
++
+ struct armsoc_bo *armsoc_bo_new_with_dim(struct armsoc_device *dev,
+ 			uint32_t width, uint32_t height, uint8_t depth,
+ 			uint8_t bpp, enum armsoc_buf_type buf_type)
+diff --git a/src/armsoc_dumb.h b/src/armsoc_dumb.h
+index a299ccf..3b687c7 100644
+--- a/src/armsoc_dumb.h
++++ b/src/armsoc_dumb.h
+@@ -89,6 +89,7 @@ void armsoc_bo_unreference(struct armsoc_bo *bo);
+ int armsoc_bo_set_dmabuf(struct armsoc_bo *bo);
+ void armsoc_bo_clear_dmabuf(struct armsoc_bo *bo);
+ int armsoc_bo_has_dmabuf(struct armsoc_bo *bo);
++int armsoc_bo_get_dmabuf(struct armsoc_bo *bo);
+ int armsoc_bo_clear(struct armsoc_bo *bo);
+ int armsoc_bo_rm_fb(struct armsoc_bo *bo);
+ int armsoc_bo_resize(struct armsoc_bo *bo, uint32_t new_width,
+diff --git a/src/armsoc_exa.c b/src/armsoc_exa.c
+index a310727..7edf0ac 100644
+--- a/src/armsoc_exa.c
++++ b/src/armsoc_exa.c
+@@ -161,10 +161,16 @@ ARMSOCModifyPixmapHeader(PixmapPtr pPixmap, int width, int height,
+ 	ScrnInfoPtr pScrn = pix2scrn(pPixmap);
+ 	struct ARMSOCRec *pARMSOC = ARMSOCPTR(pScrn);
+ 	enum armsoc_buf_type buf_type = ARMSOC_BO_NON_SCANOUT;
++	struct armsoc_bo *fb_bo = NULL;
+ 
+     /* Only modify specified fields, keeping all others intact. */
+-	if (pPixData)
++	if (pPixData) {
+ 		pPixmap->devPrivate.ptr = pPixData;
++		if (pARMSOC->shadow && pPixData == armsoc_bo_map(pARMSOC->shadow))
++			fb_bo = pARMSOC->shadow;
++		else if (pPixData == armsoc_bo_map(pARMSOC->scanout))
++			fb_bo = pARMSOC->scanout;
++	}
+ 
+ 	if (devKind > 0)
+ 		pPixmap->devKind = devKind;
+@@ -173,7 +179,7 @@ ARMSOCModifyPixmapHeader(PixmapPtr pPixmap, int width, int height,
+ 	 * We can't accelerate this pixmap, and don't ever want to
+ 	 * see it again..
+ 	 */
+-	if (pPixData && pPixData != armsoc_bo_map(pARMSOC->scanout)) {
++	if (pPixData && fb_bo && pPixData != armsoc_bo_map(fb_bo)) {
+ 		/* scratch-pixmap (see GetScratchPixmapHeader()) gets recycled,
+ 		 * so could have a previous bo!
+ 		 * Pixmap drops ref on its old bo */
+@@ -185,10 +191,10 @@ ARMSOCModifyPixmapHeader(PixmapPtr pPixmap, int width, int height,
+ 	}
+ 
+ 	/* Replacing the pixmap's current bo with the scanout bo */
+-	if (pPixData == armsoc_bo_map(pARMSOC->scanout) && priv->bo != pARMSOC->scanout) {
++	if (fb_bo && pPixData == armsoc_bo_map(fb_bo) && priv->bo != fb_bo) {
+ 		struct armsoc_bo *old_bo = priv->bo;
+ 
+-		priv->bo = pARMSOC->scanout;
++		priv->bo = fb_bo;
+ 		/* pixmap takes a ref on its new bo */
+ 		armsoc_bo_reference(priv->bo);
+ 
+@@ -225,7 +231,9 @@ ARMSOCModifyPixmapHeader(PixmapPtr pPixmap, int width, int height,
+ 	if (!pPixmap->drawable.width || !pPixmap->drawable.height)
+ 		return TRUE;
+ 
+-	assert(priv->bo);
++	if(!priv->bo)
++		return FALSE;
++
+ 	if (armsoc_bo_width(priv->bo) != pPixmap->drawable.width ||
+ 	    armsoc_bo_height(priv->bo) != pPixmap->drawable.height ||
+ 	    armsoc_bo_bpp(priv->bo) != pPixmap->drawable.bitsPerPixel) {
+diff --git a/src/armsoc_repulsion.c b/src/armsoc_repulsion.c
+new file mode 100644
+index 0000000..1a7c0cd
+--- /dev/null
++++ b/src/armsoc_repulsion.c
+@@ -0,0 +1,624 @@
++/*
++ * Copyright (C) 2024 AMD, Inc.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a
++ * copy of this software and associated documentation files (the "Software"),
++ * to deal in the Software without restriction, including without limitation
++ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the
++ * Software is furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice (including the next
++ * paragraph) shall be included in all copies or substantial portions of the
++ * Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++ * SOFTWARE.
++ *
++ * Author: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
++ *
++ */
++
++#include "armsoc_repulsion.h"
++
++#include <stdlib.h>
++#include <drm_fourcc.h>
++
++#define EGL_GL_PROTOTYPES 1
++#include <EGL/egl.h>
++#define EGL_EGLEXT_PROTOTYPES 1
++#include <EGL/eglext.h>
++#include <GLES2/gl2.h>
++#define GL_GLEXT_PROTOTYPES 1
++#include <GLES2/gl2ext.h>
++
++#include <xf86.h>
++
++/* -----------------------------------------------------------------------------
++ * Utilities
++ */
++
++#define INFO_LOG(fmt, ...) \
++do { xf86DrvMsg(0, X_INFO, fmt "\n", ##__VA_ARGS__); } while (0)
++
++#define WARN_LOG(fmt, ...) \
++do { xf86DrvMsg(0, X_WARNING, "WARNING: " fmt "\n", ##__VA_ARGS__); } while (0)
++
++#define ERROR_LOG(fmt, ...) \
++do { xf86DrvMsg(0, X_ERROR, "ERROR: " fmt "\n", ##__VA_ARGS__); } while (0)
++
++/**
++ * struct RepulsiveVertex - vertex data used for rendering
++ * @pos: vertex position in the screen coordinate  space
++ * @uv: texture coordinate bound to this vertex
++ */
++struct RepulsiveVertex {
++    GLfloat pos[3];
++    GLfloat uv[2];
++};
++
++/**
++ * struct ARMSOCRepulsion - GPU acceleration data
++ * @egl: EGL specific bits
++ * @egl.display: EGL display connection
++ * @egl.context: EGL context
++ * @egl.surface: primary EGL surface
++ * @gles: OpenGL ES related bits
++ * @gles.vbo: Vertex buffer object
++ * @gles.ibo: Index buffer object
++ * @gles.texture: External texture object
++ * @gles.proj_location: Shader location for projection matrix
++ * @gles.xform_location: Shader location for transformation matrix
++ * @gles.vertices: Array of vertices used in rendering
++ */
++struct ARMSOCRepulsion {
++    struct {
++        EGLDisplay display;
++        EGLContext context;
++        EGLSurface surface;
++    } egl;
++    struct {
++        GLuint  vbo;
++        GLuint  ibo;
++        GLuint  texture;
++        GLuint  program;
++        GLint   proj_location;
++        GLint   xform_location;
++        struct RepulsiveVertex vertices[4];
++    } gles;
++};
++
++/* -----------------------------------------------------------------------------
++ * GLES2 Functions
++ */
++
++static const char *vertex_shader = "                                \
++precision highp float;                                              \
++                                                                    \
++uniform mat3 u_projection;                                          \
++uniform mat3 u_transform;                                           \
++attribute vec3 a_position;                                          \
++attribute vec2 a_texcoord;                                          \
++                                                                    \
++varying vec2 v_texcoord;                                            \
++                                                                    \
++void main()                                                         \
++{                                                                   \
++    gl_Position.xyz =  u_transform * u_projection * a_position;     \
++    gl_Position.w = 1.0;                                            \
++    v_texcoord = a_texcoord;                                        \
++}                                                                   \
++";
++
++static const char *fragment_shader = "                              \
++#extension GL_OES_EGL_image_external : require\n                    \
++precision highp float;                                              \
++                                                                    \
++uniform samplerExternalOES texture;                                 \
++varying vec2 v_texcoord;                                            \
++                                                                    \
++void main()                                                         \
++{                                                                   \
++    gl_FragColor = texture2D(texture, v_texcoord);                  \
++}                                                                   \
++";
++
++#define SHADER_POSITION_ATTR_SLOT 0
++#define SHADER_TEX_COOR_ATTR_SLOT 1
++
++static void armsoc_repulsion_gles_log(GLenum source, GLenum type, GLuint id,
++                                      GLenum severity, GLsizei length,
++                                      const GLchar *message, const void *data)
++{
++    switch (severity) {
++        case GL_DEBUG_SEVERITY_HIGH_KHR:
++            ERROR_LOG("GLES2: %s", message);
++            break;
++        case GL_DEBUG_SEVERITY_MEDIUM_KHR:
++            WARN_LOG("GLES2: %s", message);
++            break;
++        default:
++            INFO_LOG("GLES2: %s", message);
++    };
++}
++
++static const char* gles_error_str(GLenum err)
++{
++    switch (err) {
++        case GL_NO_ERROR:                       return "no error";
++        case GL_INVALID_ENUM:                   return "invalid enum";
++        case GL_INVALID_VALUE:                  return "invalid value";
++        case GL_INVALID_OPERATION:              return "invalid operation";
++        case GL_OUT_OF_MEMORY:                  return "out of memory";
++        case GL_INVALID_FRAMEBUFFER_OPERATION:  return "invalid fb operation";
++        default:                                return "unknowm error";
++    }
++};
++
++static int armsoc_repulsion_compile_shader(struct ARMSOCRepulsion *repulsion)
++{
++    GLuint vs, fs;
++    GLint status, texture;
++    GLenum err;
++
++    vs = glCreateShader(GL_VERTEX_SHADER);
++    if (!vs) {
++        err = glGetError();
++        return err == GL_NO_ERROR ? -1 : err;
++    }
++    glShaderSource(vs, 1, &vertex_shader, NULL);
++    glCompileShader(vs);
++    glGetShaderiv(vs, GL_COMPILE_STATUS, &status);
++    if (status == GL_FALSE) {
++        GLint max_len = 1024;
++        GLchar err_log[1024];
++        glGetShaderInfoLog(vs, max_len, &max_len, &err_log[0]);
++        ERROR_LOG("VS: %s", err_log);
++        err = glGetError();
++        return err == GL_NO_ERROR ? -1 : err;
++    }
++
++    fs = glCreateShader(GL_FRAGMENT_SHADER);
++    if (!fs) {
++        err = glGetError();
++        return err == GL_NO_ERROR ? -1 : err;
++    }
++    glShaderSource(fs, 1, &fragment_shader, NULL);
++    glCompileShader(fs);
++    glGetShaderiv(fs, GL_COMPILE_STATUS, &status);
++    if (status == GL_FALSE) {
++        err = glGetError();
++        return err == GL_NO_ERROR ? -1 : err;
++    }
++
++    repulsion->gles.program = glCreateProgram();
++    if (!repulsion->gles.program) {
++        err = glGetError();
++        return err == GL_NO_ERROR ? -1 : err;
++    }
++    glAttachShader(repulsion->gles.program, vs);
++    glAttachShader(repulsion->gles.program, fs);
++    glBindAttribLocation(repulsion->gles.program, SHADER_POSITION_ATTR_SLOT,
++                         "a_position");
++    glBindAttribLocation(repulsion->gles.program, SHADER_TEX_COOR_ATTR_SLOT,
++                         "a_texcoord");
++    glLinkProgram(repulsion->gles.program);
++    glDetachShader(repulsion->gles.program, vs);
++    glDetachShader(repulsion->gles.program, fs);
++    glGetProgramiv(repulsion->gles.program, GL_LINK_STATUS, &status);
++    if (status == GL_FALSE) {
++        err = glGetError();
++        return err == GL_NO_ERROR ? -1 : err;
++    }
++    glUseProgram(repulsion->gles.program);
++    glEnableVertexAttribArray(SHADER_POSITION_ATTR_SLOT);
++    glEnableVertexAttribArray(SHADER_TEX_COOR_ATTR_SLOT);
++
++    repulsion->gles.proj_location =
++        glGetUniformLocation(repulsion->gles.program, "u_projection");
++    repulsion->gles.xform_location =
++        glGetUniformLocation(repulsion->gles.program, "u_transform");
++
++    texture = glGetUniformLocation(repulsion->gles.program, "texture");
++    glUniform1i(texture, 0);
++    glActiveTexture(GL_TEXTURE0);
++
++    return GL_NO_ERROR;
++}
++
++static int armsoc_repulsion_create_vbo(struct ARMSOCRepulsion *repulsion)
++{
++    glGenBuffers(1, &repulsion->gles.vbo);
++    glBindBuffer(GL_ARRAY_BUFFER, repulsion->gles.vbo);
++
++    return GL_NO_ERROR;
++}
++
++static int armsoc_repulsion_create_ibo(struct ARMSOCRepulsion *repulsion)
++{
++    static const GLushort indices[] = {0, 1, 2, 0, 2, 3};
++
++    glGenBuffers(1, &repulsion->gles.ibo);
++    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, repulsion->gles.ibo);
++    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
++                 GL_STATIC_DRAW);
++
++    return GL_NO_ERROR;
++}
++
++static int armsoc_repulsion_create_texture(struct ARMSOCRepulsion *repulsion)
++{
++    glGenTextures(1, &repulsion->gles.texture);
++    glBindTexture(GL_TEXTURE_EXTERNAL_OES, repulsion->gles.texture);
++    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
++    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
++    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_S,
++                    GL_CLAMP_TO_EDGE);
++    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_T,
++                    GL_CLAMP_TO_EDGE);
++
++    return GL_NO_ERROR;
++}
++
++static int armsoc_repulsion_init_gles(struct ARMSOCRepulsion *repulsion)
++{
++    int rc;
++
++    glEnable(GL_DEBUG_OUTPUT_KHR);
++    glDebugMessageCallbackKHR(armsoc_repulsion_gles_log, repulsion);
++
++    rc = armsoc_repulsion_compile_shader(repulsion);
++    if (rc != GL_NO_ERROR) {
++        ERROR_LOG("Failed to compile shader: 0x%04x (%s)",
++                  rc, gles_error_str(rc));
++        return rc;
++    }
++
++    rc = armsoc_repulsion_create_vbo(repulsion);
++    if (rc != GL_NO_ERROR) {
++        ERROR_LOG("Failed to create vertex buffer: 0x%04x (%s)",
++                  rc, gles_error_str(rc));
++        return rc;
++    }
++
++    rc = armsoc_repulsion_create_ibo(repulsion);
++    if (rc != GL_NO_ERROR) {
++        ERROR_LOG("Failed to create index buffer: 0x%04x (%s)",
++                  rc, gles_error_str(rc));
++        return rc;
++    }
++
++    rc = armsoc_repulsion_create_texture(repulsion);
++    if (rc != GL_NO_ERROR) {
++        ERROR_LOG("Failed to create texture: 0x%04x (%s)",
++                  rc, gles_error_str(rc));
++        return rc;
++    }
++
++    return GL_NO_ERROR;
++}
++
++static void armsoc_repulsion_release_texture(struct ARMSOCRepulsion *repulsion)
++{
++    glDeleteTextures(1, &repulsion->gles.texture);
++}
++
++static void armsoc_repulsion_release_ibo(struct ARMSOCRepulsion *repulsion)
++{
++    glDeleteBuffers(1, &repulsion->gles.ibo);
++}
++
++static void armsoc_repulsion_release_vbo(struct ARMSOCRepulsion *repulsion)
++{
++    glDeleteBuffers(1, &repulsion->gles.vbo);
++}
++
++static void armsoc_repulsion_release_shader(struct ARMSOCRepulsion *repulsion)
++{
++    glDeleteProgram(repulsion->gles.program);
++}
++
++static void armsoc_repulsion_release_gles(struct ARMSOCRepulsion *repulsion)
++{
++    armsoc_repulsion_release_texture(repulsion);
++    armsoc_repulsion_release_ibo(repulsion);
++    armsoc_repulsion_release_vbo(repulsion);
++    armsoc_repulsion_release_shader(repulsion);
++}
++
++/* -----------------------------------------------------------------------------
++ * EGL Functions
++ */
++
++static const char* egl_error_str(EGLint err)
++{
++    switch (err) {
++        case EGL_SUCCESS:               return "no error";
++        case EGL_NOT_INITIALIZED:       return "not initialized";
++        case EGL_BAD_ACCESS:            return "bad access";
++        case EGL_BAD_ALLOC:             return "bad alloc";
++        case EGL_BAD_CONFIG:            return "bad config";
++        case EGL_BAD_CONTEXT:           return "bad context";
++        case EGL_BAD_CURRENT_SURFACE:   return "bad current surface";
++        case EGL_BAD_DISPLAY:           return "bad display";
++        case EGL_BAD_MATCH:             return "bad match";
++        case EGL_BAD_NATIVE_PIXMAP:     return "bad native pixmap";
++        case EGL_BAD_NATIVE_WINDOW:     return "bad native window";
++        case EGL_BAD_PARAMETER:         return "bad parameter";
++        case EGL_BAD_SURFACE:           return "bad surface";
++        case EGL_CONTEXT_LOST:          return "context lost";
++        default:                        return "unknowm error";
++    }
++};
++
++static int armsoc_repulsion_init_egl(struct ARMSOCRepulsion *repulsion)
++{
++    static const EGLint config_attrs[] = {
++        EGL_RENDERABLE_TYPE,    EGL_OPENGL_ES2_BIT,
++        EGL_CONFORMANT,         EGL_OPENGL_ES2_BIT,
++        EGL_SURFACE_TYPE,       EGL_PBUFFER_BIT,
++        EGL_DEPTH_SIZE,         8,
++        EGL_RED_SIZE,           8,
++        EGL_GREEN_SIZE,         8,
++        EGL_BLUE_SIZE,          8,
++        EGL_ALPHA_SIZE,         8,
++        EGL_NONE
++    };
++    static const EGLint context_attrs[] = {
++        EGL_CONTEXT_CLIENT_VERSION,     2,
++        EGL_NONE
++    };
++    EGLint count;
++    EGLConfig config;
++
++    repulsion->egl.display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
++    if (repulsion->egl.display == EGL_NO_DISPLAY)
++        return eglGetError();
++
++    if(!eglInitialize(repulsion->egl.display, NULL, NULL))
++        return eglGetError();
++
++    if (!eglChooseConfig(repulsion->egl.display, config_attrs, &config, 1,
++                         &count))
++        return eglGetError();
++
++    if (!eglBindAPI(EGL_OPENGL_ES_API))
++        return eglGetError();
++
++    repulsion->egl.context = eglCreateContext(repulsion->egl.display, config,
++                                              EGL_NO_CONTEXT, context_attrs);
++    if (repulsion->egl.context == EGL_NO_CONTEXT)
++        return eglGetError();
++
++    repulsion->egl.surface = eglCreatePbufferSurface(repulsion->egl.display,
++                                                     config, NULL);
++    if (repulsion->egl.surface == EGL_NO_SURFACE)
++        return eglGetError();
++
++    if (!eglMakeCurrent(repulsion->egl.display, repulsion->egl.surface,
++                        repulsion->egl.surface, repulsion->egl.context))
++        return eglGetError();
++
++    if (!eglSwapInterval(repulsion->egl.display, 0))
++        return eglGetError();
++
++    return EGL_SUCCESS;
++}
++
++static void armsoc_repulsion_release_egl(struct ARMSOCRepulsion *repulsion)
++{
++    if (repulsion->egl.surface != EGL_NO_SURFACE)
++        eglDestroySurface(repulsion->egl.display, repulsion->egl.surface);
++
++    if (repulsion->egl.context)
++        eglDestroyContext(repulsion->egl.display, repulsion->egl.context);
++
++    if (repulsion->egl.display)
++        eglTerminate(repulsion->egl.display);
++
++    repulsion->egl.display = EGL_NO_DISPLAY;
++}
++
++static EGLint armsoc_repulsion_guess_bo_format(struct armsoc_bo *bo)
++{
++    switch(armsoc_bo_bpp(bo)) {
++        case 16:
++            return DRM_FORMAT_RGB565;
++        case 32:
++            return DRM_FORMAT_ARGB8888;
++        default:
++            return 0;
++    }
++}
++
++static EGLImageKHR
++armsoc_repulsion_create_egl_image(struct ARMSOCRepulsion *repulsion,
++                                  struct armsoc_bo *bo)
++{
++    const EGLint attributes[] = {
++        EGL_WIDTH,                      armsoc_bo_width(bo),
++        EGL_HEIGHT,                     armsoc_bo_height(bo),
++        EGL_LINUX_DRM_FOURCC_EXT,       armsoc_repulsion_guess_bo_format(bo),
++        EGL_DMA_BUF_PLANE0_FD_EXT,      armsoc_bo_get_dmabuf(bo),
++        EGL_DMA_BUF_PLANE0_OFFSET_EXT,  0,
++        EGL_DMA_BUF_PLANE0_PITCH_EXT,   armsoc_bo_pitch(bo),
++        EGL_NONE
++    };
++
++    return eglCreateImageKHR(repulsion->egl.display, EGL_NO_CONTEXT,
++                             EGL_LINUX_DMA_BUF_EXT, NULL, attributes);
++}
++
++static void
++armsoc_repulsion_destroy_egl_image(struct ARMSOCRepulsion *repulsion,
++                                   EGLImageKHR img)
++{
++    eglDestroyImageKHR(repulsion->egl.display, img);
++}
++
++/* -----------------------------------------------------------------------------
++ * Repulsion API
++ */
++
++bool armsoc_repulsion_composite(struct ARMSOCRepulsion *repulsion,
++                                struct armsoc_bo *src,
++                                struct armsoc_bo *dest,
++                                float xform_matrix[3][3])
++{
++    GLuint tex, fbo;
++    GLenum status;
++    EGLImageKHR dest_img, src_img;
++    GLsizei width, height;
++    static GLfloat proj_matrix[3][3] = {
++        {  2.f,  0.f, 0.f },
++        {  0.f,  2.f, 0.f },
++        { -1.f, -1.f, 0.f },
++    };
++
++    if (!repulsion || !src || !dest)
++        return false;
++
++    dest_img = armsoc_repulsion_create_egl_image(repulsion, dest);
++    if (dest_img == EGL_NO_IMAGE_KHR) {
++        EGLint err = eglGetError();
++        ERROR_LOG("Failed to create dest EGL image: 0x%04x (%s)",
++                  err, egl_error_str(err));
++        return false;
++    }
++    src_img = armsoc_repulsion_create_egl_image(repulsion, src);
++    if (src_img == EGL_NO_IMAGE_KHR) {
++        EGLint err = eglGetError();
++        ERROR_LOG("Failed to create src EGL image: 0x%04x (%s)",
++                  err, egl_error_str(err));
++        armsoc_repulsion_destroy_egl_image(repulsion, dest_img);
++        return false;
++    }
++
++    glGenTextures(1, &tex);
++    glBindTexture(GL_TEXTURE_2D, tex);
++    glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, dest_img);
++
++    glGenFramebuffers(1, &fbo);
++    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
++
++    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
++                           GL_TEXTURE_2D, tex, 0);
++
++    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
++    if (status != GL_FRAMEBUFFER_COMPLETE) {
++        ERROR_LOG("Failed to complete framebuffer");
++        glDeleteFramebuffers(1, &fbo);
++        glDeleteTextures(1, &tex);
++        armsoc_repulsion_destroy_egl_image(repulsion, dest_img);
++        armsoc_repulsion_destroy_egl_image(repulsion, src_img);
++        return false;
++    }
++
++    width = armsoc_bo_width(dest);
++    height = armsoc_bo_height(dest);
++    proj_matrix[0][0] = 2.f / width;
++    proj_matrix[1][1] = 2.f / height;
++
++    glUniformMatrix3fv(repulsion->gles.proj_location, 1, false,
++                       &proj_matrix[0][0]);
++
++    glUniformMatrix3fv(repulsion->gles.xform_location, 1, false,
++                       &xform_matrix[0][0]);
++
++    glViewport(0, 0, width, height);
++
++    glClearColor(0.f, 0.f, 1.f, 1.f);
++    glClear(GL_COLOR_BUFFER_BIT);
++
++    glEGLImageTargetTexture2DOES(GL_TEXTURE_EXTERNAL_OES, src_img);
++
++    repulsion->gles.vertices[0].pos[0] = 0.f;
++    repulsion->gles.vertices[0].pos[1] = height;
++    repulsion->gles.vertices[0].pos[2] = 1.f;
++    repulsion->gles.vertices[0].uv[0]  = 0.f;
++    repulsion->gles.vertices[0].uv[1]  = 1.f;
++
++    repulsion->gles.vertices[1].pos[0] = 0.f;
++    repulsion->gles.vertices[1].pos[1] = 0.f;
++    repulsion->gles.vertices[1].pos[2] = 1.f;
++    repulsion->gles.vertices[1].uv[0]  = 0.f;
++    repulsion->gles.vertices[1].uv[1]  = 0.f;
++
++    repulsion->gles.vertices[2].pos[0] = width;
++    repulsion->gles.vertices[2].pos[1] = 0.f;
++    repulsion->gles.vertices[2].pos[2] = 1.f;
++    repulsion->gles.vertices[2].uv[0]  = 1.f;
++    repulsion->gles.vertices[2].uv[1]  = 0.f;
++
++    repulsion->gles.vertices[3].pos[0] = width;
++    repulsion->gles.vertices[3].pos[1] = height;
++    repulsion->gles.vertices[3].pos[2] = 1.f;
++    repulsion->gles.vertices[3].uv[0]  = 1.f;
++    repulsion->gles.vertices[3].uv[1]  = 1.f;
++
++    glBufferData(GL_ARRAY_BUFFER, sizeof(repulsion->gles.vertices),
++                 repulsion->gles.vertices, GL_STATIC_DRAW);
++
++    glVertexAttribPointer(SHADER_POSITION_ATTR_SLOT, 3, GL_FLOAT, GL_FALSE,
++                          sizeof(*repulsion->gles.vertices), (const void *)(0));
++    glVertexAttribPointer(SHADER_TEX_COOR_ATTR_SLOT, 2, GL_FLOAT, GL_FALSE,
++                          sizeof(*repulsion->gles.vertices),
++                          (const void *)(sizeof(repulsion->gles.vertices->pos)));
++
++    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
++
++    glFinish();
++
++    glBindFramebuffer(GL_FRAMEBUFFER, 0);
++    glDeleteFramebuffers(1, &fbo);
++    glDeleteTextures(1, &tex);
++
++    armsoc_repulsion_destroy_egl_image(repulsion, src_img);
++    armsoc_repulsion_destroy_egl_image(repulsion, dest_img);
++
++    return true;
++}
++
++struct ARMSOCRepulsion *armsoc_repulsion_init(void)
++{
++    int rc;
++    struct ARMSOCRepulsion *repulsion = calloc(1, sizeof(*repulsion));
++    if (!repulsion) {
++        ERROR_LOG("Out of memory");
++        return NULL;
++    }
++
++    rc = armsoc_repulsion_init_egl(repulsion);
++    if (rc != EGL_SUCCESS) {
++        ERROR_LOG("Failed to initialize EGL: 0x%04x (%s)",
++                  rc, egl_error_str(rc));
++        armsoc_repulsion_release(repulsion);
++        return NULL;
++    }
++
++    rc = armsoc_repulsion_init_gles(repulsion);
++    if (rc != GL_NO_ERROR) {
++        ERROR_LOG("Failed to initialize GLES: 0x%04x (%s)",
++                  rc, gles_error_str(rc));
++        armsoc_repulsion_release(repulsion);
++        return NULL;
++    }
++
++    INFO_LOG("Repulsion initialized");
++
++    return repulsion;
++}
++
++void armsoc_repulsion_release(struct ARMSOCRepulsion *repulsion)
++{
++    if (!repulsion)
++        return;
++    armsoc_repulsion_release_gles(repulsion);
++    armsoc_repulsion_release_egl(repulsion);
++    free(repulsion);
++}
+diff --git a/src/armsoc_repulsion.h b/src/armsoc_repulsion.h
+new file mode 100644
+index 0000000..b5e57df
+--- /dev/null
++++ b/src/armsoc_repulsion.h
+@@ -0,0 +1,67 @@
++/*
++ * Copyright (C) 2024 AMD, Inc.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a
++ * copy of this software and associated documentation files (the "Software"),
++ * to deal in the Software without restriction, including without limitation
++ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
++ * and/or sell copies of the Software, and to permit persons to whom the
++ * Software is furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice (including the next
++ * paragraph) shall be included in all copies or substantial portions of the
++ * Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++ * SOFTWARE.
++ *
++ * Author: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
++ *
++ */
++
++#ifndef ARMSOC_REPULSION_H_
++#define ARMSOC_REPULSION_H_
++
++#include <stdbool.h>
++#include "armsoc_dumb.h"
++
++struct ARMSOCRepulsion;
++
++/**
++ * Initialize armsoc repulsion compositor.
++ *
++ * Return: pointer to new ARMSOCRepulsion object on success, NULL otherwise.
++ */
++struct ARMSOCRepulsion *armsoc_repulsion_init(void);
++
++/**
++ * Release armsoc repulsion compositor and free all resources.
++ * @repulsion: pointer to previously allocated ARMSOCRepulsion object.
++ */
++void armsoc_repulsion_release(struct ARMSOCRepulsion *repulsion);
++
++/**
++ * Perform 2 image composition.
++ * @repulsion: pointer to ARMSOCRepulsion object.
++ * @src: source buffer object.
++ * @dest: destination buffer object.
++ * @xform_matrix: transformation matrix to apply to source image before copying
++ * it into destination.
++ *
++ * This function performs GPU accelerated copy of @src buffer into @dest buffer
++ * while applying linear transformation.
++ *
++ * Return: pointer to new ARMSOCRepulsion object on success, NULL otherwise.
++ */
++bool armsoc_repulsion_composite(struct ARMSOCRepulsion *repulsion,
++                                struct armsoc_bo *src,
++                                struct armsoc_bo *dest,
++                                float xform_matrix[3][3]);
++
++
++#endif // ARMSOC_REPULSION_H_
+-- 
+2.25.1
+

@@ -1,0 +1,291 @@
+From 58fdfde013dfabf3a9f2c83525c00a6f057768f1 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Fri, 4 Oct 2024 15:49:46 -0600
+Subject: [PATCH] versal-net: Reorder serial port
+
+This commit requires the corresponding "versal: Reorder serial ports"
+
+This change affects the order of the serial ports when calling qemu.
+Previously the serial ports 0 & 1 were the PMC (firmware) uartlite,
+while the standard serial pors were 2 & 3.  Reverse this order to
+ensure that the first two serial ports are the ones used by Linux.
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ board-versal-net-psx-spp-1.4-alt.dts |  36 ++++++++
+ board-versal-net-psx-virt-alt.dts    | 130 +++++++++++++++++++++++++++
+ board-versal-pmx-virt-alt.dts        |  82 +++++++++++++++++
+ 3 files changed, 248 insertions(+)
+ create mode 100644 board-versal-net-psx-spp-1.4-alt.dts
+ create mode 100644 board-versal-net-psx-virt-alt.dts
+ create mode 100644 board-versal-pmx-virt-alt.dts
+
+diff --git a/board-versal-net-psx-spp-1.4-alt.dts b/board-versal-net-psx-spp-1.4-alt.dts
+new file mode 100644
+index 00000000..770a388e
+--- /dev/null
++++ b/board-versal-net-psx-spp-1.4-alt.dts
+@@ -0,0 +1,36 @@
++/*
++ * Versal Net PSX device tree.
++ *
++ * Copyright (c) 2022, Xilinx Inc
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above copyright
++ *       notice, this list of conditions and the following disclaimer in the
++ *       documentation and/or other materials provided with the distribution.
++ *     * Neither the name of the <organization> nor the
++ *       names of its contributors may be used to endorse or promote products
++ *       derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#define VERSAL_NET_APU_CPU_FREQ 100000000
++
++#include "board-versal-net-psx-virt-alt.dts"
++
++&pmc_tap {
++	platform-ver = <0x5>;
++};
+diff --git a/board-versal-net-psx-virt-alt.dts b/board-versal-net-psx-virt-alt.dts
+new file mode 100644
+index 00000000..7ee4ad9d
+--- /dev/null
++++ b/board-versal-net-psx-virt-alt.dts
+@@ -0,0 +1,130 @@
++/*
++ * Versal-Net Virtual PSX board device tree.
++ *
++ * Copyright (c) 2021-2022, Xilinx Inc.
++ * Copyright (C) 2022-2024, Advanced Micro Devices, Inc.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above copyright
++ *       notice, this list of conditions and the following disclaimer in the
++ *       documentation and/or other materials provided with the distribution.
++ *     * Neither the name of the <organization> nor the
++ *       names of its contributors may be used to endorse or promote products
++ *       derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#ifndef NUM_APUS
++#define NUM_APUS 16
++#endif
++#define VERSAL_NET_APU_CPU_FREQ 100000000
++
++#define NUM_APUS_PER_CLUSTER 4
++
++#define VERSAL_NPI_GENERIC
++#define VERSAL_PSX
++#define VERSAL_NET
++#define VERSAL_NPI_OVERRIDE
++
++/* TODO: Add GIC interrupt redirection support.  */
++#define RPU_GIC_INTERRUPT_TARGET_STEM rpu_cpu
++
++#define APU_CPU_MODEL "cortex-a78-arm-cpu"
++#define RPU_CPU_MODEL "cortex-r52-arm-cpu"
++
++#include "include/versal-net/npi-memmap.dtsh"
++#include "include/versal-net/fpd-memmap.dtsh"
++#include "board-versal-ps-virt-alt.dts"
++#include "versal-psx.dtsi"
++#include "versal-net-psmx.dtsi"
++#include "versal-psx-rpu.dtsi"
++#include "versal-net-boot-init.dtsi"
++#include "versal-net-hnic.dtsi"
++#include "versal-pmx-shared-overlay.dtsi"
++#include "versal-pmx-system-overlay.dtsi"
++#include "versal-psx-shared-overlay.dtsi"
++
++#ifndef VERSAL_NET_APU_CPU_FREQ
++ #define VERSAL_NET_APU_CPU_FREQ 2720000
++#endif
++
++#define SET_CPU_FREQ(n, f)					\
++&cpu ## n {							\
++	generic-timer-frequency = <f>;				\
++}
++
++SET_CPU_FREQ(0, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(1, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(2, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(3, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(4, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(5, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(6, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(7, VERSAL_NET_APU_CPU_FREQ);
++#if (NUM_APUS >= 16)
++SET_CPU_FREQ(8, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(9, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(10,VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(11,VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(12,VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(13,VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(14,VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(15,VERSAL_NET_APU_CPU_FREQ);
++#endif
++#if (NUM_APUS >= 32)
++SET_CPU_FREQ(16, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(17, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(18, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(19, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(20, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(21, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(22, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(23, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(24, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(25, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(26, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(27, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(28, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(29, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(30, VERSAL_NET_APU_CPU_FREQ);
++SET_CPU_FREQ(31, VERSAL_NET_APU_CPU_FREQ);
++#endif
++
++&rpu_ctrl_a {
++	tcm-mr = <&s_axi_tcm_a>;
++};
++&rpu_ctrl_a0 {
++	core = <&rpu_cpu0>;
++};
++&rpu_ctrl_a1 {
++	core = <&rpu_cpu1>;
++};
++
++&rpu_ctrl_b {
++	tcm-mr = <&s_axi_tcm_b>;
++};
++&rpu_ctrl_b0 {
++	core = <&rpu_cpu2>;
++};
++&rpu_ctrl_b1 {
++	core = <&rpu_cpu3>;
++};
++
++&pmc_tap {
++	idcode = <0x14D80093>;
++	platform-ver = <0x5>;
++};
+diff --git a/board-versal-pmx-virt-alt.dts b/board-versal-pmx-virt-alt.dts
+new file mode 100644
+index 00000000..7a4679d0
+--- /dev/null
++++ b/board-versal-pmx-virt-alt.dts
+@@ -0,0 +1,82 @@
++/*
++ * Versal Virtual PMC board device tree
++ *
++ * Copyright (c) 2016, Xilinx Inc
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions are met:
++ *     * Redistributions of source code must retain the above copyright
++ *       notice, this list of conditions and the following disclaimer.
++ *     * Redistributions in binary form must reproduce the above copyright
++ *       notice, this list of conditions and the following disclaimer in the
++ *       documentation and/or other materials provided with the distribution.
++ *     * Neither the name of the <organization> nor the
++ *       names of its contributors may be used to endorse or promote products
++ *       derived from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
++ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#define VERSAL_PMX
++#define VERSAL_NET
++#define NUM_APUS 16
++#define NUM_APUS_PER_CLUSTER 4
++#define VERSAL_NPI_OVERRIDE
++
++#include "include/versal-net/npi-memmap.dtsh"
++#include "include/versal-net/fpd-memmap.dtsh"
++#include "board-versal-pmc-virt-alt.dts"
++#include "versal-pmx-shared-overlay.dtsi"
++
++#ifndef MULTI_ARCH
++/*
++ * The single-arch setup has the entire system except
++ * the ARM cores. So we need to add the missing dummy
++ * ARM cores (pmc-virt.dts already has 0 - 1) and include
++ * the PSX and PMX system overlays.
++ */
++#include "versal-pmx-system-overlay.dtsi"
++#include "versal-psx.dtsi"
++#include "versal-psx-shared-overlay.dtsi"
++#include "versal-net-psmx.dtsi"
++
++/ {
++	/* Dummy APUs.  */
++	cpu2: apu@2 { };
++	cpu3: apu@3 { };
++	cpu4: apu@4 { };
++	cpu5: apu@5 { };
++	cpu6: apu@6 { };
++	cpu7: apu@7 { };
++#if (NUM_APUS >= 16)
++	cpu8: apu@8 { };
++	cpu9: apu@9 { };
++	cpu10: apu@10 { };
++	cpu11: apu@11 { };
++	cpu12: apu@12 { };
++	cpu13: apu@13 { };
++	cpu14: apu@14 { };
++	cpu15: apu@15 { };
++#endif
++	/* Dummy GICs.  */
++	rpu_gic_a: rpu_gic_a@0 {
++		gpio_controller ;
++		#gpio-cells = <1>;
++	};
++
++	rpu_gic_b: rpu_gic_b@0 {
++		gpio_controller ;
++		#gpio-cells = <1>;
++	};
++};
++#endif
+-- 
+2.34.1
+

@@ -27,14 +27,14 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 EXTKERNELSRC = "${@'1' if d.getVar('EXTERNALSRC') else ''}"
 
-# Force the use of the KBUILD_DEFCONFIG even if some other defconfig was generated in the ${UNPACKDIR}
+# Force the use of the KBUILD_DEFCONFIG even if some other defconfig was generated in the ${WORKDIR}
 do_kernel_metadata:prepend () {
-	[ -n "${KBUILD_DEFCONFIG}" ] && [ -e ${UNPACKDIR}/defconfig ] && rm ${UNPACKDIR}/defconfig
+	[ -n "${KBUILD_DEFCONFIG}" ] && [ -e ${WORKDIR}/defconfig ] && rm ${WORKDIR}/defconfig
 }
 
 do_configure:prepend () {
 	if [ -n "${KBUILD_DEFCONFIG}" ] && [ -n "${EXTKERNELSRC}" ]; then
-		cp ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${UNPACKDIR}/defconfig
+		cp ${S}/arch/${ARCH}/configs/${KBUILD_DEFCONFIG} ${WORKDIR}/defconfig
 	fi
 }
 

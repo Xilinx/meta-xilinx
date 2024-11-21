@@ -1,0 +1,76 @@
+From 8107e0be46e5bdbfc353648ce5129afde5275ea9 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 13 Sep 2022 16:06:10 +0530
+Subject: [PATCH 49/54] Fix Compiler crash with -freg-struct-return This patch
+ fixes a bug in MB GCC regarding the passing struct values in registers.
+ Currently we are only handling SImode With this patch all other modes are
+ handled properly
+
+    Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>
+---
+ gcc/config/microblaze/microblaze.cc | 11 ++++++++++-
+ gcc/config/microblaze/microblaze.h  | 19 -------------------
+ 2 files changed, 10 insertions(+), 20 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
+index f949a8863d3..4748c8c1f0d 100644
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
+@@ -3918,7 +3918,16 @@ microblaze_function_value (const_tree valtype,
+ 			   const_tree func ATTRIBUTE_UNUSED,
+ 			   bool outgoing ATTRIBUTE_UNUSED)
+ {
+-  return LIBCALL_VALUE (TYPE_MODE (valtype));
++  return gen_rtx_REG (TYPE_MODE (valtype), GP_RETURN);
++}
++
++#undef  TARGET_LIBCALL_VALUE
++#define TARGET_LIBCALL_VALUE microblaze_libcall_value
++
++rtx
++microblaze_libcall_value (machine_mode mode, const_rtx fun ATTRIBUTE_UNUSED)
++{
++  return gen_rtx_REG (mode, GP_RETURN);
+ }
+ 
+ /* Implement TARGET_SCHED_ADJUST_COST.  */
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 4d6babfe9c4..eea360fda47 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -266,13 +266,6 @@ extern enum pipeline_type microblaze_pipe;
+ 
+ #define LOAD_EXTEND_OP(MODE)  ZERO_EXTEND
+ 
+-#ifndef __arch64__
+-#define PROMOTE_MODE(MODE, UNSIGNEDP, TYPE)     \
+-  if (GET_MODE_CLASS (MODE) == MODE_INT         \
+-      && GET_MODE_SIZE (MODE) < 4)              \
+-    (MODE) = SImode;
+-#endif
+-
+ /* Standard register usage.  */
+ 
+ /* On the MicroBlaze, we have 32 integer registers */
+@@ -471,18 +464,6 @@ extern struct microblaze_frame_info current_frame_info;
+ 
+ #define MAX_ARGS_IN_REGISTERS			MB_ABI_MAX_ARG_REGS
+ 
+-#ifdef __aarch64__
+-#define LIBCALL_VALUE(MODE)						\
+-  gen_rtx_REG (MODE,GP_RETURN)
+-#else								
+-#define LIBCALL_VALUE(MODE)						\
+-  gen_rtx_REG (								\
+-	   ((GET_MODE_CLASS (MODE) != MODE_INT				\
+-	     || GET_MODE_SIZE (MODE) >= 4)				\
+-	    ? (MODE)							\
+-	    : SImode), GP_RETURN)
+-#endif
+-
+ /* 1 if N is a possible register number for a function value.
+    On the MicroBlaze, R2 R3 are the only register thus used.
+    Currently, R2 are only implemented  here (C has no complex type)  */
+-- 
+2.34.1
+

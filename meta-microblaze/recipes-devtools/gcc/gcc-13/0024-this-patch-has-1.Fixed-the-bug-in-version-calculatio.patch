@@ -1,0 +1,373 @@
+From a8991be91d79cf0bd17b7d303a10ec5edd7408c6 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 13 Sep 2022 12:23:54 +0530
+Subject: [PATCH 24/54] this patch has 1.Fixed the bug in version calculation.
+ 2.Add new bitfield instructions.
+
+Signed-off-by :Mahesh Bodapati <mbodapat@xilinx.com>
+---
+ gcc/config/microblaze/microblaze.cc | 154 ++++++++++++++--------------
+ gcc/config/microblaze/microblaze.h  |   2 +
+ gcc/config/microblaze/microblaze.md |  69 +++++++++++++
+ 3 files changed, 147 insertions(+), 78 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
+index 2d516724acc..e28ab593c3e 100644
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
+@@ -165,6 +165,9 @@ int microblaze_no_unsafe_delay;
+ /* Set to one if the targeted core has the CLZ insn.  */
+ int microblaze_has_clz = 0;
+ 
++/* Set to one if the targeted core has barrel-shift and cpu > 10.0 */
++int microblaze_has_bitfield = 0;
++
+ /* Which CPU pipeline do we use. We haven't really standardized on a CPU 
+    version having only a particular type of pipeline. There can still be 
+    options on the CPU to scale pipeline features up or down. :( 
+@@ -240,6 +243,63 @@ section *sdata2_section;
+ #define TARGET_HAVE_TLS true
+ #endif
+ 
++/*  Convert a version number of the form "vX.YY.Z" to an integer encoding
++    for easier range comparison.  */
++static int
++microblaze_version_to_int (const char *version)
++{
++  const char *p, *v;
++  const char *tmpl = "vXX.YY.Z";
++  int iver1 =0, iver2 =0, iver3 =0;
++
++  p = version;
++  v = tmpl;
++
++  while (*p)
++    {
++      if (*v == 'X')
++	{			/* Looking for major  */
++          if (*p == '.')
++            {
++              *v++;
++            }
++          else
++            {
++	      if (!(*p >= '0' && *p <= '9'))
++	        return -1;
++	      iver1 += (int) (*p - '0');
++              iver1 *= 1000;
++	     }
++        }
++      else if (*v == 'Y')
++	{			/* Looking for minor  */
++	  if (!(*p >= '0' && *p <= '9'))
++	    return -1;
++	  iver2 += (int) (*p - '0');
++	  iver2 *= 10;
++	}
++      else if (*v == 'Z')
++	{			/* Looking for compat  */
++	  if (!(*p >= 'a' && *p <= 'z'))
++	    return -1;
++      iver3 = ((int) (*p)) - 96;
++	}
++      else
++	{
++	  if (*p != *v)
++	    return -1;
++	}
++
++      v++;
++      p++;
++    }
++
++  if (*p)
++    return -1;
++
++  return iver1 + iver2 + iver3;
++}
++
+ /* Return truth value if a CONST_DOUBLE is ok to be a legitimate constant.  */
+ static bool
+ microblaze_const_double_ok (rtx op, machine_mode mode)
+@@ -1344,8 +1404,7 @@ microblaze_rtx_costs (rtx x, machine_mode mode, int outer_code ATTRIBUTE_UNUSED,
+       {
+ 	if (TARGET_BARREL_SHIFT)
+ 	  {
+-	    if (MICROBLAZE_VERSION_COMPARE (microblaze_select_cpu, "v5.00.a")
+-		>= 0)
++	    if (microblaze_version_to_int(microblaze_select_cpu) >= microblaze_version_to_int("v5.00.a"))
+ 	      *total = COSTS_N_INSNS (1);
+ 	    else
+ 	      *total = COSTS_N_INSNS (2);
+@@ -1406,8 +1465,7 @@ microblaze_rtx_costs (rtx x, machine_mode mode, int outer_code ATTRIBUTE_UNUSED,
+ 	  }
+ 	else if (!TARGET_SOFT_MUL)
+ 	  {
+-	    if (MICROBLAZE_VERSION_COMPARE (microblaze_select_cpu, "v5.00.a")
+-		>= 0)
++	    if (microblaze_version_to_int(microblaze_select_cpu) >= microblaze_version_to_int("v5.00.a"))
+ 	      *total = COSTS_N_INSNS (1);
+ 	    else
+ 	      *total = COSTS_N_INSNS (3);
+@@ -1680,72 +1738,13 @@ function_arg_partial_bytes (cumulative_args_t cum_v,
+   return 0;
+ }
+ 
+-/*  Convert a version number of the form "vX.YY.Z" to an integer encoding 
+-    for easier range comparison.  */
+-static int
+-microblaze_version_to_int (const char *version)
+-{
+-  const char *p, *v;
+-  const char *tmpl = "vXX.YY.Z";
+-  int iver = 0;
+-
+-  p = version;
+-  v = tmpl;
+-
+-  while (*p)
+-    {
+-      if (*v == 'X')
+-	{			/* Looking for major  */
+-          if (*p == '.')
+-            {
+-              v++;
+-            }
+-          else
+-            {
+-	      if (!(*p >= '0' && *p <= '9'))
+-	        return -1;
+-	      iver += (int) (*p - '0');
+-              iver *= 10;
+-	     }
+-        }
+-      else if (*v == 'Y')
+-	{			/* Looking for minor  */
+-	  if (!(*p >= '0' && *p <= '9'))
+-	    return -1;
+-	  iver += (int) (*p - '0');
+-	  iver *= 10;
+-	}
+-      else if (*v == 'Z')
+-	{			/* Looking for compat  */
+-	  if (!(*p >= 'a' && *p <= 'z'))
+-	    return -1;
+-	  iver *= 10;
+-	  iver += (int) (*p - 'a');
+-	}
+-      else
+-	{
+-	  if (*p != *v)
+-	    return -1;
+-	}
+-
+-      v++;
+-      p++;
+-    }
+-
+-  if (*p)
+-    return -1;
+-
+-  return iver;
+-}
+-
+-
+ static void
+ microblaze_option_override (void)
+ {
+   int i, start;
+   int regno;
+   machine_mode mode;
+-  int ver;
++  int ver,ver_int;
+ 
+   microblaze_section_threshold = (OPTION_SET_P (g_switch_value)
+ 				  ? g_switch_value
+@@ -1766,13 +1765,13 @@ microblaze_option_override (void)
+   /* Check the MicroBlaze CPU version for any special action to be done.  */
+   if (microblaze_select_cpu == NULL)
+     microblaze_select_cpu = MICROBLAZE_DEFAULT_CPU;
+-  ver = microblaze_version_to_int (microblaze_select_cpu);
+-  if (ver == -1)
++  ver_int = microblaze_version_to_int (microblaze_select_cpu);
++  if (ver_int == -1)
+     {
+       error ("%qs is an invalid argument to %<-mcpu=%>", microblaze_select_cpu);
+     }
+ 
+-  ver = MICROBLAZE_VERSION_COMPARE (microblaze_select_cpu, "v3.00.a");
++  ver = ver_int - microblaze_version_to_int("v3.00.a");
+   if (ver < 0)
+     {
+       /* No hardware exceptions in earlier versions. So no worries.  */
+@@ -1783,8 +1782,7 @@ microblaze_option_override (void)
+       microblaze_pipe = MICROBLAZE_PIPE_3;
+     }
+   else if (ver == 0
+-	   || (MICROBLAZE_VERSION_COMPARE (microblaze_select_cpu, "v4.00.b")
+-	       == 0))
++	   || (ver_int ==  microblaze_version_to_int("v4.00.b")))
+     {
+ #if 0
+       microblaze_select_flags |= (MICROBLAZE_MASK_NO_UNSAFE_DELAY);
+@@ -1801,11 +1799,9 @@ microblaze_option_override (void)
+ #endif
+       microblaze_no_unsafe_delay = 0;
+       microblaze_pipe = MICROBLAZE_PIPE_5;
+-      if (MICROBLAZE_VERSION_COMPARE (microblaze_select_cpu, "v5.00.a") == 0
+-	  || MICROBLAZE_VERSION_COMPARE (microblaze_select_cpu,
+-					 "v5.00.b") == 0
+-	  || MICROBLAZE_VERSION_COMPARE (microblaze_select_cpu,
+-					 "v5.00.c") == 0)
++      if ((ver_int == microblaze_version_to_int("v5.00.a"))
++	  || (ver_int == microblaze_version_to_int("v5.00.b"))
++	  || (ver_int == microblaze_version_to_int("v5.00.c")))
+ 	{
+ 	  /* Pattern compares are to be turned on by default only when 
+  	     compiling for MB v5.00.'z'.  */
+@@ -1813,7 +1809,7 @@ microblaze_option_override (void)
+ 	}
+     }
+ 
+-  ver = MICROBLAZE_VERSION_COMPARE (microblaze_select_cpu, "v6.00.a");
++  ver = ver_int - microblaze_version_to_int("v6.00.a");
+   if (ver < 0)
+     {
+       if (TARGET_MULTIPLY_HIGH)
+@@ -1822,7 +1818,7 @@ microblaze_option_override (void)
+ 		 "%<-mcpu=v6.00.a%> or greater");
+     }
+ 
+-  ver = MICROBLAZE_VERSION_COMPARE (microblaze_select_cpu, "v8.10.a");
++  ver = ver_int - microblaze_version_to_int("v8.10.a");
+   microblaze_has_clz = 1;
+   if (ver < 0)
+     {
+@@ -1831,7 +1827,7 @@ microblaze_option_override (void)
+     }
+ 
+   /* TARGET_REORDER defaults to 2 if -mxl-reorder not specified.  */
+-  ver = MICROBLAZE_VERSION_COMPARE (microblaze_select_cpu, "v8.30.a");
++  ver = ver_int - microblaze_version_to_int("v8.30.a");
+   if (ver < 0)
+     {
+         if (TARGET_REORDER == 1)
+@@ -1846,7 +1842,7 @@ microblaze_option_override (void)
+ 		   "%<-mcpu=v8.30.a%>");
+         TARGET_REORDER = 0;
+     }
+-  ver = microblaze_version_to_int("v10.0");
++  ver = ver_int - microblaze_version_to_int("v10.0");
+   if (ver < 0)
+     {
+ 	if (TARGET_AREA_OPTIMIZED_2)
+@@ -1856,6 +1852,8 @@ microblaze_option_override (void)
+     {
+ 	if (TARGET_AREA_OPTIMIZED_2)
+ 	 microblaze_pipe = MICROBLAZE_PIPE_8;
++        if (TARGET_BARREL_SHIFT)
++         microblaze_has_bitfield = 1;
+     }
+ 
+   if (TARGET_MULTIPLY_HIGH && TARGET_SOFT_MUL)
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index e4faa9c681f..94d96bf6b5d 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -44,6 +44,7 @@ extern int microblaze_debugger_regno[];
+ 
+ extern int microblaze_no_unsafe_delay;
+ extern int microblaze_has_clz;
++extern int microblaze_has_bitfield;
+ extern enum pipeline_type microblaze_pipe;
+ 
+ #define OBJECT_FORMAT_ELF
+@@ -63,6 +64,7 @@ extern enum pipeline_type microblaze_pipe;
+ /* Do we have CLZ?  */
+ #define TARGET_HAS_CLZ      (TARGET_PATTERN_COMPARE && microblaze_has_clz)
+ 
++#define TARGET_HAS_BITFIELD      (TARGET_BARREL_SHIFT && microblaze_has_bitfield)
+ /* The default is to support PIC.  */
+ #define TARGET_SUPPORTS_PIC 1
+ 
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 7a01b28d8f0..a76287ab4fd 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -2491,4 +2491,73 @@
+   DONE;
+ }")
+ 
++(define_expand "extvsi"
++  [(set (match_operand:SI 0 "register_operand" "r")
++	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
++			 (match_operand:SI 2 "immediate_operand" "I")
++			 (match_operand:SI 3 "immediate_operand" "I")))]
++"TARGET_HAS_BITFIELD"
++"
++{
++  unsigned HOST_WIDE_INT len = UINTVAL (operands[2]);
++  unsigned HOST_WIDE_INT pos = UINTVAL (operands[3]);
++
++  if ((len == 0) || (pos + len > 32) )
++    FAIL;
++
++  ;;if (!register_operand (operands[1], VOIDmode))
++  ;;  FAIL;
++  if (operands[0] == operands[1])
++  FAIL;
++  if (GET_CODE (operands[1]) == ASHIFT)
++  FAIL;
++;;  operands[2] = GEN_INT(INTVAL(operands[2])+1 );
++ emit_insn (gen_extv_32 (operands[0], operands[1],
++			  operands[2], operands[3]));
++  DONE;
++}")
++
++(define_insn "extv_32"
++  [(set (match_operand:SI 0 "register_operand" "=r")
++	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
++			 (match_operand:SI 2 "immediate_operand" "I")
++			 (match_operand:SI 3 "immediate_operand" "I")))]
++ "TARGET_HAS_BITFIELD && (UINTVAL (operands[2]) > 0)
++   && ((UINTVAL (operands[2]) + UINTVAL (operands[3])) <= 32)"
++  "bsefi %0,%1,%2,%3"
++  [(set_attr "type" "bshift")
++   (set_attr "length" "4")])
++
++(define_expand "insvsi"
++  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
++			 (match_operand:SI 1 "immediate_operand" "I")
++			 (match_operand:SI 2 "immediate_operand" "I"))
++	(match_operand:SI 3 "register_operand" "r"))]
++ "TARGET_HAS_BITFIELD"
++  "
++{
++  unsigned HOST_WIDE_INT len = UINTVAL (operands[1]);
++  unsigned HOST_WIDE_INT pos = UINTVAL (operands[2]);
++
++  if (len <= 0 || pos + len > 32)
++    FAIL;
++
++  ;;if (!register_operand (operands[0], VOIDmode))
++  ;;  FAIL;
++  emit_insn (gen_insv_32 (operands[0], operands[1],
++			  operands[2], operands[3]));
++  DONE;
++}")
++
++(define_insn "insv_32"
++  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
++			 (match_operand:SI 1 "immediate_operand" "I")
++			 (match_operand:SI 2 "immediate_operand" "I"))
++	(match_operand:SI 3 "register_operand" "r"))]
++ "TARGET_HAS_BITFIELD && UINTVAL (operands[1]) > 0
++   && UINTVAL (operands[1]) + UINTVAL (operands[2]) <= 32"
++  "bsifi %0, %3, %1, %2"
++  [(set_attr "type" "bshift")
++   (set_attr "length" "4")])
++
+ (include "sync.md")
+-- 
+2.34.1
+

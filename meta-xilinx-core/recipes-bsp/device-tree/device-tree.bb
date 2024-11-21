@@ -23,6 +23,9 @@ inherit devicetree image-artifact-names
 SYSTEM_DTFILE ??= ""
 CONFIG_DTFILE ??= "${SYSTEM_DTFILE}"
 
+SYSTEM_DTFILE_DEPENDS ??= ""
+DEPENDS += "${SYSTEM_DTFILE_DEPENDS}"
+
 BASE_DTS ?= "${@os.path.splitext(os.path.basename(d.getVar('CONFIG_DTFILE') or ''))[0] or 'system-top'}"
 
 EXTRA_DT_FILES ?= ""
@@ -31,12 +34,12 @@ EXTRA_DTFILES_BUNDLE ?= ""
 UBOOT_DT_FILES ?= ""
 UBOOT_DTFILE_PREFIX ?= "system-top"
 UBOOT_DTFILES_BUNDLE ?= ""
-EXTRA_OVERLAYS ?= ""
+EXTRA_DT_INCLUDE_FILES ?= ""
 
 SYSTEM_DTFILE[doc] = "System Device Tree which accepts at 0...1 dts file"
 CONFIG_DTFILE[doc] = "Domain Specific Device Tree which accepts 0...1 dts file"
 EXTRA_DT_FILES[doc] = "Add extra files to DT_FILES_PATH, it accepts 1...n dtsi files and adds to SRC_URI"
-EXTRA_OVERLAYS[doc] = "Add extra files to DT_FILES_PATH and adds a #include for each to the BASE_DTS, it access 1..n dtsi files and adds to SRC_URI"
+EXTRA_DT_INCLUDE_FILES[doc] = "Add extra files to DT_FILES_PATH and adds a #include for each to the BASE_DTS, it access 1..n dtsi files and adds to SRC_URI"
 
 # There should only be ONE CONFIG_DTFILE listed
 # These need to be passed in from global, not from a bbappend
@@ -44,7 +47,7 @@ FILESEXTRAPATHS:prepend := "${@'%s:' % os.path.dirname(d.getVar('CONFIG_DTFILE')
 SRC_URI:append := " ${@'file://%s' % os.path.basename(d.getVar('CONFIG_DTFILE') or '') if (d.getVar('CONFIG_DTFILE')) else ''}"
 
 SRC_URI:append = " ${@" ".join(["file://%s" % f for f in (d.getVar('EXTRA_DT_FILES') or "").split()])}"
-SRC_URI:append = " ${@" ".join(["file://%s" % f for f in (d.getVar('EXTRA_OVERLAYS') or "").split()])}"
+SRC_URI:append = " ${@" ".join(["file://%s" % f for f in (d.getVar('EXTRA_DT_INCLUDE_FILES') or "").split()])}"
 
 COMPATIBLE_MACHINE:zynq   = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
@@ -62,7 +65,7 @@ DTB_FILE_NAME ?= "${BASE_DTS}.dtb"
 
 DTB_BASE_NAME ?= "${MACHINE}-system${IMAGE_VERSION_SUFFIX}"
 
-# Copy the EXTRA_DT_FILES and EXTRA_OVERLAYS files in prepend operation so that
+# Copy the EXTRA_DT_FILES and EXTRA_DT_INCLUDE_FILES files in prepend operation so that
 # it can be preprocessed.
 do_configure:prepend () {
     # Create DT_FILES_PATH directory if doesn't exist during prepend operation.
@@ -70,20 +73,20 @@ do_configure:prepend () {
         mkdir -p ${DT_FILES_PATH}
     fi
 
-    for f in ${EXTRA_DT_FILES} ${EXTRA_OVERLAYS}; do
-        if [ "$(realpath ${UNPACKDIR}/${f})" != "$(realpath ${DT_FILES_PATH}/`basename ${f}`)" ]; then
-            cp ${UNPACKDIR}/${f} ${DT_FILES_PATH}/
+    for f in ${EXTRA_DT_FILES} ${EXTRA_DT_INCLUDE_FILES}; do
+        if [ "$(realpath ${WORKDIR}/${f})" != "$(realpath ${DT_FILES_PATH}/`basename ${f}`)" ]; then
+            cp ${WORKDIR}/${f} ${DT_FILES_PATH}/
         fi
     done
 }
 
 do_configure:append () {
-    for f in ${EXTRA_OVERLAYS}; do
+    for f in ${EXTRA_DT_INCLUDE_FILES}; do
         if [ ! -e ${DT_FILES_PATH}/${BASE_DTS}.dts ]; then
             if [ -e ${DT_FILES_PATH}/${BASE_DTS}.dtb ]; then
-                bberror "Unable to find ${BASE_DTS}.dts, to use EXTRA_OVERLAYS you must use a 'dts' and not 'dtb' in CONFIG_DTFILE"
+                bberror "Unable to find ${BASE_DTS}.dts, to use EXTRA_DT_INCLUDE_FILES you must use a 'dts' and not 'dtb' in CONFIG_DTFILE"
             else
-                bberror "Unable to find ${BASE_DTS}.dts, to use EXTRA_OVERLAYS you must set a valid CONFIG_DTFILE or use system-top.dts"
+                bberror "Unable to find ${BASE_DTS}.dts, to use EXTRA_DT_INCLUDE_FILES you must set a valid CONFIG_DTFILE or use system-top.dts"
             fi
             exit 1
         fi

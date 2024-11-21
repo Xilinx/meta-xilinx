@@ -16,7 +16,7 @@ COMPATIBLE_MACHINE:versal-net = "versal-net"
 
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
-B = "${UNPACKDIR}/build"
+B = "${WORKDIR}/build"
 
 BOOTGEN_CMD ?= "bootgen"
 BOOTGEN_ARGS ?= "-arch versal"
@@ -37,4 +37,4 @@ do_deploy() {
     install -m 0644 ${B}/pmc_cdo.bin ${DEPLOYDIR}/pmc_cdo.bin
 }
 
-addtask do_deploy after do_compile
+addtask deploy before do_build after do_install

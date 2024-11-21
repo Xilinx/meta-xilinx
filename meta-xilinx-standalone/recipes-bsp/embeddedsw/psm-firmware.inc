@@ -10,7 +10,7 @@ COMPATIBLE_MACHINE:versal-net = ".*"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-S = "${UNPACKDIR}/git"
+S = "${WORKDIR}/git"
 
 # This is the default in most BSPs.  A MACHINE.conf can override this!
 PSM_FIRMWARE_IMAGE_NAME ??= "psm-firmware-${MACHINE}"

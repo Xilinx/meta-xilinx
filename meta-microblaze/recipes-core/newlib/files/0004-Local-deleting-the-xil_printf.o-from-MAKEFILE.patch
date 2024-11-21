@@ -1,0 +1,26 @@
+From cff1abc10b20e8f9083ee7a5dc3ebfae431c430c Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 23 Jan 2017 15:44:17 +0530
+Subject: [PATCH 04/11] [Local]: deleting the xil_printf.o from MAKEFILE
+
+(cherry picked from commit 250aa479da0b688b87f1fa42f45ecd4536194a45)
+---
+ libgloss/microblaze/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libgloss/microblaze/Makefile.in b/libgloss/microblaze/Makefile.in
+index f1fa286bb..6d369242d 100644
+--- a/libgloss/microblaze/Makefile.in
++++ b/libgloss/microblaze/Makefile.in
+@@ -83,7 +83,7 @@ GENOBJS = fstat.o getpid.o isatty.o kill.o lseek.o print.o putnum.o stat.o unlin
+           open.o close.o read.o write.o
+ OBJS = ${GENOBJS} sbrk.o timer.o _exception_handler.o _hw_exception_handler.o \
+        _interrupt_handler.o _program_clean.o _program_init.o \
+-       xil_malloc.o xil_sbrk.o xil_printf.o
++       xil_malloc.o xil_sbrk.o
+ SCRIPTS	= xilinx.ld
+ 
+ # Tiny Linux BSP.
+-- 
+2.34.1
+

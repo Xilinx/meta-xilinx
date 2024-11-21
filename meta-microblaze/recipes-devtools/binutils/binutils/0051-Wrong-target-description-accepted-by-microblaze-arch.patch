@@ -1,0 +1,51 @@
+From 80f3d1ca2ece1ef143f00365b938e0d0b575d239 Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 9 May 2024 11:34:04 +0530
+Subject: [PATCH 51/53] Wrong target description accepted by microblaze
+ architecture
+
+Fix - Modify microblaze_gdbarch_init, set tdesc only when it is NULL
+
+Files changed - gdb/microblaze-tdep.c
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gdb/microblaze-tdep.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index 2507cfe540f..cc80e4f0e6b 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -1020,15 +1020,18 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   else
+     microblaze_abi = found_abi;
+ 
+-  if (microblaze_abi == MICROBLAZE_ABI_M64)
+-    {
+-      tdesc = tdesc_microblaze64;
+-      reg_size = 8;
+-    }
+-  else 
+-    {
+-      tdesc = tdesc_microblaze;
+-      reg_size = 4;
++  if (tdesc == NULL) 
++    { 
++       if (microblaze_abi == MICROBLAZE_ABI_M64)
++         {
++           tdesc = tdesc_microblaze64;
++           reg_size = 8;
++         }
++       else 
++         {
++           tdesc = tdesc_microblaze;
++           reg_size = 4;
++         }
+     }
+ 
+   /* Check any target description for validity.  */
+-- 
+2.34.1
+

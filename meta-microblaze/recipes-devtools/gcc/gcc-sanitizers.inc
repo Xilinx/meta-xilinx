@@ -53,7 +53,7 @@ DEPENDS = "virtual/crypt gcc-runtime virtual/${TARGET_PREFIX}gcc"
 # used to fix ../../../../../../../../../work-shared/gcc-8.3.0-r0/gcc-8.3.0/libsanitizer/libbacktrace/../../libbacktrace/elf.c:772:21: error: 'st.st_mode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
 DEBUG_OPTIMIZATION:append = " -Wno-error"
 
-#BBCLASSEXTEND = "nativesdk"
+BBCLASSEXTEND = "nativesdk"
 
 PACKAGES = "${PN} ${PN}-dbg"
 PACKAGES += "libasan libubsan liblsan libtsan"
@@ -78,14 +78,15 @@ do_package_write_ipk[depends] += "virtual/${MLPREFIX}${TARGET_PREFIX}compilerlib
 do_package_write_deb[depends] += "virtual/${MLPREFIX}${TARGET_PREFIX}compilerlibs:do_packagedata"
 do_package_write_rpm[depends] += "virtual/${MLPREFIX}${TARGET_PREFIX}compilerlibs:do_packagedata"
 
-# Only x86, powerpc, sparc, s390, arm, and aarch64 are supported
-COMPATIBLE_HOST = '(x86_64|i.86|powerpc|sparc|s390|arm|aarch64).*-linux'
+# Only x86, powerpc, sparc, s390, arm, aarch64 and loongarch64 are supported
+COMPATIBLE_HOST = '(x86_64|i.86|powerpc|sparc|s390|arm|aarch64|loongarch64).*-linux'
 # musl is currently broken entirely
 COMPATIBLE_HOST:libc-musl = 'null'
 
 FILES:libasan += "${libdir}/libasan.so.* ${libdir}/libhwasan.so.*"
 FILES:libasan-dev += "\
     ${libdir}/libasan_preinit.o \
+    ${libdir}/libhwasan_preinit.o \
     ${libdir}/libasan.so \
     ${libdir}/libhwasan.so \
     ${libdir}/libasan.la \

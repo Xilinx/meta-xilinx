@@ -1,0 +1,239 @@
+#!/bin/bash
+#
+#  FILE:
+#      mb-realoc
+#
+#  DESCRIPTION:
+#	Takes a fully linked and relocated ELF file, and turns it into an
+#	executable blob that can be run from any valid memory.  The ELF image
+#	(loadable segments only) is converted to a payload.  The blob copies
+#	the payload to the correct address in memory, and then launches it.
+#
+#  MODIFICATION:
+#
+#  LICENSING:
+#	Copyright (c) 2013 Xilinx Inc. All rights reserved.
+#
+
+
+# Default values for main variables
+BLOB_LOAD_ADDR=0x0
+INFILE=""
+BLOBNAME=""
+JUMP_OFFSET=
+
+# OTher useful vars
+TMP_BINFILE=$$.bin
+PAYLOAD_SECTION=.payload
+BLOBSTUB=/tmp/blobstub-$$
+
+function usage {
+
+	echo "Generate a PIC executable blob that copies the payload to its linked address and executes it."
+#	echo "Generate a PIC executable blob that copies the payload to its"
+#	echo "linked address and executes it.  The blob itself may be loaded"
+#	echo "to any physical address and executed, provided that"
+#	echo "  1) The payload's linked address is writeable"
+#	echo "  2) The blob's and payload's addresses don't overlap"
+#	echo "tGenerates blobname.[srec|elf|bin] files into the working directory"
+	echo ""
+	echo "Usage:"
+	echo "  mb-realoc [OPTIONS] -i PAYLOAD.elf -o BLOB_NAME"
+	echo ""
+	echo "Required:"
+	echo "  -i, --input PAYLOAD[.elf]  the fully relocated ELF file that will be the"
+	echo "                             payload."
+	echo "  -o, --output BLOB_NAME     basename of the resulting blob files."
+	echo ""
+	echo "Optional:"
+	echo "  -h, --help                 show function usage"
+	echo "  -j, --jump-offset OFFS     Offset from load address to jump (auto-detect)"
+	echo "  -l, --load LOAD_ADDR       address at which FS-boot will load the stub+payload"
+	echo ""
+}
+
+function parse_args {
+
+	args=$(getopt -o "j:hi:l:o:" --long "jump-offset:,help,input:,load:,output" -- "$@")
+
+	[ $? -ne 0 ] && usage && exit -1
+
+	eval set -- "${args}"
+
+	while true; do
+		case $1 in
+			-h | --help) usage; exit 0; ;;
+			-l | --load) BLOB_LOAD_ADDR=$2;
+				shift; shift;
+				;;
+			-i | --input) INFILE=$2;
+				shift; shift;
+				;;
+			-j | --jump-offset) JUMP_OFFSET=$2;
+				shift; shift;
+				;;
+			-o | --output) BLOBNAME=$2;
+				shift; shift;
+				;;
+			--) shift; break; ;;
+			*) usage; exit -1;
+				;;
+		esac
+	done
+
+	[ ! -z "$@" ] && echo "ERROR: Extra parameters: $@" && usage && exit -1
+
+	if [ "${INFILE}" == "" -o "${BLOBNAME}" == "" ]; then
+		echo "Error: Required parameters not provided"
+		usage && exit -1
+	fi
+}
+
+function get_elf_addr_and_size {
+
+	# Get load address of payload ELF file
+	ELF_LMA=0x$(${CROSS_COMPILE}objdump --headers $INFILE | grep -w "\.data" | awk '{print $5}')
+
+	# Generate binary image of payload
+	${CROSS_COMPILE}objcopy -R .note -R .comment -R .note.gnu.build-id  -O binary $INFILE $TMP_BINFILE
+
+	# Work out its size
+	ELF_SIZE=$(${CROSS_COMPILE}size --target binary ${TMP_BINFILE} | grep "${TMP_BINFILE}" | cut -f 4)
+
+}
+
+function get_elf_jump_offset {
+	entry_point=$(${CROSS_COMPILE}readelf -h ${INFILE} | awk '/Entry point/ {print $4}')
+	JUMP_OFFSET=$(printf "0x%08x" $((${entry_point} - ${ELF_LMA})))
+}
+
+function create_blobstub:microblaze {
+
+cat > ${BLOBSTUB}.s.in << __eof
+/*
+//      blobstub.s.in
+//              template for relocatable code blob mechanism
+//
+// LICENSING:
+//      Copyright (c) 2013 Xilinx Inc. All rights reserved.
+*/
+	.section .text
+
+	.org 0x0
+
+	.globl bootstub
+	.global _start
+	.func bootstub
+
+_start:
+bootstub:
+	brlid	r5, locator;	/* r5 gets address of bootstub */
+	nop;
+locator:
+	addi	r5, r5, 0x100;	/* Shift up to start of payload */
+	lwi	r6, r5, 0;	/* Destination of payload */
+	lwi	r7, r5, 4;	/* Length of payload */
+	lwi	r9, r5, 8;	/* boot offset */
+	addi	r5, r5, 0xc;	/* Start of payload */
+	add	r4, r6, r0;	/* Save payload destination (for jump) */
+
+	addi	r7, r7, 0x3;	/* Convert length to words */
+	srl	r7, r7;		/* Rounded up */
+	srl	r7, r7;
+
+	or	r10, r0, r0;	/* Setup r10 for incrementing address offset */
+copyloop:
+	beqi	r7, copy_done;	/* Finished copying? */
+	lw	r8, r5, r10;	/* Read word from payload */
+	sw	r8, r6, r10;	/* Write to destination */
+	addi	r10, r10, 4;	/* Increment ptr offset */
+	brid	copyloop;	/* Loop with delay slot */
+	addi	r7, r7, -1;	/* Decrement copy count */
+
+copy_done:
+	add	r4, r4, r9;	/* Apply any boot offset */
+	bra	r4;		/* Launch payload */
+
+	.align 2
+	.org 0x100
+payload:
+	.int    @destination@
+	.int    @bytecount@
+	.int    @jump_offset@
+
+	.end bootstub
+
+__eof
+
+}
+
+function build_blobstub {
+	# Substitute address and size of payload into blobstub
+	# source file
+	sed -e "s/@destination@/${ELF_LMA}/" \
+            -e "s/@bytecount@/${ELF_SIZE}/" \
+	    -e "s/@jump_offset@/${JUMP_OFFSET}/" ${BLOBSTUB}.s.in > ${BLOBSTUB}.s
+
+	# Build the blobstub
+	${CROSS_COMPILE}as -o ${BLOBSTUB}.o ${BLOBSTUB}.s
+
+	# Remove blobstub assembly file and template
+	rm ${BLOBSTUB}.s.in
+	rm ${BLOBSTUB}.s
+}
+
+function insert_payload {
+
+	# Add the payload in a new section
+	${CROSS_COMPILE}objcopy --add-section=${PAYLOAD_SECTION}=${TMP_BINFILE}\
+		 --adjust-section-vma=${PAYLOAD_SECTION}=0x10C \
+		--set-section-flags=${PAYLOAD_SECTION}=alloc,load,data \
+		${BLOBSTUB}.o ${BLOBNAME}.elf
+
+	# Remove temporary binary image and blobstub object file
+	rm ${TMP_BINFILE}
+	rm ${BLOBSTUB}.o
+}
+
+function relocate_blob {
+	# Relocate the entire package to the desired FS-boot load address
+	${CROSS_COMPILE}objcopy --change-addresses=${BLOB_LOAD_ADDR} ${BLOBNAME}.elf
+}
+
+function generate_output_files {
+	${CROSS_COMPILE}objcopy -O srec ${BLOBNAME}.elf ${BLOBNAME}.srec
+	${CROSS_COMPILE}objcopy -O binary ${BLOBNAME}.elf ${BLOBNAME}.bin
+}
+
+function xlnx_readelf {
+	${CROSS_COMPILE}readelf $@
+}
+
+parse_args "$@"
+
+if [ ! -f $INFILE ]; then
+	echo "Error: ${INFILE} does not exist"
+	exit -1;
+fi
+
+get_elf_addr_and_size
+[ -z "${JUMP_OFFSET}" ] && get_elf_jump_offset
+
+echo "INFO: Payload load address:$ELF_LMA"
+echo "INFO: Payload size:$ELF_SIZE"
+echo "INFO: Jump offset:$JUMP_OFFSET"
+
+PETALINUX_ARCH=$(xlnx_readelf -e ${INFILE} | grep "Machine:" | awk '{print $2}')
+echo "ELF ARCH is ${PETALINUX_ARCH}"
+
+if [ "${PETALINUX_ARCH}" == "Xilinx" ]; then
+	create_blobstub:microblaze
+	build_blobstub
+	insert_payload
+	relocate_blob
+else
+	echo "Architecture is not Microblaze"
+	rm ${TMP_BINFILE}
+	${CROSS_COMPILE}objcopy $INFILE  ${BLOBNAME}.elf
+fi
+generate_output_files

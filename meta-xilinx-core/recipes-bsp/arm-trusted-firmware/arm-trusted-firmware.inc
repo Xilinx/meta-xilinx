@@ -9,8 +9,8 @@ inherit deploy
 
 DEPENDS += "u-boot-mkimage-native"
 
-S = "${UNPACKDIR}/git"
-B = "${UNPACKDIR}/build"
+S = "${WORKDIR}/git"
+B = "${WORKDIR}/build"
 
 SYSROOT_DIRS += "/boot"
 
@@ -74,9 +74,6 @@ EXTRA_OEMAKE:append:versal = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.get
 
 EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
 EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
-
-ATF_PROVENCORE = "SPD=pncd SPD_PNCD_NS_IRQ=51 ZYNQMP_BL32_MEM_BASE=0x70000000 ZYNQMP_BL32_MEM_SIZE=0x0FF00000"
-EXTRA_OEMAKE:append = "${@bb.utils.contains('MACHINE_FEATURES', 'provencore', ' ${ATF_PROVENCORE}', '', d)}"
 
 TFA_BL33_LOAD ?= ""
 EXTRA_OEMAKE:append = "${@' PRELOADED_BL33_BASE=${TFA_BL33_LOAD}' if d.getVar('TFA_BL33_LOAD', True) != '' else ''}"

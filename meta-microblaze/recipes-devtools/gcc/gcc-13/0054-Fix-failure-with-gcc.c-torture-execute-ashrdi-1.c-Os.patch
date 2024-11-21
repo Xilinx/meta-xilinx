@@ -1,0 +1,42 @@
+From 79d007fea870a3b8d72faa90238cee2cdfaf5c85 Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Fri, 28 Jun 2024 12:18:38 +0530
+Subject: [PATCH 54/54] Fix failure with gcc.c-torture/execute/ashrdi-1.c -Os
+ execution test
+
+The following tests fail with -Os option because a shift instruction
+in a branch delay slot gets replaced with multiple instructions when
+the processor has no barrel shifter. This fix addresses the problem
+by marking the responsible instruction pattern as type multi preventing
+it from being placed in a delay slot.
+
+>  gcc.c-torture/execute/ashrdi-1.c   -Os  execution test
+>  gcc.c-torture/execute/pr40057.c   -Os  execution test
+>  gcc.c-torture/execute/pr79121.c   -Os  execution test
+>  gcc.c-torture/execute/pr82524.c   -Os  execution test
+>  c-c++-common/torture/vector-compare-1.c   -Os  execution test
+>  gcc.dg/torture/vec-cvt-1.c   -Os  execution test
+
+These tests pass with this fix.
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+---
+ gcc/config/microblaze/microblaze.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index aff98604db7..0e3981390c8 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -2286,7 +2286,7 @@ else
+     output_asm_insn ("bneid\t%3,.-4", operands);
+     return "sra\t%0,%0";
+   }
+-  [(set_attr "type"    "arith")
++  [(set_attr "type"    "multi")
+   (set_attr "mode"    "SI")
+   (set_attr "length"  "20")]
+ )
+-- 
+2.34.1
+

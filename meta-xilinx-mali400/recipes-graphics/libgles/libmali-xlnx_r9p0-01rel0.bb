@@ -13,8 +13,8 @@ PROVIDES += "virtual/libgles1 virtual/libgles2 virtual/egl virtual/libgbm"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 REPO ?= "git://github.com/Xilinx/mali-userspace-binaries.git;protocol=https"
-BRANCH ?= "xlnx_rel_v2024.1"
-SRCREV ?= "b3a772aad859cdadc8513b11c3e995546c20e75e"
+BRANCH ?= "xlnx_rel_v2024.2"
+SRCREV ?= "644dc96597172e3cf15aea63b4ee947d421810aa"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 
 SRC_URI = " \
@@ -28,7 +28,7 @@ SRC_URI = " \
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-S = "${UNPACKDIR}/git"
+S = "${WORKDIR}/git"
 
 # If were switching at runtime, we would need all RDEPENDS needed for all backends available
 X11RDEPENDS = "libxdamage libxext libx11 libdrm libxfixes"
@@ -55,6 +55,7 @@ USE_FB = "${@bb.utils.contains("DISTRO_FEATURES", "fbdev", "yes", "no", d)}"
 USE_WL = "${@bb.utils.contains("DISTRO_FEATURES", "wayland", "yes", "no", d)}"
 
 MONOLITHIC_LIBMALI = "libMali.so.9.0"
+MONOLITHIC_LIBMALI_MVL = "libMali.so.9"
 
 do_install() {
     #Identify the ARCH type
@@ -76,10 +77,10 @@ do_install() {
     install -m 0644 ${S}/${PV}/glesHeaders/KHR/*.h ${D}${includedir}/KHR/
 
     install -d ${D}${libdir}/pkgconfig
-    install -m 0644 ${UNPACKDIR}/egl.pc ${D}${libdir}/pkgconfig/egl.pc
-    install -m 0644 ${UNPACKDIR}/glesv2.pc ${D}${libdir}/pkgconfig/glesv2.pc
-    install -m 0644 ${UNPACKDIR}/glesv1.pc ${D}${libdir}/pkgconfig/glesv1.pc
-    install -m 0644 ${UNPACKDIR}/glesv1_cm.pc ${D}${libdir}/pkgconfig/glesv1_cm.pc
+    install -m 0644 ${WORKDIR}/egl.pc ${D}${libdir}/pkgconfig/egl.pc
+    install -m 0644 ${WORKDIR}/glesv2.pc ${D}${libdir}/pkgconfig/glesv2.pc
+    install -m 0644 ${WORKDIR}/glesv1.pc ${D}${libdir}/pkgconfig/glesv1.pc
+    install -m 0644 ${WORKDIR}/glesv1_cm.pc ${D}${libdir}/pkgconfig/glesv1_cm.pc
 
     install -d ${D}${libdir}
     install -d ${D}${includedir}
@@ -88,10 +89,11 @@ do_install() {
 
     install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/headless/${MONOLITHIC_LIBMALI} ${D}${libdir}/headless/${MONOLITHIC_LIBMALI}
     ln -snf headless/${MONOLITHIC_LIBMALI} ${D}${libdir}/${MONOLITHIC_LIBMALI}
+    ln -snf ${MONOLITHIC_LIBMALI} ${D}${libdir}/headless/${MONOLITHIC_LIBMALI_MVL}
 
     # install gbm
     install -m 0644 ${S}/${PV}/glesHeaders/GBM/gbm.h ${D}${includedir}/
-    install -m 0644 ${UNPACKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
+    install -m 0644 ${WORKDIR}/gbm.pc ${D}${libdir}/pkgconfig/gbm.pc
 
     if [ "${USE_FB}" = "yes" ]; then
         install -Dm 0644 ${S}/${PV}/${ARCH_PLATFORM_DIR}/fbdev/${MONOLITHIC_LIBMALI} ${D}${libdir}/fbdev/${MONOLITHIC_LIBMALI}

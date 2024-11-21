@@ -2,6 +2,9 @@ DESCRIPTION = "OpenAMP supported packages"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+# We don't support Zynq
+COMPATIBLE_MACHINE:zynq = "$^"
+
 inherit packagegroup features_check
 
 REQUIRED_DISTRO_FEATURES = "openamp"

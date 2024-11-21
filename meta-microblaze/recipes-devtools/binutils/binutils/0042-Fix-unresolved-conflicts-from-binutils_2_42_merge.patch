@@ -1,0 +1,42 @@
+From 81f86c3d6f787a9694e1c95625736f7c921b74df Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 28 Mar 2024 10:20:48 +0530
+Subject: [PATCH 42/53] Fix unresolved conflicts from binutils_2_42_merge
+
+opcodes/microblaze-dis.c
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ opcodes/microblaze-dis.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
+index 692c977ac00..912fa31be79 100644
+--- a/opcodes/microblaze-dis.c
++++ b/opcodes/microblaze-dis.c
+@@ -478,11 +478,16 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+ 	case INST_TYPE_NONE:
+ 	  break;
+ 	case INST_TYPE_RD_IMML:
+-	  print_func (stream, "\t%s, %s", get_field_rd (&buf, inst), get_field_imm16 (&buf, inst));
+-          break;
+-	case INST_TYPE_RD_R1_IMMW_IMMS:
+-          print_func (stream, "\t%s, %s, %s, %s", get_field_rd (&buf, inst),get_field_r1(&buf, inst),get_field_immw (&buf, inst), get_field_imms (&buf, inst));
+-	     break;
++	  print_func (stream, "\t%s, %s", 
++		  get_field_rd (&buf, inst), get_field_imm16 (&buf, inst));
++	  break;
++ 	case INST_TYPE_RD_R1_IMMW_IMMS:
++	  print_func (stream, "\t%s, %s, %s, %s", 
++		  get_field_rd (&buf, inst),
++		  get_field_r1(&buf, inst),
++		  get_field_immw (&buf, inst), 
++		  get_field_imms (&buf, inst));
++ 	  break;
+ 	/* For tuqula instruction */
+ 	case INST_TYPE_RD:
+ 	  print_func (stream, "\t%s", get_field_rd (&buf, inst));
+-- 
+2.34.1
+

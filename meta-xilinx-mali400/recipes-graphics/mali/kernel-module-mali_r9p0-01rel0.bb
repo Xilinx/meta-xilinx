@@ -42,7 +42,7 @@ inherit features_check module
 
 PARALLEL_MAKE = "-j 1"
 
-S = "${UNPACKDIR}/DX910-SW-99002-${PV}/driver/src/devicedrv/mali"
+S = "${WORKDIR}/DX910-SW-99002-${PV}/driver/src/devicedrv/mali"
 
 REQUIRED_MACHINE_FEATURES = "mali400"
 

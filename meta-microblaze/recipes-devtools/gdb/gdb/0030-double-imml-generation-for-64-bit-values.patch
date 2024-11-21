@@ -1,0 +1,29 @@
+From 6967f52fe0ebebb4bdf437cb1e683d9e87a013ff Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 26 Aug 2019 15:29:42 +0530
+Subject: [PATCH 30/54] double imml generation for 64 bit values.
+
+Conflicts:
+	gas/config/tc-microblaze.c
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ gas/config/tc-microblaze.c | 321 ++++++++++++++++++++++++++++++-------
+ opcodes/microblaze-opc.h   |   4 +-
+ 2 files changed, 262 insertions(+), 63 deletions(-)
+
+Index: gdb-14.2/opcodes/microblaze-opc.h
+===================================================================
+--- gdb-14.2.orig/opcodes/microblaze-opc.h
++++ gdb-14.2/opcodes/microblaze-opc.h
+@@ -634,8 +634,8 @@ char pvr_register_prefix[] = "rpvr";
+ #define MIN_IMM6_WIDTH  ((int) 0x00000001)
+ #define MAX_IMM6_WIDTH  ((int) 0x00000040)
+ 
+-#define MIN_IMML  ((long long) 0xffffff8000000000L)
+-#define MAX_IMML  ((long long) 0x0000007fffffffffL)
++#define MIN_IMML  ((long long) -9223372036854775808)
++#define MAX_IMML  ((long long) 9223372036854775807)
+ 
+ #endif /* MICROBLAZE_OPC */
+ 

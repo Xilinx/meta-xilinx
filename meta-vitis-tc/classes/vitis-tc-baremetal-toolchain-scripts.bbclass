@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 # Based on the version in oe-core as commit
-# 22b8761c5aee0361de9fe0b93984ce4ffeb0c25c
+# a725df1839a23b11ae1bace531d242bfc1ab98e0
 #
 # This is optimized specifically for baremetal builds where we have a single
 # common toolchain for each multilib.  This configuration is unique to
@@ -57,8 +57,6 @@ toolchain_create_sdk_env_script:xilinx-standalone () {
 	echo 'export OECORE_BASELIB="${baselib}"' >> $script
 	echo 'export OECORE_TARGET_ARCH="${TARGET_ARCH}"' >>$script
 	echo 'export OECORE_TARGET_OS="${TARGET_OS}"' >>$script
-	echo 'export OECORE_TARGET_BITS="${@siteinfo_with_prefix(d, 'bit-')}"' >>$script
-	echo 'export OECORE_TARGET_ENDIAN="${@siteinfo_with_prefix(d, 'endian-')}"' >>$script
 
 	echo 'unset command_not_found_handle' >> $script
 
@@ -112,7 +110,7 @@ EOF
 #####
 # Following is copied from meta-mingw/classes/toolchain-scripts-mingw32.bbclass
 # Based off of the oe-core meta/classes/toolchain-scripts.bbclass version as of
-# commit e4d377d5ddb62b265536bd33dbccfbb0904f8701
+# commit acbba477893ef87388effc4679b7f40ee49fc852
 toolchain_create_sdk_env_script:sdkmingw32:xilinx-standalone () {
 	# Create environment setup script
 	sdkpathnative=${7:-${SDKPATHNATIVE}}

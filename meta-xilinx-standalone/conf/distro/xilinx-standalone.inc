@@ -49,3 +49,19 @@ BB_SIGNATURE_HANDLER ?= "OEEquivHash"
 BB_HASHSERVE ??= "auto"
 
 MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc qemu-usermode"
+
+# Prevent warnings about 'buildpaths'
+# After investigation it appears a debuginfo directory path to the build
+# directory is being inserted into the objects.  This path is not actually
+# being referred to by any components.  Why this is happening is unknown,
+# so we avoid the warning as we know this is not an actual issue.
+WARN_QA:remove = "buildpaths"
+
+# By default PetaLinux uses the own-mirror class to access cached version of
+# the software.  While this distribution configuration is not PetaLinux, nor
+# should it require PetaLinux to operating properly, including the same mirror
+# configuration will unify the Linux and non-Linux (baremetal) configurations.
+# Do this via include so if meta-petalinux is not part of the build this will
+# not error.  This also allows the user to choose to handle the download
+# mirroring in their own way for non-PetaLinux like configs.
+include conf/distro/include/petalinux-mirrors.conf

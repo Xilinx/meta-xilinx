@@ -1,0 +1,58 @@
+From fbf853f0b9571529dcc72fc53adf4a35abd3e050 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 13 Sep 2022 16:45:41 +0530
+Subject: [PATCH 53/54] Add Zero_extended instructions
+
+    Due to latest changes in GCC-10.2 MB64 perforamance has reduced
+    We have added zero_extended instructions to get rid of left shift
+    and right shift loops
+
+    [CR/TSR]: TSR-974519
+
+    Signed-off-by: Nagaraju Mekala<nmekala@xilinx.com>
+		   Mahesh Bodapati<mbodapat@xilinx.com>
+---
+ gcc/config/microblaze/microblaze.md | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index f41474feca6..aff98604db7 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -1191,6 +1191,33 @@
+   (set_attr "mode"	"SI,SI,SI")
+   (set_attr "length"	"4,4,8")])
+ 
++(define_insn "zero_extendhidi2"
++  [(set (match_operand:DI 0 "register_operand" "=d")
++	(zero_extend:DI (match_operand:HI 1 "register_operand" "d")))]
++  "TARGET_MB_64"
++  "andli\t%0,%1,0xffff"
++  [(set_attr "type"	"no_delay_arith")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"8")])
++
++(define_insn "zero_extendsidi2"
++  [(set (match_operand:DI 0 "register_operand" "=d")
++	(zero_extend:DI (match_operand:SI 1 "register_operand" "d")))]
++  "TARGET_MB_64"
++  "andli\t%0,%1,0xffffffff"
++  [(set_attr "type"	"no_delay_arith")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"8")])
++  
++(define_insn "zero_extendqidi2"
++  [(set (match_operand:DI 0 "register_operand" "=d")
++	(zero_extend:DI (match_operand:QI 1 "register_operand" "d")))]
++  "TARGET_MB_64"
++  "andli\t%0,%1,0x00ff"
++  [(set_attr "type"	"no_delay_arith")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"8")])
++
+ ;;----------------------------------------------------------------
+ ;; Sign extension
+ ;;----------------------------------------------------------------
+-- 
+2.34.1
+

@@ -1,0 +1,133 @@
+From 3616ef25911d9fa8b5c0e4883f19131da48896d5 Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Thu, 29 Feb 2024 10:53:04 +0530
+Subject: [PATCH 10/53] Fix gdb-14 build errors for microblaze-xilinx-elf
+ 2023.2 merge
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/elf64-microblaze.c | 12 ++++++++++++
+ gdb/frame.c            |  2 +-
+ gdb/microblaze-tdep.c  | 17 +++++++++++------
+ 3 files changed, 24 insertions(+), 7 deletions(-)
+
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index 6cd9753a592..119d266f95a 100755
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -750,6 +750,18 @@ microblaze_elf_info_to_howto (bfd * abfd,
+   return true;
+ }
+ 
++/* Relax table contains information about instructions which can
++   be removed by relaxation -- replacing a long address with a
++   short address.  */
++struct relax_table
++{
++  /* Address where bytes may be deleted.  */
++  bfd_vma addr;
++
++  /* Number of bytes to be deleted.  */
++  size_t size;
++};
++
+ struct _microblaze_elf_section_data
+ {
+   struct bfd_elf_section_data elf;
+diff --git a/gdb/frame.c b/gdb/frame.c
+index 859e1a6553d..94bb026c4d9 100644
+--- a/gdb/frame.c
++++ b/gdb/frame.c
+@@ -1319,7 +1319,7 @@ frame_unwind_register_value (frame_info_ptr next_frame, int regnum)
+ 	      int i;
+ 
+ 	      const gdb_byte *buf = NULL;
+-	      if (value_entirely_available(value)) {
++	      if (value->entirely_available()) {
+ 	        gdb::array_view<const gdb_byte> buf = value->contents ();
+ 	      }
+ 
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index aed5f2ec30c..e1a7a49eb84 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -75,7 +75,7 @@ static const char *const microblaze_abi_strings[] = {
+ enum microblaze_abi
+ microblaze_abi (struct gdbarch *gdbarch)
+ {
+-  microblaze_gdbarch_tdep *tdep = (microblaze_gdbarch_tdep *) gdbarch_tdep (gdbarch);
++  microblaze_gdbarch_tdep *tdep = gdbarch_tdep<microblaze_gdbarch_tdep> (gdbarch);
+   return tdep->microblaze_abi;
+ }
+ /* The registers of the Xilinx microblaze processor.  */
+@@ -120,12 +120,12 @@ show_microblaze_abi (struct ui_file *file,
+ 
+ #if 1 
+       if (global_abi == MICROBLAZE_ABI_AUTO)
+-        fprintf_filtered
++        gdb_printf
+           (file,
+            "The microblaze ABI is set automatically (currently \"%s\").\n",
+            actual_abi_str);	
+       else if (global_abi == actual_abi)
+-        fprintf_filtered
++        gdb_printf
+           (file,
+            "The microblaze ABI is assumed to be \"%s\" (due to user setting).\n",
+            actual_abi_str);
+@@ -133,7 +133,7 @@ show_microblaze_abi (struct ui_file *file,
+         {
+ #endif
+           /* Probably shouldn't happen...  */
+-          fprintf_filtered (file,
++          gdb_printf (file,
+                             "The (auto detected) microblaze ABI \"%s\" is in use "
+                             "even though the user setting was \"%s\".\n",
+              actual_abi_str, microblaze_abi_strings[global_abi]);
+@@ -934,7 +934,7 @@ microblaze_iterate_over_regset_sections (struct gdbarch *gdbarch,
+                                      void *cb_data,
+                                      const struct regcache *regcache)
+ {
+-  struct microblaze_gdbarch_tdep *tdep =(microblaze_gdbarch_tdep *) gdbarch_tdep (gdbarch);
++  microblaze_gdbarch_tdep *tdep = gdbarch_tdep<microblaze_gdbarch_tdep> (gdbarch);
+ 
+   cb(".reg", tdep->sizeof_gregset, tdep->sizeof_gregset, tdep->gregset, NULL, cb_data);
+ 
+@@ -942,6 +942,8 @@ microblaze_iterate_over_regset_sections (struct gdbarch *gdbarch,
+ }
+ 
+ 
++#if 0
++// compilation errors - function is not actually used ?
+ static void
+ make_regs (struct gdbarch *arch)
+ {
+@@ -953,6 +955,7 @@ make_regs (struct gdbarch *arch)
+       set_gdbarch_ptr_bit (arch, 64);
+     }
+ }
++#endif
+ 
+ static struct gdbarch *
+ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -964,7 +967,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+  /* What has the user specified from the command line?  */
+   wanted_abi = global_microblaze_abi ();
+   if (gdbarch_debug)
+-    fprintf_unfiltered (gdb_stdlog, "microblaze_gdbarch_init: wanted_abi = %d\n",
++    gdb_printf (gdb_stdlog, "microblaze_gdbarch_init: wanted_abi = %d\n",
+                         wanted_abi);
+   if (wanted_abi != MICROBLAZE_ABI_AUTO)
+     microblaze_abi = wanted_abi;
+@@ -1038,6 +1041,8 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   gdbarch *gdbarch
+     = gdbarch_alloc (&info, gdbarch_tdep_up (new microblaze_gdbarch_tdep));
+ 
++  microblaze_gdbarch_tdep *tdep = gdbarch_tdep<microblaze_gdbarch_tdep> (gdbarch);
++
+   tdep->gregset = NULL;
+   tdep->sizeof_gregset = 0;
+   tdep->fpregset = NULL;
+-- 
+2.34.1
+

@@ -1,0 +1,1841 @@
+From ff4596845becf48fa17f06ea30a59658e9722e06 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Thu, 31 Jan 2019 14:36:00 +0530
+Subject: [PATCH 06/53] Adding 64 bit MB support Added new architecture to
+ Microblaze 64-bit support to GDB Signed-off-by :Nagaraju Mekala
+ <nmekala@xilix.com> Signed-off-by :Mahesh Bodapati <mbodapat@xilinx.com>
+
+Conflicts:
+	gdb/Makefile.in
+
+Conflicts:
+	bfd/cpu-microblaze.c
+	gdb/microblaze-tdep.c
+	ld/Makefile.am
+	ld/Makefile.in
+	opcodes/microblaze-dis.c
+
+Conflicts:
+	bfd/configure
+	gas/config/tc-microblaze.c
+	ld/Makefile.in
+	opcodes/microblaze-opcm.h
+
+Conflicts:
+	gdb/microblaze-tdep.c
+
+Conflicts:
+	bfd/elf32-microblaze.c
+	gas/config/tc-microblaze.c
+	gdb/features/Makefile
+	gdb/features/microblaze-with-stack-protect.c
+	gdb/microblaze-tdep.c
+	gdb/regformats/microblaze-with-stack-protect.dat
+	gdbserver/linux-microblaze-low.c
+	include/elf/common.h
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ bfd/Makefile.am                               |   2 +
+ bfd/Makefile.in                               |   3 +
+ bfd/archures.c                                |   2 +
+ bfd/bfd-in2.h                                 |  41 ++++-
+ bfd/config.bfd                                |   4 +
+ bfd/configure                                 |   2 +
+ bfd/cpu-microblaze.c                          |  55 +++++-
+ bfd/elf32-microblaze.c                        | 133 ++++++++++++--
+ bfd/libbfd.h                                  |   2 +
+ bfd/reloc.c                                   |  20 +++
+ bfd/targets.c                                 |   6 +
+ gdb/features/Makefile                         |   2 +
+ gdb/features/microblaze-core.xml              |   6 +-
+ gdb/features/microblaze-stack-protect.xml     |   4 +-
+ gdb/features/microblaze-with-stack-protect.c  |   8 +-
+ gdb/features/microblaze.c                     |   6 +-
+ gdb/features/microblaze64-core.xml            |  69 ++++++++
+ gdb/features/microblaze64-stack-protect.xml   |  12 ++
+ .../microblaze64-with-stack-protect.c         |  79 +++++++++
+ .../microblaze64-with-stack-protect.xml       |  12 ++
+ gdb/features/microblaze64.c                   |  77 +++++++++
+ gdb/features/microblaze64.xml                 |  11 ++
+ gdb/microblaze-linux-tdep.c                   |  36 +++-
+ gdb/microblaze-tdep.c                         | 125 ++++++++++----
+ gdb/microblaze-tdep.h                         |   4 +-
+ include/elf/common.h                          |   1 +
+ include/elf/microblaze.h                      |   2 +
+ opcodes/microblaze-dis.c                      |  52 +++---
+ opcodes/microblaze-opc.h                      | 162 ++++++++++++++++--
+ opcodes/microblaze-opcm.h                     |  24 ++-
+ 30 files changed, 853 insertions(+), 109 deletions(-)
+ create mode 100644 gdb/features/microblaze64-core.xml
+ create mode 100644 gdb/features/microblaze64-stack-protect.xml
+ create mode 100644 gdb/features/microblaze64-with-stack-protect.c
+ create mode 100644 gdb/features/microblaze64-with-stack-protect.xml
+ create mode 100644 gdb/features/microblaze64.c
+ create mode 100644 gdb/features/microblaze64.xml
+
+diff --git a/bfd/Makefile.am b/bfd/Makefile.am
+index 4f67b59585d..510f96439b7 100644
+--- a/bfd/Makefile.am
++++ b/bfd/Makefile.am
+@@ -568,6 +568,7 @@ BFD64_BACKENDS = \
+ 	elf64-ppc.lo \
+ 	elf64-riscv.lo \
+ 	elf64-s390.lo \
++	elf64-microblaze.lo \
+ 	elf64-sparc.lo \
+ 	elf64-tilegx.lo \
+ 	elf64-x86-64.lo \
+@@ -617,6 +618,7 @@ BFD64_BACKENDS_CFILES = \
+ 	elf64-nfp.c \
+ 	elf64-ppc.c \
+ 	elf64-s390.c \
++	elf64-microblaze.c \
+ 	elf64-sparc.c \
+ 	elf64-tilegx.c \
+ 	elf64-x86-64.c \
+diff --git a/bfd/Makefile.in b/bfd/Makefile.in
+index faaa0c424b8..71982d9f729 100644
+--- a/bfd/Makefile.in
++++ b/bfd/Makefile.in
+@@ -1036,6 +1036,7 @@ BFD64_BACKENDS = \
+ 	elf64-ppc.lo \
+ 	elf64-riscv.lo \
+ 	elf64-s390.lo \
++	elf64-microblaze.lo \
+ 	elf64-sparc.lo \
+ 	elf64-tilegx.lo \
+ 	elf64-x86-64.lo \
+@@ -1085,6 +1086,7 @@ BFD64_BACKENDS_CFILES = \
+ 	elf64-nfp.c \
+ 	elf64-ppc.c \
+ 	elf64-s390.c \
++	elf64-microblaze.c \
+ 	elf64-sparc.c \
+ 	elf64-tilegx.c \
+ 	elf64-x86-64.c \
+@@ -1661,6 +1663,7 @@ distclean-compile:
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-ppc.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-riscv.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-s390.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-microblaze.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-sparc.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-tilegx.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-x86-64.Plo@am__quote@
+diff --git a/bfd/archures.c b/bfd/archures.c
+index 94118b8d2cf..b9db26627ea 100644
+--- a/bfd/archures.c
++++ b/bfd/archures.c
+@@ -515,6 +515,8 @@ DESCRIPTION
+ .  bfd_arch_lm32,      {* Lattice Mico32.  *}
+ .#define bfd_mach_lm32		1
+ .  bfd_arch_microblaze,{* Xilinx MicroBlaze.  *}
++.#define bfd_mach_microblaze	1
++.#define bfd_mach_microblaze64	2
+ .  bfd_arch_kvx,        {* Kalray VLIW core of the MPPA processor family *}
+ .#define bfd_mach_kv3_unknown       0
+ .#define bfd_mach_kv3_1             1
+diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
+index 581d8fe0b3e..7ccc155394d 100644
+--- a/bfd/bfd-in2.h
++++ b/bfd/bfd-in2.h
+@@ -1771,6 +1771,8 @@ enum bfd_architecture
+   bfd_arch_lm32,      /* Lattice Mico32.  */
+ #define bfd_mach_lm32          1
+   bfd_arch_microblaze,/* Xilinx MicroBlaze.  */
++#define bfd_mach_microblaze    1
++#define bfd_mach_microblaze64  2
+   bfd_arch_kvx,        /* Kalray VLIW core of the MPPA processor family */
+ #define bfd_mach_kv3_unknown       0
+ #define bfd_mach_kv3_1             1
+@@ -6444,23 +6446,44 @@ enum bfd_reloc_code_real
+      the form "Symbol Op Symbol".  */
+   BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM,
+ 
+-  /* This is a 32 bit reloc that stores the 32 bit pc relative value in
+-     two words (with an imm instruction).  No relocation is done here -
+-     only used for relaxing.  */
++/* This is a 32 bit reloc that stores the 32 bit pc relative
++value in two words (with an imm instruction).  No relocation is
++done here - only used for relaxing  */
+   BFD_RELOC_MICROBLAZE_32_NONE,
+ 
+-  /* This is a 64 bit reloc that stores the 32 bit pc relative value in
+-     two words (with an imm instruction).  No relocation is done here -
+-     only used for relaxing.  */
+-  BFD_RELOC_MICROBLAZE_64_NONE,
++/* This is a 64 bit reloc that stores the 32 bit pc relative
++ *  +value in two words (with an imml instruction).  No relocation is
++ *   +done here - only used for relaxing  */
++    BFD_RELOC_MICROBLAZE_64_PCREL,
++
++/* This is a 64 bit reloc that stores the 32 bit relative
++ *  +value in two words (with an imml instruction).  No relocation is
++ *   +done here - only used for relaxing  */
++    BFD_RELOC_MICROBLAZE_64,
++
++/* This is a 64 bit reloc that stores the 32 bit relative
++ *  +value in two words (with an imml instruction).  No relocation is
++ *   +done here - only used for relaxing  */
++    BFD_RELOC_MICROBLAZE_EA64,
++
++/* This is a 64 bit reloc that stores the 32 bit pc relative
++ *  +value in two words (with an imm instruction).  No relocation is
++ *   +done here - only used for relaxing  */
++    BFD_RELOC_MICROBLAZE_64_NONE,
+ 
+   /* This is a 64 bit reloc that stores the 32 bit pc relative value in
+      two words (with an imm instruction).  The relocation is PC-relative
+      GOT offset.  */
+   BFD_RELOC_MICROBLAZE_64_GOTPC,
+ 
+-  /* This is a 64 bit reloc that stores the 32 bit pc relative value in
+-     two words (with an imm instruction).  The relocation is GOT offset.  */
++/* This is a 64 bit reloc that stores the 32 bit pc relative
++value in two words (with an imml instruction).  The relocation is
++PC-relative GOT offset  */
++  BFD_RELOC_MICROBLAZE_64_GPC,
++
++/* This is a 64 bit reloc that stores the 32 bit pc relative
++value in two words (with an imm instruction).  The relocation is
++GOT offset  */
+   BFD_RELOC_MICROBLAZE_64_GOT,
+ 
+   /* This is a 64 bit reloc that stores the 32 bit pc relative value in
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index bbf12447517..cbba305354f 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -884,11 +884,15 @@ case "${targ}" in
+   microblazeel*-*)
+     targ_defvec=microblaze_elf32_le_vec
+     targ_selvecs=microblaze_elf32_vec
++    targ64_selvecs=microblaze_elf64_vec
++    targ64_selvecs=microblaze_elf64_le_vec
+     ;;
+ 
+   microblaze*-*)
+     targ_defvec=microblaze_elf32_vec
+     targ_selvecs=microblaze_elf32_le_vec
++    targ64_selvecs=microblaze_elf64_vec
++    targ64_selvecs=microblaze_elf64_le_vec
+     ;;
+ 
+ #ifdef BFD64
+diff --git a/bfd/configure b/bfd/configure
+index 5618c5d3217..3c5b58c33b4 100755
+--- a/bfd/configure
++++ b/bfd/configure
+@@ -16016,6 +16016,8 @@ do
+     rx_elf32_linux_le_vec)	 tb="$tb elf32-rx.lo elf32.lo $elf" ;;
+     s390_elf32_vec)		 tb="$tb elf32-s390.lo elf32.lo $elf" ;;
+     s390_elf64_vec)		 tb="$tb elf64-s390.lo elf64.lo $elf"; target_size=64 ;;
++    microblaze_elf64_vec)	 tb="$tb elf64-microblaze.lo elf64.lo $elf"; target_size=64 ;;
++    microblaze_elf64_le_vec)	 tb="$tb elf64-microblaze.lo elf64.lo $elf"; target_size=64 ;;
+     score_elf32_be_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo elf64.lo $elf"; want64=true; target_size=64 ;;
+     score_elf32_le_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo elf64.lo $elf"; want64=true; target_size=64 ;;
+     sh_coff_vec)		 tb="$tb coff-sh.lo $coff" ;;
+diff --git a/bfd/cpu-microblaze.c b/bfd/cpu-microblaze.c
+index a7af3a17237..caf4fb66826 100644
+--- a/bfd/cpu-microblaze.c
++++ b/bfd/cpu-microblaze.c
+@@ -23,13 +23,30 @@
+ #include "bfd.h"
+ #include "libbfd.h"
+ 
+-const bfd_arch_info_type bfd_microblaze_arch =
++const bfd_arch_info_type bfd_microblaze_arch[] =
++{
++#if BFD_DEFAULT_TARGET_SIZE == 64
++{
++  64,		  		/* 32 bits in a word.  */
++  64,		  		/* 32 bits in an address.  */
++  8,		  		/* 8 bits in a byte.  */
++  bfd_arch_microblaze,		/* Architecture.  */
++  bfd_mach_microblaze64,	/* 64 bit Machine */
++  "microblaze",	  		/* Architecture name.  */
++  "MicroBlaze",	  		/* Printable name.  */
++  3,		  		/* Section align power.  */
++  false,		  		/* Is this the default architecture ?  */
++  bfd_default_compatible,	/* Architecture comparison function.  */
++  bfd_default_scan,	   	/* String to architecture conversion.  */
++  bfd_arch_default_fill,	/* Default fill.  */
++  &bfd_microblaze_arch[1]  	/* Next in list.  */
++},
+ {
+   32,				/* Bits in a word.  */
+   32,				/* Bits in an address.  */
+   8,				/* Bits in a byte.  */
+   bfd_arch_microblaze,		/* Architecture number.  */
+-  0,				/* Machine number - 0 for now.  */
++  bfd_mach_microblaze,		/* Machine number - 0 for now.  */
+   "microblaze",			/* Architecture name.  */
+   "MicroBlaze",			/* Printable name.  */
+   3,				/* Section align power.  */
+@@ -39,4 +56,38 @@ const bfd_arch_info_type bfd_microblaze_arch =
+   bfd_arch_default_fill,	/* Default fill.  */
+   NULL,				/* Next in list.  */
+   0 /* Maximum offset of a reloc from the start of an insn.  */
++}
++#else
++{
++  32,		  		/* 32 bits in a word.  */
++  32,		  		/* 32 bits in an address.  */
++  8,		  		/* 8 bits in a byte.  */
++  bfd_arch_microblaze, 		/* Architecture.  */
++  bfd_mach_microblaze,		/* 32 bit Machine */
++  "microblaze",	  		/* Architecture name.  */
++  "MicroBlaze",	  		/* Printable name.  */
++  3,		  		/* Section align power.  */
++  true,		  		/* Is this the default architecture ?  */
++  bfd_default_compatible,	/* Architecture comparison function.  */
++  bfd_default_scan,	   	/* String to architecture conversion.  */
++  bfd_arch_default_fill,	/* Default fill.  */
++  &bfd_microblaze_arch[1]   	/* Next in list.  */
++},
++{
++  64,		  		/* 32 bits in a word.  */
++  64,		  		/* 32 bits in an address.  */
++  8,		  		/* 8 bits in a byte.  */
++  bfd_arch_microblaze,		/* Architecture.  */
++  bfd_mach_microblaze64,	/* 64 bit Machine */
++  "microblaze",	  		/* Architecture name.  */
++  "MicroBlaze",	  		/* Printable name.  */
++  3,		  		/* Section align power.  */
++  false,		  		/* Is this the default architecture ?  */
++  bfd_default_compatible,	/* Architecture comparison function.  */
++  bfd_default_scan,	   	/* String to architecture conversion.  */
++  bfd_arch_default_fill,	/* Default fill.  */
++  NULL,			  	/* Next in list.  */
++  0
++}
++#endif
+ };
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index 022ce365c59..7e7c4bf471d 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -114,6 +114,20 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
+ 	  0x0000ffff,		/* Dest Mask.  */
+ 	  true),		/* PC relative offset?  */
+ 
++   HOWTO (R_MICROBLAZE_IMML_64,     	/* Type.  */
++          0,			/* Rightshift.  */
++          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
++          16,			/* Bitsize.  */
++          true,		/* PC_relative.  */
++          0,			/* Bitpos.  */
++          complain_overflow_dont, /* Complain on overflow.  */
++          bfd_elf_generic_reloc,/* Special Function.  */
++          "R_MICROBLAZE_IMML_64",   	/* Name.  */
++          false,		/* Partial Inplace.  */
++          0,			/* Source Mask.  */
++          0x0000ffff,		/* Dest Mask.  */
++          false), 		/* PC relative offset?  */
++
+    /* A 64 bit relocation.  Table entry not really used.  */
+    HOWTO (R_MICROBLAZE_64,	/* Type.  */
+ 	  0,			/* Rightshift.  */
+@@ -279,6 +293,21 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
+ 	  0x0000ffff,		/* Dest Mask.  */
+ 	  true),		/* PC relative offset?  */
+ 
++   /* A 64 bit GOTPC relocation.  Table-entry not really used.  */
++   HOWTO (R_MICROBLAZE_GPC_64,   	/* Type.  */
++          0,			/* Rightshift.  */
++          2,			/* Size (0 = byte, 1 = short, 2 = long).  */
++          16,			/* Bitsize.  */
++          true,			/* PC_relative.  */
++          0,			/* Bitpos.  */
++          complain_overflow_dont, /* Complain on overflow.  */
++          bfd_elf_generic_reloc,	/* Special Function.  */
++          "R_MICROBLAZE_GPC_64", 	/* Name.  */
++          false,		/* Partial Inplace.  */
++          0,			/* Source Mask.  */
++          0x0000ffff,		/* Dest Mask.  */
++          true), 		/* PC relative offset?  */
++
+    /* A 64 bit GOT relocation.  Table-entry not really used.  */
+    HOWTO (R_MICROBLAZE_GOT_64,  /* Type.  */
+ 	  0,			/* Rightshift.  */
+@@ -618,9 +647,15 @@ microblaze_elf_reloc_type_lookup (bfd * abfd ATTRIBUTE_UNUSED,
+     case BFD_RELOC_VTABLE_ENTRY:
+       microblaze_reloc = R_MICROBLAZE_GNU_VTENTRY;
+       break;
++    case BFD_RELOC_MICROBLAZE_64:
++      microblaze_reloc = R_MICROBLAZE_IMML_64;
++      break;
+     case BFD_RELOC_MICROBLAZE_64_GOTPC:
+       microblaze_reloc = R_MICROBLAZE_GOTPC_64;
+       break;
++    case BFD_RELOC_MICROBLAZE_64_GPC:
++      microblaze_reloc = R_MICROBLAZE_GPC_64;
++      break;
+     case BFD_RELOC_MICROBLAZE_64_GOT:
+       microblaze_reloc = R_MICROBLAZE_GOT_64;
+       break;
+@@ -1582,7 +1617,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 		if (r_symndx == STN_UNDEF || (input_section->flags & SEC_ALLOC) == 0)
+ 		  {
+ 		    relocation += addend;
+-		    if (r_type == R_MICROBLAZE_32)
++		    if (r_type == R_MICROBLAZE_32)// || r_type == R_MICROBLAZE_IMML_64)
+ 		      bfd_put_32 (input_bfd, relocation, contents + offset);
+ 		    else
+ 		      {
+@@ -1987,8 +2022,7 @@ microblaze_elf_relax_section (bfd *abfd,
+       else
+ 	symval += irel->r_addend;
+ 
+-      if ((symval & 0xffff8000) == 0
+-	  || (symval & 0xffff8000) == 0xffff8000)
++      if ((symval & 0xffff8000) == 0)
+ 	{
+ 	  /* We can delete this instruction.  */
+ 	  sdata->relax[sdata->relax_count].addr = irel->r_offset;
+@@ -2052,16 +2086,45 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		    irel->r_addend -= calc_fixup (irel->r_addend, 0, sec);
+ 		}
+ 	      break;
++	    case R_MICROBLAZE_IMML_64:
++	      {
++	        /* This was a PC-relative instruction that was
++ 		   completely resolved.  */
++	        int sfix, efix;
++            unsigned int val;
++	        bfd_vma target_address;
++	        target_address = irel->r_addend + irel->r_offset;
++	        sfix = calc_fixup (irel->r_offset, 0, sec);
++	        efix = calc_fixup (target_address, 0, sec);
++
++            /* Validate the in-band val.  */
++            val = bfd_get_32 (abfd, contents + irel->r_offset);
++            if (val != irel->r_addend && ELF64_R_TYPE (irel->r_info) == R_MICROBLAZE_32_NONE) {
++               fprintf(stderr, "%d: CORRUPT relax reloc %x %lx\n", __LINE__, val, irel->r_addend);
++            }
++	        irel->r_addend -= (efix - sfix);
++	        /* Should use HOWTO.  */
++	        microblaze_bfd_write_imm_value_64 (abfd, contents + irel->r_offset,
++	                                           irel->r_addend);
++	      }
++	      break;
+ 	    case R_MICROBLAZE_NONE:
+ 	    case R_MICROBLAZE_32_NONE:
+ 	      {
+ 		/* This was a PC-relative instruction that was
+ 		   completely resolved.  */
+ 		size_t sfix, efix;
++		unsigned int val;
+ 		bfd_vma target_address;
+ 		target_address = irel->r_addend + irel->r_offset;
+ 		sfix = calc_fixup (irel->r_offset, 0, sec);
+ 		efix = calc_fixup (target_address, 0, sec);
++
++		/* Validate the in-band val.  */
++		val = bfd_get_32 (abfd, contents + irel->r_offset);
++		if (val != irel->r_addend && ELF32_R_TYPE (irel->r_info) == R_MICROBLAZE_32_NONE) {
++		       fprintf(stderr, "%d: CORRUPT relax reloc %x %lx\n", __LINE__, val, irel->r_addend);
++		}
+ 		irel->r_addend -= (efix - sfix);
+ 		/* Should use HOWTO.  */
+ 		microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset,
+@@ -2078,8 +2141,8 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		sfix = calc_fixup (irel->r_offset + INST_WORD_SIZE, 0, sec);
+ 		efix = calc_fixup (target_address, 0, sec);
+ 		irel->r_addend -= (efix - sfix);
+-    microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset
+-				       + INST_WORD_SIZE, irel->r_addend);
++    microblaze_bfd_write_imm_value_64 (abfd, contents + irel->r_offset,
++                                       irel->r_addend);
+ 	      }
+ 	      break;
+ 	    }
+@@ -2109,10 +2172,50 @@ microblaze_elf_relax_section (bfd *abfd,
+ 	  irelscanend = irelocs + o->reloc_count;
+ 	  for (irelscan = irelocs; irelscan < irelscanend; irelscan++)
+ 	    {
+-	      if ((ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32)
+-		  || (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_NONE))
+-		{
+-		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
++             if (1 && ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_NONE)
++                {
++                  unsigned int val;
++
++                  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
++
++                  /* hax: We only do the following fixup for debug location lists.  */
++                  if (strcmp(".debug_loc", o->name))
++                    continue;
++
++                  /* This was a PC-relative instruction that was completely resolved.  */
++                  if (ocontents == NULL)
++                    {
++                      if (elf_section_data (o)->this_hdr.contents != NULL)
++                          ocontents = elf_section_data (o)->this_hdr.contents;
++                      else
++                        {
++                          /* We always cache the section contents.
++                             Perhaps, if info->keep_memory is FALSE, we
++                             should free them, if we are permitted to.  */
++
++                          if (o->rawsize == 0)
++                              o->rawsize = o->size;
++                          ocontents = (bfd_byte *) bfd_malloc (o->rawsize);
++                          if (ocontents == NULL)
++                              goto error_return;
++                          if (!bfd_get_section_contents (abfd, o, ocontents,
++                                                         (file_ptr) 0,
++                                                         o->rawsize))
++                              goto error_return;
++		          elf_section_data (o)->this_hdr.contents = ocontents;
++		        }
++		    }
++                  val = bfd_get_32 (abfd, ocontents + irelscan->r_offset);
++                  if (val != irelscan->r_addend) {
++                    fprintf(stderr, "%d: CORRUPT relax reloc! %x %lx\n", __LINE__, val, irelscan->r_addend);
++                  }
++                  irelscan->r_addend -= calc_fixup (irelscan->r_addend, 0, sec);
++                  microblaze_bfd_write_imm_value_32 (abfd, ocontents + irelscan->r_offset,
++                                                     irelscan->r_addend);
++              }
++              if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32)// || ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_IMML_64)
++                {
++	          isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
+ 
+ 		  /* Look at the reloc only if the value has been resolved.  */
+ 		  if (isym->st_shndx == shndx
+@@ -3510,6 +3613,14 @@ microblaze_elf_finish_dynamic_sections (bfd *output_bfd,
+   return true;
+ }
+ 
++
++static bool
++elf_microblaze_object_p (bfd *abfd)
++{
++  /* Set the right machine number for an s390 elf32 file.  */
++  return bfd_default_set_arch_mach (abfd, bfd_arch_microblaze, bfd_mach_microblaze);
++}
++
+ /* Hook called by the linker routine which adds symbols from an object
+    file.  We use it to put .comm items in .sbss, and not .bss.  */
+ 
+@@ -3580,8 +3691,6 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
+ #define elf_backend_finish_dynamic_symbol	microblaze_elf_finish_dynamic_symbol
+ #define elf_backend_size_dynamic_sections	microblaze_elf_size_dynamic_sections
+ #define elf_backend_add_symbol_hook		microblaze_elf_add_symbol_hook
+-
+-#define elf_backend_grok_prstatus               microblaze_elf_grok_prstatus
+-#define elf_backend_grok_psinfo                 microblaze_elf_grok_psinfo
++#define elf_backend_object_p			elf_microblaze_object_p
+ 
+ #include "elf32-target.h"
+diff --git a/bfd/libbfd.h b/bfd/libbfd.h
+index ebd4f24149b..7a3e558d70a 100644
+--- a/bfd/libbfd.h
++++ b/bfd/libbfd.h
+@@ -3011,6 +3011,8 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
+   "BFD_RELOC_MICROBLAZE_64_GOTOFF",
+   "BFD_RELOC_MICROBLAZE_32_GOTOFF",
+   "BFD_RELOC_MICROBLAZE_COPY",
++  "BFD_RELOC_MICROBLAZE_64",
++  "BFD_RELOC_MICROBLAZE_64_PCREL",
+   "BFD_RELOC_MICROBLAZE_64_TLS",
+   "BFD_RELOC_MICROBLAZE_64_TLSGD",
+   "BFD_RELOC_MICROBLAZE_64_TLSLD",
+diff --git a/bfd/reloc.c b/bfd/reloc.c
+index e74cbd75e96..fda67e5ffda 100644
+--- a/bfd/reloc.c
++++ b/bfd/reloc.c
+@@ -6665,6 +6665,12 @@ ENUMDOC
+   This is a 32 bit reloc that stores the 32 bit pc relative value in
+   two words (with an imm instruction).  No relocation is done here -
+   only used for relaxing.
++ENUM
++  BFD_RELOC_MICROBLAZE_32_NONE
++ENUMDOC
++  This is a 32 bit reloc that stores the 32 bit pc relative
++  value in two words (with an imm instruction).  No relocation is
++  done here - only used for relaxing
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_NONE
+ ENUMDOC
+@@ -7886,6 +7892,20 @@ ENUMX
+ ENUMDOC
+   Tilera TILE-Gx Relocations.
+ 
++  This is a 64 bit reloc that stores 64-bit thread pointer relative offset
++  to two words (uses imml instruction).
++ENUM
++BFD_RELOC_MICROBLAZE_64,
++ENUMDOC
++ This is a 64 bit reloc that stores the 64 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
++ENUM
++BFD_RELOC_MICROBLAZE_64_PCREL,
++ENUMDOC
++ This is a 32 bit reloc that stores the 32 bit pc relative
++ value in two words (with an imml instruction).  No relocation is
++ done here - only used for relaxing
+ ENUM
+   BFD_RELOC_BPF_64
+ ENUMX
+diff --git a/bfd/targets.c b/bfd/targets.c
+index 3addf2fe373..a9a9b975c82 100644
+--- a/bfd/targets.c
++++ b/bfd/targets.c
+@@ -799,6 +799,8 @@ extern const bfd_target mep_elf32_le_vec;
+ extern const bfd_target metag_elf32_vec;
+ extern const bfd_target microblaze_elf32_vec;
+ extern const bfd_target microblaze_elf32_le_vec;
++extern const bfd_target microblaze_elf64_vec;
++extern const bfd_target microblaze_elf64_le_vec;
+ extern const bfd_target mips_ecoff_be_vec;
+ extern const bfd_target mips_ecoff_le_vec;
+ extern const bfd_target mips_ecoff_bele_vec;
+@@ -1167,6 +1169,10 @@ static const bfd_target * const _bfd_target_vector[] =
+ 
+ 	&metag_elf32_vec,
+ 
++#ifdef BFD64
++	&microblaze_elf64_vec,
++	&microblaze_elf64_le_vec,
++#endif
+ 	&microblaze_elf32_vec,
+ 
+ 	&mips_ecoff_be_vec,
+diff --git a/gdb/features/Makefile b/gdb/features/Makefile
+index 8ac30d8cea3..690f1e94570 100644
+--- a/gdb/features/Makefile
++++ b/gdb/features/Makefile
+@@ -102,7 +102,9 @@ OUTPUTS = $(patsubst %,$(outdir)/%.dat,$(WHICH))
+ # to make on the command line.
+ XMLTOC = \
+ 	microblaze-with-stack-protect.xml \
++	microblaze64-with-stack-protect.xml \
+ 	microblaze.xml \
++	microblaze64.xml \
+ 	mips-dsp-linux.xml \
+ 	mips-linux.xml \
+ 	mips64-dsp-linux.xml \
+diff --git a/gdb/features/microblaze-core.xml b/gdb/features/microblaze-core.xml
+index d1d7d538461..4d77d9d898f 100644
+--- a/gdb/features/microblaze-core.xml
++++ b/gdb/features/microblaze-core.xml
+@@ -8,7 +8,7 @@
+ <!DOCTYPE feature SYSTEM "gdb-target.dtd">
+ <feature name="org.gnu.gdb.microblaze.core">
+   <reg name="r0" bitsize="32" regnum="0"/>
+-  <reg name="r1" bitsize="32" type="data_ptr"/>
++  <reg name="r1" bitsize="32"/>
+   <reg name="r2" bitsize="32"/>
+   <reg name="r3" bitsize="32"/>
+   <reg name="r4" bitsize="32"/>
+@@ -39,7 +39,7 @@
+   <reg name="r29" bitsize="32"/>
+   <reg name="r30" bitsize="32"/>
+   <reg name="r31" bitsize="32"/>
+-  <reg name="rpc" bitsize="32" type="code_ptr"/>
++  <reg name="rpc" bitsize="32"/>
+   <reg name="rmsr" bitsize="32"/>
+   <reg name="rear" bitsize="32"/>
+   <reg name="resr" bitsize="32"/>
+@@ -64,4 +64,6 @@
+   <reg name="rtlbsx" bitsize="32"/>
+   <reg name="rtlblo" bitsize="32"/>
+   <reg name="rtlbhi" bitsize="32"/>
++  <reg name="slr" bitsize="32"/>
++  <reg name="shr" bitsize="32"/>
+ </feature>
+diff --git a/gdb/features/microblaze-stack-protect.xml b/gdb/features/microblaze-stack-protect.xml
+index b5f68403bd5..013240ce798 100644
+--- a/gdb/features/microblaze-stack-protect.xml
++++ b/gdb/features/microblaze-stack-protect.xml
+@@ -7,6 +7,6 @@
+ 
+ <!DOCTYPE feature SYSTEM "gdb-target.dtd">
+ <feature name="org.gnu.gdb.microblaze.stack-protect">
+-  <reg name="rslr" bitsize="32"/>
+-  <reg name="rshr" bitsize="32"/>
++  <reg name="slr" bitsize="32"/>
++  <reg name="shr" bitsize="32"/>
+ </feature>
+diff --git a/gdb/features/microblaze-with-stack-protect.c b/gdb/features/microblaze-with-stack-protect.c
+index 574dc02db67..8ab9565a047 100644
+--- a/gdb/features/microblaze-with-stack-protect.c
++++ b/gdb/features/microblaze-with-stack-protect.c
+@@ -14,7 +14,7 @@ initialize_tdesc_microblaze_with_stack_protect (void)
+ 
+   feature = tdesc_create_feature (result.get (), "org.gnu.gdb.microblaze.core");
+   tdesc_create_reg (feature, "r0", 0, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "data_ptr");
++  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r2", 2, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r3", 3, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r4", 4, 1, NULL, 32, "int");
+@@ -45,7 +45,7 @@ initialize_tdesc_microblaze_with_stack_protect (void)
+   tdesc_create_reg (feature, "r29", 29, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r30", 30, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r31", 31, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "code_ptr");
++  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rmsr", 33, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rear", 34, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "resr", 35, 1, NULL, 32, "int");
+@@ -72,8 +72,8 @@ initialize_tdesc_microblaze_with_stack_protect (void)
+   tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
+ 
+   feature = tdesc_create_feature (result.get (), "org.gnu.gdb.microblaze.stack-protect");
+-  tdesc_create_reg (feature, "rslr", 57, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "rshr", 58, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "slr", 57, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "shr", 58, 1, NULL, 32, "int");
+ 
+   tdesc_microblaze_with_stack_protect = result.release ();
+ }
+diff --git a/gdb/features/microblaze.c b/gdb/features/microblaze.c
+index 8f1fb0a142f..ed12e5bcfd2 100644
+--- a/gdb/features/microblaze.c
++++ b/gdb/features/microblaze.c
+@@ -14,7 +14,7 @@ initialize_tdesc_microblaze (void)
+ 
+   feature = tdesc_create_feature (result.get (), "org.gnu.gdb.microblaze.core");
+   tdesc_create_reg (feature, "r0", 0, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "data_ptr");
++  tdesc_create_reg (feature, "r1", 1, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r2", 2, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r3", 3, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r4", 4, 1, NULL, 32, "int");
+@@ -45,7 +45,7 @@ initialize_tdesc_microblaze (void)
+   tdesc_create_reg (feature, "r29", 29, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r30", 30, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "r31", 31, 1, NULL, 32, "int");
+-  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "code_ptr");
++  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rmsr", 33, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rear", 34, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "resr", 35, 1, NULL, 32, "int");
+@@ -70,6 +70,8 @@ initialize_tdesc_microblaze (void)
+   tdesc_create_reg (feature, "rtlbsx", 54, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rtlblo", 55, 1, NULL, 32, "int");
+   tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
+ 
+   tdesc_microblaze = result.release ();
+ }
+diff --git a/gdb/features/microblaze64-core.xml b/gdb/features/microblaze64-core.xml
+new file mode 100644
+index 00000000000..96e99e2fb24
+--- /dev/null
++++ b/gdb/features/microblaze64-core.xml
+@@ -0,0 +1,69 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2014-2018 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE feature SYSTEM "gdb-target.dtd">
++<feature name="org.gnu.gdb.microblaze64.core">
++  <reg name="r0" bitsize="64" regnum="0"/>
++  <reg name="r1" bitsize="64"/>
++  <reg name="r2" bitsize="64"/>
++  <reg name="r3" bitsize="64"/>
++  <reg name="r4" bitsize="64"/>
++  <reg name="r5" bitsize="64"/>
++  <reg name="r6" bitsize="64"/>
++  <reg name="r7" bitsize="64"/>
++  <reg name="r8" bitsize="64"/>
++  <reg name="r9" bitsize="64"/>
++  <reg name="r10" bitsize="64"/>
++  <reg name="r11" bitsize="64"/>
++  <reg name="r12" bitsize="64"/>
++  <reg name="r13" bitsize="64"/>
++  <reg name="r14" bitsize="64"/>
++  <reg name="r15" bitsize="64"/>
++  <reg name="r16" bitsize="64"/>
++  <reg name="r17" bitsize="64"/>
++  <reg name="r18" bitsize="64"/>
++  <reg name="r19" bitsize="64"/>
++  <reg name="r20" bitsize="64"/>
++  <reg name="r21" bitsize="64"/>
++  <reg name="r22" bitsize="64"/>
++  <reg name="r23" bitsize="64"/>
++  <reg name="r24" bitsize="64"/>
++  <reg name="r25" bitsize="64"/>
++  <reg name="r26" bitsize="64"/>
++  <reg name="r27" bitsize="64"/>
++  <reg name="r28" bitsize="64"/>
++  <reg name="r29" bitsize="64"/>
++  <reg name="r30" bitsize="64"/>
++  <reg name="r31" bitsize="64"/>
++  <reg name="rpc" bitsize="64"/>
++  <reg name="rmsr" bitsize="32"/>
++  <reg name="rear" bitsize="64"/>
++  <reg name="resr" bitsize="32"/>
++  <reg name="rfsr" bitsize="32"/>
++  <reg name="rbtr" bitsize="64"/>
++  <reg name="rpvr0" bitsize="32"/>
++  <reg name="rpvr1" bitsize="32"/>
++  <reg name="rpvr2" bitsize="32"/>
++  <reg name="rpvr3" bitsize="32"/>
++  <reg name="rpvr4" bitsize="32"/>
++  <reg name="rpvr5" bitsize="32"/>
++  <reg name="rpvr6" bitsize="32"/>
++  <reg name="rpvr7" bitsize="32"/>
++  <reg name="rpvr8" bitsize="64"/>
++  <reg name="rpvr9" bitsize="64"/>
++  <reg name="rpvr10" bitsize="32"/>
++  <reg name="rpvr11" bitsize="32"/>
++  <reg name="redr" bitsize="32"/>
++  <reg name="rpid" bitsize="32"/>
++  <reg name="rzpr" bitsize="32"/>
++  <reg name="rtlbx" bitsize="32"/>
++  <reg name="rtlbsx" bitsize="32"/>
++  <reg name="rtlblo" bitsize="32"/>
++  <reg name="rtlbhi" bitsize="32"/>
++  <reg name="slr" bitsize="64"/>
++  <reg name="shr" bitsize="64"/>
++</feature>
+diff --git a/gdb/features/microblaze64-stack-protect.xml b/gdb/features/microblaze64-stack-protect.xml
+new file mode 100644
+index 00000000000..1bbf5fc3cea
+--- /dev/null
++++ b/gdb/features/microblaze64-stack-protect.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2014-2018 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE feature SYSTEM "gdb-target.dtd">
++<feature name="org.gnu.gdb.microblaze64.stack-protect">
++  <reg name="slr" bitsize="64"/>
++  <reg name="shr" bitsize="64"/>
++</feature>
+diff --git a/gdb/features/microblaze64-with-stack-protect.c b/gdb/features/microblaze64-with-stack-protect.c
+new file mode 100644
+index 00000000000..a4de4666c76
+--- /dev/null
++++ b/gdb/features/microblaze64-with-stack-protect.c
+@@ -0,0 +1,79 @@
++/* THIS FILE IS GENERATED.  -*- buffer-read-only: t -*- vi:set ro:
++  Original: microblaze-with-stack-protect.xml */
++
++#include "defs.h"
++#include "osabi.h"
++#include "target-descriptions.h"
++
++struct target_desc *tdesc_microblaze64_with_stack_protect;
++static void
++initialize_tdesc_microblaze64_with_stack_protect (void)
++{
++  target_desc_up result = allocate_target_description ();
++  struct tdesc_feature *feature;
++
++  feature = tdesc_create_feature (result.get() , "org.gnu.gdb.microblaze64.core");
++  tdesc_create_reg (feature, "r0", 0, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r1", 1, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r2", 2, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r3", 3, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r4", 4, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r5", 5, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r6", 6, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r7", 7, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r8", 8, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r9", 9, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r10", 10, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r11", 11, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r12", 12, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r13", 13, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r14", 14, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r15", 15, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r16", 16, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r17", 17, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r18", 18, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r19", 19, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r20", 20, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r21", 21, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r22", 22, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r23", 23, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r24", 24, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r25", 25, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r26", 26, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r27", 27, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r28", 28, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r29", 29, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r30", 30, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r31", 31, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rmsr", 33, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rear", 34, 1, NULL, 64, "int");
++  tdesc_create_reg (feature, "resr", 35, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rfsr", 36, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rbtr", 37, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpvr0", 38, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr1", 39, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr2", 40, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr3", 41, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr4", 42, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr5", 43, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr6", 44, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr7", 45, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr8", 46, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpvr9", 47, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpvr10", 48, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr11", 49, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "redr", 50, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpid", 51, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rzpr", 52, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbx", 53, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbsx", 54, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlblo", 55, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
++
++  feature = tdesc_create_feature (result.get(), "org.gnu.gdb.microblaze64.stack-protect");
++  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
++
++  tdesc_microblaze64_with_stack_protect = result.release();
++}
+diff --git a/gdb/features/microblaze64-with-stack-protect.xml b/gdb/features/microblaze64-with-stack-protect.xml
+new file mode 100644
+index 00000000000..0e9f01611f3
+--- /dev/null
++++ b/gdb/features/microblaze64-with-stack-protect.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2014-2018 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE target SYSTEM "gdb-target.dtd">
++<target>
++  <xi:include href="microblaze64-core.xml"/>
++  <xi:include href="microblaze64-stack-protect.xml"/>
++</target>
+diff --git a/gdb/features/microblaze64.c b/gdb/features/microblaze64.c
+new file mode 100644
+index 00000000000..8ab7a90dd95
+--- /dev/null
++++ b/gdb/features/microblaze64.c
+@@ -0,0 +1,77 @@
++/* THIS FILE IS GENERATED.  -*- buffer-read-only: t -*- vi:set ro:
++  Original: microblaze.xml */
++
++#include "defs.h"
++#include "osabi.h"
++#include "target-descriptions.h"
++
++struct target_desc *tdesc_microblaze64;
++static void
++initialize_tdesc_microblaze64 (void)
++{
++  target_desc_up result = allocate_target_description ();
++  struct tdesc_feature *feature;
++
++  feature = tdesc_create_feature (result.get(), "org.gnu.gdb.microblaze64.core");
++  tdesc_create_reg (feature, "r0", 0, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r1", 1, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r2", 2, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r3", 3, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r4", 4, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r5", 5, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r6", 6, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r7", 7, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r8", 8, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r9", 9, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r10", 10, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r11", 11, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r12", 12, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r13", 13, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r14", 14, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r15", 15, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r16", 16, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r17", 17, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r18", 18, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r19", 19, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r20", 20, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r21", 21, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r22", 22, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r23", 23, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r24", 24, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r25", 25, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r26", 26, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r27", 27, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r28", 28, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r29", 29, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r30", 30, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "r31", 31, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpc", 32, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rmsr", 33, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rear", 34, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "resr", 35, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rfsr", 36, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rbtr", 37, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpvr0", 38, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr1", 39, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr2", 40, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr3", 41, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr4", 42, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr5", 43, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr6", 44, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr7", 45, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr8", 46, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpvr9", 47, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "rpvr10", 48, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpvr11", 49, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "redr", 50, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rpid", 51, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rzpr", 52, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbx", 53, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbsx", 54, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlblo", 55, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "rtlbhi", 56, 1, NULL, 32, "int");
++  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
++  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
++
++  tdesc_microblaze64 = result.release();
++}
+diff --git a/gdb/features/microblaze64.xml b/gdb/features/microblaze64.xml
+new file mode 100644
+index 00000000000..515d18e65cf
+--- /dev/null
++++ b/gdb/features/microblaze64.xml
+@@ -0,0 +1,11 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2014-2018 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE target SYSTEM "gdb-target.dtd">
++<target>
++  <xi:include href="microblaze64-core.xml"/>
++</target>
+diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
+index d086debc4f8..f34b0fa9fd4 100644
+--- a/gdb/microblaze-linux-tdep.c
++++ b/gdb/microblaze-linux-tdep.c
+@@ -40,6 +40,7 @@
+ #include "features/microblaze-linux.c"
+ 
+ static int microblaze_debug_flag = 0;
++int MICROBLAZE_REGISTER_SIZE=4;
+ 
+ static void
+ microblaze_debug (const char *fmt, ...)
+@@ -55,6 +56,7 @@ microblaze_debug (const char *fmt, ...)
+     }
+ }
+ 
++#if 0
+ static int
+ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch, 
+ 					   struct bp_target_info *bp_tgt)
+@@ -86,6 +88,8 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+   return val;
+ }
+ 
++#endif
++
+ static void
+ microblaze_linux_sigtramp_cache (frame_info_ptr next_frame,
+ 				 struct trad_frame_cache *this_cache,
+@@ -147,8 +151,8 @@ microblaze_linux_init_abi (struct gdbarch_info info,
+ 
+   linux_init_abi (info, gdbarch, 0);
+ 
+-  set_gdbarch_memory_remove_breakpoint (gdbarch,
+-					microblaze_linux_memory_remove_breakpoint);
++ // set_gdbarch_memory_remove_breakpoint (gdbarch,
++ //					microblaze_linux_memory_remove_breakpoint);
+ 
+   /* Shared library handling.  */
+   set_solib_svr4_fetch_link_map_offsets (gdbarch,
+@@ -160,10 +164,30 @@ microblaze_linux_init_abi (struct gdbarch_info info,
+ 
+   /* BFD target for core files.  */
+   if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
+-    set_gdbarch_gcore_bfd_target (gdbarch, "elf32-microblaze");
++    {
++      if (info.bfd_arch_info->mach == bfd_mach_microblaze64) {
++          set_gdbarch_gcore_bfd_target (gdbarch, "elf64-microblaze");
++          MICROBLAZE_REGISTER_SIZE=8;
++        }
++      else
++        set_gdbarch_gcore_bfd_target (gdbarch, "elf32-microblaze");
++    }
+   else
+-    set_gdbarch_gcore_bfd_target (gdbarch, "elf32-microblazeel");
++    {
++      if (info.bfd_arch_info->mach == bfd_mach_microblaze64) {
++          set_gdbarch_gcore_bfd_target (gdbarch, "elf64-microblazeel");
++          MICROBLAZE_REGISTER_SIZE=8;
++        }
++      else
++        set_gdbarch_gcore_bfd_target (gdbarch, "elf32-microblazeel");
++    }
+ 
++    switch (info.bfd_arch_info->mach)
++    {
++    case bfd_mach_microblaze64:
++      set_gdbarch_ptr_bit (gdbarch, 64);
++    break;
++    }
+ 
+   /* Shared library handling.  */
+   set_gdbarch_skip_trampoline_code (gdbarch, find_solib_trampoline_target);
+@@ -178,7 +202,9 @@ void _initialize_microblaze_linux_tdep ();
+ void
+ _initialize_microblaze_linux_tdep ()
+ {
+-  gdbarch_register_osabi (bfd_arch_microblaze, 0, GDB_OSABI_LINUX, 
++  gdbarch_register_osabi (bfd_arch_microblaze, bfd_mach_microblaze, GDB_OSABI_LINUX, 
++			  microblaze_linux_init_abi);
++  gdbarch_register_osabi (bfd_arch_microblaze, bfd_mach_microblaze64, GDB_OSABI_LINUX, 
+ 			  microblaze_linux_init_abi);
+   initialize_tdesc_microblaze_linux ();
+ }
+diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
+index b0b4c1b2614..7cbbc8986a1 100644
+--- a/gdb/microblaze-tdep.c
++++ b/gdb/microblaze-tdep.c
+@@ -40,7 +40,9 @@
+ #include "remote.h"
+ 
+ #include "features/microblaze-with-stack-protect.c"
++#include "features/microblaze64-with-stack-protect.c"
+ #include "features/microblaze.c"
++#include "features/microblaze64.c"
+ 
+ /* Instruction macros used for analyzing the prologue.  */
+ /* This set of instruction macros need to be changed whenever the
+@@ -75,12 +77,13 @@ static const char * const microblaze_register_names[] =
+   "rpvr0", "rpvr1", "rpvr2", "rpvr3", "rpvr4", "rpvr5", "rpvr6",
+   "rpvr7", "rpvr8", "rpvr9", "rpvr10", "rpvr11",
+   "redr", "rpid", "rzpr", "rtlbx", "rtlbsx", "rtlblo", "rtlbhi",
+-  "rslr", "rshr"
++  "slr", "shr"
+ };
+ 
+ #define MICROBLAZE_NUM_REGS ARRAY_SIZE (microblaze_register_names)
+ 
+ static unsigned int microblaze_debug_flag = 0;
++int reg_size = 4;
+ 
+ #define microblaze_debug(fmt, ...) \
+   debug_prefixed_printf_cond_nofunc (microblaze_debug_flag, "MICROBLAZE", \
+@@ -128,6 +131,15 @@ microblaze_fetch_instruction (CORE_ADDR pc)
+ constexpr gdb_byte microblaze_break_insn[] = MICROBLAZE_BREAKPOINT;
+ 
+ typedef BP_MANIPULATION (microblaze_break_insn) microblaze_breakpoint;
++static CORE_ADDR
++microblaze_store_arguments (struct regcache *regcache, int nargs,
++			    struct value **args, CORE_ADDR sp,
++			    int struct_return, CORE_ADDR struct_addr)
++{
++  error (_("store_arguments not implemented"));
++  return sp;
++}
++#if 0
+ static int
+ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+ 				    struct bp_target_info *bp_tgt)
+@@ -146,7 +158,6 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+   /* Make sure we see the memory breakpoints.  */
+   scoped_restore restore_memory
+     = make_scoped_restore_show_memory_breakpoints (1);
+-
+   val = target_read_memory (addr, old_contents, bplen);
+ 
+   /* If our breakpoint is no longer at the address, this means that the
+@@ -161,6 +172,7 @@ microblaze_linux_memory_remove_breakpoint (struct gdbarch *gdbarch,
+   return val;
+ }
+ 
++#endif
+ /* Allocate and initialize a frame cache.  */
+ 
+ static struct microblaze_frame_cache *
+@@ -583,11 +595,11 @@ microblaze_extract_return_value (struct type *type, struct regcache *regcache,
+     {
+       case 1:	/* return last byte in the register.  */
+ 	regcache->cooked_read (MICROBLAZE_RETVAL_REGNUM, buf);
+-	memcpy(valbuf, buf + MICROBLAZE_REGISTER_SIZE - 1, 1);
++	memcpy(valbuf, buf + reg_size - 1, 1);
+ 	return;
+       case 2:	/* return last 2 bytes in register.  */
+ 	regcache->cooked_read (MICROBLAZE_RETVAL_REGNUM, buf);
+-	memcpy(valbuf, buf + MICROBLAZE_REGISTER_SIZE - 2, 2);
++	memcpy(valbuf, buf + reg_size - 2, 2);
+ 	return;
+       case 4:	/* for sizes 4 or 8, copy the required length.  */
+       case 8:
+@@ -753,6 +765,12 @@ microblaze_software_single_step (struct regcache *regcache)
+ }
+ #endif
+ 
++static void
++microblaze_write_pc (struct regcache *regcache, CORE_ADDR pc)
++{
++  regcache_cooked_write_unsigned (regcache, MICROBLAZE_PC_REGNUM, pc);
++}
++
+ static int dwarf2_to_reg_map[78] =
+ { 0  /* r0  */,   1  /* r1  */,   2  /* r2  */,   3  /* r3  */,  /*  0- 3 */
+   4  /* r4  */,   5  /* r5  */,   6  /* r6  */,   7  /* r7  */,  /*  4- 7 */
+@@ -787,13 +805,14 @@ microblaze_dwarf2_reg_to_regnum (struct gdbarch *gdbarch, int reg)
+ static void
+ microblaze_register_g_packet_guesses (struct gdbarch *gdbarch)
+ {
++
+   register_remote_g_packet_guess (gdbarch,
+ 				  4 * MICROBLAZE_NUM_CORE_REGS,
+-				  tdesc_microblaze);
++				  tdesc_microblaze64);
+ 
+   register_remote_g_packet_guess (gdbarch,
+ 				  4 * MICROBLAZE_NUM_REGS,
+-				  tdesc_microblaze_with_stack_protect);
++				  tdesc_microblaze64_with_stack_protect);
+ }
+ 
+ void
+@@ -801,7 +820,7 @@ microblaze_supply_gregset (const struct regset *regset,
+                         struct regcache *regcache,
+                         int regnum, const void *gregs)
+ {
+-  const unsigned int *regs = (const unsigned int *)gregs;
++  const gdb_byte *regs = (const gdb_byte *) gregs;
+   if (regnum >= 0)
+     regcache->raw_supply (regnum, regs + regnum);
+ 
+@@ -809,7 +828,7 @@ microblaze_supply_gregset (const struct regset *regset,
+     int i;
+ 
+     for (i = 0; i < 50; i++) {
+-      regcache->raw_supply (i, regs + i);
++      regcache->raw_supply (regnum, regs + i);
+     }
+   }
+ }
+@@ -832,6 +851,17 @@ microblaze_iterate_over_regset_sections (struct gdbarch *gdbarch,
+ }
+ 
+ 
++static void
++make_regs (struct gdbarch *arch)
++{
++  struct gdbarch_tdep *tdep = gdbarch_tdep (arch);
++  int mach = gdbarch_bfd_arch_info (arch)->mach;
++  
++  if (mach == bfd_mach_microblaze64)
++    {
++      set_gdbarch_ptr_bit (arch, 64);
++    }
++}
+ 
+ static struct gdbarch *
+ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -844,8 +874,15 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   if (arches != NULL)
+     return arches->gdbarch;
+   if (tdesc == NULL)
+-    tdesc = tdesc_microblaze;
+-
++    {
++      if (info.bfd_arch_info->mach == bfd_mach_microblaze64) 
++        {
++    	  tdesc = tdesc_microblaze64;
++          reg_size = 8;
++   	}
++      else
++    	tdesc = tdesc_microblaze;
++    }
+   /* Check any target description for validity.  */
+   if (tdesc_has_registers (tdesc))
+     {
+@@ -853,31 +890,42 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+       int valid_p;
+       int i;
+ 
+-      feature = tdesc_find_feature (tdesc,
+-				    "org.gnu.gdb.microblaze.core");
++      if (info.bfd_arch_info->mach == bfd_mach_microblaze64)
++        feature = tdesc_find_feature (tdesc,
++                                    "org.gnu.gdb.microblaze64.core");
++      else
++        feature = tdesc_find_feature (tdesc,
++                                    "org.gnu.gdb.microblaze.core");
+       if (feature == NULL)
+ 	return NULL;
+       tdesc_data = tdesc_data_alloc ();
+ 
+       valid_p = 1;
+-      for (i = 0; i < MICROBLAZE_NUM_CORE_REGS; i++)
+-	valid_p &= tdesc_numbered_register (feature, tdesc_data.get (), i,
+-					    microblaze_register_names[i]);
+-      feature = tdesc_find_feature (tdesc,
+-				    "org.gnu.gdb.microblaze.stack-protect");
++      for (i = 0; i < MICROBLAZE_NUM_REGS; i++)
++        valid_p &= tdesc_numbered_register (feature, tdesc_data.get(), i,
++                                            microblaze_register_names[i]);
++      if (info.bfd_arch_info->mach == bfd_mach_microblaze64)
++        feature = tdesc_find_feature (tdesc,
++                                    "org.gnu.gdb.microblaze64.stack-protect");
++      else
++        feature = tdesc_find_feature (tdesc,
++                                    "org.gnu.gdb.microblaze.stack-protect");
+       if (feature != NULL)
+-	{
+-	  valid_p = 1;
+-	  valid_p &= tdesc_numbered_register (feature, tdesc_data.get (),
+-					      MICROBLAZE_SLR_REGNUM,
+-					      "rslr");
+-	  valid_p &= tdesc_numbered_register (feature, tdesc_data.get (),
+-					      MICROBLAZE_SHR_REGNUM,
+-					      "rshr");
+-	}
++        {
++          valid_p = 1;
++          valid_p &= tdesc_numbered_register (feature, tdesc_data.get(),
++                                              MICROBLAZE_SLR_REGNUM,
++                                              "slr");
++          valid_p &= tdesc_numbered_register (feature, tdesc_data.get(),
++                                              MICROBLAZE_SHR_REGNUM,
++                                              "shr");
++        }
+ 
+       if (!valid_p)
+-	return NULL;
++        {
++         // tdesc_data_cleanup (tdesc_data.get ());
++          return NULL;
++        }
+     }
+ 
+   /* Allocate space for the new architecture.  */
+@@ -897,7 +945,17 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   /* Register numbers of various important registers.  */
+   set_gdbarch_sp_regnum (gdbarch, MICROBLAZE_SP_REGNUM); 
+   set_gdbarch_pc_regnum (gdbarch, MICROBLAZE_PC_REGNUM); 
++  
++  /* Register set.  
++  make_regs (gdbarch); */
++  switch (info.bfd_arch_info->mach)
++    {
++    case bfd_mach_microblaze64:
++      set_gdbarch_ptr_bit (gdbarch, 64);
++    break;
++    }
+ 
++  
+   /* Map Dwarf2 registers to GDB registers.  */
+   set_gdbarch_dwarf2_reg_to_regnum (gdbarch, microblaze_dwarf2_reg_to_regnum);
+ 
+@@ -917,7 +975,9 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+ 				       microblaze_breakpoint::kind_from_pc);
+   set_gdbarch_sw_breakpoint_from_kind (gdbarch,
+ 				       microblaze_breakpoint::bp_from_kind);
+-  set_gdbarch_memory_remove_breakpoint (gdbarch, microblaze_linux_memory_remove_breakpoint);
++//  set_gdbarch_memory_remove_breakpoint (gdbarch, microblaze_linux_memory_remove_breakpoint);
++
++//  set_gdbarch_software_single_step (gdbarch, microblaze_software_single_step);
+ 
+   set_gdbarch_software_single_step (gdbarch, microblaze_software_single_step);
+ 
+@@ -925,7 +985,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+ 
+   set_gdbarch_unwind_pc (gdbarch, microblaze_unwind_pc);
+ 
+-  microblaze_register_g_packet_guesses (gdbarch);
++  //microblaze_register_g_packet_guesses (gdbarch);
+ 
+   frame_base_set_default (gdbarch, &microblaze_frame_base);
+ 
+@@ -940,12 +1000,11 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+     tdesc_use_registers (gdbarch, tdesc, std::move (tdesc_data));
+   //frame_base_append_sniffer (gdbarch, microblaze_frame_sniffer);
+ 
+-  /* If we have register sets, enable the generic core file support.  */
++  /* If we have register sets, enable the generic core file support.  
+   if (tdep->gregset) {
+     set_gdbarch_iterate_over_regset_sections (gdbarch,
+                                           microblaze_iterate_over_regset_sections);
+-  }
+-
++  }*/
+   return gdbarch;
+ }
+ 
+@@ -957,6 +1016,8 @@ _initialize_microblaze_tdep ()
+ 
+   initialize_tdesc_microblaze_with_stack_protect ();
+   initialize_tdesc_microblaze ();
++  initialize_tdesc_microblaze64_with_stack_protect ();
++  initialize_tdesc_microblaze64 ();
+   /* Debug this files internals.  */
+   add_setshow_zuinteger_cmd ("microblaze", class_maintenance,
+ 			     &microblaze_debug_flag, _("\
+diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
+index c4c8098308f..81f7f30cb8e 100644
+--- a/gdb/microblaze-tdep.h
++++ b/gdb/microblaze-tdep.h
+@@ -28,7 +28,7 @@ struct microblaze_gregset
+    microblaze_gregset() {}
+    unsigned int gregs[32];
+    unsigned int fpregs[32];
+-   unsigned int pregs[16];
++   unsigned int pregs[18];
+ };
+ 
+ struct microblaze_gdbarch_tdep : gdbarch_tdep_base
+@@ -134,7 +134,7 @@ struct microblaze_frame_cache
+   struct trad_frame_saved_reg *saved_regs;
+ };
+ /* All registers are 32 bits.  */
+-#define MICROBLAZE_REGISTER_SIZE 4
++//#define MICROBLAZE_REGISTER_SIZE 8
+ 
+ /* MICROBLAZE_BREAKPOINT defines the breakpoint that should be used.
+    Only used for native debugging.  */
+diff --git a/include/elf/common.h b/include/elf/common.h
+index 6a66456cd22..11f5d1a3cc9 100644
+--- a/include/elf/common.h
++++ b/include/elf/common.h
+@@ -360,6 +360,7 @@
+ #define EM_U16_U8CORE	260	/* LAPIS nX-U16/U8 */
+ #define EM_TACHYUM	261	/* Tachyum */
+ #define EM_56800EF	262	/* NXP 56800EF Digital Signal Controller (DSC) */
++#define EM_MB_64	263	/* Xilinx MicroBlaze 32-bit RISC soft processor core */
+ 
+ /* If it is necessary to assign new unofficial EM_* values, please pick large
+    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
+diff --git a/include/elf/microblaze.h b/include/elf/microblaze.h
+index a48b1358efd..c515f15bfb8 100644
+--- a/include/elf/microblaze.h
++++ b/include/elf/microblaze.h
+@@ -62,6 +62,8 @@ START_RELOC_NUMBERS (elf_microblaze_reloc_type)
+   RELOC_NUMBER (R_MICROBLAZE_TEXTREL_64, 31)    /* TEXT Entry offset 64-bit.  */
+   RELOC_NUMBER (R_MICROBLAZE_TEXTREL_32_LO, 32) /* TEXT Entry offset 32-bit.  */
+   RELOC_NUMBER (R_MICROBLAZE_32_NONE, 33)
++  RELOC_NUMBER (R_MICROBLAZE_IMML_64, 34)
++  RELOC_NUMBER (R_MICROBLAZE_GPC_64, 35)    /* GOT entry offset.  */
+ END_RELOC_NUMBERS (R_MICROBLAZE_max)
+ 
+ /* Global base address names.  */
+diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
+index 3d696325803..ee447cecc3f 100644
+--- a/opcodes/microblaze-dis.c
++++ b/opcodes/microblaze-dis.c
+@@ -33,6 +33,7 @@
+ #define get_field_r1(buf, instr)   get_field (buf, instr, RA_MASK, RA_LOW)
+ #define get_field_r2(buf, instr)   get_field (buf, instr, RB_MASK, RB_LOW)
+ #define get_int_field_imm(instr)   ((instr & IMM_MASK) >> IMM_LOW)
++#define get_int_field_imml(instr)  ((instr & IMML_MASK) >> IMM_LOW)
+ #define get_int_field_r1(instr)    ((instr & RA_MASK) >> RA_LOW)
+ 
+ #define NUM_STRBUFS 4
+@@ -73,11 +74,20 @@ get_field_imm (struct string_buf *buf, long instr)
+ }
+ 
+ static char *
+-get_field_imm5 (struct string_buf *buf, long instr)
++get_field_imml (struct string_buf *buf, long instr)
+ {
+   char *p = strbuf (buf);
+ 
+-  sprintf (p, "%d", (short)((instr & IMM5_MASK) >> IMM_LOW));
++  sprintf (p, "%d", (int)((instr & IMML_MASK) >> IMM_LOW));
++  return p;
++}
++
++static char *
++get_field_imms (struct string_buf *buf, long instr)
++{
++  char *p = strbuf (buf);
++
++  sprintf (p, "%d", (short)((instr & IMM6_MASK) >> IMM_LOW));
+   return p;
+ }
+ 
+@@ -96,12 +106,9 @@ get_field_immw (struct string_buf *buf, long instr)
+   char *p = strbuf (buf);
+ 
+   if (instr & 0x00004000)
+-    sprintf (p, "%d", (short)(((instr & IMM5_WIDTH_MASK)
+-				>> IMM_WIDTH_LOW))); /* bsefi */
+-  else
+-    sprintf (p, "%d", (short)(((instr & IMM5_WIDTH_MASK) >>
+-				IMM_WIDTH_LOW) - ((instr & IMM5_MASK) >>
+-				IMM_LOW) + 1)); /* bsifi */
++    sprintf (p, "%d", (short)(((instr & IMM6_WIDTH_MASK) >> IMM_WIDTH_LOW))); /* bsefi */
++ else
++    sprintf (p, "%d", (short)(((instr & IMM6_WIDTH_MASK) >> IMM_WIDTH_LOW) - ((instr & IMM6_MASK) >> IMM_LOW) + 1)); /* bsifi */
+   return p;
+ }
+ 
+@@ -311,9 +318,14 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+ 		}
+ 	    }
+ 	  break;
+-	case INST_TYPE_RD_R1_IMM5:
++	case INST_TYPE_RD_R1_IMML:
++	  print_func (stream, "\t%s, %s, %s", get_field_rd (&buf, inst),
++		   get_field_r1(&buf, inst), get_field_imm (&buf, inst));
++          /* TODO: Also print symbol */
++          break;
++	case INST_TYPE_RD_R1_IMMS:
+ 	  print_func (stream, "\t%s, %s, %s", get_field_rd (&buf, inst),
+-		      get_field_r1 (&buf, inst), get_field_imm5 (&buf, inst));
++	           get_field_r1(&buf, inst), get_field_imms (&buf, inst));
+ 	  break;
+ 	case INST_TYPE_RD_RFSL:
+ 	  print_func (stream, "\t%s, %s", get_field_rd (&buf, inst),
+@@ -417,9 +429,12 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+ 		}
+ 	    }
+ 	  break;
+-	case INST_TYPE_RD_R2:
+-	  print_func (stream, "\t%s, %s", get_field_rd (&buf, inst),
+-		      get_field_r2 (&buf, inst));
++        case INST_TYPE_IMML:
++	  print_func (stream, "\t%s", get_field_imml (&buf, inst));
++          /* TODO: Also print symbol */
++	  break;
++        case INST_TYPE_RD_R2:
++	  print_func (stream, "\t%s, %s", get_field_rd (&buf, inst), get_field_r2 (&buf, inst));
+ 	  break;
+ 	case INST_TYPE_R2:
+ 	  print_func (stream, "\t%s", get_field_r2 (&buf, inst));
+@@ -442,15 +457,12 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+ 	  /* For mbar 16 or sleep insn.  */
+ 	case INST_TYPE_NONE:
+ 	  break;
+-	  /* For bit field insns.  */
++        /* For bit field insns.  */
+ 	case INST_TYPE_RD_R1_IMMW_IMMS:
+-	  print_func (stream, "\t%s, %s, %s, %s",
+-		      get_field_rd (&buf, inst),
+-		      get_field_r1 (&buf, inst),
+-		      get_field_immw (&buf, inst),
+-		      get_field_imm5 (&buf, inst));
++	  print_func (stream, "\t%s, %s, %s, %s", get_field_rd (&buf, inst), get_field_r1(&buf, inst),
++		   get_field_immw (&buf, inst), get_field_imms (&buf, inst));
+ 	  break;
+-	  /* For tuqula instruction */
++	/* For tuqula instruction */
+ 	case INST_TYPE_RD:
+ 	  print_func (stream, "\t%s", get_field_rd (&buf, inst));
+ 	  break;
+diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
+index fe23b0af56a..afc1220e357 100644
+--- a/opcodes/microblaze-opc.h
++++ b/opcodes/microblaze-opc.h
+@@ -40,7 +40,7 @@
+ #define INST_TYPE_RD_SPECIAL 11
+ #define INST_TYPE_R1 12
+ /* New instn type for barrel shift imms.  */
+-#define INST_TYPE_RD_R1_IMM5  13
++#define INST_TYPE_RD_R1_IMMS  13
+ #define INST_TYPE_RD_RFSL    14
+ #define INST_TYPE_R1_RFSL    15
+ 
+@@ -62,6 +62,11 @@
+ /* For bsefi and bsifi */
+ #define INST_TYPE_RD_R1_IMMW_IMMS  21
+ 
++/* For 64-bit instructions */
++#define INST_TYPE_IMML 22
++#define INST_TYPE_RD_R1_IMML 23
++#define INST_TYPE_R1_IMML 24
++
+ #define INST_TYPE_NONE 25
+ 
+ 
+@@ -91,15 +96,14 @@
+ #define OPCODE_MASK_H24   0xFC1F07FF /* High 6, bits 20-16 and low 11 bits.  */
+ #define OPCODE_MASK_H124  0xFFFF07FF /* High 16, and low 11 bits.  */
+ #define OPCODE_MASK_H1234 0xFFFFFFFF /* All 32 bits.  */
+-#define OPCODE_MASK_H3    0xFC000600 /* High 6 bits and bits 21, 22.  */
+-#define OPCODE_MASK_H3B   0xFC00F9E0 /* High 6 bits and bits 16:20 and
+-					bits 23:26. */
++#define OPCODE_MASK_H3    0xFC000700 /* High 6 bits and bits 21, 22, 23.  */
++#define OPCODE_MASK_H3B   0xFC00E600 /* High 6 bits and bits 16, 17, 18, 21, 22.  */
+ #define OPCODE_MASK_H32   0xFC00FC00 /* High 6 bits and bit 16-21.  */
+-#define OPCODE_MASK_H32B  0xFC00F820 /* High 6 bits and bits 16:20 and
+-					bit 26 */
++#define OPCODE_MASK_H32B  0xFC00E000 /* High 6 bits and bit 16, 17, 18.  */
+ #define OPCODE_MASK_H34B  0xFC0000FF /* High 6 bits and low 8 bits.  */
+ #define OPCODE_MASK_H35B  0xFC0004FF /* High 6 bits and low 9 bits.  */
+ #define OPCODE_MASK_H34C  0xFC0007E0 /* High 6 bits and bits 21-26.  */
++#define OPCODE_MASK_H8    0xFF000000 /* High 8 bits only.  */
+ 
+ /* New Mask for msrset, msrclr insns.  */
+ #define OPCODE_MASK_H23N  0xFC1F8000 /* High 6 and bits 11 - 16.  */
+@@ -109,7 +113,7 @@
+ #define DELAY_SLOT 1
+ #define NO_DELAY_SLOT 0
+ 
+-#define MAX_OPCODES 291
++#define MAX_OPCODES 412
+ 
+ const struct op_code_struct
+ {
+@@ -127,6 +131,7 @@ const struct op_code_struct
+   /* More info about output format here.  */
+ } microblaze_opcodes[MAX_OPCODES] =
+ {
++  /* 32-bit instructions */
+   {"add",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x00000000, OPCODE_MASK_H4, add, arithmetic_inst },
+   {"rsub",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x04000000, OPCODE_MASK_H4, rsub, arithmetic_inst },
+   {"addc",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x08000000, OPCODE_MASK_H4, addc, arithmetic_inst },
+@@ -163,9 +168,9 @@ const struct op_code_struct
+   {"ncget", INST_TYPE_RD_RFSL, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x6C006000, OPCODE_MASK_H32, ncget, anyware_inst },
+   {"ncput", INST_TYPE_R1_RFSL, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x6C00E000, OPCODE_MASK_H32, ncput, anyware_inst },
+   {"muli",  INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x60000000, OPCODE_MASK_H, muli, mult_inst },
+-  {"bslli", INST_TYPE_RD_R1_IMM5, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64000400, OPCODE_MASK_H3B, bslli, barrel_shift_inst },
+-  {"bsrai", INST_TYPE_RD_R1_IMM5, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64000200, OPCODE_MASK_H3B, bsrai, barrel_shift_inst },
+-  {"bsrli", INST_TYPE_RD_R1_IMM5, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64000000, OPCODE_MASK_H3B, bsrli, barrel_shift_inst },
++  {"bslli", INST_TYPE_RD_R1_IMMS, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64000400, OPCODE_MASK_H3B, bslli, barrel_shift_inst },
++  {"bsrai", INST_TYPE_RD_R1_IMMS, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64000200, OPCODE_MASK_H3B, bsrai, barrel_shift_inst },
++  {"bsrli", INST_TYPE_RD_R1_IMMS, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64000000, OPCODE_MASK_H3B, bsrli, barrel_shift_inst },
+   {"bsefi", INST_TYPE_RD_R1_IMMW_IMMS, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64004000, OPCODE_MASK_H32B, bsefi, barrel_shift_inst },
+   {"bsifi", INST_TYPE_RD_R1_IMMW_IMMS, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64008000, OPCODE_MASK_H32B, bsifi, barrel_shift_inst },
+   {"or",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x80000000, OPCODE_MASK_H4, microblaze_or, logical_inst },
+@@ -269,9 +274,7 @@ const struct op_code_struct
+   {"la",    INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x30000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst }, /* la translates to addik.  */
+   {"tuqula",INST_TYPE_RD, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x3000002A, OPCODE_MASK_H, invalid_inst, arithmetic_inst }, /* tuqula rd translates to addik rd, r0, 42.  */
+   {"not",   INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xA800FFFF, OPCODE_MASK_H34, invalid_inst, logical_inst }, /* not translates to xori rd,ra,-1.  */
+-  {"neg",   INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x04000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst }, /* neg translates to rsub rd, ra, r0.  */
+   {"rtb",   INST_TYPE_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB6000004, OPCODE_MASK_H1, invalid_inst, return_inst }, /* rtb translates to rts rd, 4.  */
+-  {"sub",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x04000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst }, /* sub translates to rsub rd, rb, ra.  */
+   {"lmi",   INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xE8000000, OPCODE_MASK_H, invalid_inst, memory_load_inst },
+   {"smi",   INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xF8000000, OPCODE_MASK_H, invalid_inst, memory_store_inst },
+   {"msrset",INST_TYPE_RD_IMM15, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x94100000, OPCODE_MASK_H23N, msrset, special_inst },
+@@ -427,7 +430,131 @@ const struct op_code_struct
+   {"suspend",   INST_TYPE_NONE,  INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBB020004, OPCODE_MASK_HN,   invalid_inst, special_inst }, /* translates to mbar 24.  */
+   {"swapb",     INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x900001E0, OPCODE_MASK_H4,   swapb,     arithmetic_inst },
+   {"swaph",     INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x900001E2, OPCODE_MASK_H4,   swaph,     arithmetic_inst },
+-  {NULL, 0, 0, 0, 0, 0, 0, 0, 0},
++  /* 64-bit instructions */
++  {"addl",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x00000100, OPCODE_MASK_H4, addl, arithmetic_inst },
++  {"rsubl",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x04000100, OPCODE_MASK_H4, rsubl, arithmetic_inst },
++  {"addlc",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x08000100, OPCODE_MASK_H4, addlc, arithmetic_inst },
++  {"rsublc",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x0C000100, OPCODE_MASK_H4, rsublc, arithmetic_inst },
++  {"addlk",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x10000100, OPCODE_MASK_H4, addlk, arithmetic_inst },
++  {"rsublk",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x14000100, OPCODE_MASK_H4, rsublk, arithmetic_inst },
++  {"addlkc",  INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x18000100, OPCODE_MASK_H4, addlkc, arithmetic_inst },
++  {"rsublkc", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x1C000100, OPCODE_MASK_H4, rsublkc, arithmetic_inst },
++  {"cmpl",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x14000101, OPCODE_MASK_H4, cmpl, arithmetic_inst },
++  {"cmplu",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x14000103, OPCODE_MASK_H4, cmplu, arithmetic_inst },
++  {"addli",   INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x20000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"rsubli",  INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x24000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"addlic",  INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x28000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"rsublic", INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x2C000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"addlik",  INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x30000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"rsublik", INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x34000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"addlikc", INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x38000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* Identical to 32-bit */
++  {"rsublikc",INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x3C000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },  /* Identical to 32-bit */
++  {"mull",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x40000100, OPCODE_MASK_H4, mull, mult_inst },
++  {"bslll",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x44000500, OPCODE_MASK_H3, bslll, barrel_shift_inst },
++  {"bslra",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x44000300, OPCODE_MASK_H3, bslra, barrel_shift_inst },
++  {"bslrl",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x44000100, OPCODE_MASK_H3, bslrl, barrel_shift_inst },
++  {"bsllli",  INST_TYPE_RD_R1_IMMS, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64002400, OPCODE_MASK_H3B, bsllli, barrel_shift_inst },
++  {"bslrai",  INST_TYPE_RD_R1_IMMS, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64002200, OPCODE_MASK_H3B, bslrai, barrel_shift_inst },
++  {"bslrli",  INST_TYPE_RD_R1_IMMS, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64002000, OPCODE_MASK_H3B, bslrli, barrel_shift_inst },
++  {"bslefi",  INST_TYPE_RD_R1_IMMW_IMMS, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64006000, OPCODE_MASK_H32B, bslefi, barrel_shift_inst },
++  {"bslifi",  INST_TYPE_RD_R1_IMMW_IMMS, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x6400a000, OPCODE_MASK_H32B, bslifi, barrel_shift_inst },
++  {"orl",     INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x80000100, OPCODE_MASK_H4, orl, logical_inst },
++  {"andl",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x84000100, OPCODE_MASK_H4, andl, logical_inst },
++  {"xorl",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x88000100, OPCODE_MASK_H4, xorl, logical_inst },
++  {"andnl",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x8C000100, OPCODE_MASK_H4, andnl, logical_inst },
++  {"pcmplbf", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x80000500, OPCODE_MASK_H4, pcmplbf, logical_inst },
++  {"pcmpleq", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x88000500, OPCODE_MASK_H4, pcmpleq, logical_inst },
++  {"pcmplne", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x8C000500, OPCODE_MASK_H4, pcmplne, logical_inst },
++  {"srla",    INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x90000101, OPCODE_MASK_H34, srla, logical_inst },
++  {"srlc",    INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x90000121, OPCODE_MASK_H34, srlc, logical_inst },
++  {"srll",    INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x90000141, OPCODE_MASK_H34, srll, logical_inst },
++  {"sextl8",  INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x90000160, OPCODE_MASK_H34, sextl8, logical_inst },
++  {"sextl16", INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x90000161, OPCODE_MASK_H34, sextl16, logical_inst },
++  {"sextl32", INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x90000162, OPCODE_MASK_H34, sextl32, logical_inst },
++  {"brea",    INST_TYPE_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x98010000, OPCODE_MASK_H124, brea, branch_inst },
++  {"bread",   INST_TYPE_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x98110000, OPCODE_MASK_H124, bread, branch_inst },
++  {"breald",  INST_TYPE_RD_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x98150000, OPCODE_MASK_H24, breald, branch_inst },
++  {"beaeq",   INST_TYPE_R1_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9D000000, OPCODE_MASK_H14, beaeq, branch_inst },
++  {"bealeq",  INST_TYPE_R1_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9D000100, OPCODE_MASK_H14, bealeq, branch_inst },
++  {"beaeqd",  INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9F000000, OPCODE_MASK_H14, beaeqd, branch_inst },
++  {"bealeqd", INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9F000100, OPCODE_MASK_H14, bealeqd, branch_inst },
++  {"beane",   INST_TYPE_R1_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9D200000, OPCODE_MASK_H14, beane, branch_inst },
++  {"bealne",  INST_TYPE_R1_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9D200100, OPCODE_MASK_H14, bealne, branch_inst },
++  {"beaned",  INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9F200000, OPCODE_MASK_H14, beaned, branch_inst },
++  {"bealned", INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9F200100, OPCODE_MASK_H14, bealned, branch_inst },
++  {"bealt",   INST_TYPE_R1_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9D400000, OPCODE_MASK_H14, bealt, branch_inst },
++  {"beallt",  INST_TYPE_R1_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9D400100, OPCODE_MASK_H14, beallt, branch_inst },
++  {"bealtd",  INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9F400000, OPCODE_MASK_H14, bealtd, branch_inst },
++  {"bealltd", INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9F400100, OPCODE_MASK_H14, bealltd, branch_inst },
++  {"beale",   INST_TYPE_R1_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9D600000, OPCODE_MASK_H14, beale, branch_inst },
++  {"bealle",  INST_TYPE_R1_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9D600100, OPCODE_MASK_H14, bealle, branch_inst },
++  {"bealed",  INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9F600000, OPCODE_MASK_H14, bealed, branch_inst },
++  {"bealled", INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9F600100, OPCODE_MASK_H14, bealled, branch_inst },
++  {"beagt",   INST_TYPE_R1_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9D800000, OPCODE_MASK_H14, beagt, branch_inst },
++  {"bealgt",  INST_TYPE_R1_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9D800100, OPCODE_MASK_H14, bealgt, branch_inst },
++  {"beagtd",  INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9F800000, OPCODE_MASK_H14, beagtd, branch_inst },
++  {"bealgtd", INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9F800100, OPCODE_MASK_H14, bealgtd, branch_inst },
++  {"beage",   INST_TYPE_R1_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9DA00000, OPCODE_MASK_H14, beage, branch_inst },
++  {"bealge",  INST_TYPE_R1_R2, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9DA00100, OPCODE_MASK_H14, bealge, branch_inst },
++  {"beaged",  INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9FA00000, OPCODE_MASK_H14, beaged, branch_inst },
++  {"bealged", INST_TYPE_R1_R2, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x9FA00100, OPCODE_MASK_H14, bealged, branch_inst },
++  {"orli",    INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xA0000000, OPCODE_MASK_H, invalid_inst, logical_inst },      /* Identical to 32-bit */
++  {"andli",   INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xA4000000, OPCODE_MASK_H, invalid_inst, logical_inst },      /* Identical to 32-bit */
++  {"xorli",   INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xA8000000, OPCODE_MASK_H, invalid_inst, logical_inst },      /* Identical to 32-bit */
++  {"andnli",  INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xAC000000, OPCODE_MASK_H, invalid_inst, logical_inst },      /* Identical to 32-bit */
++  {"imml",    INST_TYPE_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB2000000, OPCODE_MASK_H8, imml, immediate_inst },
++  {"breai",   INST_TYPE_IMM, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB8010000, OPCODE_MASK_H12, breai, branch_inst },
++  {"breaid",  INST_TYPE_IMM, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB8110000, OPCODE_MASK_H12, breaid, branch_inst },
++  {"brealid", INST_TYPE_RD_IMM, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xB8150000, OPCODE_MASK_H2, brealid, branch_inst },
++  {"beaeqi",  INST_TYPE_R1_IMM, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBD000000, OPCODE_MASK_H1, beaeqi, branch_inst },
++  {"bealeqi", INST_TYPE_R1_IMML, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBD000000, OPCODE_MASK_H1, invalid_inst, branch_inst }, /* Identical to beaeqi */
++  {"beaeqid", INST_TYPE_R1_IMM, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBF000000, OPCODE_MASK_H1, beaeqid, branch_inst },
++  {"bealeqid",INST_TYPE_R1_IMML, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBF000000, OPCODE_MASK_H1, invalid_inst, branch_inst },    /* Identical to beaeqid */
++  {"beanei",  INST_TYPE_R1_IMM, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBD200000, OPCODE_MASK_H1, beanei, branch_inst },
++  {"bealnei", INST_TYPE_R1_IMML, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBD200000, OPCODE_MASK_H1, invalid_inst, branch_inst }, /* Identical to beanei */
++  {"beaneid", INST_TYPE_R1_IMM, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBF200000, OPCODE_MASK_H1, beaneid, branch_inst },
++  {"bealneid",INST_TYPE_R1_IMML, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBF200000, OPCODE_MASK_H1, invalid_inst, branch_inst },    /* Identical to beaneid */
++  {"bealti",  INST_TYPE_R1_IMM, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBD400000, OPCODE_MASK_H1, bealti, branch_inst },
++  {"beallti", INST_TYPE_R1_IMML, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBD400000, OPCODE_MASK_H1, invalid_inst, branch_inst }, /* Identical to bealti */
++  {"bealtid", INST_TYPE_R1_IMM, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBF400000, OPCODE_MASK_H1, bealtid, branch_inst },
++  {"bealltid",INST_TYPE_R1_IMML, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBF400000, OPCODE_MASK_H1, invalid_inst, branch_inst },    /* Identical to bealtid */
++  {"bealei",  INST_TYPE_R1_IMM, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBD600000, OPCODE_MASK_H1, bealei, branch_inst },
++  {"beallei", INST_TYPE_R1_IMML, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBD600000, OPCODE_MASK_H1, invalid_inst, branch_inst }, /* Identical to bealei */
++  {"bealeid", INST_TYPE_R1_IMM, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBF600000, OPCODE_MASK_H1, bealeid, branch_inst },
++  {"bealleid",INST_TYPE_R1_IMML, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBF600000, OPCODE_MASK_H1, invalid_inst, branch_inst },    /* Identical to bealeid */
++  {"beagti",  INST_TYPE_R1_IMM, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBD800000, OPCODE_MASK_H1, beagti, branch_inst },
++  {"bealgti", INST_TYPE_R1_IMML, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBD800000, OPCODE_MASK_H1, invalid_inst, branch_inst }, /* Identical to beagti */
++  {"beagtid", INST_TYPE_R1_IMM, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBF800000, OPCODE_MASK_H1, beagtid, branch_inst },
++  {"bealgtid",INST_TYPE_R1_IMML, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBF800000, OPCODE_MASK_H1, invalid_inst, branch_inst },    /* Identical to beagtid */
++  {"beagei",  INST_TYPE_R1_IMM, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBDA00000, OPCODE_MASK_H1, beagei, branch_inst },
++  {"bealgei", INST_TYPE_R1_IMML, INST_PC_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBDA00000, OPCODE_MASK_H1, invalid_inst, branch_inst }, /* Identical to beagei */
++  {"beageid", INST_TYPE_R1_IMM, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBFA00000, OPCODE_MASK_H1, beageid, branch_inst },
++  {"bealgeid",INST_TYPE_R1_IMML, INST_PC_OFFSET, DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xBFA00000, OPCODE_MASK_H1, invalid_inst, branch_inst },    /* Identical to beageid */
++  {"ll",      INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC8000100, OPCODE_MASK_H4, ll, memory_load_inst },
++  {"llr",     INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xC8000300, OPCODE_MASK_H4, llr, memory_load_inst },
++  {"sl",      INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD8000100, OPCODE_MASK_H4, sl, memory_store_inst },
++  {"slr",     INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xD8000300, OPCODE_MASK_H4, slr, memory_store_inst },
++  {"lli",     INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xEC000000, OPCODE_MASK_H, invalid_inst, memory_load_inst },  /* Identical to 32-bit */
++  {"sli",     INST_TYPE_RD_R1_IMM, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0xFC000000, OPCODE_MASK_H, invalid_inst, memory_store_inst }, /* Identical to 32-bit */
++  {"lla",     INST_TYPE_RD_R1_IMML, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x30000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst },   /* lla translates to addlik */
++  {"dadd",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000400, OPCODE_MASK_H4, dadd, arithmetic_inst },
++  {"drsub",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000480, OPCODE_MASK_H4, drsub, arithmetic_inst },
++  {"dmul",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000500, OPCODE_MASK_H4, dmul, arithmetic_inst },
++  {"ddiv",    INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000580, OPCODE_MASK_H4, ddiv, arithmetic_inst },
++  {"dcmp.lt", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000610, OPCODE_MASK_H4, dcmp_lt, arithmetic_inst },
++  {"dcmp.eq", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000620, OPCODE_MASK_H4, dcmp_eq, arithmetic_inst },
++  {"dcmp.le", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000630, OPCODE_MASK_H4, dcmp_le, arithmetic_inst },
++  {"dcmp.gt", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000640, OPCODE_MASK_H4, dcmp_gt, arithmetic_inst },
++  {"dcmp.ne", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000650, OPCODE_MASK_H4, dcmp_ne, arithmetic_inst },
++  {"dcmp.ge", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000660, OPCODE_MASK_H4, dcmp_ge, arithmetic_inst },
++  {"dcmp.un", INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000600, OPCODE_MASK_H4, dcmp_un, arithmetic_inst },
++  {"dbl",     INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000680, OPCODE_MASK_H4, dbl,   arithmetic_inst },
++  {"dlong",   INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000700, OPCODE_MASK_H4, dlong, arithmetic_inst },
++  {"dsqrt",   INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x58000780, OPCODE_MASK_H4, dsqrt, arithmetic_inst },
++  {"neg",   INST_TYPE_RD_R1, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x04000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst }, /* neg translates to rsub rd, ra, r0.  */
++  {"sub",   INST_TYPE_RD_R1_R2, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x04000000, OPCODE_MASK_H, invalid_inst, arithmetic_inst }, /* sub translates to rsub rd, rb, ra.  */
++
++  {"", 0, 0, 0, 0, 0, 0, 0, 0},
+ };
+ 
+ /* Prefix for register names.  */
+@@ -447,8 +574,17 @@ char pvr_register_prefix[] = "rpvr";
+ #define MIN_IMM5  ((int) 0x00000000)
+ #define MAX_IMM5  ((int) 0x0000001f)
+ 
++#define MIN_IMM6  ((int) 0x00000000)
++#define MAX_IMM6  ((int) 0x0000003f)
++
+ #define MIN_IMM_WIDTH  ((int) 0x00000001)
+ #define MAX_IMM_WIDTH  ((int) 0x00000020)
+ 
++#define MIN_IMM6_WIDTH  ((int) 0x00000001)
++#define MAX_IMM6_WIDTH  ((int) 0x00000040)
++
++#define MIN_IMML  ((long) 0xffffff8000000000L)
++#define MAX_IMML  ((long) 0x0000007fffffffffL)
++
+ #endif /* MICROBLAZE_OPC */
+ 
+diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
+index cb8d3a59949..08ed44352ee 100644
+--- a/opcodes/microblaze-opcm.h
++++ b/opcodes/microblaze-opcm.h
+@@ -25,6 +25,7 @@
+ 
+ enum microblaze_instr
+ {
++  /* 32-bit instructions */
+   add, rsub, addc, rsubc, addk, rsubk, addkc, rsubkc, clz, cmp, cmpu,
+   addi, rsubi, addic, rsubic, addik, rsubik, addikc, rsubikc, mul,
+   mulh, mulhu, mulhsu, swapb, swaph,
+@@ -39,8 +40,8 @@ enum microblaze_instr
+   imm, rtsd, rtid, rtbd, rted, bri, brid, brlid, brai, braid, bralid,
+   brki, beqi, beqid, bnei, bneid, blti, bltid, blei, bleid, bgti,
+   bgtid, bgei, bgeid, lbu, lbuea, lbur, lhu, lhuea, lhur, lw, lwea, lwr, lwx,
+-  sb, sbea, sbr, sh, shea, shr, sw, swea, swr, swx, lbui, lhui, lwi,
+-  sbi, shi, swi, msrset, msrclr, tuqula, mbi_fadd, frsub, mbi_fmul, mbi_fdiv,
++  sb, sbea, sbr, sh, shea, shr, sw, swea, swr, swx, lbui, lhui, lwi, lli,
++  sbi, shi, sli, swi, msrset, msrclr, tuqula, mbi_fadd, frsub, mbi_fmul, mbi_fdiv,
+   fcmp_lt, fcmp_eq, fcmp_le, fcmp_gt, fcmp_ne, fcmp_ge, fcmp_un, flt,
+   /* 'fsqrt' is a glibc:math.h symbol.  */
+   fint, microblaze_fsqrt,
+@@ -59,6 +60,18 @@ enum microblaze_instr
+   aputd, taputd, caputd, tcaputd, naputd, tnaputd, ncaputd, tncaputd,
+   eagetd, teagetd, ecagetd, tecagetd, neagetd, tneagetd, necagetd, tnecagetd,
+   eaputd, teaputd, ecaputd, tecaputd, neaputd, tneaputd, necaputd, tnecaputd,
++
++  /* 64-bit instructions */
++  addl, rsubl, addlc, rsublc, addlk, rsublk, addlkc, rsublkc, cmpl, cmplu, mull,
++  bslll, bslra, bslrl, bsllli, bslrai, bslrli, bslefi, bslifi, orl, andl, xorl,
++  andnl, pcmplbf, pcmpleq, pcmplne, srla, srlc, srll, sextl8, sextl16, sextl32,
++  brea, bread, breald, beaeq, bealeq, beaeqd, bealeqd, beane, bealne, beaned,
++  bealned, bealt, beallt, bealtd, bealltd, beale, bealle, bealed, bealled, beagt,
++  bealgt, beagtd, bealgtd, beage, bealge, beaged, bealged, breai, breaid, brealid,
++  beaeqi, beaeqid, beanei, beaneid, bealti, bealtid, bealei, bealeid, beagti,
++  beagtid, beagei, beageid, imml, ll, llr, sl, slr,
++  dadd, drsub, dmul, ddiv, dcmp_lt, dcmp_eq, dcmp_le, dcmp_gt, dcmp_ne, dcmp_ge,
++  dcmp_un, dbl, dlong, dsqrt,
+   invalid_inst
+ };
+ 
+@@ -136,15 +149,18 @@ enum microblaze_instr_type
+ #define RA_MASK 0x001F0000
+ #define RB_MASK 0x0000F800
+ #define IMM_MASK 0x0000FFFF
++#define IMML_MASK 0x00FFFFFF
+ 
+-/* Imm mask for barrel shifts.  */
++/* Imm masks for barrel shifts.  */
+ #define IMM5_MASK 0x0000001F
++#define IMM6_MASK 0x0000003F
+ 
+ /* Imm mask for mbar.  */
+ #define IMM5_MBAR_MASK 0x03E00000
+ 
+-/* Imm mask for extract/insert width. */
++/* Imm masks for extract/insert width. */
+ #define IMM5_WIDTH_MASK 0x000007C0
++#define IMM6_WIDTH_MASK 0x00000FC0
+ 
+ /* FSL imm mask for get, put instructions.  */
+ #define  RFSL_MASK 0x000000F
+-- 
+2.34.1
+

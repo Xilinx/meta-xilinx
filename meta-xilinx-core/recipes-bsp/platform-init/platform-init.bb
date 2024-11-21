@@ -18,7 +18,7 @@ PROVIDES += "virtual/xilinx-platform-init"
 
 SRC_URI = "${@" ".join(["file://%s" % f for f in (d.getVar('PLATFORM_INIT_FILES') or "").split()])}"
 
-S = "${UNPACKDIR}"
+S = "${WORKDIR}"
 
 SYSROOT_DIRS += "${PLATFORM_INIT_DIR}"
 

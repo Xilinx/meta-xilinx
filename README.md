@@ -19,7 +19,7 @@ components, kernel etc.
 * **meta-xilinx-standalone**: layer containing the AMD Xilinx Baremetal or
 Standalone Toolchains metadata to build baremetal firmware and applications.
 
-* **meta-xilinx-standalone-experimental**: layer containing metadata to build
+* **meta-xilinx-standalone-sdt**: layer containing metadata to build
 all the boot images using lopper and system device tree without using the
 meta-xilinx-tools layer.
 
