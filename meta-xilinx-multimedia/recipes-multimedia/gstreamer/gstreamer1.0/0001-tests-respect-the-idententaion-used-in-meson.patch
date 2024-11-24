@@ -1,0 +1,34 @@
+From 5372cd5bf2a9dd247b9c5fc6e4fe248046dbb085 Mon Sep 17 00:00:00 2001
+From: Jose Quaresma <quaresma.jose@gmail.com>
+Date: Sun, 11 Apr 2021 19:48:13 +0100
+Subject: [PATCH] tests: respect the idententaion used in meson
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/789]
+
+Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+
+---
+ tests/check/meson.build | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/tests/check/meson.build b/tests/check/meson.build
+index 9787b0a..16caac7 100644
+--- a/tests/check/meson.build
++++ b/tests/check/meson.build
+@@ -145,11 +145,11 @@ foreach t : core_tests
+ 
+   if not skip_test
+     exe = executable(test_name, fname,
+-        c_args : gst_c_args + test_defines,
+-        cpp_args : gst_c_args + test_defines,
+-        include_directories : [configinc],
+-        link_with : link_with_libs,
+-        dependencies : gst_deps + test_deps,
++      c_args : gst_c_args + test_defines,
++      cpp_args : gst_c_args + test_defines,
++      include_directories : [configinc],
++      link_with : link_with_libs,
++      dependencies : gst_deps + test_deps,
+     )
+ 
+     env = environment()
