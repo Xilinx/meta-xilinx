@@ -4,12 +4,12 @@ Upstream-Status: Pending
 
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 
---- util-linux-2.39.1/include/audit-arch.h.orig	2023-08-23 14:55:54.318732126 -0600
-+++ util-linux-2.39.1/include/audit-arch.h	2023-08-23 15:02:51.058552660 -0600
-@@ -57,6 +57,8 @@
- #    else
- # 	 define SECCOMP_ARCH_NATIVE AUDIT_ARCH_LOONGARCH64
+--- util-linux-2.40.2/include/audit-arch.h	2024-11-21 15:20:31.374940887 -0700
++++ util-linux-2.40.2/include/audit-arch.h	2024-11-21 15:21:09.343343608 -0700
+@@ -67,6 +67,8 @@
  #    endif
+ #elif __alpha__
+ #    define SECCOMP_ARCH_NATIVE AUDIT_ARCH_ALPHA
 +#elif __microblaze__
 +#    define SECCOMP_ARCH_NATIVE AUDIT_ARCH_MICROBLAZE
  #else
