@@ -24,7 +24,7 @@ Message-id: 20231006154125.1068348-6-vsementsov@yandex-team.ru
    tests/avocado/machine_aspeed.py and keep r-b]
 Signed-off-by: John Snow <jsnow@redhat.com>
 
-Upstream-status: Backport (684750ab4f8a3ad69512b71532408be3ac2547d4)
+Upstream-Status: Backport (684750ab4f8a3ad69512b71532408be3ac2547d4)
 
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 ---
