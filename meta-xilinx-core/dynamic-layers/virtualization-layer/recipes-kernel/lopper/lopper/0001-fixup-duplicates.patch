@@ -1,0 +1,85 @@
+Prevent duplicate and conflicting entries in generated files
+
+Generated xparameters.h file could end up with conflicting entries between
+"Canonical definitions" and regular "definitions" for various peripherals.
+
+This would result in numerous compilation warnings, and if the conflicting
+entry was used could result in the wrong value.
+
+Also fix the comments to match the generated defines, the wrong entry name
+could have previously been used.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
+diff --git a/lopper/assists/baremetal_xparameters_xlnx.py b/lopper/assists/baremetal_xparameters_xlnx.py
+index 661979d..2b84a64 100644
+--- a/lopper/assists/baremetal_xparameters_xlnx.py
++++ b/lopper/assists/baremetal_xparameters_xlnx.py
+@@ -340,7 +340,7 @@ def xlnx_generate_xparams(tgt_node, sdt, options):
+                                 canondef_dict.update({prop:hex(prop_val[0])})
+                                 plat.buf(f'\n#define XPAR_{label_name}_{prop.upper()} {hex(prop_val[0])}')
+ 
+-                plat.buf(f'\n\n/* Canonical definitions for peripheral {label_name} */')
++                plat.buf(f'\n\n/* Canonical definitions for peripheral {canonical_name}_{index} */')
+                 for prop,val in sorted(canondef_dict.items(), key=lambda e: e[0][0], reverse=False):
+                     if prop == "FABRIC":
+                         plat.buf(f'\n#define XPAR_FABRIC_{canonical_name}_{index}_INTR {val}')
+@@ -359,7 +359,9 @@ def xlnx_generate_xparams(tgt_node, sdt, options):
+         node_list = bm_config.get_mapped_nodes(sdt, node_list, options)
+ 
+     node_ip_count_dict = {}
++    label_dict = {}
+     for node in node_list:
++        canonical_dict = {}
+         try:
+             label_name = bm_config.get_label(sdt, symbol_node, node)
+             if label_name != None:
+@@ -367,6 +369,14 @@ def xlnx_generate_xparams(tgt_node, sdt, options):
+             else:
+                 continue
+             val = bm_config.scan_reg_size(node, node['reg'].value, 0)
++
++            if label_name in label_dict:
++                if label_dict[label_name]['BASEADDR'] != val[0] or \
++                   label_dict[label_name]['HIGHADDR'] != val[0] + val[1] - 1:
++                   raise KeyError("Duplicate definition for {label_name}")
++            else:
++                label_dict[label_name] = { 'BASEADDR' : val[0] , 'HIGHADDR' : val[0] + val[1] - 1 }
++
+             plat.buf(f'\n/* Definitions for peripheral {label_name} */')
+             plat.buf(f'\n#define XPAR_{label_name}_BASEADDR {hex(val[0])}\n')
+             plat.buf(f'#define XPAR_{label_name}_HIGHADDR {hex(val[0] + val[1] - 1)}\n')
+@@ -379,12 +389,28 @@ def xlnx_generate_xparams(tgt_node, sdt, options):
+ 
+             canonical_name = node_ip_name.upper().replace("-", "_")
+ 
+-            plat.buf(f'\n/* Canonical definitions for peripheral {label_name} */')
+-            plat.buf(f'\n#define XPAR_{canonical_name}_{node_ip_count_dict[node_ip_name]}_BASEADDR {hex(val[0])}\n')
+-            plat.buf(f'#define XPAR_{canonical_name}_{node_ip_count_dict[node_ip_name]}_HIGHADDR {hex(val[0] + val[1] - 1)}\n')
++            if (f'{canonical_name}_{node_ip_count_dict[node_ip_name]}') in canonical_dict:
++                if canonical_dict[(f'{canonical_name}_{node_ip_count_dict[node_ip_name]}')]['BASEADDR'] != val[0] or \
++                   canonical_dict[(f'{canonical_name}_{node_ip_count_dict[node_ip_name]}')]['HIGHADDR'] != val[0] + val[1] - 1:
++                   raise KeyError("Duplicate definition for {canonical_name}")
++            else:
++                canonical_dict[(f'{canonical_name}_{node_ip_count_dict[node_ip_name]}')] = { 'BASEADDR' : val[0] , 'HIGHADDR' : val[0] + val[1] - 1 }
+         except KeyError:
+             pass
+ 
++    # Filter out anything already defined
++    for canonical_name in canonical_dict:
++        baseaddr = canonical_dict[canonical_name]['BASEADDR']
++        highaddr = canonical_dict[canonical_name]['HIGHADDR']
++
++        if canonical_name in label_dict:
++            # Already defined ... skip
++            continue
++
++        plat.buf(f'\n/* Canonical definitions for peripheral {canonical_name} */')
++        plat.buf(f'\n#define XPAR_{canonical_name}_BASEADDR {hex(baseaddr)}\n')
++        plat.buf(f'#define XPAR_{canonical_name}_HIGHADDR {hex(highaddr)}\n')
++
+     # Define for Board
+     if sdt.tree[tgt_node].propval('board') != ['']:
+         board = sdt.tree[tgt_node].propval('board', list)[0]
