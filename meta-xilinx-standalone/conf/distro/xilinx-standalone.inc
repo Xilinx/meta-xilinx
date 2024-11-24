@@ -3,7 +3,6 @@ DISTRO_VERSION = "1.0"
 TARGET_VENDOR = "-xilinx"
 
 TCLIBC = "newlib"
-TCLIBCAPPEND =""
 
 # Change SDK name
 SDK_VERSION = "xilinx-standalone"

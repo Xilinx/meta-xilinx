@@ -35,7 +35,6 @@ LIC_FILES_CHKSUM[xlnx_rel_v2024.1] = '0dcabd3719e5ac33f7c03f0d77d473f2'
 LIC_FILES_CHKSUM[xlnx_rel_v2024.2] = '689662801a76c14d0cb57ae169cbec7c'
 LIC_FILES_CHKSUM ??= "file://license.txt;md5=${@d.getVarFlag('LIC_FILES_CHKSUM', d.getVar('BRANCH')) or '0'}"
 
-SRC_URI = "${EMBEDDEDSW_SRCURI}"
 PV .= "+git"
 
 python() {
@@ -46,4 +45,25 @@ python() {
             var = d.getVar('SRCREV')
         except:
             raise bb.parse.SkipRecipe('BB_NO_NETWORK is enabled, can not fetch SRCREV (%s)' % d.getVar('SRCREV'))
+}
+
+SHARED_S = "${TMPDIR}/work-shared/embeddedsw-${PV}-${PR}/source/git"
+S = "${WORKDIR}/source"
+B = "${WORKDIR}/build"
+
+ERROR_QA:remove = "buildpaths"
+
+# The following is for recipes that use the common sources
+python do_copy_shared_src() {
+    src = d.getVar('SHARED_S')
+    dest = d.getVar('S')
+    if src != dest:
+        oe.path.copyhardlinktree(src, dest)
+}
+
+python() {
+    if d.getVar('BPN') != "embeddedsw-source":
+        bb.build.addtask('do_copy_shared_src', 'do_configure do_populate_lic do_deploy_source_date_epoch', 'do_patch', d)
+
+        d.appendVarFlag('do_copy_shared_src', 'depends', ' embeddedsw-source-${PV}:do_patch')
 }

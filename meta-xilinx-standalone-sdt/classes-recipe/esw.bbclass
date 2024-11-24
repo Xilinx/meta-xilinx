@@ -8,8 +8,6 @@ OECMAKE_ARGS:remove = "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON"
 
 SRCREV_FORMAT = "src_decouple"
 
-S = "${UNPACKDIR}/git"
-B = "${WORKDIR}/build"
 OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
 LICFILENAME = "license.txt"
 

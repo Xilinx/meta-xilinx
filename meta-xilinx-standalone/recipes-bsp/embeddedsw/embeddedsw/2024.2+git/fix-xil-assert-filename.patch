@@ -1,0 +1,26 @@
+Fix __FILENAME__ definition
+
+This fixes the error:
+
+| <command-line>: error: passing argument 1 of 'Xil_Assert' makes pointer from integer without a cast [-Wint-conversion]
+| .../work-shared/embeddedsw-2024.2+git-r0/source/git/lib/bsp/standalone/src/common/xil_assert.h:123:20: note: in expansion of macro '__FILENAME__'
+|   123 |         Xil_Assert(__FILENAME__, __LINE__);            \
+|       |                    ^~~~~~~~~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
+diff --git a/cmake/Findcommon.cmake b/cmake/Findcommon.cmake
+index c856d408fb..acac2e8fcc 100644
+--- a/cmake/Findcommon.cmake
++++ b/cmake/Findcommon.cmake
+@@ -11,7 +11,7 @@ endif()
+ if("${CMAKE_HOST_NAME}" STREQUAL "Linux")
+     add_compile_options("-D__FILENAME__=\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"")
+ else()
+-    add_compile_options("-D__FILENAME__='__FILE__'")
++    add_compile_options("-D__FILENAME__=__FILE__")
+ endif()
+ set (CMAKE_INSTALL_LIBDIR "lib")
+ function (collector_create name base)

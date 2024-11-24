@@ -8,6 +8,8 @@ additional variables that may not be appropriate to do on the regular
 command line build version.  This patch preserves the default while
 allowing it to be overriden as necessary.
 
+Upstream-Status: Pending
+
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 ---
  lib/sw_apps/versal_plm/misc/versal/Makefile     | 6 ++++--

@@ -6,7 +6,7 @@ Subject: [PATCH] Prevent makefile from calling copy_bsp.sh
 If we call copy_bsp.sh we will undo any manual compliation steps we
 have already done.  Avoid this.
 
-YP integration specific
+Upstream-Status: Inappropriate [YP integration specific]
 
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 ---

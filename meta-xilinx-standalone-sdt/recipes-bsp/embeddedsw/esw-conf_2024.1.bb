@@ -1,9 +1,6 @@
 # Can't depend on esw since this is needed for setup!
 inherit xlnx-embeddedsw
 
-S = "${UNPACKDIR}/git"
-B = "${WORKDIR}/build"
-
 INHIBIT_DEFAULT_DEPS = "1"
 
 # Installing this recipe should install the lopper tools and such

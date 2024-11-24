@@ -5,13 +5,6 @@ B = "${S}/lib/sw_apps/versal_plm/src/${SOC_DIR}"
 
 BSP_DIR ?= "${B}/../../misc/versal_plm_bsp"
 
-FILESPATH .= ":${FILE_DIRNAME}/embeddedsw/${PV}:${FILE_DIRNAME}/embeddedsw"
-
-SRC_URI += " \
-            file://makefile-skip-copy_bsp.sh.patch \
-            file://0001-versal_fw-Fixup-core-makefiles.patch \
-           "
-
 EXTRA_COMPILER_FLAGS = "-g -ffunction-sections -fdata-sections -Wall -Wextra -Os -flto -ffat-lto-objects"
 
 do_configure() {
