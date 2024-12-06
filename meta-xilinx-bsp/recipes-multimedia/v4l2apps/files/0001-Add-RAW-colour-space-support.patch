@@ -1,0 +1,24 @@
+From 430486b98c964f3fae07094f3ba72944c3529d53 Mon Sep 17 00:00:00 2001
+From: Adrian Fiergolski <adrian.fiergolski@fastree3d.com>
+Date: Thu, 28 Jan 2021 17:04:58 +0100
+Subject: [PATCH] Add RAW colour space support.
+
+---
+ utils/media-ctl/libv4l2subdev.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/utils/media-ctl/libv4l2subdev.c b/utils/media-ctl/libv4l2subdev.c
+index 9372a78..a0746d7 100644
+--- a/utils/media-ctl/libv4l2subdev.c
++++ b/utils/media-ctl/libv4l2subdev.c
+@@ -968,6 +968,7 @@ static struct {
+ 	{ "oprgb", V4L2_COLORSPACE_OPRGB },
+ 	{ "bt2020", V4L2_COLORSPACE_BT2020 },
+ 	{ "dcip3", V4L2_COLORSPACE_DCI_P3 },
++	{ "raw", V4L2_COLORSPACE_RAW },	
+ };
+ 
+ const char *v4l2_subdev_colorspace_to_string(enum v4l2_colorspace colorspace)
+-- 
+2.30.0
+

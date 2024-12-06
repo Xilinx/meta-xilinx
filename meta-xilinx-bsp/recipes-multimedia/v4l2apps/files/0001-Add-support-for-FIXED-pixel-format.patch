@@ -1,0 +1,24 @@
+From b21f01fc21c3071706540c13d4631bb1ea44c657 Mon Sep 17 00:00:00 2001
+From: Adrian Fiergolski <adrian.fiergolski@fastree3d.com>
+Date: Thu, 28 Jan 2021 17:03:58 +0100
+Subject: [PATCH] Add support for FIXED pixel format.
+
+---
+ utils/media-ctl/libv4l2subdev.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/utils/media-ctl/libv4l2subdev.c b/utils/media-ctl/libv4l2subdev.c
+index ebe3318..9372a78 100644
+--- a/utils/media-ctl/libv4l2subdev.c
++++ b/utils/media-ctl/libv4l2subdev.c
+@@ -855,6 +855,7 @@ static const struct {
+ 	enum v4l2_mbus_pixelcode code;
+ } mbus_formats[] = {
+ #include "media-bus-format-names.h"
++	{ "FIXED", MEDIA_BUS_FMT_FIXED},
+ 	{ "Y8", MEDIA_BUS_FMT_Y8_1X8},
+ 	{ "Y10", MEDIA_BUS_FMT_Y10_1X10 },
+ 	{ "Y12", MEDIA_BUS_FMT_Y12_1X12 },
+-- 
+2.30.0
+
