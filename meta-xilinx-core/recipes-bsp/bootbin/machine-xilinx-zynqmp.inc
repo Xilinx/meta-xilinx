@@ -6,11 +6,11 @@ BIF_COMMON_ATTR ?= ""
 #   https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18842019/Zynq+UltraScale+FSBL#ZynqUltraScale%2BFSBL-IsthereanyorderinwhichIhavetospecifybitstreaminBIFfile(forbootimagecreation)%3F
 #
 # The loading rules:
-# From the 2017.1 release, bistreams should be loaded bfore ATF...
+# From the 2017.1 release, bitstreams should be loaded before ATF...
 # ...preferably immediately after the FSBL and PMUFW.
 #
 # While the first few components must be fsbl and pmufw per:
-# https://www.xilinx.com/support/documentation/sw_manuals/xilinx2021_2/ug1283-bootgen-user-guide.pdf
+# https://docs.amd.com/r/en-US/ug1283-bootgen-user-guide/Introduction
 #
 # This combination restricts the boot order to be:
 # FSBL & PMUFW -> Bitstream (if available) -> ATF -> Device Tree (if available) -> Second Stage Bootloader
