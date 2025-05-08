@@ -3,8 +3,8 @@ inherit esw deploy
 ESW_COMPONENT_SRC = "/lib/sw_services/xilpuf/examples/"
 
 PACKAGECONFIG ??= "client server"
-PACKAGECONFIG[client]  ="-DXILPUF_Mode="client",,"
-PACKAGECONFIG[server]  ="-DXILPUF_Mode="server",,"
+PACKAGECONFIG[client] = "-DXILPUF_Mode="client",,"
+PACKAGECONFIG[server] = "-DXILPUF_Mode="server",,"
 
 DEPENDS += "xilpuf xilsecure xilmailbox xilnvm xilplmi"
 

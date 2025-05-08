@@ -17,9 +17,9 @@ OUTFILE_NAME ?= "u-boot-s"
 S = "${UNPACKDIR}"
 B = "${WORKDIR}/build"
 
-PARALLEL_MAKE=""
+PARALLEL_MAKE = ""
 
-do_configure[noexec]="1"
+do_configure[noexec] = "1"
 do_compile[depends] = "virtual/bootloader:do_deploy"
 
 do_compile() {

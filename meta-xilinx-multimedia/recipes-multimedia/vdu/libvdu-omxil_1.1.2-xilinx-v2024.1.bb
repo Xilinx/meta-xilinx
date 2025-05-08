@@ -24,7 +24,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 DEPENDS = "vdu-ctrlsw"
 RDEPENDS:${PN} = "libvdu-ctrlsw"
 
-EXTERNAL_INCLUDE="${STAGING_INCDIR}/vdu-ctrl-sw/include"
+EXTERNAL_INCLUDE = "${STAGING_INCDIR}/vdu-ctrl-sw/include"
 
 do_compile[dirs] = "${S}"
 do_install[dirs] = "${S}"

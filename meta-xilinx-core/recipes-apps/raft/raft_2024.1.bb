@@ -23,7 +23,7 @@ INITSCRIPT_PARAMS = "start 99 S ."
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "raft-startup.service"
-SYSTEMD_AUTO_ENABLE:${PN}="enable"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 DEPENDS += "libmetal"
 

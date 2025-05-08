@@ -31,7 +31,7 @@ do_compile[dirs] = "${S}"
 do_install[dirs] = "${S}"
 
 EXTRA_OEMAKE = "CC='${CC}' CXX='${CXX} ${CXXFLAGS}'"
-EXTRA_OEMAKE +=" INSTALL_HDR_PATH=${D}${includedir}/vdu-ctrl-sw/include INSTALL_PATH=${D}${bindir}"
+EXTRA_OEMAKE += "INSTALL_HDR_PATH=${D}${includedir}/vdu-ctrl-sw/include INSTALL_PATH=${D}${bindir}"
 
 do_install:append() {
 

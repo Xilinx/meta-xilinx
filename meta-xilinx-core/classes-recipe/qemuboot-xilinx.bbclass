@@ -3,7 +3,7 @@
 OVERRIDES .= ":qemuboot-xilinx"
 
 # Default machine targets for Xilinx QEMU (FDT Generic)
-QB_RNG=""
+QB_RNG = ""
 
 QB_SYSTEM_NAME ?= "${@qemu_target_binary(d)}"
 QB_DEFAULT_FSTYPE ?= "${@qemu_rootfs_params(d,'fstype')}"
