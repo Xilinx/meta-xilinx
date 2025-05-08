@@ -7,7 +7,14 @@
 # dfx_user_dts.bbclass expects user to generate pl dtsi for flat, DFx Static
 # and DFx RP xsa outside of yocto.
 
+# Preserve the caller's UNPACKDIR, since devicetrees will modify it
+ORIG_UNPACKDIR := "${UNPACKDIR}"
+
 inherit devicetree
+
+# Now set the values to what we want
+UNPACKDIR = "${ORIG_UNPACKDIR}"
+S = "${UNPACKDIR}"
 
 DEPENDS = "dtc-native bootgen-native"
 
@@ -21,7 +28,6 @@ do_fetch[cleandirs] = "${B}"
 DT_PADDING_SIZE = "0x1000"
 BOOTGEN_FLAGS ?= " -arch ${SOC_FAMILY} -w ${@bb.utils.contains('SOC_FAMILY','zynqmp','','-process_bitstream bin',d)}"
 
-S ?= "${UNPACKDIR}"
 FW_DIR ?= ""
 DTSI_PATH ?= ""
 DTBO_PATH ?= ""
