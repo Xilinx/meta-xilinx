@@ -5,6 +5,8 @@ RDEPENDS:${PN} = "qemu-xilinx-native"
 
 inherit native
 
+S = "${UNPACKDIR}"
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI = "file://qemu-system-aarch64-multiarch"

@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${LAYERPATH_xilinx}/scripts/qemuboot-tool;beginline=5
 
 SRC_URI = "file://${LAYERPATH_xilinx}/scripts/qemuboot-tool"
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 inherit nativesdk
 
