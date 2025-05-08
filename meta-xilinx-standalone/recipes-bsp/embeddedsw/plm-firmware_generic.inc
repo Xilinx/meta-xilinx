@@ -43,7 +43,6 @@ do_compile() {
     # Again, recipe-systoot include is necessary
     oe_runmake CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
 
-    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
 }
 
 do_install() {
@@ -57,8 +56,6 @@ ESW_COMPONENT = "plm.elf"
 do_deploy() {
     install -Dm 0644 ${B}/${ESW_COMPONENT} ${DEPLOYDIR}/${PLM_BASE_NAME}.elf
     ln -sf ${PLM_BASE_NAME}.elf ${DEPLOYDIR}/${PLM_IMAGE_NAME}.elf
-    install -m 0644 ${B}/${ESW_COMPONENT}.bin ${DEPLOYDIR}/${PLM_BASE_NAME}.bin
-    ln -sf ${PLM_BASE_NAME}.bin ${DEPLOYDIR}/${PLM_IMAGE_NAME}.bin
 }
 
 addtask deploy before do_build after do_install

@@ -18,8 +18,16 @@ IMAGE_CLASSES += "qemuboot-xilinx"
 # runqemu may add additional null entries or simply skip further setup.
 #
 # To help us be able to adjust for this behavior add a special
-# QB_XILINX_SERIAL that will allow us to define serial ports for qemu
+# QEMU_HW_SERIAL that will allow us to define serial ports for qemu
 # emulated boards that may not match the standard Linux behavior.
 #
-QB_XILINX_SERIAL ??= ""
-QB_OPT_APPEND += "${QB_XILINX_SERIAL} -nodefaults"
+QEMU_HW_SERIAL ??= ""
+QB_OPT_APPEND += "${QEMU_HW_SERIAL} -nodefaults"
+QB_SERIAL_OPT = ""
+
+# Workaround to trigger runqemu to use -dtb to send the APU DTB
+# This is done to ensure that we can easily change APU DTB at runtime via
+# standard runqemu options.  (only used on multiarch systems)
+# The file is not actually used, but it does have to exist.
+QB_DEFAULT_KERNEL:aarch64 = "BOOT-${MACHINE}.bin"
+QB_KERNEL_CMDLINE:aarch64 = "none"

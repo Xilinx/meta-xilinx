@@ -8,6 +8,7 @@ Subject: [LINUX][rel-v2020.1][PATCH v1 1/3] mali_memory_secure: Kernel 5.0
 onwards.
 
 Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  driver/src/devicedrv/mali/linux/mali_ukk_mem.c | 9 +++++++++
  1 file changed, 9 insertions(+)

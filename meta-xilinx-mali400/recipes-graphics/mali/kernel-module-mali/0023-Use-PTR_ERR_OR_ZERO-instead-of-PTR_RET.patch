@@ -8,6 +8,7 @@ in kernel 5.7, PTR_RET has been removed and replaced with
 PTR_ERR_OR_ZERO. So use this API instead.
 
 Signed-off-by: Dylan Yip <dylan.yip@xilinx.com>
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  linux/mali_memory_dma_buf.c | 4 ++++
  1 file changed, 4 insertions(+)

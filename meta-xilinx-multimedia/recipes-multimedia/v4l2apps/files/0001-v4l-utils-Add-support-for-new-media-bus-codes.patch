@@ -8,6 +8,7 @@ specific formats.
 
 Signed-off-by: Anil Kumar M <amamidal@xilinx.com>
 Signed-off-by: Adrian Fiergolski <Adrian.Fiergolski@fastree3d.com>
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  include/linux/media-bus-format.h | 11 +++++++++++
  1 file changed, 11 insertions(+)

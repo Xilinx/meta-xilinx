@@ -5,12 +5,11 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 inherit dfx_user_dts
 
-SRC_URI = "https://petalinux.xilinx.com/sswreleases/rel-v2024.2/sdt/2024.2/2024.2_1106_1_11061206/external/zcu104-pl-vcu-fw/zcu104-pl-vcu-fw_2024.2_1106_1.tar.gz"
+SRC_URI = "https://petalinux.xilinx.com/sswreleases/rel-v2024.2/sdt/2024.2/2024.2_1111_2_02260716/external/zcu104-pl-vcu-fw/zcu104-pl-vcu-fw_2024.2_1111_1.tar.gz"
 
-SRC_URI[sha256sum] = "1eef872153d2373c944c20752bc374e371159395a42d8353bd1a397fadc59231"
+SRC_URI[sha256sum] = "c4457697a50ecf70f5008797932feb55db18d8afbd5592e3a7ed2cc9ee9fac31"
 
-
-COMPATIBLE_MACHINE:zynqmp-zcu104-sdt-full = "${MACHINE}"
+COMPATIBLE_MACHINE = "${MACHINE}"
 
 # When do_upack is exectuted it will extract tar file with original directory
 # name so set the FW_DIR pointing to pdi and dtsi files.

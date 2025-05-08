@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 
-# Xilinx QEMU wrapper to launch both PMU and APU instances (multiarch)
+# Copyright (C) 2017-2022, Xilinx, Inc.  All rights reserved.
+# Copyright (C) 2022-2025, Advanced Micro Devices, Inc.  All rights reserved.
+#
+#
+# SPDX-License-Identifier: MIT
+
+# AMD QEMU wrapper to launch both PMU and APU instances (multiarch)
+
 import os
 import subprocess
 import sys
@@ -9,13 +16,14 @@ import re
 import shutil
 
 binpath = os.path.dirname(os.path.abspath(__file__))
-mach_path = tempfile.mkdtemp()
 
 # Separate PMU and APU arguments
 APU_args = sys.argv[1:]
 PMU_args = []
 PLM_args = []
 bootbin_arg = None
+mach_path_arg = None
+dtb_arg = None
 
 if '-pmu-args' in APU_args:
     pmu_args_idx = APU_args.index('-pmu-args')
@@ -32,14 +40,26 @@ if '-bootbin' in APU_args:
     bootbin_arg = APU_args[bootbin_args_idx+1]
     del APU_args[bootbin_args_idx:bootbin_args_idx+2]
 
-if PMU_args and PLM_args:
-    sys.exit("\nError: -pmu-args can not be used with -plm-args\n")
+if '-machine-path' in APU_args:
+    mach_path_args_idx = APU_args.index('-machine-path')
+    mach_path_arg = APU_args[mach_path_args_idx+1]
+    del APU_args[mach_path_args_idx:mach_path_args_idx+2]
+
+if '-dtb' in APU_args:
+    dtb_args_idx = APU_args.index('-dtb')
+    dtb_arg = APU_args[dtb_args_idx+1]
+    del APU_args[dtb_args_idx:dtb_args_idx+2]
+
+# Filter this out
+if '-kernel' in APU_args:
+    kernel_args_idx = APU_args.index('-kernel')
+    del APU_args[kernel_args_idx:kernel_args_idx+2]
 
 help_options = ['-h', '-help', '--help']
 def help(status):
-    print("AMD FPGA QEMU multiarch wrapper\nVersion 2024.2\n\nUsage:")
-    print(f"  {sys.argv[0]} <APU options> [-pmu-args <pmu options>]")
-    print(f"  {sys.argv[0]} <APU options> [-plm-args <plm options>]\n")
+    print("AMD FPGA QEMU multiarch wrapper\nVersion 2025.1\n\nUsage:")
+    print(f"  {sys.argv[0]} <APU options> [-pmu-args <pmu options>] [-machine-path <path>]")
+    print(f"  {sys.argv[0]} <APU options> [-plm-args <plm options>] [-machine-path <path>]\n")
     if status == 0:
         print(f"\n")
         if set(PMU_args).intersection(set(help_options)):
@@ -54,11 +74,19 @@ def help(status):
             if not set(APU_args).intersection(set(help_options)):
                 APU_args.append('-help')
             print(f"APU Options:\n")
-            print(f"    -bootbin <boot.bin> - Use a boot.bin instead of individual firmware, device trees and bootloader\n")
+            print(f"    -bootbin [arch:]<boot.bin> - Use a boot.bin instead of individual firmware, device trees and bootloader.  While arch: is optonal, it is recommended.  The default arch is 'versal'.\n")
+            print(f"    -dtb - Specify hardware dtb for the APU\n")
+            print(f"    -kernel - option is filtered out, but is available for compatibility\n")
             apu_args_s = ' '.join(APU_args)
             help_cmd = f'{binpath}/qemu-system-aarch64 {apu_args_s}'
 
+        print(f"    -machine-path <path> - Optional path to use for multiarch files. This path must be less then about 100 characters.\n     Note: if specified caller is responsible for cleaning up the directory on exist\n")
+
         print(f"{help_cmd}\n")
+
+        # Without this the Popen below can end up printing before the above
+        sys.stdout.flush()
+
         process = subprocess.Popen(help_cmd, shell=True, stderr=subprocess.PIPE)
         status = process.wait()
     sys.exit(status)
@@ -68,6 +96,23 @@ if set(APU_args).intersection(set(help_options)) or set(PMU_args).intersection(s
 
 if not PMU_args and not PLM_args:
     help(1)
+
+# The APU QEMU will hang if it does get get a -hw-dtb
+if dtb_arg and '-hw-dtb' in APU_args:
+    sys.exit(f'\nERROR: Arguments -dtb and -hw-dtb conflict, only one should be specified.')
+elif not dtb_arg and not '-hw-dtb' in APU_args:
+    sys.exit(f'\nERROR: You must specify at least a -dtb or -hw-dtb for the APU.')
+
+if mach_path_arg:
+    if not os.path.isdir(mach_path_arg):
+        sys.exit(f'\nERROR: Missing machine path for qemu: {mach_path_arg}')
+    else:
+        mach_path = os.path.realpath(mach_path_arg)
+else:
+    mach_path = tempfile.mkdtemp()
+
+if PMU_args and PLM_args:
+    sys.exit("\nError: -pmu-args can not be used with -plm-args\n")
 
 if PMU_args:
     try:
@@ -80,19 +125,32 @@ if PMU_args:
             '\nSee "meta-xilinx/README.qemu.md" for more information on accquiring the PMU ROM.\n')
 
 if bootbin_arg:
-    if not os.path.isfile(bootbin_arg):
-        print(f"\nERROR: bootbin file not found at {bootbin_arg}"
-            "       Please build and ospi_image or set QB_OSPI_BIN variable to prebuilt file\n")
+    # List of valid bootgen arches and settings
+    archs = [ 'versal' ]
+    boot_header_addr = {'versal' : '0xf201e000'}
+
+    # The bootbin is separated into "arch:file"
+    # Default to versal for legacy reasons
+    arch = 'versal'
+    bootbin_fn = bootbin_arg
+
+    if ':' in bootbin_arg:
+        (arch, bootbin_fn) = bootbin_arg.split(':', 1)
+
+    if not os.path.isfile(bootbin_fn):
+        print(f"\nERROR: bootbin file not found at {bootbin_fn}\n")
         sys.exit(1)
 
-    shutil.copyfile(bootbin_arg, f'{mach_path}/boot.bin')
+    if arch not in archs:
+        print(f"\nERROR: bootbin arch {arch} not valid ({archs})\n")
+        sys.exit(1)
 
-    bootgen_command = [f'{binpath}/bootgen', '-arch', 'versal', '-dump', 'boot.bin']
-    subprocess.run(bootgen_command + ['bh'], check=True, cwd=mach_path, stdout=subprocess.DEVNULL)
-    subprocess.run(bootgen_command + ['plm'], check=True, cwd=mach_path, stdout=subprocess.DEVNULL)
-    subprocess.run(bootgen_command + ['pmc_cdo'], check=True, cwd=mach_path, stdout=subprocess.DEVNULL)
+    shutil.copyfile(bootbin_fn, f'{mach_path}/boot.bin')
 
-    bootgen_command = f"{binpath}/bootgen -arch versal -read {bootbin_arg}"
+    bootgen_command = [f'{binpath}/bootgen', '-arch', arch, '-dump', 'boot.bin']
+    subprocess.run(bootgen_command + ['boot_files'], check=True, cwd=mach_path, stdout=subprocess.DEVNULL)
+
+    bootgen_command = f"{binpath}/bootgen -arch {arch} -read {bootbin_fn}"
     result = subprocess.check_output(bootgen_command.split())
     bootgen_output = result.decode().splitlines()
 
@@ -104,11 +162,29 @@ if bootbin_arg:
 
     plm_load_addr = re.search(r"exec_addr_lo \(0x10\) : (0x\w*)\s*", plm_line).group(1)
     pmc_load_addr = re.search(r"pmccdo_load_addr \(0x20\) : (0x\w*)", pmc_line).group(1)
+    print(f"qemu-system-aarch64-multiarch: INFO: Using QSPI/OSPI bootbin file")
 
-    PLM_args.append(f"-device loader,file={mach_path}/boot_bh.bin,addr=0xF201E000,force-raw=on")
+    boot_bh_addr = boot_header_addr[arch]
+    if boot_bh_addr and os.path.exists(f'{mach_path}/boot_bh.bin'):
+        print(f"qemu-system-aarch64-multiarch: INFO: boot header load addr: {boot_bh_addr}")
+        PLM_args.append(f"-device loader,file={mach_path}/boot_bh.bin,addr={boot_bh_addr},force-raw=on")
+    else:
+        print(f"\nERROR: boot header ({mach_path}/boot_bh.bin) or boot header ({boot_bh_addr}) address is missing\n")
+        sys.exit(1)
+
+    print(f"qemu-system-aarch64-multiarch: INFO: bootbin file dump PMC load addr: {pmc_load_addr}")
     PLM_args.append(f"-device loader,file={mach_path}/pmc_cdo.bin,addr={pmc_load_addr},force-raw=on")
+
+    print(f"qemu-system-aarch64-multiarch: INFO: bootbin file dump PLM load addr: {plm_load_addr}")
     PLM_args.append(f"-device loader,file={mach_path}/plm.bin,addr={plm_load_addr},force-raw=on")
     PLM_args.append(f"-device loader,addr={plm_load_addr},cpu-num=1")
+
+    # Add blank to make the above easier to read
+    print()
+
+# We use the normal -dtb argument to specify the hw-dtb for the multiarch runner, as -dtb is not applicable.
+if dtb_arg:
+    APU_args.append(f"-hw-dtb {dtb_arg}")
 
 # We need to switch tcp serial arguments (if they exist, e.g. qemurunner) to get the output
 tcp_serial_ports = [i for i, s in enumerate(APU_args) if 'tcp:127.0.0.1:' in s]
@@ -139,13 +215,26 @@ if mb_cmd:
 if apu_cmd:
     process_apu = subprocess.Popen(apu_cmd, shell=True, stderr=subprocess.PIPE)
 
+rc = 0
 error_msg = ""
-if apu_cmd and process_apu.wait():
-    # We only check for failures on the MB instance if APU fails
-    error_msg += '\nQEMU APU instance failed:\n%s' % process_apu.stderr.read().decode()
+if apu_cmd:
+    apu_rc = process_apu.wait()
+    if apu_rc:
+        rc = apu_rc
+        error_msg += '\nQEMU APU instance failed (%s):\n%s' % (apu_rc, process_apu.stderr.read().decode())
 
-    if mb_cmd and process_mb.wait():
-        error_msg += '\nQEMU MB instance failed:\n%s' % process_mb.stderr.read().decode()
+# We only report errors for MB if the APU failed (or APU wasn't started)
+# otherwise we assume that the shutdown of the APU is the cause of the error
+try:
+    if mb_cmd:
+        mb_rc = process_mb.wait(timeout=5)
+        if mb_rc and (apu_cmd and apu_rc):
+            rc += mb_rc
+            error_msg += '\nQEMU MB instance failed (%s):\n%s' % (mb_rc, process_mb.stderr.read().decode())
+except subprocess.TimeoutExpired:
+    process_mb.kill()
 
-shutil.rmtree(mach_path)
-sys.exit(error_msg)
+if not mach_path_arg:
+    shutil.rmtree(mach_path)
+
+sys.exit(apu_rc)

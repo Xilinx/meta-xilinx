@@ -11,6 +11,8 @@ LICENSE = "MIT"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+EXCLUDE_FROM_WORLD = "1"
+
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 

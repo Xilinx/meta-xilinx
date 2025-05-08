@@ -1,5 +1,5 @@
 # Add xen variables as addendum.
-# Variable SCRIPT_SED_ADDENDUM id defined in meta-xilinx and set to null by
+# Variable SCRIPT_SED_ADDENDUM is defined in meta-xilinx and set to null by
 # default and enable only for xen builds.
 SCRIPT_SED_ADDENDUM += "-e 's/@@XEN_IMAGE_NAME@@/${XEN_IMAGE_NAME}/' \
         -e 's/@@XEN_OFFSET@@/${XEN_OFFSET}/' \

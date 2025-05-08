@@ -6,7 +6,7 @@ Subject: [PATCH 1/9] Change Makefile to be compatible with Yocto
 Signed-off-by: Manjukumar Matha <manjukumar.harthikote-matha@xilinx.com>
 Signed-off-by: Hyun Kwon <hyun.kwon@xilinx.com>
 Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
-Upstream Status: Inappropriate [Xilinx specific]
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  driver/src/devicedrv/mali/Makefile | 11 +++++++++--
  1 file changed, 9 insertions(+), 2 deletions(-)

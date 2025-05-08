@@ -1,0 +1,54 @@
+From 7b6276c77c0be40006a7cb9f53bacf93fd493d49 Mon Sep 17 00:00:00 2001
+From: "Jain, Ronak" <ronak.jain@amd.com>
+Date: Sun, 20 Oct 2024 20:48:29 -1200
+Subject: [PATCH] sw_apps: zynqmp_pmufw: Correct IOU register base address for
+ GEM2 in SGMII mode
+
+Fix an issue where enabling GEM2 in SGMII mode causes QSPI access to
+fail on Kria K26 SOM and KV260 base boards. The failure was due to
+the PMUFW using the IOU_SLCR_BASEADDR instead of the
+IOU_SECURE_SLCR_BASEADDR when accessing the IOU_AXI_WPRTCN and
+IOU_AXI_RPRTCN registers, which caused an IO mux malfunction.
+
+This patch corrects the base addresses for these registers to ensure
+proper operation of GEM2 and QSPI.
+
+Signed-off-by: Ronak Jain <ronak.jain@amd.com>
+Acked-by: Buddhabhatti, Jay <jay.buddhabhatti@amd.com>
+---
+ lib/sw_apps/zynqmp_pmufw/src/iou_secure_slcr.h | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/lib/sw_apps/zynqmp_pmufw/src/iou_secure_slcr.h b/lib/sw_apps/zynqmp_pmufw/src/iou_secure_slcr.h
+index f462268ad0..79fc790f20 100644
+--- a/lib/sw_apps/zynqmp_pmufw/src/iou_secure_slcr.h
++++ b/lib/sw_apps/zynqmp_pmufw/src/iou_secure_slcr.h
+@@ -1,5 +1,6 @@
+ /******************************************************************************
+-* Copyright (c) 2021 Xilinx, Inc.  All rights reserved.
++* Copyright (c) 2021 - 2022 Xilinx, Inc.  All rights reserved.
++* Copyright (c) 2022 - 2024 Advanced Micro Devices, Inc. All Rights Reserved.
+ * SPDX-License-Identifier: MIT
+ ******************************************************************************/
+ 
+@@ -19,7 +20,7 @@ extern "C" {
+ /**
+  * Register: IOU_AXI_WPRTCN
+  */
+-#define IOU_AXI_WPRTCN		( ( IOU_SLCR_BASEADDR ) + ((u32)0X00000000U) )
++#define IOU_AXI_WPRTCN		( ( IOU_SECURE_SLCR_BASEADDR ) + ((u32)0X00000000U) )
+ 
+ #define GEM0_AXI_AWPROT_SHIFT		0U
+ #define GEM0_AXI_AWPROT_MASK		((u32)0x00000007U)
+@@ -37,7 +38,7 @@ extern "C" {
+ /**
+  * Register: IOU_AXI_RPRTCN
+  */
+-#define IOU_AXI_RPRTCN		( ( IOU_SLCR_BASEADDR ) + ((u32)0X00000004U) )
++#define IOU_AXI_RPRTCN		( ( IOU_SECURE_SLCR_BASEADDR ) + ((u32)0X00000004U) )
+ 
+ #define GEM0_AXI_ARPROT_SHIFT		0U
+ #define GEM0_AXI_ARPROT_MASK		((u32)0x00000007U)
+-- 
+2.34.1
+

@@ -1,0 +1,59 @@
+&smmu {
+	status = "okay";
+};
+
+&gem0 {
+    iommus = <&smmu 0x234>;
+};
+
+&gem1 {
+    iommus = <&smmu 0x235>;
+};
+
+&dwc3_0 {
+    iommus = <&smmu 0x230>;
+};
+
+&qspi {
+    iommus = <&smmu 0x244>;
+};
+
+&lpd_dma_chan0 {
+    iommus = <&smmu 0x210>;
+};
+
+&lpd_dma_chan1 {
+    iommus = <&smmu 0x212>;
+};
+
+&lpd_dma_chan2 {
+    iommus = <&smmu 0x214>;
+};
+
+&lpd_dma_chan3 {
+    iommus = <&smmu 0x216>;
+};
+
+&lpd_dma_chan4 {
+    iommus = <&smmu 0x218>;
+};
+
+&lpd_dma_chan5 {
+    iommus = <&smmu 0x21a>;
+};
+
+&lpd_dma_chan6 {
+    iommus = <&smmu 0x21c>;
+};
+
+&lpd_dma_chan7 {
+    iommus = <&smmu 0x21e>;
+};
+
+&sdhci0 {
+    iommus = <&smmu 0x242>;
+};
+
+&sdhci1 {
+    iommus = <&smmu 0x243>;
+};

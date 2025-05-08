@@ -8,7 +8,7 @@ refer kernel commit ea8c64ace86647260ec4255f483e5844d62af2df
 
 Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
 Reviewed-by: Hyun Kwon <hyun.kwon@xilinx.com>
-Upstream Status: Pending
+Upstream-Status: Pending
 ---
  driver/src/devicedrv/mali/linux/mali_memory_secure.c | 4 ++++
  1 file changed, 4 insertions(+)

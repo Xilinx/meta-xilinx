@@ -13,7 +13,6 @@ MULTIMEDIA_PACKAGES = " \
 	packagegroup-core-x11 \
 	libdrm \
 	libdrm-tests \
-	packagegroup-xilinx-qt \
 	ffmpeg \
 	"
 

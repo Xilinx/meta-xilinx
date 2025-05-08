@@ -9,6 +9,7 @@ unlocked_ioctl. Since this change has been around for almost 10 years,
 go ahead and set the default HAVE_UNLOCKED_IOCTL to be true.
 
 Signed-off-by: Dylan Yip <dylan.yip@xilinx.com>
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  Kbuild | 2 ++
  1 file changed, 2 insertions(+)

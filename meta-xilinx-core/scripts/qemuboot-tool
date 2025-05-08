@@ -1,0 +1,87 @@
+#! /usr/bin/env python3
+#
+# SPDX-License-Identifier: MIT
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+import os
+import sys
+import configparser
+
+def getVars(file, vars = {}):
+    if not os.path.exists(file):
+        sys.exit(f"{file} does not exist!")
+
+    cf = configparser.ConfigParser()
+    cf.read(file)
+
+    for k, v in cf.items('config_bsp'):
+        if k in vars and vars[k] != "":
+            continue
+        vars[k] = v
+
+    return vars
+
+
+def usage():
+    print("Used to combine multiple qemuboot.conf files, non-blank values replace prior values.\n")
+    print("%s: <command> <argument> ...\n" % sys.argv[0])
+    print("     load <file>  - load a new file")
+    print("     merge <file> - load and fill any new/empty variables")
+    print("     remove <var> - Remove a variable\n")
+    print("   Commands can be chained, such as:")
+    print("      load file1 remove val1 merge file2")
+    print()
+
+def main():
+    if "help" in sys.argv or '-h' in sys.argv or '--help' in sys.argv:
+        usage()
+        return 0
+
+    vars = {}
+
+    idx = 1
+    while(idx < len(sys.argv)):
+        arg = sys.argv[idx]
+        if arg == "load":
+            idx += 1
+            vars = getVars(sys.argv[idx], {})
+        elif arg == "merge":
+            idx += 1
+            vars = getVars(sys.argv[idx], vars)
+        elif arg == "remove":
+            idx += 1
+            key = sys.argv[idx]
+            if key not in vars:
+                print(f"remove: Variable {key} not found")
+                sys.exit(-1)
+            del vars[key]
+        else:
+            print(f"Unknown command {arg}")
+            sys.exit(-1)
+
+        idx += 1
+
+    print('[config_bsp]')
+    for var in sorted(vars.items()):
+        print('%s = %s' % (var[0], var[1]))
+
+
+if __name__ == "__main__":
+    sys.exit(main())

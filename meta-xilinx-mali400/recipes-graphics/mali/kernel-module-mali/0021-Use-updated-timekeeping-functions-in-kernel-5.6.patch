@@ -8,6 +8,7 @@ bit timekeeping functions like getnstimeofday() have been removed. So
 use the 64 bit replacements.
 
 Signed-off-by: Dylan Yip <dylan.yip@xilinx.com>
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  linux/mali_osk_time.c | 6 ++++++
  1 file changed, 6 insertions(+)

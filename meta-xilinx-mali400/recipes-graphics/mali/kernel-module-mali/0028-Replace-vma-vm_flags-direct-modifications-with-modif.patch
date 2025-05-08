@@ -9,6 +9,7 @@ functions to be able to track flag changes and to keep vma locking
 correctness. (Kernel 6.3)
 
 Signed-off-by: Parth Gajjar <parth.gajjar@amd.com>
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  linux/mali_memory.c     | 10 ++++++++++
  linux/mali_memory_cow.c | 13 ++++++++++---

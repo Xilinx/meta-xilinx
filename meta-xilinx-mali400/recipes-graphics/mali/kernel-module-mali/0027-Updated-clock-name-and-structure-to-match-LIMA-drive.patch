@@ -11,6 +11,7 @@ This will allow us to have a single device tree that works with both the
 mali driver, as well as the lima driver.
 
 Signed-off-by: Parth Gajjar <parth.gajjar@amd.com>
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  linux/mali_kernel_linux.c  | 37 +++++++------------
  1 file changed, 13 insertions(+), 24 deletions(-)

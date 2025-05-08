@@ -18,7 +18,7 @@ DFEOFDM_SUBDIR = "XilinxProcessorIPLib/drivers/dfeofdm/src"
 
 do_compile:prepend() {
     cd ${S}/${DFEOFDM_SUBDIR}
-    cp Makefile.Linux Makefile
+    install Makefile.Linux Makefile
 }
 
 do_install() {

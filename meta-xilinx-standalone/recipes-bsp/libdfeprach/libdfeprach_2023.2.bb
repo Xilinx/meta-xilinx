@@ -20,7 +20,7 @@ DFEMIX_SUBDIR = "XilinxProcessorIPLib/drivers/dfeprach/src"
 
 do_compile:prepend() {
     cd ${S}/${DFEMIX_SUBDIR}
-    cp Makefile.Linux Makefile
+    install Makefile.Linux Makefile
 }
 
 do_install() {

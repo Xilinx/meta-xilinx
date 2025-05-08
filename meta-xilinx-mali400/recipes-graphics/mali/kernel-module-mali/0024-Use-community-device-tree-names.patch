@@ -21,7 +21,7 @@ Clock-names:
   gpu_pp1 -> bus
 
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
-
+Upstream-Status: Inappropriate [Xilinx specific]
 diff -ur a/linux/mali_kernel_linux.c b/linux/mali_kernel_linux.c
 --- a/linux/mali_kernel_linux.c	2018-09-17 04:04:48.000000000 -0700
 +++ b/linux/mali_kernel_linux.c	2022-10-24 14:01:54.614376177 -0700

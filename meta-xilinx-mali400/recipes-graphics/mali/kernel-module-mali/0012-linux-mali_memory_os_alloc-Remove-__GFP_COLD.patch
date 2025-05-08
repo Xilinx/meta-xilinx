@@ -8,7 +8,7 @@ For more information refer kernel commit 453f85d43fa9ee243f0fc3ac4e1be45615301e3
 
 Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
 Reviewed-by: Hyun Kwon <hyun.kwon@xilinx.com>
-Upstream Status: Pending
+Upstream-Status: Pending
 ---
  driver/src/devicedrv/mali/linux/mali_memory_os_alloc.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)

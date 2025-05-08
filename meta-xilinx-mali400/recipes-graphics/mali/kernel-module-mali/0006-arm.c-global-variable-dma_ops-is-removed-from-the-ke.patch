@@ -10,7 +10,7 @@ returns the dma ops that got set for the device, or the dummy_dma_ops
 if none were present.
 
 Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
-Upstream Status: Pending
+Upstream-Status: Pending
 ---
  driver/src/devicedrv/mali/platform/arm/arm.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)

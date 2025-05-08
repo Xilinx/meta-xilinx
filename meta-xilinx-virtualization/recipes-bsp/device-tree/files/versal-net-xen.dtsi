@@ -1,0 +1,67 @@
+&smmu {
+    status = "okay";
+};
+
+&adma0 {
+    iommus = <&smmu 0x210>;
+};
+
+&adma1 {
+    iommus = <&smmu 0x212>;
+};
+
+&adma2 {
+    iommus = <&smmu 0x214>;
+};
+
+&adma3 {
+    iommus = <&smmu 0x216>;
+};
+
+&adma4 {
+    iommus = <&smmu 0x218>;
+};
+
+&adma5 {
+    iommus = <&smmu 0x21a>;
+};
+
+&adma6 {
+    iommus = <&smmu 0x21c>;
+};
+
+&adma7 {
+    iommus = <&smmu 0x21e>;
+};
+
+&dwc3_0 {
+    iommus = <&smmu 0x230>;
+};
+
+&dwc3_1 {
+    iommus = <&smmu 0x232>;
+};
+
+&gem0 {
+    iommus = <&smmu 0x234>;
+};
+
+&gem1 {
+    iommus = <&smmu 0x235>;
+};
+
+&sdhci0 {
+    iommus = <&smmu 0x242>;
+};
+
+&sdhci1 {
+    iommus = <&smmu 0x243>;
+};
+
+&qspi {
+    iommus = <&smmu 0x244>;
+};
+
+&ospi {
+    iommus = <&smmu 0x245>;
+};

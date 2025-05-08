@@ -9,6 +9,7 @@ removed because ioremap is already non-cached by default. So replace all
 calls with ioremap.
 
 Signed-off-by: Dylan Yip <dylan.yip@xilinx.com>
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  linux/mali_memory_cow.c        |  4 ++++
  linux/mali_osk_low_level_mem.c |  4 ++++

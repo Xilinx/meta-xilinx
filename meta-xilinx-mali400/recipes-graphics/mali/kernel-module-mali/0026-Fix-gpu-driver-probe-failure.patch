@@ -11,6 +11,7 @@ Using platform_get_irq_optional() to avoid printing error messages
 for interrupts not found.
 
 Signed-off-by: Parth Gajjar <parth.gajjar@xilinx.com>
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  linux/mali_osk_mali.c | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)

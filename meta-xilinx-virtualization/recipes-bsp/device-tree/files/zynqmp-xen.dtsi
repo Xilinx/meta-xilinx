@@ -1,0 +1,123 @@
+&smmu {
+	status = "okay";
+};
+
+&gem0 {
+    iommus = <&smmu 0x874>;
+};
+
+&gem1 {
+    iommus = <&smmu 0x875>;
+};
+
+&gem2 {
+    iommus = <&smmu 0x876>;
+};
+
+&gem3 {
+    iommus = <&smmu 0x877>;
+};
+
+&dwc3_0 {
+    iommus = <&smmu 0x860>;
+};
+
+&dwc3_1 {
+    iommus = <&smmu 0x861>;
+};
+
+&qspi {
+    iommus = <&smmu 0x873>;
+};
+
+&lpd_dma_chan1 {
+    iommus = <&smmu 0x868>;
+};
+
+&lpd_dma_chan2 {
+    iommus = <&smmu 0x869>;
+};
+
+&lpd_dma_chan3 {
+    iommus = <&smmu 0x86a>;
+};
+
+&lpd_dma_chan4 {
+    iommus = <&smmu 0x86b>;
+};
+
+&lpd_dma_chan5 {
+    iommus = <&smmu 0x86c>;
+};
+
+&lpd_dma_chan6 {
+    iommus = <&smmu 0x86d>;
+};
+
+&lpd_dma_chan7 {
+    iommus = <&smmu 0x86e>;
+};
+
+&lpd_dma_chan8 {
+    iommus = <&smmu 0x86f>;
+};
+
+&fpd_dma_chan1 {
+    iommus = <&smmu 0x14e8>;
+};
+
+&fpd_dma_chan2 {
+    iommus = <&smmu 0x14e9>;
+};
+
+&fpd_dma_chan3 {
+    iommus = <&smmu 0x14ea>;
+};
+
+&fpd_dma_chan4 {
+    iommus = <&smmu 0x14eb>;
+};
+
+&fpd_dma_chan5 {
+    iommus = <&smmu 0x14ec>;
+};
+
+&fpd_dma_chan6 {
+    iommus = <&smmu 0x14ed>;
+};
+
+&fpd_dma_chan7 {
+    iommus = <&smmu 0x14ee>;
+};
+
+&fpd_dma_chan8 {
+    iommus = <&smmu 0x14ef>;
+};
+
+&sdhci0 {
+    iommus = <&smmu 0x870>;
+};
+
+&sdhci1 {
+    iommus = <&smmu 0x871>;
+};
+
+&nand0 {
+    iommus = <&smmu 0x872>;
+};
+
+&pcie {
+    iommus = <&smmu 0x4d0>;
+};
+
+&zynqmp_dpsub {
+    iommus = <&smmu 0xce3>;
+};
+
+&zynqmp_dpdma {
+    iommus = <&smmu 0xce4>;
+};
+
+&sata {
+    iommus = <&smmu 0x4c0>, <&smmu 0x4c1>, <&smmu 0x4c2>, <&smmu 0x4c3>;
+};

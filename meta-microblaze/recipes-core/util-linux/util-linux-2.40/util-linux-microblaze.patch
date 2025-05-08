@@ -1,0 +1,17 @@
+SECCOMP / Audit support needs to know about the microblaze architecture.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
+--- util-linux-2.40.4/include/audit-arch.h.orig	2025-03-29 14:37:22.925095934 -0600
++++ util-linux-2.40.4/include/audit-arch.h	2025-03-29 14:37:47.921422955 -0600
+@@ -75,6 +75,8 @@
+ #    endif
+ #elif __alpha__
+ #    define SECCOMP_ARCH_NATIVE AUDIT_ARCH_ALPHA
++#elif __microblaze__
++#    define SECCOMP_ARCH_NATIVE AUDIT_ARCH_MICROBLAZE
+ #else
+ #    error Unknown target architecture
+ #endif

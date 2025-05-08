@@ -10,9 +10,9 @@ inherit xlnx-embeddedsw nopackages
 COMPATIBLE_HOST = ".*"
 COMPATIBLE_MACHINE = ".*"
 
-PN = "embeddedsw-source-${PV}"
-WORKDIR = "${TMPDIR}/work-shared/embeddedsw-${PV}-${PR}"
-SSTATE_SWSPEC = "sstate:embeddedsw::${PV}:${PR}::${SSTATE_VERSION}:"
+PN = "embeddedsw-source-${ESW_VER}"
+WORKDIR = "${TMPDIR}/work-shared/embeddedsw-${ESW_VER}"
+SSTATE_SWSPEC = "sstate:embeddedsw::${ESW_VER}:r0::${SSTATE_VERSION}:"
 
 STAMP = "${STAMPS_DIR}/work-shared/embeddedsw-${PV}-${PR}"
 STAMPCLEAN = "${STAMPS_DIR}/work-shared/embeddedsw-${PV}-*"

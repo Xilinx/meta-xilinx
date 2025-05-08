@@ -6,7 +6,7 @@ PROVIDES += "qemu-system-native"
 python () {
     if (not d.getVar("PREFERRED_PROVIDER_qemu-system-native") and "qemu-system-native" != d.getVar("PN")) or \
        (d.getVar("PREFERRED_PROVIDER_qemu-system-native") and d.getVar("PREFERRED_PROVIDER_qemu-system-native") != d.getVar("PN")):
-        d.delVar("BB_DONT_CACHE")
+        d.setVar('BB_DONT_CACHE', '1')
         raise bb.parse.SkipRecipe("Set PREFERRED_PROVIDER_qemu-system-native to %s to enable it" % (d.getVar("PN")))
 }
 

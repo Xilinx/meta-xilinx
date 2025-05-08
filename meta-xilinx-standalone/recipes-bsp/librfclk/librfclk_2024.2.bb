@@ -15,7 +15,7 @@ RFCLK_SUBDIR = "XilinxProcessorIPLib/drivers/board_common/src/rfclk/src"
 
 do_compile:prepend() {
     cd ${S}/${RFCLK_SUBDIR}
-    cp Makefile.Linux Makefile
+    install Makefile.Linux Makefile
 }
 
 do_install() {

@@ -50,15 +50,16 @@ ATF_CONSOLE_DEFAULT:zynqmp = "cadence"
 ATF_CONSOLE_DEFAULT:versal = "pl011"
 ATF_CONSOLE_DEFAULT:versal-net = "pl011"
 ATF_CONSOLE ?= "${ATF_CONSOLE_DEFAULT}"
+TFA_CONSOLE ?= "${ATF_CONSOLE}"
 
 DEBUG_ATF_DEFAULT = ""
 DEBUG_ATF_DEFAULT:versal = "1"
 DEBUG_ATF_DEFAULT:versal-net = "1"
 DEBUG_ATF ?= "${DEBUG_ATF_DEFAULT}"
 
-EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_CONSOLE=${ATF_CONSOLE}' if d.getVar('ATF_CONSOLE', True) != '' else ''}"
-EXTRA_OEMAKE:append:versal = "${@' VERSAL_CONSOLE=${ATF_CONSOLE}' if d.getVar('ATF_CONSOLE', True) != '' else ''}"
-EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_CONSOLE=${ATF_CONSOLE}' if d.getVar('ATF_CONSOLE', True) != '' else ''}"
+EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE', True) != '' else ''}"
+EXTRA_OEMAKE:append:versal = "${@' VERSAL_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE', True) != '' else ''}"
+EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE', True) != '' else ''}"
 EXTRA_OEMAKE:append = " ${@bb.utils.contains('DEBUG_ATF', '1', ' DEBUG=${DEBUG_ATF}', '', d)}"
 
 OUTPUT_DIR = "${@bb.utils.contains('DEBUG_ATF', '1', '${B}/${PLATFORM}/debug', '${B}/${PLATFORM}/release', d)}"
@@ -129,16 +130,16 @@ INSANE_SKIP:${PN}:append:versal-net = " buildpaths"
 
 python() {
     soc_family = d.getVar('SOC_FAMILY')
-    atf_console = d.getVar('ATF_CONSOLE')
+    atf_console = d.getVar('TFA_CONSOLE')
 
     # See plat/xilinx/<soc_family>/platform.mk 
     if soc_family and soc_family == "zynqmp":
         if not atf_console in [ 'cadence', 'cadence0', 'cadence1', 'dcc' ]:
-            raise bb.parse.SkipRecipe('ATF_CONSOLE (%s) is not configured properly for ZynqMP, only cadence, cadence0, cadence1, and dcc are valid options.' % (atf_console))
+            raise bb.parse.SkipRecipe('TFA_CONSOLE (%s) is not configured properly for ZynqMP, only cadence, cadence0, cadence1, and dcc are valid options.' % (atf_console))
     elif soc_family and soc_family == "versal":
         if not atf_console in [ 'pl011', 'pl011_0', 'pl011_1', 'dcc' ]:
-            raise bb.parse.SkipRecipe('ATF_CONSOLE (%s) is not configured properly for Versal, only pl011, pl011_0, pl011_1, and dcc are valid options.' % (atf_console))
+            raise bb.parse.SkipRecipe('TFA_CONSOLE (%s) is not configured properly for Versal, only pl011, pl011_0, pl011_1, and dcc are valid options.' % (atf_console))
     elif soc_family and soc_family == "versal-net":
         if not atf_console in [ 'pl011', 'pl011_0', 'pl011_1', 'dcc' ]:
-            raise bb.parse.SkipRecipe('ATF_CONSOLE (%s) is not configured properly for Versal-Net, only pl011, pl011_0, pl011_1, and dcc are valid options.' % (atf_console))
+            raise bb.parse.SkipRecipe('TFA_CONSOLE (%s) is not configured properly for Versal-Net, only pl011, pl011_0, pl011_1, and dcc are valid options.' % (atf_console))
 }

@@ -18,8 +18,6 @@ S = "${UNPACKDIR}/git/src"
 
 inherit cmake pkgconfig
 
-BBCLASSEXTEND = "native nativesdk"
-
 PACKAGECONFIG ??= "aie"
 PACKAGECONFIG[aie] = ",,libxaiengine aiefal,libxaiengine aiefal"
 

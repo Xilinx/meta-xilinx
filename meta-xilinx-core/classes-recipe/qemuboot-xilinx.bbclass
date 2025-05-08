@@ -3,12 +3,7 @@
 OVERRIDES .= ":qemuboot-xilinx"
 
 # Default machine targets for Xilinx QEMU (FDT Generic)
-# Allow QB_MACHINE to be overridden by a BSP config
-QB_MACHINE ?= "${QB_MACHINE_XILINX}"
 QB_RNG=""
-QB_MACHINE_XILINX:aarch64 = "-machine arm-generic-fdt"
-QB_MACHINE_XILINX:arm = "-M arm-generic-fdt-7series"
-QB_MACHINE_XILINX:microblaze = "-M microblaze-fdt-plnx"
 
 QB_SYSTEM_NAME ?= "${@qemu_target_binary(d)}"
 QB_DEFAULT_FSTYPE ?= "${@qemu_rootfs_params(d,'fstype')}"
@@ -16,17 +11,10 @@ QB_ROOTFS ?= "${@qemu_rootfs_params(d,'rootfs')}"
 QB_ROOTFS_OPT ?= "${@qemu_rootfs_params(d,'rootfs-opt')}"
 QB_DTB ?= "${@qemu_default_dtb(d)}"
 
-# defaults
-QB_DEFAULT_KERNEL ?= "none"
-QB_DEFAULT_KERNEL:zynq ?= "${@'zImage' if \
-		d.getVar('INITRAMFS_IMAGE_BUNDLE') != '1' else 'zImage-initramfs-${MACHINE}.bin'}"
-QB_DEFAULT_KERNEL:microblaze ?= "${@'simpleImage.mb' if \
-		d.getVar('INITRAMFS_IMAGE_BUNDLE') != '1' else 'simpleImage.mb-initramfs-${MACHINE}.bin'}"
-
 # https://docs.amd.com/r/en-US/ug585-zynq-7000-SoC-TRM/Boot-Mode-Pin-Settings
 # https://docs.amd.com/r/en-US/ug1085-zynq-ultrascale-trm/Boot-Modes
 # https://docs.amd.com/r/en-US/ug1304-versal-acap-ssdg/Boot-Device-Modes
-QB_BOOT_MODE ?= "-boot mode=5"
+QEMU_HW_BOOT_MODE ?= "5"
 
 
 # ZynqMP or Versal SD and eMMC drive index.
@@ -39,9 +27,9 @@ QB_BOOT_MODE ?= "-boot mode=5"
 # ZynqMP, Versal              eMMC0(secondary boot only)  2
 # ZynqMP, Versal              eMMC1                       3
 
-QB_SD_DRIVE_INDEX ?= "1"
-QB_SD_DRIVE_INDEX:zynq ?= "0"
-QB_SD_DRIVE_INDEX:versal-net ?= "0"
+QEMU_HW_SD_DRIVE_INDEX ?= "1"
+QEMU_HW_SD_DRIVE_INDEX:zynq ?= "0"
+QEMU_HW_SD_DRIVE_INDEX:versal-net ?= "0"
 
 inherit qemuboot
 
@@ -66,7 +54,7 @@ def qemu_add_extra_args(data):
     deploy_dir = data.getVar('DEPLOY_DIR_IMAGE') or ""
     machine_name = data.getVar('MACHINE') or ""
     soc_family = data.getVar('SOC_FAMILY') or ""
-    boot_mode = data.getVar('QB_BOOT_MODE') or ""
+    boot_mode = data.getVar('QEMU_HW_BOOT_MODE') or ""
     qb_extra_args = ''
     # Add kernel image and boot.scr to qemu boot command when initramfs_image supplied
     kernel_name = ''
@@ -83,10 +71,10 @@ def qemu_add_extra_args(data):
             qb_extra_args = ' -device loader,file=%s,addr=%s,force-raw=on' % (kernel_image, kernel_loadaddr)
             qb_extra_args += ' -device loader,file=%s,addr=%s,force-raw=on' % (bootscr_image, bootscr_loadaddr)
         if soc_family in ('versal', 'versal-net'):
-            qb_extra_args += ' %s' % boot_mode
+            qb_extra_args += ' -boot mode=%s' % boot_mode
     else:
         if soc_family in ('zynqmp', 'versal', 'versal-net'):
-            qb_extra_args = ' %s' % boot_mode
+            qb_extra_args = ' -boot mode=%s' % boot_mode
     return qb_extra_args
 
 def qemu_rootfs_params(data, param):
@@ -94,7 +82,7 @@ def qemu_rootfs_params(data, param):
     bundle_image = data.getVar('INITRAMFS_IMAGE_BUNDLE') or ""
     soc_family = data.getVar('SOC_FAMILY') or ""
     tune_features = (data.getVar('TUNE_FEATURES') or []).split()
-    sd_index = data.getVar('QB_SD_DRIVE_INDEX') or ""
+    sd_index = data.getVar('QEMU_HW_SD_DRIVE_INDEX') or ""
     if 'microblaze' in tune_features:
         soc_family = 'microblaze'
 

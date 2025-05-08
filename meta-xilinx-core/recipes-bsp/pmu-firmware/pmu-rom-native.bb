@@ -21,7 +21,7 @@ do_compile[noexec] = "1"
 do_install[noexec] = "1"
 
 do_deploy () {
-	install -D ${S}/pmu-rom.elf ${DEPLOYDIR}/pmu-rom.elf
+	install -D ${S}/pmu-rom.elf ${DEPLOYDIR}/${PMU_ROM}
 }
 
 addtask deploy before do_build after do_install

@@ -7,11 +7,11 @@ python () {
     if bb.data.inherits_class('nativesdk', d):
         if (not d.getVar("PREFERRED_PROVIDER_nativesdk-qemu") and "nativesdk-qemu" != d.getVar("PN")) or \
            (d.getVar("PREFERRED_PROVIDER_nativesdk-qemu") and d.getVar("PREFERRED_PROVIDER_nativesdk-qemu") != d.getVar("PN")):
-            d.delVar("BB_DONT_CACHE")
+            d.setVar('BB_DONT_CACHE', '1')
             raise bb.parse.SkipRecipe("Set PREFERRED_PROVIDER_nativesdk-qemu to %s to enable it" % (d.getVar("PN")))
     elif (not d.getVar("PREFERRED_PROVIDER_qemu") and "qemu" != d.getVar("PN")) or \
        (d.getVar("PREFERRED_PROVIDER_qemu") and d.getVar("PREFERRED_PROVIDER_qemu") != d.getVar("PN")):
-        d.delVar("BB_DONT_CACHE")
+        d.setVar('BB_DONT_CACHE', '1')
         raise bb.parse.SkipRecipe("Set PREFERRED_PROVIDER_qemu to %s to enable it" % (d.getVar("PN")))
 
     if (d.getVar('BPN') != 'qemu'):

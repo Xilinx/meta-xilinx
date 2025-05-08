@@ -1,0 +1,29 @@
+From e8c26e0e79e4987716c321dcaf0b20c089388418 Mon Sep 17 00:00:00 2001
+From: Ashish Kumar Vishwakarma <ashishkumar.vishwakarma@amd.com>
+Date: Fri, 21 Mar 2025 11:56:20 +0000
+Subject: [PATCH] xf86-video-armsoc: Update xilinx drm driver name
+
+The DP driver name has been changed from xlnx to zynqmp-dpsub.
+Updating the driver name resolving display issues.
+
+Signed-off-by: Ashish Kumar Vishwakarma <ashishkumar.vishwakarma@amd.com>
+---
+ src/drmmode_xilinx/drmmode_xilinx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/drmmode_xilinx/drmmode_xilinx.c b/src/drmmode_xilinx/drmmode_xilinx.c
+index 0ed97ae..c6ed0be 100644
+--- a/src/drmmode_xilinx/drmmode_xilinx.c
++++ b/src/drmmode_xilinx/drmmode_xilinx.c
+@@ -62,7 +62,7 @@ static int create_custom_gem(int fd, struct armsoc_create_gem *create_gem)
+ }
+ 
+ struct drmmode_interface xilinx_interface = {
+-	"xlnx"                /* name of drm driver */,
++	"zynqmp-dpsub"        /* name of drm driver */,
+ 	1                     /* use_page_flip_events */,
+ 	1                     /* use_early_display */,
+ 	0                     /* cursor width */,
+-- 
+2.44.1
+

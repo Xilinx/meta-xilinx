@@ -7,7 +7,7 @@ Add the number of PP cores that is required for Zynq/ZynqMP configuration.
 
 Signed-off-by: Hyun Kwon <hyun.kwon@xilinx.com>
 Signed-off-by: Michal Simek <michal.simek@xilinx.com>
-Upstream Status: Inappropriate [Xilinx specific]
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  driver/src/devicedrv/mali/platform/arm/arm.c | 10 ++++++++++
  1 file changed, 10 insertions(+)

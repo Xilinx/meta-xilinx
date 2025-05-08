@@ -1,0 +1,134 @@
+From 46736b39c03646a124531ddd5b6a2bcf8be65242 Mon Sep 17 00:00:00 2001
+From: Yash Ladani <yash.ladani@amd.com>
+Date: Wed, 11 Dec 2024 01:04:50 -0800
+Subject: [PATCH] Update driver to make it compatible with 6.12 kernel
+
+- Updated shrinker functions
+- Use strscpy instead of strlcpy
+- .remove handler now returns void instead of int
+
+Signed-off-by: Yash Ladani <yash.ladani@amd.com>
+---
+ linux/mali_internal_sync.c |  4 ++++
+ linux/mali_kernel_linux.c  | 12 ++++++++++++
+ linux/mali_memory_os_alloc.c  |  9 ++++++++-
+ linux/mali_osk_mali.c      | 12 +++++++++---
+ 4 files changed, 33 insertions(+), 4 deletions(-)
+
+diff --git a/linux/mali_internal_sync.c b/linux/mali_internal_sync.c
+index 981b5b1..c5fb701 100644
+--- a/linux/mali_internal_sync.c
++++ b/linux/mali_internal_sync.c
+@@ -167,7 +167,11 @@ struct mali_internal_sync_timeline *mali_internal_sync_timeline_create(const str
+ #else
+ 	sync_timeline->fence_context = fence_context_alloc(1);
+ #endif
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 8, 0)
++	strscpy(sync_timeline->name, name, sizeof(sync_timeline->name));
++#else
+ 	strlcpy(sync_timeline->name, name, sizeof(sync_timeline->name));
++#endif
+ 
+ 	INIT_LIST_HEAD(&sync_timeline->sync_pt_list_head);
+ 	spin_lock_init(&sync_timeline->sync_pt_list_lock);
+diff --git a/linux/mali_kernel_linux.c b/linux/mali_kernel_linux.c
+index 050af67..d312ea7 100644
+--- a/linux/mali_kernel_linux.c
++++ b/linux/mali_kernel_linux.c
+@@ -187,7 +187,11 @@ static int mali_ioctl(struct inode *inode, struct file *filp, unsigned int cmd,
+ #endif
+ 
+ static int mali_probe(struct platform_device *pdev);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 11, 0)
++static void mali_remove(struct platform_device *pdev);
++#else
+ static int mali_remove(struct platform_device *pdev);
++#endif
+ 
+ static int mali_driver_suspend_scheduler(struct device *dev);
+ static int mali_driver_resume_scheduler(struct device *dev);
+@@ -692,7 +696,11 @@ clock_prepare_failed:
+ 	return -EFAULT;
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 11, 0)
++static void mali_remove(struct platform_device *pdev)
++#else
+ static int mali_remove(struct platform_device *pdev)
++#endif
+ {
+ #ifdef CONFIG_MALI_DEVFREQ
+ 	struct mali_device *mdev = dev_get_drvdata(&pdev->dev);
+@@ -736,7 +744,11 @@ static int mali_remove(struct platform_device *pdev)
+ 	mali_disable_clk();
+ #endif
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 11, 0)
++	return;
++#else
+ 	return 0;
++#endif
+ }
+ 
+ static int mali_miscdevice_register(struct platform_device *pdev)
+diff --git a/linux/mali_memory_os_alloc.c b/linux/mali_memory_os_alloc.c
+index a17210e..2e79277 100644
+--- a/linux/mali_memory_os_alloc.c
++++ b/linux/mali_memory_os_alloc.c
+@@ -799,7 +799,10 @@ _mali_osk_errcode_t mali_mem_os_init(void)
+ 	dma_set_attr(DMA_ATTR_WRITE_COMBINE, &dma_attrs_wc);
+ #endif
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0)
++
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	shrinker_register(&mali_mem_os_allocator.shrinker);
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0)
+ 	register_shrinker(&mali_mem_os_allocator.shrinker, "mali");
+ #else
+ 	register_shrinker(&mali_mem_os_allocator.shrinker);
+@@ -810,7 +813,11 @@ _mali_osk_errcode_t mali_mem_os_init(void)
+ void mali_mem_os_term(void)
+ {
+ 	struct mali_page_node *m_page, *m_tmp;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 7, 0)
++	shrinker_free(&mali_mem_os_allocator.shrinker);
++#else
+ 	unregister_shrinker(&mali_mem_os_allocator.shrinker);
++#endif
+ 	cancel_delayed_work_sync(&mali_mem_os_allocator.timed_shrinker);
+ 
+ 	if (NULL != mali_mem_os_allocator.wq) {
+diff --git a/linux/mali_osk_mali.c b/linux/mali_osk_mali.c
+index 3f66132..1218d2f 100644
+--- a/linux/mali_osk_mali.c
++++ b/linux/mali_osk_mali.c
+@@ -220,8 +220,10 @@ uintptr_t _mali_osk_resource_base_address(void)
+ void _mali_osk_device_data_pmu_config_get(u16 *domain_config_array, int array_size)
+ {
+ 	struct device_node *node = mali_platform_device->dev.of_node;
+-	struct property *prop;
+-	const __be32 *p;
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6,11,0)
++    struct property *prop;
++    const __be32 *p;
++#endif
+ 	int length = 0, i = 0;
+ 	u32 u;
+ 
+@@ -238,7 +240,11 @@ void _mali_osk_device_data_pmu_config_get(u16 *domain_config_array, int array_si
+ 		return;
+ 	}
+ 
+-	of_property_for_each_u32(node, "pmu_domain_config", prop, p, u) {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,11,0)
++	of_property_for_each_u32(node, "pmu_domain_config", u) {
++#else
++    of_property_for_each_u32(node, "pmu_domain_config", prop, p, u) {
++#endif
+ 		domain_config_array[i] = (u16)u;
+ 		i++;
+ 	}
+-- 
+2.34.1
+

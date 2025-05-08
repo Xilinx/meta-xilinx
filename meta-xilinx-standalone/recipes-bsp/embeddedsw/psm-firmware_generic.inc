@@ -42,8 +42,6 @@ do_compile() {
     # --build-id=none is required due to linker script not defining a location for it.
     # Again, recipe-systoot include is necessary
     oe_runmake CC_FLAGS="-MMD -MP -Wl,--build-id=none -I${STAGING_DIR_TARGET}/usr/include"
-
-    ${MB_OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
 }
 
 do_install() {
@@ -57,8 +55,6 @@ ESW_COMPONENT = "psmfw.elf"
 do_deploy() {
     install -Dm 0644 ${B}/${ESW_COMPONENT} ${DEPLOYDIR}/${PSM_FIRMWARE_BASE_NAME}.elf
     ln -sf ${PSM_FIRMWARE_BASE_NAME}.elf ${DEPLOYDIR}/${PSM_FIRMWARE_IMAGE_NAME}.elf
-    install -m 0644 ${B}/${ESW_COMPONENT}.bin ${DEPLOYDIR}/${PSM_FIRMWARE_BASE_NAME}.bin
-    ln -sf ${PSM_FIRMWARE_BASE_NAME}.bin ${DEPLOYDIR}/${PSM_FIRMWARE_IMAGE_NAME}.bin
 }
 
 addtask deploy before do_build after do_install

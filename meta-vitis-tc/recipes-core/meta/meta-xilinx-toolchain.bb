@@ -38,3 +38,9 @@ create_sdk_files:append:sdkmingw32 () {
         rm -f ${SDK_OUTPUT}/${SDKPATH}/relocate_sdk.py
         rm -f ${SDK_OUTPUT}/${SDKPATH}/post-relocate-setup.sh
 }
+
+BAREMETAL_ERROR = ""
+BAREMETAL_ERROR:baremetal-multilib-tc = "This configuration requires DISTRO set to xilinx-standalone."
+BAREMETAL_ERROR:baremetal-multilib-tc:xilinx-standalone = ""
+
+SKIP_RECIPE[meta-xilinx-toolchain] = "${BAREMETAL_ERROR}"

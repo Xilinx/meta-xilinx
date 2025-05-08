@@ -17,7 +17,7 @@ COMPATIBLE_HOST = ".*"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # Default expects the user to provide the psm-firmware in the deploy
-# directory, named "psm-firmware-${MACHINE}.elf" and "psm-firmware-${MACHINE}.bin"
+# directory, named "psm-firmware-${MACHINE}.elf"
 # A machine, multiconfig, or local.conf should override this
 PSM_DEPENDS ??= ""
 PSM_MCDEPENDS ??= ""
@@ -25,7 +25,7 @@ PSM_DEPLOY_DIR ??= "${DEPLOY_DIR_IMAGE}"
 PSM_FIRMWARE_DEPLOY_DIR[vardepsexclude] += "TOPDIR"
 PSM_FIRMWARE_IMAGE_NAME ??= "psm-firmware-${MACHINE}"
 
-# Default is for the multilib case (without the extension .elf/.bin)
+# Default is for the multilib case (without the extension .elf)
 PSM_FILE ??= "${PSM_FIRMWARE_DEPLOY_DIR}/${PSM_FIRMWARE_IMAGE_NAME}"
 PSM_FILE[vardepsexclude] = "PSM_FIRMWARE_DEPLOY_DIR"
 
@@ -49,7 +49,6 @@ do_deploy() {
     # If the item is already in OUR deploy_image_dir, nothing to deploy!
     if ${SHOULD_DEPLOY}; then
         install -Dm 0644 ${PSM_FILE}.elf ${DEPLOYDIR}/${PSM_FIRMWARE_IMAGE_NAME}.elf
-        install -Dm 0644 ${PSM_FILE}.bin ${DEPLOYDIR}/${PSM_FIRMWARE_IMAGE_NAME}.bin
     fi
 }
 
@@ -71,25 +70,28 @@ def check_psm_vars(d):
         d.setVar('BB_DONT_CACHE', '1')
 
         msg = ""
-        fail = False
         if not os.path.exists(d.getVar('PSM_FILE') + ".elf"):
             msg = msg + "The expected file %s.elf is not available.  " % d.getVar('PSM_FILE')
-            fail = True
-        if not os.path.exists(d.getVar('PSM_FILE') + ".bin"):
-            msg = msg + "The expected file %s.bin is not available.  " % d.getVar('PSM_FILE')
-            fail = True
-
-        if fail:
             if not d.getVar('WITHIN_EXT_SDK'):
                 raise bb.parse.SkipRecipe("%s\nSee the meta-xilinx-core README." % msg)
         else:
             # We found the file, so be sure to track it
-            d.setVar('SRC_URI', 'file://${PSM_FILE}.elf file://${PSM_FILE}.bin')
+            d.setVar('SRC_URI', 'file://${PSM_FILE}.elf')
             d.setVarFlag('do_install', 'file-checksums', '${PSM_FILE}.elf:True')
-            d.setVarFlag('do_deploy', 'file-checksums', '${PSM_FILE}.elf:True ${PSM_FILE}.bin:True')
+            d.setVarFlag('do_deploy', 'file-checksums', '${PSM_FILE}.elf:True')
 
 python() {
     # Need to allow bbappends to change the check
     check_psm_vars(d)
+
+    # Fix the mcdepends dependency format: mc:from-mc:to-mc:recipe:task
+    # If the value is 'mc::' we'll adjust it to be mc:BB_CURRENT_MC: (temporary workaround)
+    # If the value is 'mc:default:' we'll adjuts it to be mc:: (temporary workaround for bitbake bug)
+    mcdepend = d.getVar('PSM_MCDEPENDS')
+    if mcdepend:
+        if d.getVar('BB_CURRENT_MC') == 'default':
+            d.setVar('PSM_MCDEPENDS', mcdepend.replace('mc:default:', 'mc::'))
+        else:
+            d.setVar('PSM_MCDEPENDS', mcdepend.replace('mc::', 'mc:${BB_CURRENT_MC}:'))
 }
 

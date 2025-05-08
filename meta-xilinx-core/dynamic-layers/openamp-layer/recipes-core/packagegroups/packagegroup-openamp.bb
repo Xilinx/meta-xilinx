@@ -25,7 +25,10 @@ RDEPENDS:${PN}-matrix-mul:append:zcu102-zynqmp = " openamp-fw-mat-muld"
 RDEPENDS:${PN}-rpc-demo = "rpmsg-proxy-app"
 RDEPENDS:${PN}-rpc-demo:append:zcu102-zynqmp = " openamp-fw-rpc-demo"
 
-RDEPENDS:${PN}:append = " ${@'open-amp-device-tree' if d.getVar('ENABLE_OPENAMP_DTSI') != '1' else ''}"
+# ENABLE_OPENAMP_DTSI = 0 or empty: Build a dtbo
+# ENABLE_OPENAMP_DTSI = 1: Bundle into the device-tree the openamp items
+# ENABLE_OPENAMP_DTSI = 2 (!= 0, 1 or empty): Do nothing, assume openamp is already integrated into the device-tree
+RDEPENDS:${PN}:append = " ${@'open-amp-device-tree' if not d.getVar('ENABLE_OPENAMP_DTSI') or d.getVar('ENABLE_OPENAMP_DTSI') == '0' else ''}"
 
 RDEPENDS:${PN}:append = " \
 	libmetal \

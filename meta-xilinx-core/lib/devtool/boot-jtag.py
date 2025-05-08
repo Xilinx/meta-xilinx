@@ -68,7 +68,7 @@ def bootjtag(args, config, basepath, workspace):
     print("INFO: MACHINE: " + machine)
 
     if arch != 'microblazeel':
-        if "fpga-overaly" in machine_features:
+        if "fpga-overlay" in machine_features:
             print("INFO: fpga-overlay MACHINE_FEATURES is enabled, Hence PL bitstream or PDI will not be loaded at initial boot, User can load from u-boot or linux.")
         else:
             print("INFO: fpga-overlay MACHINE_FEATURES is not enabled, Hence PL bitstream or PDI will be loaded at initial boot.")
@@ -78,7 +78,7 @@ def bootjtag(args, config, basepath, workspace):
 
     # For MB, Zynq 7000 and ZynqMP.
     if arch == 'microblazeel' or soc == 'zynq' or soc == 'zynqmp':
-        if not "fpga-overaly" in machine_features:
+        if not "fpga-overlay" in machine_features:
             data['bit'] = glob.glob(os.path.join(deploy_dir, '*' + machine + '.bit'))[0]
         data['uboot'] = os.path.join(deploy_dir, 'u-boot.elf')
         data['dtb'] = os.path.join(deploy_dir, machine + '-system.dtb')
@@ -122,7 +122,7 @@ def bootjtag(args, config, basepath, workspace):
         lines.append('    if { [ta] != "" } break;')
         lines.append('    after 50')
         lines.append('}')
-        if not "fpga-overaly" in machine_features:
+        if not "fpga-overlay" in machine_features:
             lines.append('')
             lines.append('puts stderr "INFO: Configuring the PL ..."')
             lines.append('puts stderr "INFO: Downloading bitstream: ' + data['bit'] + '"')

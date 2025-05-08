@@ -1,6 +1,8 @@
 SUMMARY = "Xilinx's fork of a fast open source processor emulator"
 HOMEPAGE = "https://github.com/xilinx/qemu/"
 
+CVE_PRODUCT = "qemu"
+
 # This qemu fork is NOT compatible with running on a 32-bit system
 # See: https://github.com/Xilinx/qemu/issues/35
 COMPATIBLE_HOST:arm = "null"

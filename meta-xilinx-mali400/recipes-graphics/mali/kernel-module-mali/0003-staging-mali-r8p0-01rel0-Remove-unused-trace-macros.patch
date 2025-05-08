@@ -7,7 +7,7 @@ TRACE_SYSTEM_STRING is not need in each trace file anymore.
 
 Signed-off-by: Hyun Kwon <hyun.kwon@xilinx.com>
 Signed-off-by: Madhurkiran Harikrishnan <madhurki@xilinx.com>
-Upstream Status: Pending
+Upstream-Status: Pending
 ---
  driver/src/devicedrv/mali/linux/mali_linux_trace.h | 2 --
  1 file changed, 2 deletions(-)

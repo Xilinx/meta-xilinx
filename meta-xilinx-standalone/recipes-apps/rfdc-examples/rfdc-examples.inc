@@ -21,5 +21,5 @@ RFDC_SUBDIR = "XilinxProcessorIPLib/drivers/rfdc/examples"
 
 do_compile:prepend () {
     cd ${S}/${RFDC_SUBDIR}
-    cp Makefile.Linux Makefile
+    install Makefile.Linux Makefile
 }

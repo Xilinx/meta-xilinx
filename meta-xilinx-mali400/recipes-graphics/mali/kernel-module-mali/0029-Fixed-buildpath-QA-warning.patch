@@ -10,7 +10,7 @@ QA Issue: File /lib/modules/6.6.10-xilinx-v2024.1-g2c37bbe14ced/updates/mali.ko
  reference to TMPDIR [buildpaths]" from the log file.
 
 Signed-off-by: Parth Gajjar <parth.gajjar@amd.com>
-
+Upstream-Status: Inappropriate [Xilinx specific]
 diff --git a/Kbuild b/Kbuild
 index 8c6e6e0..2b8632b 100644
 --- a/Kbuild

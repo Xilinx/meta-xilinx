@@ -9,7 +9,7 @@ timer_setup API. For more information refer kernel commit
 
 Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
 Reviewed-by: Hyun Kwon <hyun.kwon@xilinx.com>
-Upstream Status: Pending
+Upstream-Status: Pending
 ---
  driver/src/devicedrv/mali/common/mali_control_timer.c |  6 ++++++
  driver/src/devicedrv/mali/common/mali_group.c         |  6 ++++++

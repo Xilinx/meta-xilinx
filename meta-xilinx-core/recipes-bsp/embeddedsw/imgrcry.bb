@@ -66,4 +66,14 @@ def check_imgrcry_variables(d):
 python() {
     # Need to allow bbappends to change the check
     check_imgrcry_variables(d)
+
+    # Fix the mcdepends dependency format: mc:from-mc:to-mc:recipe:task
+    # If the value is 'mc::' we'll adjust it to be mc:BB_CURRENT_MC: (temporary workaround)
+    # If the value is 'mc:default:' we'll adjuts it to be mc:: (temporary workaround for bitbake bug)
+    mcdepend = d.getVar('IMGRCRY_MCDEPENDS')
+    if mcdepend:
+        if d.getVar('BB_CURRENT_MC') == 'default':
+            d.setVar('IMGRCRY_MCDEPENDS', mcdepend.replace('mc:default:', 'mc::'))
+        else:
+            d.setVar('IMGRCRY_MCDEPENDS', mcdepend.replace('mc::', 'mc:${BB_CURRENT_MC}:'))
 }

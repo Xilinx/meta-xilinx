@@ -8,6 +8,7 @@ From kernel 4.20 onwards, support for vm_insert_pfn is deprecated.
 Hence, replace the same with vmf_insert_pfn.
 
 Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  .../devicedrv/mali/linux/mali_memory_block_alloc.c   |  6 +++++-
  driver/src/devicedrv/mali/linux/mali_memory_cow.c    | 14 ++++++++++++--

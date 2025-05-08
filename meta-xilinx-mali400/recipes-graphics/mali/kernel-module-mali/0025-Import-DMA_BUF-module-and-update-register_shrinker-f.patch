@@ -9,6 +9,7 @@ register_shrinker function call now requires two arguments
 for kernel 5.16 or higher updated this function call.
 
 Signed-off-by: Yash Ladani <yash.ladani@amd.com>
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  linux/mali_memory_dma_buf.c  | 4 ++++
  linux/mali_memory_os_alloc.c | 5 ++++-

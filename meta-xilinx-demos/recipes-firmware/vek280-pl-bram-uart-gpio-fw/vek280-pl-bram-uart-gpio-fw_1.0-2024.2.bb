@@ -5,12 +5,11 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 inherit dfx_user_dts
 
-SRC_URI = "https://petalinux.xilinx.com/sswreleases/rel-v2024.2/sdt/2024.2/2024.2_1106_1_11061206/external/vek280-pl-bram-gpio-fw/vek280-pl-bram-gpio-fw_2024.2_1106_1.tar.gz"
+SRC_URI = "https://petalinux.xilinx.com/sswreleases/rel-v2024.2/sdt/2024.2/2024.2_1111_2_02260716/external/vek280-pl-bram-gpio-fw/vek280-pl-bram-gpio-fw_2024.2_1111_1.tar.gz"
 
-SRC_URI[sha256sum] = "bf7688694a27a0f81e7d59d16c2b819994aa5fb8adfb0d94656da4040e4bc279"
+SRC_URI[sha256sum] = "0c31d5595368ae796c7aac0344e084225fb9abe3ecf4c2f17583191a8196aed4"
 
-COMPATIBLE_MACHINE:versal-vek280-sdt-seg = "${MACHINE}"
-COMPATIBLE_MACHINE:versal-vek280-sdt-seg-ospi = "${MACHINE}"
+COMPATIBLE_MACHINE = "${MACHINE}"
 
 # When do_upack is exectuted it will extract tar file with original directory
 # name so set the FW_DIR pointing to pdi and dtsi files.

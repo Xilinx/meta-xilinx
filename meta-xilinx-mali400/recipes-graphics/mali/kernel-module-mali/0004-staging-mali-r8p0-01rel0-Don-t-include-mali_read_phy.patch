@@ -7,7 +7,7 @@ Subject: [PATCH 4/9] staging: mali: r8p0-01rel0: Don't include
 mali_read_phys() is not used with CONFIG_ARCH_ZYNQ and CONFIG_ARCH_ZYNQMP.
 
 Signed-off-by: Hyun Kwon <hyun.kwon@xilinx.com>
-Upstream Status: Inappropriate [Xilinx specific]
+Upstream-Status: Inappropriate [Xilinx specific]
 ---
  driver/src/devicedrv/mali/platform/arm/arm.c | 4 ++++
  1 file changed, 4 insertions(+)

@@ -18,7 +18,7 @@ DFECCF_SUBDIR = "XilinxProcessorIPLib/drivers/dfeccf/src"
 
 do_compile:prepend() {
     cd ${S}/${DFECCF_SUBDIR}
-    cp Makefile.Linux Makefile
+    install Makefile.Linux Makefile
 }
 
 do_install() {
