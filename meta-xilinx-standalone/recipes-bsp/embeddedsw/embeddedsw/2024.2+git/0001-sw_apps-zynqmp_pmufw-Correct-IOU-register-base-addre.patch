@@ -13,6 +13,8 @@ IOU_AXI_RPRTCN registers, which caused an IO mux malfunction.
 This patch corrects the base addresses for these registers to ensure
 proper operation of GEM2 and QSPI.
 
+Upstream-Status: Backport
+
 Signed-off-by: Ronak Jain <ronak.jain@amd.com>
 Acked-by: Buddhabhatti, Jay <jay.buddhabhatti@amd.com>
 ---
