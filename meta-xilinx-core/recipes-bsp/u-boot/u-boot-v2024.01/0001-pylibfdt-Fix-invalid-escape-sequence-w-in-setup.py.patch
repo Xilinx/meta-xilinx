@@ -1,0 +1,42 @@
+From d4c84d7062ecd739de8ed509782f52ddb9109f32 Mon Sep 17 00:00:00 2001
+From: Florian Schmaus <flo@geekplace.eu>
+Date: Tue, 20 Feb 2024 08:52:48 -0500
+Subject: [PATCH] pylibfdt: Fix "invalid escape sequence '\w'" in setup.py
+
+Once u-boot's build system invokes
+
+python3 scripts/dtc/pylibfdt/setup.py --quiet build_ext --inplace
+
+it may fail with
+
+scripts/dtc/pylibfdt/setup.py:40: SyntaxWarning: invalid escape sequence '\w'
+  RE_KEY_VALUE = re.compile('(?P<key>\w+) *(?P<plus>[+])?= *(?P<value>.*)$')
+
+depending on the used Python version.
+
+Explicitly mark the regex string as raw string to avoid the warning.
+
+Upstream-Status: Backport [d4c84d7062ecd739de8ed509782f52ddb9109f32]
+
+Signed-off-by: Florian Schmaus <flo@geekplace.eu>
+Reviewed-by: Heinrich Schuchardt <heinrich.schuchardt@canonical.com>
+---
+ scripts/dtc/pylibfdt/setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/dtc/pylibfdt/setup.py b/scripts/dtc/pylibfdt/setup.py
+index 8baae08770c..c6fe5a6a446 100755
+--- a/scripts/dtc/pylibfdt/setup.py
++++ b/scripts/dtc/pylibfdt/setup.py
+@@ -37,7 +37,7 @@ with open(os.path.join(srcdir, "../README"), "r") as fh:
+     long_description = fh.read()
+ 
+ # Decodes a Makefile assignment line into key and value (and plus for +=)
+-RE_KEY_VALUE = re.compile('(?P<key>\w+) *(?P<plus>[+])?= *(?P<value>.*)$')
++RE_KEY_VALUE = re.compile(r'(?P<key>\w+) *(?P<plus>[+])?= *(?P<value>.*)$')
+ 
+ def get_top_builddir():
+     if '--top-builddir' in sys.argv:
+-- 
+2.34.1
+

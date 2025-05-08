@@ -15,3 +15,8 @@ HAS_PLATFORM_INIT ?= " \
 DEPENDS += "bc-native dtc-native python3-setuptools-native gnutls-native"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/u-boot-v2024.01:"
+
+SRC_URI += " \
+	file://0001-pylibfdt-Fix-invalid-escape-sequence-w-in-setup.py.patch \
+	file://0001-scripts-dtc-pylibfdt-libfdt.i_shipped-Use-SWIG_Appen.patch \
+	"
