@@ -1,0 +1,79 @@
+From 2802de720bccb386675a41b3dc95c3f75a472428 Mon Sep 17 00:00:00 2001
+From: Jonathan Stroud <jonathan.stroud@amd.com>
+Date: Fri, 18 Apr 2025 13:45:18 -0600
+Subject: [PATCH 2/4] Proper support binary string fields
+
+Signed-off-by: Jonathan Stroud <jonathan.stroud@amd.com>
+---
+ frugy/types.py | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/frugy/types.py b/frugy/types.py
+index 8df67f9..ce541a0 100644
+--- a/frugy/types.py
++++ b/frugy/types.py
+@@ -130,6 +130,9 @@ class StringField():
+     })
+ 
+     def bit_size(self) -> int:
++        def size_bin(val: str) -> int:
++            return int(len(val) / 2)
++
+         def size_plain(val: str) -> int:
+             return len(val)
+ 
+@@ -142,7 +145,7 @@ class StringField():
+             return n // 2
+ 
+         size_fn = {
+-            StringFmt.BIN: size_plain,
++            StringFmt.BIN: size_bin,
+             StringFmt.BCD_PLUS: size_bcd_plus,
+             StringFmt.ASCII_6BIT: size_6bit,
+             StringFmt.ASCII_8BIT: size_plain
+@@ -153,6 +156,13 @@ class StringField():
+         return self.bit_size() // 8
+ 
+     def serialize(self) -> bytearray:
++        def ser_bin(val: str) -> bytearray:
++            try:
++                val = bytearray(bytes.fromhex(val))
++            except:
++                val = b""
++            return val
++
+         def ser_plain(val: str) -> bytearray:
+             return val.encode(_en_decode)
+ 
+@@ -167,7 +177,7 @@ class StringField():
+             return bitstruct.pack('u2u6', self._format.value, len(val))
+ 
+         ser_fn = {
+-            StringFmt.BIN: ser_plain,
++            StringFmt.BIN: ser_bin,
+             StringFmt.BCD_PLUS: ser_bcd_plus,
+             StringFmt.ASCII_6BIT: ser_6bit,
+             StringFmt.ASCII_8BIT: ser_plain
+@@ -176,6 +186,10 @@ class StringField():
+         return ser_type_length(result) + result
+ 
+     def deserialize(self, input: bytearray) -> bytearray:
++        def deser_bin(val: bytearray) -> str:
++            strval = str(val)
++            return val.hex()
++
+         def deser_plain(val: bytearray) -> str:
+             return val.decode(_en_decode)
+ 
+@@ -195,7 +209,7 @@ class StringField():
+         payload, remainder = remainder[:payload_len], remainder[payload_len:]
+ 
+         deser_fn = {
+-            StringFmt.BIN: deser_plain,
++            StringFmt.BIN: deser_bin,
+             StringFmt.BCD_PLUS: deser_bcd_plus,
+             StringFmt.ASCII_6BIT: deser_6bit,
+             StringFmt.ASCII_8BIT: deser_plain
+-- 
+2.34.1
+

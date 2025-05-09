@@ -1,0 +1,32 @@
+From c06348ff04c3ff61a49f1c429c741bf07988062a Mon Sep 17 00:00:00 2001
+From: Jonathan Stroud <jonathan.stroud@amd.com>
+Date: Fri, 18 Apr 2025 11:37:52 -0600
+Subject: [PATCH 4/4] Allow reading from files without .bin so you can read
+ sysfs directly
+
+---
+ frugy/cli.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/frugy/cli.py b/frugy/cli.py
+index 68a15ed..195c8f5 100644
+--- a/frugy/cli.py
++++ b/frugy/cli.py
+@@ -182,10 +182,10 @@ def main():
+ 
+     basename, ext = os.path.splitext(os.path.basename(args.srcfile))
+ 
+-    if read_mode and ext != '.bin':
+-        print('Cowardly refusing to read a FRU file not ending with .bin',
+-              file=sys.stderr)
+-        sys.exit(1)
++    #if read_mode and ext != '.bin':
++    #    print('Cowardly refusing to read a FRU file not ending with .bin',
++    #          file=sys.stderr)
++    #    sys.exit(1)
+     if not read_mode and ext != '.yml' and ext != '.yaml':
+         print('Cowardly refusing to read a YAML file not ending with .yaml or .yml', file=sys.stderr)
+         sys.exit(1)
+-- 
+2.34.1
+
