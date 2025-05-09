@@ -1,0 +1,37 @@
+From 89b0e7a69a07025874b94478efdc5d1280b1704c Mon Sep 17 00:00:00 2001
+From: "Andrew G. Morgan" <morgan@kernel.org>
+Date: Sun, 23 Mar 2025 06:30:29 -0700
+Subject: [PATCH] Add support for some less mainstream architectures.
+
+These (__alpha__, __hppa__, __sh__) don't have the SA_RESTORER
+complication, so hopefully can "just work". I'm relying on Debian's
+build servers to confirm.
+
+See: https://bugzilla.kernel.org/show_bug.cgi?id=219915
+
+Signed-off-by: Andrew G. Morgan <morgan@kernel.org>
+
+Upstream-Status: Backport [89b0e7a69a07025874b94478efdc5d1280b1704c]
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ psx/psx_calls.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/psx/psx_calls.c b/psx/psx_calls.c
+index 99e1d51..2651f22 100644
+--- a/psx/psx_calls.c
++++ b/psx/psx_calls.c
+@@ -36,7 +36,8 @@
+ #if defined(__x86_64__) || defined(__i386__)	   \
+     || defined(__arm__) || defined(__aarch64__)	   \
+     || defined(__mips__) || defined(__loongarch__) \
+-    || defined(__powerpc__) || defined(__s390__) || defined(__riscv)
++    || defined(__powerpc__) || defined(__s390__) || defined(__riscv) \
++    || defined(__alpha__) || defined(__hppa__) || defined(__sh__)
+ 
+ #undef _NSIG
+ #undef _NSIG_BPW
+-- 
+2.34.1
+

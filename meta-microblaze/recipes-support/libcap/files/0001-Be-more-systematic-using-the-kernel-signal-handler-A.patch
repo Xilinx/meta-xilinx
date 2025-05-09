@@ -1,0 +1,97 @@
+From 07d8ce731d5fe9063abfef4a77306e273b18b5f3 Mon Sep 17 00:00:00 2001
+From: "Andrew G. Morgan" <morgan@kernel.org>
+Date: Sat, 29 Mar 2025 08:01:03 -0700
+Subject: [PATCH] Be more systematic using the kernel signal handler APIs.
+
+Each architecture seems to have its own nuance. Found a way
+to get the kernel header compilation to confirm what sigaction
+structure is expected by the kernel. This made a few differences
+and I am hoping it addresses why the alpha build fails with
+debian's sid compile. It makes some changes to memory reservation
+for other architectures, arm64 (aka aarch64) in particular.
+
+Signed-off-by: Andrew G. Morgan <morgan@kernel.org>
+
+Upstream-Status: Backport [07d8ce731d5fe9063abfef4a77306e273b18b5f3]
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ psx/psx_calls.c | 37 +++++++++++++++++++++++++++++--------
+ 1 file changed, 29 insertions(+), 8 deletions(-)
+
+diff --git a/psx/psx_calls.c b/psx/psx_calls.c
+index 9b7d1d5..9662fbd 100644
+--- a/psx/psx_calls.c
++++ b/psx/psx_calls.c
+@@ -32,6 +32,16 @@
+  * Coupled with the glibc suppression of access to the exact signal we
+  * want to use, we have ended up just inlining all architecture
+  * support here.
++ *
++ * To figure out all this stuff, I started with the following in the
++ * linux source tree:
++ *
++ *  mkdir -p junk/uapi
++ *  ln -s ../include/asm-generic ./junk/asm
++ *  ln -s ../../include/uapi/asm-generic ./junk/uapi/asm
++ *  a=arm ; gcc -I ./arch/$a/include -I ./arch/$a/include/generated \
++ *    -I ./include -I ./tools/include/generated/ -I ./junk \
++ *    -E ./include/uapi/linux/signal.h | less -psigaction
+  */
+ #if defined(__x86_64__) || defined(__i386__)	   \
+     || defined(__arm__) || defined(__aarch64__)	   \
+@@ -58,14 +68,20 @@
+ #define _NSIG_WORDS  (_NSIG / _NSIG_BPW)
+ 
+ #if defined(__x86_64__) || defined(__i386__) \
+-    || defined(__arm__) || defined(__powerpc__) \
+-    || defined(__m68k__) || defined(__sh__) || defined(__sparc__)
+-/* field defined */
+-#define _HAS_SA_RESTORER 1
+-#if !(defined(__m68k__) || defined(__sh__) || defined(__sparc__))
++    || defined(__arm__) \
++    || defined(__powerpc__)
+ /* field used */
+ #define SA_RESTORER  0x04000000
+ #endif /* architectures that use SA_RESTORER */
++
++#if defined(SA_RESTORER) \
++    || defined(__aarch64__) \
++    || defined(__m68k__) || defined(__sh__) || defined(__sparc__) \
++    || defined(__s390__) || defined(__sparc__)
++/* field defined */
++#define _HAS_SA_RESTORER   void *sa_restorer;
++#else
++#define _HAS_SA_RESTORER
+ #endif /* architectures that include sa_restorer field */
+ 
+ typedef struct {
+@@ -75,6 +91,12 @@ typedef struct {
+ #define sigset_t psx_sigset_t
+ 
+ struct psx_sigaction {
++#if defined(__m68k__) || defined(__alpha__)
++    void *sa_handler;
++    sigset_t sa_mask;
++    unsigned long sa_flags;
++    _HAS_SA_RESTORER
++#else /* ndef (__m68k__ or __alpha__) */
+ #if defined(__mips__)
+     unsigned long sa_flags;
+     void *sa_handler;
+@@ -82,10 +104,9 @@ struct psx_sigaction {
+     void *sa_handler;
+     unsigned long sa_flags;
+ #endif
+-#ifdef _HAS_SA_RESTORER
+-    void *sa_restorer;
+-#endif
++    _HAS_SA_RESTORER
+     sigset_t sa_mask;
++#endif /* def (__m68k__ or __alpha__) */
+ };
+ 
+ #define sigaction psx_sigaction
+-- 
+2.34.1
+
