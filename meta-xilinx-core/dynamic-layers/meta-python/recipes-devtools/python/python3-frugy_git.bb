@@ -7,7 +7,10 @@ FILESEXTRAPATHS: := "${THISDIR}/${PN}:"
 
 SRC_URI = " \
     git://github.com/MicroTCA-Tech-Lab/frugy.git;branch=master;protocol=https \
-	file://0001-Add-support-for-xilinx-multirecords.patch"
+	file://0001-Add-Xilinx-Vendor-multirecords.patch \
+	file://0002-Proper-support-binary-string-fields.patch \
+	file://0003-Add-support-for-multiple-string-types.patch \
+	file://0004-Allow-reading-from-files-without-.bin-so-you-can-rea.patch"
 
 SRCREV = "799d61a092a317947e5965170d96286cbe1eacf2"
 

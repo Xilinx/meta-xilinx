@@ -1,0 +1,80 @@
+From bb2f426c4d6cac1aacd1b7f2ed6e142dd6c235f8 Mon Sep 17 00:00:00 2001
+From: Jonathan Stroud <jonathan.stroud@amd.com>
+Date: Wed, 23 Apr 2025 20:15:24 -0600
+Subject: [PATCH 3/4] Add support for multiple string types
+
+---
+ frugy/types.py | 45 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 43 insertions(+), 2 deletions(-)
+
+diff --git a/frugy/types.py b/frugy/types.py
+index ce541a0..85938d2 100644
+--- a/frugy/types.py
++++ b/frugy/types.py
+@@ -223,6 +223,9 @@ class StringField():
+     def to_dict(self):
+         return self._value
+ 
++    def format(self):
++        return self._format
++
+     def update(self, value):
+         self._value = value
+ 
+@@ -321,13 +324,51 @@ class CustomStringArray:
+             self.update(initdict)
+ 
+     def update(self, initdict):
+-        self.strings = [StringField(v, format = StringFmt.BIN) for v in initdict]
++        try:
++            for v, k in initdict.items():
++                if v == "ASCII_8BIT":
++                    for s in k:
++                        self.strings += [StringField(s, format = StringFmt.ASCII_8BIT)]
++                elif v == "BIN":
++                    for s in k:
++                        self.strings += [StringField(s, format = StringFmt.BIN)]
++                elif v == "BCD_PLUS":
++                    for s in k:
++                        self.strings += [StringField(s, format = StringFmt.BCD_PLUS)]
++                elif v == "ASCII_6BIT":
++                    for s in k:
++                        self.strings += [StringField(s, format = StringFmt.ASCII_6BIT)]
++        except:
++            self.strings = [StringField(v, format = StringFmt.BIN) for v in initdict]
+ 
+     def __repr__(self):
+         return self.to_dict().__repr__()
+ 
+     def to_dict(self):
+-        return [v.to_dict() for v in self.strings]
++        ret = {}
++        for v in self.strings:
++            if v.format() == StringFmt.ASCII_8BIT:
++                if "ASCII_8BIT" in ret:
++                    ret["ASCII_8BIT"] += [v.to_dict()]
++                else:
++                    ret["ASCII_8BIT"] = [v.to_dict()]
++            elif v.format() == StringFmt.ASCII_6BIT:
++                if "ASCII_6BIT" in ret:
++                    ret["ASCII_6BIT"] += [v.to_dict()]
++                else:
++                    ret["ASCII_6BIT"] = [v.to_dict()]
++            elif v.format() == StringFmt.BCD_PLUS:
++                if "BCD_PLUS" in ret:
++                    ret["BCD_PLUS"] += [v.to_dict()]
++                else:
++                    ret["BCD_PLUS"] = [v.to_dict()]
++            elif v.format() == StringFmt.BIN:
++                if "BIN" in ret:
++                    ret["BIN"] += [v.to_dict()]
++                else:
++                    ret["BIN"] = [v.to_dict()]
++
++        return ret
+ 
+     def serialize(self):
+         result = b''
+-- 
+2.34.1
+
