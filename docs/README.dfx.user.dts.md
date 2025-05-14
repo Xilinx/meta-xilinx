@@ -1,12 +1,13 @@
 # Build Instructions to create firmware recipes using dfx_user_dts bbclass
 
-* [Introduction](#introduction)
-* [How to create a firmware recipe app](#how-to-create-a-firmware-recipe-app)
-* [Test Procedure on Target](#test-procedure-on-target)
-  * [Loading PL bitstream or pdi and dt overlay](#loading-pl-bitstream-or-pdi-and-dt-overlay)
-  * [Testing PL functionality](#testing-pl-functionality)
-  * [Unloading PL bitstream or pdi and dt overlay](#unloading-pl-bitstream-or-pdi-and-dt-overlay)
-* [References](#references)
+- [Build Instructions to create firmware recipes using dfx\_user\_dts bbclass](#build-instructions-to-create-firmware-recipes-using-dfx_user_dts-bbclass)
+  - [Introduction](#introduction)
+  - [How to create a firmware recipe app](#how-to-create-a-firmware-recipe-app)
+  - [Test Procedure on Target](#test-procedure-on-target)
+    - [Loading PL bitstream or pdi and dt overlay](#loading-pl-bitstream-or-pdi-and-dt-overlay)
+    - [Testing PL functionality](#testing-pl-functionality)
+    - [Unloading PL bitstream or pdi and dt overlay](#unloading-pl-bitstream-or-pdi-and-dt-overlay)
+  - [References](#references)
 
 ## Introduction
 This readme describes the build instructions to create firmware recipes using
@@ -73,7 +74,7 @@ SRC_URI = " \
 ```
 
 ```
-# Versal Segmented Configuration design
+# Versal/Versal-2ve-2vm Segmented Configuration design
 SRC_URI = " \
     file://<flat_design>_pld.pdi \
     file://<flat_design>_pld.dtsi \
@@ -82,7 +83,7 @@ SRC_URI = " \
 ```
 
 ```
-# Versal Segmented Configuration design
+# Versal/Versal-2ve-2vm Segmented Configuration design
 SRC_URI = " \
     file://<flat_design>_pld.pdi \
     file://<flat_design>_pld.dtbo \
@@ -91,7 +92,7 @@ SRC_URI = " \
 ```
 
 ```
-# Versal Segmented Configuration design
+# Versal/Versal-2ve-2vm Segmented Configuration design
 SRC_URI = " \
     file://<flat_design>_pld.pdi \
     file://shell.json \
@@ -283,56 +284,99 @@ SRC_URI = " \
 
 1. Follow SDT or XSCT Build instructions whichever build method is used but not
    both.
-    a. [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.md) upto step 4.
-    b. [XSCT Building Instructions](../README.building.md)
-       upto step 4.b (With SDT overlay).
-2. Create recipes-firmware directory in meta layer and copy the .bit/bin/pdi,
-   .dtsi/dtbo, .json and .xclbin file to these directories.
-```
-$ mkdir -p <meta-layer>/recipes-firmware/<recipes-firmware-app>/files
-$ cp -r <path-to-files>/*.{bit or bin or pdi, dtsi or dtbo, shell.json or accel.json and .xclbin} <meta-layer>/recipes-firmware/<firmware-app-name>/files
-```
-3. Now create the recipes for flat or static or partial firmware using recipetool.
-```
-$ recipetool create -o <meta-layer>/recipes-firmware/<firmware-app-name>/firmware-app-name.bb file:///<meta-layer>/recipes-firmware/<firmware-app-name>/files
-```
-4. Modify the recipe and inherit dfx_user_dts bbclass as shown below.
-```
-SUMMARY = "Full Bitstream loading app firmware using dfx_user_dts bbclass"
-LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+    1. [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.bsp.md)
+        upto step 4 (With SDT overlay).
+    2. [XSCT Building Instructions](../README.building.md)
+    3. Below example uses zynqmp-zcu111 machine fw files.
 
-inherit dfx_user_dts
+2. Create recipes-firmware and files directory in distribution or bsp meta layer.
+    > **Note:**
+    >   1. If a distribution or bsp meta layer doesn't exists then create one using
+    >   `bitbake-layers create-layer` command.
+    >   2. Make sure meta layer is include using `bitbake-layers add-layer` command.
+    ```
+    $ mkdir -p <path-to-meta-layer>/recipes-firmware/<recipes-firmware-app>/files
+    ```
 
-SRC_URI = "\
-    file://shell.json \
-    file://zcu111-pl-demo-user-dts.bit \
-    file://zcu111-pl-demo-user-dts.dtsi \
-    "
+3. Copy the .bit/bin/pdi, .dts/dtsi/dtbo, .json and .xclbin file to these directories.
+    ```
+    $ mkdir -p <path-to-meta-layer>/recipes-firmware/<recipes-firmware-app>/files
+    $ cp -r <path-to-files>/*.{bit or bin or pdi, dtsi or dtbo, shell.json or accel.json and .xclbin} <path-to-meta-layer>/recipes-firmware/<firmware-app-name>/files
+    ```
 
-COMPATIBLE_MACHINE ?= "^$"
-COMPATIBLE_MACHINE:zynqmp = "zynqmp"
-```
-5. Add firmware-recipe app to image and enable fpga-overlay machine features to
-   local.conf as shown below.
-> **Note:** fpga-manager-script provides fpgautil tool to load .bin/pdi and dtbo
-> at runtime linux.
-```
-MACHINE_FEATURES += "fpga-overlay"
-IMAGE_INSTALL:append = " \
-  firmware-app-name \
-  fpga-manager-script \
-  "
-```
-6. Follow SDT or XSCT Build instructions whichever build method is used but not
+4. Now create the recipes for flat or static or partial firmware using recipetool.
+    ```
+    $ recipetool create -o <path-to-meta-layer>/recipes-firmware/<firmware-app-name>/firmware-app-name.bb file:///<path-to-meta-layer>/recipes-firmware/<firmware-app-name>/files
+    ```
+
+   * Example usage:
+        ```
+        $ bitbake-layers create-layer /home/user/sources/meta-custom
+        $ bitbake-layers add-layer /home/user/sources/meta-custom
+        $ mkdir -p /home/user/sources/meta-custom/recipes-firmware/zcu111-pl-demo-user-dts/files
+        $ cp -r /home/user/zcu111-fw/* /home/user/sources/meta-custom/recipes-firmware/zcu111-pl-demo-user-dts/files
+        $ tree ../sources/meta-custom/recipes-firmware/zcu111-pl-demo-user-dts/files
+        ../sources/meta-custom/recipes-firmware/zcu111-pl-demo-user-dts/files
+        ├── pl.dtsi
+        ├── zcu111-pl-demo-user-dts.bit
+        └── zcu111-pl-demo-user-dts.dtsi
+
+        0 directories, 3 files
+        $
+        $ recipetool create -o /home/user/sources/meta-custom/recipes-firmware/zcu111-pl-demo-user-dts/zcu111-pl-demo-user-dts.bb file:///home/user/sources/meta-custom/recipes-firmware/zcu111-pl-demo-user-dts/files
+        ```
+   * Bitbake messages: Once recipe is generated bitbake will generate an INFO 
+    message at the bottom of your shell prompt as shown below.
+        ```
+        INFO: Recipe ../sources/meta-custom/recipes-firmware/zcu111-pl-demo-user-dts/zcu111-pl-demo-user-dts.bb has been created; further editing may be required to make it fully functional
+        ```
+
+1. Modify the recipe `<path-to-meta-layer>/recipes-firmware/<firmware-app-name>/firmware-app-name.bb`
+   inherit dfx_user_dts bbclass and set the COMPATIBLE_MACHINE as shown below.
+
+   > **Note:** COMPATIBLE_MACHINE should match machine fw files.
+
+    ```
+    SUMMARY = "<board-name> {full|dfx|segmented} loading app firmware using dfx_user_dts bbclass"
+    LICENSE = "MIT"
+    LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+
+    inherit dfx_user_dts
+
+    SRC_URI = "\
+        file://shell.json \
+        file://zcu111-pl-demo-user-dts.bit \
+        file://zcu111-pl-demo-user-dts.dtsi \
+        "
+
+    COMPATIBLE_MACHINE ?= "^$"
+    COMPATIBLE_MACHINE:zynqmp-zcu111 = "${MACHINE}"
+    ```
+
+2. Add firmware-recipe app to target image recipe and enable fpga-overlay machine
+   features in local.conf as shown below.
+
+    > **Note:** fpga-manager-script provides fpgautil tool to load .bin/pdi and dtbo
+    > at runtime linux.
+
+    ```
+    MACHINE_FEATURES += "fpga-overlay"
+    IMAGE_INSTALL:append = " \
+    firmware-app-name \
+    fpga-manager-script \
+    ```
+
+3. Follow SDT or XSCT Build instructions whichever build method is used but not
    both.
     a. [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.md ) and continue from step 5.
     b. [XSCT Building Instructions](../README.building.md)
        and continue from step 5.
-7. Once images are built firmware app files will be installed on target_rootfs.
-```
-# <target_rootfs>/lib/firmware/xilinx/firmware-app-name
-```
+
+4. Once images are built firmware app files will be installed on target_rootfs.
+    ```
+    # <target_rootfs>/lib/firmware/xilinx/firmware-app-name
+    ```
+
 ---
 
 ## Test Procedure on Target
