@@ -1,7 +1,8 @@
 # How to package and deploy firmware elf or bin to linux root filesystem
 
-* [Introduction](#introduction)
-* [How to create and install firmware package recipe](#how-to-create-and-install-firmware-package-recipe)
+- [How to package and deploy firmware elf or bin to linux root filesystem](#how-to-package-and-deploy-firmware-elf-or-bin-to-linux-root-filesystem)
+  - [Introduction](#introduction)
+  - [How to create and install firmware package recipe](#how-to-create-and-install-firmware-package-recipe)
 
 ## Introduction
 This readme describes how to package and deploy firmware baremetal or freertos
@@ -18,13 +19,14 @@ filesystem.
    upto step 3.
 
 2. Create recipes-firmware directory in distribution meta layer.
+> **Note:** Make sure meta layer is include using `bitbake-layers add-layer` command.
 ```
-$ mkdir -p <meta-layer>/recipes-firmware/<firmware-package-name>/
+$ mkdir -p <path-to-meta-layer>/recipes-firmware/<firmware-package-name>/
 ```
 
 3. Now create the recipes firmware package using recipetool.
 ```
-$ recipetool create -o <meta-layer>/recipes-firmware/<firmware-package-name>/firmware-package-name.bb 
+$ recipetool create -o <path-to-meta-layer>/recipes-firmware/<firmware-package-name>/firmware-package-name.bb
 ```
 
 4. Modify the recipe and inherit fw-package bbclass as shown below.
