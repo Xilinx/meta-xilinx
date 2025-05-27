@@ -7,13 +7,18 @@ include recipes-bsp/bootbin/machine-xilinx-${SOC_FAMILY}.inc
 IMGRCVRY_ATTR ?= "${BIF_PARTITION_ATTR}"
 IMGRCVRY_KERNEL_ATTR ?= "linux-xlnx rootfs"
 
+IMGRCVRY_KERNEL_ADDR ?= "0x200000"
+IMGRCVRY_KERNEL_ADDR:versal-2ve-2vm ?= "0x20200000"
+IMGRCVRY_ROOTFS_ADDR ?= "0x4000000"
+IMGRCVRY_ROOTFS_ADDR:versal-2ve-2vm ?= "0x24000000"
+
 # specify BIF partition attributes for linux-xlnx
-BIF_PARTITION_ATTR[linux-xlnx] ?= "type=raw, load=0x20200000"
+BIF_PARTITION_ATTR[linux-xlnx] ?= "type=raw, load=${IMGRCVRY_KERNEL_ADDR}"
 BIF_PARTITION_IMAGE[linux-xlnx] ?= "${DEPLOY_DIR_IMAGE}/Image.gz"
 BIF_PARTITION_ID[linux-xlnx] ?= "0x1c000000"
 
 # specify BIF partition attributes for tiny-rootfs
-BIF_PARTITION_ATTR[rootfs] ?= "type=raw, load=0x24000000"
+BIF_PARTITION_ATTR[rootfs] ?= "type=raw, load=${IMGRCVRY_ROOTFS_ADDR}"
 BIF_PARTITION_IMAGE[rootfs] ?= "${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.cpio.gz.u-boot"
 BIF_PARTITION_ID[rootfs] ?= "0x1c000000"
 
