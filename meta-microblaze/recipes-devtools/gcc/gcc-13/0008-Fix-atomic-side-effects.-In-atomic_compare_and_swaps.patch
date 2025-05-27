@@ -1,7 +1,7 @@
 From cd3db73d253df229054863e5f920e59e60b84c45 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 16:41:43 +0530
-Subject: [PATCH 08/54] Fix atomic side effects. In atomic_compare_and_swapsi,
+Subject: [PATCH 08/56] Fix atomic side effects. In atomic_compare_and_swapsi,
  add side effects to prevent incorrect assumptions during optimization.
  Previously, the outputs were considered unused; this generated assembly code
  with undefined side effects after invocation of the atomic.

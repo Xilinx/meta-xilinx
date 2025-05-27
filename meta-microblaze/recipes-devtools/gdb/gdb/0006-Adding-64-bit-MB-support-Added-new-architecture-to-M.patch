@@ -1,7 +1,7 @@
 From 510b596b8cd25ccb3563555190d5396c7b378522 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Thu, 31 Jan 2019 14:36:00 +0530
-Subject: [PATCH 06/54] Adding 64 bit MB support Added new architecture to
+Subject: [PATCH 06/56] Adding 64 bit MB support Added new architecture to
  Microblaze 64-bit support to GDB Signed-off-by :Nagaraju Mekala
  <nmekala@xilix.com> Signed-off-by :Mahesh Bodapati <mbodapat@xilinx.com>
 

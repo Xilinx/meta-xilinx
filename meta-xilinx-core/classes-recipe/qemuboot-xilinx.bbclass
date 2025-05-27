@@ -59,7 +59,7 @@ def qemu_add_extra_args(data):
     # Add kernel image and boot.scr to qemu boot command when initramfs_image supplied
     kernel_name = ''
     bootscr_image = '%s/boot.scr' % deploy_dir
-    if soc_family in ('zynqmp', 'versal', 'versal-net'):
+    if soc_family in ('zynqmp', 'versal', 'versal-net', 'versal-2ve-2vm'):
         kernel_name = 'Image'
         bootscr_loadaddr = '0x20000000'
     if initramfs_image:
@@ -70,10 +70,10 @@ def qemu_add_extra_args(data):
         if kernel_name:
             qb_extra_args = ' -device loader,file=%s,addr=%s,force-raw=on' % (kernel_image, kernel_loadaddr)
             qb_extra_args += ' -device loader,file=%s,addr=%s,force-raw=on' % (bootscr_image, bootscr_loadaddr)
-        if soc_family in ('versal', 'versal-net'):
+        if soc_family in ('versal', 'versal-net', 'versal-2ve-2vm'):
             qb_extra_args += ' -boot mode=%s' % boot_mode
     else:
-        if soc_family in ('zynqmp', 'versal', 'versal-net'):
+        if soc_family in ('zynqmp', 'versal', 'versal-net', 'versal-2ve-2vm'):
             qb_extra_args = ' -boot mode=%s' % boot_mode
     return qb_extra_args
 
@@ -95,7 +95,8 @@ def qemu_rootfs_params(data, param):
             "zynq": "cpio.gz",
             "zynqmp": "cpio.gz.u-boot",
             "versal": "cpio.gz.u-boot.qemu-sd-fatimg",
-            "versal-net": "cpio.gz.u-boot.qemu-sd-fatimg"
+            "versal-net": "cpio.gz.u-boot.qemu-sd-fatimg",
+            "versal-2ve-2vm": "cpio.gz.u-boot.qemu-sd-fatimg"
         }
         if not initramfs_image:
             image_fs = data.getVar('IMAGE_FSTYPES')

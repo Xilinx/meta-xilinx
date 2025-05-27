@@ -1,0 +1,73 @@
+From 2d54a92019f7ea223ee0ad5432ba915fbdddf8db Mon Sep 17 00:00:00 2001
+From: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+Date: Tue, 28 May 2024 14:47:18 -0600
+Subject: [PATCH] versal_2ve_2vm_fw: Fixup core makefiles
+
+The Yocto Project build environment needs to be able to override a few
+additional variables that may not be appropriate to do on the regular
+command line build version.  This Yocto Project specific will allow this
+behavior.
+
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+---
+ lib/sw_apps/asufw/misc/Makefile                    | 6 ++++--
+ lib/sw_apps/versal_plm/misc/versal_aiepg2/Makefile | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/lib/sw_apps/asufw/misc/Makefile b/lib/sw_apps/asufw/misc/Makefile
+index 1215b0dbdd..a48db0cfb3 100644
+--- a/lib/sw_apps/asufw/misc/Makefile
++++ b/lib/sw_apps/asufw/misc/Makefile
+@@ -7,6 +7,8 @@
+ COMPILER := riscv64-unknown-elf-gcc
+ ARCHIVER := riscv64-unknown-elf-ar
+ ASSEMBLER := riscv64-unknown-elf-as
++COMPILER_FLAGS := -O2 -c -MMD -MP -mabi=ilp32 -march=rv32imac_zicsr_zifencei
++EXTRA_COMPILER_FLAGS := -Wall -Wextra -O2 -flto -ffat-lto-objects
+ DRIVER_LIB_VERSION = 1.0
+ PROCESSOR = asu_0
+ LIBRARIES = ${PROCESSOR}/lib/libxil.a
+@@ -46,11 +48,11 @@ $(PROCESSOR)/lib/libxil.a: $(PROCESSOR)/lib/libxil_init.a
+ 
+ %/make.include: $(if $(wildcard $(PROCESSOR)/lib/libxil_init.a),$(PROCESSOR)/lib/libxil.a,)
+ 	@echo "Running Make include in $(subst /make.include,,$@)"
+-	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -MMD -MP -mabi=ilp32 -march=rv32imac_zicsr_zifencei" "EXTRA_COMPILER_FLAGS=-Wall -Wextra -O2 -flto -ffat-lto-objects"
++	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=$(COMPILER_FLAGS)" "EXTRA_COMPILER_FLAGS=$(EXTRA_COMPILER_FLAGS)"
+ 
+ %/make.libs: include
+ 	@echo "Running Make libs in $(subst /make.libs,,$@)"
+-	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -MMD -MP -mabi=ilp32 -march=rv32imac_zicsr_zifencei" "EXTRA_COMPILER_FLAGS=-Wall -Wextra -O2 -flto -ffat-lto-objects"
++	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=$(COMPILER_FLAGS)" "EXTRA_COMPILER_FLAGS=$(EXTRA_COMPILER_FLAGS)"
+ 
+ %/make.clean:
+ 	$(MAKE) -C $(subst /make.clean,,$@) -s clean
+diff --git a/lib/sw_apps/versal_plm/misc/versal_aiepg2/Makefile b/lib/sw_apps/versal_plm/misc/versal_aiepg2/Makefile
+index 284e2fa5fc..69808cd85b 100755
+--- a/lib/sw_apps/versal_plm/misc/versal_aiepg2/Makefile
++++ b/lib/sw_apps/versal_plm/misc/versal_aiepg2/Makefile
+@@ -8,6 +8,8 @@
+ COMPILER := mb-gcc
+ ARCHIVER := mb-gcc-ar
+ ASSEMBLER := mb-as
++COMPILER_FLAGS := -O2 -c -mcpu=v11.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare
++EXTRA_COMPILER_FLAGS := -g -ffunction-sections -fdata-sections -Wall -Wextra -Os -flto -ffat-lto-objects
+ DRIVER_LIB_VERSION = 1.0
+ PROCESSOR = psx_pmc_0
+ LIBRARIES = ${PROCESSOR}/lib/libxil.a
+@@ -58,11 +60,11 @@ $(PROCESSOR)/lib/libxil.a: $(PROCESSOR)/lib/libxil_init.a
+ 
+ %/make.include: $(if $(wildcard $(PROCESSOR)/lib/libxil_init.a),$(PROCESSOR)/lib/libxil.a,)
+ 	@echo "Running Make include in $(subst /make.include,,$@)"
+-	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v11.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra -Os -flto -ffat-lto-objects"
++	$(MAKE) -C $(subst /make.include,,$@) -s include  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=$(COMPILER_FLAGS)" "EXTRA_COMPILER_FLAGS=$(EXTRA_COMPILER_FLAGS)"
+ 
+ %/make.libs: include
+ 	@echo "Running Make libs in $(subst /make.libs,,$@)"
+-	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=  -O2 -c -mcpu=v11.0 -mlittle-endian -mxl-barrel-shift -mxl-pattern-compare" "EXTRA_COMPILER_FLAGS=-g -ffunction-sections -fdata-sections -Wall -Wextra -Os -flto -ffat-lto-objects"
++	$(MAKE) -C $(subst /make.libs,,$@) -s libs  "SHELL=$(SHELL)" "COMPILER=$(COMPILER)" "ASSEMBLER=$(ASSEMBLER)" "ARCHIVER=$(ARCHIVER)" "COMPILER_FLAGS=$(COMPILER_FLAGS)" "EXTRA_COMPILER_FLAGS=$(EXTRA_COMPILER_FLAGS)"
+ 
+ %/make.clean:
+ 	$(MAKE) -C $(subst /make.clean,,$@) -s clean
+-- 
+2.34.1
+

@@ -1,7 +1,7 @@
 From 3c6f051ce41f06eab29932859be52ed864bef52f Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 17 Apr 2019 12:36:16 +0530
-Subject: [PATCH 45/54] fixed typos in mul,div and mod assembly files.
+Subject: [PATCH 45/56] fixed typos in mul,div and mod assembly files.
 
 ---
  libgcc/config/microblaze/divsi3.S  | 47 ++++++++++++++++++++----

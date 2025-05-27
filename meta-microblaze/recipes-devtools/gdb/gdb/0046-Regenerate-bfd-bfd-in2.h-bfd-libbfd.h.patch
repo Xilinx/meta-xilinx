@@ -1,7 +1,7 @@
 From 4d201d0a948ab6160f449d41a50a6794dd3efde7 Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Thu, 28 Mar 2024 15:47:56 +0530
-Subject: [PATCH 46/54] Regenerate - bfd/bfd-in2.h bfd/libbfd.h
+Subject: [PATCH 46/56] Regenerate - bfd/bfd-in2.h bfd/libbfd.h
 
 Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
 Signed-off-by: Aayush Misra <aayushm@amd.com>

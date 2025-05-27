@@ -1,7 +1,7 @@
 From 411324e0340a32b4a84094b38e5d74f38cf391bc Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 19 Oct 2018 14:26:25 +0530
-Subject: [PATCH 40/54] Fixed the missing stack adjustment in prologue of
+Subject: [PATCH 40/56] Fixed the missing stack adjustment in prologue of
  modsi3 function
 
 ---

@@ -1,7 +1,7 @@
 From 8dfc5e76a3b0388bb5c88c5c0072256f3062f3c8 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Wed, 17 Oct 2018 16:56:14 +0530
-Subject: [PATCH 39/54] fixing the 32bit LTO related issue9(1014024)
+Subject: [PATCH 39/56] fixing the 32bit LTO related issue9(1014024)
 
 ---
  gcc/config/microblaze/microblaze.h | 24 ++++++++++++++----------

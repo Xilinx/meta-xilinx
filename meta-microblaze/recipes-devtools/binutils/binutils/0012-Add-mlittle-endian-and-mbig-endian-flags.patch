@@ -1,7 +1,7 @@
 From 05a5677c1b5cd7f109c49e6697b6716f7ac0fb97 Mon Sep 17 00:00:00 2001
 From: nagaraju <nmekala@xilix.com>
 Date: Tue, 19 Mar 2013 17:18:23 +0530
-Subject: [PATCH 12/53] Add mlittle-endian and mbig-endian flags
+Subject: [PATCH 12/56] Add mlittle-endian and mbig-endian flags
 
 Added support in gas for mlittle-endian and mbig-endian flags
 as options.

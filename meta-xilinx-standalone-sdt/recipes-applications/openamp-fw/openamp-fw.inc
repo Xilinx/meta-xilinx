@@ -1,44 +1,57 @@
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
-LICENSE = "MIT"
-INSANE_SKIP:${PN} = "arch"
+SUMMARY = "Sample recipe to package and deploy baremetal or freertos elf or bin to linux rootfs"
+LICENSE = "CLOSED"
 
-COMPATIBLE_HOST = ".*"
+inherit check_sdt_enabled fw-package
 
-FW_LIB_DIR = "${nonarch_base_libdir}/firmware"
-INSANE_SKIP:${PN} = "arch"
+OPENAMP_XLNX_RECIPE ?= "open-amp-xlnx-echo"
 
-OPENAMP_FW_SRC_NAME ?= "rpmsg-echo.out"
+FW_OS ?= "${MCNAME}"
+
+TARGET_MC:zynqmp = "cortexr5-0-${FW_OS}"
+TARGET_MC:versal = "cortexr5-0-${FW_OS}"
+TARGET_MC:versal-net = "cortexr52-0-${FW_OS}"
+FW_MCDEPENDS = "mc::${MACHINE}-${TARGET_MC}:${OPENAMP_XLNX_RECIPE}-${FW_OS}:do_deploy"
+FW_DEPLOY_DIR ?= "${TMPDIR}-${MACHINE}-${TARGET_MC}/deploy/images/${MACHINE}"
+
+DESTDIR = "${nonarch_base_libdir}/firmware"
+
 OPENAMP_FW_NAME ?= "image_echo_test"
 
-FW_MACHINE:zynqmp = "cortexr5-0"
-FW_MACHINE:versal = "cortexr5-0"
-FW_MACHINE:versal-net = "cortexr52-0"
-FW_OS ?= "baremetal"
-
-FW_TARGET ?= "${MACHINE}-${FW_MACHINE}-${FW_OS}"
-
-OPENAMP_FW_DEPLOY_DIR ?= "-${FW_TARGET}/deploy/images/${MACHINE}/"
+OPENAMP_FW_SRC_NAME ?= "${OPENAMP_XLNX_RECIPE}-${FW_OS}.elf"
+FW_NAME ?= "${OPENAMP_FW_SRC_NAME}"
+FW_FILE ?= "${FW_DEPLOY_DIR}/${OPENAMP_FW_SRC_NAME}"
+FW_IMAGE_NAME ?= "${OPENAMP_FW_NAME}"
 
 DEPENDS = " open-amp-xlnx "
-do_install[mcdepends] += "mc::${FW_TARGET}:open-amp-xlnx:do_deploy"
+
 do_install() {
-	src=${TMPDIR}${OPENAMP_FW_DEPLOY_DIR}/${OPENAMP_FW_SRC_NAME}
-	dest=${D}${FW_LIB_DIR}/${OPENAMP_FW_NAME}
-	if [ ! -e $src ]; then
-		bberror "Multiconfig firmware $src is not found.  Set OPENAMP_FW_DEPLOY_DIR:pn-${PN} if necessary."
-		exit 1
-	fi
-	install -d ${D}${FW_LIB_DIR}
-	install -m 0644 ${src} ${dest}
+    if [ ! -e ${FW_DEPLOY_DIR}/${OPENAMP_FW_SRC_NAME} ]; then
+        echo "Unable to find FW_FILE (${OPENAMP_FW_SRC_NAME})"
+        exit 1
+    fi
+
+    install -Dm 0644 ${FW_DEPLOY_DIR}/${OPENAMP_FW_SRC_NAME} ${D}${DESTDIR}/${FW_IMAGE_NAME}
 }
 
-do_compile[noexec] = "1"
+# If the item is already in OUR deploy_image_dir, nothing to deploy!
+SHOULD_DEPLOY = "${@'false' if (d.getVar('FW_FILE')).startswith(d.getVar('DEPLOY_DIR_IMAGE')) else 'true'}"
+do_deploy() {
+    # If the item is already in OUR deploy_image_dir, nothing to deploy!
+    if ${SHOULD_DEPLOY}; then
+        install -Dm 0644 ${FW_FILE} ${DEPLOYDIR}/${FW_IMAGE_NAME}
+    fi
+}
 
-FILES:${PN} = "${FW_LIB_DIR}/${OPENAMP_FW_NAME}"
-
-python() {
-    multiconfigs = (d.getVar('BBMULTICONFIG') or '').split()
-    fw_target = d.getVar('FW_TARGET')
-    if not fw_target in multiconfigs:
-        raise bb.parse.SkipRecipe("Required multiconfig %s is not available.  Either add the multiconfig to your configuration or adjust FW_TARGET:pn-%s." % (fw_target, d.getVar('PN')))
+SUPPORTED_OS_LIST = "baremetal freertos"
+BBCLASSEXTEND = "${@' '.join(['mcextend:'+x for x in d.getVar('SUPPORTED_OS_LIST').split()])}"
+python () {
+    if not d.getVar("MCNAME"):
+        raise bb.parse.SkipRecipe("No class extension set, %s is supported" % d.getVar('SUPPORTED_OS_LIST'))
+    else:
+        mc_dep = d.getVar("FW_MCDEPENDS")
+        if mc_dep:
+            mc = mc_dep.split(':')[2]
+            if not mc in (d.getVar('BBMULTICONFIG') or ""):
+                d.setVar('BB_DONT_CACHE', '1')
+                raise bb.parse.SkipRecipe("Requires multiconfig %s, which is not available." % d.getVar(mc))
 }

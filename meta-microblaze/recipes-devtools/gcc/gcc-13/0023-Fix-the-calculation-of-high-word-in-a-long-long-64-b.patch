@@ -1,7 +1,7 @@
 From f9871617fe69a105ebc4aa4838c682bfe40e4f2c Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 13 Sep 2022 12:03:08 +0530
-Subject: [PATCH 23/54] Fix the calculation of high word in a long long 64-bit
+Subject: [PATCH 23/56] Fix the calculation of high word in a long long 64-bit
 
     This patch will change the calculation of high word in a long long 64-bit.
     Earlier to this patch the high word of long long word (0xF0000000ULL) is

@@ -1,7 +1,7 @@
 From b6735e00ff7c60f8e66527402dd541b4217ce38f Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 19 Apr 2021 14:33:27 +0530
-Subject: [PATCH 07/54] these changes will make 64 bit vectors as default
+Subject: [PATCH 07/56] these changes will make 64 bit vectors as default
  target types when we built gdb with microblaze 64 bit type targets,for
  instance microblaze-xilinx-elf64/microblazeel-xilinx-elf64
 

@@ -1,7 +1,7 @@
 From ac87f4a6b9e35083a0403f188b61a317b53cfdbc Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 10 Oct 2022 16:37:53 +0530
-Subject: [PATCH 39/53] Initial port of core reading support Added support for
+Subject: [PATCH 39/56] Initial port of core reading support Added support for
  reading notes in linux core dumps Support for reading of PRSTATUS and PSINFO
  information for rebuilding ".reg" sections of core dumps at run time.
 

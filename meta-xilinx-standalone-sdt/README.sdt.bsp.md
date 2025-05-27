@@ -16,8 +16,8 @@ Be sure to read everything below.
 > * meta-xilinx-standalone-sdt layer depends on meta-openamp layer make sure
 >   meta-openamp is cloned and add using `bitbake-layers` command.
 
-> **Note:** SDT builds for following devices are not supported in 2024.2 release.
-> * MicroBlaze
+> **Note:** SDT builds for following devices are not supported in 2025.1 release.
+>  * MicroBlaze
 
 1. Follow [Building Instructions](../README.building.md) upto step 6.
 
@@ -45,21 +45,21 @@ $ export PATH=$PATH:<ABSOLUTE_PATH>/gen-machine-conf
 > **Recommended SDT Machine nomenclature:**
 >
 > 1. Machine Configuration file nomenclature: `<soc-family>-<board-name>-sdt-<design-name>`
-> * Example: `MACHINE = "versal-vek280-sdt-seg"`
+>     * Example: `MACHINE = "versal-vek280-sdt-seg"`
 >
 > 2. BSP Reference design name:
-> * `full` - Zynq-7000/ZynqMP full bitstream loading Vivado design.
-> * `dfx` - ZynqMP/Versal full bitstream loading Vivado design.
-> * `seg` - Versal Segmented Configuration Vivado design.
+>     * `full` - Zynq-7000/ZynqMP Vivado design.
+>     * `dfx` - ZynqMP/Versal DFx Vivado design.
+>     * `seg` - Versal/Versal-2ve-2vm Segmented Configuration Vivado design.
 >
 > **Note:** In machine file nomencalutre `<soc-family>-<board-name>-sdt-<design-name>`
 > If design-name suffix is not set or defined then it is treated as flat design
 > without dynamic PL configuration.
 
    a. Without SDT pl overlay:
-```
- $ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c <conf-directory> -l <path-to-build-directory>/build/conf/local.conf --machine-name <soc-family>-<board-name>-sdt-<design-name>
-```
+   ```
+   $ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c <conf-directory> -l <path-to-build-directory>/build/conf/local.conf --machine-name <soc-family>-<board-name>-sdt-<design-name>
+   ```
 
    b. With SDT pl overlay:
       To generate SDT pl overlay run gen-machineconf command with
@@ -69,19 +69,20 @@ $ export PATH=$PATH:<ABSOLUTE_PATH>/gen-machine-conf
       recipes. See https://github.com/Xilinx/meta-xilinx/blob/master/docs/README.dfx.user.dts.md
 	  for more details.
 
-> **Note:** DFx partial dtsi is not processed by gen-machineconf(lopper) tool, User
->          needs to use the *_partial.dtsi and *_partial.pdi/bit from sdtgen output
->          artifacts to DFx partial firmware recipes.
+   > **Note:**
+   > * DFx partial dtsi is not processed by gen-machine-conf(lopper) tool, User needs
+   >   to use the *_partial.dtsi and *_partial.pdi/bit from sdtgen output artifacts
+   >   for DFx partial firmware recipes.
 
-   * Zynq-700 or ZynqMP Full bitstream or Versal Segmented Configuration:
-```
- $ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c <conf-directory> -l <path-to-build-directory>/build/conf/local.conf --machine-name <soc-family>-<board-name>-sdt-<design-name> -g full
-```
+   * Zynq-7000/ZynqMP Full bitstream or Versal/Versal-2ve-2vm Segmented Configuration:
+   ```
+   $ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c <conf-directory> -l <path-to-build-directory>/build/conf/local.conf --machine-name <soc-family>-<board-name>-sdt-<design-name> -g full
+   ```
 
    * ZynqMP or Versal DFx:
-```
- $ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c <conf-directory> -l <path-to-build-directory>/build/conf/local.conf --machine-name <soc-family>-<board-name>-sdt-<design-name> -g dfx
-```
+   ```
+   $ gen-machineconf parse-sdt --hw-description <path_to_sdtgen_output_directory> -c <conf-directory> -l <path-to-build-directory>/build/conf/local.conf --machine-name <soc-family>-<board-name>-sdt-<design-name> -g dfx
+   ```
 
 For example, Zynq-7000:
 ```
@@ -152,12 +153,21 @@ A minimum configuration is included with the generated configuration.
 5. Continue [Building Instructions](https://github.com/Xilinx/meta-xilinx/blob/master/README.building.md)
    from step 8.
 
->**Note:** Only AMD eval boards have the dtsi in System Device Tree repo, for custom
-> board user has to follow one of the following methods.
-> 1. Patch System Device Tree to include the custom board dtsi and include the
-> custom board dtsi during sdtgen build step.
-> `% sdtgen set_dt_param -board_dts <custom-board-dtsi-name>`
+>**Note:** Only AMD eval boards have the dtsi in System Device Tree repo, for
+> custom board or any user specified dt file, user has include the dt file during
+> sdtgen build step using `set_dt_param -user_dts` command as shown below. For
+> more details see [SDT README](https://github.com/Xilinx/system-device-tree-xlnx/blob/master/README.md)
 >
-> 2. Create a custom board dtsi file and use EXTRA_DT_INCLUDE_FILES variable to
-> include the custom board dtsi to final dtb. Here is the example usage.
-> `EXTRA_DT_INCLUDE_FILES:append = " <path-to-directory>/<custom-board>.dtsi"`
+> ```
+> $ source /<path-to-install-directory>/Vivado/settings64.sh
+> $ sdtgen
+> sdtgen% set_dt_param help
+> sdtgen% set_dt_param -dir <path_to_sdtgen_output_directory>
+> sdtgen% set_dt_param -xsa <path-to-xsa>/<file-name>.xsa
+> sdtgen% set_dt_param -board_dts <amd-eval-board-dtsi>
+> sdtgen% set_dt_param -user_dts <custom-dt-file>
+> sdtgen% generate_sdt
+> sdtgen% exit
+> exit
+> $
+> ```

@@ -1,0 +1,43 @@
+Upstream-Status: Pending
+
+Index: git/tools/pygrub/Makefile
+===================================================================
+--- git.orig/tools/pygrub/Makefile
++++ git/tools/pygrub/Makefile
+@@ -13,14 +13,14 @@ setup.py = CC="$(CC)" CFLAGS="$(PY_CFLAG
+ all: build
+ .PHONY: build
+ build:
+-	$(setup.py) build
++	$(setup.py) build $(DISTUTILS_BUILD_ARGS)
+ 
+ .PHONY: install
+ install: all
+ 	$(INSTALL_DIR) $(DESTDIR)/$(bindir)
+ 	$(INSTALL_DIR) $(DESTDIR)/$(LIBEXEC_BIN)
+ 	$(setup.py) install --record $(INSTALL_LOG) $(PYTHON_PREFIX_ARG) \
+-		--root="$(DESTDIR)" --force
++		--root="$(DESTDIR)" --force  $(DISTUTILS_INSTALL_ARGS)
+ 	$(INSTALL_PYTHON_PROG) src/pygrub $(DESTDIR)/$(LIBEXEC_BIN)/pygrub
+ 
+ .PHONY: uninstall
+Index: git/tools/python/Makefile
+===================================================================
+--- git.orig/tools/python/Makefile
++++ git/tools/python/Makefile
+@@ -16,13 +16,13 @@ setup.py = CC="$(CC)" CFLAGS="$(PY_CFLAG
+ 
+ .PHONY: build
+ build:
+-	$(setup.py) build
++	$(setup.py) build $(DISTUTILS_BUILD_ARGS)
+ 
+ .PHONY: install
+ install:
+ 	$(INSTALL_DIR) $(DESTDIR)$(LIBEXEC_BIN)
+ 	$(setup.py) install --record $(INSTALL_LOG) $(PYTHON_PREFIX_ARG) \
+-		--root="$(DESTDIR)" --force
++		--root="$(DESTDIR)" --force $(DISTUTILS_INSTALL_ARGS)
+ 	$(INSTALL_PYTHON_PROG) scripts/convert-legacy-stream $(DESTDIR)$(LIBEXEC_BIN)
+ 	$(INSTALL_PYTHON_PROG) scripts/verify-stream-v2 $(DESTDIR)$(LIBEXEC_BIN)
+ 

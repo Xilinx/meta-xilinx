@@ -55,9 +55,11 @@ SRC_URI += " \
     file://0046-Regenerate-bfd-bfd-in2.h-bfd-libbfd.h.patch \
     file://0047-gdb-remote.c-revert-earlier-change-to-process_g_pack.patch \
     file://0048-Fix-build-issues-after-Xilinx-2023.2-binutils-patch-.patch \
-    file://0049-When-unwinding-pc-value-adjust-return-pc-value.patch \
-    file://0050-info-reg-pc-does-not-print-symbolic-value.patch \
-    file://0051-Wrong-target-description-accepted-by-microblaze-arch.patch \
-    file://0052-Merge-gdb-microblaze-linux-tdep.c-to-gdb-14-and-fix-.patch \
-    file://0053-Roll-back-an-improvement-which-inlines-target_gdbarc.patch \
+    file://0050-When-unwinding-pc-value-adjust-return-pc-value.patch \
+    file://0051-info-reg-pc-does-not-print-symbolic-value.patch \
+    file://0052-Wrong-target-description-accepted-by-microblaze-arch.patch \
+    file://0053-Merge-gdb-microblaze-linux-tdep.c-to-gdb-14-and-fix-.patch \
+    file://0054-Roll-back-an-improvement-which-inlines-target_gdbarc.patch \
+    file://0055-fix-microblaze-linux-nat.patch \
+    file://0056-Microblaze_Fix_regression_introduced_during_2024.2.patch \
 "

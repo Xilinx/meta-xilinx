@@ -1,7 +1,7 @@
 From a969ab3f04de077eca6d928dd651e3c6b042367d Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 18:18:41 +0530
-Subject: [PATCH 19/54] Update ashlsi3 & movsf patterns This patch removes the
+Subject: [PATCH 19/56] Update ashlsi3 & movsf patterns This patch removes the
  use of HOST_WIDE_INT_PRINT_HEX macro in print_operand of
  ashlsi3_with_mul_nodelay,ashlsi3_with_mul_delay and movsf_internal patterns
  beacuse HOST_WIDE_INT_PRINT_HEX is generating 64-bit value which our

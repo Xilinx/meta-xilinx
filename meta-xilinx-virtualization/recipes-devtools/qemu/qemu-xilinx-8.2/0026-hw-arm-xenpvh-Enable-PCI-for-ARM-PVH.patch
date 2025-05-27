@@ -1,0 +1,49 @@
+From f66d9f4beb40be329547bad3a0ebf3a726342b7d Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Fri, 6 Sep 2024 15:05:51 +0200
+Subject: [PATCH 26/27] hw/arm: xenpvh: Enable PCI for ARM PVH
+
+Enable PCI support for the ARM Xen PVH machine.
+
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+---
+ hw/arm/xen-pvh.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/hw/arm/xen-pvh.c b/hw/arm/xen-pvh.c
+index 28af3910ea..33f0dd5982 100644
+--- a/hw/arm/xen-pvh.c
++++ b/hw/arm/xen-pvh.c
+@@ -39,6 +39,16 @@ static void xen_arm_instance_init(Object *obj)
+                                          VIRTIO_MMIO_DEV_SIZE };
+ }
+ 
++static void xen_pvh_set_pci_intx_irq(void *opaque, int intx_irq, int level)
++{
++    XenPVHMachineState *s = XEN_PVH_MACHINE(opaque);
++    int irq = s->cfg.pci_intx_irq_base + intx_irq;
++
++    if (xendevicemodel_set_irq_level(xen_dmod, xen_domid, irq, level)) {
++        error_report("xendevicemodel_set_pci_intx_level failed");
++    }
++}
++
+ static void xen_arm_machine_class_init(ObjectClass *oc, void *data)
+ {
+     XenPVHMachineClass *xpc = XEN_PVH_MACHINE_CLASS(oc);
+@@ -69,7 +79,11 @@ static void xen_arm_machine_class_init(ObjectClass *oc, void *data)
+     /* Xen/ARM does not use buffered IOREQs.  */
+     xpc->handle_bufioreq = HVM_IOREQSRV_BUFIOREQ_OFF;
+ 
++    /* PCI INTX delivery.  */
++    xpc->set_pci_intx_irq = xen_pvh_set_pci_intx_irq;
++
+     /* List of supported features known to work on PVH ARM.  */
++    xpc->has_pci = true;
+     xpc->has_tpm = true;
+     xpc->has_virtio_mmio = true;
+ 
+-- 
+2.34.1
+

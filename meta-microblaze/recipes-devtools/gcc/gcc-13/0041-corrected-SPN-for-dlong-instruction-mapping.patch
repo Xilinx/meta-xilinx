@@ -1,7 +1,7 @@
 From b03e3a75a37213823c062bb72e4f6f470c516222 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 24 Oct 2018 18:31:04 +0530
-Subject: [PATCH 41/54] corrected SPN for dlong instruction mapping.
+Subject: [PATCH 41/56] corrected SPN for dlong instruction mapping.
 
 ---
  gcc/config/microblaze/microblaze.md | 4 ++--

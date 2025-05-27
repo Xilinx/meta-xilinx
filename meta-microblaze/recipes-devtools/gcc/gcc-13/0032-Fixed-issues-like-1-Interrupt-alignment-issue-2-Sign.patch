@@ -1,7 +1,7 @@
 From 63e3adfb493e225c55536e72cfbf8be70977cdc8 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 13 Sep 2022 15:24:25 +0530
-Subject: [PATCH 32/54] Fixed issues like: 1 Interrupt alignment issue 2 Sign
+Subject: [PATCH 32/56] Fixed issues like: 1 Interrupt alignment issue 2 Sign
  extension issue
 
 ---

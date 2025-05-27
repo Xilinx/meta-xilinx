@@ -1,4 +1,4 @@
-From 2da2588a1dda1fd7fd2f6fc89db13cc5694d793e Mon Sep 17 00:00:00 2001
+From 7d88d40d25766f5f8c7cf300cfe45516b03327af Mon Sep 17 00:00:00 2001
 From: Mark Hatle <mark.hatle@amd.com>
 Date: Sat, 24 Aug 2024 11:23:18 -0600
 Subject: [PATCH] versal: Reorder serial ports
@@ -10,13 +10,13 @@ ensure that the first two serial ports are the ones used by Linux.
 
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 ---
- board-versal-pmc-virt-alt.dts  | 230 ++++++++++++++++
- board-versal-ps-vck190-alt.dts |  58 ++++
- board-versal-ps-virt-alt.dts   | 354 +++++++++++++++++++++++++
+ board-versal-pmc-virt-alt.dts  | 238 +++++++++++++++++
+ board-versal-ps-vck190-alt.dts |  57 ++++
+ board-versal-ps-virt-alt.dts   | 359 +++++++++++++++++++++++++
  versal-pmc-alt.dtsi            |  40 +++
  versal-pmc-ppu-alt.dtsi        | 252 ++++++++++++++++++
- versal-ps-iou-alt.dtsi         | 467 +++++++++++++++++++++++++++++++++
- 6 files changed, 1401 insertions(+)
+ versal-ps-iou-alt.dtsi         | 468 +++++++++++++++++++++++++++++++++
+ 6 files changed, 1414 insertions(+)
  create mode 100644 board-versal-pmc-virt-alt.dts
  create mode 100644 board-versal-ps-vck190-alt.dts
  create mode 100644 board-versal-ps-virt-alt.dts
@@ -26,10 +26,10 @@ Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 
 diff --git a/board-versal-pmc-virt-alt.dts b/board-versal-pmc-virt-alt.dts
 new file mode 100644
-index 00000000..52d23c83
+index 000000000..30a76ca3b
 --- /dev/null
 +++ b/board-versal-pmc-virt-alt.dts
-@@ -0,0 +1,230 @@
+@@ -0,0 +1,238 @@
 +/*
 + * Versal Virtual PMC board device tree
 + *
@@ -71,11 +71,15 @@ index 00000000..52d23c83
 +
 +#ifndef MULTI_ARCH
 +#include "versal-pmc-alt.dtsi"
++#ifndef VERSAL2_DEV
 +#include "versal-psm.dtsi"
++#endif
 +#include "versal-ddrmc.dtsi"
 +#include "versal-ps-iou-alt.dtsi"
 +#include "versal-pmc-ppu-cpus.dtsi"
++#ifndef VERSAL2_DEV
 +#include "versal-psm-cpu.dtsi"
++#endif
 +
 +/ {
 +	/* FIXME: Once we add the NOC, these should be attached to it.  */
@@ -127,7 +131,9 @@ index 00000000..52d23c83
 +#include "versal-icnt.dtsi"
 +#include "versal-rams.dtsi"
 +#include "versal-pmc-ppu-cpus.dtsi"
++#ifndef VERSAL2_DEV
 +#include "versal-psm-cpu.dtsi"
++#endif
 +
 +/ {
 +	/* FIXME: Once we add the NOC, these should be attached to it.  */
@@ -180,11 +186,13 @@ index 00000000..52d23c83
 +		#gpio-cells = <1>;
 +		num-gpios = <30>;
 +	};
++#ifndef VERSAL2_DEV
 +	rp_psm0: rp_psm0@0 {
 +		compatible = "remote-port-gpio";
 +		remote-ports = <&ps_pmc_rp 8>;
 +		interrupts-extended = < &psm0 0 >;
 +	};
++#endif
 +#ifdef MM_NPI_DDRMC_MAIN_0
 +	rp_ddrmc_ub0: rp_ddrmc_ub@0 {
 +		compatible = "remote-port-gpio";
@@ -262,10 +270,10 @@ index 00000000..52d23c83
 +};
 diff --git a/board-versal-ps-vck190-alt.dts b/board-versal-ps-vck190-alt.dts
 new file mode 100644
-index 00000000..b61d3d5c
+index 000000000..dddcdd034
 --- /dev/null
 +++ b/board-versal-ps-vck190-alt.dts
-@@ -0,0 +1,58 @@
+@@ -0,0 +1,57 @@
 +/*
 + * Versal Virtual vck190 board device tree
 + *
@@ -308,7 +316,6 @@ index 00000000..b61d3d5c
 +		#size-cells = <0>;
 +		compatible = "nxp,pca9548";
 +		reg = <0x74>;
-+		chip-enable = <0x1>;
 +		i2c@0 {
 +			#address-cells = <1>;
 +			#size-cells = <0>;
@@ -326,10 +333,10 @@ index 00000000..b61d3d5c
 +};
 diff --git a/board-versal-ps-virt-alt.dts b/board-versal-ps-virt-alt.dts
 new file mode 100644
-index 00000000..7585d196
+index 000000000..85525ffb4
 --- /dev/null
 +++ b/board-versal-ps-virt-alt.dts
-@@ -0,0 +1,354 @@
+@@ -0,0 +1,359 @@
 +/*
 + * Versal Virtual PS board device tree
 + *
@@ -388,7 +395,9 @@ index 00000000..7585d196
 +#include "versal.dtsh"
 +
 +#include "versal-pmc.dtsi"
++#ifndef VERSAL2_DEV
 +#include "versal-psm.dtsi"
++#endif
 +#include "versal-ddrmc.dtsi"
 +#ifdef VERSAL_PSX
 +#include "versal-psx-apu.dtsi"
@@ -552,6 +561,8 @@ index 00000000..7585d196
 +		mr = <&lmb_psm>;
 +	};
 +
++#ifndef VERSAL2_DEV
++
 +#define RPU_INTC_REDIRECT(NCPU, PSMOUT, RPUN)							\
 +glue(rpu_intc_redirect_, NCPU): glue(rpu_intc_redirect, NCPU)@NCPU {	\
 +	#interrupt-cells = <1>;									\
@@ -565,6 +576,7 @@ index 00000000..7585d196
 +		RPU_INTC_REDIRECT(0, 4, 6)
 +		RPU_INTC_REDIRECT(1, 5, 7)
 +	};
++#endif
 +
 +#else
 +	/* Single ARCH PS board has no PPU MicroBlazes.  */
@@ -686,7 +698,7 @@ index 00000000..7585d196
 +#endif
 diff --git a/versal-pmc-alt.dtsi b/versal-pmc-alt.dtsi
 new file mode 100644
-index 00000000..8236911b
+index 000000000..8236911b6
 --- /dev/null
 +++ b/versal-pmc-alt.dtsi
 @@ -0,0 +1,40 @@
@@ -732,7 +744,7 @@ index 00000000..8236911b
 +#include "versal-pmc-bat.dtsi"
 diff --git a/versal-pmc-ppu-alt.dtsi b/versal-pmc-ppu-alt.dtsi
 new file mode 100644
-index 00000000..726413f4
+index 000000000..726413f43
 --- /dev/null
 +++ b/versal-pmc-ppu-alt.dtsi
 @@ -0,0 +1,252 @@
@@ -990,10 +1002,10 @@ index 00000000..726413f4
 +
 diff --git a/versal-ps-iou-alt.dtsi b/versal-ps-iou-alt.dtsi
 new file mode 100644
-index 00000000..a6c22b86
+index 000000000..3382bd9b4
 --- /dev/null
 +++ b/versal-ps-iou-alt.dtsi
-@@ -0,0 +1,467 @@
+@@ -0,0 +1,468 @@
 +/*
 + * Versal PS IOU
 + *
@@ -1039,7 +1051,7 @@ index 00000000..a6c22b86
 +	reg = <0x0 g_base 0x0 g_size 0x0>;				\
 +	num-priority-queues = <2>;					\
 +	reset-gpios = <&crl rst_idx>;					\
-+	power-gpios = <&psm_local pwr_idx>;				\
++	power-gpios = <PWR_GPIO_SRC pwr_idx>;				\
 +}
 +
 +// FIXME: Add support for SMIDs
@@ -1077,6 +1089,66 @@ index 00000000..a6c22b86
 +	interrupts = <XRAM_IRQ_0>;			\
 +	alloc-ram = <0>;				\
 +}
++
++/*
++ * Versal, Versal-Net, Versal Gen 2 CAN device creation macro.
++ */
++#define CREATE_CAN(n, addr_nm, size_nm)			   \
++	glue(can, n): can@addr_nm {			   \
++		compatible = "xlnx,versal-canfd";	   \
++		rx-fifo0 = <0x40>;			   \
++		rx-fifo1 = <0x40>;			   \
++		enable-rx-fifo1 = <0x1>;		   \
++		canfdbus = <&canfdbus0>;		   \
++		interrupts = <glue(glue(CAN, n), _IRQ_0)>; \
++		reg = <0x0 addr_nm 0x0 size_nm 0x0>;	   \
++		reset-gpios = <&crl glue(CRL_RST_CAN, n)>; \
++	}
++
++/*
++ * Versal, Versal-Net, Versal Gen 2 TTC device creation macro.
++ */
++#define CREATE_TTC(n, addr_nm, size_nm)			   \
++	glue(ttc, n): timer@addr_nm {			   \
++		compatible = "xlnx,ps7-ttc-1.00.a";	   \
++		interrupts = <glue(glue(TTC, n), _IRQ_0)   \
++			      glue(glue(TTC, n), _IRQ_1)   \
++			      glue(glue(TTC, n), _IRQ_2)   \
++			     >;				   \
++		reg = <0x0 addr_nm 0x0 size_nm 0x0>;	   \
++		width = <32>;				   \
++		reset-gpios = <&crl glue(CRL_RST_TTC, n)>; \
++	}
++
++/*
++ * Versal, Versal-Net, Versal Gen 2 i2c_i3c device creation macro.
++ */
++#define CREATE_I2C_I3C(n, addr_nm, size_nm)				       \
++		glue(ps_i2c, n): ps_i2c@addr_nm {			       \
++			#address-cells = <1>;				       \
++			#size-cells = <0>;				       \
++			compatible = "xlnx,ps7-i2c-1.00.a", "cdns,i2c-r1p10";  \
++			interrupts = <glue(glue(I2C, n), _IRQ_0)>;	       \
++			reg-extended = <&amba_lpd 0x0 addr_nm 0x0 size_nm 0x0>;\
++			reset-gpios = <&crl glue(CRL_RST_I2C, n)>;	       \
++		}
++
++/*
++ * Versal, Versal-Net, Versal Gen 2 lpd watchdogs device creation macro.
++ */
++#define CREATE_LPD_WWDT(n, addr_nm, size_nm)			      \
++	glue(lpd_wwdt, n): wwdt@addr_nm {			      \
++		compatible = "xlnx,versal-wwdt";		      \
++		reg = <0x0 addr_nm 0x0 size_nm 0x0>;		      \
++		/* IRQ order must match the QEMU model */	      \
++		interrupts = <glue(glue(WWDT, n), _LPX_IRQ_0)	      \
++			      glue(glue(WWDT, n), _RST_PENDING_IRQ_0) \
++			      glue(glue(GWDT, n), _WS0_IRQ_0)	      \
++			      glue(glue(GWDT, n), _WS1_IRQ_0)	      \
++			      >;				      \
++		pclk = <100000000>;				      \
++		reset-gpios = <&crl glue(CRL_RST_SWDT, n)>;	      \
++	}
 +
 +&amba_fpd {
 +#ifdef MM_FPD_FPD_APU
@@ -1191,26 +1263,8 @@ index 00000000..a6c22b86
 +		compatible = "can-bus";
 +	};
 +
-+	can0: can@MM_CANFD0 {
-+		compatible = "xlnx,versal-canfd";
-+		rx-fifo0 = <0x40>;
-+		rx-fifo1 = <0x40>;
-+		enable-rx-fifo1 = <0x1>;
-+		canfdbus = <&canfdbus0>;
-+		interrupts = <CAN0_IRQ_0>;
-+		reg = <0x0 MM_CANFD0 0x0 MM_CANFD0_SIZE 0x0>;
-+		reset-gpios = <&crl CRL_RST_CAN0>;
-+	};
-+	can1: can@MM_CANFD1 {
-+		compatible = "xlnx,versal-canfd";
-+		rx-fifo0 = <0x40>;
-+		rx-fifo1 = <0x40>;
-+		enable-rx-fifo1 = <0x1>;
-+		canfdbus = <&canfdbus0>;
-+		interrupts = <CAN1_IRQ_0>;
-+		reg = <0x0 MM_CANFD1 0x0 MM_CANFD1_SIZE 0x0>;
-+		reset-gpios = <&crl CRL_RST_CAN1>;
-+	};
++	CREATE_CAN(0, MM_CANFD0, MM_CANFD0_SIZE);
++	CREATE_CAN(1, MM_CANFD1, MM_CANFD1_SIZE);
 +
 +	crl: crl@MM_CRL {
 +		compatible = "xlnx,versal-crl";
@@ -1295,34 +1349,10 @@ index 00000000..a6c22b86
 +		slots = <2>;
 +	};
 +
-+	ttc0: timer@MM_TTC0 {
-+		compatible = "xlnx,ps7-ttc-1.00.a";
-+		interrupts = <TTC0_IRQ_0 TTC0_IRQ_1 TTC0_IRQ_2>;
-+		reg = <0x0 MM_TTC0 0x0 MM_TTC0_SIZE 0x0>;
-+		width = <32>;
-+		reset-gpios = < &crl CRL_RST_TTC0 >;
-+	};
-+	ttc1: timer@MM_TTC1 {
-+		compatible = "xlnx,ps7-ttc-1.00.a";
-+		interrupts = <TTC1_IRQ_0 TTC1_IRQ_1 TTC1_IRQ_2>;
-+		reg = <0x0 MM_TTC1 0x0 MM_TTC1_SIZE 0x0>;
-+		width = <32>;
-+		reset-gpios = < &crl CRL_RST_TTC1 >;
-+	};
-+	ttc2: timer@MM_TTC2 {
-+		compatible = "xlnx,ps7-ttc-1.00.a";
-+		interrupts = <TTC2_IRQ_0 TTC2_IRQ_1 TTC2_IRQ_2>;
-+		reg = <0x0 MM_TTC2 0x0 MM_TTC2_SIZE 0x0>;
-+		width = <32>;
-+		reset-gpios = < &crl CRL_RST_TTC2 >;
-+	};
-+	ttc3: timer@MM_TTC3 {
-+		compatible = "xlnx,ps7-ttc-1.00.a";
-+		interrupts = <TTC3_IRQ_0 TTC3_IRQ_1 TTC3_IRQ_2>;
-+		reg = <0x0 MM_TTC3 0x0 MM_TTC3_SIZE 0x0>;
-+		width = <32>;
-+		reset-gpios = < &crl CRL_RST_TTC3 >;
-+	};
++	CREATE_TTC(0, MM_TTC0, MM_TTC0_SIZE);
++	CREATE_TTC(1, MM_TTC1, MM_TTC1_SIZE);
++	CREATE_TTC(2, MM_TTC2, MM_TTC2_SIZE);
++	CREATE_TTC(3, MM_TTC3, MM_TTC3_SIZE);
 +
 +	ZDMA_CHANNEL(adma0, adma, MM_ADMA_CH0, ADMA_IRQ_0, 128, &smmu_tbu0, SMID_DMA0_CH0, 0x0);
 +	ZDMA_CHANNEL(adma1, adma, MM_ADMA_CH1, ADMA_IRQ_1, 128, &smmu_tbu0, SMID_DMA0_CH1, 0x1);
@@ -1340,22 +1370,8 @@ index 00000000..a6c22b86
 +
 +	lpd_i2c_wrapper {
 +#ifdef MM_PS_I2C0
-+		ps_i2c0: ps_i2c0@MM_PS_I2C0 {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			compatible = "xlnx,ps7-i2c-1.00.a", "cdns,i2c-r1p10";
-+			interrupts = <I2C0_IRQ_0>;
-+			reg-extended = <&amba_lpd 0x0 MM_PS_I2C0 0x0 MM_PS_I2C0_SIZE 0x0>;
-+			reset-gpios = <&crl CRL_RST_I2C0>;
-+		};
-+		ps_i2c1: ps_i2c0@MM_PS_I2C1 {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			compatible = "xlnx,ps7-i2c-1.00.a", "cdns,i2c-r1p10";
-+			interrupts = <I2C1_IRQ_0>;
-+			reg-extended = <&amba_lpd 0x0 MM_PS_I2C1 0x0 MM_PS_I2C1_SIZE 0x0>;
-+			reset-gpios = <&crl CRL_RST_I2C1>;
-+		};
++		CREATE_I2C_I3C(0, MM_PS_I2C0, MM_PS_I2C0_SIZE);
++		CREATE_I2C_I3C(1, MM_PS_I2C1, MM_PS_I2C1_SIZE);
 +#endif
 +	};
 +
@@ -1374,7 +1390,7 @@ index 00000000..a6c22b86
 +	};
 +#endif
 +
-+	lpd_slcr@MM_LPD_SLCR {
++	lpd_slcr: lpd_slcr@MM_LPD_SLCR {
 +		compatible = "xlnx,versal-lpd-slcr";
 +		reg = <0x0 MM_LPD_SLCR 0x0 MM_LPD_SLCR_SIZE 0x0>;
 +	};
@@ -1395,19 +1411,16 @@ index 00000000..a6c22b86
 +		memattr-write-gem1 = <&gem1_w_memattr_smid>;
 +	};
 +
-+#ifdef MM_WWDT
-+	lpd_wwdt: wwdt@MM_WWDT {
-+		compatible = "xlnx,versal-wwdt";
-+		reg = <0x0 MM_WWDT 0x0 MM_WWDT_SIZE 0x0>;
-+		/* IRQ order must match the QEMU model */
-+		interrupts = <WWDT_IRQ_0
-+					WWDT_RST_PENDING_IRQ_0
-+					GWDT_WS0_IRQ_0
-+					GWDT_WS1_IRQ_0>;
-+		pclk = <100000000>;
-+		reset-gpios = <&crl CRL_RST_SWDT>;
-+	};
++#ifndef WWDT0_LPX_IRQ_0
++/* Alias those name for Versal since Versal-Net and Versal Gen 2 has a different
++ * name for those IRQs lines.  */
++#define WWDT0_LPX_IRQ_0 WWDT_IRQ_0
++#define WWDT0_RST_PENDING_IRQ_0 WWDT_RST_PENDING_IRQ_0
++#define GWDT0_WS0_IRQ_0 GWDT_WS0_IRQ_0
++#define GWDT0_WS1_IRQ_0 GWDT_WS1_IRQ_0
 +#endif
++
++	CREATE_LPD_WWDT(0, MM_WWDT, MM_WWDT_SIZE);
 +
 +	lpd_gpio: lpd_gpio@MM_PS_GPIO {
 +		#gpio-cells = <1>;

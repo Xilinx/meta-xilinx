@@ -1,7 +1,7 @@
 From d0f1a493d130e06816df4d11f31421a8691761e0 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 15:23:57 +0530
-Subject: [PATCH 15/54] Add optimized lshrsi3 When barrel shifter is not
+Subject: [PATCH 15/56] Add optimized lshrsi3 When barrel shifter is not
  present, the immediate value is greater than #5 and optimization is -OS, the
  compiler will generate shift operation using loop.
 

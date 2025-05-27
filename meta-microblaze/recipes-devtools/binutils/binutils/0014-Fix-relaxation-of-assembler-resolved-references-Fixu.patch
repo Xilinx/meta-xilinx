@@ -1,7 +1,7 @@
 From 965a464418e8c8968453206f27763043fb38dc64 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 8 Nov 2016 11:54:08 +0530
-Subject: [PATCH 14/53] Fix relaxation of assembler resolved references,Fixup
+Subject: [PATCH 14/56] Fix relaxation of assembler resolved references,Fixup
  debug_loc sections after linker relaxation Adds a new reloctype
  R_MICROBLAZE_32_NONE, used for passing reloc info from the assembler to the
  linker when the linker manages to fully resolve a local symbol reference.

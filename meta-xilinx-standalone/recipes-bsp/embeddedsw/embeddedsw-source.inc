@@ -1,4 +1,15 @@
-deltask do_configure
+python do_configure () {
+    externalsrc = d.getVar('EXTERNALSRC')
+    if externalsrc:
+        dest = d.getVar('SHARED_S')
+        if externalsrc != dest:
+            oe.path.copyhardlinktree(externalsrc, dest)
+            for symlink in d.getVar('EXTERNALSRC_SYMLINKS').split():
+                link = symlink.split(':')[0]
+                if os.path.islink((dest + '/' + link)):
+                    os.unlink((dest + '/' + link))
+}
+
 deltask do_compile
 deltask do_install
 deltask do_populate_sysroot

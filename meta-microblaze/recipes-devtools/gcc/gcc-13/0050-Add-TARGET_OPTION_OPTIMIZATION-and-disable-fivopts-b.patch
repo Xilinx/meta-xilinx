@@ -1,7 +1,7 @@
 From b7fb925d6277d11e4014aa1731fc58813e30761f Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Wed, 8 May 2019 14:12:03 +0530
-Subject: [PATCH 50/54] Add TARGET_OPTION_OPTIMIZATION and disable fivopts by
+Subject: [PATCH 50/56] Add TARGET_OPTION_OPTIMIZATION and disable fivopts by
  default
 
 Added TARGET_OPTION_OPTIMIZATIONS and Turn off ivopts by default.

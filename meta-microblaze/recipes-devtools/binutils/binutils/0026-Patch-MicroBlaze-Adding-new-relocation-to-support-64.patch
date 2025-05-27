@@ -1,7 +1,7 @@
 From d3fd5a77fa218f8f6c296337758d45cab61483fe Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 2 Nov 2021 17:28:24 +0530
-Subject: [PATCH 26/53] [Patch,MicroBlaze : Adding new relocation to support
+Subject: [PATCH 26/56] [Patch,MicroBlaze : Adding new relocation to support
  64bit rodata.
 
 Signed-off-by: Aayush Misra <aayushm@amd.com>

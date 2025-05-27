@@ -1,7 +1,7 @@
 PROVIDES += "qemu-system-native"
 
 # Skip processing of this recipe if it is not explicitly specified as the
-# PREFERRED_PROVIDER for qemu-syste-native. This avoids network access required by
+# PREFERRED_PROVIDER for qemu-system-native. This avoids network access required by
 # the use of AUTOREV SRCREVs, which may be the default for some recipes.
 python () {
     if (not d.getVar("PREFERRED_PROVIDER_qemu-system-native") and "qemu-system-native" != d.getVar("PN")) or \

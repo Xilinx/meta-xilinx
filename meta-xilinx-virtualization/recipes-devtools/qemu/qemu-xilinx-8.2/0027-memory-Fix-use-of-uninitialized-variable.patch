@@ -1,0 +1,30 @@
+From f3db83f2d24b7ecc471b2bb27c30c3951b987d48 Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Wed, 23 Apr 2025 00:48:42 +0200
+Subject: [PATCH 27/27] memory: Fix use of uninitialized variable
+
+This fixes an issue with memry cache mappings not getting
+created due to the use of an uninitialized variable.
+This mainly affects virtio devices.
+
+Fixes: 4e71cea9c01a (memory: add MemoryRegion map and unmap callbacks)
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+---
+ system/physmem.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/system/physmem.c b/system/physmem.c
+index 4542ded68e..a607a0dbf3 100644
+--- a/system/physmem.c
++++ b/system/physmem.c
+@@ -3273,6 +3273,7 @@ int64_t address_space_cache_init(MemoryRegionCache *cache,
+          * doing this if we found actual RAM, which behaves the same
+          * regardless of attributes; so UNSPECIFIED is fine.
+          */
++        cache->ptr = NULL;
+         if (mr->ops && mr->ops->map) {
+             cache->ptr = mr->ops->map(&mr, addr, &l, is_write,
+                                       MEMTXATTRS_UNSPECIFIED);
+-- 
+2.34.1
+

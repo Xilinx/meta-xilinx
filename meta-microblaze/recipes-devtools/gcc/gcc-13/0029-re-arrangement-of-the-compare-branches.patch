@@ -1,7 +1,7 @@
 From 870bfd716fcddeb72660f3176fb2a68aaa5ecc0e Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 13 Sep 2022 14:45:15 +0530
-Subject: [PATCH 29/54] re-arrangement of the compare branches
+Subject: [PATCH 29/56] re-arrangement of the compare branches
 
 ---
  gcc/config/microblaze/microblaze.cc |  28 ++----

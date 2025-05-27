@@ -1,7 +1,7 @@
 From e372266dde792b03fb1754769a9615c818336171 Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Mon, 1 Apr 2024 16:21:28 +0530
-Subject: [PATCH 48/53] Fix build issues after Xilinx 2023.2 binutils patch
+Subject: [PATCH 48/56] Fix build issues after Xilinx 2023.2 binutils patch
  merge
 
 binutils/readelf.c - duplicate case statement

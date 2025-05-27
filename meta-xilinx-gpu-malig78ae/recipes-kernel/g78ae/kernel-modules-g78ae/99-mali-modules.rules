@@ -1,0 +1,18 @@
+# Device rules for GPU Mali-G78AE drivers
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="memory_group_manager", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_gpu_power", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_gpu_system", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_gpu_assign", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_gpu_partition_config", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_gpu_partition_control", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_arbiter", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_gpu_resource_group", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_gpu_aw", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_kbase", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="dma-buf-test-exporter", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="kutf", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_kutf_clk_rate_trace_test_portal", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_kutf_irq_test", MODE="0660", GROUP="video", TAG+="uaccess"
+ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_kutf_mgm_integration_test", MODE="0660", GROUP="video", TAG+="uaccess"
+
+ACTION=="add", SUBSYSTEM=="misc", MODE="0660", GROUP="video", TAG+="uaccess", RUN+="/usr/bin/load-mali-modules.sh"

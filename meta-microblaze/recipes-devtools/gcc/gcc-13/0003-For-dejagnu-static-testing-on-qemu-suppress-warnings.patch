@@ -1,7 +1,7 @@
 From 0b4ec0cbfc13f5a40a20663da9c074ac81c5ec3f Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 11 Jan 2017 15:46:28 +0530
-Subject: [PATCH 03/54] For dejagnu static testing on qemu, suppress warnings
+Subject: [PATCH 03/56] For dejagnu static testing on qemu, suppress warnings
  about multiple definitions from the test function and libc in line with
  method used by powerpc. Dynamic linking and using a qemu binary which
  understands sysroot resolves all test failures with builtins

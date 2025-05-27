@@ -1,7 +1,7 @@
 From fbf853f0b9571529dcc72fc53adf4a35abd3e050 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 13 Sep 2022 16:45:41 +0530
-Subject: [PATCH 53/54] Add Zero_extended instructions
+Subject: [PATCH 53/56] Add Zero_extended instructions
 
     Due to latest changes in GCC-10.2 MB64 perforamance has reduced
     We have added zero_extended instructions to get rid of left shift

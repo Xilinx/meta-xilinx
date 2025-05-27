@@ -1,7 +1,7 @@
 From 9dc1f7291c4c7abfe254ca4e86a6ba0975a74960 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 10:57:19 +0530
-Subject: [PATCH 12/54] Use bralid for profiler calls Signed-off-by: Edgar E.
+Subject: [PATCH 12/56] Use bralid for profiler calls Signed-off-by: Edgar E.
  Iglesias <edgar.iglesias@gmail.com>
 
 ---

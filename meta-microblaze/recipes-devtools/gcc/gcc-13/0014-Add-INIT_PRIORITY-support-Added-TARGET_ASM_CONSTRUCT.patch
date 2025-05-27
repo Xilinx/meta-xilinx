@@ -1,7 +1,7 @@
 From 40dd974a6cd608567f1746a934c9743b80ca1e3f Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 12 Sep 2022 20:20:00 +0530
-Subject: [PATCH 14/54] Add INIT_PRIORITY support Added TARGET_ASM_CONSTRUCTOR
+Subject: [PATCH 14/56] Add INIT_PRIORITY support Added TARGET_ASM_CONSTRUCTOR
  and TARGET_ASM_DESTRUCTOR macros.
 
 These macros allows users to control the order of initialization

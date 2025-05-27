@@ -1,7 +1,7 @@
 From d8b25fd6d8cac000bb8f5ad65ada949447322fca Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Wed, 1 May 2024 11:12:32 +0530
-Subject: [PATCH 50/54] When unwinding pc value, adjust return pc value
+Subject: [PATCH 50/56] When unwinding pc value, adjust return pc value
 
 A call (branch and link) instruction can include a delay slot, the
 value of pc stored in the link register for Microblaze architecture

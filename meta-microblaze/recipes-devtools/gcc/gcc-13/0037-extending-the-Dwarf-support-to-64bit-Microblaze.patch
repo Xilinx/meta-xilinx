@@ -1,7 +1,7 @@
 From d2c971646ce103fa17cc32474cb942268bc59258 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Mon, 15 Oct 2018 12:00:10 +0530
-Subject: [PATCH 37/54] extending the Dwarf support to 64bit Microblaze
+Subject: [PATCH 37/56] extending the Dwarf support to 64bit Microblaze
 
 ---
  gcc/config/microblaze/microblaze.h | 2 +-

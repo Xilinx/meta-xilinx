@@ -1,7 +1,7 @@
 From 9ea2aee3599d2f1fc9d67c7a72cd7c826272a2fa Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Sat, 13 Oct 2018 21:12:43 +0530
-Subject: [PATCH 36/54] Fixed the load store issue with the 32bit arith
+Subject: [PATCH 36/56] Fixed the load store issue with the 32bit arith
  libraries
 
 ---

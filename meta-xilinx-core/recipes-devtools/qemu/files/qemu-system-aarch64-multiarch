@@ -21,6 +21,7 @@ binpath = os.path.dirname(os.path.abspath(__file__))
 APU_args = sys.argv[1:]
 PMU_args = []
 PLM_args = []
+ASU_args = []
 bootbin_arg = None
 mach_path_arg = None
 dtb_arg = None
@@ -34,6 +35,11 @@ if '-plm-args' in APU_args:
     plm_args_idx = APU_args.index('-plm-args')
     PLM_args = APU_args[plm_args_idx+1].split()
     del APU_args[plm_args_idx:plm_args_idx+2]
+
+if '-asu-args' in APU_args:
+    asu_args_idx = APU_args.index('-asu-args')
+    ASU_args = APU_args[asu_args_idx+1].split()
+    del APU_args[asu_args_idx:asu_args_idx+2]
 
 if '-bootbin' in APU_args:
     bootbin_args_idx = APU_args.index('-bootbin')
@@ -60,6 +66,7 @@ def help(status):
     print("AMD FPGA QEMU multiarch wrapper\nVersion 2025.1\n\nUsage:")
     print(f"  {sys.argv[0]} <APU options> [-pmu-args <pmu options>] [-machine-path <path>]")
     print(f"  {sys.argv[0]} <APU options> [-plm-args <plm options>] [-machine-path <path>]\n")
+    print(f"  {sys.argv[0]} <APU options> [-plm-args <plm options>] [-asu-args <asu options>] [-machine-path <path>]\n")
     if status == 0:
         print(f"\n")
         if set(PMU_args).intersection(set(help_options)):
@@ -70,6 +77,10 @@ def help(status):
             print(f"PLM Options:\n")
             plm_args_s = ' '.join(PLM_args)
             help_cmd = f'{binpath}/qemu-system-microblazeel {plm_args_s}'
+        elif set(ASU_args).intersection(set(help_options)):
+            print(f"ASU Options:\n")
+            asu_args_s = ' '.join(ASU_args)
+            help_cmd = f'{binpath}/qemu-system-riscv32 {asu_args_s}'
         else:
             if not set(APU_args).intersection(set(help_options)):
                 APU_args.append('-help')
@@ -80,7 +91,7 @@ def help(status):
             apu_args_s = ' '.join(APU_args)
             help_cmd = f'{binpath}/qemu-system-aarch64 {apu_args_s}'
 
-        print(f"    -machine-path <path> - Optional path to use for multiarch files. This path must be less then about 100 characters.\n     Note: if specified caller is responsible for cleaning up the directory on exist\n")
+        print(f"    -machine-path <path> - Optional path to use for multiarch files\n     Note: if specified caller is responsible for cleaning up the directory on exit\n")
 
         print(f"{help_cmd}\n")
 
@@ -91,7 +102,7 @@ def help(status):
         status = process.wait()
     sys.exit(status)
 
-if set(APU_args).intersection(set(help_options)) or set(PMU_args).intersection(set(help_options)) or set(PLM_args).intersection(set(help_options)):
+if set(APU_args).intersection(set(help_options)) or set(PMU_args).intersection(set(help_options)) or set(PLM_args).intersection(set(help_options)) or set(ASU_args).intersection(set(help_options)):
     help(0)
 
 if not PMU_args and not PLM_args:
@@ -111,8 +122,11 @@ if mach_path_arg:
 else:
     mach_path = tempfile.mkdtemp()
 
-if PMU_args and PLM_args:
-    sys.exit("\nError: -pmu-args can not be used with -plm-args\n")
+if PMU_args and (PLM_args or ASU_args):
+    sys.exit("\nError: -pmu-args can not be used with -plm-args or -asu-args\n")
+
+if ASU_args and not PLM_args:
+    sys.exit("\nError: -asu-args required -plm-args\n")
 
 if PMU_args:
     try:
@@ -126,8 +140,9 @@ if PMU_args:
 
 if bootbin_arg:
     # List of valid bootgen arches and settings
-    archs = [ 'versal' ]
-    boot_header_addr = {'versal' : '0xf201e000'}
+    archs = [ 'versal', 'versal_2ve_2vm' ]
+    boot_header_addr = {'versal' : '0xf201e000', 'versal_2ve_2vm' : '0xf201eec0'}
+    hash_block_addr = {'versal' : None, 'versal_2ve_2vm' : '0xf201ecc0'}
 
     # The bootbin is separated into "arch:file"
     # Default to versal for legacy reasons
@@ -172,6 +187,15 @@ if bootbin_arg:
         print(f"\nERROR: boot header ({mach_path}/boot_bh.bin) or boot header ({boot_bh_addr}) address is missing\n")
         sys.exit(1)
 
+    hash_addr = hash_block_addr[arch]
+    if hash_addr:
+        if os.path.exists(f'{mach_path}/HashBlock0.bin'):
+            print(f"qemu-system-aarch64-multiarch: INFO: boot HashBlock0 load addr: {hash_addr}")
+            PLM_args.append(f"-device loader,file={mach_path}/HashBlock0.bin,addr={hash_addr}")
+        else:
+            print(f"\nERROR: Hash Block 0 ({mach_path}/HashBlock0.bin) is missing\n")
+            sys.exit(1)
+
     print(f"qemu-system-aarch64-multiarch: INFO: bootbin file dump PMC load addr: {pmc_load_addr}")
     PLM_args.append(f"-device loader,file={mach_path}/pmc_cdo.bin,addr={pmc_load_addr},force-raw=on")
 
@@ -195,6 +219,7 @@ if len(tcp_serial_ports) == 2:
     APU_args[tcp_serial_ports[0]],APU_args[tcp_serial_ports[1]] = APU_args[tcp_serial_ports[1]],APU_args[tcp_serial_ports[0]]
 
 mb_cmd = ""
+riscv_cmd = ""
 if PMU_args:
     pmu_args_s = ' '.join(PMU_args)
     mb_cmd = f'{binpath}/qemu-system-microblazeel {pmu_args_s} -machine-path {mach_path}'
@@ -205,9 +230,17 @@ if PLM_args:
     mb_cmd = f'{binpath}/qemu-system-microblazeel {plm_args_s} -machine-path {mach_path}'
     print(f"PLM instance cmd: {mb_cmd}\n")
 
+if ASU_args:
+    asu_args_s = ' '.join(ASU_args)
+    riscv_cmd = f'{binpath}/qemu-system-riscv32 {asu_args_s} -machine-path {mach_path}'
+    print(f"ASU instance cmd: {riscv_cmd}\n")
+
 apu_args_s = ' '.join(APU_args)
 apu_cmd = f'{binpath}/qemu-system-aarch64 {apu_args_s} -machine-path {mach_path}'
 print(f"APU instance cmd: {apu_cmd}\n")
+
+if riscv_cmd:
+    process_riscv = subprocess.Popen(riscv_cmd, shell=True, stderr=subprocess.PIPE)
 
 if mb_cmd:
     process_mb = subprocess.Popen(mb_cmd, shell=True, stderr=subprocess.PIPE)
@@ -223,7 +256,7 @@ if apu_cmd:
         rc = apu_rc
         error_msg += '\nQEMU APU instance failed (%s):\n%s' % (apu_rc, process_apu.stderr.read().decode())
 
-# We only report errors for MB if the APU failed (or APU wasn't started)
+# We only report errors for MB and Risc-V if the APU failed (or APU wasn't started)
 # otherwise we assume that the shutdown of the APU is the cause of the error
 try:
     if mb_cmd:
@@ -234,7 +267,19 @@ try:
 except subprocess.TimeoutExpired:
     process_mb.kill()
 
+try:
+    if riscv_cmd:
+        riscv_rc = process_riscv.wait(timeout=5)
+        if riscv_rc and (apu_cmd and apu_rc):
+            rc += riscv_rc
+            error_msg += '\nQEMU Risc-V instance failed (%s):\n%s' % (riscv_rc, process_riscv.stderr.read().decode())
+except subprocess.TimeoutExpired:
+    process_riscv.kill()
+
 if not mach_path_arg:
     shutil.rmtree(mach_path)
+
+if apu_rc != 0:
+    print(error_msg)
 
 sys.exit(apu_rc)

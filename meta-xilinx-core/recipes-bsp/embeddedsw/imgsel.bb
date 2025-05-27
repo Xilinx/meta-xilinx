@@ -8,6 +8,8 @@ INHIBIT_DEFAULT_DEPS = "1"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
+COMPATIBLE_MACHINE:versal = "versal"
+COMPATIBLE_MACHINE:versal-2ve-2vm = "versal-2ve-2vm"
 
 # Since we're just copying, we can run any config
 COMPATIBLE_HOST = ".*"
@@ -37,6 +39,7 @@ do_deploy() {
     if ${SHOULD_DEPLOY}; then
         install -Dm 0644 ${IMGSEL_FILE}.bin ${DEPLOYDIR}/${IMGSEL_IMAGE_NAME}.bin
         install -Dm 0644 ${IMGSEL_FILE}.elf ${DEPLOYDIR}/${IMGSEL_IMAGE_NAME}.elf
+        install -Dm 0644 ${IMGSEL_FILE}.manifest ${DEPLOYDIR}/${IMGSEL_IMAGE_NAME}.manifest
     fi
 }
 

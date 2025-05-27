@@ -1,0 +1,421 @@
+From c658eaeed963ab77812fb14045c528b83f523e7a Mon Sep 17 00:00:00 2001
+From: Parth Gajjar <parth.gajjar@amd.com>
+Date: Tue, 4 Mar 2025 10:57:27 -0800
+Subject: [PATCH 2/2] Making arbiter driver compatible with 6.12 kernel
+
+remove returns void after 6.11 kernel instead of int
+
+Signed-off-by: Parth Gajjar <parth.gajjar@amd.com>
+---
+ .../arbiter/mali_arbiter/mali_arbiter_main.c   | 10 ++++++++++
+ .../power/mali_gpu_power/mali_gpu_power.c      | 13 +++++++++++++
+ .../ptm/mali_gpu_assign/mali_gpu_assign.c      | 10 ++++++++++
+ .../ptm/mali_gpu_aw/mali_gpu_aw_main.c         | 16 ++++++++++++++++
+ .../mali_gpu_partition_config.c                | 17 +++++++++++++++++
+ .../mali_gpu_partition_control.c               | 18 ++++++++++++++++++
+ .../mali_gpu_resource_group_main.c             | 13 +++++++++++++
+ .../ptm/mali_gpu_system/mali_gpu_system.c      | 14 ++++++++++++++
+ .../tests/mali_emu_kbase/mali_emu_kbase.c      | 10 ++++++++++
+ 9 files changed, 121 insertions(+)
+
+diff --git a/drivers/gpu/arm/arbitration/arbiter/mali_arbiter/mali_arbiter_main.c b/drivers/gpu/arm/arbitration/arbiter/mali_arbiter/mali_arbiter_main.c
+index b1a7439..5887917 100644
+--- a/drivers/gpu/arm/arbitration/arbiter/mali_arbiter/mali_arbiter_main.c
++++ b/drivers/gpu/arm/arbitration/arbiter/mali_arbiter/mali_arbiter_main.c
+@@ -15,6 +15,7 @@
+ #include <linux/of_platform.h>
+ #include <linux/of_address.h>
+ #include <linux/platform_device.h>
++#include <linux/version.h>
+ 
+ #include <mali_arbiter/mali_arbiter.h>
+ #include "mali_arbiter_core.h"
+@@ -122,7 +123,11 @@ static int arbiter_probe(struct platform_device *pdev)
+  *
+  * Return: 0 if success or a Linux error code
+  */
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++static void arbiter_remove(struct platform_device *pdev)
++#else
+ static int arbiter_remove(struct platform_device *pdev)
++#endif
+ {
+ 	struct mali_arb_data *arb_data;
+ 
+@@ -132,7 +137,12 @@ static int arbiter_remove(struct platform_device *pdev)
+ 		arbiter_core_destroy(&pdev->dev, arb_data);
+ 
+ 	dev_info(&pdev->dev, "Arbiter removed\n");
++
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++	return;
++#else
+ 	return 0;
++#endif
+ }
+ 
+ static const struct of_device_id arbiter_dt_match[] = { { .compatible = MALI_ARBITER_DT_NAME },
+diff --git a/drivers/gpu/arm/arbitration/power/mali_gpu_power/mali_gpu_power.c b/drivers/gpu/arm/arbitration/power/mali_gpu_power/mali_gpu_power.c
+index 1f04d2b..f96c1d5 100644
+--- a/drivers/gpu/arm/arbitration/power/mali_gpu_power/mali_gpu_power.c
++++ b/drivers/gpu/arm/arbitration/power/mali_gpu_power/mali_gpu_power.c
+@@ -1449,12 +1449,20 @@ static void gpu_power_cleanup(struct mali_gpu_power *gpu_power)
+  *
+  * Return: 0 always
+  */
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++static void gpu_power_remove(struct platform_device *pdev)
++#else
+ static int gpu_power_remove(struct platform_device *pdev)
++#endif
+ {
+ 	struct mali_gpu_power *gpu_power;
+ 
+ 	if (!pdev)
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++		return;
++#else
+ 		return 0;
++#endif
+ 
+ 	gpu_power = gpu_power_from_dev(&pdev->dev);
+ 
+@@ -1496,7 +1504,12 @@ static int gpu_power_remove(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, NULL);
+ 
+ 	dev_info(&pdev->dev, "dvfs_integrator_remove done\n");
++
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++	return;
++#else
+ 	return 0;
++#endif
+ }
+ 
+ /*
+diff --git a/drivers/gpu/arm/arbitration/ptm/mali_gpu_assign/mali_gpu_assign.c b/drivers/gpu/arm/arbitration/ptm/mali_gpu_assign/mali_gpu_assign.c
+index 424629e..f0038b0 100644
+--- a/drivers/gpu/arm/arbitration/ptm/mali_gpu_assign/mali_gpu_assign.c
++++ b/drivers/gpu/arm/arbitration/ptm/mali_gpu_assign/mali_gpu_assign.c
+@@ -16,6 +16,7 @@
+ #include <linux/of_address.h>
+ #include <linux/string.h>
+ #include <linux/io.h>
++#include <linux/version.h>
+ #include <ptm/mali_gpu_assign.h>
+ 
+ /*
+@@ -780,7 +781,11 @@ fail_resources:
+  *
+  * Return: 0
+  */
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++static void gpu_assign_remove(struct platform_device *pdev)
++#else
+ static int gpu_assign_remove(struct platform_device *pdev)
++#endif
+ {
+ 	struct mali_gpu_ptm_assign *ptm_assign_data;
+ 
+@@ -792,7 +797,12 @@ static int gpu_assign_remove(struct platform_device *pdev)
+ 		dev_set_drvdata(&pdev->dev, NULL);
+ 		devm_kfree(&pdev->dev, ptm_assign_data);
+ 	}
++
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++	return;
++#else
+ 	return 0;
++#endif
+ }
+ 
+ 
+diff --git a/drivers/gpu/arm/arbitration/ptm/mali_gpu_aw/mali_gpu_aw_main.c b/drivers/gpu/arm/arbitration/ptm/mali_gpu_aw/mali_gpu_aw_main.c
+index 9b64856..1affb7c 100644
+--- a/drivers/gpu/arm/arbitration/ptm/mali_gpu_aw/mali_gpu_aw_main.c
++++ b/drivers/gpu/arm/arbitration/ptm/mali_gpu_aw/mali_gpu_aw_main.c
+@@ -1632,7 +1632,11 @@ fail_request_mem:
+  *
+  * Return: Linux error code
+  */
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++static void aw_remove(struct platform_device *pdev)
++#else
+ static int aw_remove(struct platform_device *pdev)
++#endif
+ {
+ 	struct arbiter_if_dev *arbif_dev;
+ 	struct mali_gpu_ptm_aw *awdev;
+@@ -1642,11 +1646,19 @@ static int aw_remove(struct platform_device *pdev)
+ 	uint64_t msg_payload;
+ 
+ 	if (WARN_ON(!pdev))
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++		return;
++#else
+ 		return -EINVAL;
++#endif
+ 
+ 	arbif_dev = platform_get_drvdata(pdev);
+ 	if (WARN_ON(!arbif_dev))
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++		return;
++#else
+ 		return -EFAULT;
++#endif
+ 
+ 	awdev = container_of(arbif_dev, struct mali_gpu_ptm_aw, arbif_dev);
+ 
+@@ -1693,7 +1705,11 @@ static int aw_remove(struct platform_device *pdev)
+ 
+ 	free_awdev(awdev);
+ 
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++	return;
++#else
+ 	return 0;
++#endif
+ }
+ 
+ 
+diff --git a/drivers/gpu/arm/arbitration/ptm/mali_gpu_partition_config/mali_gpu_partition_config.c b/drivers/gpu/arm/arbitration/ptm/mali_gpu_partition_config/mali_gpu_partition_config.c
+index e780514..472204b 100644
+--- a/drivers/gpu/arm/arbitration/ptm/mali_gpu_partition_config/mali_gpu_partition_config.c
++++ b/drivers/gpu/arm/arbitration/ptm/mali_gpu_partition_config/mali_gpu_partition_config.c
+@@ -10,6 +10,7 @@
+ #include <linux/of_address.h>
+ #include <linux/iopoll.h>
+ #include <linux/of_platform.h>
++#include <linux/version.h>
+ #include <ptm/mali_gpu_partition_config.h>
+ 
+ 
+@@ -310,18 +311,30 @@ req_memory_fail:
+  *
+  * Return: 0 if success, or a Linux error code
+  */
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++static void pm_config_remove(struct platform_device *pdev)
++#else
+ static int pm_config_remove(struct platform_device *pdev)
++#endif
+ {
+ 	struct part_cfg_ops *ops;
+ 	struct mali_gpu_part_cfg *partition_config;
+ 
+ 	if (!pdev)
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++		return;
++#else
+ 		return -EINVAL;
++#endif
+ 
+ 	ops = dev_get_drvdata(&pdev->dev);
+ 	if (ops == NULL) {
+ 		dev_err(&pdev->dev, "Retrieving ptm config device failed\n");
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++		return;
++#else
+ 		return -ENODEV;
++#endif
+ 	}
+ 
+ 	partition_config = container_of(ops, struct mali_gpu_part_cfg, prt_cfg_ops);
+@@ -333,7 +346,11 @@ static int pm_config_remove(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, NULL);
+ 	devm_kfree(&pdev->dev, partition_config);
+ 
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++	return;
++#else
+ 	return 0;
++#endif
+ }
+ 
+ 
+diff --git a/drivers/gpu/arm/arbitration/ptm/mali_gpu_partition_control/mali_gpu_partition_control.c b/drivers/gpu/arm/arbitration/ptm/mali_gpu_partition_control/mali_gpu_partition_control.c
+index 4a48165..a47a151 100644
+--- a/drivers/gpu/arm/arbitration/ptm/mali_gpu_partition_control/mali_gpu_partition_control.c
++++ b/drivers/gpu/arm/arbitration/ptm/mali_gpu_partition_control/mali_gpu_partition_control.c
+@@ -10,6 +10,8 @@
+ #include <linux/of_address.h>
+ #include <linux/iopoll.h>
+ #include <linux/of_platform.h>
++#include <linux/version.h>
++
+ #include <mali_arbiter/mali_arbiter.h>
+ 
+ /* Arbiter version against which was implemented this file */
+@@ -403,16 +405,28 @@ req_memory_fail:
+  *
+  * Return: Always returns 0
+  */
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++static void pm_control_remove(struct platform_device *pdev)
++#else
+ static int pm_control_remove(struct platform_device *pdev)
++#endif
+ {
+ 	struct mali_gpu_part_ctrl *partition_ctrl;
+ 
+ 	if (!pdev)
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++		return;
++#else
+ 		return -EINVAL;
++#endif
+ 
+ 	partition_ctrl = to_mali_gpu_part_ctrl(&pdev->dev);
+ 	if (!partition_ctrl)
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++		return;
++#else
+ 		return -ENODEV;
++#endif
+ 
+ 	release_mem_region(partition_ctrl->reg_resrc->start,
+ 			   resource_size(partition_ctrl->reg_resrc));
+@@ -421,7 +435,11 @@ static int pm_control_remove(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, NULL);
+ 	devm_kfree(&pdev->dev, partition_ctrl);
+ 
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++	return;
++#else
+ 	return 0;
++#endif
+ }
+ 
+ static const struct of_device_id pm_control_dt_match[] = { { .compatible = PTM_CONTROL_DT_NAME },
+diff --git a/drivers/gpu/arm/arbitration/ptm/mali_gpu_resource_group/mali_gpu_resource_group_main.c b/drivers/gpu/arm/arbitration/ptm/mali_gpu_resource_group/mali_gpu_resource_group_main.c
+index a3df9f8..23ea357 100644
+--- a/drivers/gpu/arm/arbitration/ptm/mali_gpu_resource_group/mali_gpu_resource_group_main.c
++++ b/drivers/gpu/arm/arbitration/ptm/mali_gpu_resource_group/mali_gpu_resource_group_main.c
+@@ -25,6 +25,7 @@
+ #include <linux/of_platform.h>
+ #include <linux/iopoll.h>
+ #include <linux/atomic.h>
++#include <linux/version.h>
+ 
+ #include <arb_vm_protocol/mali_arb_vm_protocol.h>
+ #include <linux/mali_gpu_power.h>
+@@ -2726,7 +2727,11 @@ out_rg_alloc:
+  *
+  * Return: Always returns 0.
+  */
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++static void res_group_remove(struct platform_device *pdev)
++#else
+ static int res_group_remove(struct platform_device *pdev)
++#endif
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct mali_gpu_ptm_rg *ptm_rg;
+@@ -2735,7 +2740,11 @@ static int res_group_remove(struct platform_device *pdev)
+ 
+ 	ptm_rg = to_mali_gpu_ptm_rg(dev);
+ 	if (!ptm_rg)
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++		return;
++#else
+ 		return -ENODEV;
++#endif
+ 
+ 	reg_res = ptm_rg->res;
+ 	mem = ptm_rg->mem;
+@@ -2774,7 +2783,11 @@ static int res_group_remove(struct platform_device *pdev)
+ 	/* Free the memory allocated to the device */
+ 	devm_kfree(&pdev->dev, ptm_rg);
+ 
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++	return;
++#else
+ 	return 0;
++#endif
+ }
+ 
+ 
+diff --git a/drivers/gpu/arm/arbitration/ptm/mali_gpu_system/mali_gpu_system.c b/drivers/gpu/arm/arbitration/ptm/mali_gpu_system/mali_gpu_system.c
+index 73ca508..abefab0 100644
+--- a/drivers/gpu/arm/arbitration/ptm/mali_gpu_system/mali_gpu_system.c
++++ b/drivers/gpu/arm/arbitration/ptm/mali_gpu_system/mali_gpu_system.c
+@@ -19,6 +19,8 @@
+ #include <linux/interrupt.h>
+ #include <linux/irq.h>
+ #include <linux/bitops.h>
++#include <linux/version.h>
++
+ #include <ptm/mali_gpu_assign.h>
+ 
+ /* Device tree compatible ID of the System Module */
+@@ -522,7 +524,11 @@ fail_resources:
+  *
+  * Return: 0 always
+  */
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++static void gpu_system_remove(struct platform_device *pdev)
++#else
+ static int gpu_system_remove(struct platform_device *pdev)
++#endif
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct system *system;
+@@ -536,10 +542,18 @@ static int gpu_system_remove(struct platform_device *pdev)
+ 		free_irq(system->irq.line, system);
+ 		dev_set_drvdata(dev, NULL);
+ 		devm_kfree(dev, system);
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++		return;
++#else
+ 		return 0;
++#endif
+ 	}
+ 	dev_err(dev, "Can't properly release resources");
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++	return;
++#else
+ 	return -EINVAL;
++#endif
+ }
+ 
+ 
+diff --git a/drivers/gpu/arm/arbitration/tests/mali_emu_kbase/mali_emu_kbase.c b/drivers/gpu/arm/arbitration/tests/mali_emu_kbase/mali_emu_kbase.c
+index 602fdf6..9652f42 100644
+--- a/drivers/gpu/arm/arbitration/tests/mali_emu_kbase/mali_emu_kbase.c
++++ b/drivers/gpu/arm/arbitration/tests/mali_emu_kbase/mali_emu_kbase.c
+@@ -36,6 +36,7 @@
+ #include <linux/of_platform.h>
+ #include <linux/workqueue.h>
+ #include <linux/sched.h>
++#include <linux/version.h>
+ #include <linux/mali_arbiter_interface.h>
+ 
+ #define MALI_REQUIRED_KBASE_ARBITER_INTERFACE_VERSION 5
+@@ -354,7 +355,11 @@ clean_up:
+  *
+  * Return: Always returns 0
+  */
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++static void kbase_remove(struct platform_device *pdev)
++#else
+ static int kbase_remove(struct platform_device *pdev)
++#endif
+ {
+ 	struct mali_emu_kbase *kbase;
+ 
+@@ -371,7 +376,12 @@ static int kbase_remove(struct platform_device *pdev)
+ 	module_put(kbase->pdev->dev.driver->owner);
+ 
+ 	devm_kfree(&pdev->dev, kbase);
++
++#if (KERNEL_VERSION(6, 11, 0) <= LINUX_VERSION_CODE)
++	return;
++#else
+ 	return 0;
++#endif
+ }
+ 
+ /*
+-- 
+2.34.1
+

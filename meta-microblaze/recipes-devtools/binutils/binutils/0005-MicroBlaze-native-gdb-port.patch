@@ -1,7 +1,7 @@
 From 5b633480eb0b45dc15b6416c54535c54c062d23c Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 10 Oct 2022 18:53:46 +0530
-Subject: [PATCH 05/53] MicroBlaze native gdb port.
+Subject: [PATCH 05/56] MicroBlaze native gdb port.
 
 signed-off-by : Mahesh Bodapati <mbodapat@amd.com>
 

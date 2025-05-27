@@ -1,6 +1,17 @@
 inherit esw
 
-DEPENDS += "xilstandalone xiltimer xilffs xilpdi xilplmi xilloader xilpm xilsecure xilsem xilnvm"
+DEPENDS += "\
+    xilstandalone \
+    xiltimer \
+    xilffs \
+    xilpdi \
+    xilplmi \
+    xilloader \
+    ${@'xilpm-ng' if d.getVar('ESW_MACHINE') == 'pmc_0' else 'xilpm'} \
+    xilsecure \
+    xilsem \
+    xilnvm \
+    "
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/versal_plm/src/"
 

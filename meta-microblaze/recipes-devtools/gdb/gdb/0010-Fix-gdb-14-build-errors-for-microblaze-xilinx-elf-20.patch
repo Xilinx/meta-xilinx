@@ -1,7 +1,7 @@
 From 6b6632b730808a012738f9eddf621abd6463e317 Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Thu, 29 Feb 2024 10:53:04 +0530
-Subject: [PATCH 10/54] Fix gdb-14 build errors for microblaze-xilinx-elf
+Subject: [PATCH 10/56] Fix gdb-14 build errors for microblaze-xilinx-elf
  2023.2 merge
 
 Signed-off-by: Aayush Misra <aayushm@amd.com>

@@ -1,7 +1,7 @@
 From e4d7207d18e47a9ce5fbf57fc4faa370bf150284 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 26 Aug 2019 15:29:42 +0530
-Subject: [PATCH 30/53] double imml generation for 64 bit values.
+Subject: [PATCH 30/56] double imml generation for 64 bit values.
 
 Conflicts:
 	gas/config/tc-microblaze.c

@@ -1,7 +1,7 @@
 From b792943436857172e7a39e26a00602c7e6620860 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 13 Sep 2022 16:38:43 +0530
-Subject: [PATCH 52/54] If we use break_handler attribute then interrupt vector
+Subject: [PATCH 52/56] If we use break_handler attribute then interrupt vector
  call happened to break_handler instead of interrupt_handler. this fix will
  resolve the issue CR-1081780. This fix will not change the behavior of
  compiler unless there is a usage of break_handler attribute. signed-off-by :

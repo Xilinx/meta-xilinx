@@ -1,7 +1,7 @@
 From 8d20c82d95e22a42551b446c087d9e06958a3580 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 26 Aug 2019 15:55:22 +0530
-Subject: [PATCH 48/54] Added support for 64 bit Immediate values.
+Subject: [PATCH 48/56] Added support for 64 bit Immediate values.
 
 ---
  gcc/config/microblaze/constraints.md | 4 ++--

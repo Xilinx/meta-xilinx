@@ -1,0 +1,29 @@
+From b7cc270ee80eaf67dd4240ffefaafcff57a541d2 Mon Sep 17 00:00:00 2001
+From: Jonathan Stroud <jonathan.stroud@amd.com>
+Date: Mon, 24 Mar 2025 18:26:35 -0600
+Subject: [PATCH] Reread the eeprom in the late_board_init
+
+The pointer to the board_info gets reset when switching to executing out
+of DDR, so re-read the eeprom.
+
+Signed-off-by: Jonathan Stroud <jonathan.stroud@amd.com>
+---
+ board/xilinx/common/board.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/board/xilinx/common/board.c b/board/xilinx/common/board.c
+index 02490ae85a3..c5048142a24 100644
+--- a/board/xilinx/common/board.c
++++ b/board/xilinx/common/board.c
+@@ -431,6 +431,8 @@ int board_late_init_xilinx(void)
+ 	u64 bootscr_address;
+ 	u64 bootscr_offset;
+ 
++	xilinx_read_eeprom();
++
+ 	/* Fetch bootscr_address/bootscr_offset from DT and update */
+ 	if (!ofnode_read_bootscript_address(&bootscr_address,
+ 					    &bootscr_offset)) {
+-- 
+2.34.1
+

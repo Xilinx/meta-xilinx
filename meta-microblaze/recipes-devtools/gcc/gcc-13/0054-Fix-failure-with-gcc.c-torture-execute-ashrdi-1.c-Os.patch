@@ -1,7 +1,7 @@
 From 79d007fea870a3b8d72faa90238cee2cdfaf5c85 Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Fri, 28 Jun 2024 12:18:38 +0530
-Subject: [PATCH 54/54] Fix failure with gcc.c-torture/execute/ashrdi-1.c -Os
+Subject: [PATCH 54/56] Fix failure with gcc.c-torture/execute/ashrdi-1.c -Os
  execution test
 
 The following tests fail with -Os option because a shift instruction

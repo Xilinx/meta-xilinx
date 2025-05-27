@@ -1,7 +1,7 @@
 From 6de628ecccf3739891052a2fbaf97048384c6190 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 16:34:27 +0530
-Subject: [PATCH 07/54] Add MicroBlaze to check_profiling_available Testsuite,
+Subject: [PATCH 07/56] Add MicroBlaze to check_profiling_available Testsuite,
  add microblaze*-*-* target in check_profiling_available inline with other
  archs setting profiling_available_saved to 0
 

@@ -44,10 +44,10 @@ This layer depends on:
         https://github.com/Xilinx/meta-xilinx (development and AMD release)
 	layers: meta-xilinx-core, meta-xilinx-microblaze, meta-xilinx-bsp,
             meta-xilinx-standalone.
-	branch: scarthgap or AMD release version (e.g. rel-v2024.2)
+	branch: scarthgap or AMD release version (e.g. rel-v2025.1)
 
 	URI: https://github.com/Xilinx/meta-jupyter
-	branch: scarthgap or AMD release version (e.g. rel-v2024.2)
+	branch: scarthgap or AMD release version (e.g. rel-v2025.1)
 
 	URI: https://github.com/OpenAMP/meta-openamp
 	branch: scarthgap
@@ -57,7 +57,7 @@ This layer depends on:
 
 	URI: https://github.com/Xilinx/meta-ros
 	layers: meta-ros-common, meta-ros2, meta-ros2-jazzy
-	branch: AMD release version (e.g. rel-v2024.2)
+	branch: AMD release version (e.g. rel-v2025.1)
 
 	URI: https://git.yoctoproject.org/meta-arm
 	layers: meta-arm, meta-arm-toolchain

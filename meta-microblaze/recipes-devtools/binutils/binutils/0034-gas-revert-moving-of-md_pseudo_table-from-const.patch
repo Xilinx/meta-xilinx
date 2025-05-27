@@ -1,7 +1,7 @@
 From ec4fac4177c4364f52d1bc6ba53ffd971323cc22 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 8 Nov 2021 21:57:13 +0530
-Subject: [PATCH 34/53] gas: revert moving of md_pseudo_table from const
+Subject: [PATCH 34/56] gas: revert moving of md_pseudo_table from const
 
 The base system expect md_pseudo_table to be constant, Changing the
 definition will break other architectures when compiled with a

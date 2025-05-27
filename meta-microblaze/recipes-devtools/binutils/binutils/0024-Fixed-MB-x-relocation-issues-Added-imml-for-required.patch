@@ -1,7 +1,7 @@
 From 88f7a313f8e21021dacfc8da2c490a433f596fd8 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 28 Sep 2018 12:04:55 +0530
-Subject: [PATCH 24/53] -Fixed MB-x relocation issues -Added imml for required
+Subject: [PATCH 24/56] -Fixed MB-x relocation issues -Added imml for required
  MB-x instructions
 
 Conflicts:

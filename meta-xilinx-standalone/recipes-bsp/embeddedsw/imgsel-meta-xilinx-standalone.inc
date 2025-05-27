@@ -1,7 +1,13 @@
 # Default imgsel configuration, using fsbl multiconfig
 IMGSEL_DEPENDS ?= ""
-IMGSEL_MCDEPENDS ?= "mc::${MACHINE}-cortexa53-fsbl:image-selector:do_deploy"
-IMGSEL_DEPLOY_DIR ?= "${TOPDIR}/tmp-${MACHINE}-cortexa53-fsbl/deploy/images/${MACHINE}/"
+
+IMGSEL_MC_TARGET ?=""
+IMGSEL_MC_TARGET:zynqmp ?= "${MACHINE}-cortexa53-fsbl"
+IMGSEL_MC_TARGET:versal ?= "${MACHINE}-microblaze-pmc"
+IMGSEL_MC_TARGET:versal-2ve-2vm ?= "${MACHINE}-microblaze-pmc"
+
+IMGSEL_MCDEPENDS ?= "mc::${IMGSEL_MC_TARGET}:image-selector:do_deploy"
+IMGSEL_DEPLOY_DIR ?= "${TOPDIR}/tmp-${IMGSEL_MC_TARGET}/deploy/images/${MACHINE}/"
 IMGSEL_IMAGE_NAME ?= "image-selector-${MACHINE}"
 
 def check_imgsel_variables(d):

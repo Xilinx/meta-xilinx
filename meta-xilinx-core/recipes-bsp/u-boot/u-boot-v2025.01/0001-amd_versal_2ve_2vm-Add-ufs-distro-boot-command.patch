@@ -1,0 +1,40 @@
+From e1daf390355f8f3b095dd91811182171738e26e0 Mon Sep 17 00:00:00 2001
+From: Jonathan Stroud <jonathan.stroud@amd.com>
+Date: Wed, 26 Mar 2025 18:14:14 -0600
+Subject: [PATCH] Hack for the boot_ufs command
+
+Hack the UFS bootcmd_ufs to work with existing implementation.  Eventually
+the implementation will fall back to a more generic design that is
+compatible with regular u-boot implementation.
+
+Patch is Yocto Project integration specific.
+
+Based on a patch originally from:
+
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+Signed-off-by: Jonathan Stroud <jonathan.stroud@amd.com>
+
+Added contentxt and renamed the patch
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ include/configs/amd_versal2.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/configs/amd_versal2.h b/include/configs/amd_versal2.h
+index 1ade6adfa0b..5ad72eb4767 100644
+--- a/include/configs/amd_versal2.h
++++ b/include/configs/amd_versal2.h
+@@ -108,7 +108,8 @@
+ #define BOOT_TARGET_DEVICES_UFS(func)	func(UFS, ufs, 0)
+ 
+ #define BOOTENV_DEV_UFS(devtypeu, devtypel, instance) \
+-	"bootcmd_" #devtypel "=" #devtypel " init " #instance "; scsi scan;\0"
++	"bootcmd_ufs=echo UFS: Trying to boot script at ${scriptaddr} && " \
++	"source ${scriptaddr}; echo UFS: SCRIPT FAILED: continuing...;\0"
+ 
+ #define BOOTENV_DEV_NAME_UFS(devtypeu, devtypel, instance) \
+ 	"ufs "
+-- 
+2.34.1
+

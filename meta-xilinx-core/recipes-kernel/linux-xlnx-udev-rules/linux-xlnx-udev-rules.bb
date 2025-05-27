@@ -17,6 +17,7 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:microblaze = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
+COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
 
 do_configure[noexec] = '1'
 do_compile[noexec] = '1'

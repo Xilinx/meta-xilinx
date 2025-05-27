@@ -1,7 +1,7 @@
 From 41d8b3677d64bf9408925667c103a04b176050d5 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 16:52:56 +0530
-Subject: [PATCH 11/54] Added ashrsi3_with_size_opt Added ashrsi3_with_size_opt
+Subject: [PATCH 11/56] Added ashrsi3_with_size_opt Added ashrsi3_with_size_opt
  pattern to optimize the sra instructions when the -Os optimization is used.
  lshrsi3_with_size_opt is being removed as it has conflicts with unsigned int
  variables

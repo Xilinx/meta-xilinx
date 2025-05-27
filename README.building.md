@@ -6,7 +6,7 @@ layers.
 The following instructions require OE-Core meta and BitBake. Poky provides these
 components, however they can be acquired separately.
 
-> **Pre-requisites:** Refer [Preparing Build Host](https://docs.yoctoproject.org/5.0.4/singleindex.html#preparing-the-build-host) documentation.
+> **Pre-requisites:** Refer [Preparing Build Host](https://docs.yoctoproject.org/5.0.8/singleindex.html#preparing-the-build-host) documentation.
 
 1. Create a project directory.
 ```
@@ -41,6 +41,11 @@ $ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx-tools
 > submodules, If you don't need to clone gen-machine-conf repo then remove
 > `--recurse-submodules` option.
 > * Skip this step if you are using yocto-manifests https://github.com/Xilinx/yocto-manifests
+> * If you are using pre-built target machines then clone these layers and add
+>   these layers in step 4. For more details see meta layer README files.
+>   * [meta-amd-adaptive-socs-bsp README](https://github.com/Xilinx/meta-amd-adaptive-socs/blob/master/meta-amd-adaptive-socs-bsp/README.asoc.bsp.md)
+>   * [meta-xilinx-tools README](https://github.com/Xilinx/meta-xilinx-tools/blob/master/README.xsct.bsp.md)
+>   * [meta-kria README](https://github.com/Xilinx/meta-kria/blob/master/README.kria.bsp.md)
 
 3. Initialize a build environment using the `oe-init-build-env` script. 
 ```
@@ -61,7 +66,6 @@ $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-filesystems
 $ bitbake-layers add-layer ./<path-to-layer>/meta-virtualization
 $ bitbake-layers add-layer ./<path-to-layer>/meta-arm/meta-arm-toolchain
 $ bitbake-layers add-layer ./<path-to-layer>/meta-arm/meta-arm
-$ bitbake-layers add-layer ./<path-to-layer>/meta-openamp
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-microblaze
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-core
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone
@@ -70,14 +74,25 @@ $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-bsp
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-tools
 ```
 > **Note:**
-> 1. For SDT build flow user can remove meta-xilinx-tools as this layer is
+> 1. If any of the layers depends on other layers then add those layers first.
+> 2. For SDT build flow user can remove meta-xilinx-tools as this layer is
 > optional.
-> 2. If user wants to build machine files supported by meta-xilinx-vendor or
+> 3. If user wants to use MALI400 or MALIG78AE GPU or Multimedia or PL firmware
+>    demos or Virtualization then add these respective layers. For more details
+>    see layer README files.
+> ```
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-mali400
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-demos
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-multimedia
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-virtualization
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-gpu-malig78ae
+> ```
+> 4. If user wants to build machine files supported by meta-xilinx-vendor or
 > met-xilinx-contrib layer then include these layer running following commands.
-```
-$ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-vendor
-$ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-contrib
-```
+> ```
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-vendor
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-contrib
+> ```
 
 5. Create a new layer to for SDT or XSCT machine files geneated using gen-machineconf
    tool. If user already has a custom-bsp layer then you can skip this step.
@@ -102,11 +117,6 @@ TMPDIR = "/tmp/$USER/yocto/release_version/build"
 ```
 MACHINE = "<target_machine_name>"
 ```
-* For list of available pre-built target machines see meta layer README files.
-
-  * [meta-amd-adaptive-socs-bsp README](https://github.com/Xilinx/meta-amd-adaptive-socs/blob/master/meta-amd-adaptive-socs-bsp/README.asoc.bsp.md)
-  * [meta-xilinx-tools README](https://github.com/Xilinx/meta-xilinx-tools/blob/master/README.xsct.bsp.md)
-  * [meta-kria README](https://github.com/Xilinx/meta-kria/blob/master/README.kria.bsp.md)
 
 9. Once machine files are generated in <conf-directory>/machine/<soc-family>-<board-name>-<sdt-or-xsct>-<design-name>.conf,
    include the QEMU DT files, See [QEMU Configurations](#qemu-configurations)

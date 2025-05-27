@@ -1,0 +1,108 @@
+From bac2a8aa9675f99124cf86b030e885ad70047ab1 Mon Sep 17 00:00:00 2001
+From: Arno Glim <arno.glim@amd.com>
+Date: Wed, 9 Apr 2025 10:48:47 -0700
+Subject: [LIBDRM PATCH v2] Update libdrm drm_fourcc.h to add VCU2 tiled formats
+ needed to compile kmssink for gstreamer. Actual support will be added in
+ future. Aligned somewhat with uapi version of this file.
+
+BRANCH: devtool
+CR-1225127
+
+Upstream-Status: Pending
+
+Signed-off-by: Arno Glim <arno.glim@amd.com>
+---
+ include/drm/drm_fourcc.h | 55 ++++++++++++++++++++++++++++++----------
+ 1 file changed, 41 insertions(+), 14 deletions(-)
+
+diff --git a/include/drm/drm_fourcc.h b/include/drm/drm_fourcc.h
+index 804b2f2..7e27bfd 100644
+--- a/include/drm/drm_fourcc.h
++++ b/include/drm/drm_fourcc.h
+@@ -326,6 +326,14 @@ extern "C" {
+ #define DRM_FORMAT_NV20		fourcc_code('N', 'V', '2', '0') /* 2x1 subsampled Cr:Cb plane */
+ #define DRM_FORMAT_NV30		fourcc_code('N', 'V', '3', '0') /* non-subsampled Cr:Cb plane */
+
++/*
++ * 2 plane 10 bit per component YCbCr
++ * index 0 = Y plane, [31:0] x:Y2:Y1:Y0 2:10:10:10 little endian
++ * index 1 = Cb:Cr plane, [63:0] x:Cb2:Cr2:Cb1:x:Cr1:Cb0:Cr0 2:10:10:10:2:10:10:10 little endian
++ */
++#define DRM_FORMAT_XV15                fourcc_code('X', 'V', '1', '5') /* 2x2 subsampled Cb:Cr plane 2:10:10:10 */
++#define DRM_FORMAT_XV20                fourcc_code('X', 'V', '2', '0') /* 2x1 subsampled Cb:Cr plane 2:10:10:10 */
++
+ /*
+  * 2 plane YCbCr MSB aligned
+  * index 0 = Y plane, [15:0] Y:x [10:6] little endian
+@@ -377,13 +385,13 @@ extern "C" {
+  */
+ #define DRM_FORMAT_Q401		fourcc_code('Q', '4', '0', '1')
+
+-/*
+- * 2 plane 10 bit per component YCbCr
+- * index 0 = Y plane, [31:0] x:Y2:Y1:Y0 2:10:10:10 little endian
+- * index 1 = Cb:Cr plane, [63:0] x:Cb2:Cr2:Cb1:x:Cr1:Cb0:Cr0 2:10:10:10:2:10:10:10 little endian
++/* 3 plane non-subsampled (444) YCbCr
++ * 10 bits per component
++ * index 0: Y plane, [31:0] x:Y2:Y1:Y0 [2:10:10:10] little endian
++ * index 1: Cb plane, [31:0] x:Cb2:Cb1:Cb0 [2:10:10:10] little endian
++ * index 2: Cr plane, [31:0] x:Cr2:Cr1:Cr0 [2:10:10:10] little endian
+  */
+-#define DRM_FORMAT_XV15                fourcc_code('X', 'V', '1', '5') /* 2x2 subsampled Cb:Cr plane 2:10:10:10 */
+-#define DRM_FORMAT_XV20                fourcc_code('X', 'V', '2', '0') /* 2x1 subsampled Cb:Cr plane 2:10:10:10 */
++#define DRM_FORMAT_X403		fourcc_code('X', '4', '0', '3') /* non-subsampled Cb:Cr plane, 10 bit per channel */
+
+ /*
+  * 3 plane YCbCr
+@@ -405,13 +413,32 @@ extern "C" {
+ #define DRM_FORMAT_YUV444	fourcc_code('Y', 'U', '2', '4') /* non-subsampled Cb (1) and Cr (2) planes */
+ #define DRM_FORMAT_YVU444	fourcc_code('Y', 'V', '2', '4') /* non-subsampled Cr (1) and Cb (2) planes */
+
+-/* 3 plane non-subsampled (444) YCbCr
+- * 10 bits per component
+- * index 0: Y plane, [31:0] x:Y2:Y1:Y0 [2:10:10:10] little endian
+- * index 1: Cb plane, [31:0] x:Cb2:Cb1:Cb0 [2:10:10:10] little endian
+- * index 2: Cr plane, [31:0] x:Cr2:Cr1:Cr0 [2:10:10:10] little endian
+- */
+-#define DRM_FORMAT_X403		fourcc_code('X', '4', '0', '3') /* non-subsampled Cb:Cr plane, 10 bit per channel */
++/* tile formats */
++#define DRM_FORMAT_T5M8  fourcc_code('T', '5', 'M', '8') /* Y/CbCr 4:0:0 8-bit 32x4 tiles */
++#define DRM_FORMAT_T5MA  fourcc_code('T', '5', 'M', 'A') /* Y/CbCr 4:0:0 10-bit 32x4 tiles */
++#define DRM_FORMAT_T5MC  fourcc_code('T', '5', 'M', 'C') /* Y/CbCr 4:0:0 12-bit 32x4 tiles */
++#define DRM_FORMAT_T6M8  fourcc_code('T', '6', 'M', '8') /* Y/CbCr 4:0:0 8-bit 64x4 tiles */
++#define DRM_FORMAT_T6MA  fourcc_code('T', '6', 'M', 'A') /* Y/CbCr 4:0:0 10-bit 64x4 tiles */
++#define DRM_FORMAT_T6MC  fourcc_code('T', '6', 'M', 'C') /* Y/CbCr 4:0:0 12-bit 64x4 tiles */
++#define DRM_FORMAT_T508  fourcc_code('T', '5', '0', '8') /* Y/CbCr 4:2:0 8-bit 32x4 tiles */
++#define DRM_FORMAT_T50A  fourcc_code('T', '5', '0', 'A') /* Y/CbCr 4:2:0 10-bit 32x4 tiles */
++#define DRM_FORMAT_T50C  fourcc_code('T', '5', '0', 'C') /* Y/CbCr 4:2:0 12-bit 32x4 tiles */
++#define DRM_FORMAT_T608  fourcc_code('T', '6', '0', '8') /* Y/CbCr 4:2:0 8-bit 64x4 tiles */
++#define DRM_FORMAT_T60A  fourcc_code('T', '6', '0', 'A') /* Y/CbCr 4:2:0 10-bit 64x4 tiles */
++#define DRM_FORMAT_T60C  fourcc_code('T', '6', '0', 'C') /* Y/CbCr 4:2:0 12-bit 64x4 tiles */
++#define DRM_FORMAT_T528  fourcc_code('T', '5', '2', '8') /* Y/CbCr 4:2:2 8-bit 32x4 tiles */
++#define DRM_FORMAT_T52A  fourcc_code('T', '5', '2', 'A') /* Y/CbCr 4:2:2 10-bit 32x4 tiles */
++#define DRM_FORMAT_T52C  fourcc_code('T', '5', '2', 'C') /* Y/CbCr 4:2:2 12-bit 32x4 tiles */
++#define DRM_FORMAT_T628  fourcc_code('T', '6', '2', '8') /* Y/CbCr 4:2:2 8-bit 64x4 tiles */
++#define DRM_FORMAT_T62A  fourcc_code('T', '6', '2', 'A') /* Y/CbCr 4:2:2 10-bit 64x4 tiles */
++#define DRM_FORMAT_T62C  fourcc_code('T', '6', '2', 'C') /* Y/CbCr 4:2:2 12-bit 64x4 tiles */
++#define DRM_FORMAT_T548  fourcc_code('T', '5', '4', '8') /* Y/CbCr 4:4:4 8-bit 32x4 tiles */
++#define DRM_FORMAT_T54A  fourcc_code('T', '5', '4', 'A') /* Y/CbCr 4:4:4 10-bit 32x4 tiles */
++#define DRM_FORMAT_T54C  fourcc_code('T', '5', '4', 'C') /* Y/CbCr 4:4:4 12-bit 32x4 tiles */
++#define DRM_FORMAT_T648  fourcc_code('T', '6', '4', '8') /* Y/CbCr 4:4:4 8-bit 64x4 tiles */
++#define DRM_FORMAT_T64A  fourcc_code('T', '6', '4', 'A') /* Y/CbCr 4:4:4 10-bit 64x4 tiles */
++#define DRM_FORMAT_T64C  fourcc_code('T', '6', '4', 'C') /* Y/CbCr 4:4:4 12-bit 64x4 tiles */
++
+
+ /*
+  * Format Modifiers:
+@@ -951,7 +978,7 @@ extern "C" {
+  * which corresponds to the "generic" kind used for simple single-sample
+  * uncompressed color formats on Fermi - Volta GPUs.
+  */
+-static __inline__ __u64
++static inline __u64
+ drm_fourcc_canonicalize_nvidia_format_mod(__u64 modifier)
+ {
+ 	if (!(modifier & 0x10) || (modifier & (0xff << 12)))
+--
+2.25.1
+

@@ -1,7 +1,7 @@
 From 0776495e85a15c1ad84fd90736059902bb3ea152 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 13 Sep 2022 15:59:12 +0530
-Subject: [PATCH 46/54] MB-64 removal of barrel-shift instructions from default
+Subject: [PATCH 46/56] MB-64 removal of barrel-shift instructions from default
  By default MB-64 is generatting barrel-shift instructions. It has been
  removed from default. Barrel-shift instructions will be generated only if
  barrel-shifter is enabled. Similarly to double instructions as well.

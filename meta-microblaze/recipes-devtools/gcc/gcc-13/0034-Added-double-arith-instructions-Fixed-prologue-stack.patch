@@ -1,7 +1,7 @@
 From 924a756b5c9edc5d626f68323f67ced2800c75ff Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Tue, 9 Oct 2018 10:07:08 +0530
-Subject: [PATCH 34/54] -Added double arith instructions -Fixed prologue stack
+Subject: [PATCH 34/56] -Added double arith instructions -Fixed prologue stack
  pointer decrement issue
 
 ---

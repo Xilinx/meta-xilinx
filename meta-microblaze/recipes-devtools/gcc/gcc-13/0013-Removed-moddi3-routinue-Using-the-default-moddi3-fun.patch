@@ -1,7 +1,7 @@
 From a2dbb662c573d2bf1a6a9192eb0d7f453ad20c59 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 17:36:16 +0530
-Subject: [PATCH 13/54] Removed moddi3 routinue Using the default moddi3
+Subject: [PATCH 13/56] Removed moddi3 routinue Using the default moddi3
  function as the existing implementation has many bugs
 
 Signed-off-by:Nagaraju <nmekala@xilix.com>

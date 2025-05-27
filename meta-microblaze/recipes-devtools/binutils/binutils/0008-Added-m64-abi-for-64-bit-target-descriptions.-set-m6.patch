@@ -1,7 +1,7 @@
 From 815e641399628fcde8e13f925e4a6d3bc565a762 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 9 Nov 2021 16:19:17 +0530
-Subject: [PATCH 08/53] Added m64 abi for 64 bit target descriptions. set m64
+Subject: [PATCH 08/56] Added m64 abi for 64 bit target descriptions. set m64
  abi for 64 bit elf.
 
 Conflicts:

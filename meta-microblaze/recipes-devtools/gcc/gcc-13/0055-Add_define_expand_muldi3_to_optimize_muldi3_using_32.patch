@@ -1,0 +1,88 @@
+From 9449635d8f3a6a6a14b20252c4eadf01dbe112f0 Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Tue, 17 Sep 2024 16:56:42 +0530
+Subject: [PATCH 55/55] ADD define_expand muldi3 to optimize muldi3 using 32
+ bit multiply when enabled
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+---
+ gcc/config/microblaze/microblaze.md | 64 +++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 0e3981390c8..f18238b0845 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -859,6 +859,70 @@
+   (set_attr "length"    "4")])
+ 
+ 
++;
++; muldi3
++;
++; Microblaze at this time does not have a 64-bit multiply
++; Use the 32-bit hardware multiplier when configured
++;
++;
++
++(define_expand "muldi3"
++  [
++; subreg SI out op1 op2 to op1_low(3) op1_high(4) op2_low(5) op2_high(6)
++   (set (match_operand:DI 0 "register_operand" "=d") (match_dup:DI 8))
++
++   (set (match_dup:SI 3) 
++	(subreg:SI (match_operand:DI 1 "register_operand" "d") 0))
++
++   (set (match_dup:DI 8) (lshiftrt:DI (match_dup:DI 1) (const_int 32)) )
++   (set (match_dup:SI 4) (subreg:SI (match_dup:DI 8) 0))
++
++   (set (match_dup:SI 5) 
++	(subreg:SI (match_operand:DI 2 "register_operand" "d") 0))
++
++   (set (match_dup:DI 8) (lshiftrt:DI (match_dup:DI 2) (const_int 32)) )
++   (set (match_dup:SI 6) (subreg:SI (match_dup:DI 8) 0))
++
++; Result = reg3 * rg5 + Shift-left [ high(rg3 * rg5) + rg3 * rg6 + rg4 * rg5 ]
++
++   (set (match_dup:SI 7) (mult:SI (match_dup:SI 3) (match_dup:SI 5)))
++   (set (match_dup:DI 0) (sign_extend:DI (match_dup:SI 7)))
++
++   (set (match_dup:SI 7)
++        (truncate:SI
++         (lshiftrt:DI
++          (mult:DI (sign_extend:DI (match_dup:SI 3 ))
++                   (sign_extend:DI (match_dup:SI 5 )))
++          (const_int 32))))
++   (set (match_dup:DI 8) (sign_extend:DI (match_dup:SI 7)))
++   (set (match_dup:DI 8) (ashift:DI (match_dup:DI 8) (const_int 32)))
++
++   (set (match_dup:DI 0) (plus:DI (match_dup:DI 0) (match_dup:DI 8)))
++
++   (set (match_dup:SI 7) (mult:SI (match_dup:SI 3) (match_dup:SI 6)))
++   (set (match_dup:DI 8) (sign_extend:DI (match_dup:SI 7)))
++   (set (match_dup:DI 8) (ashift:DI (match_dup:DI 8) (const_int 32)))
++
++   (set (match_dup:DI 0) (plus:DI (match_dup:DI 0) (match_dup:DI 8)))
++
++   (set (match_dup:SI 7) (mult:SI (match_dup:SI 4) (match_dup:SI 5)))
++   (set (match_dup:DI 8) (sign_extend:DI (match_dup:SI 7)))
++   (set (match_dup:DI 8) (ashift:DI (match_dup:DI 8) (const_int 32)))
++
++   (set (match_dup:DI 0) (plus:DI (match_dup:DI 0) (match_dup:DI 8)))
++		]
++  "!TARGET_SOFT_MUL && TARGET_MB_64 && TARGET_BARREL_SHIFT"
++"
++{
++  operands[3] = gen_reg_rtx (SImode);
++  operands[4] = gen_reg_rtx (SImode);
++  operands[5] = gen_reg_rtx (SImode);
++  operands[6] = gen_reg_rtx (SImode);
++  operands[7] = gen_reg_rtx (SImode);
++  operands[8] = gen_reg_rtx (DImode);
++}")
++
+ ;;----------------------------------------------------------------
+ ;; Division and remainder
+ ;;----------------------------------------------------------------
+-- 
+2.43.5

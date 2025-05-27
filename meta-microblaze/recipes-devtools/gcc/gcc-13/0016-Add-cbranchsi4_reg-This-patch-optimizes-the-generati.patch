@@ -1,7 +1,7 @@
 From e94d406c9fa0d7b99532bd8cf4b2a4580cdb02b7 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 17:04:37 +0530
-Subject: [PATCH 16/54] Add cbranchsi4_reg This patch optimizes the generation
+Subject: [PATCH 16/56] Add cbranchsi4_reg This patch optimizes the generation
  of pcmpne/pcmpeq instruction if the compare instruction has no immediate
  values.For the immediate values the xor instruction is generated
 

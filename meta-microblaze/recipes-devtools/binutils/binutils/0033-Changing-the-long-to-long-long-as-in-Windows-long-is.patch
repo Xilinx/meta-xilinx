@@ -1,7 +1,7 @@
 From 0c29905801152c8b8230bcca00b49b945054586b Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilinx.com>
 Date: Tue, 20 Apr 2021 21:22:06 +0530
-Subject: [PATCH 33/53] Changing the long to long long as in Windows long is
+Subject: [PATCH 33/56] Changing the long to long long as in Windows long is
  32-bit but we need the variable to be 64-bit
 
 Signed-off-by :Nagaraju Mekala <nmekala@xilix.com>

@@ -1,7 +1,7 @@
 From 0673e986a5c06cba6507e0361ebdb9cf309f6a4c Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 11 Sep 2018 13:43:48 +0530
-Subject: [PATCH 31/54] Support of multilibs with m64 ...
+Subject: [PATCH 31/56] Support of multilibs with m64 ...
 
 Conflicts:
 	gcc/config/microblaze/microblaze-c.c

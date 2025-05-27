@@ -40,3 +40,13 @@ BIF_PARTITION_ID[u-boot-xlnx] ?= "0x1c000000"
 BIF_PARTITION_ATTR[arm-trusted-firmware] ?= "core=a72-0, exception_level = el-3, trustzone"
 BIF_PARTITION_IMAGE[arm-trusted-firmware] ?= "${RECIPE_SYSROOT}/boot/arm-trusted-firmware.elf"
 BIF_PARTITION_ID[arm-trusted-firmware] ?= "0x1c000000"
+
+# Force the newly created CDO file to be made available in the deploy directory
+do_extract_cdo() {
+    :
+}
+
+do_extract_cdo[noexec] = "1"
+do_extract_cdo[depends] += "extract-cdo:do_deploy"
+
+addtask do_extract_cdo before do_build after do_deploy

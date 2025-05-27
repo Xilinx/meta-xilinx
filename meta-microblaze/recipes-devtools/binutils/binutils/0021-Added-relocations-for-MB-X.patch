@@ -1,7 +1,7 @@
 From 39ba1e8a13828ac3c860a72b95c3abae024044b5 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Tue, 11 Sep 2018 17:30:17 +0530
-Subject: [PATCH 21/53] Added relocations for MB-X
+Subject: [PATCH 21/56] Added relocations for MB-X
 
 Conflicts:
 	bfd/bfd-in2.h

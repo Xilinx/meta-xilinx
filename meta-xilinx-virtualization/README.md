@@ -22,7 +22,7 @@ This layer depends on:
         https://git.yoctoproject.org/meta-xilinx (official version)
         https://github.com/Xilinx/meta-xilinx (development and AMD release)
 	layers: meta-xilinx-core, meta-xilinx-standalone
-	branch: scarthgap or AMD release version (e.g. rel-v2024.2)
+	branch: scarthgap or AMD release version (e.g. rel-v2025.1)
 
 	URI: https://git.yoctoproject.org/meta-virtualization
 	branch: scarthgap

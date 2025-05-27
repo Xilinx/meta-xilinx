@@ -1,7 +1,7 @@
 From b926d05a0cdd32d9821a48f62eef49c5b1025f73 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Thu, 29 Nov 2018 17:55:08 +0530
-Subject: [PATCH 42/54] fixing the long & long long mingw toolchain issue
+Subject: [PATCH 42/56] fixing the long & long long mingw toolchain issue
 
 ---
  gcc/config/microblaze/constraints.md | 2 +-

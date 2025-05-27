@@ -1,0 +1,142 @@
+From adc41fcc7257f39bffb99f82193949e3081955eb Mon Sep 17 00:00:00 2001
+From: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
+Date: Mon, 29 Jan 2024 18:09:41 +0200
+Subject: [PATCH 22/27] hw/xen/xen-hvm-common.c: convert DPRINTF to tracepoints
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Tracing DPRINTFs to stderr might not be desired. A developer that relies
+on tracepoints should be able to opt-in to each tracepoint and rely on
+QEMU's log redirection, instead of stderr by default.
+
+This commit converts DPRINTFs in this file that are used for tracing
+into tracepoints.
+
+Signed-off-by: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Message-id: b000ab73022dfeb7a7ab0ee8fd0f41fb208adaf0.1706544115.git.manos.pitsidianakis@linaro.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+---
+ hw/xen/trace-events     | 10 +++++++++-
+ hw/xen/xen-hvm-common.c | 35 ++++++++++++++++++-----------------
+ 2 files changed, 27 insertions(+), 18 deletions(-)
+
+diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+index 0c28fd7bb6..a07fe41c6d 100644
+--- a/hw/xen/trace-events
++++ b/hw/xen/trace-events
+@@ -42,7 +42,7 @@ xs_node_vscanf(char *path, char *value) "%s %s"
+ xs_node_watch(char *path) "%s"
+ xs_node_unwatch(char *path) "%s"
+ 
+-# xen-hvm.c
++# xen-hvm-common.c
+ xen_ram_alloc(unsigned long ram_addr, unsigned long size) "requested: 0x%lx, size 0x%lx"
+ xen_client_set_memory(uint64_t start_addr, unsigned long size, bool log_dirty) "0x%"PRIx64" size 0x%lx, log_dirty %i"
+ handle_ioreq(void *req, uint32_t type, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p type=%d dir=%d df=%d ptr=%d port=0x%"PRIx64" data=0x%"PRIx64" count=%d size=%d"
+@@ -55,6 +55,14 @@ cpu_ioreq_move(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint6
+ xen_map_resource_ioreq(uint32_t id, void *addr) "id: %u addr: %p"
+ cpu_ioreq_config_read(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
+ cpu_ioreq_config_write(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
++cpu_get_ioreq_from_shared_memory_req_not_ready(int state, int data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O request not ready: 0x%x, ptr: 0x%x, port: 0x%"PRIx64", data: 0x%"PRIx64", count: %u, size: %u"
++xen_main_loop_prepare_init_cpu(int id, void *cpu) "cpu_by_vcpu_id[%d]=%p"
++xen_map_ioreq_server_shared_page(long unsigned int ioreq_pfn) "shared page at pfn 0x%lx"
++xen_map_ioreq_server_buffered_io_page(long unsigned int ioreq_pfn) "buffered io page at pfn 0x%lx"
++xen_map_ioreq_server_buffered_io_evtchn(int bufioreq_evtchn) "buffered io evtchn is 0x%x"
++destroy_hvm_domain_cannot_acquire_handle(void) "Cannot acquire xenctrl handle"
++destroy_hvm_domain_failed_action(const char *action, int sts, char *errno_s) "xc_domain_shutdown failed to issue %s, sts %d, %s"
++destroy_hvm_domain_action(int xen_domid, const char *action) "Issued domain %d %s"
+ 
+ # xen-pvh-common.c
+ xen_create_virtio_mmio_devices(int i, int irq, uint64_t base) "Created virtio-mmio device %d: irq %d base 0x%"PRIx64
+diff --git a/hw/xen/xen-hvm-common.c b/hw/xen/xen-hvm-common.c
+index abd0ad4e7e..5fb786b700 100644
+--- a/hw/xen/xen-hvm-common.c
++++ b/hw/xen/xen-hvm-common.c
+@@ -169,11 +169,12 @@ static ioreq_t *cpu_get_ioreq_from_shared_memory(XenIOState *state, int vcpu)
+     ioreq_t *req = xen_vcpu_ioreq(state->shared_page, vcpu);
+ 
+     if (req->state != STATE_IOREQ_READY) {
+-        DPRINTF("I/O request not ready: "
+-                "%x, ptr: %x, port: %"PRIx64", "
+-                "data: %"PRIx64", count: %u, size: %u\n",
+-                req->state, req->data_is_ptr, req->addr,
+-                req->data, req->count, req->size);
++        trace_cpu_get_ioreq_from_shared_memory_req_not_ready(req->state,
++                                                             req->data_is_ptr,
++                                                             req->addr,
++                                                             req->data,
++                                                             req->count,
++                                                             req->size);
+         return NULL;
+     }
+ 
+@@ -601,10 +602,9 @@ static void xen_main_loop_prepare(XenIOState *state)
+     if (evtchn_fd != -1) {
+         CPUState *cpu_state;
+ 
+-        DPRINTF("%s: Init cpu_by_vcpu_id\n", __func__);
+         CPU_FOREACH(cpu_state) {
+-            DPRINTF("%s: cpu_by_vcpu_id[%d]=%p\n",
+-                    __func__, cpu_state->cpu_index, cpu_state);
++            trace_xen_main_loop_prepare_init_cpu(cpu_state->cpu_index,
++                                                 cpu_state);
+             state->cpu_by_vcpu_id[cpu_state->cpu_index] = cpu_state;
+         }
+         qemu_set_fd_handler(evtchn_fd, cpu_handle_ioreq, NULL, state);
+@@ -681,7 +681,7 @@ static int xen_map_ioreq_server(XenIOState *state)
+     }
+ 
+     if (state->shared_page == NULL) {
+-        DPRINTF("shared page at pfn %lx\n", ioreq_pfn);
++        trace_xen_map_ioreq_server_shared_page(ioreq_pfn);
+ 
+         state->shared_page = xenforeignmemory_map(xen_fmem, xen_domid,
+                                                   PROT_READ | PROT_WRITE,
+@@ -693,7 +693,7 @@ static int xen_map_ioreq_server(XenIOState *state)
+     }
+ 
+     if (state->buffered_io_page == NULL) {
+-        DPRINTF("buffered io page at pfn %lx\n", bufioreq_pfn);
++        trace_xen_map_ioreq_server_buffered_io_page(bufioreq_pfn);
+ 
+         state->buffered_io_page = xenforeignmemory_map(xen_fmem, xen_domid,
+                                                        PROT_READ | PROT_WRITE,
+@@ -709,7 +709,7 @@ static int xen_map_ioreq_server(XenIOState *state)
+         return -1;
+     }
+ 
+-    DPRINTF("buffered io evtchn is %x\n", bufioreq_evtchn);
++    trace_xen_map_ioreq_server_buffered_io_evtchn(bufioreq_evtchn);
+ 
+     state->bufioreq_remote_port = bufioreq_evtchn;
+ 
+@@ -737,16 +737,17 @@ void destroy_hvm_domain(bool reboot)
+ 
+     xc_handle = xc_interface_open(0, 0, 0);
+     if (xc_handle == NULL) {
+-        fprintf(stderr, "Cannot acquire xenctrl handle\n");
++        trace_destroy_hvm_domain_cannot_acquire_handle();
+     } else {
+         sts = xc_domain_shutdown(xc_handle, xen_domid, reason);
+         if (sts != 0) {
+-            fprintf(stderr, "xc_domain_shutdown failed to issue %s, "
+-                    "sts %d, %s\n", reboot ? "reboot" : "poweroff",
+-                    sts, strerror(errno));
++            trace_destroy_hvm_domain_failed_action(
++                reboot ? "reboot" : "poweroff", sts, strerror(errno)
++            );
+         } else {
+-            fprintf(stderr, "Issued domain %d %s\n", xen_domid,
+-                    reboot ? "reboot" : "poweroff");
++            trace_destroy_hvm_domain_action(
++                xen_domid, reboot ? "reboot" : "poweroff"
++            );
+         }
+         xc_interface_close(xc_handle);
+     }
+-- 
+2.34.1
+

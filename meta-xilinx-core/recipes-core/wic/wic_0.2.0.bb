@@ -9,4 +9,17 @@ S = "${WORKDIR}/git"
 
 inherit python_poetry_core
 
+# wic is not generally a tool that would be installed on a target
+# usually it would be run on the build host
+# the wic non-create commands (ls, cp) need the following
+RDEPENDS:${PN} = " \
+    dosfstools \
+    e2fsprogs \
+    e2fsprogs-resize2fs \
+    gptfdisk \
+    mtools \
+    parted \
+    util-linux \
+"
+
 BBCLASSEXTEND = "native nativesdk"

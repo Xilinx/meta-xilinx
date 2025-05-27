@@ -1,0 +1,424 @@
+From d2dda7e9d63c0868d2c4ac396ff77fdb4afa54fa Mon Sep 17 00:00:00 2001
+From: Jonathan Stroud <jonathan.stroud@amd.com>
+Date: Fri, 18 Apr 2025 13:48:12 -0600
+Subject: [PATCH] Add support for xilinx multirecords
+
+    Signed-off-by: Jonathan Stroud <jonathan.stroud@amd.com>
+---
+ frugy/areas.py               |   7 +-
+ frugy/cli.py                 |   8 +--
+ frugy/fru.py                 |   1 +
+ frugy/fru_registry.py        |   1 +
+ frugy/multirecords_xilinx.py | 123 +++++++++++++++++++++++++++++++++++
+ frugy/types.py               | 117 +++++++++++++++++++++++++++++++--
+ requirements.txt             |   1 +
+ 7 files changed, 247 insertions(+), 11 deletions(-)
+ create mode 100644 frugy/multirecords_xilinx.py
+
+diff --git a/frugy/areas.py b/frugy/areas.py
+index 8ac431a..2755fda 100644
+--- a/frugy/areas.py
++++ b/frugy/areas.py
+@@ -10,7 +10,7 @@
+ #                                                                         #
+ ###########################################################################
+ 
+-from frugy.types import FruAreaVersioned, FruAreaSized, FixedField, StringField, StringField, bin2hex_helper, CustomStringArray
++from frugy.types import *
+ from frugy.fru_registry import FruRecordType, rec_register
+ from datetime import datetime, timedelta
+ import logging
+@@ -73,8 +73,9 @@ class BoardInfo(FruAreaSized):
+         ('product_name', StringField),
+         ('serial_number', StringField),
+         ('part_number', StringField),
+-        ('fru_file_id', StringField),
+-        ('custom_info_fields', CustomStringArray),
++        #('fru_file_id', StringField),
++        ('fru_file_id', StringField, '', {'format': StringFmt.BIN}),
++        ('custom_info_fields', XilinxCustomStringArray),
+     ]
+ 
+     _time_ref = datetime(1996, 1, 1)
+diff --git a/frugy/cli.py b/frugy/cli.py
+index 68a15ed..195c8f5 100644
+--- a/frugy/cli.py
++++ b/frugy/cli.py
+@@ -182,10 +182,10 @@ def main():
+ 
+     basename, ext = os.path.splitext(os.path.basename(args.srcfile))
+ 
+-    if read_mode and ext != '.bin':
+-        print('Cowardly refusing to read a FRU file not ending with .bin',
+-              file=sys.stderr)
+-        sys.exit(1)
++    #if read_mode and ext != '.bin':
++    #    print('Cowardly refusing to read a FRU file not ending with .bin',
++    #          file=sys.stderr)
++    #    sys.exit(1)
+     if not read_mode and ext != '.yml' and ext != '.yaml':
+         print('Cowardly refusing to read a YAML file not ending with .yaml or .yml', file=sys.stderr)
+         sys.exit(1)
+diff --git a/frugy/fru.py b/frugy/fru.py
+index b66a2bb..0a9b63b 100644
+--- a/frugy/fru.py
++++ b/frugy/fru.py
+@@ -16,6 +16,7 @@ from frugy.multirecords import MultirecordArea
+ import frugy.multirecords_ipmi
+ import frugy.multirecords_picmg
+ import frugy.multirecords_fmc
++import frugy.multirecords_xilinx
+ import yaml
+ from bidict import bidict
+ import os
+diff --git a/frugy/fru_registry.py b/frugy/fru_registry.py
+index dc08d0b..2e1e6de 100644
+--- a/frugy/fru_registry.py
++++ b/frugy/fru_registry.py
+@@ -22,6 +22,7 @@ class FruRecordType(Enum):
+     picmg_secondary = auto()
+     fmc_multirecord = auto()
+     fmc_secondary = auto()
++    xilinx_multirecord = auto()
+ 
+ 
+ _registry = defaultdict(list)
+diff --git a/frugy/multirecords_xilinx.py b/frugy/multirecords_xilinx.py
+new file mode 100644
+index 0000000..27fde2a
+--- /dev/null
++++ b/frugy/multirecords_xilinx.py
+@@ -0,0 +1,123 @@
++###########################################################################
++#      ____  _____________  __    __  __ _           _____ ___   _        #
++#     / __ \/ ____/ ___/\ \/ /   |  \/  (_)__ _ _ __|_   _/ __| /_\  (R)  #
++#    / / / / __/  \__ \  \  /    | |\/| | / _| '_/ _ \| || (__ / _ \      #
++#   / /_/ / /___ ___/ /  / /     |_|  |_|_\__|_| \___/|_| \___/_/ \_\     #
++#  /_____/_____//____/  /_/      T  E  C  H  N  O  L  O  G  Y   L A B     #
++#                                                                         #
++#          Copyright 2021 Deutsches Elektronen-Synchrotron DESY.          #
++#                  SPDX-License-Identifier: BSD-3-Clause                  #
++#                                                                         #
++###########################################################################
++
++from frugy.types import *
++from frugy.multirecords import ipmi_multirecord, MultirecordEntry
++from frugy.fru_registry import FruRecordType, rec_register, rec_lookup_by_id
++
++
++# IPMI standard multirecords
++
++
++@ipmi_multirecord(0xd2)
++class OemXilinxEntry(MultirecordEntry):
++    ''' Platform Management FRU Information Storage Definition, Table 18-4 '''
++
++    _xilinx_identifier = 0x10da
++
++    def _payload_prologue(self):
++        return self._xilinx_identifier.to_bytes(3, 'little') + self._record_id.to_bytes(length=1, byteorder='little')
++
++    @classmethod
++    def from_payload(cls, payload):
++        xilinx_id, payload = payload[:3], payload[3:]
++        xilinx_id = int.from_bytes(xilinx_id, 'little')
++        rec_id, payload = payload[0], payload[1:]
++
++
++        if xilinx_id != cls._xilinx_identifier:
++            raise ValueError(
++                f"FMC identifier mismatch: expected 0x{cls._xilinx_identifier:06x}, received 0x{xilinx_id:06x} ({xilinx_id})")
++        try:
++            cls_inst = rec_lookup_by_id(
++                FruRecordType.xilinx_multirecord, rec_id)()
++        except KeyError:
++            raise RuntimeError(f"Unknown Xilinx entry 0x{rec_id:02x}")
++
++        cls_inst._deserialize(payload)
++        cls_inst._record_id = rec_id
++        return cls_inst
++
++
++@ipmi_multirecord(0xd3)
++class OemXilinxD3Entry(MultirecordEntry):
++    ''' Platform Management FRU Information Storage Definition, Table 18-4 '''
++
++    _xilinx_identifier = 0x10da
++
++    def _payload_prologue(self):
++        return self._xilinx_identifier.to_bytes(3, 'little')
++
++    @classmethod
++    def from_payload(cls, payload):
++        xilinx_id, payload = payload[:3], payload[3:]
++        rec_id = 0xd3
++
++        try:
++            cls_inst = rec_lookup_by_id(
++                FruRecordType.xilinx_multirecord, rec_id)()
++        except KeyError:
++            raise RuntimeError(f"Unknown Xilinx entry 0x{rec_id:02x}")
++
++        cls_inst._deserialize(payload)
++        cls_inst._record_id = rec_id
++        return cls_inst
++
++def xilinx_multirecord(rec_id):
++    def register_and_set_id(cls):
++        cls._record_id = rec_id
++        rec_register(cls, FruRecordType.xilinx_multirecord, rec_id)
++        return cls
++    return register_and_set_id
++
++@xilinx_multirecord(0x31)
++class dut_xilinx_mac(OemXilinxEntry):
++    _schema = [
++        ('mac0', MacField),
++        ('mac1', MacField, None),
++        ('mac2', MacField, None),
++        ('mac3', MacField, None),
++    ]
++
++    def to_dict(self):
++        result = super().to_dict()
++        new_result = {}
++        for key, value in result.items():
++            if (value != ''):
++                new_result[key] = value
++        return new_result
++
++
++
++@xilinx_multirecord(0x11)
++class sys_ctrl_xilinx_mac(OemXilinxEntry):
++    _schema = [
++        ('mac0', MacField),
++        ('mac1', MacField, None),
++        ('mac2', MacField, None),
++        ('mac3', MacField, None),
++    ]
++
++    def to_dict(self):
++        result = super().to_dict()
++        new_result = {}
++        for key, value in result.items():
++            if (value != ''):
++                new_result[key] = value
++        return new_result
++
++@xilinx_multirecord(0xd3)
++class xilinx_oem_d3(OemXilinxD3Entry):
++    _schema = [
++        ('data', FixedStringField, 80, {'default': ''}),
++    ]
++
+diff --git a/frugy/types.py b/frugy/types.py
+index f9aadf5..734ddf7 100644
+--- a/frugy/types.py
++++ b/frugy/types.py
+@@ -17,6 +17,7 @@ from itertools import zip_longest
+ import uuid
+ from bidict import bidict
+ from ipaddress import IPv4Address
++from macaddress import MAC
+ import logging
+ 
+ _format_version_default = 1
+@@ -129,6 +130,9 @@ class StringField():
+     })
+ 
+     def bit_size(self) -> int:
++        def size_bin(val: str) -> int:
++            return int(len(val) / 2)
++
+         def size_plain(val: str) -> int:
+             return len(val)
+ 
+@@ -141,7 +145,7 @@ class StringField():
+             return n // 2
+ 
+         size_fn = {
+-            StringFmt.BIN: size_plain,
++            StringFmt.BIN: size_bin,
+             StringFmt.BCD_PLUS: size_bcd_plus,
+             StringFmt.ASCII_6BIT: size_6bit,
+             StringFmt.ASCII_8BIT: size_plain
+@@ -152,6 +156,9 @@ class StringField():
+         return self.bit_size() // 8
+ 
+     def serialize(self) -> bytearray:
++        def ser_bin(val: str) -> bytearray:
++            return bytearray(bytes.fromhex(val))
++
+         def ser_plain(val: str) -> bytearray:
+             return val.encode(_en_decode)
+ 
+@@ -166,7 +173,7 @@ class StringField():
+             return bitstruct.pack('u2u6', self._format.value, len(val))
+ 
+         ser_fn = {
+-            StringFmt.BIN: ser_plain,
++            StringFmt.BIN: ser_bin,
+             StringFmt.BCD_PLUS: ser_bcd_plus,
+             StringFmt.ASCII_6BIT: ser_6bit,
+             StringFmt.ASCII_8BIT: ser_plain
+@@ -175,6 +182,13 @@ class StringField():
+         return ser_type_length(result) + result
+ 
+     def deserialize(self, input: bytearray) -> bytearray:
++        def deser_bin(val: bytearray) -> str:
++            strval = str(val)
++            #print(strval)
++            return val.hex()
++        #    return val.decode(_en_decode)
++        #    return "0x"+val.hex()
++
+         def deser_plain(val: bytearray) -> str:
+             return val.decode(_en_decode)
+ 
+@@ -194,7 +208,7 @@ class StringField():
+         payload, remainder = remainder[:payload_len], remainder[payload_len:]
+ 
+         deser_fn = {
+-            StringFmt.BIN: deser_plain,
++            StringFmt.BIN: deser_bin,
+             StringFmt.BCD_PLUS: deser_bcd_plus,
+             StringFmt.ASCII_6BIT: deser_6bit,
+             StringFmt.ASCII_8BIT: deser_plain
+@@ -293,6 +307,60 @@ class FixedStringField():
+         return self.to_dict() != self._default
+ 
+ 
++class XilinxCustomStringArray:
++    ''' Platform Management FRU Information Storage Definition, Table 10-1, 11-1, 12-1 '''
++    ''' This is a daisy-chain of StringField objects, delimited with 0xc1 '''
++    _shortname = 'strarray'
++
++    _delimiter = b'\xc1'
++
++    def __init__(self, initdict=None, parent=None):
++        self.strings = []
++        if initdict is not None:
++            self.update(initdict)
++
++    def update(self, initdict):
++        self.strings = [StringField(v, format = StringFmt.ASCII_8BIT) for v in initdict[:1]]
++        self.strings += [StringField(v, format = StringFmt.BIN) for v in initdict[1:]]
++
++    def __repr__(self):
++        return self.to_dict().__repr__()
++
++    def to_dict(self):
++        return [v.to_dict() for v in self.strings]
++
++    def serialize(self):
++        result = b''
++        for v in self.strings:
++            result += v.serialize()
++        return result + self._delimiter
++
++    def deserialize(self, input):
++        self.strings = []
++        remainder = input
++        while len(remainder):
++            if remainder[0:1] == self._delimiter:
++                remainder = remainder[1:]
++                break
++            tmp = StringField(format = StringFmt.BIN)
++            remainder = tmp.deserialize(remainder)
++            self.strings.append(tmp)
++
++        logging.debug(
++            f'{self.__class__.__name__}: parsed {len(self.strings)} strings')
++        return remainder
++
++    def size_total(self):
++        # add one for the delimiter
++        return sum([v.size_total() for v in self.strings]) + 1
++
++    def bit_size(self) -> int:
++        return self.size_total() * 8
++
++    def val_not_default(self):
++        return len(self.strings) != 0
++
++
+ class CustomStringArray:
+     ''' Platform Management FRU Information Storage Definition, Table 10-1, 11-1, 12-1 '''
+     ''' This is a daisy-chain of StringField objects, delimited with 0xc1 '''
+@@ -306,7 +374,7 @@ class CustomStringArray:
+             self.update(initdict)
+ 
+     def update(self, initdict):
+-        self.strings = [StringField(v, format = StringFmt.BIN) for v in initdict]
++        self.strings += [StringField(v, format = StringFmt.BIN) for v in initdict]
+ 
+     def __repr__(self):
+         return self.to_dict().__repr__()
+@@ -378,6 +446,46 @@ class IpV4Field():
+         return self.to_dict() != self._default
+ 
+ 
++class MacField():
++    ''' Field containing a IPv4 address '''
++    _shortname = 'mac'
++
++    _num_bytes = 6
++
++    def __init__(self, default='00:00:00:00:00:00', parent=None):
++        self._default = default
++        if (default == None):
++            self._value = None
++        else:
++            self._value = MAC(default)
++
++    def bit_size(self) -> int:
++        return self._num_bytes * 8
++
++    def serialize(self) -> bytearray:
++        if (self._value == None):
++            return b''
++        return int(self._value).to_bytes(self._num_bytes, 'big')
++
++    def deserialize(self, input: bytearray) -> bytearray:
++        tmp, remainder = input[:self._num_bytes], input[self._num_bytes:]
++        tmp = int.from_bytes(tmp, 'big')
++        if (tmp == 0):
++            self._value = ''
++        else:
++            self._value = MAC(tmp)
++        return remainder
++
++    def to_dict(self):
++        return str(self._value)
++
++    def update(self, value):
++        self._value = MAC(value)
++
++    def val_not_default(self):
++        return self.to_dict() != self._default
++
++
+ class GuidField():
+     ''' Field containing a 128-bit GUID '''
+     _shortname = 'guid'
+@@ -611,6 +719,7 @@ class FruAreaBase:
+ 
+         for k, v in self._dict.items():
+             logging.debug(f'{self.__class__.__name__}: parsing {k}')
++
+             if hasattr(v, 'bit_fmt'):
+                 bit_fmt += v.bit_fmt()
+                 bit_fields.append(v)
+diff --git a/requirements.txt b/requirements.txt
+index fdf557c..eeefe3d 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1,3 +1,4 @@
+ bitstruct>=8.0.0
+ PyYAML>=5.1.0
+ bidict>=0.20.0
++macaddress>=2.0.2
+-- 
+2.34.1
+

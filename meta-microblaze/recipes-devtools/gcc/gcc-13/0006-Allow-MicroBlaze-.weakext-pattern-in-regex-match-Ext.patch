@@ -1,7 +1,7 @@
 From 7b07ae9c8086973b7baa031b09889146057de8ab Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 16:14:15 +0530
-Subject: [PATCH 06/54] Allow MicroBlaze .weakext pattern in regex match Extend
+Subject: [PATCH 06/56] Allow MicroBlaze .weakext pattern in regex match Extend
  regex pattern to include optional ext at the end of .weak to match the
  MicroBlaze weak label .weakext
 

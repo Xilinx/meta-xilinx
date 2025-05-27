@@ -1,7 +1,7 @@
 From 1cda2f5772650aa65853e6a3e9d8162498c2f469 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 13 Sep 2022 11:49:11 +0530
-Subject: [PATCH 21/54] Correct the const high double immediate value with this
+Subject: [PATCH 21/56] Correct the const high double immediate value with this
  patch the loading of the DI mode immediate values will be using
  REAL_VALUE_FROM_CONST_DOUBLE and REAL_VALUE_TO_TARGET_DOUBLE functions, as
  CONST_DOUBLE_HIGH was returning the sign extension value even of the unsigned

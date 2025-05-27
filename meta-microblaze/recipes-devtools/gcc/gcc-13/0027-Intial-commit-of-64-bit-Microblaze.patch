@@ -1,7 +1,7 @@
 From dd3eee641d2bf28216bf02f324cf8b81d4a61e43 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 13 Sep 2022 13:56:52 +0530
-Subject: [PATCH 27/54] Intial commit of 64-bit Microblaze
+Subject: [PATCH 27/56] Intial commit of 64-bit Microblaze
 
     Conflicts:
         gcc/config/microblaze/microblaze.md

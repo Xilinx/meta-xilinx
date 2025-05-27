@@ -1,7 +1,7 @@
 From 06c3e8ef9bdea329af1099e14abbde3d76a114a9 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 1 Nov 2021 19:06:53 +0530
-Subject: [PATCH 19/53] initial support for MicroBlaze 64 bit [-m64]
+Subject: [PATCH 19/56] initial support for MicroBlaze 64 bit [-m64]
 
 Conflicts:
 	bfd/elf32-microblaze.c

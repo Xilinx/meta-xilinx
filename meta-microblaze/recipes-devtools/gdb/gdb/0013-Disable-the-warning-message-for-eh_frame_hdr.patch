@@ -1,7 +1,7 @@
 From ee4f6d0c1ea82b531d7481692e499fc0b35c88a8 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Date: Fri, 22 Jun 2012 01:20:20 +0200
-Subject: [PATCH 13/54] Disable the warning message for eh_frame_hdr
+Subject: [PATCH 13/56] Disable the warning message for eh_frame_hdr
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 

@@ -1,0 +1,77 @@
+/* OSPI patitions for Image-recovery */
+&ospi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	flash0: flash@0 {
+		/delete-node/ partitions;
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			partition@0 {
+				label = "Image Selector";
+				reg = <0 0x60000>;
+			};
+			partition@60000 {
+                	        label = "Image Selector Backup";
+                	        reg = <0x60000 0x60000>;
+                	};
+                	partition@c0000 {
+                	        label = "Image Selector Scratchpad";
+                	        reg = <0xc0000 0x20000>;
+                	};
+                	partition@e0000 {
+                	        label = "Image Recovery";
+                	        reg = <0xe0000 0x1400000>;
+                	};
+                	partition@14e0000 {
+                	        label = "Image Recovery Scratchpad";
+                	        reg = <0x14e0000 0x20000>;
+                	};
+                	partition@1500000 {
+                	        label = "SystemReady-DT Update Metadata";
+                	        reg = <0x1500000 0x20000>;
+                	};
+                	partition@1520000 {
+                	        label = "SystemReady-DT Update Metadata Backup";
+                	        reg = <0x1520000 0x20000>;
+                	};
+                	partition@1540000 {
+                	        label = "U-Boot Variables";
+                	        reg = <0x1540000 0x20000>;
+                	};
+                	partition@1560000 {
+                	        label = "U-Boot Variables Backup";
+                	        reg = <0x1560000 0x20000>;
+                	};
+                	partition@1580000 {
+                	        label = "Bank A Space";
+                	        reg = <0x1580000 0x7200000>;
+                	};
+                	partition@8780000 {
+                	        label = "U-Boot Variables Bank A";
+                	        reg = <0x8780000 0x20000>;
+                	};
+                	partition@87a0000 {
+                	        label = "U-Boot Variables Bank A Backup";
+                	        reg = <0x87a0000 0x20000>;
+                	};
+                	partition@87c0000 {
+                	        label = "Bank B Space";
+                	        reg = <0x87c0000 0x7200000>;
+                	};
+                	partition@f9c0000 {
+                	        label = "U-Boot Variables Bank B";
+                	        reg = <0xF9c0000 0x20000>;
+                	};
+                	partition@f9e0000 {
+                	        label = "U-Boot Variables Bank B Backup";
+                	        reg = <0xF9e0000 0x20000>;
+                	};
+                	partition@fa00000 {
+                	        label = "User Scratchpad";
+                	        reg = <0xFa00000 0x5e0000>;
+                	};
+		};
+	};
+};

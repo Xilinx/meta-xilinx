@@ -1,7 +1,7 @@
 From 854371934116e5197d627cebaf274f431205b914 Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Thu, 14 Mar 2019 18:11:04 +0530
-Subject: [PATCH 43/54] Fix the MB-64 bug of handling QI objects
+Subject: [PATCH 43/56] Fix the MB-64 bug of handling QI objects
 
 ---
  gcc/config/microblaze/microblaze.md | 14 +++++++-------

@@ -17,6 +17,7 @@ COMPATIBLE_MACHINE:zynq = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
+COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
 
 PROVIDES = "virtual/boot-bin"
 
@@ -40,11 +41,13 @@ SRC_URI += "${@('file://' + d.getVar("BIF_FILE_PATH")) if d.getVar("BIF_FILE_PAT
 # zynqmp     : zynqmp
 # versal     : versal
 # versal-net : versalnet
+# versal-2ve-2vm : versal_2ve_2vm
 BOOTGEN_ARCH_DEFAULT = "undefined"
 BOOTGEN_ARCH_DEFAULT:zynq = "zynq"
 BOOTGEN_ARCH_DEFAULT:zynqmp = "zynqmp"
 BOOTGEN_ARCH_DEFAULT:versal = "versal"
 BOOTGEN_ARCH_DEFAULT:versal-net = "versalnet"
+BOOTGEN_ARCH_DEFAULT:versal-2ve-2vm = "versal_2ve_2vm"
 BOOTGEN_ARCH ?= "${BOOTGEN_ARCH_DEFAULT}"
 BOOTGEN_EXTRA_ARGS ?= ""
 
@@ -53,11 +56,13 @@ QEMU_FLASH_TYPE_DEFAULT:zynq = "qspi"
 QEMU_FLASH_TYPE_DEFAULT:zynqmp = "qspi"
 QEMU_FLASH_TYPE_DEFAULT:versal = "${@'ospi' if d.getVar("QEMU_HW_BOOT_MODE") == '8' else 'qspi'}"
 QEMU_FLASH_TYPE_DEFAULT:versal-net = "${@'ospi' if d.getVar("QEMU_HW_BOOT_MODE") == '8' else 'qspi'}"
+QEMU_FLASH_TYPE_DEFAULT:versal-2ve-2vm = "${@'ospi' if d.getVar("QEMU_HW_BOOT_MODE") == '8' else 'qspi'}"
 QEMU_FLASH_TYPE ?= "${QEMU_FLASH_TYPE_DEFAULT}"
 
 BOOTSCR_DEP = ''
 BOOTSCR_DEP:versal = '${UBOOT_BOOT_SCRIPT}:do_deploy'
 BOOTSCR_DEP:versal-net = '${UBOOT_BOOT_SCRIPT}:do_deploy'
+BOOTSCR_DEP:versal-2ve-2vm = '${UBOOT_BOOT_SCRIPT}:do_deploy'
 
 BIF_BITSTREAM_ATTR ?= "${@bb.utils.contains('MACHINE_FEATURES', 'fpga-overlay', '', 'bitstream', d)}"
 
@@ -172,7 +177,7 @@ python do_configure() {
             attrflags = d.getVarFlags("BIF_COMMON_ATTR") or {}
             if arch in ['zynq', 'zynqmp']:
                 create_zynq_bif(bifattr, attrflags,'','', 1, biffd, d)
-            elif arch in ['versal', 'versal-net']:
+            elif arch in ['versal', 'versal-net', 'versal-2ve-2vm']:
                 create_versal_bif(bifattr, attrflags,'','', 1, biffd, d)
             else:
                 create_bif(bifattr, attrflags,'','', 1, biffd, d)
@@ -200,7 +205,7 @@ python do_configure() {
 
             if arch in ['zynq', 'zynqmp']:
                 create_zynq_bif(bifpartition, attrflags, local_attrimage, ids, 0, biffd, d)
-            elif arch in ['versal', 'versal-net']:
+            elif arch in ['versal', 'versal-net', 'versal-2ve-2vm']:
                 create_versal_bif(bifpartition, attrflags, local_attrimage, ids, 0, biffd, d)
             else:
                 create_bif(bifpartition, attrflags, local_attrimage, ids, 0, biffd, d)
@@ -232,6 +237,12 @@ do_compile:append:versal() {
 }
 
 do_compile:append:versal-net() {
+    dd if=/dev/zero bs=256M count=1  > ${B}/qemu-${QEMU_FLASH_TYPE}.bin
+    dd if=${B}/BOOT.bin of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=0 conv=notrunc
+    dd if=${DEPLOY_DIR_IMAGE}/boot.scr of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=66584576 conv=notrunc
+}
+
+do_compile:append:versal-2ve-2vm() {
     dd if=/dev/zero bs=256M count=1  > ${B}/qemu-${QEMU_FLASH_TYPE}.bin
     dd if=${B}/BOOT.bin of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=0 conv=notrunc
     dd if=${DEPLOY_DIR_IMAGE}/boot.scr of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=66584576 conv=notrunc
@@ -276,6 +287,15 @@ do_deploy:append:versal-net () {
     install -m 0644 ${B}/qemu-${QEMU_FLASH_TYPE}.bin ${DEPLOYDIR}/${QEMU_FLASH_IMAGE_NAME}.bin
     ln -sf ${QEMU_FLASH_IMAGE_NAME}.bin ${DEPLOYDIR}/qemu-${QEMU_FLASH_TYPE}-${MACHINE}.bin
 
+}
+
+do_deploy:append:versal-2ve-2vm() {
+
+    install -m 0644 ${B}/BOOT_bh.bin ${DEPLOYDIR}/${BOOTBIN_BASE_NAME}_bh.bin
+    ln -sf ${BOOTBIN_BASE_NAME}_bh.bin ${DEPLOYDIR}/BOOT-${MACHINE}_bh.bin
+
+    install -m 0644 ${B}/qemu-${QEMU_FLASH_TYPE}.bin ${DEPLOYDIR}/${QEMU_FLASH_IMAGE_NAME}.bin
+    ln -sf ${QEMU_FLASH_IMAGE_NAME}.bin ${DEPLOYDIR}/qemu-${QEMU_FLASH_TYPE}-${MACHINE}.bin
 }
 
 FILES:${PN} += "/boot/BOOT.bin"

@@ -1,7 +1,7 @@
 From 0982e0c2733aa773d88876e68320b072e5b2a9ad Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Thu, 9 May 2024 11:34:04 +0530
-Subject: [PATCH 52/54] Wrong target description accepted by microblaze
+Subject: [PATCH 52/56] Wrong target description accepted by microblaze
  architecture
 
 Fix - Modify microblaze_gdbarch_init, set tdesc only when it is NULL

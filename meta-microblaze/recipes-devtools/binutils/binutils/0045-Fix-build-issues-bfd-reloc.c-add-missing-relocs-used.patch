@@ -1,7 +1,7 @@
 From 8fd6902a818f28422bd98b18ff3f0fe9b872e5cf Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Thu, 28 Mar 2024 15:37:11 +0530
-Subject: [PATCH 45/53] Fix build issues - bfd/reloc.c add missing relocs used
+Subject: [PATCH 45/56] Fix build issues - bfd/reloc.c add missing relocs used
  elsewhere
 
 	BFD_RELOC_MICROBLAZE_EA64

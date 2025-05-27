@@ -1,7 +1,7 @@
 From fc4d292d4154cad199cbe1635790867c98a84fc6 Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Thu, 14 Mar 2024 10:41:33 +0530
-Subject: [PATCH 40/53] Fix build issues after Xilinx 2023.2 binutils merge
+Subject: [PATCH 40/56] Fix build issues after Xilinx 2023.2 binutils merge
 
 Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
 Signed-off-by: Aayush Misra <aayushm@amd.com>

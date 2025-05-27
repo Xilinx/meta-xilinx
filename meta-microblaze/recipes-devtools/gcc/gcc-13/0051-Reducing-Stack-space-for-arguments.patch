@@ -1,7 +1,7 @@
 From a464c0e6070cac9b40b7fe760e25cbd484a615a7 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 13 Sep 2022 16:35:00 +0530
-Subject: [PATCH 51/54] Reducing Stack space for arguments
+Subject: [PATCH 51/56] Reducing Stack space for arguments
 
     Currently in Microblaze target stack space for arguments in register is being
     allocated even if there are no arguments in the function.

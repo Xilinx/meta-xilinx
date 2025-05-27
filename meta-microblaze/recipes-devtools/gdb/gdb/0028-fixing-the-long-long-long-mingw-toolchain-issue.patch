@@ -1,7 +1,7 @@
 From 646b229752b9816b25d2b9ffe79b895b69742745 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Thu, 29 Nov 2018 17:59:25 +0530
-Subject: [PATCH 28/54] fixing the long & long long mingw toolchain issue
+Subject: [PATCH 28/56] fixing the long & long long mingw toolchain issue
 
 Signed-off-by: Aayush Misra <aayushm@amd.com>
 ---

@@ -1,7 +1,7 @@
 From 81f86c3d6f787a9694e1c95625736f7c921b74df Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Thu, 28 Mar 2024 10:20:48 +0530
-Subject: [PATCH 42/53] Fix unresolved conflicts from binutils_2_42_merge
+Subject: [PATCH 42/56] Fix unresolved conflicts from binutils_2_42_merge
 
 opcodes/microblaze-dis.c
 

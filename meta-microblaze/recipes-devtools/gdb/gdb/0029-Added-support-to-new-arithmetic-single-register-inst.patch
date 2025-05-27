@@ -1,7 +1,7 @@
 From 1a9a688939dfbf7cca9685b326c0387672c567b4 Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Fri, 23 Aug 2019 16:18:43 +0530
-Subject: [PATCH 29/54] Added support to new arithmetic single register
+Subject: [PATCH 29/56] Added support to new arithmetic single register
  instructions
 
 Conflicts:

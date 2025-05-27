@@ -1,7 +1,7 @@
 From aba85eba7bc5cc19edafe54379fb1f1794dc3844 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 4 Jun 2018 10:10:18 +0530
-Subject: [PATCH 26/54] Removed fsqrt generation for double values.
+Subject: [PATCH 26/56] Removed fsqrt generation for double values.
 
 ---
  gcc/config/microblaze/microblaze.md | 14 --------------

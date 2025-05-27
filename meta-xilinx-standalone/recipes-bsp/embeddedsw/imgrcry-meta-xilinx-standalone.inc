@@ -1,7 +1,7 @@
 # Default imgrcry configuration, using fsbl multiconfig
-IMGRCRY_DEPENDS ?= ""
-IMGRCRY_MCDEPENDS ?= "mc::${MACHINE}-cortexa53-fsbl:image-recovery:do_deploy"
-IMGRCRY_DEPLOY_DIR ?= "${TOPDIR}/tmp-${MACHINE}-cortexa53-fsbl/deploy/images/${MACHINE}/"
+IMGRCRY_DEPENDS ?= "image-recovery:do_deploy"
+IMGRCRY_MCDEPENDS ?= ""
+IMGRCRY_DEPLOY_DIR ?= "${TOPDIR}/tmp/deploy/images/${MACHINE}/"
 IMGRCRY_IMAGE_NAME ?= "image-recovery-${MACHINE}"
 
 def check_imgrcry_variables(d):

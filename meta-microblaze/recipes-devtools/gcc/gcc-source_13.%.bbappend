@@ -59,5 +59,7 @@ SRC_URI += " \
     file://0052-If-we-use-break_handler-attribute-then-interrupt-vec.patch \
     file://0053-Add-Zero_extended-instructions.patch \
     file://0054-Fix-failure-with-gcc.c-torture-execute-ashrdi-1.c-Os.patch \
+    file://0055-Add_define_expand_muldi3_to_optimize_muldi3_using_32.patch \
+    file://0056-Fix_muldi3_-_enable_only_when_TARGET_MULTIPLY_HIGH_is.patch \
     file://microblaze-mulitlib-hack.patch \
 "

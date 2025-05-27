@@ -1,7 +1,7 @@
 From 07743ed9395bfea466cdbdf0bbe9566fa93165de Mon Sep 17 00:00:00 2001
 From: David Holsgrove <david.holsgrove@xilinx.com>
 Date: Wed, 27 Feb 2013 13:56:11 +1000
-Subject: [PATCH 15/53] upstream change to garbage collection sweep causes mb
+Subject: [PATCH 15/56] upstream change to garbage collection sweep causes mb
  regression
 
 Upstream change for PR13177 now clears the def_regular during gc_sweep of a

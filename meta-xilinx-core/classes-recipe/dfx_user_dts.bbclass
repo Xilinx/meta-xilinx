@@ -46,8 +46,14 @@ XCL_PATH[doc] = "Absolute '.xclbin' file path as input to SRC_URI"
 python() {
     import re
     soc_family = d.getVar("SOC_FAMILY")
-    if "git://" in d.getVar("SRC_URI") or "https://" in d.getVar("SRC_URI"):
+    srcuri = d.getVar('SRC_URI')
+    uri = bb.fetch.URI(srcuri)
+    if uri.scheme in ("git", "gitsm"):
+        bb.debug(2, "SRC_URI scheme is git or gitsm")
         d.setVar("S",'${WORKDIR}/git/'+d.getVar("FW_DIR"))
+    elif uri.scheme in ("http", "https", "ftp"):
+        bb.debug(2, "SRC_URI scheme is http or https or ftp")
+        d.setVar("S",'${WORKDIR}/'+d.getVar("FW_DIR"))
     else:
         dtsi_found = False
         dtbo_found = False
@@ -59,36 +65,36 @@ python() {
         for s in d.getVar("SRC_URI").split():
             if s.endswith(('.dtsi', '.dts')):
                 dtsi_found = True
-                d.setVar("DTSI_PATH",os.path.dirname(s.lstrip('file://')))
+                d.setVar("DTSI_PATH",os.path.dirname(s.removeprefix('file://')))
             if s.endswith('.dtbo'):
                 if dtbo_found:
                     bb.warn("More then one '.dtbo' file specified in SRC_URI.")
                 dtbo_found = True
-                d.setVar("DTBO_PATH",os.path.dirname(s.lstrip('file://')))
+                d.setVar("DTBO_PATH",os.path.dirname(s.removeprefix('file://')))
             if soc_family == "zynq" or soc_family == "zynqmp":
                 if s.endswith('.bit'):
                     if bit_found:
                         bb.warn("More then one '.bit' file specified in SRC_URI.")
                     bit_found = True
-                    d.setVar("BIT_PATH",os.path.dirname(s.lstrip('file://')))
+                    d.setVar("BIT_PATH",os.path.dirname(s.removeprefix('file://')))
                 if s.endswith('.bin'):
                     if bin_found:
                         bb.warn("More then one '.bin' file specified in SRC_URI.")
                     bin_found = True
-                    d.setVar("BIN_PATH",os.path.dirname(s.lstrip('file://')))
+                    d.setVar("BIN_PATH",os.path.dirname(s.removeprefix('file://')))
             else:
                 if s.endswith('.pdi'):
                     if pdi_found:
                         bb.warn("More then one '.pdi' file specified in SRC_URI.")
                     pdi_found = True
-                    d.setVar("PDI_PATH",os.path.dirname(s.lstrip('file://')))
+                    d.setVar("PDI_PATH",os.path.dirname(s.removeprefix('file://')))
 
             # Optional input
             if s.endswith('.json'):
-                d.setVar("JSON_PATH",os.path.dirname(s.lstrip('file://')))
+                d.setVar("JSON_PATH",os.path.dirname(s.removeprefix('file://')))
 
             if s.endswith('.xclbin'):
-                d.setVar("XCL_PATH",os.path.dirname(s.lstrip('file://')))
+                d.setVar("XCL_PATH",os.path.dirname(s.removeprefix('file://')))
 
         # Check for valid combination of input files in SRC_URI
         # Skip recipe if any of the below conditions are not satisfied.

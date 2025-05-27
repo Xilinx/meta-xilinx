@@ -30,6 +30,23 @@ device tree etc.
 * **meta-xilinx-multimedia**: layer contains AMD Xilinx specific multimedia packages
 including recipes for the fork of GStreamer.
 
+* **meta-xilinx-mali400**: layer contains AMD Xilinx MALI400 GPU drivers and
+library packages including recipes for the fork of wayland.
+
+* **meta-xilinx-gpu-malig78ae**: layer contains AMD Xilinx MALIG78 GPU drivers and
+library packages.
+
+* **meta-xilinx-demos**: layer contains PL firmware, gpio demo apps packages.
+
+* **meta-xilinx-imgrcvry**: layer containing AMD Xilinx image recovery features
+metadata and packages.
+
+* **meta-vitis-tc**: layer contains toolchain build that are embedded into AMD
+Vivado and Vitis tools.
+
+* **meta-xilinx-virtualization**: layer containing metadata to build Xen target
+images.
+
 > **See:** AMD Xilinx devices:
 	https://www.xilinx.com/products/silicon-devices.html
 

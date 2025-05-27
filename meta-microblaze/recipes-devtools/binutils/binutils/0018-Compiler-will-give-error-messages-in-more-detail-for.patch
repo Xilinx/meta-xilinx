@@ -1,7 +1,7 @@
 From 3056650d65b5bfa34bf16cd1ee7829a64dfb19ac Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 21 Feb 2018 12:32:02 +0530
-Subject: [PATCH 18/53] Compiler will give error messages in more detail for
+Subject: [PATCH 18/56] Compiler will give error messages in more detail for
  mxl-gp-opt flag..
 
 Signed-off-by: Aayush Misra <aayushm@amd.com>

@@ -1,7 +1,7 @@
 From 8a7a8b724a87c532096004f43b987c352474a905 Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Fri, 19 Jul 2024 12:39:24 +0530
-Subject: [PATCH 54/54] Roll back an improvement which inlines target_gdbarch
+Subject: [PATCH 54/56] Roll back an improvement which inlines target_gdbarch
  () inherited from binutils 2.42 merge that causes compilation issues on gdb
  14.2
 

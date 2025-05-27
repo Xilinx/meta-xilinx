@@ -1,7 +1,7 @@
 From 3ebc7f9a11d66843982544cd0f88f35cc4defb83 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Fri, 12 Oct 2018 16:07:36 +0530
-Subject: [PATCH 35/54] Fixed the issue in the delay slot with swap
+Subject: [PATCH 35/56] Fixed the issue in the delay slot with swap
  instructions
 
 ---

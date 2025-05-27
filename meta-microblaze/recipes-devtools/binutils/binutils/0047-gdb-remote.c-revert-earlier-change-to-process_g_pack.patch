@@ -1,7 +1,7 @@
 From 8deda21efd527564a262dc07a519f8bd03095b3c Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Thu, 28 Mar 2024 16:32:22 +0530
-Subject: [PATCH 47/53] gdb/remote.c - revert earlier change to
+Subject: [PATCH 47/56] gdb/remote.c - revert earlier change to
  process_g_packet
 
 When connecting to remote target, gdb (microblaze-xilinx-elf) was

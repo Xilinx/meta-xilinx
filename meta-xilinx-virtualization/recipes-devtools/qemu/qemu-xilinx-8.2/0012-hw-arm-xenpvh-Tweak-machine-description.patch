@@ -1,0 +1,30 @@
+From 3c66ec8df907bc313d4075d716b4288860506a37 Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Thu, 8 Aug 2024 22:30:53 +0200
+Subject: [PATCH 12/27] hw/arm: xenpvh: Tweak machine description
+
+Tweak machine description to better express that this is
+a Xen PVH machine for ARM.
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/arm/xen_arm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/arm/xen_arm.c b/hw/arm/xen_arm.c
+index 5ea9bbc4cd..0176173dc9 100644
+--- a/hw/arm/xen_arm.c
++++ b/hw/arm/xen_arm.c
+@@ -214,7 +214,7 @@ static void xen_arm_machine_class_init(ObjectClass *oc, void *data)
+ {
+ 
+     MachineClass *mc = MACHINE_CLASS(oc);
+-    mc->desc = "Xen Para-virtualized PC";
++    mc->desc = "Xen PVH ARM machine";
+     mc->init = xen_arm_init;
+     mc->max_cpus = 1;
+     mc->default_machine_opts = "accel=xen";
+-- 
+2.34.1
+

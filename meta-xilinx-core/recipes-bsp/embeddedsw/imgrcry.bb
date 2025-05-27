@@ -30,13 +30,21 @@ do_fetch[mcdepends] += "${IMGRCRY_MCDEPENDS}"
 
 inherit deploy
 
+do_install() {
+    if [ ! -e ${IMGRCRY_FILE}.bin ]; then
+        echo "Unable to find IMGRCRY_FILE (${IMGRCRY_FILE}.bin)"
+        exit 1
+    fi
+
+    install -Dm 0644 ${IMGRCRY_FILE}.bin ${D}/boot/${PN}.bin
+}
+
 # If the item is already in OUR deploy_image_dir, nothing to deploy!
 SHOULD_DEPLOY = "${@'false' if (d.getVar('IMGRCRY_FILE')).startswith(d.getVar('DEPLOY_DIR_IMAGE')) else 'true'}"
 do_deploy() {
     # If the item is already in OUR deploy_image_dir, nothing to deploy!
     if ${SHOULD_DEPLOY}; then
         install -Dm 0644 ${IMGRCRY_FILE}.bin ${DEPLOYDIR}/${IMGRCRY_IMAGE_NAME}.bin
-        install -Dm 0644 ${IMGRCRY_FILE}.elf ${DEPLOYDIR}/${IMGRCRY_IMAGE_NAME}.elf
     fi
 }
 
@@ -47,6 +55,9 @@ INSANE_SKIP:${PN}-dbg = "arch"
 
 # Disable buildpaths QA check warnings.
 INSANE_SKIP:${PN} += "buildpaths"
+
+SYSROOT_DIRS += "/boot"
+FILES:${PN} = "/boot/${PN}.bin"
 
 def check_imgrcry_variables(d):
     # If both are blank, the user MUST pass in the path to the firmware!

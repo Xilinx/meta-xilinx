@@ -1,7 +1,7 @@
 From 0760cd661f6c09cda8327288f79314319a0b9b14 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 17:11:04 +0530
-Subject: [PATCH 17/54] Inline Expansion of fsqrt builtin. The changes are made
+Subject: [PATCH 17/56] Inline Expansion of fsqrt builtin. The changes are made
  in the patch for the inline expansion of the fsqrt builtin with fqrt
  instruction. The sqrt math function takes double as argument and return
  double as argument. The pattern is selected while expanding the unary op

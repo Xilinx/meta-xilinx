@@ -1,7 +1,7 @@
 From e89c2729322ce147e8a5a5e7842944593b4dd474 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 27 Feb 2019 15:12:32 +0530
-Subject: [PATCH 27/53] Revert "ld: Remove unused expression state" --defsym
+Subject: [PATCH 27/56] Revert "ld: Remove unused expression state" --defsym
  symbol=expression Create a global symbol in the output file, containing the
  absolute address given by expression.
 

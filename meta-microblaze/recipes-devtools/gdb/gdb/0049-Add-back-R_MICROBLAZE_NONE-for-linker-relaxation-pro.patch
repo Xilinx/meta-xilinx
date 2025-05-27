@@ -1,7 +1,7 @@
 From bf491bdb2e4d30c14968be096969da700dedfc64 Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Wed, 17 Apr 2024 16:14:14 +0530
-Subject: [PATCH 49/54] Add back R_MICROBLAZE_NONE for linker relaxation
+Subject: [PATCH 49/56] Add back R_MICROBLAZE_NONE for linker relaxation
  processing
 
 Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>

@@ -1,7 +1,7 @@
 From a88796930d8ef1b97056217ffdcc9f86326cdc98 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 13 Sep 2022 11:58:14 +0530
-Subject: [PATCH 22/54] Fix internal compiler error with msmall-divides This
+Subject: [PATCH 22/56] Fix internal compiler error with msmall-divides This
  patch will fix the internal error microblaze_expand_divide function which
  come of rtx PLUS where the mem_rtx is of type SI and the operand is of type
  QImode. This patch modifies the mem_rtx as QImode and Plus as QImode to fix

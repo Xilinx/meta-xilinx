@@ -1,7 +1,7 @@
 From fa91dbd8c23e519760213f32de572cbf98ad6bc3 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 10 Oct 2022 15:07:22 +0530
-Subject: [PATCH 02/54] Add initial port of linux gdbserver add
+Subject: [PATCH 02/56] Add initial port of linux gdbserver add
  gdb_proc_service_h to gdbserver microblaze-linux
 
 gdbserver needs to initialise the microblaze registers

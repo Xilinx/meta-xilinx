@@ -1,0 +1,36 @@
+From f6e29b842a7bab108bf9a1d5d0c253b34bd330e4 Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Fri, 31 Jan 2025 10:50:09 +0530
+Subject: [PATCH] Microblaze: Fix regression introduced during 2024.2
+ gdb-14-branch merge
+
+While assembling addli (and other arithmetic instructions) when
+encoding a symbol operand - set opc to str_microblaze_64 to ensure
+imml is generated instead of imm. This patch was part of Xilinx 2023.2
+patch set - but was lost during Xilinx gdb-14 merge (2024.2).
+
+Files changed
+* gas/config/tc-microblaze.c: md_assemble: Set opc to str_microblaze_64
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+---
+ gas/config/tc-microblaze.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index d3d1e334bb5..3c0a4688816 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -2292,8 +2292,8 @@ md_assemble (char * str)
+ 
+       if (exp.X_op != O_constant)
+ 	{
+-	  char *opc = NULL;
+-	  //char *opc = str_microblaze_64;
++	  //char *opc = NULL;
++	  char *opc = str_microblaze_64;
+ 	  relax_substateT subtype;
+ 
+ 	  if (exp.X_md != 0)
+-- 
+2.43.5

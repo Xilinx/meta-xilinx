@@ -1,7 +1,7 @@
 From 72cdba90d70131c092918c5d5c18eb800f0f9dfb Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Thu, 12 Jan 2017 16:50:17 +0530
-Subject: [PATCH 10/54] Fix the Microblaze crash with msmall-divides flag
+Subject: [PATCH 10/56] Fix the Microblaze crash with msmall-divides flag
  Compiler is crashing when we use msmall-divides and mxl-barrel-shift flag.
  This is because when use above flags microblaze_expand_divide function will
  be called for division operation. In microblaze_expand_divide function we are

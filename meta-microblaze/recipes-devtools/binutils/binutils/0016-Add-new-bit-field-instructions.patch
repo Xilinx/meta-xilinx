@@ -1,7 +1,7 @@
 From 39ef5af3dd4551b24a47c8e48af67478183a7149 Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Mon, 18 Jul 2016 12:24:28 +0530
-Subject: [PATCH 16/53] Add new bit-field instructions
+Subject: [PATCH 16/56] Add new bit-field instructions
 
 This patches adds new bsefi and bsifi instructions.
 BSEFI- The instruction shall extract a bit field from a

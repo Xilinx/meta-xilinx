@@ -1,0 +1,88 @@
+From a874b444c27a4bbaebaf79cecaae8a02e10a87cf Mon Sep 17 00:00:00 2001
+From: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
+Date: Mon, 29 Jan 2024 18:09:42 +0200
+Subject: [PATCH 06/27] hw/xen: convert stderr prints to error/warn reports
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+According to the QEMU Coding Style document:
+
+> Do not use printf(), fprintf() or monitor_printf(). Instead, use
+> error_report() or error_vreport() from error-report.h. This ensures the
+> error is reported in the right place (current monitor or stderr), and in
+> a uniform format.
+> Use error_printf() & friends to print additional information.
+
+This commit changes fprintfs that report warnings and errors to the
+appropriate report functions.
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Signed-off-by: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Message-id: 42a8953553cf68e8bacada966f93af4fbce45919.1706544115.git.manos.pitsidianakis@linaro.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+---
+ hw/xen/xen-hvm-common.c | 12 ++++++------
+ hw/xen/xen-mapcache.c   |  5 ++---
+ 2 files changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/hw/xen/xen-hvm-common.c b/hw/xen/xen-hvm-common.c
+index ec99f86216..abd0ad4e7e 100644
+--- a/hw/xen/xen-hvm-common.c
++++ b/hw/xen/xen-hvm-common.c
+@@ -20,8 +20,8 @@ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size, MemoryRegion *mr,
+ 
+     if (runstate_check(RUN_STATE_INMIGRATE)) {
+         /* RAM already populated in Xen */
+-        fprintf(stderr, "%s: do not alloc "RAM_ADDR_FMT
+-                " bytes of ram at "RAM_ADDR_FMT" when runstate is INMIGRATE\n",
++        warn_report("%s: do not alloc "RAM_ADDR_FMT
++                " bytes of ram at "RAM_ADDR_FMT" when runstate is INMIGRATE",
+                 __func__, size, ram_addr);
+         return;
+     }
+@@ -551,9 +551,9 @@ static void cpu_handle_ioreq(void *opaque)
+         req->data = copy.data;
+ 
+         if (req->state != STATE_IOREQ_INPROCESS) {
+-            fprintf(stderr, "Badness in I/O request ... not in service?!: "
++            warn_report("Badness in I/O request ... not in service?!: "
+                     "%x, ptr: %x, port: %"PRIx64", "
+-                    "data: %"PRIx64", count: %u, size: %u, type: %u\n",
++                    "data: %"PRIx64", count: %u, size: %u, type: %u",
+                     req->state, req->data_is_ptr, req->addr,
+                     req->data, req->count, req->size, req->type);
+             destroy_hvm_domain(false);
+@@ -757,9 +757,9 @@ void xen_shutdown_fatal_error(const char *fmt, ...)
+     va_list ap;
+ 
+     va_start(ap, fmt);
+-    vfprintf(stderr, fmt, ap);
++    error_vreport(fmt, ap);
+     va_end(ap);
+-    fprintf(stderr, "Will destroy the domain.\n");
++    error_report("Will destroy the domain.");
+     /* destroy the domain */
+     qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_ERROR);
+ }
+diff --git a/hw/xen/xen-mapcache.c b/hw/xen/xen-mapcache.c
+index fa88e51f73..bbd8a1b001 100644
+--- a/hw/xen/xen-mapcache.c
++++ b/hw/xen/xen-mapcache.c
+@@ -349,9 +349,8 @@ tryagain:
+         MapCacheRev *reventry = g_new0(MapCacheRev, 1);
+         entry->lock++;
+         if (entry->lock == 0) {
+-            fprintf(stderr,
+-                    "mapcache entry lock overflow: "HWADDR_FMT_plx" -> %p\n",
+-                    entry->paddr_index, entry->vaddr_base);
++            error_report("mapcache entry lock overflow: "HWADDR_FMT_plx" -> %p",
++                         entry->paddr_index, entry->vaddr_base);
+             abort();
+         }
+         reventry->dma = dma;
+-- 
+2.34.1
+

@@ -1,0 +1,41 @@
+From 51061a561badf514070a9d1b0eaed1b10e5e4cc6 Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Fri, 16 Aug 2024 15:54:19 +0200
+Subject: [PATCH 18/27] hw/arm: xenpvh: Rename xen_arm.c -> xen-pvh.c
+
+Rename xen_arm.c -> xen-pvh.c to better express that this
+is a PVH machine and to align with x86 HVM and future PVH
+machine filenames:
+hw/i386/xen/xen-hvm.c
+hw/i386/xen/xen-pvh.c (in preparation)
+
+No functional changes.
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/arm/meson.build              | 2 +-
+ hw/arm/{xen_arm.c => xen-pvh.c} | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename hw/arm/{xen_arm.c => xen-pvh.c} (100%)
+
+diff --git a/hw/arm/meson.build b/hw/arm/meson.build
+index cce0899d99..c249e46b6c 100644
+--- a/hw/arm/meson.build
++++ b/hw/arm/meson.build
+@@ -66,7 +66,7 @@ arm_ss.add(when: 'CONFIG_FSL_IMX6UL', if_true: files('fsl-imx6ul.c', 'mcimx6ul-e
+ arm_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_soc.c'))
+ arm_ss.add(when: 'CONFIG_XEN', if_true: files(
+   'xen-stubs.c',
+-  'xen_arm.c',
++  'xen-pvh.c',
+ ))
+ 
+ system_ss.add(when: 'CONFIG_ARM_SMMUV3', if_true: files('smmu-common.c'))
+diff --git a/hw/arm/xen_arm.c b/hw/arm/xen-pvh.c
+similarity index 100%
+rename from hw/arm/xen_arm.c
+rename to hw/arm/xen-pvh.c
+-- 
+2.34.1
+

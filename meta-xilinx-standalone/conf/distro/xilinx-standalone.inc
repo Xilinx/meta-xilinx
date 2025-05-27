@@ -18,6 +18,7 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexr5', ' -DARMR5', ''
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexr52', ' -DARMR5 -DARMR52', '', d)}"
 TUNE_CCARGS:append:versal = " -Dversal"
 TUNE_CCARGS:append:versal-net = " -DVERSAL_NET"
+TUNE_CCARGS:append:versal-2ve-2vm = " -DVERSAL_NET"
 
 # Make sure all regular recipes are excluded from compatibility
 # Avoid using this for native, nativesdk or cross recipes

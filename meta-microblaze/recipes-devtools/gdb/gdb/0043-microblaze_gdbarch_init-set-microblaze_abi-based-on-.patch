@@ -1,7 +1,7 @@
 From 03df31becbc7dc6d35189fec3b4b2c7dfd3a8103 Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Thu, 28 Mar 2024 10:59:40 +0530
-Subject: [PATCH 43/54] microblaze_gdbarch_init: set microblaze_abi based on
+Subject: [PATCH 43/56] microblaze_gdbarch_init: set microblaze_abi based on
  wanted_abi and found_abi
 
 Earlier found_abi was declared but not set, instead gdbarch_info info

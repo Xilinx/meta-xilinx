@@ -1,0 +1,131 @@
+From 4db6eea0cec8a7d42d407cec43d9789764a3ac2d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Date: Tue, 14 Nov 2023 11:22:29 +0100
+Subject: [PATCH 03/27] hw/xen: Rename 'ram_memory' global variable as
+ 'xen_memory'
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+To avoid a potential global variable shadow in
+hw/i386/pc_piix.c::pc_init1(), rename Xen's
+"ram_memory" as "xen_memory".
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+Message-Id: <20231114143816.71079-11-philmd@linaro.org>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+---
+ hw/arm/xen_arm.c                |  6 +++---
+ hw/i386/xen/xen-hvm.c           | 10 +++++-----
+ hw/xen/xen-hvm-common.c         |  6 +++---
+ include/hw/xen/xen-hvm-common.h |  2 +-
+ 4 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/hw/arm/xen_arm.c b/hw/arm/xen_arm.c
+index a5631529d0..8a185da193 100644
+--- a/hw/arm/xen_arm.c
++++ b/hw/arm/xen_arm.c
+@@ -111,17 +111,17 @@ static void xen_init_ram(MachineState *machine)
+         block_len = GUEST_RAM1_BASE + ram_size[1];
+     }
+ 
+-    memory_region_init_ram(&ram_memory, NULL, "xen.ram", block_len,
++    memory_region_init_ram(&xen_memory, NULL, "xen.ram", block_len,
+                            &error_fatal);
+ 
+-    memory_region_init_alias(&ram_lo, NULL, "xen.ram.lo", &ram_memory,
++    memory_region_init_alias(&ram_lo, NULL, "xen.ram.lo", &xen_memory,
+                              GUEST_RAM0_BASE, ram_size[0]);
+     memory_region_add_subregion(sysmem, GUEST_RAM0_BASE, &ram_lo);
+     DPRINTF("Initialized region xen.ram.lo: base 0x%llx size 0x%lx\n",
+             GUEST_RAM0_BASE, ram_size[0]);
+ 
+     if (ram_size[1] > 0) {
+-        memory_region_init_alias(&ram_hi, NULL, "xen.ram.hi", &ram_memory,
++        memory_region_init_alias(&ram_hi, NULL, "xen.ram.hi", &xen_memory,
+                                  GUEST_RAM1_BASE, ram_size[1]);
+         memory_region_add_subregion(sysmem, GUEST_RAM1_BASE, &ram_hi);
+         DPRINTF("Initialized region xen.ram.hi: base 0x%llx size 0x%lx\n",
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index f42621e674..1ae943370b 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -149,12 +149,12 @@ static void xen_ram_init(PCMachineState *pcms,
+          */
+         block_len = (4 * GiB) + x86ms->above_4g_mem_size;
+     }
+-    memory_region_init_ram(&ram_memory, NULL, "xen.ram", block_len,
++    memory_region_init_ram(&xen_memory, NULL, "xen.ram", block_len,
+                            &error_fatal);
+-    *ram_memory_p = &ram_memory;
++    *ram_memory_p = &xen_memory;
+ 
+     memory_region_init_alias(&ram_640k, NULL, "xen.ram.640k",
+-                             &ram_memory, 0, 0xa0000);
++                             &xen_memory, 0, 0xa0000);
+     memory_region_add_subregion(sysmem, 0, &ram_640k);
+     /* Skip of the VGA IO memory space, it will be registered later by the VGA
+      * emulated device.
+@@ -163,12 +163,12 @@ static void xen_ram_init(PCMachineState *pcms,
+      * the Options ROM, so it is registered here as RAM.
+      */
+     memory_region_init_alias(&ram_lo, NULL, "xen.ram.lo",
+-                             &ram_memory, 0xc0000,
++                             &xen_memory, 0xc0000,
+                              x86ms->below_4g_mem_size - 0xc0000);
+     memory_region_add_subregion(sysmem, 0xc0000, &ram_lo);
+     if (x86ms->above_4g_mem_size > 0) {
+         memory_region_init_alias(&ram_hi, NULL, "xen.ram.hi",
+-                                 &ram_memory, 0x100000000ULL,
++                                 &xen_memory, 0x100000000ULL,
+                                  x86ms->above_4g_mem_size);
+         memory_region_add_subregion(sysmem, 0x100000000ULL, &ram_hi);
+     }
+diff --git a/hw/xen/xen-hvm-common.c b/hw/xen/xen-hvm-common.c
+index 565dc39c8f..cf4053c9f2 100644
+--- a/hw/xen/xen-hvm-common.c
++++ b/hw/xen/xen-hvm-common.c
+@@ -9,7 +9,7 @@
+ #include "hw/boards.h"
+ #include "hw/xen/arch_hvm.h"
+ 
+-MemoryRegion ram_memory;
++MemoryRegion xen_memory;
+ 
+ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size, MemoryRegion *mr,
+                    Error **errp)
+@@ -26,7 +26,7 @@ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size, MemoryRegion *mr,
+         return;
+     }
+ 
+-    if (mr == &ram_memory) {
++    if (mr == &xen_memory) {
+         return;
+     }
+ 
+@@ -53,7 +53,7 @@ static void xen_set_memory(struct MemoryListener *listener,
+ {
+     XenIOState *state = container_of(listener, XenIOState, memory_listener);
+ 
+-    if (section->mr == &ram_memory) {
++    if (section->mr == &xen_memory) {
+         return;
+     } else {
+         if (add) {
+diff --git a/include/hw/xen/xen-hvm-common.h b/include/hw/xen/xen-hvm-common.h
+index 4e9904f1a6..d3fa5ed29b 100644
+--- a/include/hw/xen/xen-hvm-common.h
++++ b/include/hw/xen/xen-hvm-common.h
+@@ -16,7 +16,7 @@
+ #include "qemu/error-report.h"
+ #include <xen/hvm/ioreq.h>
+ 
+-extern MemoryRegion ram_memory;
++extern MemoryRegion xen_memory;
+ extern MemoryListener xen_io_listener;
+ extern DeviceListener xen_device_listener;
+ 
+-- 
+2.34.1
+

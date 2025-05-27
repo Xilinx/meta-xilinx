@@ -1,0 +1,28 @@
+From 011ffcd00252f97d30509409efc6821bd63b78f5 Mon Sep 17 00:00:00 2001
+From: Gopi Kumar Bulusu <gopi@sankhya.com>
+Date: Tue, 17 Sep 2024 19:11:41 +0530
+Subject: [PATCH 56/56] Fix muldi3 - enable only when TARGET_MULTIPLY_HIGH is
+ set
+
+Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>
+---
+ gcc/config/microblaze/microblaze.md | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index f18238b0845..cbdb3ed323a 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -912,7 +912,8 @@
+ 
+    (set (match_dup:DI 0) (plus:DI (match_dup:DI 0) (match_dup:DI 8)))
+ 		]
+-  "!TARGET_SOFT_MUL && TARGET_MB_64 && TARGET_BARREL_SHIFT"
++  "!TARGET_SOFT_MUL && TARGET_MB_64 && TARGET_BARREL_SHIFT && 
++    TARGET_MULTIPLY_HIGH"
+ "
+ {
+   operands[3] = gen_reg_rtx (SImode);
+-- 
+2.43.5
+

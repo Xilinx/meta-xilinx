@@ -1,7 +1,7 @@
 From 389711a13933a60323d368d5e5f1f54bd171b16b Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Thu, 29 Feb 2024 10:55:16 +0530
-Subject: [PATCH 11/54] fix gdb microblaze-xilinx-elf crash issue on invocation
+Subject: [PATCH 11/56] fix gdb microblaze-xilinx-elf crash issue on invocation
  Regression from merging microblaze 64-bit support
 
 Signed-off-by: Aayush Misra <aayushm@amd.com>

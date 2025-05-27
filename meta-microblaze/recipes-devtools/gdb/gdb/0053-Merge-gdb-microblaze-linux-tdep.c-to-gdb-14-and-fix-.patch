@@ -1,7 +1,7 @@
 From 31b8744afcb31825083a23bbc08b6e00772ebd07 Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Thu, 23 May 2024 16:02:59 +0530
-Subject: [PATCH 53/54] Merge gdb/microblaze-linux-tdep.c to gdb-14 and fix
+Subject: [PATCH 53/56] Merge gdb/microblaze-linux-tdep.c to gdb-14 and fix
  compilation issues.
 
 Signed-off-by: Gopi Kumar Bulusu <gopi@sankhya.com>

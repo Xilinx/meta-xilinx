@@ -1,7 +1,7 @@
 From 21daca8e01515b2e73463adbf9488b63bb0ccf54 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 12 Sep 2022 21:05:51 +0530
-Subject: [PATCH 20/54] 8-stage pipeline for microblaze This patch adds the
+Subject: [PATCH 20/56] 8-stage pipeline for microblaze This patch adds the
  support for the 8-stage pipeline. The new 8-stage pipeline reduces the
  latencies of float & integer division drastically
 

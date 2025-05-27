@@ -1,7 +1,7 @@
 From a96aee31c41e4d851531100a0716401c3464f6ef Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Thu, 14 Mar 2024 15:44:56 +0530
-Subject: [PATCH 41/54] disable truncated register warning (gdb/remote.c)
+Subject: [PATCH 41/56] disable truncated register warning (gdb/remote.c)
 
 Signed-off-by: Aayush Misra <aayushm@amd.com>
 ---

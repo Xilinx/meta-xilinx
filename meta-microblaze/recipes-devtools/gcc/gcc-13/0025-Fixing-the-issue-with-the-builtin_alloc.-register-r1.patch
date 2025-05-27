@@ -1,7 +1,7 @@
 From 85273a514d0ab3b243b947633ab46705a0d946bc Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Thu, 23 Feb 2017 17:09:04 +0530
-Subject: [PATCH 25/54] Fixing the issue with the builtin_alloc. register r18
+Subject: [PATCH 25/56] Fixing the issue with the builtin_alloc. register r18
  was not properly handling the stack pattern which was resolved by using free
  available register
 

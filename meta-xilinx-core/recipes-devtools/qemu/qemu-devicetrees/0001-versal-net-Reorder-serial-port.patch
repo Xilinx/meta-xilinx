@@ -1,4 +1,4 @@
-From 58fdfde013dfabf3a9f2c83525c00a6f057768f1 Mon Sep 17 00:00:00 2001
+From d48df62bb63795d393ec351f9acf67c150af1b75 Mon Sep 17 00:00:00 2001
 From: Mark Hatle <mark.hatle@amd.com>
 Date: Fri, 4 Oct 2024 15:49:46 -0600
 Subject: [PATCH] versal-net: Reorder serial port
@@ -12,17 +12,17 @@ ensure that the first two serial ports are the ones used by Linux.
 
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 ---
- board-versal-net-psx-spp-1.4-alt.dts |  36 ++++++++
- board-versal-net-psx-virt-alt.dts    | 130 +++++++++++++++++++++++++++
- board-versal-pmx-virt-alt.dts        |  82 +++++++++++++++++
- 3 files changed, 248 insertions(+)
+ board-versal-net-psx-spp-1.4-alt.dts |  36 +++++++
+ board-versal-net-psx-virt-alt.dts    | 136 +++++++++++++++++++++++++++
+ board-versal-pmx-virt-alt.dts        |  82 ++++++++++++++++
+ 3 files changed, 254 insertions(+)
  create mode 100644 board-versal-net-psx-spp-1.4-alt.dts
  create mode 100644 board-versal-net-psx-virt-alt.dts
  create mode 100644 board-versal-pmx-virt-alt.dts
 
 diff --git a/board-versal-net-psx-spp-1.4-alt.dts b/board-versal-net-psx-spp-1.4-alt.dts
 new file mode 100644
-index 00000000..770a388e
+index 000000000..770a388e7
 --- /dev/null
 +++ b/board-versal-net-psx-spp-1.4-alt.dts
 @@ -0,0 +1,36 @@
@@ -64,10 +64,10 @@ index 00000000..770a388e
 +};
 diff --git a/board-versal-net-psx-virt-alt.dts b/board-versal-net-psx-virt-alt.dts
 new file mode 100644
-index 00000000..7ee4ad9d
+index 000000000..06a42fe2b
 --- /dev/null
 +++ b/board-versal-net-psx-virt-alt.dts
-@@ -0,0 +1,130 @@
+@@ -0,0 +1,136 @@
 +/*
 + * Versal-Net Virtual PSX board device tree.
 + *
@@ -104,6 +104,8 @@ index 00000000..7ee4ad9d
 +#define VERSAL_NET_APU_CPU_FREQ 100000000
 +
 +#define NUM_APUS_PER_CLUSTER 4
++
++#define NUM_RPUS 4
 +
 +#define VERSAL_NPI_GENERIC
 +#define VERSAL_PSX
@@ -179,9 +181,11 @@ index 00000000..7ee4ad9d
 +};
 +&rpu_ctrl_a0 {
 +	core = <&rpu_cpu0>;
++	tcm-mr = <&tcm_core0>;
 +};
 +&rpu_ctrl_a1 {
 +	core = <&rpu_cpu1>;
++	tcm-mr = <&tcm_core1>;
 +};
 +
 +&rpu_ctrl_b {
@@ -189,9 +193,11 @@ index 00000000..7ee4ad9d
 +};
 +&rpu_ctrl_b0 {
 +	core = <&rpu_cpu2>;
++	tcm-mr = <&tcm_core2>;
 +};
 +&rpu_ctrl_b1 {
 +	core = <&rpu_cpu3>;
++	tcm-mr = <&tcm_core3>;
 +};
 +
 +&pmc_tap {
@@ -200,7 +206,7 @@ index 00000000..7ee4ad9d
 +};
 diff --git a/board-versal-pmx-virt-alt.dts b/board-versal-pmx-virt-alt.dts
 new file mode 100644
-index 00000000..7a4679d0
+index 000000000..7a4679d02
 --- /dev/null
 +++ b/board-versal-pmx-virt-alt.dts
 @@ -0,0 +1,82 @@

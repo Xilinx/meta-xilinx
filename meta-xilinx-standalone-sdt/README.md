@@ -26,14 +26,14 @@ This layer depends on:
         https://git.yoctoproject.org/meta-xilinx (official version)
         https://github.com/Xilinx/meta-xilinx (development and AMD release)
 	layers: meta-xilinx-core, meta-xilinx-bsp, meta-xilinx-standalone
-	branch: scarthgap or AMD release version (e.g. rel-v2024.2)
+	branch: scarthgap or AMD release version (e.g. rel-v2025.1)
 
 	URI:
         https://git.yoctoproject.org/meta-virtualization (official version)
         https://github.com/Xilinx/meta-virtualization (development and AMD release)
-	branch: scarthgap or AMD release version (e.g. rel-v2024.2)
+	branch: scarthgap or AMD release version (e.g. rel-v2025.1)
 
 	URI:
         https://github.com/OpenAMP/meta-openamp (official version)
         https://github.com/Xilinx/meta-openamp (development and AMD release)
-	branch: scarthgap or AMD release version (e.g. rel-v2024.2)
+	branch: scarthgap or AMD release version (e.g. rel-v2025.1)

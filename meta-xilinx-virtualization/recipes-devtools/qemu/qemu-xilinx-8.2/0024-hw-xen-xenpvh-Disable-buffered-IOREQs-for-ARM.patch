@@ -1,0 +1,80 @@
+From 46b83259bda7fd9bf96e962a20538a44a33aebc0 Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Thu, 5 Sep 2024 01:00:36 +0200
+Subject: [PATCH 24/27] hw/xen: xenpvh: Disable buffered IOREQs for ARM
+
+Add a way to enable/disable buffered IOREQs for PVH machines
+and disable them for ARM. ARM does not support buffered
+IOREQ's nor the legacy way to map IOREQ info pages.
+
+See the following for more details:
+https://xenbits.xen.org/gitweb/?p=xen.git;a=commitdiff;h=2fbd7e609e1803ac5e5c26e22aa8e4b5a6cddbb1
+https://xenbits.xen.org/gitweb/?p=xen.git;a=blob;f=xen/arch/arm/ioreq.c;h=2e829d2e7f3760401b96fa7c930e2015fb1cf463;hb=HEAD#l138
+
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+---
+ hw/arm/xen-pvh.c                | 3 +++
+ hw/i386/xen/xen-pvh.c           | 3 +++
+ hw/xen/xen-pvh-common.c         | 2 +-
+ include/hw/xen/xen-pvh-common.h | 3 +++
+ 4 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/hw/arm/xen-pvh.c b/hw/arm/xen-pvh.c
+index 04cb9855af..28af3910ea 100644
+--- a/hw/arm/xen-pvh.c
++++ b/hw/arm/xen-pvh.c
+@@ -66,6 +66,9 @@ static void xen_arm_machine_class_init(ObjectClass *oc, void *data)
+      */
+     mc->max_cpus = GUEST_MAX_VCPUS;
+ 
++    /* Xen/ARM does not use buffered IOREQs.  */
++    xpc->handle_bufioreq = HVM_IOREQSRV_BUFIOREQ_OFF;
++
+     /* List of supported features known to work on PVH ARM.  */
+     xpc->has_tpm = true;
+     xpc->has_virtio_mmio = true;
+diff --git a/hw/i386/xen/xen-pvh.c b/hw/i386/xen/xen-pvh.c
+index cb45b0a45a..3ca75bd7c4 100644
+--- a/hw/i386/xen/xen-pvh.c
++++ b/hw/i386/xen/xen-pvh.c
+@@ -90,6 +90,9 @@ static void xen_pvh_machine_class_init(ObjectClass *oc, void *data)
+     /* We have an implementation specific init to create CPU objects.  */
+     xpc->init = xen_pvh_init;
+ 
++    /* Enable buffered IOREQs.  */
++    xpc->handle_bufioreq = HVM_IOREQSRV_BUFIOREQ_ATOMIC;
++
+     /*
+      * PCI INTX routing.
+      *
+diff --git a/hw/xen/xen-pvh-common.c b/hw/xen/xen-pvh-common.c
+index 58c3c338d3..6103c000c3 100644
+--- a/hw/xen/xen-pvh-common.c
++++ b/hw/xen/xen-pvh-common.c
+@@ -194,7 +194,7 @@ static void xen_pvh_init(MachineState *ms)
+ 
+     xen_pvh_init_ram(s, sysmem);
+     xen_register_ioreq(&s->ioreq, ms->smp.max_cpus,
+-                       HVM_IOREQSRV_BUFIOREQ_ATOMIC,
++                       xpc->handle_bufioreq,
+                        &xen_memory_listener);
+ 
+     if (s->cfg.virtio_mmio_num) {
+diff --git a/include/hw/xen/xen-pvh-common.h b/include/hw/xen/xen-pvh-common.h
+index bc09eea936..5cdd23c2f4 100644
+--- a/include/hw/xen/xen-pvh-common.h
++++ b/include/hw/xen/xen-pvh-common.h
+@@ -43,6 +43,9 @@ struct XenPVHMachineClass {
+      */
+     int (*set_pci_link_route)(uint8_t line, uint8_t irq);
+ 
++    /* Allow implementations to optionally enable buffered ioreqs.  */
++    uint8_t handle_bufioreq;
++
+     /*
+      * Each implementation can optionally enable features that it
+      * supports and are known to work.
+-- 
+2.34.1
+

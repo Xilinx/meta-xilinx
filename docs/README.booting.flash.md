@@ -2,8 +2,9 @@
 
 Booting OS Images from flash devices such as QSPI/NOR/NAND/OSPI.
 
-* [U-boot boot scripts configurations](#u-boot-boot-scripts-configurations)
-* [Booting from QSPI or NOR or OSPI](#booting-from-qspi-or-nor-or-ospi)
+- [Booting OS Images from Flash Device](#booting-os-images-from-flash-device)
+	- [U-boot boot scripts configurations](#u-boot-boot-scripts-configurations)
+	- [Booting from QSPI or NOR or OSPI](#booting-from-qspi-or-nor-or-ospi)
 
 ## U-boot boot scripts configurations
 
@@ -14,12 +15,13 @@ Booting OS Images from flash devices such as QSPI/NOR/NAND/OSPI.
 2. Below table describes boot.scr partition offset and load address for all the
    platforms.
 
-| Device     | Partition Offset address for boot.scr | Load address of boot.scr in DDR        |
-|------------|---------------------------------------|----------------------------------------|
-| MicroBlaze | 0x1F00000                             | DDR base address + DDR Size - 0xe00000 |
-| Zynq-7000  | 0xFC0000                              | DDR base address + 0x3000000           |
-| ZynqMP     | 0x3E80000                             | DDR base address + 0x20000000          |
-| Versal     | 0x7F80000                             | DDR base address + 0x20000000          |
+| Device         | Partition Offset address for boot.scr | Load address of boot.scr in DDR        |
+|----------------|---------------------------------------|----------------------------------------|
+| MicroBlaze     | 0x1F00000                             | DDR base address + DDR Size - 0xe00000 |
+| Zynq-7000      | 0xFC0000                              | DDR base address + 0x3000000           |
+| ZynqMP         | 0x3E80000                             | DDR base address + 0x20000000          |
+| Versal         | 0x7F80000                             | DDR base address + 0x20000000          |
+| Versal-2ve-2vm | 0x7F80000                             | DDR base address + 0x78000000          |
 
 ## Booting from QSPI or NOR or OSPI
 

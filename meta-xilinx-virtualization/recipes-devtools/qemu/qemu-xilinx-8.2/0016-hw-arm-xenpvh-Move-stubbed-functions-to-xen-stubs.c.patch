@@ -1,0 +1,102 @@
+From 902c809309607a57e11a11b56bc4c1f20a535bad Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Fri, 16 Aug 2024 15:46:32 +0200
+Subject: [PATCH 16/27] hw/arm: xenpvh: Move stubbed functions to xen-stubs.c
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/arm/meson.build |  5 ++++-
+ hw/arm/xen-stubs.c | 32 ++++++++++++++++++++++++++++++++
+ hw/arm/xen_arm.c   | 20 --------------------
+ 3 files changed, 36 insertions(+), 21 deletions(-)
+ create mode 100644 hw/arm/xen-stubs.c
+
+diff --git a/hw/arm/meson.build b/hw/arm/meson.build
+index 68245d3ad1..cce0899d99 100644
+--- a/hw/arm/meson.build
++++ b/hw/arm/meson.build
+@@ -64,7 +64,10 @@ arm_ss.add(when: 'CONFIG_FSL_IMX7', if_true: files('fsl-imx7.c', 'mcimx7d-sabre.
+ arm_ss.add(when: 'CONFIG_ARM_SMMUV3', if_true: files('smmuv3.c'))
+ arm_ss.add(when: 'CONFIG_FSL_IMX6UL', if_true: files('fsl-imx6ul.c', 'mcimx6ul-evk.c'))
+ arm_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_soc.c'))
+-arm_ss.add(when: 'CONFIG_XEN', if_true: files('xen_arm.c'))
++arm_ss.add(when: 'CONFIG_XEN', if_true: files(
++  'xen-stubs.c',
++  'xen_arm.c',
++))
+ 
+ system_ss.add(when: 'CONFIG_ARM_SMMUV3', if_true: files('smmu-common.c'))
+ system_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4_boards.c'))
+diff --git a/hw/arm/xen-stubs.c b/hw/arm/xen-stubs.c
+new file mode 100644
+index 0000000000..4ac6a56a96
+--- /dev/null
++++ b/hw/arm/xen-stubs.c
+@@ -0,0 +1,32 @@
++/*
++ * Stubs for unimplemented Xen functions for ARM.
++ *
++ * SPDX-License-Identifier: MIT
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "qapi/qapi-commands-migration.h"
++#include "hw/boards.h"
++#include "sysemu/sysemu.h"
++#include "hw/xen/xen-hvm-common.h"
++#include "hw/xen/arch_hvm.h"
++
++void arch_handle_ioreq(XenIOState *state, ioreq_t *req)
++{
++    hw_error("Invalid ioreq type 0x%x\n", req->type);
++    return;
++}
++
++void arch_xen_set_memory(XenIOState *state, MemoryRegionSection *section,
++                         bool add)
++{
++}
++
++void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
++{
++}
++
++void qmp_xen_set_global_dirty_log(bool enable, Error **errp)
++{
++}
+diff --git a/hw/arm/xen_arm.c b/hw/arm/xen_arm.c
+index 581e65d3b8..bb0b280f17 100644
+--- a/hw/arm/xen_arm.c
++++ b/hw/arm/xen_arm.c
+@@ -112,26 +112,6 @@ static void xen_init_ram(MachineState *machine)
+     ram_grants = *xen_init_grant_ram();
+ }
+ 
+-void arch_handle_ioreq(XenIOState *state, ioreq_t *req)
+-{
+-    hw_error("Invalid ioreq type 0x%x\n", req->type);
+-
+-    return;
+-}
+-
+-void arch_xen_set_memory(XenIOState *state, MemoryRegionSection *section,
+-                         bool add)
+-{
+-}
+-
+-void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+-{
+-}
+-
+-void qmp_xen_set_global_dirty_log(bool enable, Error **errp)
+-{
+-}
+-
+ #ifdef CONFIG_TPM
+ static void xen_enable_tpm(XenArmState *xam)
+ {
+-- 
+2.34.1
+

@@ -1,7 +1,7 @@
 From 003f60fa4eedddd15de6e9f633bffec1a887fe45 Mon Sep 17 00:00:00 2001
 From: Nagaraju <nmekala@xilinx.com>
 Date: Fri, 23 Aug 2019 16:16:53 +0530
-Subject: [PATCH 47/54] Added new MB-64 single register arithmetic instructions
+Subject: [PATCH 47/56] Added new MB-64 single register arithmetic instructions
 
 ---
  gcc/config/microblaze/microblaze.md | 56 +++++++++++++++++++++++++++++

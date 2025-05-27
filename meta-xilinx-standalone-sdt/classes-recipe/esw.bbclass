@@ -1,11 +1,5 @@
 inherit check_sdt_enabled python3native xlnx-embeddedsw pkgconfig cmake
 
-# Poky always tries to enable EXPORT_COMPILE_COMMANDS, but ESW changes
-# behavior when this is enabled and will generate:
-#    -isystem /usr/include
-# which will cause a build failures.
-OECMAKE_ARGS:remove = "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON"
-
 SRCREV_FORMAT = "src_decouple"
 
 OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
@@ -14,6 +8,7 @@ LICFILENAME = "license.txt"
 SPECFILE_PATH:arm = "${S}/scripts/specs/arm/Xilinx.spec"
 SPECFILE_PATH:aarch64 = "${S}/scripts/specs/arm/Xilinx.spec"
 SPECFILE_PATH:microblaze = "${S}/scripts/specs/microblaze/Xilinx.spec"
+SPECFILE_PATH:riscv32 = "${S}/scripts/specs/microblaze_riscv/Xilinx.spec"
 
 ESW_MACHINE ?= "${MACHINE}"
 
@@ -36,13 +31,17 @@ do_install[depends] += "device-tree:do_deploy"
 
 def get_xlnx_cmake_processor(tune, machine, d):
     cmake_processor = tune
-    if tune.startswith('microblaze'):
+    if tune.startswith('microblaze') and tune != "microblaze_riscv":
         if (machine == 'psu_pmu_0'):
             cmake_processor = 'pmu_microblaze'
-        elif (machine in [ 'psv_pmc_0', 'psx_pmc_0' ]):
+        elif (machine in [ 'psv_pmc_0', 'psx_pmc_0', 'pmc_0']):
             cmake_processor = 'plm_microblaze'
+        elif (machine == 'asu'):
+            cmake_processor = 'microblaze_riscv'
         else:
             cmake_processor = 'microblaze'
+    elif tune == 'microblaze_riscv':
+        cmake_processor = 'microblaze_riscv'
     elif (tune in [ 'cortexr5', 'cortexr5hf' ]):
         cmake_processor = 'cortexr5'
     elif (tune in [ 'cortexr52', 'cortexr52hf' ]):
@@ -62,6 +61,8 @@ XLNX_CMAKE_MACHINE:zynq = "Zynq"
 XLNX_CMAKE_MACHINE:zynqmp = "ZynqMP"
 XLNX_CMAKE_MACHINE:versal = "Versal"
 XLNX_CMAKE_MACHINE:versal-net = "VersalNet"
+XLNX_CMAKE_MACHINE:versal-2ve-2vm = "VersalNet"
+XLNX_CMAKE_SUBMACHINE:versal-2ve-2vm = "Versal_2VE_2VM"
 
 XLNX_CMAKE_SUBMACHINE = "undefined"
 

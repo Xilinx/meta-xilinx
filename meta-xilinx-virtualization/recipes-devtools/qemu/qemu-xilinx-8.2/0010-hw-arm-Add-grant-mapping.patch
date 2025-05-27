@@ -1,0 +1,33 @@
+From 12ea10f6189865046d9b202e48f4879717bf7d19 Mon Sep 17 00:00:00 2001
+From: Vikram Garhwal <vikram.garhwal@amd.com>
+Date: Tue, 27 Feb 2024 14:35:01 -0800
+Subject: [PATCH 10/27] hw: arm: Add grant mapping.
+
+Enable grant ram mapping support for Xenpvh machine on ARM.
+
+[EI: Remove DPRINTF]
+Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+---
+ hw/arm/xen_arm.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/hw/arm/xen_arm.c b/hw/arm/xen_arm.c
+index 8a185da193..d3cd4f37fb 100644
+--- a/hw/arm/xen_arm.c
++++ b/hw/arm/xen_arm.c
+@@ -127,6 +127,8 @@ static void xen_init_ram(MachineState *machine)
+         DPRINTF("Initialized region xen.ram.hi: base 0x%llx size 0x%lx\n",
+                 GUEST_RAM1_BASE, ram_size[1]);
+     }
++
++    ram_grants = *xen_init_grant_ram();
+ }
+ 
+ void arch_handle_ioreq(XenIOState *state, ioreq_t *req)
+-- 
+2.34.1
+

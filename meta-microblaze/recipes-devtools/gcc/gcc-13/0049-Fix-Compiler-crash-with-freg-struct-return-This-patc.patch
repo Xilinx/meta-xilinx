@@ -1,7 +1,7 @@
 From 8107e0be46e5bdbfc353648ce5129afde5275ea9 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 13 Sep 2022 16:06:10 +0530
-Subject: [PATCH 49/54] Fix Compiler crash with -freg-struct-return This patch
+Subject: [PATCH 49/56] Fix Compiler crash with -freg-struct-return This patch
  fixes a bug in MB GCC regarding the passing struct values in registers.
  Currently we are only handling SImode With this patch all other modes are
  handled properly

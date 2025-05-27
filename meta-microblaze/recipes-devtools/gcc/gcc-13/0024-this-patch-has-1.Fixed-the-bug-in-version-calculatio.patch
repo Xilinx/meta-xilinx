@@ -1,7 +1,7 @@
 From a8991be91d79cf0bd17b7d303a10ec5edd7408c6 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 13 Sep 2022 12:23:54 +0530
-Subject: [PATCH 24/54] this patch has 1.Fixed the bug in version calculation.
+Subject: [PATCH 24/56] this patch has 1.Fixed the bug in version calculation.
  2.Add new bitfield instructions.
 
 Signed-off-by :Mahesh Bodapati <mbodapat@xilinx.com>

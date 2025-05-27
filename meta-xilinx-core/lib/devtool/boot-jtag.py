@@ -56,7 +56,7 @@ def bootjtag(args, config, basepath, workspace):
     # MB = (DDR base address + DDR Size) - 0xe00000
     # Zynq 7000 = DDR base address + 0x3000000
     # ZynqMP = DDR base address + 0x20000000
-    # Versal & Versal-net = DDR base address + 0x20000000
+    # Versal, Versal-Net and Versal-2ve-2vm = DDR base address + 0x20000000
     if arch == 'microblazeel':
         # Assuming DDR size is 2GB
         bootscr_addr = hex(int(ddr_base_addr, 16) + 0x80000000 - 0xe00000)
@@ -90,7 +90,7 @@ def bootjtag(args, config, basepath, workspace):
         data['atf'] = os.path.join(deploy_dir, 'arm-trusted-firmware.elf')
         data['pmufw'] = os.path.join(deploy_dir, 'pmu-firmware-' + machine + '.elf')
 
-    if soc in ('versal', 'versal-net'):
+    if soc in ('versal', 'versal-net', 'versal-2ve-2vm'):
         data['bootbin'] = os.path.join(deploy_dir, 'boot.bin')
 
     data['bootscr'] = os.path.join(deploy_dir, 'boot.scr')
@@ -166,8 +166,8 @@ def bootjtag(args, config, basepath, workspace):
         lines.append('stop')
         lines.append('')
         lines.append('targets -set -nocase -filter {name =~ \"*Versal*\"}')
-    elif soc == 'versal-net':
-        # Download boot.bin to versal device
+    elif soc == 'versal-net' or soc == 'versal-2ve-2vm':
+        # Download boot.bin to versal-net and versal-2ve-2vm device
         lines.append('targets -set -nocase -filter {name =~ \"*PMC*\"}')
         lines.append('puts stderr "INFO: Downloading BOOT bin file: ' + data['bootbin'] + '"')
         lines.append('device program \"' + data['bootbin'] + '\"')
@@ -235,11 +235,11 @@ def bootjtag(args, config, basepath, workspace):
     lines.append('dow -data \"' + data['bootscr'] + '\" ' + bootscr_addr)
     lines.append('')
 
-    # Select A72 Core 0 to load and run Versal images
+    # Select A72 or A78 Core 0 to load and run Versal/VersalNet/Versal-2ve-2vm images
     if soc == 'versal':
         lines.append('targets -set -nocase -filter {name =~ \"*A72*#0\"}')
 
-    if soc == 'versal-net':
+    if soc == 'versal-net' or soc == 'versal-2ve-2vm':
         lines.append('targets -set -nocase -filter {name =~ \"*A78*#0\"}')
 
     lines.append('con')

@@ -1,7 +1,7 @@
 From 0a7299e82a8f463e9e7cd6297c5bdc0aac3a0ec4 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Tue, 17 Jan 2017 18:07:24 +0530
-Subject: [PATCH 18/54] microblaze.md: Improve 'adddi3' and 'subdi3' insn
+Subject: [PATCH 18/56] microblaze.md: Improve 'adddi3' and 'subdi3' insn
  definitions Change adddi3 to handle DI immediates as the second operand, this
  requires modification to the output template however reduces the need to
  specify seperate templates for 16-bit positive/negative immediate operands.

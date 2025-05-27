@@ -1,7 +1,7 @@
 From 254bd83017b21301c73e7501c71b2cf128ac18d9 Mon Sep 17 00:00:00 2001
 From: Gopi Kumar Bulusu <gopi@sankhya.com>
 Date: Thu, 28 Mar 2024 11:36:32 +0530
-Subject: [PATCH 44/54] Start bfd_mach_microblaze values from 0 (0,1) instead
+Subject: [PATCH 44/56] Start bfd_mach_microblaze values from 0 (0,1) instead
  of (1,2)
 
 Before 64-bit support there was only bfd_mach_microblaze (implicitly set to 0),
