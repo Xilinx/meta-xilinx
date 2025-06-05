@@ -8,7 +8,7 @@ BRANCH ?= "xlnx_rel_v2025.1"
 REPO ?= "git://github.com/Xilinx/libdfx.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
-SRCREV = "af8d735fae286e7bc94c830a86c960598a4ac014"
+SRCREV = "484f3bf2262d06cce67c9453308e72978fbb4565"
 
 # Don't allow building for Zynq and Microblaze MACHINE unless it is supported.
 COMPATIBLE_MACHINE = "^$"
