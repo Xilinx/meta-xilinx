@@ -30,7 +30,7 @@ python __anonymous () {
 }
 
 do_configure:prepend () {
-    if [ -n "${UBOOT_USER_SPECIFIED_DTS}" && ! -f ${S}/arch/arm/dts/${UBOOT_USER_SPECIFIED_DTS}.dts ]; then
+    if [ -n "${UBOOT_USER_SPECIFIED_DTS}" ] && [ ! -f "${S}/arch/arm/dts/${UBOOT_USER_SPECIFIED_DTS}.dts" ]; then
         bbfatal "Uboot user specified dts (${UBOOT_USER_SPECIFIED_DTS}.dts) is not found in \
 the${S}/arch/arm/dts directory, you need to patch dts file to u-boot source and use this configuration. \
 For more details refer https://u-boot.readthedocs.io/en/latest/develop/devicetree/control.html#configuration "
