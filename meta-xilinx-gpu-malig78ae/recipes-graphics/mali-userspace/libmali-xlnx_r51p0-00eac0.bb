@@ -9,8 +9,8 @@ REQUIRED_DISTRO_FEATURES = "wayland"
 REQUIRED_MACHINE_FEATURES = "malig78ae"
 
 REPO ?= "git://github.com/Xilinx/g78ae-userspace-binaries.git;protocol=https"
-BRANCH ?= "r51p0-00eac0-1.rel01"
-SRCREV ?= "9323acee1129b6f21c94db142d2a697e681d7583"
+BRANCH ?= "r51p0-00eac0-1.rel03"
+SRCREV ?= "3d52a4e78f1b2f5348df12ceaa7185e6519af34b"
 
 SRC_URI = "${REPO};branch=${BRANCH}"
 
@@ -33,7 +33,7 @@ do_install() {
     install_include_dir="${D}${includedir}"
     install_lib_dir="${D}${libdir}"
     install_pkgconfig_dir="${D}${libdir}/pkgconfig"
-    install_vulkan_icd_dir="${D}/${datadir}/vulkan/icd.d"
+    install_vulkan_dir="${D}/${datadir}/vulkan"
 
     # libraries
     install -d ${install_lib_dir}
@@ -60,9 +60,11 @@ do_install() {
     install -m 0644 ${S}/pkgconfig/glesv2.pc ${install_pkgconfig_dir}/glesv2.pc
     install -m 0644 ${S}/pkgconfig/gbm.pc ${install_pkgconfig_dir}/gbm.pc
 
-    # vulkan icd
-    install -d ${install_vulkan_icd_dir}
-    install -m 0644 ${S}/vulkan/mali_icd.json ${install_vulkan_icd_dir}/mali_icd.json
+    # vulkan icd and implicit_layer
+    install -d ${install_vulkan_dir}/icd.d
+    install -m 0644 ${S}/vulkan/icd.d/mali_icd.json ${install_vulkan_dir}/icd.d/mali_icd.json
+    install -d ${install_vulkan_dir}/implicit_layer.d
+    install -m 0644 ${S}/vulkan/implicit_layer.d/* ${install_vulkan_dir}/implicit_layer.d/
 }
 
 # Package gets renamed on the debian class, but we want to keep -xlnx
@@ -77,7 +79,6 @@ INHIBIT_SYSROOT_STRIP = "1"
 # explicitly depends upon them.
 EXCLUDE_FROM_WORLD = "1"
 
-# Rewrite to EXCLUDE libmali.so
 FILES:${PN}-dev = " \
 	${includedir} \
 	${libdir}/pkgconfig \
@@ -85,14 +86,12 @@ FILES:${PN}-dev = " \
 	${libdir}/libgbm.so \
 	${libdir}/libGLESv1_CM.so \
 	${libdir}/libGLESv2.so \
+	${libdir}/libmali.so \
 	${libdir}/libOpenCL.so \
 	"
 
-# Due to an incorrect 'FILTER' section entry, libmali.so needs to be in
-# the runtime package, even though it's not the soname
 FILES:${PN} += " \
 	${datadir} \
-	${libdir}/libmali.so \
 	"
 
 INSANE_SKIP:${PN} = "already-stripped dev-so"
