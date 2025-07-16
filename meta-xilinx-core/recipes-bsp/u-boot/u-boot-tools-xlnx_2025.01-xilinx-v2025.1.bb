@@ -1,8 +1,8 @@
 require u-boot-tools-xlnx.inc
 require u-boot-xlnx-2025.1.inc
 
-PROVIDES:append = " ${PN}-mkfwumdata"
-PROVIDES:class-native += "u-boot-mkfwumdata-native"
+PROVIDES:append = " ${PN}-mkfwumdata ${PN}-efivars"
+PROVIDES:class-native += "u-boot-mkfwumdata-native u-boot-efivars-native"
 
 # MUST clear CONFIG_VIDEO to avoid a compilation failure trying to construct
 # bmp_logo.h
@@ -27,9 +27,15 @@ do_compile () {
 
 PACKAGES += "${PN}-mkfwumdata"
 
+PACKAGES += "${PN}-efivars"
+
 do_install:append() {
         install -m 0755 tools/mkfwumdata ${D}${bindir}/uboot-mkfwumdata
         ln -sf uboot-mkfwumdata ${D}${bindir}/mkfwumdata
+
+        install -m 0755 ${S}/tools/efivar.py ${D}${bindir}/efivar.py
 }
 
 FILES:${PN}-mkfwumdata = "${bindir}/uboot-mkfwumdata ${bindir}/mkfwumdata"
+
+FILES:${PN}-efivars = "${bindir}/efivar.py"
