@@ -21,7 +21,7 @@ COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
 
 PROVIDES = "virtual/boot-bin"
 
-DEPENDS += "bootgen-native ${UBOOT_BOOT_SCRIPT}"
+DEPENDS += "bootgen-native"
 
 # There is no bitstream recipe, so really depend on virtual/bitstream
 # We need to refer to virtual/arm-trusted-firmware and not arm-trusted-firmware as there may be multiple providers
@@ -59,16 +59,9 @@ QEMU_FLASH_TYPE_DEFAULT:versal-net = "${@'ospi' if d.getVar("QEMU_HW_BOOT_MODE")
 QEMU_FLASH_TYPE_DEFAULT:versal-2ve-2vm = "${@'ospi' if d.getVar("QEMU_HW_BOOT_MODE") == '8' else 'qspi'}"
 QEMU_FLASH_TYPE ?= "${QEMU_FLASH_TYPE_DEFAULT}"
 
-BOOTSCR_DEP = ''
-BOOTSCR_DEP:versal = '${UBOOT_BOOT_SCRIPT}:do_deploy'
-BOOTSCR_DEP:versal-net = '${UBOOT_BOOT_SCRIPT}:do_deploy'
-BOOTSCR_DEP:versal-2ve-2vm = '${UBOOT_BOOT_SCRIPT}:do_deploy'
-
 BIF_BITSTREAM_ATTR ?= "${@bb.utils.contains('MACHINE_FEATURES', 'fpga-overlay', '', 'bitstream', d)}"
 
 do_patch[noexec] = "1"
-
-do_compile[depends] .= " ${BOOTSCR_DEP}"
 
 def create_bif(config, attrflags, attrimage, ids, common_attr, biffd, d):
     arch = d.getVar("SOC_FAMILY")
@@ -233,19 +226,16 @@ do_compile() {
 do_compile:append:versal() {
     dd if=/dev/zero bs=256M count=1  > ${B}/qemu-${QEMU_FLASH_TYPE}.bin
     dd if=${B}/BOOT.bin of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=0 conv=notrunc
-    dd if=${DEPLOY_DIR_IMAGE}/boot.scr of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=66584576 conv=notrunc
 }
 
 do_compile:append:versal-net() {
     dd if=/dev/zero bs=256M count=1  > ${B}/qemu-${QEMU_FLASH_TYPE}.bin
     dd if=${B}/BOOT.bin of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=0 conv=notrunc
-    dd if=${DEPLOY_DIR_IMAGE}/boot.scr of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=66584576 conv=notrunc
 }
 
 do_compile:append:versal-2ve-2vm() {
     dd if=/dev/zero bs=256M count=1  > ${B}/qemu-${QEMU_FLASH_TYPE}.bin
     dd if=${B}/BOOT.bin of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=0 conv=notrunc
-    dd if=${DEPLOY_DIR_IMAGE}/boot.scr of=${B}/qemu-${QEMU_FLASH_TYPE}.bin bs=1 seek=66584576 conv=notrunc
 }
 
 do_install() {
