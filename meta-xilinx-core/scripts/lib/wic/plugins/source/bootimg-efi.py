@@ -282,7 +282,7 @@ class BootimgEFIPlugin(SourcePlugin):
     @classmethod
     def do_prepare_partition(cls, part, source_params, creator, cr_workdir,
                              oe_builddir, bootimg_dir, kernel_dir,
-                             rootfs_dir, native_sysroot):
+                             rootfs_dir, native_sysroot, sector_size):
         """
         Called to do the actual content population for a partition i.e. it
         'prepares' the partition to be incorporated into the image.
@@ -489,8 +489,8 @@ class BootimgEFIPlugin(SourcePlugin):
 
         label = part.label if part.label else "ESP"
 
-        dosfs_cmd = "mkdosfs -n %s -i %s -C %s %d" % \
-                    (label, part.fsuuid, bootimg, blocks)
+        dosfs_cmd = "mkdosfs -S %d -n %s -i %s -C %s %d" % \
+                    (sector_size, label, part.fsuuid, bootimg, blocks)
         exec_native_cmd(dosfs_cmd, native_sysroot)
 
         mcopy_cmd = "mcopy -i %s -s %s/* ::/" % (bootimg, hdddir)

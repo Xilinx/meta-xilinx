@@ -73,7 +73,7 @@ class RootfsPlugin(SourcePlugin):
     @classmethod
     def do_prepare_partition(cls, part, source_params, cr, cr_workdir,
                              oe_builddir, bootimg_dir, kernel_dir,
-                             krootfs_dir, native_sysroot):
+                             krootfs_dir, native_sysroot, sector_size):
         """
         Called to do the actual content population for a partition i.e. it
         'prepares' the partition to be incorporated into the image.

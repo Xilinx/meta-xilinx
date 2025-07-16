@@ -188,7 +188,7 @@ class Partition():
                                   kernel_dir, native_sysroot)
         plugin.do_prepare_partition(self, srcparams_dict, creator,
                                     cr_workdir, oe_builddir, bootimg_dir,
-                                    kernel_dir, rootfs_dir, native_sysroot)
+                                    kernel_dir, rootfs_dir, native_sysroot, sector_size=self.sector_size)
         plugin.do_post_partition(self, srcparams_dict, creator,
                                     cr_workdir, oe_builddir, bootimg_dir,
                                     kernel_dir, rootfs_dir, native_sysroot)
@@ -397,8 +397,8 @@ class Partition():
         extraopts = self.mkfs_extraopts
         extraopts += " -S %d" % self.sector_size
 
-        dosfs_cmd = "mkdosfs %s -i %s %s %s -C %s %d" % \
-                    (label_str, self.fsuuid, size_str, extraopts, rootfs,
+        dosfs_cmd = "mkdosfs %s -S %d -i %s %s %s -C %s %d" % \
+                    (label_str, self.sector_size, self.fsuuid, size_str, extraopts, rootfs,
                      rootfs_size)
         logger.info("dosfs_cmd(rootfs): %s" % dosfs_cmd)
         exec_native_cmd(dosfs_cmd, native_sysroot)
@@ -499,8 +499,8 @@ class Partition():
         extraopts = self.mkfs_extraopts
         extraopts += " -S %d" % self.sector_size
 
-        dosfs_cmd = "mkdosfs %s -i %s %s %s -C %s %d" % \
-                    (label_str, self.fsuuid, extraopts, size_str, rootfs,
+        dosfs_cmd = "mkdosfs %s -S %d -i %s %s %s -C %s %d" % \
+                    (label_str, self.sector_size, self.fsuuid, extraopts, size_str, rootfs,
                      blocks)
         logger.info("dosfs_cmd(empty): %s" % dosfs_cmd)
         exec_native_cmd(dosfs_cmd, native_sysroot)
