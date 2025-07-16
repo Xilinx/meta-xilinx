@@ -1,0 +1,113 @@
+From 0ed46583abf93ec9e54936acfa0b5f52b69621e8 Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Wed, 16 Jul 2025 18:28:42 +0000
+Subject: [PATCH 61/61] RFC: work around compiler errors that certainly deserve
+ a closer look
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This commit is NOT the final word on the matter. With gcc-14, I get the
+following compiler errors:
+
+    gcc  -DHAVE_CONFIG_H -I. -I../../gas  -I. -I../../gas -I../bfd -I../../gas/config -I../../gas/../include -I../../gas/.. -I../../gas/../bfd -DLOCALEDIR="\"/home/gsmecher/crs/crs-yocto/build/tmp-t0-crs-microblaze-pmu/work/x86_64-linux/binutils-cross-microblazeel/2.42/recipe-sysroot-native/usr/share/locale\"" -isystem/home/gsmecher/crs/crs-yocto/build/tmp-t0-crs-microblaze-pmu/work/x86_64-linux/binutils-cross-microblazeel/2.42/recipe-sysroot-native/usr/include -W -Wall -Wstrict-prototypes -Wmissing-prototypes -Wshadow -Wstack-usage=262144 -Wwrite-strings -I../../gas/../zlib  -isystem/home/gsmecher/crs/crs-yocto/build/tmp-t0-crs-microblaze-pmu/work/x86_64-linux/binutils-cross-microblazeel/2.42/recipe-sysroot-native/usr/include -O2 -pipe     -c -o config/tc-microblaze.o ../../gas/config/tc-microblaze.c
+    chmod u+w doc/asconfig.texi
+    In file included from ../../gas/config/tc-microblaze.c:27:
+    ../../gas/config/tc-microblaze.c: In function ‘md_assemble’:
+    ../../gas/../opcodes/microblaze-opc.h:95:27: warning: overflow in conversion from ‘unsigned int’ to ‘short int’ changes value from ‘4227858432’ to ‘0’ [-Woverflow]
+       95 | #define OPCODE_MASK_H     0xFC000000 /* High 6 bits only.  */
+          |                           ^~~~~~~~~~
+    ../../gas/config/tc-microblaze.c:1053:38: note: in expansion of macro ‘OPCODE_MASK_H’
+     1053 |           opcode->inst_offset_type = OPCODE_MASK_H;
+          |                                      ^~~~~~~~~~~~~
+    ../../gas/../opcodes/microblaze-opc.h:96:26: warning: overflow in conversion from ‘unsigned int’ to ‘short int’ changes value from ‘4229890048’ to ‘0’ [-Woverflow]
+       96 | #define OPCODE_MASK_LIMM 0xFC1F0000 /* High 6 bits and 12-16 bits */
+          |                          ^~~~~~~~~~
+    ../../gas/config/tc-microblaze.c:1082:38: note: in expansion of macro ‘OPCODE_MASK_LIMM’
+     1082 |           opcode->inst_offset_type = OPCODE_MASK_LIMM;
+          |                                      ^~~~~~~~~~~~~~~~
+    ../../gas/config/tc-microblaze.c:1549:41: error: passing argument 2 of ‘parse_reg’ from incompatible pointer type [-Wincompatible-pointer-types]
+     1549 |         op_end = parse_reg (op_end + 1, &immed);  /* Get rfslN.  */
+          |                                         ^~~~~~
+          |                                         |
+          |                                         long long unsigned int *
+    ../../gas/config/tc-microblaze.c:440:33: note: expected ‘unsigned int *’ but argument is of type ‘long long unsigned int *’
+      440 | parse_reg (char * s, unsigned * reg)
+          |                      ~~~~~~~~~~~^~~
+    ../../gas/config/tc-microblaze.c:1692:41: error: passing argument 2 of ‘parse_reg’ from incompatible pointer type [-Wincompatible-pointer-types]
+     1692 |         op_end = parse_reg (op_end + 1, &immed);  /* Get rfslN.  */
+          |                                         ^~~~~~
+          |                                         |
+          |                                         long long unsigned int *
+    ../../gas/config/tc-microblaze.c:440:33: note: expected ‘unsigned int *’ but argument is of type ‘long long unsigned int *’
+      440 | parse_reg (char * s, unsigned * reg)
+          |                      ~~~~~~~~~~~^~~
+    ../../gas/config/tc-microblaze.c:1710:41: error: passing argument 2 of ‘parse_reg’ from incompatible pointer type [-Wincompatible-pointer-types]
+     1710 |         op_end = parse_reg (op_end + 1, &immed);  /* Get rfslN.  */
+          |                                         ^~~~~~
+          |                                         |
+          |                                         long long unsigned int *
+    ../../gas/config/tc-microblaze.c:440:33: note: expected ‘unsigned int *’ but argument is of type ‘long long unsigned int *’
+      440 | parse_reg (char * s, unsigned * reg)
+          |                      ~~~~~~~~~~~^~~
+
+This patch avoids the errors and maintains what I believe to be the
+current behaviour. However, there is certainly something wrong here -
+the code should be verified against design intent, and these workarounds
+should be discarded.
+---
+ gas/config/tc-microblaze.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 35e8bc5b..f9d6a303 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -1050,7 +1050,7 @@ md_assemble (char * str)
+ 	{
+           
+  	  opcode->inst_type=INST_TYPE_RD_R1_IMML;
+-          opcode->inst_offset_type = OPCODE_MASK_H;
++          opcode->inst_offset_type = 0; /* FIXME OPCODE_MASK_H; */
+           if (streq (name, "addli"))
+  	    opcode->bit_sequence = ADDLI_MASK;
+           else if (streq (name, "addlic"))
+@@ -1079,7 +1079,7 @@ md_assemble (char * str)
+       else
+         {
+ 	  opcode->inst_type=INST_TYPE_RD_IMML;
+-          opcode->inst_offset_type = OPCODE_MASK_LIMM;
++          opcode->inst_offset_type = 0; /* FIXME OPCODE_MASK_LIMM; */
+           if (streq (name, "addli"))
+  	    opcode->bit_sequence = ADDLI_ONE_REG_MASK;
+           else if (streq (name, "addlic"))
+@@ -1546,7 +1546,7 @@ md_assemble (char * str)
+           reg1 = 0;
+         }
+       if (strcmp (op_end, ""))
+-        op_end = parse_reg (op_end + 1, &immed);  /* Get rfslN.  */
++        op_end = parse_reg (op_end + 1, (unsigned *)&immed);  /* Get rfslN.  */
+       else
+ 	{
+           as_fatal (_("Error in statement syntax"));
+@@ -1689,7 +1689,7 @@ md_assemble (char * str)
+           reg1 = 0;
+         }
+       if (strcmp (op_end, ""))
+-        op_end = parse_reg (op_end + 1, &immed);  /* Get rfslN.  */
++        op_end = parse_reg (op_end + 1, (unsigned *)&immed);  /* Get rfslN.  */
+       else
+ 	{
+           as_fatal (_("Error in statement syntax"));
+@@ -1707,7 +1707,7 @@ md_assemble (char * str)
+ 
+     case INST_TYPE_RFSL:
+       if (strcmp (op_end, ""))
+-        op_end = parse_reg (op_end + 1, &immed);  /* Get rfslN.  */
++        op_end = parse_reg (op_end + 1, (unsigned *)&immed);  /* Get rfslN.  */
+       else
+ 	{
+           as_fatal (_("Error in statement syntax"));
+-- 
+2.47.2
+

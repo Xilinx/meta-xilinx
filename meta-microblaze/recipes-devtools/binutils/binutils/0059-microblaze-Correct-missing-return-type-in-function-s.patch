@@ -1,0 +1,50 @@
+From a3bd5336213685c4806cc2ac11080aee0a12bc6f Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Wed, 16 Jul 2025 10:22:54 -0700
+Subject: [PATCH 59/61] microblaze: Correct missing return type in function
+ signature
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes the following build error on gcc-14:
+
+    gcc [...] -c ../../opcodes/microblaze-dis.c -o microblaze-dis.o
+    ../../opcodes/microblaze-dis.c:146:1: error: return type defaults to ‘int’ [-Wimplicit-int]
+      146 | get_field_imm16 (struct string_buf *buf, long instr)
+          | ^~~~~~~~~~~~~~~
+    ../../opcodes/microblaze-dis.c:146:1: warning: no previous prototype for ‘get_field_imm16’ [-Wmissing-prototypes]
+    ../../opcodes/microblaze-dis.c: In function ‘get_field_imm16’:
+    ../../opcodes/microblaze-dis.c:151:10: error: returning ‘char *’ from a function with return type ‘int’ makes integer from pointer without a cast [-Wint-conversion]
+      151 |   return p;
+          |          ^
+    ../../opcodes/microblaze-dis.c: In function ‘print_insn_microblaze’:
+    ../../opcodes/microblaze-dis.c:481:39: warning: format ‘%s’ expects argument of type ‘char *’, but argument 4 has type ‘int’ [-Wformat=]
+      481 |           print_func (stream, "\t%s, %s",
+          |                                      ~^
+          |                                       |
+          |                                       char *
+          |                                      %d
+      482 |                   get_field_rd (&buf, inst), get_field_imm16 (&buf, inst));
+          |                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          |                                              |
+          |                                              int
+---
+ opcodes/microblaze-dis.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
+index 912fa31b..5db26a93 100644
+--- a/opcodes/microblaze-dis.c
++++ b/opcodes/microblaze-dis.c
+@@ -143,6 +143,7 @@ get_field_imm15 (struct string_buf *buf, long instr)
+   return p;
+ }
+ 
++static char *
+ get_field_imm16 (struct string_buf *buf, long instr)
+ {
+   char *p = strbuf (buf);
+-- 
+2.47.2
+

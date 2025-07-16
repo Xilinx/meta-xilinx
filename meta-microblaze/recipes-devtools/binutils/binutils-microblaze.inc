@@ -62,4 +62,9 @@ SRC_URI += " \
     file://0054-Roll-back-an-improvement-which-inlines-target_gdbarc.patch \
     file://0055-fix-microblaze-linux-nat.patch \
     file://0056-Microblaze_Fix_regression_introduced_during_2024.2.patch \
+    file://0057-elf64-microblaze-correct-type-signature-mismatches.patch \
+    file://0058-microblaze64-use-elf_dyn_relocs-rather-than-elf64_mb.patch \
+    file://0059-microblaze-Correct-missing-return-type-in-function-s.patch \
+    file://0060-microblaze-correct-incompatible-type-cast-gcc-14.patch \
+    file://0061-RFC-work-around-compiler-errors-that-certainly-deser.patch \
 "

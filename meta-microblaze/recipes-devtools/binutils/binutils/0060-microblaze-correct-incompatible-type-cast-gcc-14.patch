@@ -1,0 +1,35 @@
+From 678bd8666befa5e0c3a0e32a52466bc7c893295a Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Wed, 16 Jul 2025 10:26:05 -0700
+Subject: [PATCH 60/61] microblaze: correct incompatible type cast (gcc-14)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The old cast is incorrect, and no cast is actually necessary.
+Fixes the following build error with gcc-14:
+
+    ../../gas/config/tc-microblaze.c: In function ‘md_begin’:
+    ../../gas/config/tc-microblaze.c:413:15: error: assignment to ‘struct op_code_struct *’ from incompatible pointer type ‘struct microblaze_opcodes *’ [-Wincompatible-pointer-types]
+      413 |   for (opcode = (struct microblaze_opcodes *)microblaze_opcodes; opcode->name; opcode ++)
+          |               ^
+---
+ gas/config/tc-microblaze.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
+index 3c0a4688..35e8bc5b 100644
+--- a/gas/config/tc-microblaze.c
++++ b/gas/config/tc-microblaze.c
+@@ -410,7 +410,7 @@ md_begin (void)
+   opcode_hash_control = str_htab_create ();
+ 
+   /* Insert unique names into hash table.  */
+-  for (opcode = (struct microblaze_opcodes *)microblaze_opcodes; opcode->name; opcode ++)
++  for (opcode = microblaze_opcodes; opcode->name; opcode ++)
+     {
+       if (strcmp (prev_name, opcode->name))
+ 	{
+-- 
+2.47.2
+
