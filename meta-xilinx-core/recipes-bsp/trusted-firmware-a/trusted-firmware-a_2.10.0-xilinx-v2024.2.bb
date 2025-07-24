@@ -119,14 +119,16 @@ inherit deploy
 DEPENDS += "u-boot-mkimage-native"
 
 do_deploy() {
-    # Copy the /boot items to deploy
+    # Copy the /boot items to deploy. This may be a different bitbake run than
+    # do_install(), so ATF_BASE_NAME may have changed - use the symlinks
+    # instead of the underlying files.
     install -d ${DEPLOYDIR}
-    install -m 0644 ${D}/boot/${ATF_BASE_NAME}.elf ${DEPLOYDIR}/${ATF_BASE_NAME}.elf
+    install -m 0644 ${D}/boot/arm-trusted-firmware.elf ${DEPLOYDIR}/${ATF_BASE_NAME}.elf
     ln -sf ${ATF_BASE_NAME}.elf ${DEPLOYDIR}/arm-trusted-firmware.elf
-    install -m 0644 ${D}/boot/${ATF_BASE_NAME}.bin ${DEPLOYDIR}/${ATF_BASE_NAME}.bin
+    install -m 0644 ${D}/boot/arm-trusted-firmware.bin ${DEPLOYDIR}/${ATF_BASE_NAME}.bin
     ln -sf ${ATF_BASE_NAME}.bin ${DEPLOYDIR}/arm-trusted-firmware.bin
 
-    install -m 0644 ${D}/boot/${ATF_BASE_NAME}.ub ${DEPLOYDIR}/${ATF_BASE_NAME}.ub
+    install -m 0644 ${D}/boot/arm-trusted-firmware.ub ${DEPLOYDIR}/${ATF_BASE_NAME}.ub
     ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/arm-trusted-firmware.ub
     ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/atf-uboot.ub
 }
