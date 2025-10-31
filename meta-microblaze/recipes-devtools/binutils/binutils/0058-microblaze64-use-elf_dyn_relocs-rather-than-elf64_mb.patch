@@ -1,0 +1,172 @@
+From 4695a57f49849604a763f797b754139b2a2ec86b Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Wed, 16 Jul 2025 10:17:21 -0700
+Subject: [PATCH 58/61] microblaze64: use elf_dyn_relocs rather than
+ elf64_mb_dyn_relocs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The two structures are identical, and before this patch, building on
+gcc-14 fails as follows:
+
+    gcc [...] -c ../../bfd/elf64-microblaze.c -o elf64-microblaze.o
+    ../../bfd/elf64-microblaze.c: In function ‘microblaze_elf_check_relocs’:
+    ../../bfd/elf64-microblaze.c:2821:24: error: assignment to ‘struct elf64_mb_dyn_relocs **’ from incompatible pointer type ‘struct elf_dyn_relocs **’ [-Wincompatible-pointer-types]
+     2821 |                   head = &h->dyn_relocs;
+          |                        ^
+    ../../bfd/elf64-microblaze.c: In function ‘microblaze_elf_adjust_dynamic_symbol’:
+    ../../bfd/elf64-microblaze.c:2959:17: warning: unused variable ‘srel’ [-Wunused-variable]
+     2959 |   asection *s, *srel;
+          |                 ^~~~
+    ../../bfd/elf64-microblaze.c: In function ‘allocate_dynrelocs’:
+    ../../bfd/elf64-microblaze.c:3283:10: error: assignment to ‘struct elf64_mb_dyn_relocs *’ from incompatible pointer type ‘struct elf_dyn_relocs *’ [-Wincompatible-pointer-types]
+     3283 |   for (p = h->dyn_relocs; p != NULL; p = p->next)
+          |          ^
+    ../../bfd/elf64-microblaze.c: In function ‘microblaze_elf_size_dynamic_sections’:
+    ../../bfd/elf64-microblaze.c:3328:18: error: assignment to ‘struct elf_dyn_relocs *’ from incompatible pointer type ‘struct elf64_mb_dyn_relocs *’ [-Wincompatible-pointer-types]
+     3328 |           for (p = ((struct elf64_mb_dyn_relocs *)
+          |                  ^
+    ../../bfd/elf64-microblaze.c: At top level:
+    ../../bfd/elf64-microblaze.c:2577:1: warning: ‘microblaze_elf_gc_sweep_hook’ defined but not used [-Wunused-function]
+     2577 | microblaze_elf_gc_sweep_hook (bfd * abfd ATTRIBUTE_UNUSED,
+          | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Harmonization of the dyn_relocs structs appears to date back to 2020:
+
+    https://lists.gnu.org/archive/html/bug-binutils/2020-06/msg00023.html
+
+I believe this patch follows convention, but if the local struct
+definition is desirable, it's probably just a matter of a few missing
+casts.
+---
+ bfd/elf64-microblaze.c | 44 ++++++++++++------------------------------
+ 1 file changed, 12 insertions(+), 32 deletions(-)
+
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index 3b12802a..fe1df793 100755
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -807,26 +807,6 @@ microblaze_elf_is_local_label_name (bfd *abfd, const char *name)
+   return _bfd_elf_is_local_label_name (abfd, name);
+ }
+ 
+-/* The microblaze linker (like many others) needs to keep track of
+-   the number of relocs that it decides to copy as dynamic relocs in
+-   check_relocs for each symbol. This is so that it can later discard
+-   them if they are found to be unnecessary.  We store the information
+-   in a field extending the regular ELF linker hash table.  */
+-
+-struct elf64_mb_dyn_relocs
+-{
+-  struct elf64_mb_dyn_relocs *next;
+-
+-  /* The input section of the reloc.  */
+-  asection *sec;
+-
+-  /* Total number of relocs copied for the input section.  */
+-  bfd_size_type count;
+-
+-  /* Number of pc-relative relocs copied for the input section.  */
+-  bfd_size_type pc_count;
+-};
+-
+ /* ELF linker hash entry.  */
+ 
+ struct elf64_mb_link_hash_entry
+@@ -834,7 +814,7 @@ struct elf64_mb_link_hash_entry
+   struct elf_link_hash_entry elf;
+ 
+   /* Track dynamic relocs copied for this symbol.  */
+-  struct elf64_mb_dyn_relocs *dyn_relocs;
++  struct elf_dyn_relocs *dyn_relocs;
+ 
+   /* TLS Reference Types for the symbol; Updated by check_relocs */
+ #define TLS_GD     1  /* GD reloc. */
+@@ -2794,8 +2774,8 @@ microblaze_elf_check_relocs (bfd * abfd,
+                     && (h->root.type == bfd_link_hash_defweak
+                         || !h->def_regular)))
+               {
+-                struct elf64_mb_dyn_relocs *p;
+-                struct elf64_mb_dyn_relocs **head;
++                struct elf_dyn_relocs *p;
++                struct elf_dyn_relocs **head;
+ 
+                 /* When creating a shared object, we must copy these
+                    relocs into the output file.  We create a reloc
+@@ -2839,14 +2819,14 @@ microblaze_elf_check_relocs (bfd * abfd,
+ 		      return false;
+ 
+ 		    vpp = &elf_section_data (s)->local_dynrel;
+-		    head = (struct elf64_mb_dyn_relocs **) vpp;
++		    head = (struct elf_dyn_relocs **) vpp;
+ 		  }
+ 
+ 		p = *head;
+ 		if (p == NULL || p->sec != sec)
+ 		  {
+ 		    size_t amt = sizeof *p;
+-		    p = ((struct elf64_mb_dyn_relocs *)
++		    p = ((struct elf_dyn_relocs *)
+ 			 bfd_alloc (htab->elf.dynobj, amt));
+ 		    if (p == NULL)
+ 		      return false;
+@@ -2913,8 +2893,8 @@ microblaze_elf_copy_indirect_symbol (struct bfd_link_info *info,
+     {
+       if (edir->dyn_relocs != NULL)
+ 	{
+-	  struct elf64_mb_dyn_relocs **pp;
+-	  struct elf64_mb_dyn_relocs *p;
++	  struct elf_dyn_relocs **pp;
++	  struct elf_dyn_relocs *p;
+ 
+ 	  if (ind->root.type == bfd_link_hash_indirect)
+ 	    abort ();
+@@ -2923,7 +2903,7 @@ microblaze_elf_copy_indirect_symbol (struct bfd_link_info *info,
+ 	     list.  Merge any entries against the same section.  */
+ 	  for (pp = &eind->dyn_relocs; (p = *pp) != NULL; )
+ 	    {
+-	      struct elf64_mb_dyn_relocs *q;
++	      struct elf_dyn_relocs *q;
+ 
+ 	      for (q = edir->dyn_relocs; q != NULL; q = q->next)
+ 		if (q->sec == p->sec)
+@@ -2954,7 +2934,7 @@ microblaze_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
+ {
+   struct elf64_mb_link_hash_table *htab;
+   struct elf64_mb_link_hash_entry * eh;
+-  struct elf64_mb_dyn_relocs *p;
++  struct elf_dyn_relocs *p;
+   asection *sdynbss;
+   asection *s, *srel;
+   unsigned int power_of_two;
+@@ -3098,7 +3078,7 @@ allocate_dynrelocs (struct elf_link_hash_entry *h, void * dat)
+   struct bfd_link_info *info;
+   struct elf64_mb_link_hash_table *htab;
+   struct elf64_mb_link_hash_entry *eh;
+-  struct elf64_mb_dyn_relocs *p;
++  struct elf_dyn_relocs *p;
+ 
+   if (h->root.type == bfd_link_hash_indirect)
+     return true;
+@@ -3231,7 +3211,7 @@ allocate_dynrelocs (struct elf_link_hash_entry *h, void * dat)
+ 	  && (h->forced_local
+ 	      || info->symbolic))
+ 	{
+-	  struct elf64_mb_dyn_relocs **pp;
++	  struct elf_dyn_relocs **pp;
+ 
+ 	  for (pp = &eh->dyn_relocs; (p = *pp) != NULL; )
+ 	    {
+@@ -3325,7 +3305,7 @@ microblaze_elf_size_dynamic_sections (bfd *output_bfd ATTRIBUTE_UNUSED,
+ 	{
+ 	  struct elf_dyn_relocs *p;
+ 
+-	  for (p = ((struct elf64_mb_dyn_relocs *)
++	  for (p = ((struct elf_dyn_relocs *)
+ 		    elf_section_data (s)->local_dynrel);
+ 	       p != NULL;
+ 	       p = p->next)
+-- 
+2.47.2
+

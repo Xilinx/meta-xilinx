@@ -1,0 +1,89 @@
+From 48d00ad4f63c80bdf83a39f662ce2243feede783 Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Wed, 16 Jul 2025 10:04:00 -0700
+Subject: [PATCH 57/61] elf64-microblaze: correct type signature mismatches
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The incorrect pointer type is promoted to an error by gcc-14, and
+corrects the build errors shown at the bottom.
+
+The use of "struct bfd_link_info" rather than "obfd" dates back to 2016:
+
+    https://ecos.sourceware.org/ml/binutils/2016-10/msg00052.html
+
+...so I do not believe this is tied to a recent binutils release.
+
+    libtool: compile:  gcc [...] -c ../../bfd/elf64-microblaze.c -o elf64-microblaze.o
+    ../../bfd/elf64-microblaze.c: In function ‘microblaze_elf_merge_private_bfd_data’:
+    ../../bfd/elf64-microblaze.c:1815:49: error: passing argument 2 of ‘_bfd_generic_verify_endian_match’ from incompatible pointer type [-Wincompatible-pointer-types]
+     1815 |   if (! _bfd_generic_verify_endian_match (ibfd, obfd))
+          |                                                 ^~~~
+          |                                                 |
+          |                                                 bfd *
+    In file included from ../../bfd/elf64-microblaze.c:26:
+    ../../bfd/libbfd.h:1037:38: note: expected ‘struct bfd_link_info *’ but argument is of type ‘bfd *’
+     1037 |    (bfd *ibfd, struct bfd_link_info *info) ATTRIBUTE_HIDDEN;
+          |                ~~~~~~~~~~~~~~~~~~~~~~^~~~
+    ./elf64-target.h: At top level:
+    ../../bfd/elf64-microblaze.c:3806:49: error: initialization of ‘_Bool (*)(bfd *, struct bfd_link_info *)’ from incompatible pointer type ‘_Bool (*)(bfd *, bfd *)’ [-Wincompatible-pointer-types]
+     3806 | #define bfd_elf64_bfd_merge_private_bfd_data    microblaze_elf_merge_private_bfd_data
+          |                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ./bfd.h:7702:3: note: in expansion of macro ‘bfd_elf64_bfd_merge_private_bfd_data’
+     7702 |   NAME##_bfd_merge_private_bfd_data, \
+          |   ^~~~
+    ./elf64-target.h:1061:3: note: in expansion of macro ‘BFD_JUMP_TABLE_COPY’
+     1061 |   BFD_JUMP_TABLE_COPY (bfd_elf64),
+          |   ^~~~~~~~~~~~~~~~~~~
+    ../../bfd/elf64-microblaze.c:3806:49: note: (near initialization for ‘microblaze_elf64_vec._bfd_merge_private_bfd_data’)
+     3806 | #define bfd_elf64_bfd_merge_private_bfd_data    microblaze_elf_merge_private_bfd_data
+          |                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ./bfd.h:7702:3: note: in expansion of macro ‘bfd_elf64_bfd_merge_private_bfd_data’
+     7702 |   NAME##_bfd_merge_private_bfd_data, \
+          |   ^~~~
+    ./elf64-target.h:1061:3: note: in expansion of macro ‘BFD_JUMP_TABLE_COPY’
+     1061 |   BFD_JUMP_TABLE_COPY (bfd_elf64),
+          |   ^~~~~~~~~~~~~~~~~~~
+    ../../bfd/elf64-microblaze.c:3806:49: error: initialization of ‘_Bool (*)(bfd *, struct bfd_link_info *)’ from incompatible pointer type ‘_Bool (*)(bfd *, bfd *)’ [-Wincompatible-pointer-types]
+     3806 | #define bfd_elf64_bfd_merge_private_bfd_data    microblaze_elf_merge_private_bfd_data
+          |                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ./bfd.h:7702:3: note: in expansion of macro ‘bfd_elf64_bfd_merge_private_bfd_data’
+     7702 |   NAME##_bfd_merge_private_bfd_data, \
+          |   ^~~~
+    ./elf64-target.h:1166:3: note: in expansion of macro ‘BFD_JUMP_TABLE_COPY’
+     1166 |   BFD_JUMP_TABLE_COPY (bfd_elf64),
+          |   ^~~~~~~~~~~~~~~~~~~
+    ../../bfd/elf64-microblaze.c:3806:49: note: (near initialization for ‘microblaze_elf64_le_vec._bfd_merge_private_bfd_data’)
+     3806 | #define bfd_elf64_bfd_merge_private_bfd_data    microblaze_elf_merge_private_bfd_data
+          |                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ./bfd.h:7702:3: note: in expansion of macro ‘bfd_elf64_bfd_merge_private_bfd_data’
+     7702 |   NAME##_bfd_merge_private_bfd_data, \
+          |   ^~~~
+    ./elf64-target.h:1166:3: note: in expansion of macro ‘BFD_JUMP_TABLE_COPY’
+     1166 |   BFD_JUMP_TABLE_COPY (bfd_elf64),
+          |   ^~~~~~~~~~~~~~~~~~~
+---
+ bfd/elf64-microblaze.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
+index 9f542f55..3b12802a 100755
+--- a/bfd/elf64-microblaze.c
++++ b/bfd/elf64-microblaze.c
+@@ -1809,10 +1809,10 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+ 
+    Note: We only use this hook to catch endian mismatches.  */
+ static bool
+-microblaze_elf_merge_private_bfd_data (bfd * ibfd, bfd * obfd)
++microblaze_elf_merge_private_bfd_data (bfd * ibfd, struct bfd_link_info *info)
+ {
+   /* Check if we have the same endianess.  */
+-  if (! _bfd_generic_verify_endian_match (ibfd, obfd))
++  if (! _bfd_generic_verify_endian_match (ibfd, info))
+     return false;
+ 
+   return true;
+-- 
+2.47.2
+
