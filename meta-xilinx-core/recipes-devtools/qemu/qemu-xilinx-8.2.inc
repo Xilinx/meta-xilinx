@@ -44,7 +44,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/qemu-xilinx:"
 PV .= "+git"
 REPO ?= "gitsm://github.com/Xilinx/qemu.git;protocol=https"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG};name=qemu"
 SRCREV_qemu = "${SRCREV}"
 SRCREV_FORMAT = "qemu"

@@ -24,7 +24,7 @@ https://docs.yoctoproject.org/dev/contributor-guide/submit-changes.html#
 `git format-patch -s --subject-prefix="meta-xilinx][<BRANCH_NAME>][PATCH" -1`
 
 **Example:**
-`git format-patch -s --subject-prefix="meta-xilinx][scarthgap][PATCH" -1`
+`git format-patch -s --subject-prefix="meta-xilinx][wrynose][PATCH" -1`
 
 **Maintainers:**
 
@@ -32,12 +32,6 @@ https://docs.yoctoproject.org/dev/contributor-guide/submit-changes.html#
 	Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
 	John Toomey <john.toomey@amd.com>
 	Trevor Woerner <trevor.woerner@amd.com>
-
-> **Note:**
-
-* meta-xilinx-contrib layer:
-  * We don't have any maintainers when user submit a patch to this layer
-    email meta-xilinx@yoctoproject.org and cc'ing below reviewers.
 
 **Reviewers:**
 

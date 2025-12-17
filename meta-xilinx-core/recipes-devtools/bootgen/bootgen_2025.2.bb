@@ -13,7 +13,7 @@ REPO ?= "git://github.com/Xilinx/bootgen.git;protocol=https"
 BRANCH = "xlnx_rel_v2025.2"
 SRCREV = "0e336a00dcff5842648f4a1e9f919abf7c960d97"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
 do_install() {

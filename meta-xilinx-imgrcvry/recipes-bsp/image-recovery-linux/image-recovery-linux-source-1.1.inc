@@ -7,6 +7,6 @@ BRANCH ?= "main"
 
 SRCREV ?= "41fe71a896acb3a8b9af42225c9b8643b583e6bf"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 
 SRC_URI = "${REPO};${BRANCHARG}"

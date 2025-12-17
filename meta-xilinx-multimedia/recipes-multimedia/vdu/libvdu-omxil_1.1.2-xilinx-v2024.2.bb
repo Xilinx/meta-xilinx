@@ -9,7 +9,7 @@ BRANCH ?= "xlnx_rel_v2024.2"
 REPO   ?= "git://github.com/Xilinx/vdu-omx-il.git;protocol=https"
 SRCREV ?= "af9c6e8935799f4dcd579b0164dd05eb039b569d"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
 S = "${WORKDIR}/git"

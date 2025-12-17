@@ -70,7 +70,6 @@ $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-microblaze
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-core
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone-sdt
-$ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-bsp
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-tools
 ```
 > **Note:**
@@ -86,12 +85,6 @@ $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-tools
 > $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-multimedia
 > $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-virtualization
 > $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-gpu-malig78ae
-> ```
-> 4. If user wants to build machine files supported by meta-xilinx-vendor or
-> met-xilinx-contrib layer then include these layer running following commands.
-> ```
-> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-vendor
-> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-contrib
 > ```
 
 5. Create a new layer to for SDT or XSCT machine files geneated using gen-machineconf

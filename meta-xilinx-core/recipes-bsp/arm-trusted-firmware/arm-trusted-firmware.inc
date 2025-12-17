@@ -20,7 +20,7 @@ PV .= "+git"
 
 BRANCH ?= ""
 REPO ?= "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https"
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
 inherit image-artifact-names
@@ -61,9 +61,9 @@ DEBUG_ATF_DEFAULT:versal = "1"
 DEBUG_ATF_DEFAULT:versal-net = "1"
 DEBUG_ATF ?= "${DEBUG_ATF_DEFAULT}"
 
-EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE', True) != '' else ''}"
-EXTRA_OEMAKE:append:versal = "${@' VERSAL_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE', True) != '' else ''}"
-EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE', True) != '' else ''}"
+EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
+EXTRA_OEMAKE:append:versal = "${@' VERSAL_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
+EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
 EXTRA_OEMAKE:append = " ${@bb.utils.contains('DEBUG_ATF', '1', ' DEBUG=${DEBUG_ATF}', '', d)}"
 
 OUTPUT_DIR = "${@bb.utils.contains('DEBUG_ATF', '1', '${B}/${PLATFORM}/debug', '${B}/${PLATFORM}/release', d)}"
@@ -71,17 +71,17 @@ OUTPUT_DIR = "${@bb.utils.contains('DEBUG_ATF', '1', '${B}/${PLATFORM}/debug', '
 ATF_MEM_BASE ?= ""
 ATF_MEM_SIZE ?= ""
 
-EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
-EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
+EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE') != '' else ''}"
+EXTRA_OEMAKE:append:zynqmp = "${@' ZYNQMP_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE') != '' else ''}"
 
-EXTRA_OEMAKE:append:versal = "${@' VERSAL_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
-EXTRA_OEMAKE:append:versal = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
+EXTRA_OEMAKE:append:versal = "${@' VERSAL_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE') != '' else ''}"
+EXTRA_OEMAKE:append:versal = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE') != '' else ''}"
 
-EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
-EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
+EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE') != '' else ''}"
+EXTRA_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE') != '' else ''}"
 
 TFA_BL33_LOAD ?= ""
-EXTRA_OEMAKE:append = "${@' PRELOADED_BL33_BASE=${TFA_BL33_LOAD}' if d.getVar('TFA_BL33_LOAD', True) != '' else ''}"
+EXTRA_OEMAKE:append = "${@' PRELOADED_BL33_BASE=${TFA_BL33_LOAD}' if d.getVar('TFA_BL33_LOAD') != '' else ''}"
 
 # Workaround for bl31.elf has a LOAD segment with RWX permissions
 EXTRA_OEMAKE:append = ' TF_LDFLAGS="--no-warn-rwx-segments --fatal-warnings -O1 --gc-sections"'

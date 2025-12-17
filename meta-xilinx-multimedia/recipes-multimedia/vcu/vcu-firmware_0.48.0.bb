@@ -13,7 +13,7 @@ BRANCH ?= "master"
 REPO ?= "git://github.com/Xilinx/vcu-firmware.git;protocol=https"
 SRCREV = "56738a059175313bd38d12d73510eed028485450"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI   = "${REPO};${BRANCHARG}"
 
 inherit features_check

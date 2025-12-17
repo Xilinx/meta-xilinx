@@ -13,7 +13,7 @@ BRANCH ?= "master"
 REPO ?= "git://github.com/Xilinx/vdu-firmware.git;protocol=https"
 SRCREV ?= "e14e7614fbcbd72f0aa75b953e089bf4634ee128"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI   = "${REPO};${BRANCHARG}"
 
 inherit autotools features_check

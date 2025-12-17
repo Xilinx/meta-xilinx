@@ -14,7 +14,7 @@ BRANCH = "master"
 REPO = "git://github.com/Xilinx/vcu2-modules.git;protocol=https"
 SRCREV = "056476b8a37d2ad2d4a3eb10ae5a1e3a24ef4e95"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = " \
     ${REPO};${BRANCHARG} \
     file://99-vcu2-codec.rules \

@@ -4,7 +4,7 @@ PV = "${LINUX_VERSION}+git"
 
 # Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
 KBRANCH ?= "undefined"
-SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH', True) != '']}"
+SRCBRANCHARG = "${@['nobranch=1', 'branch=${KBRANCH}'][d.getVar('KBRANCH') != '']}"
 
 FILESOVERRIDES:append := ":${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or ''}"
 KERNELURI ?= "git://github.com/Xilinx/linux-xlnx.git;protocol=https;name=machine"

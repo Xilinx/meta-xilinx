@@ -12,7 +12,7 @@ BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/hdmi-modules.git;protocol=https"
 SRCREV = "c6f38809f82750f048018b6cc9827a51479a4025"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
 SRC_URI += "file://0001-Support-both-pre-6.4.0-and-current-kernels.patch"

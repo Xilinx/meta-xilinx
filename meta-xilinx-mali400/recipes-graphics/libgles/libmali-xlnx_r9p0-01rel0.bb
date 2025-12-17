@@ -17,7 +17,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 REPO ?= "git://github.com/Xilinx/mali-userspace-binaries.git;protocol=https"
 BRANCH ?= "xlnx_rel_v2024.2"
 SRCREV ?= "644dc96597172e3cf15aea63b4ee947d421810aa"
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 
 SRC_URI = " \
     ${REPO};${BRANCHARG} \

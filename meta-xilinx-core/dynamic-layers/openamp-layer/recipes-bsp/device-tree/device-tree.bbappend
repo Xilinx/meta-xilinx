@@ -14,7 +14,7 @@ OPENAMP_EXTRA_DT_INCLUDE_FILES:versal-net = "versal-net-openamp.dtsi"
 # ENABLE_OPENAMP_DTSI = 1: Bundle into the device-tree the openamp items
 # ENABLE_OPENAMP_DTSI = 2 (!= 0, 1 or empty): Do nothing, assume openamp is already integrated into the device-tree
 def set_openamp_extra_dt_include_files(d):
-    distro_features = d.getVar('DISTRO_FEATURES', True)
+    distro_features = d.getVar('DISTRO_FEATURES')
     enable_openamp_dtsi = d.getVar('ENABLE_OPENAMP_DTSI')
     if 'openamp' in distro_features and enable_openamp_dtsi == '1':
         return ' ${OPENAMP_EXTRA_DT_INCLUDE_FILES}'

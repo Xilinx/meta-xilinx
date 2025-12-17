@@ -124,12 +124,12 @@ python(){
         lic_file = d.getVar('LIC_FILES_CHKSUM', False)
         licpath=externalsrc
         for i in range(5):
-            if os.path.isfile(licpath + '/' + d.getVar('LICFILENAME',True)):
+            if os.path.isfile(licpath + '/' + d.getVar('LICFILENAME')):
                 lic_file = lic_file.replace('${S}',licpath)
                 d.setVar('LIC_FILES_CHKSUM', lic_file)
                 return
             licpath=os.path.dirname(licpath)
-        bb.error("Couldn't find license file: %s, within directory %s or his parent directories" % (d.getVar('LICFILENAME',True), externalsrc))
+        bb.error("Couldn't find license file: %s, within directory %s or his parent directories" % (d.getVar('LICFILENAME'), externalsrc))
 }
 
 do_generate_driver_data[dirs] = "${B}"

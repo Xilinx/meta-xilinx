@@ -12,7 +12,7 @@ BRANCH ?= "xlnx_rel_v2025.1"
 REPO   ?= "git://github.com/Xilinx/dp-modules.git;protocol=https"
 SRCREV ?= "709d08e99f6f7fbd558312ae6bcb3762352be877"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
 SRC_URI += "file://0001-Support-both-pre-6.4.0-and-current-i2c-probing.patch"

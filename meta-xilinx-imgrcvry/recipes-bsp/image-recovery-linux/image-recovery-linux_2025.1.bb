@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 REPO ??= "git://github.com/Xilinx/image-recovery-linux.git;protocol=https"
 BRANCH ??= "main"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 
 SRC_URI = "${REPO};${BRANCHARG}"
 SRCREV ??= "acbe5b61f6ee2245abfa53f6fc7d08de6a757338"

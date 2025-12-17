@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=94aba86aec117f003b958a52f019f1a7"
 
 BRANCH ?= "xlnx_rel_v2025.1"
 REPO ?= "git://github.com/Xilinx/libdfx.git;protocol=https"
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 SRCREV = "484f3bf2262d06cce67c9453308e72978fbb4565"
 

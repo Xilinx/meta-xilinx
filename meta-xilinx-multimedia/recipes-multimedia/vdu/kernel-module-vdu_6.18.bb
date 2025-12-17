@@ -14,7 +14,7 @@ BRANCH ?= "master"
 REPO ?= "git://github.com/Xilinx/vdu-modules.git;protocol=https"
 SRCREV ?= "81b8c58f8d888eda535aeb773f768af134e9347c"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG} \
     file://99-vdu-enc-dec.rules \
 "

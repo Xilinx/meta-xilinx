@@ -14,7 +14,7 @@ BRANCH = "xlnx_rel_v2024.2"
 REPO = "git://github.com/Xilinx/vcu-modules.git;protocol=https"
 SRCREV = "91d19a16308a438596138d30d8174e148fc45584"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = " \
     ${REPO};${BRANCHARG} \
     file://99-vcu-enc-dec.rules \

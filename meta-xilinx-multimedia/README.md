@@ -13,10 +13,10 @@ This layer depends on:
 
 	URI: https://git.yoctoproject.org/poky
 	layers: meta, meta-poky
-	branch: scarthgap
+	branch: wrynose
 
 	URI: https://git.openembedded.org/meta-openembedded
 	layers: meta-oe, meta-perl, meta-python, meta-filesystems, meta-gnome,
             meta-multimedia, meta-networking, meta-webserver, meta-xfce,
             meta-initramfs.
-	branch: scarthgap
+	branch: wrynose

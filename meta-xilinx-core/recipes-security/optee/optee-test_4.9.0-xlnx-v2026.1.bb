@@ -2,7 +2,7 @@ require optee-test-amd.inc
 
 BRANCH ?= "xlnx_rebase_v4.9.0"
 REPO ?= "git://github.com/Xilinx/optee_test.git;protocol=https"
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
 SRCREV = "b27648ea8472cceceb8dda368a965c709066f7aa"

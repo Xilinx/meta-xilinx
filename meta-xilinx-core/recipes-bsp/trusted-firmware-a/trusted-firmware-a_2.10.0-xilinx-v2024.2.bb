@@ -41,9 +41,9 @@ ATF_CONSOLE ?= "${TFA_CONSOLE_DEFAULT}"
 TFA_CONSOLE ?= "${ATF_CONSOLE}"
 
 TFA_CONSOLE_OEMAKE = ""
-TFA_CONSOLE_OEMAKE:append:zynqmp = "${@' ZYNQMP_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE', True) != '' else ''}"
-TFA_CONSOLE_OEMAKE:append:versal = "${@' VERSAL_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE', True) != '' else ''}"
-TFA_CONSOLE_OEMAKE:append:versal-net = "${@' VERSAL_NET_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE', True) != '' else ''}"
+TFA_CONSOLE_OEMAKE:append:zynqmp = "${@' ZYNQMP_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
+TFA_CONSOLE_OEMAKE:append:versal = "${@' VERSAL_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
+TFA_CONSOLE_OEMAKE:append:versal-net = "${@' VERSAL_NET_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
 
 EXTRA_OEMAKE += "${TFA_CONSOLE_OEMAKE}"
 
@@ -66,19 +66,19 @@ TFA_MEM_BASE ?= "${ATF_MEM_BASE}"
 TFA_MEM_SIZE ?= "${ATF_MEM_SIZE}"
 
 TFA_MEM_OEMAKE = ""
-TFA_MEM_OEMAKE:append:zynqmp     = "${@' ZYNQMP_ATF_MEM_BASE=${ATF_MEM_BASE}'     if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
-TFA_MEM_OEMAKE:append:zynqmp     = "${@' ZYNQMP_ATF_MEM_SIZE=${ATF_MEM_SIZE}'     if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
-TFA_MEM_OEMAKE:append:versal     = "${@' VERSAL_ATF_MEM_BASE=${ATF_MEM_BASE}'     if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
-TFA_MEM_OEMAKE:append:versal     = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}'     if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
-TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE', True) != '' else ''}"
-TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE', True) != '' else ''}"
+TFA_MEM_OEMAKE:append:zynqmp     = "${@' ZYNQMP_ATF_MEM_BASE=${ATF_MEM_BASE}'     if d.getVar('ATF_MEM_BASE') != '' else ''}"
+TFA_MEM_OEMAKE:append:zynqmp     = "${@' ZYNQMP_ATF_MEM_SIZE=${ATF_MEM_SIZE}'     if d.getVar('ATF_MEM_SIZE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal     = "${@' VERSAL_ATF_MEM_BASE=${ATF_MEM_BASE}'     if d.getVar('ATF_MEM_BASE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal     = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}'     if d.getVar('ATF_MEM_SIZE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE') != '' else ''}"
 
 EXTRA_OEMAKE += "${TFA_MEM_OEMAKE}"
 
 
 ### Preloaded Base
 TFA_BL33_LOAD ?= ""
-EXTRA_OEMAKE += "${@' PRELOADED_BL33_BASE=${TFA_BL33_LOAD}' if d.getVar('TFA_BL33_LOAD', True) != '' else ''}"
+EXTRA_OEMAKE += "${@' PRELOADED_BL33_BASE=${TFA_BL33_LOAD}' if d.getVar('TFA_BL33_LOAD') != '' else ''}"
 
 
 # Workaround for bl31.elf has a LOAD segment with RWX permissions

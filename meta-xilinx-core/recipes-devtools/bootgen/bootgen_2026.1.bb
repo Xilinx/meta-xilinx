@@ -13,7 +13,7 @@ REPO ?= "git://github.com/Xilinx/bootgen.git;protocol=https"
 BRANCH = "master"
 SRCREV = "e576e5e1e227a74c31e54607623c1bb7f38eec12"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
 do_install() {

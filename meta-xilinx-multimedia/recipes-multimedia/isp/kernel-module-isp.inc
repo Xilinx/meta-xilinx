@@ -11,7 +11,7 @@ COMPATIBLE_MACHINE:versal-2ve-2vm = "versal-2ve-2vm"
 
 S = "${WORKDIR}/git"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${SRC_BRANCH}'][d.getVar('SRC_BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${SRC_BRANCH}'][d.getVar('SRC_BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
 # The inherit of module.bbclass will automatically name module packages with

@@ -31,34 +31,33 @@ This layer depends on:
 
 	URI: https://git.yoctoproject.org/poky
 	layers: meta, meta-poky
-	branch: scarthgap
+	branch: wrynose
 
 	URI: https://git.openembedded.org/meta-openembedded
 	layers: meta-oe, meta-perl, meta-python, meta-filesystems, meta-gnome,
             meta-multimedia, meta-networking, meta-webserver, meta-xfce,
             meta-initramfs.
-	branch: scarthgap
+	branch: wrynose
 
 	URI:
         https://git.yoctoproject.org/meta-xilinx (official version)
         https://github.com/Xilinx/meta-xilinx (development and AMD release)
-	layers: meta-xilinx-core, meta-xilinx-microblaze, meta-xilinx-bsp,
-            meta-xilinx-standalone.
-	branch: scarthgap or AMD release version (e.g. rel-v2026.1)
+	layers: meta-xilinx-core, meta-xilinx-microblaze, meta-xilinx-standalone.
+	branch: wrynose
 
 	URI: https://github.com/Xilinx/meta-jupyter
-	branch: scarthgap or AMD release version (e.g. rel-v2026.1)
+	branch: wrynose
 
 	URI: https://github.com/OpenAMP/meta-openamp
-	branch: scarthgap
+	branch: wrynose
 
 	URI: https://github.com/meta-qt5/meta-qt5
-	branch: scarthgap
+	branch: wrynose
 
 	URI: https://github.com/Xilinx/meta-ros
 	layers: meta-ros-common, meta-ros2, meta-ros2-jazzy
-	branch: AMD release version (e.g. rel-v2026.1)
+	branch: wrynose
 
 	URI: https://git.yoctoproject.org/meta-arm
 	layers: meta-arm, meta-arm-toolchain
-	branch: scarthgap
+	branch: wrynose

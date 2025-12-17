@@ -16,7 +16,7 @@ BRANCH = "master"
 REPO = "git://github.com/Xilinx/vcu-modules.git;protocol=https"
 SRCREV = "432ac3d1578999a84ae96bb66c3ecdc0fe479867"
 
-BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
+BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = " \
     ${REPO};${BRANCHARG} \
     file://99-vcu-enc-dec.rules \
