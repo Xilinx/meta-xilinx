@@ -5,9 +5,9 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 inherit dfx_user_dts
 
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2025.2/edf_files/2025.2/02170000/external/fwapp/vek385-revb-pl-bram-gpio-fw_2025.2.1_0216_1_02170000.tar.gz"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2025.2/edf_files/2025.2/02180135/external/fwapp/vek385-revb-pl-bram-gpio-fw_2025.2.1_0217_1_02180135.tar.gz"
 
-SRC_URI[sha256sum] = "b7b751a94c909e8b9775884c750dbd61d1ad82a335e8b1d7fb00f1c6839c8610"
+SRC_URI[sha256sum] = "aca8ae81dc062b4a2b7769b714810626156a90506a02b20fb529d07273a03c64"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:amd-cortexa78-mali-common = "${MACHINE}"
