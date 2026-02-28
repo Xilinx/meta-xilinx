@@ -1,0 +1,25 @@
+name: ypt
+
+# Format: abc1234d | Commit message | #42
+run-name: "${{ github.sha }} | ${{ github.event.head_commit.message }} | #${{ github.run_number }}"
+
+on:
+  push:
+
+jobs:
+  patchwork:
+    # Only run if:
+    # - ypt_workflow_branches variable is defined AND branch is in the list
+    # - NOT the public "Xilinx" org
+    # - NOT a fork
+    if: |
+      vars.ypt_workflow_branches != '' &&
+      contains(format(',{0},', vars.ypt_workflow_branches), format(',{0},', github.ref_name)) &&
+      github.repository_owner != 'Xilinx' &&
+      github.event.repository.fork == false
+    uses: AMD-AECG-SSW-PUBLIC/yocto-scripts/.github/workflows/ypt_patchwork_update.yml@master
+    with:
+      repo: ${{ github.repository }}
+      ref: ${{ github.ref }}
+      payload: ${{ toJson(github.event) }}
+    secrets: inherit
