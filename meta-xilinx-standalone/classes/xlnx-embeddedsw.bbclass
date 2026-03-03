@@ -12,7 +12,7 @@ ESW_BRANCH[2023.2] = "xlnx_rel_v2023.2_update"
 ESW_BRANCH[2024.1] = "xlnx_rel_v2024.1"
 ESW_BRANCH[2024.2] = "xlnx_rel_v2024.2"
 ESW_BRANCH[2025.1] = "xlnx_rel_v2025.1"
-ESW_BRANCH[2025.2] = "xlnx_rel_v2025.2"
+ESW_BRANCH[2025.2] = "xlnx_rel_v2025.2.1"
 ESW_BRANCH = "${@d.getVarFlag('ESW_BRANCH', d.getVar('ESW_VER')) or '${ESW_VER}'}"
 ESW_BRANCH[vardeps] += "ESW_VER"
 BRANCH ??= "${ESW_BRANCH}"
@@ -42,7 +42,7 @@ ESW_LIC_FILES_CHKSUM[xlnx_rel_v2023.2_update] = '9fceecdbcad88698f265578f3d4cb26
 ESW_LIC_FILES_CHKSUM[xlnx_rel_v2024.1] = '0dcabd3719e5ac33f7c03f0d77d473f2'
 ESW_LIC_FILES_CHKSUM[xlnx_rel_v2024.2] = '689662801a76c14d0cb57ae169cbec7c'
 ESW_LIC_FILES_CHKSUM[xlnx_rel_v2025.1] = '981710c1c5161c0b8b578ede7374d1c9'
-ESW_LIC_FILES_CHKSUM[xlnx_rel_v2025.2] = 'c225c4cbc07b5aceeb804f4abad3c693'
+ESW_LIC_FILES_CHKSUM[xlnx_rel_v2025.2.1] = 'c225c4cbc07b5aceeb804f4abad3c693'
 ESW_LIC_FILES_CHKSUM = "${@d.getVarFlag('ESW_LIC_FILES_CHKSUM', d.getVar('BRANCH')) or '0'}"
 ESW_LIC_FILES_CHKSUM[vardeps] += "BRANCH"
 LIC_FILES_CHKSUM ??= "file://license.txt;md5=${ESW_LIC_FILES_CHKSUM}"
