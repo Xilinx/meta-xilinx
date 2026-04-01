@@ -5,6 +5,12 @@ definitions:
                flags: 0
              - dev: psu_r5_0_btcm_global@ffe20000
                flags: 0
+          
+         openamp_channel1_access_srams: &openamp_channel1_access_srams # used for access in each domain
+             - dev: psu_r5_1_atcm_global@ffe90000
+               flags: 0
+             - dev: psu_r5_1_btcm_global@ffeb0000
+               flags: 0
 
          rproc0: &rproc0
              - start: 0x9800000
@@ -23,6 +29,26 @@ definitions:
 
          rpu0vdev0buffer: &rpu0vdev0buffer
              - start: 0x9868000
+               size: 0x40000
+               no-map: 1
+
+         rproc1: &rproc1
+             - start: 0x9e00000
+               size: 0x60000
+               no-map: 1
+
+         rpu1vdev0vring0: &rpu1vdev0vring0
+             - start: 0x9e60000
+               size: 0x4000
+               no-map: 1
+
+         rpu1vdev0vring1: &rpu1vdev0vring1
+             - start: 0x9e64000
+               size: 0x4000
+               no-map: 1
+
+         rpu1vdev0buffer: &rpu1vdev0buffer
+             - start: 0x9e68000
                size: 0x40000
                no-map: 1
 
@@ -45,6 +71,12 @@ domains:
               flags: {}
             - dev: ipi1
               flags: {}
+            - dev: cpus_r5_1
+              flags: {}
+            - dev: ipi7
+              flags: {}
+            - dev: ipi2
+              flags: {}
             - dev: "/cpus-a53@0/cpu@0"
               label: psu_cortexa53_0
               flags: {}
@@ -57,6 +89,10 @@ domains:
             - dev: psu_r5_0_atcm_global@ffe00000
               flags: {}
             - dev: psu_r5_0_btcm_global@ffe20000
+              flags: {}
+            - dev: psu_r5_1_atcm_global@ffe90000
+              flags: {}
+            - dev: psu_r5_1_btcm_global@ffeb0000
               flags: {}
             - dev: amba_pl
             - dev: gem0
@@ -72,7 +108,7 @@ domains:
 
         reserved-memory:
             ranges: true
-            <<+: [ *rpu0vdev0vring1, *rpu0vdev0vring0, *rpu0vdev0buffer, *rproc0 ]
+            <<+: [ *rpu0vdev0vring1, *rpu0vdev0vring0, *rpu0vdev0buffer, *rproc0, *rpu1vdev0vring1, *rpu1vdev0vring0, *rpu1vdev0buffer, *rproc1]
 
         domain-to-domain:
             compatible: openamp,domain-to-domain-v1
@@ -80,8 +116,10 @@ domains:
                 compatible: openamp,remoteproc-v2
                 remote:
                     - openamp_r5_0_cluster
+                    - openamp_r5_1_cluster
                 elfload:
                     - [ psu_r5_0_atcm_global@ffe00000, psu_r5_0_btcm_global@ffe20000, rproc0 ]
+                    - [ psu_r5_1_atcm_global@ffe90000, psu_r5_1_btcm_global@ffeb0000, rproc1 ]
 
             rpmsg-relation:
                 compatible: openamp,rpmsg-v1
@@ -91,6 +129,9 @@ domains:
                      - rpu0vdev0vring0
                      - rpu0vdev0vring1
                      - rpu0vdev0buffer
+                     - rpu1vdev0vring0
+                     - rpu1vdev0vring1
+                     - rpu1vdev0buffer
                 mbox:
                     - ipi7
 
@@ -138,5 +179,50 @@ domains:
                      - rpu0vdev0vring0
                      - rpu0vdev0vring1
                      - rpu0vdev0buffer
+    
+    openamp_r5_1_cluster:
+        compatible:
+            - "openamp,domain-v1"
+        cpus:
+            - cluster: cpus_r5_1
+              cpumask: 0x2
+              mode:
+              secure: true
+              cluster_cpu: psu_cortexr5_1
+        os,type: freertos
+        access:
+            - dev: psu_r5_1_atcm_global@ffe90000
+              label: psu_r5_1_atcm_global
+              flags: {}
+            - dev: psu_r5_1_btcm_global@ffeb0000
+              flags: {}
+              label: psu_r5_1_btcm_global
+            - dev: ipi7
+              flags: {}
+            - dev: ipi2
+              flags: {}
+            - dev: memory@100000
+              flags: {}
+            - dev: psu_rpu
+              flags: {}
+            - dev: ttc3
+              flags: {}
+
+        reserved-memory:
+            ranges: true
+            <<+: [ *rpu1vdev0vring1, *rpu1vdev0vring0, *rpu1vdev0buffer, *rproc1 ]
+
+        domain-to-domain:
+             compatible: openamp,domain-to-domain-v1
+             rpmsg-relation:
+                 compatible: openamp,rpmsg-v1
+                 host:
+                     - openamp_a53_0_cluster
+                 mbox:
+                     - ipi2
+                 carveouts:
+                     - rpu1vdev0vring0
+                     - rpu1vdev0vring1
+                     - rpu1vdev0buffer
 
 
