@@ -7,7 +7,8 @@ PV .= "+git"
 REPO = "git://github.com/Xilinx/libmetal.git;protocol=https"
 
 include ${LAYER_PATH_openamp-layer}/recipes-openamp/libmetal/libmetal.inc
-include ${LAYER_PATH_openamp-layer}/vendor/xilinx/recipes-openamp/libmetal/libmetal-xlnx.inc
+PACKAGE_ARCH = "${TUNE_PKGARCH}"
+EXTRA_OECMAKE:append = " -DPROJECT_VENDOR=xlnx "
 
 RPROVIDES:${PN}-dbg += "libmetal-dbg"
 RPROVIDES:${PN}-dev += "libmetal-dev"

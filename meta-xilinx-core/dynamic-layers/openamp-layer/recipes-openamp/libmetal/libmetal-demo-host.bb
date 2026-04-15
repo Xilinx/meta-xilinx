@@ -31,4 +31,4 @@ cmake_do_generate_toolchain_file:append() {
 EOF
 }
 
-RDEPENDS:${PN}:append:aarch64:linux = " libudev kernel-module-uio-pdrv-genirq "
+RDEPENDS:${PN}:append = " libudev kernel-module-uio-pdrv-genirq "
