@@ -1,0 +1,2 @@
+define KFEATURE_DESCRIPTION "Fix orphaned SND_HDA_PREALLOC_SIZE in hdmi-module"
+kconf non-hardware hdmi-module-fix.cfg
