@@ -142,29 +142,98 @@ def preprocess_argv(argv):
     return result
 
 
+def copy_artifacts_dir(src_dir, verbose=False):
+    """
+    Copy *src_dir* into the current working directory with a '-tmp' suffix.
+
+    The destination is: <cwd>/<basename-of-src_dir>-tmp
+    If the destination already exists it is removed first so the copy is fresh.
+
+    Args:
+        src_dir: Absolute path to the source artifacts directory
+        verbose: Enable verbose output
+
+    Returns:
+        str: Absolute path to the newly created copy, or None on failure
+    """
+    src_path = Path(src_dir)
+    dest_path = Path(os.getcwd()) / f"tmp-{src_path.name}"
+
+    try:
+        if dest_path.exists():
+            if verbose:
+                print(f"Removing existing temp directory: {dest_path}")
+            shutil.rmtree(dest_path)
+
+        shutil.copytree(src_path, dest_path)
+
+        if verbose:
+            print(f"Copied artifacts to: {dest_path}")
+
+        return str(dest_path)
+    except Exception as e:
+        print(f"ERROR: Failed to copy artifacts directory: {e}", file=sys.stderr)
+        return None
+
+
+def find_file_by_extension(search_dir, extensions, verbose=False):
+    """
+    Search *search_dir* recursively for the first file matching one of the
+    given *extensions* (e.g. ['.mmi'] or ['.bit', '.rcdo']).
+
+    Args:
+        search_dir: Directory to search in
+        extensions:  List of lower-case extensions including the dot
+        verbose:     Enable verbose output
+
+    Returns:
+        str: Absolute path of the first matching file, or None if not found
+    """
+    search_path = Path(search_dir)
+    if not search_path.is_dir():
+        print(f"ERROR: Artifacts directory not found: {search_dir}", file=sys.stderr)
+        return None
+
+    matches = [
+        p for p in sorted(search_path.rglob('*'))
+        if p.is_file() and p.suffix.lower() in extensions
+    ]
+
+    if not matches:
+        print(
+            f"ERROR: No {'/'.join(extensions)} file found under: {search_dir}",
+            file=sys.stderr,
+        )
+        return None
+
+    if len(matches) > 1:
+        print(
+            f"WARNING: Multiple {'/'.join(extensions)} files found under {search_dir}; "
+            f"using the first one: {matches[0]}",
+            file=sys.stderr,
+        )
+
+    if verbose:
+        print(f"Auto-detected {matches[0].suffix} file: {matches[0]}")
+
+    return str(matches[0])
+
+
 def parse_arguments():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(
         description='Generate updated-fpga.bit or updated-fpga.rcdo using updatemem'
     )
     parser.add_argument(
-        '-m', '--mmi-file',
+        '-s', '--sdt-artifacts-dir',
         required=True,
-        help='Path to MMI file'
-    )
-    parser.add_argument(
-        '-b', '--bit-file',
-        required=True,
-        help='Path to input FPGA file (.bit or .rcdo)'
+        help='Directory containing system-dt artifacts. The script will '
+             'automatically search for a .mmi file and a .bit or .rcdo file.'
     )
     parser.add_argument(
         '-d', '--data-file',
         required=True,
         help='Path to ELF file to embed (e.g., fs-boot.elf, u-boot-spl.elf, zephyr.elf, etc.)'
-    )
-    parser.add_argument(
-        '-p', '--processor',
-        help='Processor name (if not specified, will auto-detect from MMI file)'
     )
     parser.add_argument(
         '-o', '--output-directory',
@@ -356,6 +425,127 @@ def compile_bitstream(mmi_file, bit_file, data_file, processor, output, verbose)
         )
 
 
+def copy_rcdo_to_pdi_files(output_rcdo, original_rcdo, work_dir, verbose=False):
+    """
+    If *work_dir* contains a .pdi file (anywhere in the tree), replace the
+    original .rcdo (*original_rcdo* / bit_file) in-place with *output_rcdo*,
+    keeping the original filename.
+
+    Args:
+        output_rcdo:   Absolute path to the newly generated .rcdo file
+        original_rcdo: Absolute path to the original .rcdo inside the tmp
+                       artifacts directory (bit_file)
+        work_dir:      Path to the tmp artifacts directory (searched for .pdi)
+        verbose:       Enable verbose output
+
+    Returns:
+        str: Destination path if replaced, None if no .pdi found or on error
+    """
+    pdi_files = list(Path(work_dir).rglob('*.pdi'))
+    if not pdi_files:
+        if verbose:
+            print(f"No .pdi file found under {work_dir}; skipping rcdo replacement.")
+        return None
+
+    if verbose:
+        print(f"Found .pdi file: {pdi_files[0]}; proceeding with rcdo replacement.")
+
+    dest = Path(original_rcdo)
+
+    try:
+        shutil.copy2(output_rcdo, dest)
+        print(f"Updating original rcdo: {dest}")
+        print(f"  Original rcdo '{dest.name}' has been updated with '{Path(output_rcdo).name}'")
+        if verbose:
+            print(f"  Source : {output_rcdo}")
+            print(f"  Dest   : {dest}")
+        return str(dest)
+    except Exception as e:
+        print(f"ERROR: Failed to replace original rcdo: {e}", file=sys.stderr)
+        return None
+
+
+def run_bootgen(pdi_files_dir, output_directory, verbose=False):
+    """
+    Run bootgen from *pdi_files_dir* using the .bif file found there to
+    generate an updated .pdi in *output_directory*.
+
+    Equivalent to:
+        cd <pdi_files_dir>
+        bootgen -arch spartanup -image <name>.bif -w -o <output_directory>/updated-fpga.pdi
+
+    Args:
+        pdi_files_dir:    Directory containing the .bif file (and updated .rcdo)
+        output_directory: Directory where updated-fpga.pdi will be written
+        verbose:          Enable verbose output
+
+    Returns:
+        str: Path to the generated .pdi file, or None on failure
+    """
+    bif_files = list(Path(pdi_files_dir).glob('*.bif'))
+    if not bif_files:
+        print(f"ERROR: No .bif file found in {pdi_files_dir}", file=sys.stderr)
+        return None
+
+    if len(bif_files) > 1:
+        print(
+            f"WARNING: Multiple .bif files found in {pdi_files_dir}; "
+            f"using: {bif_files[0]}",
+            file=sys.stderr,
+        )
+
+    bif_file = bif_files[0].name
+    output_pdi = os.path.join(output_directory, 'updated-fpga.pdi')
+
+    cmd = [
+        'bootgen',
+        '-arch', 'spartanup',
+        '-image', bif_file,
+        '-w',
+        '-o', output_pdi,
+    ]
+
+    if verbose:
+        print(f"Running bootgen in: {pdi_files_dir}")
+        print(f"Command: {' '.join(cmd)}")
+
+    try:
+        result = subprocess.run(
+            cmd,
+            cwd=str(pdi_files_dir),
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        if verbose and result.stdout:
+            print("bootgen STDOUT:", result.stdout)
+        if result.stderr:
+            print("bootgen STDERR:", result.stderr, file=sys.stderr)
+
+        if not os.path.exists(output_pdi):
+            print(f"ERROR: bootgen did not create output: {output_pdi}", file=sys.stderr)
+            return None
+
+        print(f"Successfully generated PDI: {output_pdi}")
+        return output_pdi
+
+    except subprocess.CalledProcessError as e:
+        print(f"ERROR: bootgen failed with return code {e.returncode}", file=sys.stderr)
+        if e.stdout:
+            print(f"STDOUT: {e.stdout}", file=sys.stderr)
+        if e.stderr:
+            print(f"STDERR: {e.stderr}", file=sys.stderr)
+        return None
+    except FileNotFoundError:
+        print(
+            "ERROR: bootgen not found in PATH. "
+            "Make sure Vitis/Bootgen tools are installed and sourced.",
+            file=sys.stderr,
+        )
+        return None
+
+
 def generate_spi_image_tcl(bit_file, spi_image_format, spi_interface, spi_size,
                            output_directory, verbose=False,
                            u_boot=None, boot_script=None, kernel=None, rootfs=None):
@@ -399,6 +589,10 @@ def generate_spi_image_tcl(bit_file, spi_image_format, spi_interface, spi_size,
     if loaddata_entries:
         loaddata_str = ' -loaddata "' + ' '.join(loaddata_entries) + '"'
 
+    # Use -loadpdi for .pdi files, -loadbit for .bit/.rcdo files
+    _, bit_ext = os.path.splitext(bit_file)
+    load_option = "-loadpdi" if bit_ext.lower() == ".pdi" else "-loadbit"
+
     tcl_content = f"""# Auto-generated by update-fpga.py
 # SPI flash image generation script for Vivado write_cfgmem
 
@@ -410,7 +604,7 @@ set bit_file_path "{bit_file}"
 set output_file_path "{output_image}"{tcl_var_defs_str}
 
 # Run the command
-write_cfgmem -force -format $format -size $size -interface $interface -loadbit "up 0x0 $bit_file_path"{loaddata_str} -file $output_file_path
+write_cfgmem -force -format $format -size $size -interface $interface {load_option} "up 0x0 $bit_file_path"{loaddata_str} -file $output_file_path
 """
 
     try:
@@ -453,9 +647,23 @@ def main():
         # Check if updatemem is available first
         check_updatemem_available()
         
-        # Resolve paths
-        mmi_file = os.path.abspath(args.mmi_file)
-        bit_file = os.path.abspath(args.bit_file)
+        # Copy sdt artifacts to <cwd>/<dirname>-tmp and use the copy as input
+        artifacts_dir = os.path.abspath(args.sdt_artifacts_dir)
+        work_dir = copy_artifacts_dir(artifacts_dir, args.verbose)
+        if work_dir is None:
+            return 1
+        print(f"Using artifacts copy: {work_dir}")
+
+        detected = find_file_by_extension(work_dir, ['.mmi'], args.verbose)
+        if detected is None:
+            return 1
+        mmi_file = os.path.abspath(detected)
+
+        detected = find_file_by_extension(work_dir, ['.bit', '.rcdo'], args.verbose)
+        if detected is None:
+            return 1
+        bit_file = os.path.abspath(detected)
+
         data_file = os.path.abspath(args.data_file)
         output_directory = os.path.abspath(args.output_directory) if args.output_directory else os.getcwd()
         
@@ -467,27 +675,19 @@ def main():
             output_filename = f'updated-fpga{input_ext}'
         output = os.path.join(output_directory, output_filename)
         
-        # Determine processor: use command-line arg if provided, otherwise auto-detect from MMI
-        if args.processor:
-            processor = args.processor
-            if args.verbose:
-                print(f"Using processor from command line: {processor}")
-        else:
-            processor = read_instpath_from_mmi(mmi_file, args.verbose)
-            if processor is None:
-                print("ERROR: Could not determine processor path. Either provide --processor or ensure MMI file contains InstPath.", file=sys.stderr)
-                return 1
-        
+        # Auto-detect processor from MMI file
+        processor = read_instpath_from_mmi(mmi_file, args.verbose)
+        if processor is None:
+            print("ERROR: Could not determine processor path. Ensure MMI file contains InstPath.", file=sys.stderr)
+            return 1
+
         # Always print a summary of what the script is doing
         print("=== Running FPGA Update ===")
         print(f"Using --mmi-file {mmi_file} as input")
         print(f"Using --bit-file {bit_file} as input")
         print(f"Adding --data-file {data_file} to {output_filename}")
         print(f"Using --output-directory {output_directory}")
-        if args.processor:
-            print(f"Using --processor {processor}")
-        else:
-            print(f"Auto-detected --processor {processor} from MMI file")
+        print(f"Auto-detected --processor {processor} from MMI file")
         if args.spi_image_format:
             print(f"Using --spi-image-format {args.spi_image_format}")
             print(f"Using --spi-interface {args.spi_interface}")
@@ -507,7 +707,7 @@ def main():
             print(f"MMI File: {mmi_file}")
             print(f"Bitstream File: {bit_file}")
             print(f"Data File: {data_file}")
-            print(f"Processor: {processor}")
+            print(f"Processor (auto-detected): {processor}")
             print(f"Output Directory: {output_directory}")
             print(f"Output File: {output}")
             if args.spi_image_format:
@@ -537,6 +737,38 @@ def main():
             return 1
         
         print(f"Successfully generated : {output} with {bit_file} embeddeded with {data_file} elf file")
+
+        # If the output is a .rcdo and work_dir has a .pdi anywhere in the
+        # tree, replace the original rcdo (bit_file) in-place with the updated one
+        # then run bootgen from the pdi_files directory to regenerate the .pdi
+        _, out_ext = os.path.splitext(output)
+        if out_ext.lower() == '.rcdo':
+            replaced = copy_rcdo_to_pdi_files(output, bit_file, work_dir, args.verbose)
+            if replaced:
+                pdi_files_dir = Path(bit_file).parent
+                generated_pdi = run_bootgen(pdi_files_dir, output_directory, args.verbose)
+                # If user requested an SPI image format, generate MCS/BIN from
+                # the PDI using Vivado write_cfgmem (generate_spi_image_tcl)
+                if generated_pdi and args.spi_image_format:
+                    if not args.spi_interface or not args.spi_size:
+                        print("ERROR: --spi-interface and --spi-size are required when --spi-image-format is specified.", file=sys.stderr)
+                        return 1
+                    tcl_file = generate_spi_image_tcl(
+                        bit_file=generated_pdi,
+                        spi_image_format=args.spi_image_format,
+                        spi_interface=args.spi_interface,
+                        spi_size=args.spi_size,
+                        output_directory=output_directory,
+                        verbose=args.verbose,
+                        u_boot=args.u_boot,
+                        boot_script=args.boot_script,
+                        kernel=args.kernel,
+                        rootfs=args.rootfs,
+                    )
+                    if tcl_file is None:
+                        return 1
+                    print(f"Successfully generated SPI TCL script: {tcl_file}")
+                    return 0
 
         # Generate SPI image TCL script if SPI args are provided
         if args.spi_image_format:
