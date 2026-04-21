@@ -70,8 +70,10 @@ do_install() {
         bbnote "PKGDIR:${OPENAMPFW_PKGDIR_SUFFIX}"
         bbnote "FULLNM:${FULL_NAME}"
 
-        install -d ${D}${OPENAMPFW_BASEDIR}/${OPENAMPFW_BOARD}/rpu/${FULL_NAME}/${FULL_NAME}_slot${OPENAMPFW_SLOT}
-        install -Dm 0644 ${S}/*${OPENAMPFW_PKGDIR_SUFFIX}/${DEMO}.elf ${D}${OPENAMPFW_BASEDIR}/${OPENAMPFW_BOARD}/rpu/${FULL_NAME}/${FULL_NAME}_slot${OPENAMPFW_SLOT}/${FULL_NAME}.elf
+        DESTINATION=${D}${OPENAMPFW_BASEDIR}/${OPENAMPFW_BOARD}/rpu/${OPENAMPFW_SLOT}
+
+        install -d ${DESTINATION}
+        install -Dm 0644 ${S}/*${OPENAMPFW_PKGDIR_SUFFIX}/${DEMO}.elf ${DESTINATION}/${DEMO}.elf
    done
    if [ ${elf_found} -ne 1 ]; then
        bberror "no *elf files found to deploy"
