@@ -206,7 +206,10 @@ def spi_assemble(d, components, output_size, manifest_data=None):
         path = comp.get("path")
         generator = comp.get("generator")
 
-        if path:
+        if comp.get("data") is not None:
+            # Pre-loaded by caller (e.g. so spi_generate_manifest sees the bytes).
+            data = comp["data"]
+        elif path:
             with open(path, "rb") as f:
                 data = f.read()
         elif comp.get("manifest"):
@@ -231,15 +234,16 @@ def spi_assemble(d, components, output_size, manifest_data=None):
     return buf
 
 
-def spi_generate_manifest(d, components, output_size, flash_size, buf=None):
-    """Generate JSON manifest.
+def spi_generate_manifest(d, components, output_size, flash_size):
+    """Generate the canonical manifest dict.
 
-    If buf is provided, includes final image SHA256. Otherwise generates
-    a partial manifest suitable for embedding in the image.
+    Single source of truth: both the embedded copy and the sidecar
+    are produced from this. The sidecar adds image.sha256 (the only
+    field that genuinely cannot be self-referential); see do_compile().
 
-    Each offset gets its own entry, sorted by offset.
+    Per-component sha256 is emitted whenever comp["data"] is set, so
+    callers must pre-load file-backed components before invoking this.
     """
-    import json
     import hashlib
     import os
 
@@ -268,10 +272,6 @@ def spi_generate_manifest(d, components, output_size, flash_size, buf=None):
     if d.getVar("SPI_ERASE_BLOCK_SIZE"):
         manifest["image"]["erase_block_size"] = "0x%x" % int(d.getVar("SPI_ERASE_BLOCK_SIZE"), 0)
 
-    # Include image hash only if buffer provided (final manifest)
-    if buf is not None:
-        manifest["image"]["sha256"] = hashlib.sha256(buf.getbuffer()).hexdigest()
-
     # Build list of entries, one per offset
     entries = []
     for comp in components:
@@ -285,7 +285,7 @@ def spi_generate_manifest(d, components, output_size, flash_size, buf=None):
             if comp.get("size"):
                 entry["size"] = "0x%x" % comp["size"]
 
-            if comp.get("data"):
+            if comp.get("data") is not None:
                 entry["sha256"] = hashlib.sha256(comp["data"]).hexdigest()
 
             if comp.get("path"):
@@ -308,6 +308,7 @@ def spi_generate_manifest(d, components, output_size, flash_size, buf=None):
 
 python do_compile() {
     import json
+    import hashlib
     import os
 
     output_dir = d.getVar("B")
@@ -317,20 +318,30 @@ python do_compile() {
     components, output_size, flash_size = spi_parse_layout(d)
     spi_validate_files(d, components)
 
-    # Check if any component uses @manifest
-    has_embedded_manifest = any(c.get("manifest") for c in components)
+    # Pre-read file-backed components so the manifest can hash them.
+    # spi_assemble() will reuse this data instead of re-reading.
+    for comp in components:
+        if comp.get("path"):
+            with open(comp["path"], "rb") as f:
+                comp["data"] = f.read()
+
+    # Build the manifest exactly once. Embedded and sidecar are derived
+    # from this same dict so they cannot drift; only image.sha256 is
+    # added below for the sidecar (it is intrinsically self-referential
+    # and must be applied after the image is assembled).
+    manifest = spi_generate_manifest(d, components, output_size, flash_size)
 
     manifest_data = None
-    if has_embedded_manifest:
-        # Generate embedded manifest (without final image hash)
-        embedded_manifest = spi_generate_manifest(d, components, output_size, flash_size)
-        manifest_data = (json.dumps(embedded_manifest, indent=2) + "\n").encode("utf-8")
+    if any(c.get("manifest") for c in components):
+        manifest_data = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
 
-    # Assemble image
     buf = spi_assemble(d, components, output_size, manifest_data)
 
-    # Generate final manifest (with image hash)
-    manifest = spi_generate_manifest(d, components, output_size, flash_size, buf)
+    # Sidecar manifest = canonical manifest + image.sha256.
+    # This is the ONLY permitted divergence from the embedded copy.
+    sidecar = dict(manifest)
+    sidecar["image"] = dict(manifest["image"])
+    sidecar["image"]["sha256"] = hashlib.sha256(buf.getbuffer()).hexdigest()
 
     # Write image
     image_path = output_dir + "/" + image_name + ".bin"
@@ -340,7 +351,7 @@ python do_compile() {
     # Write manifest
     manifest_path = output_dir + "/" + image_name + ".manifest.json"
     with open(manifest_path, "w") as f:
-        json.dump(manifest, f, indent=2)
+        json.dump(sidecar, f, indent=2)
         f.write("\n")
 
     bb.note("SPI image: %s (%d bytes)" % (image_path, output_size))
