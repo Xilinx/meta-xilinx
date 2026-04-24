@@ -6,8 +6,8 @@ COMPATIBLE_HOST = ".*-linux"
 
 S = "${WORKDIR}"
 
-SRC_URI = "https://edf.amd.com/sswreleases/isp-firmware/2026.1/03252026/isp_fw_03242026.tar.gz"
-SRC_URI[sha256sum]="c4ef77a019f1f6f8d5e4c5e58ca3cc21d2e264c499983d53c5e64bcb10ffc2a3"
+SRC_URI = "https://edf.amd.com/sswreleases/isp-firmware/2026.1/04232026/isp_fw_04232026.tar.gz"
+SRC_URI[sha256sum]="25e8bf063cceabe0731bf0cfa58ce2baa339195cdad0f9710886ad68b8daf4d8"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 do_compile[noexec] = "1"
