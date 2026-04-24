@@ -1,13 +1,13 @@
 SUMMARY = "ISP Media Server and Libraries"
 DESCRIPTION = "ISP Media Server application and required shared libraries."
 LICENSE = "CLOSED"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=c7774c4d8c75e31e42f030d5369a1112"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=fb857fc9e8eed46509f2cce8648a05c1"
 COMPATIBLE_HOST = ".*-linux"
 
 S = "${WORKDIR}"
 
-SRC_URI = "https://edf.amd.com/sswreleases/isp-media-server/2026.1/03242026/isp-media-server_03242026.tar.gz"
-SRC_URI[sha256sum] = "8325636faf5233b7a4ceef0a028eef6eb3cd87832fadee02892adc2b390e206d"
+SRC_URI = "https://edf.amd.com/sswreleases/isp-media-server/2026.1/04232026/isp-media-server_04232026.tar.gz"
+SRC_URI[sha256sum] = "080ce165f026da887070dab565d048344a05f10a78209c515444cb6cc249d82d"
 
 RDEPENDS:${PN} += "kernel-module-isp"
 
