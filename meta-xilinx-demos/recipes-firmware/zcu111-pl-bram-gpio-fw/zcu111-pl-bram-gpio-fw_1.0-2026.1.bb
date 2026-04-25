@@ -5,9 +5,9 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 inherit dfx_user_dts
 
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/04240558/external/fwapp/zcu111-pl-bram-gpio-fw_2026.1_0424_1_04240558.tar.gz"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/04250544/external/fwapp/zcu111-pl-bram-gpio-fw_2026.1_0425_1_04250544.tar.gz"
 
-SRC_URI[sha256sum] = "0ae190eff00705cbc38d1002e1d3a4facd816545de715c0f1e521c221fbac359"
+SRC_URI[sha256sum] = "5a85317fe85478ad43b3eeb36ca9f376cbe6ee219f29d73403a0ddc97aded03d"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:amd-cortexa53-common = "${MACHINE}"
