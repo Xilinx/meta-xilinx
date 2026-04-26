@@ -16,7 +16,7 @@ ESW_COMPONENT_SRC = "/src/"
 ESW_EXECUTABLE_NAME = "imgsel"
 
 SRC_URI:append = " git://github.com/Xilinx/image-selector.git;protocol=https;branch=main;destsuffix=image-selector;name=image-selector"
-SRCREV_image-selector = "1b800f96a861144e87f68a1a224735e0c09734b8"
+SRCREV_image-selector = "283bcb2b49eaa2ff1eae2f0d926e1844797352c2"
 
 OECMAKE_SOURCEPATH = "${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}"
 
