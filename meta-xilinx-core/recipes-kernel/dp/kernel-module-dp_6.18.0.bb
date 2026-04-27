@@ -10,7 +10,7 @@ S = "${WORKDIR}/git"
 
 REPO   = "git://github.com/Xilinx/dp-modules.git;protocol=https"
 BRANCH = "master"
-SRCREV = "e784ddf984213fe4591372a5205f83c49a089937"
+SRCREV = "20b98d2b13d249ee3da68c417bbf35539f6188d0"
 
 SRC_URI = "${REPO};branch=${BRANCH}"
 SRC_URI += "file://0001-Support-both-pre-6.4.0-and-current-i2c-probing.patch"
