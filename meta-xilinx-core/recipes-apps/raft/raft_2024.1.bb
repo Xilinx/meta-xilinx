@@ -14,7 +14,6 @@ S = "${WORKDIR}/git"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zcu208-zynqmp = "${MACHINE}"
 COMPATIBLE_MACHINE:zcu216-zynqmp = "${MACHINE}"
-COMPATIBLE_MACHINE:system-controller = "${MACHINE}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -37,7 +36,6 @@ RDEPENDS:${PN} += "\
 
 PACKAGECONFIG[raftnotebooks] = "enabled,disabled,,packagegroup-xilinx-jupyter"
 PACKAGECONFIG[raftstartup] = "enabled,disabled,,librfdc librfclk libmetal"
-PACKAGECONFIG[raftstartupsc] = "enabled,disabled,,python3-psutil python3-periphery"
 
 do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','true','false',d)}; then
@@ -47,7 +45,6 @@ do_install() {
     fi
     oe_runmake install DESTDIR=${D}\
     NOTEBOOKS=${@bb.utils.contains('PACKAGECONFIG','raftnotebooks','enabled','', d)}\
-    STARTUPSC=${@bb.utils.contains('PACKAGECONFIG','raftstartupsc','enabled','',d)}\
     STARTUP=${@bb.utils.contains('PACKAGECONFIG','raftstartup','enabled','',d)}\
     BINDIR=${D}${bindir}\
     SYSTEM_UNIT_DIR=${D}${systemd_system_unitdir}\
@@ -56,7 +53,6 @@ do_install() {
 
 PACKAGECONFIG:append:zcu208-zynqmp = "raftnotebooks raftstartup"
 PACKAGECONFIG:append:zcu216-zynqmp = "raftnotebooks raftstartup"
-PACKAGECONFIG:append:system-controller = "raftstartupsc"
 
 FILES:${PN} += " \
     ${datadir}/raft/* \
