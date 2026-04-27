@@ -13,7 +13,6 @@ BRANCH = "master"
 SRCREV = "e784ddf984213fe4591372a5205f83c49a089937"
 
 SRC_URI = "${REPO};branch=${BRANCH}"
-SRC_URI += "file://0001-Support-both-pre-6.4.0-and-current-i2c-probing.patch"
 
 inherit module
 
