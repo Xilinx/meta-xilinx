@@ -221,7 +221,7 @@ python devicetree_do_compile:append() {
         # In case of dtbo as input, bbclass doesn't know if firmware-name is .bit
         # or .bin format and corresponding file name. Hence we are not doing .bin
         # conversion.
-        if soc_family == 'zynq' or soc_family == 'zynqmp' and glob.glob(d.getVar('S') + '/' +(d.getVar('DTSI_PATH') or '') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE')):
+        if (soc_family == 'zynq' or soc_family == 'zynqmp') and glob.glob(d.getVar('S') + '/' +(d.getVar('DTSI_PATH') or '') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE')):
             pn = d.getVar('PN')
             biffile = pn + '.bif'
             with open(biffile, 'w') as f:
