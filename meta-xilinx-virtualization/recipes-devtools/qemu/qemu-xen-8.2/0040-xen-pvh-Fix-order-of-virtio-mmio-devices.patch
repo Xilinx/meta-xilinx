@@ -1,0 +1,45 @@
+From 32f04a03b130cd1d6947f70aa13b168b2a7c0672 Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Mon, 30 Mar 2026 18:32:49 +0200
+Subject: [PATCH 40/40] xen: pvh: Fix order of virtio-mmio devices
+
+Fix the order of virtio-mmio devices to bring back
+the command-line ordering from before virtio-msg
+got merged.
+
+Fixes: ef0f55d62d (hw/arm: xenpvh: Enable virtio-msg)
+
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+---
+ hw/xen/xen-pvh-common.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/hw/xen/xen-pvh-common.c b/hw/xen/xen-pvh-common.c
+index 583399d283..aaa44e9a88 100644
+--- a/hw/xen/xen-pvh-common.c
++++ b/hw/xen/xen-pvh-common.c
+@@ -293,14 +293,15 @@ static void xen_pvh_init(MachineState *ms)
+                        &xen_memory_listener,
+                        s->cfg.mapcache);
+ 
+-    if (s->cfg.virtio_mmio_num) {
+-        xen_create_virtio_mmio_devices(s);
+-    }
+-
++    /* Register virtio-msg before virtio-mmio to keep original bus order. */
+     if (xpc->has_virtio_msg) {
+         xen_create_virtio_msg_devices(s);
+     }
+ 
++    if (s->cfg.virtio_mmio_num) {
++        xen_create_virtio_mmio_devices(s);
++    }
++
+ #ifdef CONFIG_TPM
+     if (xpc->has_tpm) {
+         if (s->cfg.tpm.base) {
+-- 
+2.34.1
+

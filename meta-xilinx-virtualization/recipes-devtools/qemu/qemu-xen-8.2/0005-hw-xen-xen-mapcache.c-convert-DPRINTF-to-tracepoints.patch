@@ -1,7 +1,7 @@
 From a362ed50e705cefcef9068aeaeaa10a3fe189a95 Mon Sep 17 00:00:00 2001
 From: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
 Date: Mon, 29 Jan 2024 18:09:40 +0200
-Subject: [PATCH 05/27] hw/xen/xen-mapcache.c: convert DPRINTF to tracepoints
+Subject: [PATCH 05/40] hw/xen/xen-mapcache.c: convert DPRINTF to tracepoints
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

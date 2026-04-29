@@ -35,6 +35,12 @@ SRC_URI_XEN:class-target = " \
     file://0032-virtio-Add-a-virtio-msg-bus-between-backend-and-Xen.patch \
     file://0033-hw-arm-xenpvh-Enable-virtio-msg.patch \
     file://0034-hw-x86-xenpvh-Enable-virtio-msg.patch \
+    file://0035-xen-mapcache-Assert-mapcache-existance.patch \
+    file://0036-xen-mapcache-Add-function-to-check-if-the-mapcache-i.patch \
+    file://0037-physmem-xen-Conditionalize-use-of-the-mapcache.patch \
+    file://0038-hw-xen-hvm-Add-a-mapcache-arg-to-xen_register_ioreq.patch \
+    file://0039-hw-xen-xenpvh-Add-prop-to-enable-disable-the-mapcach.patch \
+    file://0040-xen-pvh-Fix-order-of-virtio-mmio-devices.patch \
     "
 
 FILESEXTRAPATHS:prepend:class-target := "${THISDIR}/qemu-xen-8.2:"

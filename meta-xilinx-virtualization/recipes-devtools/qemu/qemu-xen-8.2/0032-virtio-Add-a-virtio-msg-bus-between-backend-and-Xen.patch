@@ -1,7 +1,7 @@
 From c745aa85055071ea6c499114fea3b1c4e9e7a4fc Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Wed, 27 Aug 2025 19:25:09 +0200
-Subject: [PATCH 32/34] virtio: Add a virtio-msg bus between backend and Xen
+Subject: [PATCH 32/40] virtio: Add a virtio-msg bus between backend and Xen
 
 Add a virtio-msg bus between backend and Xen. This is for
 virtio-msg between the backend and a front-end in Xen itself.

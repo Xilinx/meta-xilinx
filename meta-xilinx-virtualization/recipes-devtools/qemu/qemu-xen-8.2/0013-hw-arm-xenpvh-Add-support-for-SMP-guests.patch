@@ -1,7 +1,7 @@
 From a4b9e4b83d1951f01858d802806a533c7dcd45d8 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Thu, 8 Aug 2024 13:30:12 +0200
-Subject: [PATCH 13/27] hw/arm: xenpvh: Add support for SMP guests
+Subject: [PATCH 13/40] hw/arm: xenpvh: Add support for SMP guests
 
 Add SMP support for Xen PVH ARM guests.
 Create ms->smp.max_cpus ioreq servers to handle hotplug.

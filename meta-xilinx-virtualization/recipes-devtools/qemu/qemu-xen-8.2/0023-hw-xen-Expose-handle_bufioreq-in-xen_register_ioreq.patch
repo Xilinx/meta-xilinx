@@ -1,7 +1,7 @@
 From 87f2048c05c1ddbf256384688cb7b404cea923da Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Wed, 4 Sep 2024 19:28:06 +0200
-Subject: [PATCH 23/27] hw/xen: Expose handle_bufioreq in xen_register_ioreq
+Subject: [PATCH 23/40] hw/xen: Expose handle_bufioreq in xen_register_ioreq
 
 Expose handle_bufioreq in xen_register_ioreq().
 This is to allow machines to enable or disable buffered ioreqs.

@@ -1,7 +1,7 @@
 From 46b83259bda7fd9bf96e962a20538a44a33aebc0 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Thu, 5 Sep 2024 01:00:36 +0200
-Subject: [PATCH 24/27] hw/xen: xenpvh: Disable buffered IOREQs for ARM
+Subject: [PATCH 24/40] hw/xen: xenpvh: Disable buffered IOREQs for ARM
 
 Add a way to enable/disable buffered IOREQs for PVH machines
 and disable them for ARM. ARM does not support buffered

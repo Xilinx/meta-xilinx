@@ -1,7 +1,7 @@
 From 4db6eea0cec8a7d42d407cec43d9789764a3ac2d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 Date: Tue, 14 Nov 2023 11:22:29 +0100
-Subject: [PATCH 03/27] hw/xen: Rename 'ram_memory' global variable as
+Subject: [PATCH 03/40] hw/xen: Rename 'ram_memory' global variable as
  'xen_memory'
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8

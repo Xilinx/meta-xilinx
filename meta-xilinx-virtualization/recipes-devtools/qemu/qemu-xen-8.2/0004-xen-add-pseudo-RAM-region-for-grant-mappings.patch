@@ -1,7 +1,7 @@
 From 7c9b100a4dfd9dcfad4e6c0b2152aefa1c98e74f Mon Sep 17 00:00:00 2001
 From: Juergen Gross <jgross@suse.com>
 Date: Wed, 25 Oct 2023 14:24:16 -0700
-Subject: [PATCH 04/27] xen: add pseudo RAM region for grant mappings
+Subject: [PATCH 04/40] xen: add pseudo RAM region for grant mappings
 
 Add a memory region which can be used to automatically map granted
 memory. It is starting at 0x8000000000000000ULL in order to be able to

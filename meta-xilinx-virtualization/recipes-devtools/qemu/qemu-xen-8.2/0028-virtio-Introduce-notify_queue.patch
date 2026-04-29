@@ -1,7 +1,7 @@
 From 57cca1c40b85772abb950975d98fcfd389e2562a Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Tue, 26 Aug 2025 19:13:18 +0200
-Subject: [PATCH 28/34] virtio: Introduce notify_queue
+Subject: [PATCH 28/40] virtio: Introduce notify_queue
 
 Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
 

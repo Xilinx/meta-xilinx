@@ -1,7 +1,7 @@
 From adc41fcc7257f39bffb99f82193949e3081955eb Mon Sep 17 00:00:00 2001
 From: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
 Date: Mon, 29 Jan 2024 18:09:41 +0200
-Subject: [PATCH 22/27] hw/xen/xen-hvm-common.c: convert DPRINTF to tracepoints
+Subject: [PATCH 22/40] hw/xen/xen-hvm-common.c: convert DPRINTF to tracepoints
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

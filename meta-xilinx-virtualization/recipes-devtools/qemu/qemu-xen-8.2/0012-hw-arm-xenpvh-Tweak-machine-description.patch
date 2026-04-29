@@ -1,7 +1,7 @@
 From 3c66ec8df907bc313d4075d716b4288860506a37 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Thu, 8 Aug 2024 22:30:53 +0200
-Subject: [PATCH 12/27] hw/arm: xenpvh: Tweak machine description
+Subject: [PATCH 12/40] hw/arm: xenpvh: Tweak machine description
 
 Tweak machine description to better express that this is
 a Xen PVH machine for ARM.

@@ -1,7 +1,7 @@
 From e2290d34c858734de7657c15974acf66d943fb52 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Fri, 16 Aug 2024 16:00:45 +0200
-Subject: [PATCH 20/27] hw/xen: pvh-common: Add support for creating PCIe/GPEX
+Subject: [PATCH 20/40] hw/xen: pvh-common: Add support for creating PCIe/GPEX
 
 Add support for optionally creating a PCIe/GPEX controller.
 

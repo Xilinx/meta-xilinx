@@ -1,7 +1,7 @@
 From 2fcf8234e4f378db52a8ba1a12ff0f8408174350 Mon Sep 17 00:00:00 2001
 From: Vikram Garhwal <vikram.garhwal@amd.com>
 Date: Tue, 27 Feb 2024 14:34:55 -0800
-Subject: [PATCH 01/27] softmmu: physmem: Split ram_block_add()
+Subject: [PATCH 01/40] softmmu: physmem: Split ram_block_add()
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
