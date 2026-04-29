@@ -37,6 +37,6 @@ SRC_URI_XEN:class-target = " \
     file://0034-hw-x86-xenpvh-Enable-virtio-msg.patch \
     "
 
-FILESEXTRAPATHS:prepend:class-target := "${THISDIR}/qemu-xilinx-8.2:"
+FILESEXTRAPATHS:prepend:class-target := "${THISDIR}/qemu-xen-8.2:"
 
 SRC_URI .= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${SRC_URI_XEN}', '', d)}"
