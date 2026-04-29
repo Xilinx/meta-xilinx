@@ -43,46 +43,28 @@ axi:
 domains:
   APU_Linux:
     compatible: openamp,domain-v1
-    cpus:
-      - cluster: cpus_a78
-        cpumask: 0xff
-        mode:
-          secure: false
-          el: 0x3
-    os,type: linux
-
     domain-to-domain:
       compatible: openamp,domain-to-domain-v1
-
       libmetal-relation:
         compatible: libmetal,ipc-v1
         relation0:
-            remote: RPU_1_BM
-            carveouts: [ libmetal_uio_desc0@99c8000, libmetal_uio_desc1@99cc000, libmetal_uio_data@99d0000 ]
-            mbox: ipi_3_to_ipi_2 # IPI3 OpenAMP example app (APU)
-            timer: ttc3
+          remote: RPU_1_BM
+          carveouts: [ libmetal_uio_desc0@99c8000, libmetal_uio_desc1@99cc000, libmetal_uio_data@99d0000 ]
+          mbox: ipi_3_to_ipi_2 # IPI3 OpenAMP example app (APU)
+          timer: ttc3
 
   RPU_1_BM:
     compatible: openamp,domain-v1
-    cpus:
-      - cluster: cpus_r52_1
-        cluster_cpu: cortexr52_1
-        cpumask: 0x2
-        mode:
-          secure: true
-          el: 0x3
-    os,type: baremetal
     domain-to-domain:
       compatible: openamp,domain-to-domain-v1
-
       libmetal-relation:
         compatible: libmetal,ipc-v1
         relation0:
-            host: APU_Linux
-            carveouts: [ libmetal_uio_desc0@99c8000, libmetal_uio_desc1@99cc000, libmetal_uio_data@99d0000 ]
-            mbox: ipi_2_to_ipi_3 #IPI2 Libmetal example app (RPU)
-            timer: [ ttc2, ttc3 ]
-            elfload: [ libmetal_elf@9968000 ]
+          host: APU_Linux
+          carveouts: [ libmetal_uio_desc0@99c8000, libmetal_uio_desc1@99cc000, libmetal_uio_data@99d0000 ]
+          mbox: ipi_2_to_ipi_3 #IPI2 Libmetal example app (RPU)
+          timer: [ ttc2, ttc3 ]
+          elfload: [ libmetal_elf@9968000 ]
 
     sram:
       - dev: libmetal_elf@9968000

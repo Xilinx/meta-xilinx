@@ -32,13 +32,6 @@ reserved-memory:
 domains:
   APU_Linux:
     compatible: openamp,domain-v1
-    cpus:
-      - cluster: cpus_a78
-        cpumask: 0xff
-        mode:
-          secure: false
-          el: 0x3
-    os,type: linux
     reserved-memory:
       - vdev0vring0@9860000
       - vdev0vring1@9864000
@@ -51,26 +44,23 @@ domains:
       remoteproc-relation:
         compatible: openamp,remoteproc-v2
         relation0:
-            remote: RPU_Zephyr
-            elfload: [ r52_0a_atcm_global, r52_0a_btcm_global, r52_0a_ctcm_global, ddrboot@9800100, rsctbl@9800000 ]
+          remote: RPU_Zephyr
+          elfload: [ r52_0a_atcm_global, r52_0a_btcm_global, r52_0a_ctcm_global, ddrboot@9800100, rsctbl@9800000 ]
 
       rpmsg-relation:
         compatible: openamp,rpmsg-v1
         relation0:
-            remote: RPU_Zephyr
-            carveouts: [ vdev0vring0@9860000, vdev0vring1@9864000, vdev0buffer@9868000 ]
-            mbox: ipi_1_nobuf_to_ipi_2_nobuf #IPI_BO_BUF1 OpenAMP example app (APU)
+          remote: RPU_Zephyr
+          carveouts: [ vdev0vring0@9860000, vdev0vring1@9864000, vdev0buffer@9868000 ]
+          mbox: ipi_1_nobuf_to_ipi_2_nobuf #IPI_BO_BUF1 OpenAMP example app (APU)
 
   RPU_Zephyr:
     compatible: openamp,domain-v1
-    cpus: 
-      - cluster: cpus_r52_0
-        cluster_cpu: cortexr52_0
-        cpumask: 0x1
-        mode:
-          secure: true
-          el: 0x3  
-    os,type: zephyr
+    chosen:
+      stdout-path: "serial0:115200n8"
+      bootargs: "earlycon=pl011,mmio32,0xf1920000 console=ttyAMA0,115200"
+      zephyr,console: "serial0"
+      zephyr,shell-uart: "serial0"
     xlnx,ddr-boot: true
     xlnx,zephyr,mems: [ ddrboot@9800100 ]
     domain-to-domain:
@@ -78,9 +68,9 @@ domains:
       rpmsg-relation:
         compatible: openamp,rpmsg-v1
         relation0:
-            host: APU_Linux
-            mbox: ipi_2_nobuf_to_ipi_1_nobuf #IPI_NO_BUF2 OpenAMP example app (RPU)
-            carveouts: [ vdev0vring0@9860000, vdev0vring1@9864000, vdev0buffer@9868000 ]
+          host: APU_Linux
+          mbox: ipi_2_nobuf_to_ipi_1_nobuf #IPI_NO_BUF2 OpenAMP example app (RPU)
+          carveouts: [ vdev0vring0@9860000, vdev0vring1@9864000, vdev0buffer@9868000 ]
     sram:
       - dev: ddrboot@9800100
         start: 0x9800100
