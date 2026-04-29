@@ -1,0 +1,13 @@
+domains:
+  APU_Linux:
+    compatible: openamp,domain-v1
+    cpus:
+      - cluster: cpus_a9
+        cpumask: 0x3
+        mode:
+          secure: true
+          el: 0x3
+    os,type: linux
+    chosen:
+      bootargs: "earlycon"
+      stdout-path: "serial0:115200n8"
