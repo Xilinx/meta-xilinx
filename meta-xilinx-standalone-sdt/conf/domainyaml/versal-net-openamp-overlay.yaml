@@ -32,13 +32,6 @@ reserved-memory:
 domains:
   APU_Linux:
     compatible: openamp,domain-v1
-    cpus:
-      - cluster: cpus_a78
-        cpumask: 0xff
-        mode:
-          secure: false
-          el: 0x3
-    os,type: linux
     reserved-memory:
       - vdev0vring0@9860000
       - vdev0vring1@9864000
@@ -51,26 +44,23 @@ domains:
       remoteproc-relation:
         compatible: openamp,remoteproc-v2
         relation0:
-            remote: RPU_Zephyr
-            elfload: [ psx_wizard_0_psxl_0_psx_r52_0a_atcm_global, psx_wizard_0_psxl_0_psx_r52_0a_btcm_global, psx_wizard_0_psxl_0_psx_r52_0a_ctcm_global, ddrboot@9800100, rsctbl@9800000 ]
+          remote: RPU_Zephyr
+          elfload: [ psx_wizard_0_psxl_0_psx_r52_0a_atcm_global, psx_wizard_0_psxl_0_psx_r52_0a_btcm_global, psx_wizard_0_psxl_0_psx_r52_0a_ctcm_global, ddrboot@9800100, rsctbl@9800000 ]
 
       rpmsg-relation:
         compatible: openamp,rpmsg-v1
         relation0:
-            remote: RPU_Zephyr
-            carveouts: [ vdev0vring0@9860000, vdev0vring1@9864000, vdev0buffer@9868000 ]
-            mbox: ipi_nobuf1_to_ipi_nobuf2
+          remote: RPU_Zephyr
+          carveouts: [ vdev0vring0@9860000, vdev0vring1@9864000, vdev0buffer@9868000 ]
+          mbox: ipi_nobuf1_to_ipi_nobuf2
 
   RPU_Zephyr:
     compatible: openamp,domain-v1
-    cpus: 
-      - cluster: cpus_r52_0
-        cluster_cpu: psx_cortexr52_0
-        cpumask: 0x1
-        mode:
-          secure: true
-          el: 0x3  
-    os,type: zephyr
+    chosen:
+      stdout-path: "serial1:115200n8"
+      bootargs: "earlycon=pl011,mmio32,0xf1930000 console=ttyAMA1,115200"
+      zephyr,console: "serial1"
+      zephyr,shell-uart: "serial1"
     xlnx,ddr-boot: true
     xlnx,zephyr,mems: [ ddrboot@9800100 ]
     domain-to-domain:
