@@ -6,6 +6,8 @@ Subject: [PATCH 12/27] hw/arm: xenpvh: Tweak machine description
 Tweak machine description to better express that this is
 a Xen PVH machine for ARM.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 ---

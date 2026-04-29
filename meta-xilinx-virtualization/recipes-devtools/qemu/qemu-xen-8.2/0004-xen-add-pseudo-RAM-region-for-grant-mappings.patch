@@ -11,6 +11,8 @@ For this reason the xen.ram memory region is expanded, which has no
 further impact as it is used just as a container of the real RAM
 regions and now the grant region.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Juergen Gross <jgross@suse.com>
 Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>

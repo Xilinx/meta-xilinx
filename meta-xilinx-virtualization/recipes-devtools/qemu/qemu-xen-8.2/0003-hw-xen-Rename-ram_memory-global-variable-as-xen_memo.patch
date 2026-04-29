@@ -11,6 +11,8 @@ To avoid a potential global variable shadow in
 hw/i386/pc_piix.c::pc_init1(), rename Xen's
 "ram_memory" as "xen_memory".
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 Message-Id: <20231114143816.71079-11-philmd@linaro.org>

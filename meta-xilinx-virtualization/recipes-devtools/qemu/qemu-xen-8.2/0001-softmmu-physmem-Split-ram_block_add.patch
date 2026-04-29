@@ -10,6 +10,8 @@ Extract ram block list update to a new function ram_block_add_list(). This is
 done to support grant mappings which adds a memory region for granted memory and
 updates the ram_block list.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Juergen Gross <jgross@suse.com>
 Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>

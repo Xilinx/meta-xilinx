@@ -8,6 +8,8 @@ comment line.
 
 No functional changes.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Acked-by: Stefano Stabellini <sstabellini@kernel.org>
 ---

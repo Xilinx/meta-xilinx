@@ -6,6 +6,8 @@ Subject: [PATCH 10/27] hw: arm: Add grant mapping.
 Enable grant ram mapping support for Xenpvh machine on ARM.
 
 [EI: Remove DPRINTF]
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>

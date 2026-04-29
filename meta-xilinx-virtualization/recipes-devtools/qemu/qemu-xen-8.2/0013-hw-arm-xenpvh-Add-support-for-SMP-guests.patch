@@ -16,6 +16,8 @@ the user explicitly specifies it with -smp.
 If the user doesn't pass -smp on the command-line, smp.cpus
 and smp.max_cpus will default to 1.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 ---

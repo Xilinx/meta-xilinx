@@ -6,6 +6,8 @@ Subject: [PATCH 17/27] hw/arm: xenpvh: Break out a common PVH machine
 Break out a common Xen PVH machine in preparation for
 adding a x86 Xen PVH machine.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>

@@ -11,6 +11,8 @@ Today xen_ram_addr_from_mapcache() will either abort() or return 0 in
 case it can't find a matching entry for a pointer value. Both cases
 are bad, so change that to return an invalid address instead.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Juergen Gross <jgross@suse.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>

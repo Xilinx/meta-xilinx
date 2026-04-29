@@ -17,6 +17,8 @@ According to the QEMU Coding Style document:
 This commit changes fprintfs that report warnings and errors to the
 appropriate report functions.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Signed-off-by: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>

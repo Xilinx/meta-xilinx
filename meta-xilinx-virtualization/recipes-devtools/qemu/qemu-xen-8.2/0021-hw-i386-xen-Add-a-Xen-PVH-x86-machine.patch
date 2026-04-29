@@ -5,6 +5,8 @@ Subject: [PATCH 21/27] hw/i386/xen: Add a Xen PVH x86 machine
 
 Add a Xen PVH x86 machine based on the abstract PVH Machine.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>

@@ -5,6 +5,8 @@ Subject: [PATCH 20/27] hw/xen: pvh-common: Add support for creating PCIe/GPEX
 
 Add support for optionally creating a PCIe/GPEX controller.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 ---

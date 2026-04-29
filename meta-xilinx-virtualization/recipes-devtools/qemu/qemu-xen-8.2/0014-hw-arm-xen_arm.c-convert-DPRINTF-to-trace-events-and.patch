@@ -15,6 +15,8 @@ This commit converts DPRINTFs in this file that are used for tracing
 into trace events. Errors or warnings are converted to error_report and
 warn_report calls.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Message-id: fe5e3bd54231abe933f95a24e0e88208cd8cfd8f.1706544115.git.manos.pitsidianakis@linaro.org

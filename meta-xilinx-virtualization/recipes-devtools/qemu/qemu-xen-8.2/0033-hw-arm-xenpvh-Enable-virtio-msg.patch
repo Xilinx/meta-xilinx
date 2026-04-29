@@ -3,6 +3,8 @@ From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Tue, 26 Aug 2025 21:20:23 +0200
 Subject: [PATCH 33/34] hw/arm: xenpvh: Enable virtio-msg
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Acked-by: Stefano Stabellini <stefano.stabellini@amd.com>
 ---

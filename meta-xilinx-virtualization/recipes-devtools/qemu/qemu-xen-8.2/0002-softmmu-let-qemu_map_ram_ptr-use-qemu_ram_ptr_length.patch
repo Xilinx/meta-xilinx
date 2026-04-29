@@ -8,6 +8,8 @@ qemu_map_ram_ptr() and qemu_ram_ptr_length() share quite some code, so
 modify qemu_ram_ptr_length() a little bit and use it for
 qemu_map_ram_ptr(), too.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Juergen Gross <jgross@suse.com>
 Signed-off-by: Vikram Garhwal <vikram.garhwal@amd.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>

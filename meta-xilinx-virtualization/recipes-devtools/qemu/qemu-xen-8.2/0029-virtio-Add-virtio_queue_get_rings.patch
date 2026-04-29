@@ -3,6 +3,8 @@ From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Tue, 26 Aug 2025 16:06:18 +0200
 Subject: [PATCH 29/34] virtio: Add virtio_queue_get_rings
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Acked-by: Stefano Stabellini <stefano.stabellini@amd.com>
 ---

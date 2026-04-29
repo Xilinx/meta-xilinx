@@ -9,6 +9,8 @@ This is to allow machines to enable or disable buffered ioreqs.
 No functional change since all callers still set it to
 HVM_IOREQSRV_BUFIOREQ_ATOMIC.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 ---

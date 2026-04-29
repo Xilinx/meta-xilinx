@@ -5,6 +5,8 @@ Subject: [PATCH 26/27] hw/arm: xenpvh: Enable PCI for ARM PVH
 
 Enable PCI support for the ARM Xen PVH machine.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 ---

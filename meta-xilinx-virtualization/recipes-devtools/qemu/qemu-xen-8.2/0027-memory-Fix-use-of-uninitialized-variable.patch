@@ -8,6 +8,8 @@ created due to the use of an uninitialized variable.
 This mainly affects virtio devices.
 
 Fixes: 4e71cea9c01a (memory: add MemoryRegion map and unmap callbacks)
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 ---
  system/physmem.c | 1 +

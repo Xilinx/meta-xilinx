@@ -6,6 +6,8 @@ Subject: [PATCH 30/34] virtio: Add the virtio-msg transport
 Add the new virtio-msg transport together with a framework
 for virtio-msg buses.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Reviewed-by: Stefano Stabellini <stefano.stabellini@amd.com>
 ---

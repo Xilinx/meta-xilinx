@@ -13,6 +13,8 @@ QEMU's log redirection, instead of stderr by default.
 This commit converts DPRINTFs in this file that are used for tracing
 into tracepoints.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Message-id: 2fbe1fbc59078e384761c932e97cfa4276a53d75.1706544115.git.manos.pitsidianakis@linaro.org

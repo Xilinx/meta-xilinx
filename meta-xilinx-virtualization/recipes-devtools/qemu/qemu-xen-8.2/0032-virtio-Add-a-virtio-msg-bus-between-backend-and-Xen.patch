@@ -6,6 +6,8 @@ Subject: [PATCH 32/34] virtio: Add a virtio-msg bus between backend and Xen
 Add a virtio-msg bus between backend and Xen. This is for
 virtio-msg between the backend and a front-end in Xen itself.
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Reviewed-by: Stefano Stabellini <stefano.stabellini@amd.com>
 ---

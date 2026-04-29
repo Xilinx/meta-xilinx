@@ -3,6 +3,8 @@ From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Fri, 16 Aug 2024 15:46:32 +0200
 Subject: [PATCH 16/27] hw/arm: xenpvh: Move stubbed functions to xen-stubs.c
 
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
