@@ -1,0 +1,74 @@
+reserved-memory:
+  ranges: true
+  "#size-cells": 2
+  "#address-cells": 2
+  rproc0@9800000:
+    label: rproc0
+    start: 0x9800000
+    size: 0x60000
+    no-map: 1
+  vdev0vring0@9860000:
+    label: vdev0vring0
+    start: 0x9860000
+    size: 0x4000
+    no-map: 1
+  vdev0vring1@9864000:
+    label: vdev0vring1
+    start: 0x9864000
+    size: 0x4000
+    no-map: 1
+  vdev0buffer@9868000:
+    label: vdev0buffer
+    start: 0x9868000
+    size: 0x100000
+    no-map: 1
+
+domains:
+  APU_Linux: # host in channel from a72-0
+    compatible: openamp,domain-v1
+    reserved-memory:
+      - vdev0buffer@9868000
+      - vdev0vring1@9864000
+      - vdev0vring0@9860000
+      - rproc0@9800000
+
+    domain-to-domain:
+      compatible: openamp,domain-to-domain-v1
+      remoteproc-relation:
+        compatible: openamp,remoteproc-v2
+        relation0:
+          remote: R5_0_FREERTOS
+          elfload: [ psv_r5_0_atcm_global@ffe00000, psv_r5_0_btcm_global@ffe20000, rproc0@9800000 ]
+
+      rpmsg-relation:
+        compatible: openamp,rpmsg-v1
+        relation0:
+          remote: R5_0_FREERTOS
+          mbox: ipi_3_to_ipi_1
+          carveouts: [ vdev0vring0@9860000, vdev0vring1@9864000, vdev0buffer@9868000 ]
+          timer: [ ttc0, ttc1 ]
+
+  R5_0_FREERTOS:
+    compatible: openamp,domain-v1
+    sram:
+      - dev: rproc0@9800000
+        start: 0x9800000
+        size: 0x6000
+      - dev: psv_r5_0_atcm_global@ffe00000
+        size: 64K
+        start: 0xffe00000
+    reserved-memory:
+      - vdev0buffer@9868000
+      - vdev0vring1@9864000
+      - vdev0vring0@9860000
+      - rproc0@9800000
+
+    domain-to-domain:
+      compatible: openamp,domain-to-domain-v1
+      rpmsg-relation:
+        compatible: openamp,rpmsg-v1
+        relation0:
+          host: APU_Linux
+          mbox: ipi_1_to_ipi_3
+          carveouts: [ vdev0vring0@9860000, vdev0vring1@9864000, vdev0buffer@9868000 ]
+          timer: ttc3
