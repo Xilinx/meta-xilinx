@@ -1,0 +1,29 @@
+From: Christian Kohn <chris.kohn@amd.com>
+Subject: [PATCH] drm2d: Use ARGB8888 framebuffer format
+
+The zynqmp-dpsub primary plane does not support DRM_FORMAT_XRGB8888
+but does support DRM_FORMAT_ARGB8888. These formats are identical in
+layout, differing only in that ARGB8888 has a meaningful alpha channel
+(which kmscon sets to 0 via memset anyway).
+
+Use ARGB8888 for dumb buffer framebuffers to support drivers that
+lack XRGB8888 on the primary plane.
+
+Upstream-Status: Inappropriate [zynqmp-dpsub workaround]
+
+AI-Generated: Claude Opus 4.6
+Signed-off-by: Christian Kohn <chris.kohn@amd.com>
+---
+ src/uterm_drm2d_video.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/src/uterm_drm2d_video.c
++++ b/src/uterm_drm2d_video.c
+@@ -57,7 +57,7 @@
+ 	uint32_t pitches[4] = {rb->stride, 0, 0, 0};
+ 	uint32_t offsets[4] = {0, 0, 0, 0};
+
+-	return drmModeAddFB2(fd, width, height, DRM_FORMAT_XRGB8888, handles, pitches, offsets,
++	return drmModeAddFB2(fd, width, height, DRM_FORMAT_ARGB8888, handles, pitches, offsets,
+ 			     &rb->id, 0);
+ }

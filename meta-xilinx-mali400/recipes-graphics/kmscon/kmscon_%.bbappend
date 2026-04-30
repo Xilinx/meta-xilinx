@@ -1,5 +1,13 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/kmscon:"
 
+# zynqmp-specific DRM patches require machine arch packaging
+PACKAGE_ARCH:zynqmp = "${MACHINE_ARCH}"
+
+# DRM workarounds for zynqmp-dpsub driver only
+SRC_URI:append:zynqmp = " \
+    file://0002-drm2d-Use-ARGB8888-framebuffer-format.patch \
+"
+
 # Fix cross-compilation: genunifont is a native tool that needs
 # native zlib, not the target zlib
 DEPENDS += "zlib-native"
