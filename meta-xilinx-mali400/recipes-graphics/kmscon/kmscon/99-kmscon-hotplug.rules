@@ -1,0 +1,1 @@
+ACTION=="change", SUBSYSTEM=="drm", KERNEL=="card0", ENV{HOTPLUG}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}="kmsconvt@tty1.service"
