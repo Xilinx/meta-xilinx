@@ -6,6 +6,7 @@ PACKAGE_ARCH:zynqmp = "${MACHINE_ARCH}"
 # DRM workarounds for zynqmp-dpsub driver only
 SRC_URI:append:zynqmp = " \
     file://0002-drm2d-Use-ARGB8888-framebuffer-format.patch \
+    file://0003-drm-Force-legacy-modesetting.patch \
 "
 
 # Fix cross-compilation: genunifont is a native tool that needs

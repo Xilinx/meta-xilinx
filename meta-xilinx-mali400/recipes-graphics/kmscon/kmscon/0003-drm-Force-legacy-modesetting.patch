@@ -1,0 +1,29 @@
+From: Christian Kohn <chris.kohn@amd.com>
+Subject: [PATCH] drm: Force legacy modesetting
+
+Some DRM drivers (e.g. zynqmp-dpsub) advertise atomic modesetting
+support but fail the test-only atomic commit, causing a segfault.
+
+Force legacy modesetting mode as a workaround until the driver or
+kmscon's atomic path is fixed.
+
+Upstream-Status: Inappropriate [zynqmp-dpsub workaround]
+
+AI-Generated: Claude Opus 4.6
+Signed-off-by: Christian Kohn <chris.kohn@amd.com>
+---
+ src/uterm_drm_shared.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+--- a/src/uterm_drm_shared.c
++++ b/src/uterm_drm_shared.c
+@@ -1022,6 +1022,9 @@
+ 		vdrm->legacy = true;
+ 	}
+
++	/* Force legacy modesetting to work around drivers that advertise
++	 * atomic support but fail the test-only atomic commit. */
++	vdrm->legacy = true;
+ 	ret = ev_eloop_new_fd(video->eloop, &vdrm->efd, vdrm->fd, EV_READABLE, io_event, video);
+ 	if (ret)
+ 		goto err_close;
