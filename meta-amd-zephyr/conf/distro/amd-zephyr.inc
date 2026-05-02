@@ -1,4 +1,4 @@
-DISTRO_NAME = "AMD Zephyr Distro"
+DISTRO_NAME = "AMD Zephyr RTOS distribution"
 DISTRO_VERSION = "1.0"
 TARGET_VENDOR = "-amd"
 
