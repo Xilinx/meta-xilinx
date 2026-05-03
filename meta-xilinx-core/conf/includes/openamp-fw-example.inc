@@ -63,6 +63,13 @@ do_install() {
         elf_found=1
         DEMO=$(basename -s .elf ${DEMO})
         FULL_NAME=${OPENAMPFW_BOARD}-${OPENAMPFW_CORE}-${OPENAMPFW_SLOT}-${DEMO}
+
+	# Handle case where prefix is open-amp-xlnx- for basename
+	FULL_NAME=$(echo $FULL_NAME | sed 's/open-amp-xlnx-//g')
+
+	# Handle case where prefix contains -rpmsg-multi-srv
+	FULL_NAME=$(echo $FULL_NAME | sed 's/-rpmsg-multi-srv//g')
+
         bbnote "DEMO:  ${DEMO}"
         bbnote "BOARD: ${OPENAMPFW_BOARD}"
         bbnote "CORE:  ${OPENAMPFW_CORE}"
@@ -73,7 +80,7 @@ do_install() {
         DESTINATION=${D}${OPENAMPFW_BASEDIR}/${OPENAMPFW_BOARD}/rpu/${OPENAMPFW_SLOT}
 
         install -d ${DESTINATION}
-        install -Dm 0644 ${S}/*${OPENAMPFW_PKGDIR_SUFFIX}/${DEMO}.elf ${DESTINATION}/${DEMO}.elf
+        install -Dm 0644 ${S}/*${OPENAMPFW_PKGDIR_SUFFIX}/${DEMO}.elf ${DESTINATION}/${FULL_NAME}.elf
    done
    if [ ${elf_found} -ne 1 ]; then
        bberror "no *elf files found to deploy"
