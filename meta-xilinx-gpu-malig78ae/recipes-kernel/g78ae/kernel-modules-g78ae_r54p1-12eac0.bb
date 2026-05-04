@@ -10,8 +10,8 @@ LIC_FILES_CHKSUM = " \
 # md5sum: 13e14ae1bd7ad5bff731bba4a31bb510
 
 BRANCH = "r54p1-12eac0"
-SRCREV_kernel = "cf7466ba3a5a50293ff43fdd34f284151f05c0f5"
-SRCREV_arbitration = "6839acc38c663799466a51c1521ec7fb516e97df"
+SRCREV_kernel = "379addce312d566720edc878ebf7292774a6e27f"
+SRCREV_arbitration = "8c5448552b84e5a7ecb13046ad02a31cb673aeeb"
 SRCREV_FORMAT = "kernel_arbitration"
 
 SRC_URI = " \
