@@ -146,17 +146,14 @@ RDEPENDS:${PN}-demo:aarch64 = "\
     ${ROS_DEMO_PACKAGES} \
 "
 
-#RDEPENDS:${PN}-control:aarch64 = "\
-#    ${ROS_BASE_PACKAGES} \
-#    ${ROS_CONTROL_PACKAGES} \
-#"
+RDEPENDS:${PN}-control:aarch64 = "\
+    ${ROS_BASE_PACKAGES} \
+    ${ROS_CONTROL_PACKAGES} \
+"
 
 RDEPENDS:${PN}-dev:aarch64 = "\
     ${ROS_BUILDESSENTIAL_PACKAGES} \
 "
-
-# TODO
-# 1. Due to failing hardware-interfaces disable ${PN}-control
 
 RDEPENDS:${PN}:aarch64 = "\
     ${PN}-demo \
