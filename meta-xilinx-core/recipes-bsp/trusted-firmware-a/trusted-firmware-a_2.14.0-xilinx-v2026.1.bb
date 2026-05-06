@@ -18,9 +18,9 @@ LIC_FILES_CHKSUM = "file://docs/license.rst;md5=6ed7bace7b0bc63021c6eba7b524039e
 TFA_SCMI_SERVER ?= "0"
 
 # SCMI Server repository details
-SRCBRANCH_scmi-server = "master"
+SRCBRANCH_scmi-server = "main"
 SRC_URI_SCMI_SERVER ?= "git://github.com/Xilinx/scmi-server.git;name=scmi-server;protocol=https;destsuffix=scmi-server;branch=${SRCBRANCH_scmi-server}"
-SRCREV_scmi-server = "174f9c26098939ba1aba1d896799355b991f1298"
+SRCREV_scmi-server = "ab72d3d9cff6cb08f3959d883c2a5f19f2e8d3b2"
 
 # Conditionally add SCMI server to sources
 SRC_URI:append = " ${@bb.utils.contains('TFA_SCMI_SERVER', '1', '${SRC_URI_SCMI_SERVER}', '', d)}"
