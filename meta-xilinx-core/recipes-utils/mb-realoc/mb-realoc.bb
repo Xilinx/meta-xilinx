@@ -1,3 +1,5 @@
+SUMMARY = "AMD MicroBlaze ELF relocator helper used to retarget u-boot \
+to a new load address before deploy."
 DESCRIPTION = "mb-realoc"
 
 LICENSE = "CLOSED"

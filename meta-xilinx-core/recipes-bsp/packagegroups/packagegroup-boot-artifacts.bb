@@ -1,4 +1,7 @@
-DESCRIPTION = "Boot artifacts for AMD FPGAs.  This includes the boot.bin, and associated qemu artifacts."
+SUMMARY = "Aggregates the AMD FPGA boot artifacts (boot.bin and the \
+associated QEMU support files) into a deploy-time packagegroup."
+DESCRIPTION = "Boot artifacts for AMD FPGAs. This includes the \
+boot.bin, and associated qemu artifacts."
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

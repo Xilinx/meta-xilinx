@@ -1,4 +1,7 @@
+SUMMARY = "AMD MIPI CSI-2 receiver controller driver (baremetal)."
 
+DESCRIPTION = "Baremetal driver for the AMD MIPI CSI-2 receiver \
+controller IP block in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "csi"

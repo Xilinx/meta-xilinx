@@ -1,3 +1,5 @@
+SUMMARY = "GStreamer 1.0 plug-ins and helpers used by AMD Xilinx \
+multimedia pipelines."
 DESCRIPTION = "GStreamer packages"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

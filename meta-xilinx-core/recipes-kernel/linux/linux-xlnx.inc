@@ -50,6 +50,7 @@ LINUX_MB_INC = ""
 LINUX_MB_INC:microblaze = "linux-microblaze.inc"
 require ${LINUX_MB_INC}
 
+SUMMARY = "AMD Xilinx Linux kernel (linux-xlnx)."
 DESCRIPTION = "Xilinx Kernel"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 

@@ -1,3 +1,5 @@
+SUMMARY = "Deploys a pre-built AMD Zynq / Zynq UltraScale+ MPSoC First \
+Stage Boot Loader (FSBL) ELF as virtual/fsbl."
 DESCRIPTION = "Xilinx First Stage Boot Loader"
 
 LICENSE = "CLOSED"

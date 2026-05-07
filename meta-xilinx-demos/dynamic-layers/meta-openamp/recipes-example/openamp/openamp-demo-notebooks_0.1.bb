@@ -1,3 +1,5 @@
+SUMMARY = "Jupyter notebook examples that drive the AMD Xilinx OpenAMP \
+demos."
 DESCRIPTION = "Jupyter notebooks for openAMP"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=268f2517fdae6d70f4ea4c55c4090aa8"

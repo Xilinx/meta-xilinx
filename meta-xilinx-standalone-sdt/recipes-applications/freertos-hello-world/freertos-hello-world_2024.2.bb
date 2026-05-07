@@ -1,3 +1,6 @@
+SUMMARY = "FreeRTOS hello-world example application."
+DESCRIPTION = "AMD Xilinx FreeRTOS sample application that prints \
+'hello world' from a single task."
 inherit esw python3native esw_apps_common
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/freertos_hello_world/src/"

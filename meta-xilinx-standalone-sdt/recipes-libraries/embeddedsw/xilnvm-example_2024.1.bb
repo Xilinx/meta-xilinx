@@ -1,3 +1,9 @@
+SUMMARY = "AMD Xilinx eFUSE access library (xilnvm)."
+DESCRIPTION = "Library from the AMD Xilinx embeddedsw stack that \
+reads/writes the non-volatile-memory (eFUSE) blocks of Versal devices \
+from baremetal firmware. This recipe builds the driver \
+self-test/example ELF that ships alongside the driver in the \
+embeddedsw tree."
 inherit esw deploy
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilnvm/examples/"

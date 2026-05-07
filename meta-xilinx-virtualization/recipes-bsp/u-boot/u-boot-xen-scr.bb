@@ -1,4 +1,7 @@
 SUMMARY = "Xen u-boot script generation using image builder"
+DESCRIPTION = "Generates a U-Boot boot script that hands control to \
+the Xen hypervisor and launches the configured DomU images, built from \
+the AMD Xilinx Xen image-builder output."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 

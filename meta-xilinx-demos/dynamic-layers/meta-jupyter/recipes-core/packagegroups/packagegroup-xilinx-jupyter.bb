@@ -1,4 +1,7 @@
-DESCRIPTION = "Required packages for running jupyter notebook with python3"
+SUMMARY = "Packagegroup pulling in JupyterLab plus the Python 3 kernel \
+and helpers needed to run the AMD Xilinx Jupyter notebook demos."
+DESCRIPTION = "Required packages for running jupyter notebook with \
+python3"
 
 inherit packagegroup
 

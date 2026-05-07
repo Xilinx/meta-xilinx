@@ -1,3 +1,8 @@
+SUMMARY = "AMD Xilinx OpenAMP (open-amp) library (xlnx fork)."
+DESCRIPTION = "AMD Xilinx fork of the OpenAMP open-amp library, \
+implementing VirtIO/RPMsg/Remoteproc on top of libmetal so Linux on \
+the APU can boot and message firmware running on the RPU/PMU \
+MicroBlaze cores of Zynq UltraScale+ MPSoC, Versal and Versal NET."
 SRCBRANCH ?= "2026"
 SRCREV = "2c90602ecb809c7b48d2d756318806c6e7666488"
 BRANCH = "2026"

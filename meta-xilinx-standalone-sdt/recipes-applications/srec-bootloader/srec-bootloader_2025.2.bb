@@ -1,3 +1,6 @@
+SUMMARY = "SREC over UART secondary bootloader (baremetal)."
+DESCRIPTION = "AMD Xilinx baremetal secondary bootloader that loads an \
+S-Record (SREC) ELF over the UART console."
 inherit esw python3native esw_apps_common
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/srec_bootloader/src/"

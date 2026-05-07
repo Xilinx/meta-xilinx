@@ -1,3 +1,5 @@
+SUMMARY = "AMD Xilinx fork of ARM Trusted Firmware (TF-A) for Zynq \
+UltraScale+ MPSoC, Versal and Versal NET."
 DESCRIPTION = "ARM Trusted Firmware"
 
 LICENSE = "BSD-3-Clause"

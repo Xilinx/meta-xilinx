@@ -1,3 +1,4 @@
+SUMMARY = "Standalone build of the Yocto wic image-manipulation tool."
 DESCRIPTION = "wic Image Manipulator"
 SECTION = "console/utils"
 LICENSE = "GPL-2.0-only"

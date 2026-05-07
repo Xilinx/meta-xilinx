@@ -1,3 +1,6 @@
+SUMMARY = "AMD UART Lite (XPS UART Lite) driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD UART Lite IP block in the \
+embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "uartlite"

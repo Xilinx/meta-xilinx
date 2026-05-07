@@ -1,3 +1,6 @@
+SUMMARY = "Memory test application (baremetal)."
+DESCRIPTION = "AMD Xilinx baremetal application that runs a suite of \
+memory (DDR/OCM) read/write/walking-bit tests."
 inherit esw python3native esw_apps_common
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/memory_tests/src/"

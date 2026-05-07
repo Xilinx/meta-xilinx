@@ -1,4 +1,7 @@
 SUMMARY = "Basic Application container image"
+DESCRIPTION = "Base layer for AMD Xilinx OCI/Docker application \
+container images: minimal rootfs plus the runtime needed to host a \
+single application payload."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 

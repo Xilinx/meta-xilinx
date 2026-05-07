@@ -1,3 +1,7 @@
+SUMMARY = "AMD Xilinx RSA signature verification library (xilrsa)."
+DESCRIPTION = "Library from the AMD Xilinx embeddedsw stack that \
+performs RSA signature verification for the Zynq UltraScale+ MPSoC \
+secure-boot flow."
 inherit esw python3native
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilrsa/src/"

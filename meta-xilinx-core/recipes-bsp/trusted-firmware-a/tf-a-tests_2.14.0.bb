@@ -1,5 +1,6 @@
 DEFAULT_PREFERENCE = "-1"
 
+SUMMARY = "Trusted Firmware-A Test Framework (TFTF) v2.14.0."
 DESCRIPTION = "Trusted Firmware-A tests(aka TFTF)"
 LICENSE = "BSD-3-Clause & NCSA"
 

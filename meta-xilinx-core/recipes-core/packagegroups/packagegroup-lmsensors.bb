@@ -1,4 +1,6 @@
-DESCRIPTION = "PetaLinux packages that provides tools and drivers for monitoring temperatures, voltage"
+SUMMARY = "lm_sensors hardware-monitoring tools and drivers."
+DESCRIPTION = "PetaLinux packages that provides tools and drivers for \
+monitoring temperatures, voltage"
 
 PACKAGE_ARCH = "${TUNE_PKGARCH}"
 

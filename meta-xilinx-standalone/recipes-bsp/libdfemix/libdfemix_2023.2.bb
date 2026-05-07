@@ -1,4 +1,7 @@
 SUMMARY = "Linux dfemix library"
+DESCRIPTION = "Linux user-space library for the AMD Mixer (DFE-MIX) PL \
+DSP IP block, used in Versal RFSoC / Versal Adaptive Compute DFE \
+designs to configure and drive the digital up/down mixer at runtime."
 SECTION = "libdfemix"
 LICENSE = "BSD"
 

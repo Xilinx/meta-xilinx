@@ -1,3 +1,6 @@
+SUMMARY = "AMD Zynq UltraScale+ PS watchdog driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD Zynq UltraScale+ MPSoC \
+PS-side watchdog controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "wdtps"

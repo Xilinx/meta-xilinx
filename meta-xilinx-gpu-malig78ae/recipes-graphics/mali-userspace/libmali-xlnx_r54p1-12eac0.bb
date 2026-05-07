@@ -1,3 +1,5 @@
+SUMMARY = "Arm Mali-G78AE user-space GLES/Vulkan driver libraries for \
+AMD Versal Series Gen 2 devices."
 DESCRIPTION = "libraries for Versal with Mali G78AE"
 
 LICENSE = "Proprietary"

@@ -1,4 +1,8 @@
 SUMMARY = "Linux dfeofdm library"
+DESCRIPTION = "Linux user-space library for the AMD OFDM (DFE-OFDM) PL \
+DSP IP block, used in Versal RFSoC / Versal Adaptive Compute DFE \
+designs to configure and drive the OFDM modulator/demodulator at \
+runtime."
 SECTION = "libdfeofdm"
 LICENSE = "BSD-3-Clause"
 

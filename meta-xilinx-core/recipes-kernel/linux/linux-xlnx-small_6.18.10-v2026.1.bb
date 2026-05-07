@@ -1,5 +1,7 @@
 require linux-xlnx_6.18.10-v2026.1.bb
 
+SUMMARY = "AMD Xilinx Linux kernel (linux-xlnx) with a reduced \
+defconfig for image-recovery use."
 DESCRIPTION = "Xilinx Kernel - Alternative smaller configuration"
 
 # Eventually we may have more smaller configuration, set a variable

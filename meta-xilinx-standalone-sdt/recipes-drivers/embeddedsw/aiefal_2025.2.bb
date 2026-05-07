@@ -1,3 +1,7 @@
+SUMMARY = "AMD AI Engine Function Abstraction Layer (AIEFAL)."
+DESCRIPTION = "AMD AI Engine Function Abstraction Layer library, \
+providing a high-level baremetal API on top of the low-level AIE \
+driver for Versal AI Core / AI Edge devices."
 inherit cmake ccmake
  
 COMPATIBLE_HOST = "aarch64-xilinx-elf"

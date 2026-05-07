@@ -1,3 +1,6 @@
+SUMMARY = "FreeRTOS lwIP TCP performance server example application."
+DESCRIPTION = "AMD Xilinx FreeRTOS sample application that runs the \
+iperf-style TCP performance server on top of the lwIP stack."
 inherit esw python3native esw_apps_common
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/freertos_lwip_tcp_perf_server/src/"

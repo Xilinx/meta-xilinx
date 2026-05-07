@@ -1,3 +1,6 @@
+SUMMARY = "AMD AXI Ethernet MAC driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD AXI Ethernet (1G/10G) MAC \
+IP block in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "axiethernet"

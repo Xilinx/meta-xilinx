@@ -1,3 +1,7 @@
+SUMMARY = "AMD Zynq SCUGIC interrupt controller driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the Arm Generic Interrupt \
+Controller (GIC) instance in AMD Zynq / Zynq UltraScale+ MPSoC \
+PS-sides, exposed via the embeddedsw SCUGIC API."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "scugic"

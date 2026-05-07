@@ -1,4 +1,7 @@
-SUMMARY = "Use git repo data for building a version number according PEP-440"
+SUMMARY = "Use git repo data for building a version number according \
+PEP-440"
+DESCRIPTION = "setuptools plugin that derives PEP-440 version numbers \
+from git tags/refs at build time."
 HOMEPAGE = "https://setuptools-git-versioning.readthedocs.io"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=92e79e3a844e66731724600f3ac9c0d8"

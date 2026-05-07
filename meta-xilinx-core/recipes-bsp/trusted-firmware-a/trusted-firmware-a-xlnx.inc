@@ -1,3 +1,5 @@
+SUMMARY = "AMD Xilinx fork of TF-A (trusted-firmware-a) for Zynq \
+UltraScale+ MPSoC, Versal and Versal NET."
 # Xilinx-specific trusted-firmware-a configuration
 # Include this after the base trusted-firmware-a.inc
 

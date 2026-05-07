@@ -1,3 +1,6 @@
+SUMMARY = "AMD Zynq-7000 CAN controller driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the legacy AMD Zynq-7000 CAN \
+controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "can"

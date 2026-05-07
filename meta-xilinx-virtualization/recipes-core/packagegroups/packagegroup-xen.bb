@@ -1,3 +1,6 @@
+SUMMARY = "Packagegroup pulling in the Xen hypervisor runtime, \
+xen-tools and supporting components used by the AMD Xilinx Xen-based \
+virtualization stack."
 DESCRIPTION = "Xen supported packages"
 
 PACKAGE_ARCH = "${TUNE_PKGARCH}"

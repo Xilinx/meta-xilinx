@@ -1,3 +1,6 @@
+SUMMARY = "OpenAMP Zephyr demo RPU firmware payload."
+DESCRIPTION = "Pre-built RPU Zephyr OpenAMP demo payload loaded by the \
+APU-side OpenAMP example application on supported boards."
 require openamp-fw.inc
 MCNAME = "zephyr"
 

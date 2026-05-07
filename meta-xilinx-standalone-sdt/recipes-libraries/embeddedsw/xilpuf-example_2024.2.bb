@@ -1,3 +1,9 @@
+SUMMARY = "AMD Xilinx Versal PUF library (xilpuf)."
+DESCRIPTION = "Library from the AMD Xilinx embeddedsw stack that \
+exposes the Versal Physically Unclonable Function (PUF) for key \
+generation from baremetal firmware. This recipe builds the driver \
+self-test/example ELF that ships alongside the driver in the \
+embeddedsw tree."
 inherit esw deploy
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilpuf/examples/"

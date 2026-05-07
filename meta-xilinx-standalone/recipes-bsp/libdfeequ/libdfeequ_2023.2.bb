@@ -1,4 +1,7 @@
 SUMMARY = "Linux dfeequ library"
+DESCRIPTION = "Linux user-space library for the AMD Equaliser \
+(DFE-EQU) PL DSP IP block, used in Versal RFSoC / Versal Adaptive \
+Compute DFE designs to configure and drive the equaliser at runtime."
 SECTION = "libdfeequ"
 LICENSE = "BSD"
 

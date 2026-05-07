@@ -1,3 +1,5 @@
+SUMMARY = "AMD Zynq / Zynq UltraScale+ MPSoC First Stage Boot Loader \
+(FSBL) firmware."
 DESCRIPTION = "First Stage Bootloader"
 
 inherit xlnx-embeddedsw deploy shared-manifest

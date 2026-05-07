@@ -3,7 +3,10 @@ INITRAMFS_IMAGE ??= ""
 # Adjust our name to be explicit to what we're going to produce
 PN = "initramdisk-${INITRAMFS_IMAGE}"
 
-DESCRIPTION = "Provide the initramdisk available via a package, installed in /boot"
+SUMMARY = "Wraps an INITRAMFS_IMAGE artifact as an installable package \
+delivered to /boot."
+DESCRIPTION = "Provide the initramdisk available via a package, \
+installed in /boot"
 
 DEPENDS = "${INITRAMFS_IMAGE}"
 

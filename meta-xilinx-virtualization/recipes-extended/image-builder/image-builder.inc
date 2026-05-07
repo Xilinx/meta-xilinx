@@ -1,4 +1,8 @@
 SUMMARY = "Xen Image Builder"
+DESCRIPTION = "AMD Xilinx port of Xen's image-builder helper that \
+takes a Xen DomU image plus configuration and produces the boot \
+artifacts (ITS/ITB, U-Boot scripts, etc.) needed to launch it on AMD \
+Xilinx Xen-based virtualization stacks."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d2794c0df5b907fdace235a619d80314"
 

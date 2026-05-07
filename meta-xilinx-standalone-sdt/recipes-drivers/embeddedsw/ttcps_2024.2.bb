@@ -1,3 +1,6 @@
+SUMMARY = "AMD Zynq PS triple-timer counter driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD Zynq / Zynq UltraScale+ \
+MPSoC PS-side triple-timer counter (TTC) in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "ttcps"

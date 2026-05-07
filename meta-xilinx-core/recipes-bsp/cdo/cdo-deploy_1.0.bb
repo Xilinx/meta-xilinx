@@ -1,4 +1,7 @@
-DESCRIPTION = "Recipe to deploy cdo files from System Device Tree Directory"
+SUMMARY = "Deploys CDO (Configuration Data Object) files extracted \
+from the System Device Tree directory for AMD Versal targets."
+DESCRIPTION = "Recipe to deploy cdo files from System Device Tree \
+Directory"
 
 LICENSE = "CLOSED"
 

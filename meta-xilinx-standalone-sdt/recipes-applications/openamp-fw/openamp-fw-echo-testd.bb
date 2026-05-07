@@ -1,3 +1,7 @@
+SUMMARY = "OpenAMP echo-test RPU firmware payload."
+DESCRIPTION = "Pre-built RPU OpenAMP firmware payload (echo-testd) \
+loaded by the APU-side OpenAMP example application on Zynq UltraScale+ \
+/ Versal / Versal NET boards."
 require openamp-fw.inc
 
 PROVIDES:append:armv7r = " openamp-fw-echo-testd "

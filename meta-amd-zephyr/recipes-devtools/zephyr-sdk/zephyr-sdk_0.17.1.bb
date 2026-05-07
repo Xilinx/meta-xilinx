@@ -1,6 +1,7 @@
 SUMMARY = "Zephyr SDK Bundle"
-DESCRIPTION = "Official SDK built using crosstool-ng, distributed by the \
-Zephyr project"
+DESCRIPTION = "Pre-built Zephyr SDK bundle (compilers, libraries and \
+CMake toolchain files for every supported Zephyr target architecture) \
+produced by the Zephyr project's crosstool-NG build."
 COMPATIBLE_HOST = "(x86_64|aarch64).*-linux"
 
 LICENSE = "Apache-2.0"

@@ -1,3 +1,7 @@
+SUMMARY = "AMD Xilinx legacy umbrella library (libxil)."
+DESCRIPTION = "Legacy umbrella library that aggregates the AMD Xilinx \
+embeddedsw drivers and services as a single libxil.a for old-style \
+baremetal firmware builds."
 inherit esw python3native features_check
 
 LIBXIL_CONFIG ??= ""

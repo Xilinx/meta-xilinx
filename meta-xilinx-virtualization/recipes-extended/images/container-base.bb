@@ -3,6 +3,9 @@
 # OpenEmbedded and the Yocto Project) ELCe 2018
 #
 SUMMARY = "Basic container image"
+DESCRIPTION = "Base layer for AMD Xilinx OCI/Docker container images: \
+minimal busybox-based rootfs intended as a parent for more specific \
+container recipes."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 

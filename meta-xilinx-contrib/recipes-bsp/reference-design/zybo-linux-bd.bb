@@ -1,7 +1,7 @@
 SUMMARY = "The reference design for zybo-linux-bd"
-DESCRIPTION = "Contains the Reference Design Files and hardware software \
-hand-off file. The HDF provides bitstream and Xilinx ps7_init_gpl.c/h \
-platform headers."
+DESCRIPTION = "Reference design files (bitstream, ps7_init headers, \
+hardware definition file) shipped by Digilent for the Zybo Zynq-7000 \
+board, used by U-Boot and the kernel device-tree build."
 SECTION = "bsp"
 
 DEPENDS += "unzip-native"

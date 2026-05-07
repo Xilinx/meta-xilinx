@@ -1,7 +1,12 @@
 # Backported from meta-openembedded master
 # https://git.openembedded.org/meta-openembedded/tree/meta-oe/recipes-support/libtinyxml2/libtinyxml2_10.0.0.bb
 
-SUMMARY = "TinyXML-2 is a simple, small, efficient, C++ XML parser that can be easily integrating into other programs"
+SUMMARY = "TinyXML-2 is a simple, small, efficient, C++ XML parser \
+that can be easily integrating into other programs"
+DESCRIPTION = "TinyXML-2 is a small, efficient C++ XML parser that can \
+be easily integrated into other programs; backported from \
+meta-openembedded master to meta-xilinx-core because some AMD \
+components depend on this exact version."
 HOMEPAGE = "https://leethomason.github.io/tinyxml2"
 SECTION = "libs"
 LICENSE = "Zlib"

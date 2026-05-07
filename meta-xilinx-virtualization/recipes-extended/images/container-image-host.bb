@@ -1,3 +1,5 @@
+SUMMARY = "Configurable AMD Xilinx host image suitable for running \
+OCI/Docker containers under the Xen hypervisor."
 DESCRIPTION = "A configurable container host image"
 LICENSE = "MIT"
 

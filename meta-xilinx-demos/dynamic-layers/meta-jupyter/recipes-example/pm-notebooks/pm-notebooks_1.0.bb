@@ -1,4 +1,7 @@
-DESCRIPTION = "Jupyter notebook examples for Platform Management (PM) in Versal devices"
+SUMMARY = "Jupyter notebook examples for Versal Platform Management \
+(PM)."
+DESCRIPTION = "Jupyter notebook examples for Platform Management (PM) \
+in Versal devices"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://../../LICENSE;md5=268f2517fdae6d70f4ea4c55c4090aa8"
 

@@ -1,3 +1,7 @@
+SUMMARY = "OpenAMP rpmsg RPC/proxy example application (xlnx)."
+DESCRIPTION = "OpenAMP rpmsg RPC/proxy example app, demonstrating \
+remote POSIX system-call proxying from a remote firmware back to Linux \
+running on the APU."
 require open-amp-xlnx-demos_v2026.1.inc
 
 PROVIDES += "open-amp-xlnx-proxy"

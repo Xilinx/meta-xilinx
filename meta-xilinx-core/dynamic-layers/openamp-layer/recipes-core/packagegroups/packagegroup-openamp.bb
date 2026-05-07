@@ -1,3 +1,5 @@
+SUMMARY = "OpenAMP rpmsg example applications, helpers and remote-core \
+firmware packages for AMD Xilinx adaptive SoCs."
 DESCRIPTION = "OpenAMP supported packages"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

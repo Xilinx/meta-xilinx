@@ -1,3 +1,7 @@
+SUMMARY = "AMD Xilinx Versal On-Chip Permissions library (xilocp)."
+DESCRIPTION = "Library from the AMD Xilinx embeddedsw stack that \
+manages the Versal On-Chip Permissions controller from baremetal \
+firmware."
 inherit esw
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilocp/src/"

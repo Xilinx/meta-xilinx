@@ -1,4 +1,8 @@
 SUMMARY = "Linux dfeprach library"
+DESCRIPTION = "Linux user-space library for the AMD PRACH (DFE-PRACH) \
+PL DSP IP block, used in Versal RFSoC / Versal Adaptive Compute DFE \
+designs to configure and drive the LTE/NR Physical Random Access \
+Channel processor at runtime."
 SECTION = "libdfeprach"
 LICENSE = "BSD"
 

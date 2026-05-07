@@ -1,3 +1,6 @@
+SUMMARY = "AMD Versal PMC/PSM UART (PL011) driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the Arm PL011 UART instance used \
+by the AMD Versal PMC/PSM in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "uartpsv"

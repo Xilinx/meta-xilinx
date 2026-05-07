@@ -1,4 +1,8 @@
-SUMMARY = "A nearly empty image just capable of allowing a device to boot via boot.bin."
+SUMMARY = "A nearly empty image just capable of allowing a device to \
+boot via boot.bin."
+DESCRIPTION = "Builds a deliberately empty Yocto image so that QEMU \
+and hardware boot flows can validate firmware/boot.bin images without \
+requiring a populated rootfs."
 
 # Ensure this is really empty
 IMAGE_INSTALL = ""

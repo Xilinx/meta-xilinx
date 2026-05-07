@@ -1,4 +1,7 @@
+SUMMARY = "AMD Zynq-7000 PS USB controller driver (baremetal)."
 
+DESCRIPTION = "Baremetal driver for the AMD Zynq-7000 PS-side USB 2.0 \
+controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "usbps"

@@ -1,3 +1,6 @@
+SUMMARY = "AMD CSU DMA controller driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD Configuration Security \
+Unit (CSU) DMA controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "csudma"

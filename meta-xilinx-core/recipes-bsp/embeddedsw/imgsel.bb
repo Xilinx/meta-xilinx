@@ -1,3 +1,5 @@
+SUMMARY = "Deploys a pre-built AMD Image Selector (imgsel) binary for \
+Zynq UltraScale+ MPSoC and Versal targets as virtual/imgsel."
 DESCRIPTION = "Image Selector"
 
 LICENSE = "CLOSED"

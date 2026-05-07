@@ -1,3 +1,6 @@
+SUMMARY = "AMD AI Engine v2 baremetal driver."
+DESCRIPTION = "Baremetal driver for the AMD AI Engine v2 array used in \
+Versal AI Core / AI Edge / AI Edge Gen 2 devices."
 inherit cmake ccmake
  
 COMPATIBLE_HOST = "aarch64-xilinx-elf"

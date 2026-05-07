@@ -1,3 +1,6 @@
+SUMMARY = "AMD Zynq UltraScale+ PS DMA controller driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD Zynq UltraScale+ MPSoC \
+PS-side general-purpose DMA controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "dmaps"

@@ -2,6 +2,8 @@ COMPATIBLE_HOST = "${HOST_SYS}"
 
 SUMMARY = "Target packages for the standalone SDK"
 
+DESCRIPTION = "Packagegroup pulling in the newlib-based standalone \
+(no-OS) target sysroot pieces shipped in the AMD Vitis baremetal SDK."
 PACKAGE_ARCH = "${TUNE_PKGARCH}"
 
 inherit packagegroup

@@ -1,4 +1,10 @@
+SUMMARY = "AMD Xilinx U-Boot fork built for the image-recovery boot \
+path."
 
+DESCRIPTION = "Cut-down build of the AMD Xilinx U-Boot fork used as \
+the second-stage bootloader in the image-recovery flow: only the \
+minimum needed to boot the recovery kernel and re-flash the primary \
+boot partition."
 require ${LAYERPATH_xilinx}/recipes-bsp/u-boot/u-boot-xlnx.inc
 require ${LAYERPATH_xilinx}/recipes-bsp/u-boot/u-boot-spl-zynq-init.inc
 require ${LAYERPATH_xilinx}/recipes-bsp/u-boot/u-boot-xlnx-2025.1.inc

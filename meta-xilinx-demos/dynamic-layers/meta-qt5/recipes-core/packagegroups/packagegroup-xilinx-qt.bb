@@ -1,3 +1,5 @@
+SUMMARY = "Packagegroup pulling in the Qt 5 runtime used by the AMD \
+Xilinx graphical demos."
 DESCRIPTION = "Qt packages"
 
 # Workaround for DISTRO_FEATURES wayland only set on 64-bit ARM machines

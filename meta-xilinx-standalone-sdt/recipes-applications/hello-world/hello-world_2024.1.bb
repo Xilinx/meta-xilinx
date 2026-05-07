@@ -1,3 +1,6 @@
+SUMMARY = "Baremetal hello-world example application."
+DESCRIPTION = "AMD Xilinx baremetal sample application that prints \
+'hello world' to the configured serial console."
 inherit esw deploy python3native esw_apps_common
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/hello_world/src/"

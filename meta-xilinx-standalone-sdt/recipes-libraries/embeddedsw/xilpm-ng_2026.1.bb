@@ -1,3 +1,6 @@
+SUMMARY = "AMD Xilinx Power Management library (xilpm, next-gen)."
+DESCRIPTION = "Next-generation rewrite of the AMD Xilinx embeddedsw \
+power-management library used on newer Versal generations."
 inherit esw python3native
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilpm_ng/src/"

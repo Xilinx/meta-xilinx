@@ -1,4 +1,8 @@
 SUMMARY = "RAFT python application"
+DESCRIPTION = "AMD Xilinx RAFT (Remote API Framework) python \
+application: a JSON-RPC server exposing the on-target RFSoC / DFE \
+driver stack so a remote host can configure and stream samples through \
+the data converters and DFE PL DSP IP."
 LICENSE = "MIT & BSD-3-Clause"
 LIC_FILES_CHKSUM = " \
     file://${WORKDIR}/git/LICENSE;md5=cc21c526211d34984839aa67dd16f172 \

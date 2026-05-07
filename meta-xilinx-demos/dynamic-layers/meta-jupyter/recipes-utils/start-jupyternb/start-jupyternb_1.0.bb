@@ -1,5 +1,8 @@
 SUMMARY = "Start Jupyter at system boot"
 
+DESCRIPTION = "systemd unit that starts a classic Jupyter Notebook \
+server at system boot, binding to the on-target interface so AMD \
+Xilinx Jupyter notebook demos are reachable from a host browser."
 SRC_URI = " file://start-jupyter.sh \
             file://jupyter-setup.sh \
             file://jupyter_notebook_config.py \

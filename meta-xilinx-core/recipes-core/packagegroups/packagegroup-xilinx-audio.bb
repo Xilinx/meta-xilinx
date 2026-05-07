@@ -1,3 +1,5 @@
+SUMMARY = "ALSA audio runtime libraries and tools for AMD Xilinx \
+boards."
 DESCRIPTION = "ASLA supported packages"
 
 PACKAGE_ARCH = "${TUNE_PKGARCH}"

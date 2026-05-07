@@ -1,3 +1,6 @@
+SUMMARY = "AMD CAN FD controller driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD CAN FD (Flexible \
+Data-rate) controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "canfd"

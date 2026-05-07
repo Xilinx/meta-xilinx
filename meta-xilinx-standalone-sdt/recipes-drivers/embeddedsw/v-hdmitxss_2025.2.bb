@@ -1,4 +1,7 @@
+SUMMARY = "AMD HDMI TX subsystem driver (baremetal)."
 
+DESCRIPTION = "Baremetal driver for the AMD HDMI Transmitter Subsystem \
+IP block in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "v-hdmitxss"

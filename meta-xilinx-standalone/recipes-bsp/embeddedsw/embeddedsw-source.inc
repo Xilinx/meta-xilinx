@@ -1,3 +1,9 @@
+SUMMARY = "AMD Xilinx Embedded Software (embeddedsw) source tree."
+DESCRIPTION = "Source-only recipe that fetches the AMD Xilinx Embedded \
+Software (embeddedsw) git tree and exports it for the per-PN ESW \
+driver, library and firmware recipes to consume via shared-S. Not \
+built or deployed on its own."
+
 # Somewhere we need to verify the LIC_FILES_CHKSUM
 # normally part of deployment, but there is no deployment
 do_patch[postfuncs] += "populate_lic_qa_checksum"

@@ -2,6 +2,10 @@
 # version is not available in the linux-firmware repository.
 #
 SUMMARY = "TI Bluetooth firmware files for use with Linux kernel"
+DESCRIPTION = "Packages the TIInit_11.8.32.bts Bluetooth firmware for \
+the Texas Instruments WiLink combo radio used on some Zynq / Zynq \
+UltraScale+ MPSoC reference boards; the file is fetched from the TI \
+service-pack git tree because it is not carried in linux-firmware."
 SECTION = "kernel"
 
 LICENSE = "Firmware-ti-bt"

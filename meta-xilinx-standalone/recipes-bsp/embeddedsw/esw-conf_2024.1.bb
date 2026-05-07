@@ -1,4 +1,9 @@
+SUMMARY = "AMD Xilinx ESW configuration helper recipe (Lopper, SDT \
+fragments and helper metadata)."
 # Can't depend on esw since this is needed for setup!
+DESCRIPTION = "AMD Xilinx ESW configuration helper recipe: deploys the \
+Lopper tools, system-device-tree fragments and helper YAML metadata \
+that the rest of the embeddedsw recipes consume during configure."
 inherit xlnx-embeddedsw
 
 INHIBIT_DEFAULT_DEPS = "1"

@@ -1,3 +1,5 @@
+SUMMARY = "Superset of X11 server, client libraries and utilities for \
+AMD Xilinx desktop-style boards."
 DESCRIPTION = "Xilinx X11 packages superset"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

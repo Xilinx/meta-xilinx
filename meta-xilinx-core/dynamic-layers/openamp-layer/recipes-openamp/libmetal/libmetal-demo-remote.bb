@@ -1,3 +1,8 @@
+SUMMARY = "AMD Xilinx libmetal IRQ shared-memory demo for the remote \
+core."
+DESCRIPTION = "Builds the libmetal IRQ / shared-memory demo intended \
+to run as the remote-side firmware on the RPU/MicroBlaze, paired with \
+the host-side libmetal-demo-host application."
 require ${LAYER_PATH_openamp-layer}/recipes-openamp/rpmsg-examples/rpmsg-example.inc
 REPO = "git://github.com/Xilinx/openamp-system-reference.git;protocol=https"
 SRCREV = "fab6139f6dd306383a4d4b666667993b91ac2bd9"

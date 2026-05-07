@@ -1,3 +1,7 @@
+SUMMARY = "AMD Xilinx Versal PUF library (xilpuf)."
+DESCRIPTION = "Library from the AMD Xilinx embeddedsw stack that \
+exposes the Versal Physically Unclonable Function (PUF) for key \
+generation from baremetal firmware."
 inherit esw
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilpuf/src/"

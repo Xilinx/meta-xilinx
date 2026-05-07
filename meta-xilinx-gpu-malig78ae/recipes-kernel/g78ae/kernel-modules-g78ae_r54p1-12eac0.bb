@@ -1,4 +1,6 @@
 SUMMARY = "A Mali G78AE Linux Kernel modules"
+DESCRIPTION = "Out-of-tree Linux kernel module for the Arm Mali-G78AE \
+GPU as found on AMD Versal Series Gen 2 devices."
 SECTION = "kernel/modules"
 
 LICENSE = "GPL-2.0-only"

@@ -1,3 +1,7 @@
+SUMMARY = "AMD Xilinx inter-processor mailbox library (xilmailbox)."
+DESCRIPTION = "Library from the AMD Xilinx embeddedsw stack that \
+provides an abstraction over the inter-processor mailbox / IPI \
+hardware on Zynq UltraScale+ and Versal devices."
 inherit esw
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilmailbox/src/"

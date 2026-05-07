@@ -1,3 +1,5 @@
+SUMMARY = "Deploys a pre-built AMD Zynq UltraScale+ MPSoC Image \
+Recovery binary as virtual/imgrcry."
 DESCRIPTION = "Image Recovery"
 
 LICENSE = "CLOSED"

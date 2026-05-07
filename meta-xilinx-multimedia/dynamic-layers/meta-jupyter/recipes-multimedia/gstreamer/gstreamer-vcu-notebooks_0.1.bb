@@ -1,3 +1,5 @@
+SUMMARY = "Jupyter notebook examples that drive the GStreamer-VCU \
+demos on Zynq UltraScale+ MPSoC EV devices."
 DESCRIPTION = "Jupyter notebook examples for VCU in ZynqMP-EV devices"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=17e31b2e971eed6471a361c7dc4faa18"

@@ -1,6 +1,8 @@
-ESCRIPTION = "PSM Firmware"
 SUMMARY = "PSM firmware for versal devices"
 
+DESCRIPTION = "AMD Versal / Versal NET Platform Security Manager (PSM) \
+firmware (MicroBlaze) that handles system-level power-management and \
+security operations."
 inherit xlnx-embeddedsw deploy shared-manifest
 
 COMPATIBLE_HOST = "microblaze.*-elf"

@@ -1,3 +1,7 @@
+SUMMARY = "Peripheral self-test application (baremetal)."
+DESCRIPTION = "AMD Xilinx baremetal application that runs the \
+per-driver self-tests for the peripherals enabled in the system device \
+tree."
 inherit esw python3native esw_apps_common
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/peripheral_tests/src/"

@@ -1,3 +1,9 @@
+SUMMARY = "AMD Xilinx fork of Das U-Boot for Zynq, Zynq UltraScale+ \
+MPSoC, Versal, Versal NET and MicroBlaze targets."
+DESCRIPTION = "Das U-Boot bootloader built from the AMD Xilinx \
+u-boot-xlnx tree, which carries the SoC and board ports (PSU init, \
+FSBL hand-off, secure boot, RPU/APU SPL flows, ...) needed to boot AMD \
+adaptive SoC and FPGA platforms."
 require recipes-bsp/u-boot/u-boot-common.inc
 require recipes-bsp/u-boot/u-boot.inc
 

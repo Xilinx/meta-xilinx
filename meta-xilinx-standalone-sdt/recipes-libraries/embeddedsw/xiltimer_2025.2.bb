@@ -1,3 +1,7 @@
+SUMMARY = "AMD Xilinx generic timer abstraction library (xiltimer)."
+DESCRIPTION = "Generic timer abstraction library from the AMD Xilinx \
+embeddedsw tree that selects the appropriate hardware timer (TTC, \
+scutimer, axi-timer, etc.) for use by baremetal firmware."
 inherit esw python3native
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xiltimer/src/"

@@ -1,4 +1,7 @@
 SUMMARY = "U-boot boot scripts for Xilinx devices"
+DESCRIPTION = "Generates the U-Boot boot.scr / boot.scr.uimg used by \
+AMD Xilinx Zynq, Zynq UltraScale+ MPSoC, Versal and MicroBlaze boards \
+to load the kernel, device tree and ramdisk during boot."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 

@@ -1,3 +1,5 @@
+SUMMARY = "Extracts CDO (Configuration Data Object) files from a \
+Versal boot.bin so they can be supplied to QEMU."
 DESCRIPTION = "Recipe to extract boot_files for qemu usage"
 
 LICENSE = "CLOSED"

@@ -1,4 +1,7 @@
 SUMMARY = "Seamless operability between C++11 and Python"
+DESCRIPTION = "Header-only C++11 library for exposing C++ types to \
+Python (and the other way around); used as a build-time dependency of \
+several AMD Python extension modules."
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=774f65abd8a7fe3124be2cdf766cd06f"
 DEPENDS = "python3-cmake-native python3-ninja-native"

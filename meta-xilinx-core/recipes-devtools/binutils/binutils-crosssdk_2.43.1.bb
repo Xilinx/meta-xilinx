@@ -1,3 +1,8 @@
+SUMMARY = "GNU Binary Utilities (binutils) cross-SDK 2.43.1 \
+(meta-xilinx backport)."
+DESCRIPTION = "Cross-SDK build of GNU binutils 2.43.1 backported into \
+meta-xilinx-core so the AMD Xilinx layers can be built against this \
+toolchain version on Yocto releases that ship a different default."
 require binutils-cross_${PV}.bb
 
 inherit crosssdk

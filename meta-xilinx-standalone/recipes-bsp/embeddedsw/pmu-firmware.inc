@@ -1,3 +1,5 @@
+SUMMARY = "AMD Zynq UltraScale+ MPSoC Platform Management Unit (PMU) \
+firmware (MicroBlaze)."
 DESCRIPTION = "PMU Firmware"
 
 inherit xlnx-embeddedsw deploy shared-manifest

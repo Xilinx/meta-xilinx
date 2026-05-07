@@ -1,3 +1,6 @@
+SUMMARY = "libmetal IRQ/shared-memory demo RPU firmware payload."
+DESCRIPTION = "Pre-built RPU baremetal demo payload that exercises \
+libmetal IRQ and shared-memory primitives between the APU and RPU."
 require openamp-fw.inc
 
 FW_OS = "baremetal"

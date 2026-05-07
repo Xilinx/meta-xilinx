@@ -1,4 +1,6 @@
 SUMMARY = "A Mali 400 Linux Kernel module"
+DESCRIPTION = "Out-of-tree Linux kernel module for the Arm Mali-400 \
+GPU as found on Zynq UltraScale+ MPSoC EG/EV variants."
 SECTION = "kernel/modules"
 
 LICENSE = "GPL-2.0-only"

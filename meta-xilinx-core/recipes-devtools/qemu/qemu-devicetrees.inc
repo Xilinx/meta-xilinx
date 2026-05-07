@@ -1,4 +1,8 @@
 SUMMARY = "Xilinx's hardware device trees required for QEMU"
+DESCRIPTION = "Hand-written QEMU machine device trees that describe \
+AMD Xilinx Zynq, Zynq UltraScale+ MPSoC, Versal and Versal NET \
+reference platforms; consumed by the AMD QEMU fork to model the SoC IP \
+topology when emulating these devices."
 HOMEPAGE = "https://github.com/xilinx/qemu-devicetrees/"
 LICENSE = "BSD-3-Clause"
 DEPENDS += "dtc-native"

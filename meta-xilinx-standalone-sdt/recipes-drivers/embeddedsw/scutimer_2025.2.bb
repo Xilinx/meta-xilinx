@@ -1,4 +1,7 @@
+SUMMARY = "AMD Zynq Cortex-A9 private timer driver (baremetal)."
 
+DESCRIPTION = "Baremetal driver for the Cortex-A9 private timer in AMD \
+Zynq-7000 PS-sides, exposed via the embeddedsw SCU timer API."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "scutimer"

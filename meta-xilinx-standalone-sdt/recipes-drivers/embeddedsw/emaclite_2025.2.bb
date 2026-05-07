@@ -1,3 +1,6 @@
+SUMMARY = "AMD EmacLite (XPS Ethernet Lite) driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD EmacLite (XPS Ethernet \
+Lite) MAC IP block in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "emaclite"

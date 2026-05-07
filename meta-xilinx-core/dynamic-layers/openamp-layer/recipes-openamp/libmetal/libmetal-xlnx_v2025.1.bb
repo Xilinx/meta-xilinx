@@ -1,3 +1,9 @@
+SUMMARY = "AMD Xilinx libmetal hardware abstraction library (xlnx \
+fork)."
+DESCRIPTION = "AMD Xilinx fork of the OpenAMP libmetal library, \
+providing the user-space and baremetal hardware abstraction layer \
+(memory, IRQ, I/O) used by open-amp on Zynq UltraScale+ MPSoC, Versal \
+and Versal NET inter-processor communication."
 SRCBRANCH ?= "2025"
 SRCREV = "50559a720099471bdbb22c3e93604a32c9ac7790"
 BRANCH = "xlnx_rel_v2025.1"

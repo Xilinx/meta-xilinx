@@ -1,3 +1,8 @@
+SUMMARY = "AMD Xilinx libmetal IRQ shared-memory demo for the host \
+(Linux APU)."
+DESCRIPTION = "Builds the libmetal IRQ / shared-memory demo \
+(irq_shmem_demo) intended to run on the Linux host (APU) side, \
+exercising the libmetal user-space abstractions."
 require ${LAYER_PATH_openamp-layer}/recipes-openamp/rpmsg-examples/rpmsg-example.inc
 LIC_FILES_CHKSUM ?= "file://LICENSE.md;md5=ab88daf995c0bd0071c2e1e55f3d3505"
 REPO = "git://github.com/Xilinx/openamp-system-reference.git;protocol=https"

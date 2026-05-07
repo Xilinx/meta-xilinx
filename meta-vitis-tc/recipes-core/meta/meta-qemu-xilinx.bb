@@ -1,4 +1,7 @@
 SUMMARY = "Meta package for building a installable qemu SDK"
+DESCRIPTION = "Meta-recipe that aggregates the AMD Xilinx fork of QEMU \
+and its device trees into an installable SDK tarball used by AMD Vitis \
+embedded software flows."
 LICENSE = "MIT"
 
 

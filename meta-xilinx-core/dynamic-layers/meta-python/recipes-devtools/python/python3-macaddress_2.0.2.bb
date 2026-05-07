@@ -1,4 +1,7 @@
 SUMMARY = "MAC address manipulation library for Python"
+DESCRIPTION = "Pure-Python library for parsing, formatting and \
+manipulating MAC and EUI addresses, used by other AMD Xilinx Python \
+tooling (e.g. frugy)."
 HOMEPAGE = "https://github.com/mentalisttraceur/python-macaddress"
 LICENSE = "0BSD"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=ea2eb804531932406bb4957581a4b0f4"

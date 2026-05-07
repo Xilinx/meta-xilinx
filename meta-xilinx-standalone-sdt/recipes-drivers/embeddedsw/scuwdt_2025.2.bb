@@ -1,4 +1,7 @@
+SUMMARY = "AMD Zynq Cortex-A9 private watchdog driver (baremetal)."
 
+DESCRIPTION = "Baremetal driver for the Cortex-A9 private watchdog in \
+AMD Zynq-7000 PS-sides, exposed via the embeddedsw SCU watchdog API."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "scuwdt"

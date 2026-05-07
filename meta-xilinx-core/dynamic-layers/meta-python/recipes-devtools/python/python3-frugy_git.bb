@@ -1,4 +1,7 @@
 SUMMARY = "Python 3.3+'s frugy for Python 2.6, 2.7, 3.2."
+DESCRIPTION = "FRU Generator YAML (frugy): build, edit and inspect \
+IPMI Field-Replaceable-Unit (FRU) information records using a \
+human-readable YAML schema."
 HOMEPAGE = "https://github.com/MicroTCA-Tech-Lab/frugy"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=750d848625d8174091b953f2de0e8f8e"

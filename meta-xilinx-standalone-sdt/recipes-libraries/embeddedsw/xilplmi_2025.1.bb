@@ -1,3 +1,7 @@
+SUMMARY = "AMD Xilinx Versal PLM infrastructure library (xilplmi)."
+DESCRIPTION = "Infrastructure subsystem of the Versal Platform Loader \
+and Manager (PLM) firmware (event manager, error handling, IPI), part \
+of the AMD Xilinx embeddedsw stack."
 inherit esw
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilplmi/src/"

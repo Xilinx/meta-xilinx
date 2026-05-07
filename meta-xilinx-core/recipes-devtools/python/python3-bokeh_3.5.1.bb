@@ -1,4 +1,8 @@
-SUMMARY = "Interactive plots and applications in the browser from Python"
+SUMMARY = "Interactive plots and applications in the browser from \
+Python"
+DESCRIPTION = "Bokeh interactive visualization library: build \
+browser-deliverable HTML/JS plots, dashboards and apps from Python, \
+used here by AMD's web-based RFSoC/DFE inspection tools."
 HOMEPAGE = "https://bokeh.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=4d2241e774601133cb2c58ae1277f9a5"

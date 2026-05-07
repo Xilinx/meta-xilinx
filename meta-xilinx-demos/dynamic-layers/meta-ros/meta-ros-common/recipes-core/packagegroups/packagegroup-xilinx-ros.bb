@@ -1,4 +1,7 @@
-DESCRIPTION = "Packages for ROS2 Base and Demos including some basic pub/sub examples"
+SUMMARY = "Packagegroup pulling in the ROS 2 base runtime plus example \
+publisher/subscriber nodes for the AMD Xilinx ROS demos."
+DESCRIPTION = "Packages for ROS2 Base and Demos including some basic \
+pub/sub examples"
 
 PACKAGE_ARCH = "${TUNE_PKGARCH}"
 

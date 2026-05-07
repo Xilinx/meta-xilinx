@@ -1,3 +1,7 @@
+SUMMARY = "lwIP TCP/IP stack for AMD Xilinx baremetal targets."
+DESCRIPTION = "AMD Xilinx port of the lwIP lightweight TCP/IP stack, \
+packaged as a baremetal library for use with Xilinx MAC drivers \
+(axiethernet, emaclite, emacps)."
 inherit esw python3native
 
 ESW_COMPONENT_SRC = "/ThirdParty/sw_services/lwip220/src/"

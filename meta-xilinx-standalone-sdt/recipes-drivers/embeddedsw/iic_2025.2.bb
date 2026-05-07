@@ -1,3 +1,6 @@
+SUMMARY = "AMD AXI IIC (I2C) controller driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD AXI IIC (I2C) master/slave \
+IP block in the embeddedsw stack."
 inherit features_check
   
 REQUIRED_MACHINE_FEATURES = "iic"

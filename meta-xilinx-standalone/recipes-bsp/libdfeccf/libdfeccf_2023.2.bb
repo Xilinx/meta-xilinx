@@ -1,4 +1,8 @@
 SUMMARY = "Linux dfeccf library"
+DESCRIPTION = "Linux user-space library for the AMD Channel Filter \
+(DFE-CCF) PL DSP IP block, used in Versal RFSoC / Versal Adaptive \
+Compute DFE designs to configure and drive the channel filter at \
+runtime."
 SECTION = "libdfeccf"
 LICENSE = "BSD"
 

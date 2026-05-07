@@ -1,3 +1,4 @@
+SUMMARY = "Extended userspace networking stack utilities."
 DESCRIPTION = "Packages to extend network stack"
 
 inherit packagegroup

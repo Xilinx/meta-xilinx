@@ -1,4 +1,7 @@
-DESCRIPTION = "Demo scripts to run common usecases involving VCU in ZynqMP"
+SUMMARY = "GStreamer demo scripts exercising the H.264/H.265 Video \
+Codec Unit (VCU) on Zynq UltraScale+ MPSoC EV devices."
+DESCRIPTION = "Demo scripts to run common usecases involving VCU in \
+ZynqMP"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=17e31b2e971eed6471a361c7dc4faa18"
 

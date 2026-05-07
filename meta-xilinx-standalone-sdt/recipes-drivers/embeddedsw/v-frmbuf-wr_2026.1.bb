@@ -1,3 +1,6 @@
+SUMMARY = "AMD Video Frame Buffer Write driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD Video Frame Buffer Write \
+IP block in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "v-frmbuf-wr"

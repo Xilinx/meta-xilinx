@@ -1,3 +1,6 @@
+SUMMARY = "Baremetal lwIP TCP performance client example application."
+DESCRIPTION = "AMD Xilinx baremetal sample application that drives the \
+iperf-style TCP performance client on top of the lwIP stack."
 inherit esw python3native esw_apps_common
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/lwip_tcp_perf_client/src/"

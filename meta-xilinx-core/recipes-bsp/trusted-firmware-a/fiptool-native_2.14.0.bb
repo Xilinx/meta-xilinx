@@ -4,6 +4,8 @@ DEFAULT_PREFERENCE = "-1"
 # It is a packaging format used by TF-A to package the
 # firmware images in a single binary.
 
+SUMMARY = "Native fiptool (TF-A v2.14.0) for packaging Firmware Image \
+Packages (FIPs)."
 DESCRIPTION = "fiptool - Trusted Firmware tool for packaging"
 LICENSE = "BSD-3-Clause"
 

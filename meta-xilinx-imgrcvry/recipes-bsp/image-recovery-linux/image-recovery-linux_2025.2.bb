@@ -1,4 +1,9 @@
-DESCRIPTION = "Image Recovery"
+SUMMARY = "AMD Xilinx image-recovery Linux helper kernel for \
+boot-image fall-back on supported boards."
+DESCRIPTION = "Slim Linux kernel image used by the AMD Xilinx \
+image-recovery boot path: when the primary boot partition is corrupt, \
+the boot ROM falls back to this image so the system can still come up \
+and re-flash a working primary image."
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"

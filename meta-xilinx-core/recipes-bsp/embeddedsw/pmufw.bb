@@ -1,3 +1,5 @@
+SUMMARY = "Deploys a pre-built AMD Zynq UltraScale+ MPSoC Platform \
+Management Unit (PMU) firmware ELF as virtual/pmu-firmware."
 DESCRIPTION = "PMU Firmware"
 
 LICENSE = "CLOSED"

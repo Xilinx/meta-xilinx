@@ -1,3 +1,7 @@
+SUMMARY = "AMD Xilinx Power Management library (xilpm)."
+DESCRIPTION = "Library from the AMD Xilinx embeddedsw stack that \
+exposes the PMU/PMC power-management API to baremetal firmware on Zynq \
+UltraScale+ MPSoC and Versal devices."
 inherit esw python3native
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilpm/src/"

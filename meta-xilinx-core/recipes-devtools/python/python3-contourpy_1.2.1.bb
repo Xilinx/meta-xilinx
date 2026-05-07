@@ -1,4 +1,8 @@
-SUMMARY = "Python library for calculating contours of 2D quadrilateral grids"
+SUMMARY = "Python library for calculating contours of 2D quadrilateral \
+grids"
+DESCRIPTION = "Pure-C++/Python library for calculating contours of 2D \
+quadrilateral grids; runtime dependency of matplotlib and of AMD's \
+Python-based plotting tools."
 HOMEPAGE = "https://github.com/contourpy/contourpy"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a051d5dfc6ccbc7bbe3e626d65156784"

@@ -1,3 +1,8 @@
+SUMMARY = "AMD Xilinx Standalone (no-OS) BSP library."
+DESCRIPTION = "Core 'standalone' (no-OS) Board Support Package library \
+from the AMD Xilinx Embedded Software (embeddedsw) tree, providing C \
+runtime, exception handling, basic I/O and platform initialisation for \
+baremetal firmware."
 inherit esw python3native
 
 ESW_COMPONENT_SRC = "/lib/bsp/standalone/src/"

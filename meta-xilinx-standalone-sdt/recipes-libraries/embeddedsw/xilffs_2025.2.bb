@@ -1,3 +1,7 @@
+SUMMARY = "AMD Xilinx FAT filesystem library (xilffs)."
+DESCRIPTION = "Wrapper around the FatFs FAT filesystem library, \
+integrated with the AMD Xilinx embeddedsw stack for use by baremetal \
+firmware."
 inherit esw
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilffs/src/"

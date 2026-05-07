@@ -1,3 +1,6 @@
+SUMMARY = "Packagegroup pulling in the AMD Xilinx out-of-box \
+multimedia stack (GStreamer, hardware-accelerated codecs, helper \
+apps)."
 DESCRIPTION = "Packages for out of box multimedia experience"
 
 # Can not be all arch due to libdrm

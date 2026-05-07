@@ -1,4 +1,7 @@
-SUMMARY = "U-Boot uEnv.txt SD boot environment generation for Zynq targets"
+SUMMARY = "U-Boot uEnv.txt SD boot environment generation for Zynq \
+targets"
+DESCRIPTION = "Generates the uEnv.txt environment file consumed by \
+U-Boot during SD-card boot on Zynq and Zynq UltraScale+ MPSoC targets."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 

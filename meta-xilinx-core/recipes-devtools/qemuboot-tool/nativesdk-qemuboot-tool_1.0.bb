@@ -1,4 +1,8 @@
-SUMMARY = "helper script to adjust and merge multiple qemuboot.conf files"
+SUMMARY = "helper script to adjust and merge multiple qemuboot.conf \
+files"
+DESCRIPTION = "SDK helper that merges and edits qemuboot.conf \
+fragments produced by Yocto so the resulting configuration matches the \
+SDK's installation paths."
 LICENSE = "MIT"
 RDEPENDS:${PN} = "nativesdk-python3-core"
 

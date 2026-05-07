@@ -1,3 +1,6 @@
+SUMMARY = "AMD Zynq PS I2C controller driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD Zynq / Zynq UltraScale+ \
+MPSoC PS-side I2C controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "iicps"

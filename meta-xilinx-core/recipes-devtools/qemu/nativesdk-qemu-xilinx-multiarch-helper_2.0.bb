@@ -1,4 +1,8 @@
-SUMMARY = "SDK Helper scripts for executing a multi-arch instance of AMD QEMU"
+SUMMARY = "SDK Helper scripts for executing a multi-arch instance of \
+AMD QEMU"
+DESCRIPTION = "SDK-side wrapper script that launches the heterogeneous \
+multi-arch instance of the AMD QEMU fork (APU/RPU/PMU/MicroBlaze) from \
+a single command line, for SDK users."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 

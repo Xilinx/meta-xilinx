@@ -1,3 +1,6 @@
+SUMMARY = "AMD AXI Performance Monitor driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD AXI Performance Monitor \
+(APM) IP block in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "axipmon"

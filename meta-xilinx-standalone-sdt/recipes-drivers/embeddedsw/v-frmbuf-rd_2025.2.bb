@@ -1,3 +1,6 @@
+SUMMARY = "AMD Video Frame Buffer Read driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD Video Frame Buffer Read IP \
+block in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "v-frmbuf-rd"
