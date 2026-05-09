@@ -4,7 +4,9 @@ DESCRIPTION = "Pre-built Cortex-R5 OpenAMP firmware demo payloads \
 (echo, matrix-multiply, rpc_demo) that the APU-side OpenAMP example \
 applications load onto the RPU on the AMD Versal AI Core VCK190 \
 evaluation kit."
-LICENSE = "CLOSED"
+
+LICENSE = "BSD-3-Clause"
+LIC_FILES_CHKSUM = "file://${WORKDIR}/versal-vck190-multidomain_packagegroup-openamp-fw-examples/LICENSE.md;md5=0b96a4c07d631aa5141bd3f058ba43b0"
 
 SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/05100702/external/packagegroup-openamp-fw-examples/versal-vck190-multidomain_packagegroup-openamp-fw-examples_05100702.tar.gz"
 SRC_URI[sha256sum] = "2382f1af8425a8e8aba76b8592fa37b1292bd3471ab2661782ca6cf1e57e0d18"

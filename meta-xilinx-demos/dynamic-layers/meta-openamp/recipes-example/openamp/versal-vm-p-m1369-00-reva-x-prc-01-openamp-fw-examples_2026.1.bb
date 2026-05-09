@@ -5,7 +5,9 @@ DESCRIPTION = "Pre-built Cortex-R5 OpenAMP firmware demo payloads \
 (echo, matrix-multiply, rpc_demo) that the APU-side OpenAMP example \
 applications load onto the RPU on the AMD Versal VM-P-M1369-00 Rev A \
 SOM mounted on the X-PRC-01 carrier."
-LICENSE = "CLOSED"
+
+LICENSE = "BSD-3-Clause"
+LIC_FILES_CHKSUM = "file://${WORKDIR}/versal-vm-p-m1369-00-reva-x-prc-01-reva-multidomain_packagegroup-openamp-fw-examples/LICENSE.md;md5=0b96a4c07d631aa5141bd3f058ba43b0"
 
 SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/05100702/external/packagegroup-openamp-fw-examples/versal-vm-p-m1369-00-reva-x-prc-01-reva-multidomain_packagegroup-openamp-fw-examples_05100702.tar.gz"
 SRC_URI[sha256sum] = "edf2904a32f7c6b69c15afae5a53c978e964d8d8cc09124fdee128fabc5bebeb"
