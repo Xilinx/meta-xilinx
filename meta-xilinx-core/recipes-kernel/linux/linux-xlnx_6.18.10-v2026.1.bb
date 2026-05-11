@@ -8,6 +8,11 @@ KCONF_AUDIT_LEVEL="0"
 
 include linux-xlnx.inc
 
+# CVE exclusions
+include recipes-kernel/linux/cve-exclusion-linux-xlnx.inc
+include recipes-kernel/linux/cve-exclusion-linux-xlnx_${LINUX_VERSION}.inc
+
 PV .= "+v2026.1"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
