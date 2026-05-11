@@ -6,7 +6,7 @@ applications load onto the RPU on the AMD Versal Prime VMK180 \
 evaluation kit."
 LICENSE = "CLOSED"
 
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/05080630/external/packagegroup-openamp-fw-examples/versal-vmk180-multidomain_packagegroup-openamp-fw-examples_05080630.tar.gz"
-SRC_URI[sha256sum] = "c1178fcb020e989563a0e4f1efbbd38f9ab8054b81852a9ba8a365aa1f0395ac"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/05100702/external/packagegroup-openamp-fw-examples/versal-vmk180-multidomain_packagegroup-openamp-fw-examples_05100702.tar.gz"
+SRC_URI[sha256sum] = "b4c0346810eb7ed9fd5d10d78c300716e667d246082e0c8b608d1977575307a7"
 
 require conf/includes/openamp-fw-example.inc

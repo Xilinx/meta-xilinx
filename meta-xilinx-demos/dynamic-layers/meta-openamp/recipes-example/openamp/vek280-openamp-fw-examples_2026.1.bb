@@ -6,7 +6,7 @@ applications load onto the RPU on the AMD Versal AI Edge VEK280 \
 evaluation kit."
 LICENSE = "CLOSED"
 
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/05080630/external/packagegroup-openamp-fw-examples/versal-vek280-multidomain_packagegroup-openamp-fw-examples_05080630.tar.gz"
-SRC_URI[sha256sum] = "1f2ec8ebac79b026a84bca7ae38a237b8d45b30400667e33588934287fe6f950"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/05100702/external/packagegroup-openamp-fw-examples/versal-vek280-multidomain_packagegroup-openamp-fw-examples_05100702.tar.gz"
+SRC_URI[sha256sum] = "f1876664987c430ecdb6178956d9638cbbf283e8e3f606568ca888256101ad33"
 
 require conf/includes/openamp-fw-example.inc

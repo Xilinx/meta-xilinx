@@ -7,8 +7,8 @@ applications load onto the RPU on the AMD Versal VM-P-M1369-00 Rev A \
 SOM mounted on the X-PRC-01 carrier."
 LICENSE = "CLOSED"
 
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/05080630/external/packagegroup-openamp-fw-examples/versal-vm-p-m1369-00-reva-x-prc-01-reva-multidomain_packagegroup-openamp-fw-examples_05080630.tar.gz"
-SRC_URI[sha256sum] = "bea7fa8292f6fe974eed070357115f6a41dad56c16ee5826ee48b34df311037a"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/05100702/external/packagegroup-openamp-fw-examples/versal-vm-p-m1369-00-reva-x-prc-01-reva-multidomain_packagegroup-openamp-fw-examples_05100702.tar.gz"
+SRC_URI[sha256sum] = "edf2904a32f7c6b69c15afae5a53c978e964d8d8cc09124fdee128fabc5bebeb"
 
 require conf/includes/openamp-fw-example.inc
 OPENAMPFW_BOARD = "versal-vm-p-m1369-00-reva-x-prc-01"

@@ -6,7 +6,7 @@ applications load onto the RPU on the AMD Versal AI Core VCK190 \
 evaluation kit."
 LICENSE = "CLOSED"
 
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/05080630/external/packagegroup-openamp-fw-examples/versal-vck190-multidomain_packagegroup-openamp-fw-examples_05080630.tar.gz"
-SRC_URI[sha256sum] = "57557220ceeb01bc2b688ad0551a6c7311981d729478e2599677d0cd8cf0d67e"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/05100702/external/packagegroup-openamp-fw-examples/versal-vck190-multidomain_packagegroup-openamp-fw-examples_05100702.tar.gz"
+SRC_URI[sha256sum] = "2382f1af8425a8e8aba76b8592fa37b1292bd3471ab2661782ca6cf1e57e0d18"
 
 require conf/includes/openamp-fw-example.inc
