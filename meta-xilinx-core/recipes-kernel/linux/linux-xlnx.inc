@@ -116,6 +116,8 @@ KERNEL_FEATURES:append:aarch64 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'kvm', ' features/kvm/qemu-kvm-enable.scc', '', d)} \
     "
 
+KERNEL_MODULE_AUTOLOAD += "${@bb.utils.contains('DISTRO_FEATURES', 'kvm', 'vhost', '', d)}"
+
 SRC_URI:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'file://extra-configs.cfg', '', d)}"
 
 # To enable lttng, we need kprobes
