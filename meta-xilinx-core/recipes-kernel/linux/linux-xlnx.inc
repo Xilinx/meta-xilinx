@@ -113,6 +113,7 @@ KERNEL_FEATURES:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualizati
 
 KERNEL_FEATURES:append:aarch64 = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'kvm', ' features/kvm/qemu-kvm-enable.scc', '', d)} \
     "
 
 SRC_URI:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'file://extra-configs.cfg', '', d)}"
