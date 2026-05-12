@@ -36,3 +36,11 @@ domains:
           secure: true
           el: 0x3
     os,type: baremetal
+
+  PMC_MB:
+    compatible: openamp,domain-v1
+    cpus:
+      - cluster: cpus_microblaze_0
+        cpumask: 0x1
+        mode:
+          secure: false
