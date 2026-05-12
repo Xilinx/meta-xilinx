@@ -94,15 +94,26 @@ KBUILD_DEFCONFIG_DEFAULT:versal-2ve-2vm ?= "xilinx_defconfig"
 
 KBUILD_DEFCONFIG ?= "${KBUILD_DEFCONFIG_DEFAULT}"
 
-KERNEL_FEATURES:append:zynqmp = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)}"
-
 KERNEL_FEATURES:append:zynqmp = "${@' features/xilinx/overlay_of/overlay_of.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
 
-KERNEL_FEATURES:append:versal = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} features/xilinx/hdmi-module/hdmi-module.scc features/xilinx/hdmi-module/hdmi-module-fix.scc"
-KERNEL_FEATURES:append:versal-net = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} features/xilinx/hdmi-module/hdmi-module.scc features/xilinx/hdmi-module/hdmi-module-fix.scc"
-KERNEL_FEATURES:append:versal-2ve-2vm = "${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} features/xilinx/hdmi-module/hdmi-module.scc features/xilinx/hdmi-module/hdmi-module-fix.scc"
+KERNEL_FEATURES:append:versal = " \
+    features/xilinx/hdmi-module/hdmi-module.scc \
+    features/xilinx/hdmi-module/hdmi-module-fix.scc \
+    "
+KERNEL_FEATURES:append:versal-net = " \
+    features/xilinx/hdmi-module/hdmi-module.scc \
+    features/xilinx/hdmi-module/hdmi-module-fix.scc \
+    "
+KERNEL_FEATURES:append:versal-2ve-2vm = " \
+    features/xilinx/hdmi-module/hdmi-module.scc \
+    features/xilinx/hdmi-module/hdmi-module-fix.scc \
+    "
 
 KERNEL_FEATURES:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' features/ocicontainer/ocicontainer.scc', '', d)}"
+
+KERNEL_FEATURES:append:aarch64 = " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'xen', ' features/xen/xen.scc', '', d)} \
+    "
 
 SRC_URI:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'file://extra-configs.cfg', '', d)}"
 
