@@ -10,3 +10,5 @@ SRC_URI = " \
     ${XEN_URI};branch=${XEN_BRANCH} \
     file://0001-python-pygrub-pass-DISTUTILS-xen-4.19.patch \
     "
+
+include cve-exclusion-4.21.inc
