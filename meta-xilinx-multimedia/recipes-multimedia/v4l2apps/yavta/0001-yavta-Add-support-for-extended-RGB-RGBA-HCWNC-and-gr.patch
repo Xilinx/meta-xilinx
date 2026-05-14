@@ -1,0 +1,149 @@
+From ed3351834dbe5d3599c296d5ed44576364b144e7 Mon Sep 17 00:00:00 2001
+From: Mounik Katikala <mounik.katikala@amd.com>
+Date: Wed, 13 May 2026 12:09:15 +0530
+Subject: [PATCH] yavta: Add support for extended RGB/RGBA, HCWNC, and grey
+ formats
+
+Add support for BF16/FP16/FP32 RGB and RGBA packed and planar layouts
+(including 4x3-tiled planar), HCWNC4/HCWNC8 NPU block formats, and
+GREY_BF16 / GREY_FP16 / GREY_FP32 in bundled videodev2.h and
+pixel_formats[].
+
+Upstream-Status: Pending
+
+Signed-off-by: Mounik Katikala <mounik.katikala@amd.com>
+---
+ include/linux/videodev2.h | 53 +++++++++++++++++++++++++++++++++++++++
+ yavta.c                   | 45 +++++++++++++++++++++++++++++++++
+ 2 files changed, 98 insertions(+)
+
+diff --git a/include/linux/videodev2.h b/include/linux/videodev2.h
+index 1230ac0..0cf46c0 100644
+--- a/include/linux/videodev2.h
++++ b/include/linux/videodev2.h
+@@ -518,6 +518,56 @@ struct v4l2_pix_format {
+ #define V4L2_PIX_FMT_ARGB32  v4l2_fourcc('B', 'A', '2', '4') /* 32  ARGB-8-8-8-8  */
+ #define V4L2_PIX_FMT_XRGB32  v4l2_fourcc('B', 'X', '2', '4') /* 32  XRGB-8-8-8-8  */
+
++/* RGB formats (6 or 8 bytes per pixel) */
++#define V4L2_PIX_FMT_RGB_BF48  v4l2_fourcc('B', 'B', '4', '8') /* 48  RGB-BF-16-16-16 */
++#define V4L2_PIX_FMT_RGB_FP48  v4l2_fourcc('B', 'F', '4', '8') /* 48  RGB-FP-16-16-16 */
++#define V4L2_PIX_FMT_RGB_FP323232  v4l2_fourcc('B', 'R', '9', '6') /* 96  RGB-32-32-32 */
++#define V4L2_PIX_FMT_RGBA_BF64  v4l2_fourcc('B', 'B', '6', '4') /* 64  RGBA-BF-16-16-16-16 */
++#define V4L2_PIX_FMT_RGBA_FP64  v4l2_fourcc('B', 'F', '6', '4') /* 64  RGBA-FP-16-16-16-16 */
++#define V4L2_PIX_FMT_RGBA_FP32323232  v4l2_fourcc('B', 'A', '3', '2') /* 128 RGBA-FP-32-32-32-32 */
++#define V4L2_PIX_FMT_RGB24P  v4l2_fourcc('B', 'R', 'M', '3') /* 24  RGB-8-8-8 plr */
++#define V4L2_PIX_FMT_RGB_BF48P  v4l2_fourcc('B', 'B', '4', 'M') /* 48  RGB-BF-16-16-16 plr */
++#define V4L2_PIX_FMT_RGB_FP48P  v4l2_fourcc('B', 'F', '4', 'M') /* 48  RGB-FP-16-16-16 plr */
++#define V4L2_PIX_FMT_RGB_FP323232P  v4l2_fourcc('B', '9', '6', 'M') /* 96  RGB-FP-32-32-32 plr */
++#define V4L2_PIX_FMT_RGBA32P  v4l2_fourcc('B', 'A', '8', 'M') /* 32  RGBA-8-8-8-8 plr */
++#define V4L2_PIX_FMT_RGBA_BF64P  v4l2_fourcc('B', 'B', '6', 'M') /* 64  RGBA-BF-16-16-16-16 plr */
++#define V4L2_PIX_FMT_RGBA_FP64P  v4l2_fourcc('B', 'F', '6', 'M') /* 64  RGBA-FP-16-16-16-16 plr */
++#define V4L2_PIX_FMT_RGBA_FP32323232P  v4l2_fourcc('B', '3', '2', 'M') /* 128  RGBA-FP-32-32-32-32 plr */
++#define V4L2_PIX_FMT_RGB24P_4_3  v4l2_fourcc('B', '3', '4', '3') /* 24  RGB-8-8-8 plr 4x3 */
++#define V4L2_PIX_FMT_RGB_BF48P_4_3  v4l2_fourcc('B', '4', '4', '3') /* 48  RGB-BF-16-16-16 plr 4x3 */
++#define V4L2_PIX_FMT_RGB_FP48P_4_3  v4l2_fourcc('B', '5', '4', '3') /* 48  RGB-FP-16-16-16 plr 4x3 */
++#define V4L2_PIX_FMT_RGB_FP323232P_4_3  v4l2_fourcc('B', '6', '4', '3') /* 96  RGB-FP-32-32-32 plr 4x3 */
++
++/*
++ * HCWNC packed formats (NPU channel-blocked memory layouts).
++ * HCWNC4 / HCWNC8 expand to Height-Channel-Width-Batch-Channel4 and
++ * Height-Channel-Width-Batch-Channel8;
++ */
++#define V4L2_PIX_FMT_HCWNC4_8_4_4		v4l2_fourcc('H', 'C', '4', '8')  /* 32  HCWNC4 u8 4x4 */
++#define V4L2_PIX_FMT_HCWNC4_BF16_4_4		v4l2_fourcc('H', 'B', '4', '6')  /* 64  HCWNC4 BF16 4x4 */
++#define V4L2_PIX_FMT_HCWNC4_FP16_4_4		v4l2_fourcc('H', 'F', '4', '6')  /* 64  HCWNC4 FP16 4x4 */
++#define V4L2_PIX_FMT_HCWNC4_FP32_4_4		v4l2_fourcc('H', '4', '3', '2')  /* 128 HCWNC4 FP32 4x4 */
++#define V4L2_PIX_FMT_HCWNC8_8_4_4		v4l2_fourcc('H', 'C', '8', '8')  /* 64  HCWNC8 u8 4x4 */
++#define V4L2_PIX_FMT_HCWNC8_BF16_4_4		v4l2_fourcc('H', 'B', '8', '6')  /* 128 HCWNC8 BF16 4x4 */
++#define V4L2_PIX_FMT_HCWNC8_FP16_4_4		v4l2_fourcc('H', 'F', '8', '6')  /* 128 HCWNC8 FP16 4x4 */
++#define V4L2_PIX_FMT_HCWNC8_FP32_4_4		v4l2_fourcc('H', '8', '3', '2')  /* 256 HCWNC8 FP32 4x4 */
++#define V4L2_PIX_FMT_HCWNC4_8_4_3		v4l2_fourcc('H', 'C', '4', '3')  /* 32  HCWNC4 u8 4x3 */
++#define V4L2_PIX_FMT_HCWNC4_BF16_4_3		v4l2_fourcc('H', 'B', '4', '3')  /* 64  HCWNC4 BF16 4x3 */
++#define V4L2_PIX_FMT_HCWNC4_FP16_4_3		v4l2_fourcc('H', 'F', '4', '3')  /* 64  HCWNC4 FP16 4x3 */
++#define V4L2_PIX_FMT_HCWNC4_FP32_4_3		v4l2_fourcc('H', '4', '3', '3')  /* 128 HCWNC4 FP32 4x3 */
++#define V4L2_PIX_FMT_HCWNC8_8_4_3		v4l2_fourcc('H', 'C', '8', '3')  /* 64  HCWNC8 u8 4x3 */
++#define V4L2_PIX_FMT_HCWNC8_BF16_4_3		v4l2_fourcc('H', 'B', '8', '3')  /* 128 HCWNC8 BF16 4x3 */
++#define V4L2_PIX_FMT_HCWNC8_FP16_4_3		v4l2_fourcc('H', 'F', '8', '3')  /* 128 HCWNC8 FP16 4x3 */
++#define V4L2_PIX_FMT_HCWNC8_FP32_4_3		v4l2_fourcc('H', '8', '3', '3')  /* 256 HCWNC8 FP32 4x3 */
++#define V4L2_PIX_FMT_HCWNC4_8_3_3		v4l2_fourcc('H', 'C', '4', '4')  /* 32  HCWNC4 u8 3x3 */
++#define V4L2_PIX_FMT_HCWNC4_BF16_3_3		v4l2_fourcc('H', 'B', '4', '4')  /* 64  HCWNC4 BF16 3x3 */
++#define V4L2_PIX_FMT_HCWNC4_FP16_3_3		v4l2_fourcc('H', 'F', '4', '4')  /* 64  HCWNC4 FP16 3x3 */
++#define V4L2_PIX_FMT_HCWNC4_FP32_3_3		v4l2_fourcc('H', '4', '3', '4')  /* 128 HCWNC4 FP32 3x3 */
++#define V4L2_PIX_FMT_HCWNC8_8_3_3		v4l2_fourcc('H', 'C', '8', '4')  /* 64  HCWNC8 u8 3x3 */
++#define V4L2_PIX_FMT_HCWNC8_BF16_3_3		v4l2_fourcc('H', 'B', '8', '4')  /* 128 HCWNC8 BF16 3x3 */
++#define V4L2_PIX_FMT_HCWNC8_FP16_3_3		v4l2_fourcc('H', 'F', '8', '4')  /* 128 HCWNC8 FP16 3x3 */
++#define V4L2_PIX_FMT_HCWNC8_FP32_3_3		v4l2_fourcc('H', '8', '3', '4')  /* 256 HCWNC8 FP32 3x3 */
++
+ /* Grey formats */
+ #define V4L2_PIX_FMT_GREY    v4l2_fourcc('G', 'R', 'E', 'Y') /*  8  Greyscale     */
+ #define V4L2_PIX_FMT_Y4      v4l2_fourcc('Y', '0', '4', ' ') /*  4  Greyscale     */
+@@ -526,6 +576,9 @@ struct v4l2_pix_format {
+ #define V4L2_PIX_FMT_Y12     v4l2_fourcc('Y', '1', '2', ' ') /* 12  Greyscale     */
+ #define V4L2_PIX_FMT_Y16     v4l2_fourcc('Y', '1', '6', ' ') /* 16  Greyscale     */
+ #define V4L2_PIX_FMT_Y16_BE  v4l2_fourcc_be('Y', '1', '6', ' ') /* 16  Greyscale BE  */
++#define V4L2_PIX_FMT_GREY_BF16     v4l2_fourcc('Y', 'B', '1', '6') /* 16 BF16 Greyscale     */
++#define V4L2_PIX_FMT_GREY_FP16     v4l2_fourcc('Y', 'F', '1', '6') /* 16 FP16 Greyscale     */
++#define V4L2_PIX_FMT_GREY_FP32     v4l2_fourcc('Y', 'F', '3', '2') /* 32 FP32 Greyscale     */
+
+ /* Grey bit-packed formats */
+ #define V4L2_PIX_FMT_Y10BPACK    v4l2_fourcc('Y', '1', '0', 'B') /* 10  Greyscale bit-packed */
+diff --git a/yavta.c b/yavta.c
+index 579d9b9..8fc8d33 100644
+--- a/yavta.c
++++ b/yavta.c
+@@ -356,6 +356,51 @@ static struct v4l2_format_info {
+ 	{ "DV", V4L2_PIX_FMT_DV, 1 },
+ 	{ "MJPEG", V4L2_PIX_FMT_MJPEG, 1 },
+ 	{ "MPEG", V4L2_PIX_FMT_MPEG, 1 },
++	{ "RGB_BF48", V4L2_PIX_FMT_RGB_BF48, 1},
++	{ "RGB_FP48", V4L2_PIX_FMT_RGB_FP48, 1},
++	{ "RGB_FP323232", V4L2_PIX_FMT_RGB_FP323232, 1},
++	{ "RGBA_BF64", V4L2_PIX_FMT_RGBA_BF64, 1},
++	{ "RGBA_FP64", V4L2_PIX_FMT_RGBA_FP64, 1},
++	{ "RGBA_FP32323232", V4L2_PIX_FMT_RGBA_FP32323232, 1},
++	{ "RGB24P", V4L2_PIX_FMT_RGB24P, 1},
++	{ "RGB_BF48P", V4L2_PIX_FMT_RGB_BF48P, 1},
++	{ "RGB_FP48P", V4L2_PIX_FMT_RGB_FP48P, 1},
++	{ "RGB_FP323232P", V4L2_PIX_FMT_RGB_FP323232P, 1},
++	{ "RGBA32P", V4L2_PIX_FMT_RGBA32P, 1},
++	{ "RGBA_BF64P", V4L2_PIX_FMT_RGBA_BF64P, 1},
++	{ "RGBA_FP64P", V4L2_PIX_FMT_RGBA_FP64P, 1},
++	{ "RGBA_FP32323232P", V4L2_PIX_FMT_RGBA_FP32323232P, 1},
++	{ "RGB24P_4_3", V4L2_PIX_FMT_RGB24P_4_3, 1},
++	{ "RGB_BF48P_4_3", V4L2_PIX_FMT_RGB_BF48P_4_3, 1},
++	{ "RGB_FP48P_4_3", V4L2_PIX_FMT_RGB_FP48P_4_3, 1},
++	{ "RGB_FP323232P_4_3", V4L2_PIX_FMT_RGB_FP323232P_4_3, 1},
++	{ "HCWNC4_8_4_4", V4L2_PIX_FMT_HCWNC4_8_4_4, 1},
++	{ "HCWNC4_BF16_4_4", V4L2_PIX_FMT_HCWNC4_BF16_4_4, 1},
++	{ "HCWNC4_FP16_4_4", V4L2_PIX_FMT_HCWNC4_FP16_4_4, 1},
++	{ "HCWNC4_FP32_4_4", V4L2_PIX_FMT_HCWNC4_FP32_4_4, 1},
++	{ "HCWNC8_8_4_4", V4L2_PIX_FMT_HCWNC8_8_4_4, 1},
++	{ "HCWNC8_BF16_4_4", V4L2_PIX_FMT_HCWNC8_BF16_4_4, 1},
++	{ "HCWNC8_FP16_4_4", V4L2_PIX_FMT_HCWNC8_FP16_4_4, 1},
++	{ "HCWNC8_FP32_4_4", V4L2_PIX_FMT_HCWNC8_FP32_4_4, 1},
++	{ "HCWNC4_8_4_3", V4L2_PIX_FMT_HCWNC4_8_4_3, 1},
++	{ "HCWNC4_BF16_4_3", V4L2_PIX_FMT_HCWNC4_BF16_4_3, 1},
++	{ "HCWNC4_FP16_4_3", V4L2_PIX_FMT_HCWNC4_FP16_4_3, 1},
++	{ "HCWNC4_FP32_4_3", V4L2_PIX_FMT_HCWNC4_FP32_4_3, 1},
++	{ "HCWNC8_8_4_3", V4L2_PIX_FMT_HCWNC8_8_4_3, 1},
++	{ "HCWNC8_BF16_4_3", V4L2_PIX_FMT_HCWNC8_BF16_4_3, 1},
++	{ "HCWNC8_FP16_4_3", V4L2_PIX_FMT_HCWNC8_FP16_4_3, 1},
++	{ "HCWNC8_FP32_4_3", V4L2_PIX_FMT_HCWNC8_FP32_4_3, 1},
++	{ "HCWNC4_8_3_3", V4L2_PIX_FMT_HCWNC4_8_3_3, 1},
++	{ "HCWNC4_BF16_3_3", V4L2_PIX_FMT_HCWNC4_BF16_3_3, 1},
++	{ "HCWNC4_FP16_3_3", V4L2_PIX_FMT_HCWNC4_FP16_3_3, 1},
++	{ "HCWNC4_FP32_3_3", V4L2_PIX_FMT_HCWNC4_FP32_3_3, 1},
++	{ "HCWNC8_8_3_3", V4L2_PIX_FMT_HCWNC8_8_3_3, 1},
++	{ "HCWNC8_BF16_3_3", V4L2_PIX_FMT_HCWNC8_BF16_3_3, 1},
++	{ "HCWNC8_FP16_3_3", V4L2_PIX_FMT_HCWNC8_FP16_3_3, 1},
++	{ "HCWNC8_FP32_3_3", V4L2_PIX_FMT_HCWNC8_FP32_3_3, 1},
++	{ "GREY_BF16", V4L2_PIX_FMT_GREY_BF16, 1},
++	{ "GREY_FP16", V4L2_PIX_FMT_GREY_FP16, 1},
++	{ "GREY_FP32", V4L2_PIX_FMT_GREY_FP32, 1},
+ };
+
+ static void list_formats(void)
+--
+2.43.0
+
