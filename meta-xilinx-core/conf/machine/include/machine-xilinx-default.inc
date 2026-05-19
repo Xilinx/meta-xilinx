@@ -3,7 +3,7 @@ INHERIT += "xilinx-deprecated"
 
 # Default Xilinx BSP Machine settings
 
-MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc"
+MACHINE_FEATURES_OPTED_OUT += "rtc"
 
 # File System Configuration
 IMAGE_FSTYPES ?= "tar.gz cpio cpio.gz cpio.gz.u-boot"

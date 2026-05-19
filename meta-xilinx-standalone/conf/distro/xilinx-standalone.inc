@@ -49,7 +49,7 @@ INHERIT += "uninative"
 BB_SIGNATURE_HANDLER ?= "OEEquivHash"
 BB_HASHSERVE ??= "auto"
 
-MACHINE_FEATURES_BACKFILL_CONSIDERED += "rtc qemu-usermode"
+MACHINE_FEATURES_OPTED_OUT += "rtc qemu-usermode"
 
 # Prevent warnings about 'buildpaths'
 # After investigation it appears a debuginfo directory path to the build
