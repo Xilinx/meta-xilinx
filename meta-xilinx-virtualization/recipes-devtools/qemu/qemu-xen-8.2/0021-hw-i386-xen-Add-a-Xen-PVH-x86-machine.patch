@@ -1,7 +1,7 @@
 From cf2aed8ec5e4f861cb192f59c8995e89cb5ac1f1 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Thu, 8 Aug 2024 17:52:21 +0200
-Subject: [PATCH 21/40] hw/i386/xen: Add a Xen PVH x86 machine
+Subject: [PATCH 21/41] hw/i386/xen: Add a Xen PVH x86 machine
 
 Add a Xen PVH x86 machine based on the abstract PVH Machine.
 

@@ -1,7 +1,7 @@
 From 686ffed329138ab789127dfeee4fda24bc461b48 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Tue, 26 Aug 2025 20:06:37 +0200
-Subject: [PATCH 30/40] virtio: Add the virtio-msg transport
+Subject: [PATCH 30/41] virtio: Add the virtio-msg transport
 
 Add the new virtio-msg transport together with a framework
 for virtio-msg buses.

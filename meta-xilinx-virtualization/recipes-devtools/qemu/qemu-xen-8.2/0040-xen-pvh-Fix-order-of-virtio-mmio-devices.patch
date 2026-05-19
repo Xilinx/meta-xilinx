@@ -1,7 +1,7 @@
 From 32f04a03b130cd1d6947f70aa13b168b2a7c0672 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Mon, 30 Mar 2026 18:32:49 +0200
-Subject: [PATCH 40/40] xen: pvh: Fix order of virtio-mmio devices
+Subject: [PATCH 40/41] xen: pvh: Fix order of virtio-mmio devices
 
 Fix the order of virtio-mmio devices to bring back
 the command-line ordering from before virtio-msg

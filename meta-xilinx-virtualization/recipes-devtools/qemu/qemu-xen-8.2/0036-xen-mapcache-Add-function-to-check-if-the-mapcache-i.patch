@@ -1,7 +1,7 @@
 From 0ee9c60e0ff1d8df1e99631ba289d4fd4f179025 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Wed, 23 Jul 2025 11:41:26 +0200
-Subject: [PATCH 36/40] xen: mapcache: Add function to check if the mapcache is
+Subject: [PATCH 36/41] xen: mapcache: Add function to check if the mapcache is
  enabled
 
 Add function to check if the mapcache is enabled.

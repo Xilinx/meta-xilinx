@@ -1,7 +1,7 @@
 From 7b0b46cfe3f4c7121ea0040b8fd84c5c75569d9a Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Tue, 26 Aug 2025 16:06:18 +0200
-Subject: [PATCH 29/40] virtio: Add virtio_queue_get_rings
+Subject: [PATCH 29/41] virtio: Add virtio_queue_get_rings
 
 Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
 
