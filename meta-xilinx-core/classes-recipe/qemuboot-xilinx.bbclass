@@ -3,7 +3,7 @@
 OVERRIDES .= ":qemuboot-xilinx"
 
 # Default machine targets for Xilinx QEMU (FDT Generic)
-QB_RNG=""
+QB_RNG = ""
 
 DEFAULT_QB_SYSTEM_NAME = "qemu-system-amd-fpga-multiarch"
 DEFAULT_QB_SYSTEM_NAME:microblaze = "qemu-system-microblazeel"

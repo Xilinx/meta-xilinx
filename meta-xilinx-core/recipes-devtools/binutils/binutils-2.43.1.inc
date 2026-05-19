@@ -1,7 +1,7 @@
 # This backport version should only be used when explicitly enabled
 DEFAULT_PREFERENCE = "-1"
 
-LIC_FILES_CHKSUM="\
+LIC_FILES_CHKSUM = "\
     file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552\
     file://COPYING.LIB;md5=9f604d8a4f8e74f4f5140845a21b6674\
     file://COPYING3;md5=d32239bcb673463ab874e80d47fae504\

@@ -34,9 +34,9 @@ inherit update-rc.d systemd
 INITSCRIPT_NAME = "jupyter-setup.sh"
 INITSCRIPT_PARAMS = "start 99 3 5 . stop 20 0 1 2 6 ."
 
-SYSTEMD_PACKAGES="${PN}"
-SYSTEMD_SERVICE:${PN}="jupyter-setup.service"
-SYSTEMD_AUTO_ENABLE:${PN}="disable"
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE:${PN} = "jupyter-setup.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
 S = "${WORKDIR}"
 

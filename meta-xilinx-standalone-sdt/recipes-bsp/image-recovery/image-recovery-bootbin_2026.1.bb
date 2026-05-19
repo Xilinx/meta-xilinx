@@ -20,7 +20,7 @@ FSBL_IMAGE_NAME ??= "fsbl-${MACHINE}"
 IMGRCVRY_IMAGE_NAME ??= "image-recovery-${MACHINE}"
 IMGRCVRY_WEBIMG_NAME ??= "image-recovery-web-${MACHINE}"
 
-IMGRCRY_BIF_MC_TARGET ?=""
+IMGRCRY_BIF_MC_TARGET ?= ""
 IMGRCRY_BIF_MC_TARGET:zynqmp ?= "${MACHINE}-cortexa53-0-baremetal"
 IMGRCVRY_BIF_DEPENDS ?= "virtual/fsbl:do_deploy image-recovery-web:do_deploy"
 IMGRCVRY_BIF_MCDEPENDS ?= "mc::${IMGRCRY_BIF_MC_TARGET}:image-recovery:do_deploy"

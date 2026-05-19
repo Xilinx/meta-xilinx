@@ -6,7 +6,7 @@ the host-side libmetal-demo-host application."
 require ${LAYER_PATH_openamp-layer}/recipes-openamp/rpmsg-examples/rpmsg-example.inc
 REPO = "git://github.com/Xilinx/openamp-system-reference.git;protocol=https"
 SRCREV = "fab6139f6dd306383a4d4b666667993b91ac2bd9"
-BRANCH="2026"
+BRANCH = "2026"
 
 inherit ccmake cmake python3-dir deploy
 

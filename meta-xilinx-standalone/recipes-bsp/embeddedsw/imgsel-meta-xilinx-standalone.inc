@@ -1,7 +1,7 @@
 # Default imgsel configuration, using fsbl multiconfig
 IMGSEL_DEPENDS ?= ""
 
-IMGSEL_MC_TARGET ?=""
+IMGSEL_MC_TARGET ?= ""
 IMGSEL_MC_TARGET:zynqmp ?= "${MACHINE}-cortexa53-fsbl"
 IMGSEL_MC_TARGET:versal ?= "${MACHINE}-microblaze-pmc"
 IMGSEL_MC_TARGET:versal-2ve-2vm ?= "${MACHINE}-microblaze-pmc"

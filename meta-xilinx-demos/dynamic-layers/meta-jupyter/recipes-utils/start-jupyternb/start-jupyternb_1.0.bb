@@ -26,9 +26,9 @@ RDEPENDS:${PN} = " ${JUPYTER_STARTUP_PACKAGES}"
 INITSCRIPT_NAME = "jupyter-setup.sh"
 INITSCRIPT_PARAMS = "start 99 S ."
 
-SYSTEMD_PACKAGES="${PN}"
-SYSTEMD_SERVICE:${PN}="jupyter-setup.service"
-SYSTEMD_AUTO_ENABLE:${PN}="disable"
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE:${PN} = "jupyter-setup.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
 S = "${WORKDIR}"
 

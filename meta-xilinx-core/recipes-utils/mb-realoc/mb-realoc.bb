@@ -18,9 +18,9 @@ ELF_INFILE ?= "${DEPLOY_DIR_IMAGE}/u-boot.elf"
 OUTFILE_NAME ?= "u-boot-s"
 B = "${UNPACKDIR}"
 
-PARALLEL_MAKE=""
+PARALLEL_MAKE = ""
 
-do_configure[noexec]="1"
+do_configure[noexec] = "1"
 do_compile[depends] = "virtual/bootloader:do_deploy"
 
 do_compile() {

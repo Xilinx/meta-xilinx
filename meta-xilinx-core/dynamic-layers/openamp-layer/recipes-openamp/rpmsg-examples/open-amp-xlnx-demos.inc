@@ -44,7 +44,7 @@ OPENAMP_CMAKE_SOC:zynqmp = "ZYNQMP"
 OPENAMP_CMAKE_SOC:versal = "VERSAL"
 OPENAMP_CMAKE_SOC:versal-net = "VERSAL_NET"
 
-LINKER_METADATA_FILE="OpenAMP_Lopper_Linker_Cfg.cmake"
+LINKER_METADATA_FILE = "OpenAMP_Lopper_Linker_Cfg.cmake"
 
 TOOLCHAIN_FILE_MACHINE:armv7r = "zynqmp_r5"
 TOOLCHAIN_FILE_MACHINE:armv8r = "zynqmp_r5"

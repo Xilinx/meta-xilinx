@@ -9,8 +9,8 @@ inherit esw deploy
 ESW_COMPONENT_SRC = "/lib/sw_services/xilnvm/examples/"
 
 PACKAGECONFIG ??= "client server"
-PACKAGECONFIG[client]  ="-DXILNVM_mode="client",,"
-PACKAGECONFIG[server]  ="-DXILNVM_mode="server",,"
+PACKAGECONFIG[client] = "-DXILNVM_mode="client",,"
+PACKAGECONFIG[server] = "-DXILNVM_mode="server",,"
 
 DEPENDS += "xilnvm"
 

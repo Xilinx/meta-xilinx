@@ -34,9 +34,9 @@ EXTRA_OECMAKE += " \
 INITSCRIPT_NAME = "dfx-mgr.sh"
 INITSCRIPT_PARAMS = "start 99 S ."
 
-SYSTEMD_PACKAGES="${PN}"
-SYSTEMD_SERVICE:${PN}="dfx-mgr.service dfx-mgr-fw-load.service"
-SYSTEMD_AUTO_ENABLE:${PN}="enable"
+SYSTEMD_PACKAGES = "${PN}"
+SYSTEMD_SERVICE:${PN} = "dfx-mgr.service dfx-mgr-fw-load.service"
+SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 
 do_install(){

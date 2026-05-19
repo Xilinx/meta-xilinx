@@ -8,8 +8,8 @@ ESW_COMPONENT_SRC = "/lib/sw_services/xilnvm/src/"
 ESW_COMPONENT_NAME = "libxilnvm.a"
 
 PACKAGECONFIG ??= "client server"
-PACKAGECONFIG[client]  ="-DXILNVM_mode="client",,"
-PACKAGECONFIG[server]  ="-DXILNVM_mode="server",,"
+PACKAGECONFIG[client] = "-DXILNVM_mode="client",,"
+PACKAGECONFIG[server] = "-DXILNVM_mode="server",,"
 
 DEPENDS += "\
     libxil \
