@@ -6,7 +6,6 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=eb723b61539feef013de476e68b5c50a"
 
 PV = "6.18.0+git"
 
-S = "${WORKDIR}/git"
 
 REPO   = "git://github.com/Xilinx/dp-modules.git;protocol=https"
 BRANCH = "master"

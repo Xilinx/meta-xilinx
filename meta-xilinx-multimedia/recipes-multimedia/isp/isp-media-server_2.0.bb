@@ -4,7 +4,7 @@ LICENSE = "CLOSED"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=fb857fc9e8eed46509f2cce8648a05c1"
 COMPATIBLE_HOST = ".*-linux"
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 SRC_URI = "https://edf.amd.com/sswreleases/isp-media-server/2026.1/05062026/isp-media-server_05062026.tar.gz"
 SRC_URI[sha256sum] = "1fdb9aae5dd0bde27c3b7bb09b7ca7afc5be071a6d0e177b6fe307169d092154"

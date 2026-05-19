@@ -14,7 +14,6 @@ SRC_URI = " \
 
 SRCREV = "aebe8142233667034153a1806ac29dd199acb99f"
 
-S = "${WORKDIR}/git"
 
 inherit setuptools3
 

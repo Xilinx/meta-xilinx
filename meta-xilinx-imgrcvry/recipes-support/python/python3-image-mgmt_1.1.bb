@@ -7,7 +7,6 @@ require recipes-bsp/image-recovery-linux/image-recovery-linux-source-${PV}.inc
 
 inherit setuptools3
 
-S = "${WORKDIR}/git"
 
 # Python dependencies
 RDEPENDS:${PN} = " \

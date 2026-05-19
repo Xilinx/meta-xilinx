@@ -13,7 +13,6 @@ SRCREV = "1cf36645012ead64f05f24972ac6a273038296a4"
 inherit autotools-brokensep
 RDEPENDS:${PN} += "freeipmi"
 
-S = "${WORKDIR}/git"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"

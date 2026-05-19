@@ -16,7 +16,6 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 SRCREV ??= "acbe5b61f6ee2245abfa53f6fc7d08de6a757338"
 
-S = "${WORKDIR}/git"
 
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"

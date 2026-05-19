@@ -9,7 +9,6 @@ COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-S = "${WORKDIR}/git"
 
 # This is the default in most BSPs.  A MACHINE.conf can override this!
 ASU_IMAGE_NAME ??= "asu-${MACHINE}"

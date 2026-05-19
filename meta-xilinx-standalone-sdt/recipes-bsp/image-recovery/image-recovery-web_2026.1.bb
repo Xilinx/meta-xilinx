@@ -10,7 +10,6 @@ require image-recovery-src_2026.1.inc
 SRC_URI = "${IMG_RCVRY_REPO};${IMG_RCVRY_BRANCHARG}"
 SRCREV ?= "${IMG_RCVRY_SRCREV}"
 
-S = "${WORKDIR}/git"
 
 DEPENDS += "dosfstools-native mtools-native"
 

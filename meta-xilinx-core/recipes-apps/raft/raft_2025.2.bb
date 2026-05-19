@@ -14,7 +14,6 @@ SRCREV = "5ec18717b2f60b40c7634a48c06d13725df9cfbb"
 
 inherit update-rc.d systemd
 
-S = "${WORKDIR}/git"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zcu208-zynqmp = "${MACHINE}"
 COMPATIBLE_MACHINE:zcu216-zynqmp = "${MACHINE}"

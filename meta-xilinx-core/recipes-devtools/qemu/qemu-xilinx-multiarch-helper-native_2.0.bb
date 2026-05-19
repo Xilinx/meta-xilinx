@@ -15,7 +15,6 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 require qemu-xilinx-multiarch-helper.inc
 
-S = "${WORKDIR}/git"
 B = "${S}"
 
 SYSROOT_DIRS += "${bindir}/qemu-xilinx"

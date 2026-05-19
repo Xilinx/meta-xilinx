@@ -17,7 +17,6 @@ SRCREV = "321ea883b7190d4e85cae5512a12e5eaa8f8731f"
 SRC_URI = "git://github.com/leethomason/tinyxml2.git;branch=master;protocol=https \
            file://run-ptest"
 
-S = "${WORKDIR}/git"
 
 inherit meson ptest
 

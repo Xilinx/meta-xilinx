@@ -9,7 +9,6 @@ DEPENDS = "python3-cmake-native python3-ninja-native"
 SRCREV = "941f45bcb51457884fa1afd6e24a67377d70f75c"
 SRC_URI = "git://github.com/pybind/pybind11.git;branch=stable;protocol=https"
 
-S = "${WORKDIR}/git"
 
 inherit cmake python_setuptools_build_meta
 

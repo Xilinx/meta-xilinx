@@ -11,7 +11,6 @@ inherit deploy shared-manifest
 
 DEPENDS += "u-boot-mkimage-native"
 
-S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 SYSROOT_DIRS += "/boot"

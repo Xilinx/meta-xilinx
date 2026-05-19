@@ -8,7 +8,7 @@ SRC_URI = "\
     file://99-dma-heap.rules \
 "
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 inherit useradd
 

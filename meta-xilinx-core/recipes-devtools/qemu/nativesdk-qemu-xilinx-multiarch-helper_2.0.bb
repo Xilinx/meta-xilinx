@@ -12,7 +12,6 @@ inherit setuptools3 nativesdk
 
 require qemu-xilinx-multiarch-helper.inc
 
-S = "${WORKDIR}/git"
 B = "${S}"
 
 do_install:append() {

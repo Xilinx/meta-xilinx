@@ -4,7 +4,7 @@ LICENSE="CLOSED"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=cd33347a71202f7531fd3f82892a4a74"
 COMPATIBLE_HOST = ".*-linux"
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 SRC_URI = "https://edf.amd.com/sswreleases/isp-firmware/2026.1/05282026/isp_fw_05282026.tar.gz"
 SRC_URI[sha256sum]="f96fe1ac2d94dfc320359eb7d8fa7a5b5033576518f83753076d1be651709754"

@@ -28,7 +28,7 @@ OPENAMPFW_PKGDIR_SUFFIX:versal ?= "openamp-fw-examples"
 OPENAMPFW_PKGDIR_SUFFIX:versal-net ?= "openamp-zephyr-demo"
 OPENAMPFW_PKGDIR_SUFFIX:versal-2ve-2vm ?= "openamp-zephyr-demo"
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 do_install() {
     if [ -z "${OPENAMPFW_CORE}" ]; then

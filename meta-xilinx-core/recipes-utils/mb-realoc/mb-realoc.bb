@@ -16,7 +16,7 @@ ELF_LOAD_ADDR ?= "0"
 ELF_JUMP_OFFSET ?= ""
 ELF_INFILE ?= "${DEPLOY_DIR_IMAGE}/u-boot.elf"
 OUTFILE_NAME ?= "u-boot-s"
-B = "${WORKDIR}"
+B = "${UNPACKDIR}"
 
 PARALLEL_MAKE=""
 

@@ -16,7 +16,6 @@ SRCREV ?= "e351fab9da02397c710f58f20ab5d1c8a844f241"
 
 SRC_URI = "${REPO};branch=${BRANCH}"
 
-S = "${WORKDIR}/git"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

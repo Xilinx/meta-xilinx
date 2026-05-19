@@ -8,7 +8,6 @@ PE = "1"
 
 PV .= "+git"
 
-S = "${WORKDIR}/git"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 

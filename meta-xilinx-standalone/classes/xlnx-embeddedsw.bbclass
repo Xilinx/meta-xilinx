@@ -48,7 +48,6 @@ python() {
 }
 
 SHARED_S = "${TMPDIR}/work-shared/embeddedsw-${ESW_VER}/git"
-S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 ERROR_QA:remove = "buildpaths"

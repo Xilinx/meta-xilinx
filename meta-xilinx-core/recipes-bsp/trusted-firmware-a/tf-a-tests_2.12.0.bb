@@ -31,7 +31,6 @@ TFA_PLATFORM ?= "invalid"
 EXTRA_OEMAKE += "ARCH=aarch64"
 EXTRA_OEMAKE += "LOG_LEVEL=50"
 
-S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 # Add platform parameter

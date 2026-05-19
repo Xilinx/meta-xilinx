@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 RDEPENDS:${PN} += "busybox util-linux-hexdump i2c-tools"
 SRC_URI = "file://mac-address-config.sh"
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 REQUIRED_DISTRO_FEATURES = "sysvinit"
 

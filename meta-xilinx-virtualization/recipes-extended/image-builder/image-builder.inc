@@ -10,7 +10,6 @@ REPO ?= "git://github.com/Xilinx/imagebuilder.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-S = "${WORKDIR}/git"
 
 inherit deploy
 

@@ -3,7 +3,6 @@ RPROVIDES:${PN} += "open-amp"
 
 inherit ccmake cmake python3-dir deploy
 
-S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
 
 OECMAKE_SOURCEPATH = "${S}/"

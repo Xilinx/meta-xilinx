@@ -22,7 +22,6 @@ DEPENDS = "\
 
 SRC_URI = "git://github.com/kmscon/kmscon;protocol=https;branch=main"
 SRCREV = "03e50c7db0489daaa41b5f62946fd6aaeab63a6e"
-S = "${WORKDIR}/git"
 
 inherit meson pkgconfig systemd
 

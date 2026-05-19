@@ -34,7 +34,6 @@ SRC_URI = " \
 	"
 SRCREV ?= "816a69eb15a9034351381211d9cd15de81da10c7"
 
-S = "${WORKDIR}/git"
 
 inherit autotools-brokensep pkgconfig systemd
 

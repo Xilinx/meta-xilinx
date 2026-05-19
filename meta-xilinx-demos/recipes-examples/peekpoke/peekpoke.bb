@@ -13,7 +13,7 @@ SRC_URI = "file://peek.c \
            file://poke.c \
            file://Makefile \
           "
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 CFLAGS:prepend = "-I ${S}/include"
 do_compile() {
         oe_runmake

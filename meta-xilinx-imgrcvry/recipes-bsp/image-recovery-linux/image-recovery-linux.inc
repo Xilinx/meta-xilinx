@@ -2,7 +2,6 @@ DESCRIPTION = "Image Recovery"
 
 inherit autotools-brokensep
 
-S = "${WORKDIR}/git"
 
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"

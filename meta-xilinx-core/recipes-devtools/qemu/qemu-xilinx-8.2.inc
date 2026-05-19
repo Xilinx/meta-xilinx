@@ -99,7 +99,6 @@ SRC_URI += "\
            file://qemu-guest-agent.udev \
            "
 
-S = "${WORKDIR}/git"
 
 # Based on qemu settings in poky/meta/conf/distro/include/no-static-libs.inc
 DISABLE_STATIC:pn-qemu-xilinx = ""

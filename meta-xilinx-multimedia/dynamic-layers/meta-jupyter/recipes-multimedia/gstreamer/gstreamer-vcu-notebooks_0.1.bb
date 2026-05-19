@@ -8,7 +8,6 @@ inherit jupyter-examples
 
 require gstreamer-multimedia-notebooks_0.1.inc
 
-S = "${WORKDIR}/git"
 
 inherit features_check
 

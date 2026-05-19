@@ -27,7 +27,6 @@ SRC_URI = " \
 
 inherit features_check module python3native
 
-S = "${WORKDIR}/git"
 
 REQUIRED_MACHINE_FEATURES = "malig78ae"
 

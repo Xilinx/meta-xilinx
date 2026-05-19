@@ -6,7 +6,6 @@ require aie-rt-2025.inc
 SECTION	= "devel"
 
 XAIEFAL_DIR ?= "fal"
-S = "${WORKDIR}/git"
 
 IOBACKENDS ?= "Linux"
 

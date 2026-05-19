@@ -23,7 +23,6 @@ DEPENDS = "xkeyboard-config"
 
 SRC_URI = "git://github.com/kmscon/libtsm;protocol=https;branch=main"
 SRCREV = "6cdacfc452bf29d98e297fe3a96e55e94a88ce3e"
-S = "${WORKDIR}/git"
 
 inherit meson pkgconfig
 

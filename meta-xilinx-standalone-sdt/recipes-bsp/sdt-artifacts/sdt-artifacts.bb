@@ -23,8 +23,8 @@ SRC_URI[sha256sum] = "${@d.getVarFlag('SDT_URI', 'sha256sum') or 'undefined'}"
 COMPATIBLE_HOST:xilinx-standalone = "${HOST_SYS}"
 PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
-# Don't set S = "${WORKDIR}/git" as we need this to work for other protocols
-S = "${@d.getVarFlag('SDT_URI', 'S') or '${WORKDIR}'}"
+# Don't set S = "${UNPACKDIR}/git" as we need this to work for other protocols
+S = "${@d.getVarFlag('SDT_URI', 'S') or '${UNPACKDIR}'}"
 
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
@@ -36,7 +36,7 @@ python () {
 
 do_install() {
     install -d ${D}${datadir}/sdt/${MACHINE}
-    if [ "${S}" = "${WORKDIR}" ]; then
+    if [ "${S}" = "${UNPACKDIR}" ]; then
         # If we just copying everything, then we'll copy build components.
         # This fallback is for the case where the user provides each of the
         # files instead of a tarball.  It shouldn't be used, but is here just
@@ -62,7 +62,7 @@ FILES:${PN} = "${datadir}/sdt/${MACHINE}"
 
 do_deploy() {
     install -d ${DEPLOYDIR}/system-dt${IMAGE_VERSION_SUFFIX}
-    if [ "${S}" = "${WORKDIR}" ]; then
+    if [ "${S}" = "${UNPACKDIR}" ]; then
         # If we just copying everything, then we'll copy build components.
         # This fallback is for the case where the user provides each of the
         # files instead of a tarball.  It shouldn't be used, but is here just

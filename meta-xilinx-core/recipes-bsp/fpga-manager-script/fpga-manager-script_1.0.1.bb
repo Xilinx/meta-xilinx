@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${WORKDIR}/fpgautil.c;beginline=1;endline=7;md5=1948a
 SRC_URI = "\
 	file://fpgautil.c \
 	"
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 

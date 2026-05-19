@@ -11,7 +11,6 @@ inherit deploy
 SRCREV = "74434f255873d74e56cc50aa762d1caf24c099f8"
 SRC_URI = "git://github.com/riscv/opensbi.git;branch=master;protocol=https"
 
-S = "${WORKDIR}/git"
 
 COMPATIBLE_HOST = "(riscv64|riscv32).*"
 
