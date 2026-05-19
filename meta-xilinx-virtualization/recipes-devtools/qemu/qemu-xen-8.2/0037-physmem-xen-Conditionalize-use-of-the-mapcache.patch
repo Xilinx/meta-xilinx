@@ -1,7 +1,7 @@
 From 13dc45b37280248a3b1f5e606a5b835e2b2c29c3 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Wed, 23 Jul 2025 11:56:51 +0200
-Subject: [PATCH 37/40] physmem: xen: Conditionalize use of the mapcache
+Subject: [PATCH 37/41] physmem: xen: Conditionalize use of the mapcache
 
 Conditionalize use of the mapcache. This is in preparation
 to optionally disable the mapcache at runtime.

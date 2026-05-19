@@ -1,0 +1,116 @@
+From bba59c0facd3b5557001ad131a589e4437258d5c Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Mon, 18 May 2026 15:51:22 +0200
+Subject: [PATCH 41/41] hw/xen: pvh: Unify mapcache=off RAM layout with mapcache=on
+
+With mapcache=off, the low/high RAM banks were standalone regions
+distinct from xen_memory, so xen_set_memory() routed them to the
+ioreq server and ordinary guest RAM accesses on ARM PVH came back
+as IOREQ_TYPE_COPY, stalling boot.
+
+Reserve one contiguous VA range covering both banks, foreign-map
+each bank at its guest-physical offset, and expose the whole thing
+as a single xen_memory region with low/high aliases. Both mapcache
+modes now produce the same MR layout.
+
+No functional change for mapcache=on.
+
+Upstream-Status: Pending
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+---
+ hw/xen/xen-pvh-common.c | 51 +++++++++++++++++++++++------------------
+ 1 file changed, 29 insertions(+), 22 deletions(-)
+
+diff --git a/hw/xen/xen-pvh-common.c b/hw/xen/xen-pvh-common.c
+index aaa44e9a88..4700afc4fc 100644
+--- a/hw/xen/xen-pvh-common.c
++++ b/hw/xen/xen-pvh-common.c
+@@ -37,23 +37,26 @@ static const MemoryListener xen_memory_listener = {
+  */
+ #define XEN_PVH_MAP_CHUNK_PAGES 65535
+ 
+-static void *xen_map_guest_ram(XenPVHMachineState *s,
++static void *xen_map_guest_ram(XenPVHMachineState *s, void *base,
+                                uint64_t addr, uint64_t size)
+ {
+     size_t total_pages = size >> XC_PAGE_SHIFT;
+     size_t chunk_pages = MIN(XEN_PVH_MAP_CHUNK_PAGES, total_pages);
+     g_autofree xen_pfn_t *pfns = NULL;
+-    void *base = NULL;
+     size_t offset;
+ 
+     if (!total_pages) {
++        base = NULL;
+         goto done;
+     }
+ 
+-    base = mmap(NULL, size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+-    if (base == MAP_FAILED) {
+-        base = NULL;
+-        goto done;
++    if (!base) {
++        base = mmap(NULL, size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS,
++                    -1, 0);
++        if (base == MAP_FAILED) {
++            base = NULL;
++            goto done;
++        }
+     }
+ 
+     pfns = g_new0(xen_pfn_t, chunk_pages);
+@@ -78,7 +81,6 @@ static void *xen_map_guest_ram(XenPVHMachineState *s,
+             PROT_READ | PROT_WRITE, MAP_FIXED,
+             num_pages, pfns, NULL);
+         if (!mapped) {
+-            munmap(base, size);
+             base = NULL;
+             goto done;
+         }
+@@ -112,24 +114,29 @@ static void xen_pvh_init_ram(XenPVHMachineState *s,
+     if (s->cfg.mapcache) {
+         memory_region_init_ram(&xen_memory, NULL, "xen.ram",
+                                block_len, &error_fatal);
+-        memory_region_init_alias(&s->ram.low, NULL, "xen.ram.lo", &xen_memory,
+-                                 s->cfg.ram_low.base, ram_size[0]);
+-        if (ram_size[1] > 0) {
+-            memory_region_init_alias(&s->ram.high, NULL, "xen.ram.hi",
+-                                     &xen_memory,
+-                                     s->cfg.ram_high.base, ram_size[1]);
+-        }
+     } else {
+-        void *p;
+-
+-        p = xen_map_guest_ram(s, s->cfg.ram_low.base, ram_size[0]);
+-        memory_region_init_ram_ptr(&s->ram.low, NULL, "xen.ram.lo",
+-                                   ram_size[0], p);
++        /* Foreign-map both banks into one contiguous VA range so we can
++         * expose them as a single xen_memory region with aliases, matching
++         * the mapcache=on layout. */
++        void *p = mmap(NULL, block_len, PROT_NONE,
++                       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++
++        xen_map_guest_ram(s, (uint8_t *)p + s->cfg.ram_low.base,
++                          s->cfg.ram_low.base, ram_size[0]);
+         if (ram_size[1] > 0) {
+-            p = xen_map_guest_ram(s, s->cfg.ram_high.base, ram_size[1]);
+-            memory_region_init_ram_ptr(&s->ram.high, NULL, "xen.ram.hi",
+-                                       ram_size[1], p);
++            xen_map_guest_ram(s, (uint8_t *)p + s->cfg.ram_high.base,
++                              s->cfg.ram_high.base, ram_size[1]);
+         }
++        memory_region_init_ram_ptr(&xen_memory, NULL, "xen.ram",
++                                   block_len, p);
++    }
++
++    memory_region_init_alias(&s->ram.low, NULL, "xen.ram.lo", &xen_memory,
++                             s->cfg.ram_low.base, ram_size[0]);
++    if (ram_size[1] > 0) {
++        memory_region_init_alias(&s->ram.high, NULL, "xen.ram.hi",
++                                 &xen_memory,
++                                 s->cfg.ram_high.base, ram_size[1]);
+     }
+ 
+     /* Map them onto QEMU's address-space.  */
+-- 
+2.34.1
+

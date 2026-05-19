@@ -1,7 +1,7 @@
 From 533e801b20bd20ea8b5b7e05fd3765e6d5c9e033 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Thu, 28 Aug 2025 20:14:47 +0200
-Subject: [PATCH 34/40] hw/x86: xenpvh: Enable virtio-msg
+Subject: [PATCH 34/41] hw/x86: xenpvh: Enable virtio-msg
 
 Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
 

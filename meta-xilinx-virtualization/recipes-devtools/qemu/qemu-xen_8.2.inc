@@ -41,6 +41,7 @@ SRC_URI_XEN:class-target = " \
     file://0038-hw-xen-hvm-Add-a-mapcache-arg-to-xen_register_ioreq.patch \
     file://0039-hw-xen-xenpvh-Add-prop-to-enable-disable-the-mapcach.patch \
     file://0040-xen-pvh-Fix-order-of-virtio-mmio-devices.patch \
+    file://0041-hw-xen-pvh-Unify-mapcache-off-RAM-layout-with-mapcac.patch \
     "
 
 FILESEXTRAPATHS:prepend:class-target := "${THISDIR}/qemu-xen-8.2:"

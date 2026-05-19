@@ -1,7 +1,7 @@
 From 00e75db4f2fb8776d6df1953f4908f21a32616e3 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Fri, 13 Sep 2024 21:14:04 +0200
-Subject: [PATCH 25/40] hw/xen: xenpvh: Add pci-intx-irq-base property
+Subject: [PATCH 25/41] hw/xen: xenpvh: Add pci-intx-irq-base property
 
 Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
 

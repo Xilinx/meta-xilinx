@@ -1,7 +1,7 @@
 From 7ff4fb5c0245a9e2519a847513c8f40f2d256ca8 Mon Sep 17 00:00:00 2001
 From: Juergen Gross <jgross@suse.com>
 Date: Thu, 20 May 2021 11:54:48 +0200
-Subject: [PATCH 02/40] softmmu: let qemu_map_ram_ptr() use
+Subject: [PATCH 02/41] softmmu: let qemu_map_ram_ptr() use
  qemu_ram_ptr_length()
 
 qemu_map_ram_ptr() and qemu_ram_ptr_length() share quite some code, so

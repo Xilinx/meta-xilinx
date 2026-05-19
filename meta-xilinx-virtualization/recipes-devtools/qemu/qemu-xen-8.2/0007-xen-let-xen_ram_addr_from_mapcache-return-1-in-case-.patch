@@ -1,7 +1,7 @@
 From 349fd92a622bbb6a0e104009e67085a512a61a30 Mon Sep 17 00:00:00 2001
 From: Juergen Gross <jgross@suse.com>
 Date: Tue, 27 Feb 2024 14:34:58 -0800
-Subject: [PATCH 07/40] xen: let xen_ram_addr_from_mapcache() return -1 in case
+Subject: [PATCH 07/41] xen: let xen_ram_addr_from_mapcache() return -1 in case
  of not found entry
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8

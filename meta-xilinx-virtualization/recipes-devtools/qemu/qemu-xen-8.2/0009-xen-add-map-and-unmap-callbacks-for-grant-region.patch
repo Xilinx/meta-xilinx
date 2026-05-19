@@ -1,7 +1,7 @@
 From 9fd5169558d6924b3c40c7cd9363bcd9162baf46 Mon Sep 17 00:00:00 2001
 From: Juergen Gross <jgross@suse.com>
 Date: Tue, 27 Feb 2024 14:35:00 -0800
-Subject: [PATCH 09/40] xen: add map and unmap callbacks for grant region
+Subject: [PATCH 09/41] xen: add map and unmap callbacks for grant region
 
 Add the callbacks for mapping/unmapping guest memory via grants to the
 special grant memory region.
