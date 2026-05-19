@@ -1,5 +1,6 @@
 #!/bin/bash
 
+modprobe mali_gpu_pm
 modprobe mali_gpu_power
 modprobe mali_gpu_system
 modprobe mali_gpu_assign ptm_config='A:S0:S1:P0:W0'

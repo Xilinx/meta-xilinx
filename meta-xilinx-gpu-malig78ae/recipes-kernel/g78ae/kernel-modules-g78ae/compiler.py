@@ -206,6 +206,17 @@ class Compiler:
 			use_common_options=False,
 		),
 		Module(
+			name='mali_gpu_pm',
+			path='gpu/arm/midgard/mali_gpu_pm',
+			includes=[
+				'gpu/arm/midgard/mali_gpu_pm',
+			],
+			options=[
+				'CONFIG_MALI_GPU_PM=y',
+			],
+			use_common_options=False,
+		),
+		Module(
 			name='mali_kutf_clk_rate_trace_test_portal',
 			debug=True,
 			path='gpu/arm/midgard/tests/mali_kutf_clk_rate_trace/kernel',
