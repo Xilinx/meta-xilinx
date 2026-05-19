@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = " \
 # md5sum: 13e14ae1bd7ad5bff731bba4a31bb510
 
 BRANCH = "r54p1-12eac0"
-SRCREV_kernel = "1bb2b38d39065aec2d9674f83294887c56c2c00b"
+SRCREV_kernel = "379addce312d566720edc878ebf7292774a6e27f"
 SRCREV_arbitration = "8c5448552b84e5a7ecb13046ad02a31cb673aeeb"
 SRCREV_FORMAT = "kernel_arbitration"
 
@@ -80,7 +80,6 @@ FILES:${PN} = "\
 	${INSTALL_DIR}/kernel-module-mali-kutf-irq-test.ko \
 	${INSTALL_DIR}/kernel-module-mali-kutf-mgm-integration-test.ko \
 	${INSTALL_DIR}/kernel-module-memory-group-manager.ko \
-	${INSTALL_DIR}/kernel-module-mali-gpu-pm.ko \
         /etc/udev/rules.d/99-mali-modules.rules \
         /usr/bin/load-mali-modules.sh \
         /etc/modprobe.d/mali_kbase.conf \
@@ -102,5 +101,4 @@ RPROVIDES:${PN} = "\
 	kernel-module-mali-kutf-irq-test \
 	kernel-module-mali-kutf-mgm-integration-test \
 	kernel-module-memory-group-manager \
-	kernel-module-mali-gpu-pm \
 "
