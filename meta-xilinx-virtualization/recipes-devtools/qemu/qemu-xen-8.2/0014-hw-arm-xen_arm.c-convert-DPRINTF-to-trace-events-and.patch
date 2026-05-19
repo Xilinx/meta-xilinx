@@ -1,7 +1,7 @@
 From b751c8e8a7bdfe3421b14b82fe0ad8aeb3ac935b Mon Sep 17 00:00:00 2001
 From: Manos Pitsidianakis <manos.pitsidianakis@linaro.org>
 Date: Mon, 29 Jan 2024 18:09:38 +0200
-Subject: [PATCH 14/41] hw/arm/xen_arm.c: convert DPRINTF to trace events and
+Subject: [PATCH 14/40] hw/arm/xen_arm.c: convert DPRINTF to trace events and
  error/warn reports
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8

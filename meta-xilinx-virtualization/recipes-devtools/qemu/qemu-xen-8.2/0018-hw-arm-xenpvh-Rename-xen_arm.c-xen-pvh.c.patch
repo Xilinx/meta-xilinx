@@ -1,7 +1,7 @@
 From 51061a561badf514070a9d1b0eaed1b10e5e4cc6 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Fri, 16 Aug 2024 15:54:19 +0200
-Subject: [PATCH 18/41] hw/arm: xenpvh: Rename xen_arm.c -> xen-pvh.c
+Subject: [PATCH 18/40] hw/arm: xenpvh: Rename xen_arm.c -> xen-pvh.c
 
 Rename xen_arm.c -> xen-pvh.c to better express that this
 is a PVH machine and to align with x86 HVM and future PVH

@@ -1,7 +1,7 @@
 From 73254a9f6fc02cb99aad1c6e82c8279f2cff3ed5 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Wed, 23 Jul 2025 11:29:15 +0200
-Subject: [PATCH 35/41] xen: mapcache: Assert mapcache existance
+Subject: [PATCH 35/40] xen: mapcache: Assert mapcache existance
 
 Assert that the mapcache was created prior to being used.
 

@@ -1,7 +1,7 @@
 From 4e71cea9c01afa2ebbc9590bce69ec71713d2780 Mon Sep 17 00:00:00 2001
 From: Juergen Gross <jgross@suse.com>
 Date: Tue, 27 Feb 2024 14:34:59 -0800
-Subject: [PATCH 08/41] memory: add MemoryRegion map and unmap callbacks
+Subject: [PATCH 08/40] memory: add MemoryRegion map and unmap callbacks
 
 In order to support mapping and unmapping guest memory dynamically to
 and from qemu during address_space_[un]map() operations add the map()

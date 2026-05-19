@@ -1,7 +1,7 @@
 From 12ea10f6189865046d9b202e48f4879717bf7d19 Mon Sep 17 00:00:00 2001
 From: Vikram Garhwal <vikram.garhwal@amd.com>
 Date: Tue, 27 Feb 2024 14:35:01 -0800
-Subject: [PATCH 10/41] hw: arm: Add grant mapping.
+Subject: [PATCH 10/40] hw: arm: Add grant mapping.
 
 Enable grant ram mapping support for Xenpvh machine on ARM.
 

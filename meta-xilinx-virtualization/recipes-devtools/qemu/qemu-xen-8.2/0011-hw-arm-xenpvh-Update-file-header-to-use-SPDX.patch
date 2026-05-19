@@ -1,7 +1,7 @@
 From da88ddb83edec384e14c3575435fad928af5e763 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Thu, 8 Aug 2024 22:09:14 +0200
-Subject: [PATCH 11/41] hw/arm: xenpvh: Update file header to use SPDX
+Subject: [PATCH 11/40] hw/arm: xenpvh: Update file header to use SPDX
 
 Update file header to use SPDX and remove stray empty
 comment line.

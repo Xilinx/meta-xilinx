@@ -1,7 +1,7 @@
 From b92ad5e7619101c72bf9925d6e2de22b6c36b8ab Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Wed, 23 Jul 2025 12:06:18 +0200
-Subject: [PATCH 38/41] hw/xen-hvm: Add a mapcache arg to xen_register_ioreq()
+Subject: [PATCH 38/40] hw/xen-hvm: Add a mapcache arg to xen_register_ioreq()
 
 Add a mapcache argument to xen_register_ioreq() allowing
 the caller to optionally disable the mapcache.

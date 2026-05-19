@@ -1,7 +1,7 @@
 From f66d9f4beb40be329547bad3a0ebf3a726342b7d Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Fri, 6 Sep 2024 15:05:51 +0200
-Subject: [PATCH 26/41] hw/arm: xenpvh: Enable PCI for ARM PVH
+Subject: [PATCH 26/40] hw/arm: xenpvh: Enable PCI for ARM PVH
 
 Enable PCI support for the ARM Xen PVH machine.
 

@@ -1,7 +1,7 @@
 From bc9dd735e13089b2466c350ae029fc0e064a8551 Mon Sep 17 00:00:00 2001
 From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
 Date: Fri, 16 Aug 2024 16:21:57 +0200
-Subject: [PATCH 15/41] hw/arm: xenpvh: Remove double-negation in warning
+Subject: [PATCH 15/40] hw/arm: xenpvh: Remove double-negation in warning
 
 Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
 
