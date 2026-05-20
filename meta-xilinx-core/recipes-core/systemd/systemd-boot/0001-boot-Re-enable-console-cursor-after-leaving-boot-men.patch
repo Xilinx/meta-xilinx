@@ -22,15 +22,21 @@ state.
 AI-Generated: Claude Opus 4.5
 
 Signed-off-by: John Toomey <john.toomey@amd.com>
+
+Rebase with systemd-259.5
+
+AI-Generated: GitHub Copilot (Claude Sonnet 4.6)
+
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
 ---
- src/boot/efi/boot.c | 1 +
+ src/boot/boot.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/src/boot/efi/boot.c b/src/boot/efi/boot.c
+diff --git a/src/boot/boot.c b/src/boot/boot.c
 index 5c0f0ab10a..c80ea7f395 100644
---- a/src/boot/efi/boot.c
-+++ b/src/boot/efi/boot.c
-@@ -1142,6 +1142,7 @@ static bool menu_run(
+--- a/src/boot/boot.c
++++ b/src/boot/boot.c
+@@ -960,6 +960,7 @@ static bool menu_run(
          }
  
          *chosen_entry = config->entries[idx_highlight];
