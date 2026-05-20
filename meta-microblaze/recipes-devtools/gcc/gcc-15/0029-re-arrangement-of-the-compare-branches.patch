@@ -1,0 +1,27 @@
+From 870bfd716fcddeb72660f3176fb2a68aaa5ecc0e Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 13 Sep 2022 14:45:15 +0530
+Subject: [PATCH 29/56] re-arrangement of the compare branches
+
+NOTE: Patch emptied for GCC-15 - all changes already present in baseline.
+The compare branch rearrangements are already included in the GCC-15 source.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mahesh Bodapati <mbodapat@xilinx.com>
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ gcc/config/microblaze/microblaze.md | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index placeholder..placeholder2 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -1,3 +1,4 @@
++;; GCC-15 patch 0029 placeholder - original changes already in baseline
+ ;; microblaze.md -- Machine description for Xilinx MicroBlaze processors.
+ ;; Copyright (C) 2009-2025 Free Software Foundation, Inc.
+ 
+-- 
+2.34.1

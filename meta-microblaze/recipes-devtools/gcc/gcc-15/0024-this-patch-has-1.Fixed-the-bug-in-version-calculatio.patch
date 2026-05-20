@@ -1,0 +1,107 @@
+From a8991be91d79cf0bd17b7d303a10ec5edd7408c6 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 13 Sep 2022 12:23:54 +0530
+Subject: [PATCH 24/56] this patch has 1.Fixed the bug in version calculation.
+ 2.Add new bitfield instructions.
+
+Upstream-Status: Pending
+
+Signed-off-by :Mahesh Bodapati <mbodapat@xilinx.com>
+---
+ gcc/config/microblaze/microblaze.cc | 154 ++++++++++++++--------------
+ gcc/config/microblaze/microblaze.h  |   2 +
+ gcc/config/microblaze/microblaze.md |  69 +++++++++++++
+ 3 files changed, 147 insertions(+), 78 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
+index 22c884f..9436c08 100644
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
+@@ -165,6 +165,9 @@
+ /* Set to one if the targeted core has the CLZ insn.  */
+ int microblaze_has_clz = 0;
+ 
++/* Set to one if the targeted core has barrel-shift and cpu > 10.0 */
++int microblaze_has_bitfield = 0;
++
+ /* Which CPU pipeline do we use. We haven't really standardized on a CPU
+    version having only a particular type of pipeline. There can still be
+    options on the CPU to scale pipeline features up or down. :(
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 6eb1f24..11a436f 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -2488,4 +2488,73 @@
+   DONE;
+ }")
+ 
++(define_expand "extvsi"
++  [(set (match_operand:SI 0 "register_operand" "r")
++	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
++			 (match_operand:SI 2 "immediate_operand" "I")
++			 (match_operand:SI 3 "immediate_operand" "I")))]
++"TARGET_HAS_BITFIELD"
++"
++{
++  unsigned HOST_WIDE_INT len = UINTVAL (operands[2]);
++  unsigned HOST_WIDE_INT pos = UINTVAL (operands[3]);
++
++  if ((len == 0) || (pos + len > 32) )
++    FAIL;
++
++  ;;if (!register_operand (operands[1], VOIDmode))
++  ;;  FAIL;
++  if (operands[0] == operands[1])
++  FAIL;
++  if (GET_CODE (operands[1]) == ASHIFT)
++  FAIL;
++;;  operands[2] = GEN_INT(INTVAL(operands[2])+1 );
++ emit_insn (gen_extv_32 (operands[0], operands[1],
++			  operands[2], operands[3]));
++  DONE;
++}")
++
++(define_insn "extv_32"
++  [(set (match_operand:SI 0 "register_operand" "=r")
++	(zero_extract:SI (match_operand:SI 1 "register_operand" "r")
++			 (match_operand:SI 2 "immediate_operand" "I")
++			 (match_operand:SI 3 "immediate_operand" "I")))]
++ "TARGET_HAS_BITFIELD && (UINTVAL (operands[2]) > 0)
++   && ((UINTVAL (operands[2]) + UINTVAL (operands[3])) <= 32)"
++  "bsefi %0,%1,%2,%3"
++  [(set_attr "type" "bshift")
++   (set_attr "length" "4")])
++
++(define_expand "insvsi"
++  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
++			 (match_operand:SI 1 "immediate_operand" "I")
++			 (match_operand:SI 2 "immediate_operand" "I"))
++	(match_operand:SI 3 "register_operand" "r"))]
++ "TARGET_HAS_BITFIELD"
++  "
++{
++  unsigned HOST_WIDE_INT len = UINTVAL (operands[1]);
++  unsigned HOST_WIDE_INT pos = UINTVAL (operands[2]);
++
++  if (len <= 0 || pos + len > 32)
++    FAIL;
++
++  ;;if (!register_operand (operands[0], VOIDmode))
++  ;;  FAIL;
++  emit_insn (gen_insv_32 (operands[0], operands[1],
++			  operands[2], operands[3]));
++  DONE;
++}")
++
++(define_insn "insv_32"
++  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "+r")
++			 (match_operand:SI 1 "immediate_operand" "I")
++			 (match_operand:SI 2 "immediate_operand" "I"))
++	(match_operand:SI 3 "register_operand" "r"))]
++ "TARGET_HAS_BITFIELD && UINTVAL (operands[1]) > 0
++   && UINTVAL (operands[1]) + UINTVAL (operands[2]) <= 32"
++  "bsifi %0, %3, %1, %2"
++  [(set_attr "type" "bshift")
++   (set_attr "length" "4")])
++
+ (include "sync.md")

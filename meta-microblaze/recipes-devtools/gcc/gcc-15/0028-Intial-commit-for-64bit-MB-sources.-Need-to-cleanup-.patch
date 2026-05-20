@@ -1,0 +1,282 @@
+From e21e40a00f4beb2c0a93f4df1dee37bf3e40c605 Mon Sep 17 00:00:00 2001
+From: Nagaraju Mekala <nmekala@xilix.com>
+Date: Tue, 9 Oct 2018 12:47:00 +0530
+Subject: [PATCH 28/56] Intial commit for 64bit MB sources. Need to cleanup and
+ fix many issues.
+
+NOTE: Fixed for GCC-15: dropped constraints.md, microblaze.cc (already applied),
+and microblaze.md hunks 12-13 (tablejump patterns already applied).
+
+Upstream-Status: Pending
+
+Signed-off-by: Nagaraju Mekala <nmekala@xilix.com>
+Signed-off-by: Mahesh Bodapati <vmahesh@xilinx.com>
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
+---
+ gcc/config/microblaze/microblaze-c.cc |    6 +
+ gcc/config/microblaze/microblaze.md   |  150 +++++++++++++++++--
+ 2 files changed, 148 insertions(+), 8 deletions(-)
+
+diff --git a/gcc/config/microblaze/microblaze-c.cc b/gcc/config/microblaze/microblaze-c.cc
+index c57271d..d4d83b3 100644
+--- a/gcc/config/microblaze/microblaze-c.cc
++++ b/gcc/config/microblaze/microblaze-c.cc
+@@ -100,4 +100,10 @@
+         builtin_define ("HAVE_HW_FPU_SQRT");
+       builtin_define ("__HAVE_HW_FPU_SQRT__");
+     }
++  if (TARGET_MB_64)
++    {
++      builtin_define ("__arch64__");
++      builtin_define ("__microblaze64__");
++      builtin_define ("__MICROBLAZE64__");
++    }
+ }
+diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
+index 33e186f..92e0bbb 100644
+--- a/gcc/config/microblaze/microblaze.md
++++ b/gcc/config/microblaze/microblaze.md
+@@ -793,6 +793,15 @@
+   (set_attr "mode"	"SI")
+   (set_attr "length"	"4")])
+ 
++(define_insn "negsi_long"
++  [(set (match_operand:SI 0 "register_operand" "=d")
++	(neg:SI (match_operand:DI 1 "register_operand" "d")))]
++  ""
++  "rsubk\t%0,%1,r0"
++  [(set_attr "type"	"arith")
++  (set_attr "mode"	"SI")
++  (set_attr "length"	"4")])
++
+ (define_insn "negdi2_long"
+   [(set (match_operand:DI 0 "register_operand" "=d")
+ 	(neg:DI (match_operand:DI 1 "register_operand" "d")))]
+@@ -848,18 +857,17 @@
+ ;;----------------------------------------------------------------
+ 
+ (define_insn "anddi3"
+-  [(set (match_operand:DI 0 "register_operand" "=d,d")
+-	(and:DI (match_operand:DI 1 "arith_operand" "d,d")
+-		(match_operand:DI 2 "arith_operand" "d,K")))]
++  [(set (match_operand:DI 0 "register_operand" "=d,d,d")
++	(and:DI (match_operand:DI 1 "arith_operand" "d,d,d")
++		(match_operand:DI 2 "arith_operand" "d,K,I")))]
+   "TARGET_MB_64"
+   "@
+    andl\t%0,%1,%2
+-   andli\t%0,%1,%2 #andl1"
+-  ;; andli\t%0,%1,%2 #andl3
+-  ;; andli\t%0,%1,%2 #andl2
+-  [(set_attr "type"	"arith,arith")
+-  (set_attr "mode"	"DI,DI")
+-  (set_attr "length"	"4,4")])
++   andli\t%0,%1,%2 #andl2
++   andli\t%0,%1,%2 #andl3"
++  [(set_attr "type"	"arith,no_delay_arith,no_delay_arith")
++  (set_attr "mode"	"DI,DI,DI")
++  (set_attr "length"	"4,4,4")])
+ 
+ (define_insn "andsi3"
+   [(set (match_operand:SI 0 "register_operand" "=d,d,d,d")
+@@ -884,7 +892,7 @@
+   "@
+    orl\t%0,%1,%2
+    orli\t%0,%1,%2 #andl1"
+-  [(set_attr "type"	"arith,arith")
++  [(set_attr "type"	"arith,no_delay_arith")
+   (set_attr "mode"	"DI,DI")
+   (set_attr "length"	"4,4")])
+ 
+@@ -910,7 +918,7 @@
+   "@
+    xorl\t%0,%1,%2
+    xorli\t%0,%1,%2 #andl1"
+-  [(set_attr "type"	"arith,arith")
++  [(set_attr "type"	"arith,no_delay_arith")
+   (set_attr "mode"	"DI,DI")
+   (set_attr "length"	"4,4")])
+ 
+@@ -983,26 +991,6 @@
+   (set_attr "mode"	"SI")
+   (set_attr "length"	"4")])
+ 
+-;;(define_expand "extendqidi2"
+-;;  [(set (match_operand:DI 0 "register_operand" "=d")
+-;;        (sign_extend:DI (match_operand:QI 1 "general_operand" "d")))]
+-;;  "TARGET_MB_64"
+-;;  {
+-;;	if (GET_CODE (operands[1]) != REG)
+-;;	FAIL;
+-;;   }
+-;;)
+-    
+-
+-;;(define_insn "extendqidi2"
+-;;  [(set (match_operand:DI 0 "register_operand" "=d")
+-;;	(sign_extend:DI (match_operand:QI 1 "register_operand" "d")))]
+-;;  "TARGET_MB_64"
+-;;  "sextl8\t%0,%1"
+-;;  [(set_attr "type"	"arith")
+-;;  (set_attr "mode"	"DI")
+-;;  (set_attr "length"	"4")])
+-
+ (define_insn "extendhisi2"
+   [(set (match_operand:SI 0 "register_operand" "=d")
+ 	(sign_extend:SI (match_operand:HI 1 "register_operand" "d")))]
+@@ -1025,6 +1013,27 @@
+ ;; Those for integer source operand are ordered
+ ;; widest source type first.
+ 
++(define_insn "extendsidi2_long"
++  [(set (match_operand:DI 0 "register_operand" "=d,d,d")
++	(sign_extend:DI (match_operand:SI 1 "nonimmediate_operand" "d,R,m")))]
++  "TARGET_MB_64"
++  {
++    switch (which_alternative)
++    {
++      case 0:
++        return "sextl32\t%0,%1";
++      case 1:
++      case 2:
++        {
++          output_asm_insn ("ll%i1\t%0,%1", operands);
++          return "sextl32\t%0,%0";
++        }
++    } 
++  }
++  [(set_attr "type"	"multi,multi,multi")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"4,8,8")])
++
+ (define_insn "extendsidi2"
+   [(set (match_operand:DI 0 "register_operand" "=d,d,d")
+ 	(sign_extend:DI (match_operand:SI 1 "nonimmediate_operand" "d,R,m")))]
+@@ -1236,6 +1245,8 @@
+   (set_attr "length"	"4,4,8,4,8,4,8")])
+ 
+ 
++
++
+ ;; 16-bit Integer moves
+ 
+ ;; Unlike most other insns, the move insns can't be split with
+@@ -1908,6 +1919,31 @@
+   "
+ )
+ 
++
++(define_insn "seq_internal_pat_long" 
++  [(set (match_operand:DI 0 "register_operand" "=d")
++	(eq:DI 
++	       (match_operand:DI 1 "register_operand" "d")
++	       (match_operand:DI 2 "register_operand" "d")))]
++  "TARGET_MB_64"
++  "pcmpleq\t%0,%1,%2"
++  [(set_attr "type"	"arith")
++   (set_attr "mode"	"DI")
++   (set_attr "length"	"4")]
++)              
++
++(define_insn "sne_internal_pat_long" 
++  [(set (match_operand:DI 0 "register_operand" "=d")
++	(ne:DI 
++	       (match_operand:DI 1 "register_operand" "d")
++	       (match_operand:DI 2 "register_operand" "d")))]
++  "TARGET_MB_64"
++  "pcmplne\t%0,%1,%2"
++  [(set_attr "type"	"arith")
++  (set_attr "mode"	"DI")
++  (set_attr "length"	"4")]
++)              
++
+ (define_insn "seq_internal_pat" 
+   [(set (match_operand:SI 0 "register_operand" "=d")
+ 	(eq:SI 
+@@ -1984,8 +2020,8 @@
+ (define_expand "cbranchsi4"
+   [(set (pc)
+         (if_then_else (match_operator 0 "ordered_comparison_operator"
+-                       [(match_operand:SI 1 "register_operand")
+-                        (match_operand:SI 2 "arith_operand" "I,i")])
++                       [(match_operand 1 "register_operand")
++                        (match_operand 2 "arith_operand" "I,i")])
+                       (label_ref (match_operand 3 ""))
+                       (pc)))]
+   ""
+@@ -2028,6 +2064,26 @@
+ 		      (label_ref (match_operand 1))
+ 		      (pc)))])
+ 
++(define_insn "branch_zero64"
++  [(set (pc)
++	(if_then_else (match_operator 0 "ordered_comparison_operator"
++  				 [(match_operand 1 "register_operand" "d")
++                                  (const_int 0)])
++                      (match_operand 2 "pc_or_label_operand" "")
++                      (match_operand 3 "pc_or_label_operand" "")))
++  ]
++  "TARGET_MB_64"
++  {
++    if (operands[3] == pc_rtx) 
++      return "bea%C0i%?\t%z1,%2";
++    else 
++      return "bea%N0i%?\t%z1,%3";
++  }
++  [(set_attr "type"	"branch")
++   (set_attr "mode"	"none")
++   (set_attr "length"	"4")]
++)
++
+ (define_insn "branch_zero"
+   [(set (pc)
+ 	(if_then_else (match_operator:SI 0 "ordered_comparison_operator"
+@@ -2048,6 +2104,47 @@
+    (set_attr "length"	"4")]
+ )
+ 
++(define_insn "branch_compare64"
++  [(set (pc)
++        (if_then_else (match_operator 0 "cmp_op"
++                                         [(match_operand 1 "register_operand" "d")
++                                          (match_operand 2 "register_operand" "d")
++                                         ])
++                      (label_ref (match_operand 3))
++                      (pc)))
++  (clobber(reg:SI R_TMP))]
++  "TARGET_MB_64"
++  {
++    operands[4] = gen_rtx_REG (SImode, MB_ABI_ASM_TEMP_REGNUM);
++    enum rtx_code code = GET_CODE (operands[0]);
++
++    if (code == GT || code == LE)
++      {
++        output_asm_insn ("cmp\tr18,%z1,%z2", operands);
++        code = swap_condition (code);
++      }
++    else if (code == GTU || code == LEU)
++      {
++        output_asm_insn ("cmpu\tr18,%z1,%z2", operands);
++        code = swap_condition (code);
++      }
++    else if (code == GE || code == LT)
++      {
++        output_asm_insn ("cmp\tr18,%z2,%z1", operands);
++      }
++    else if (code == GEU || code == LTU)
++      {
++        output_asm_insn ("cmpu\tr18,%z2,%z1", operands);
++      }
++
++    operands[0] = gen_rtx_fmt_ee (signed_condition (code), SImode, operands[4], const0_rtx);
++    return "bea%C0i%?\tr18,%3";
++  }
++  [(set_attr "type"     "branch")
++   (set_attr "mode"     "none")
++   (set_attr "length"   "12")]
++)
++
+ (define_insn "branch_compare"
+   [(set (pc)
+         (if_then_else (match_operator:SI 0 "cmp_op"
