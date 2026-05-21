@@ -9,6 +9,12 @@ have already done.  Avoid this.
 Upstream-Status: Inappropriate [YP integration specific]
 
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
+Rebase with Wrynose
+
+AI-Generated: GitHub Copilot (Claude Sonnet 4.6)
+
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
 ---
  lib/sw_apps/versal_plm/src/versal/Makefile       | 4 ++--
  lib/sw_apps/versal_plm/src/versal_net/Makefile   | 4 ++--
@@ -17,10 +23,8 @@ Signed-off-by: Mark Hatle <mark.hatle@amd.com>
  lib/sw_apps/zynqmp_pmufw/src/Makefile            | 4 ++--
  5 files changed, 11 insertions(+), 11 deletions(-)
 
-Index: git/lib/sw_apps/versal_plm/src/versal/Makefile
-===================================================================
---- git.orig/lib/sw_apps/versal_plm/src/versal/Makefile
-+++ git/lib/sw_apps/versal_plm/src/versal/Makefile
+--- a/lib/sw_apps/versal_plm/src/versal/Makefile
++++ b/lib/sw_apps/versal_plm/src/versal/Makefile
 @@ -35,8 +35,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
  $(OBJS): $(LIBS)
  
@@ -32,10 +36,8 @@ Index: git/lib/sw_apps/versal_plm/src/versal/Makefile
  	echo "Compiling bsp"
  	$(MAKE) -C ../../misc/versal/versal_plm_bsp
  
-Index: git/lib/sw_apps/versal_plm/src/versal_net/Makefile
-===================================================================
---- git.orig/lib/sw_apps/versal_plm/src/versal_net/Makefile
-+++ git/lib/sw_apps/versal_plm/src/versal_net/Makefile
+--- a/lib/sw_apps/versal_plm/src/versal_net/Makefile
++++ b/lib/sw_apps/versal_plm/src/versal_net/Makefile
 @@ -35,8 +35,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
  $(OBJS): $(LIBS)
  
@@ -47,10 +49,8 @@ Index: git/lib/sw_apps/versal_plm/src/versal_net/Makefile
  	echo "Compiling bsp"
  	$(MAKE) -C ../../misc/versal_net/versal_plm_bsp
  
-Index: git/lib/sw_apps/versal_psmfw/src/versal/Makefile
-===================================================================
---- git.orig/lib/sw_apps/versal_psmfw/src/versal/Makefile
-+++ git/lib/sw_apps/versal_psmfw/src/versal/Makefile
+--- a/lib/sw_apps/versal_psmfw/src/versal/Makefile
++++ b/lib/sw_apps/versal_psmfw/src/versal/Makefile
 @@ -37,8 +37,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
  $(OBJS): $(LIBS)
  
@@ -62,10 +62,8 @@ Index: git/lib/sw_apps/versal_psmfw/src/versal/Makefile
  	echo "Compiling bsp"
  	$(MAKE) -C ../../misc/versal_psmfw_bsp
  
-Index: git/lib/sw_apps/versal_psmfw/src/versal_net/Makefile
-===================================================================
---- git.orig/lib/sw_apps/versal_psmfw/src/versal_net/Makefile
-+++ git/lib/sw_apps/versal_psmfw/src/versal_net/Makefile
+--- a/lib/sw_apps/versal_psmfw/src/versal_net/Makefile
++++ b/lib/sw_apps/versal_psmfw/src/versal_net/Makefile
 @@ -37,8 +37,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
  $(OBJS): $(LIBS)
  
@@ -82,10 +80,8 @@ Index: git/lib/sw_apps/versal_psmfw/src/versal_net/Makefile
  clean:
  	rm -rf $(OBJS) $(LIBS) $(EXEC) *.o *.d ../common/*.o ../common/*.d
 -	rm -rf ../../misc/versal_net/versal_psmfw_bsp
-Index: git/lib/sw_apps/zynqmp_pmufw/src/Makefile
-===================================================================
---- git.orig/lib/sw_apps/zynqmp_pmufw/src/Makefile
-+++ git/lib/sw_apps/zynqmp_pmufw/src/Makefile
+--- a/lib/sw_apps/zynqmp_pmufw/src/Makefile
++++ b/lib/sw_apps/zynqmp_pmufw/src/Makefile
 @@ -30,8 +30,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
  $(OBJS): $(LIBS)
  
