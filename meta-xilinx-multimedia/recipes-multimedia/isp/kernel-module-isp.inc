@@ -1,5 +1,5 @@
-SUMMARY = "Xilinx Versal2 ISP linux kernel module"
-DESCRIPTION = "Versal2 Image Signal Processor (ISP) out-of-tree kernel modules provider for aarch64 devices"
+SUMMARY = "Xilinx Versal-2ve-2vm ISP linux kernel module"
+DESCRIPTION = "Versal-2ve-2vm Image Signal Processor (ISP) out-of-tree kernel modules provider for aarch64 devices"
 SECTION = "kernel/modules"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=eb723b61539feef013de476e68b5c50a"
