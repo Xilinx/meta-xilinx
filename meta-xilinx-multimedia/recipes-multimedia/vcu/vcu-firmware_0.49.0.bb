@@ -11,7 +11,7 @@ S  = "${WORKDIR}/git"
 
 BRANCH ?= "master"
 REPO ?= "git://github.com/Xilinx/vcu-firmware.git;protocol=https"
-SRCREV = "c6d904dbe8edb1ebf682a2019978292880c42eb5"
+SRCREV = "cd2bf28c48ca4a2ce1a9530c4e45e5f439a14cb2"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI   = "${REPO};${BRANCHARG}"
