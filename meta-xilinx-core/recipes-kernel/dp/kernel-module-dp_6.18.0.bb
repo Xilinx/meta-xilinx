@@ -10,7 +10,7 @@ S = "${WORKDIR}/git"
 
 REPO   = "git://github.com/Xilinx/dp-modules.git;protocol=https"
 BRANCH = "master"
-SRCREV = "fb2fe5b1236afd17b51ddc0cb4cd69aa7f80c79f"
+SRCREV = "f7b1b2858d674a07bc8ecd82010adb7de6c76534"
 
 SRC_URI = "${REPO};branch=${BRANCH}"
 
