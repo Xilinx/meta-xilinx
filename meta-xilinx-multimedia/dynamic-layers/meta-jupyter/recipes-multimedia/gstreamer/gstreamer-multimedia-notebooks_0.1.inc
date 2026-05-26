@@ -1,6 +1,6 @@
-BRANCH ?= "xlnx_rel_v2025.2"
+BRANCH ?= "xlnx_rel_v2026.1"
 REPO   ?= "git://github.com/Xilinx/multimedia-notebooks.git;protocol=https"
-SRCREV ?= "204ed16c44478dfa1f426b22110c06fcf7da6259"
+SRCREV ?= "4e7491e53818a4eed7f5e2753e0b1e5d99bd54ac"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
