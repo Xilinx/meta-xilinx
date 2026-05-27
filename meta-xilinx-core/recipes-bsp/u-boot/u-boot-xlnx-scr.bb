@@ -233,6 +233,8 @@ BITSTREAM_LOAD_ADDRESS ?= "0x100000"
 
 do_configure[noexec] = "1"
 
+S = "${UNPACKDIR}"
+
 def append_baseaddr(d,offset):
     skip_append = d.getVar('SKIP_APPEND_BASEADDR') or ""
     if skip_append == "1":
@@ -294,14 +296,14 @@ do_compile() {
         -e 's:@@KERNEL_ROOT_RAMDISK@@:${KERNEL_ROOT_RAMDISK}:' \
         -e 's:@@KERNEL_COMMAND_APPEND@@:${KERNEL_COMMAND_APPEND}:' \
         ${SCRIPT_SED_ADDENDUM} \
-        "${WORKDIR}/boot.cmd.${BOOTMODE}${BOOTFILE_EXT}" > "${WORKDIR}/boot.cmd"
+        "${UNPACKDIR}/boot.cmd.${BOOTMODE}${BOOTFILE_EXT}" > "${UNPACKDIR}/boot.cmd"
 
-    mkimage -A arm -T script -C none -n "Boot script" -d "${WORKDIR}/boot.cmd" boot.scr
+    mkimage -A arm -T script -C none -n "Boot script" -d "${UNPACKDIR}/boot.cmd" boot.scr
 
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
         -e 's/@@DEVICE_TREE_NAME@@/${DEVICE_TREE_NAME}/' \
         -e 's/@@RAMDISK_IMAGE@@/${PXERAMDISK_IMAGE}/' \
-        "${WORKDIR}/pxeboot.pxe" > "pxeboot.pxe"
+        "${UNPACKDIR}/pxeboot.pxe" > "pxeboot.pxe"
 }
 
 do_install() {

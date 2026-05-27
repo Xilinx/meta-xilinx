@@ -84,6 +84,8 @@ BIF_BITSTREAM_ATTR ?= "${@bb.utils.contains('MACHINE_FEATURES', 'fpga-overlay', 
 
 do_patch[noexec] = "1"
 
+S = "${UNPACKDIR}"
+
 python do_configure() {
     fp = d.getVar("BIF_FILE_PATH")
     
@@ -101,7 +103,7 @@ do_configure[vardeps] += "BIF_PARTITION_ID BIF_PARTITION_NAME"
 do_compile() {
     rm -f ${B}/BOOT.bin
     if [ "${BIF_FILE_PATH}" != "${B}/bootgen.bif" ];then
-        BIF_FILE_PATH="${WORKDIR}${BIF_FILE_PATH}"
+        BIF_FILE_PATH="${UNPACKDIR}${BIF_FILE_PATH}"
     fi
     bootgen -image ${BIF_FILE_PATH} -arch ${BOOTGEN_ARCH} ${BOOTGEN_EXTRA_ARGS} -w -o ${B}/BOOT.bin
     if [ ! -e ${B}/BOOT.bin ]; then
