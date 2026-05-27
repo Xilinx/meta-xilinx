@@ -47,7 +47,8 @@ python() {
             raise bb.parse.SkipRecipe('BB_NO_NETWORK is enabled, can not fetch SRCREV (%s)' % d.getVar('SRCREV'))
 }
 
-SHARED_S = "${TMPDIR}/work-shared/embeddedsw-${ESW_VER}/git"
+SHARED_S = "${TMPDIR}/work-shared/embeddedsw-${ESW_VER}/sources/embeddedsw-source-${ESW_VER}+git"
+
 B = "${WORKDIR}/build"
 
 ERROR_QA:remove = "buildpaths"
@@ -84,7 +85,7 @@ do_deploy_source_date_epoch () {
         sde_file=${SDE_FILE}
         sde_file=${sde_file#${WORKDIR}/}
         mkdir -p ${SDE_DEPLOYDIR} $(dirname ${SDE_FILE})
-        cp -p $(dirname ${SHARED_S})/$sde_file ${SDE_DEPLOYDIR}
-        cp -p $(dirname ${SHARED_S})/$sde_file ${SDE_FILE}
+        cp -p `dirname $(dirname ${SHARED_S})`/$sde_file ${SDE_DEPLOYDIR}
+        cp -p `dirname $(dirname ${SHARED_S})`/$sde_file ${SDE_FILE}
     fi
 }

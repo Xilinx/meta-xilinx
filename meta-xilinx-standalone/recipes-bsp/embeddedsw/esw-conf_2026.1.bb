@@ -18,6 +18,8 @@ ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/"
 do_configure[noexec] = '1'
 do_compile[noexec] = '1'
 
+S = "${UNPACKDIR}/embeddedsw-source-${PV}"
+
 do_install() {
     # The configuration step requires only the yaml files, make them
     # available to the SDK
