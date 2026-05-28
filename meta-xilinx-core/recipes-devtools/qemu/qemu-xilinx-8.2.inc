@@ -59,12 +59,12 @@ SRCREV_keycodemapdb = "f5772a62ec52591ff6870b7e8ef32482371f22c6"
 SRCREV_libvfio-user = "0b28d205572c80b568a1003db2c8f37ca333e4d7"
 SRCREV_slirp = "26be815b86e8d49add8c9a8b320239b9594ff03d"
 SRC_URI += "\
-           git://gitlab.com/qemu-project/berkeley-softfloat-3.git;protocol=https;nobranch=1;destsuffix=git/subprojects/berkeley-softfloat-3;name=berkeley-softfloat-3 \
-           git://gitlab.com/qemu-project/berkeley-testfloat-3.git;protocol=https;nobranch=1;destsuffix=git/subprojects/berkeley-testfloat-3;name=berkeley-testfloat-3 \
-           git://gitlab.com/qemu-project/dtc.git;protocol=https;nobranch=1;destsuffix=git/subprojects/dtc;name=dtc \
-           git://gitlab.com/qemu-project/keycodemapdb.git;protocol=https;nobranch=1;destsuffix=git/subprojects/keycodemapdb;name=keycodemapdb \
-           git://gitlab.com/qemu-project/libvfio-user.git;protocol=https;nobranch=1;destsuffix=git/subprojects/libvfio-user;name=libvfio-user \
-           git://gitlab.freedesktop.org/slirp/libslirp.git;protocol=https;nobranch=1;destsuffix=git/subprojects/slirp;name=slirp \
+           git://gitlab.com/qemu-project/berkeley-softfloat-3.git;protocol=https;nobranch=1;destsuffix=${BP}/subprojects/berkeley-softfloat-3;name=berkeley-softfloat-3 \
+           git://gitlab.com/qemu-project/berkeley-testfloat-3.git;protocol=https;nobranch=1;destsuffix=${BP}/subprojects/berkeley-testfloat-3;name=berkeley-testfloat-3 \
+           git://gitlab.com/qemu-project/dtc.git;protocol=https;nobranch=1;destsuffix=${BP}/subprojects/dtc;name=dtc \
+           git://gitlab.com/qemu-project/keycodemapdb.git;protocol=https;nobranch=1;destsuffix=${BP}/subprojects/keycodemapdb;name=keycodemapdb \
+           git://gitlab.com/qemu-project/libvfio-user.git;protocol=https;nobranch=1;destsuffix=${BP}/subprojects/libvfio-user;name=libvfio-user \
+           git://gitlab.freedesktop.org/slirp/libslirp.git;protocol=https;nobranch=1;destsuffix=${BP}/subprojects/slirp;name=slirp \
 "
 
 # Configure meson for disable-download
