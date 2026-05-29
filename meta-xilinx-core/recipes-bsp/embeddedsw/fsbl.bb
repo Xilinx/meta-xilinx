@@ -59,7 +59,7 @@ do_deploy() {
 
 addtask deploy before do_build after do_install
 
-INSANE_SKIP:${PN} = "arch"
+INSANE_SKIP:${PN} = "arch textrel"
 INSANE_SKIP:${PN}-dbg = "arch"
 
 # Disable buildpaths QA check warnings.
