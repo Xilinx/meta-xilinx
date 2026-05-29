@@ -6,6 +6,20 @@ inherit check_sdt_enabled python3native xlnx-embeddedsw pkgconfig cmake
 # which will cause a build failures.
 OECMAKE_ARGS:remove = "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON"
 
+# cmake 4.3 changed CMP0000 to fatal when cmake_minimum_required() is absent.
+# Set a default CMAKE version which resolves most cases.
+OECMAKE_ARGS += "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+
+# ESW upstream CMakeLists.txt files lack this directive.
+# Inject it at the top of the file before cmake reads it, since -D variables
+# are processed too late for some checks.
+do_configure:prepend() {
+    local cmake_file="${OECMAKE_SOURCEPATH}/CMakeLists.txt"
+    if [ -f "$cmake_file" ] && ! grep -q "cmake_minimum_required" "$cmake_file"; then
+        sed -i '1s/^/cmake_minimum_required(VERSION 3.5)\n/' "$cmake_file"
+    fi
+}
+
 SRCREV_FORMAT = "src_decouple"
 
 OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
