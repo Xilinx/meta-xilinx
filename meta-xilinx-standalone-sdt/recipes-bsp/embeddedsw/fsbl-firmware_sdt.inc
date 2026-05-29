@@ -16,6 +16,8 @@ DEPENDS += "${PSU_INIT_DEPENDS} ${ESW_FSBL_DEPENDS}"
 CFLAGS:append:aarch64 = " -DARMA53_64"
 CFLAGS:append:armv7r = " -DARMR5"
 
+
+
 # These files usually come in from sdt-artifacts (SYSTEM_DTFILE_DEPENDS)
 FSBL_PS_INIT_C:zynq = "ps7_init.c"
 FSBL_PS_INIT_C:zynqmp = "psu_init.c"
@@ -40,6 +42,23 @@ do_configure:prepend() {
         bbfatal "Using the default ${FSBL_PS_INIT_H}, this may not work correctly.  Looking for ${PSU_INIT_PATH}/${FSBL_PS_INIT_H}"
     fi
     install -m 0644 ${S}/cmake/UserConfig.cmake ${S}/${ESW_COMPONENT_SRC}
+
+    # binutils 2.46 promotes "PHDR segment not covered by LOAD segment" from
+    # a warning to a fatal error during LTO link. The linker auto-generates a
+    # PT_PHDR entry that cannot be covered by any LOAD segment (the binary
+    # lives entirely in OCM at 0xFFFC0000). The --no-check-sections flag is
+    # not forwarded through lto-wrapper's internal ld invocation.
+    # Fix: inject an explicit PHDRS block (without PT_PHDR) into the linker
+    # script so the linker never generates the uncoverable PT_PHDR entry.
+    for _ld in ${S}/${ESW_COMPONENT_SRC}/lscript_a53.ld ${S}/${ESW_COMPONENT_SRC}/lscript.ld; do
+        if [ -f "${_ld}" ] && ! grep -q "^PHDRS" "${_ld}"; then
+            # Insert PHDRS block (single load segment) before SECTIONS
+            sed -i 's/^SECTIONS$/PHDRS\n{\n  load PT_LOAD ;\n}\n\nSECTIONS/' "${_ld}"
+            # Annotate the first section's memory assignment with :load so
+            # that PT_LOAD covers it; subsequent sections inherit this PHDR.
+            sed -i '0,/^} > [^ ]* *$/{s/^\(} > [^ ]*\) *$/\1 :load/}' "${_ld}"
+        fi
+    done
 }
 
 do_install() {
