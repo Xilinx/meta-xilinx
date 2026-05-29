@@ -7,7 +7,6 @@ PE = "1"
 
 PV .= "+git"
 
-S  = "${WORKDIR}/git"
 
 BRANCH ?= "xlnx_rel_v2025.1"
 REPO ?= "git://github.com/Xilinx/vcu-firmware.git;protocol=https"

@@ -29,7 +29,7 @@ RDEPENDS:${PN} = "vcu2-firmware"
 
 do_install:append() {
     install -d ${D}${sysconfdir}/udev/rules.d
-    install -m 0644 ${WORKDIR}/99-vcu2-codec.rules ${D}${sysconfdir}/udev/rules.d/
+    install -m 0644 ${UNPACKDIR}/99-vcu2-codec.rules ${D}${sysconfdir}/udev/rules.d/
 }
 
 FILES:${PN} = "${sysconfdir}/udev/rules.d/*"

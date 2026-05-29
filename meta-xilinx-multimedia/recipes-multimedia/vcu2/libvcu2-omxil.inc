@@ -10,7 +10,6 @@ REPO ?= "git://github.com/Xilinx/vcu2-omx-il.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-S  = "${WORKDIR}/git"
 
 inherit features_check
 

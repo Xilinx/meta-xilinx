@@ -31,7 +31,7 @@ KERNEL_MODULE_AUTOLOAD += "dmaproxy"
 
 do_install:append() {
     install -d ${D}${sysconfdir}/udev/rules.d
-    install -m 0644 ${WORKDIR}/99-vcu-enc-dec.rules ${D}${sysconfdir}/udev/rules.d/
+    install -m 0644 ${UNPACKDIR}/99-vcu-enc-dec.rules ${D}${sysconfdir}/udev/rules.d/
 }
 
 FILES:${PN} = "${sysconfdir}/udev/rules.d/*"
