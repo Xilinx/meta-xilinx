@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+Date: Fri, 29 May 2026 00:00:00 -0600
+Subject: [PATCH] newlib/ssp: Remove write() and raise() calls from
+ __stack_chk_fail for bare-metal
+
+newlib 4.6.0 changed __stack_chk_fail to call write(2, ...) and
+raise(SIGABRT) before _exit(127).  These syscalls are unavailable in
+bare-metal environments (no file descriptors, no signal delivery),
+causing the linker to fail when any library compiled with
+-fstack-protector is linked against the bare-metal libc.a:
+
+  libc.a(stack_protector.o): in function '__stack_chk_fail':
+  stack_protector.c:39: undefined reference to 'write'
+
+For bare-metal targets fall straight through to _exit(127).  The
+diagnostic message is dropped because there is no stderr.
+
+Upstream-Status: Inappropriate [bare-metal specific]
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+---
+ newlib/libc/ssp/stack_protector.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/newlib/libc/ssp/stack_protector.c b/newlib/libc/ssp/stack_protector.c
+index a1b2c3d..e4f5a6b 100644
+--- a/newlib/libc/ssp/stack_protector.c
++++ b/newlib/libc/ssp/stack_protector.c
+@@ -35,9 +35,6 @@
+ __attribute__((__noreturn__))
+ __stack_chk_fail (void)
+ {
+-  char msg[] = "*** stack smashing detected ***: terminated\n";
+-  write (2, msg, strlen (msg));
+-  raise (SIGABRT);
+   _exit (127);
+ }
