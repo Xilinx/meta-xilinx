@@ -1,0 +1,23 @@
+From 573f7b22a43a206f0bcaa131c5f6de18a08d46c2 Mon Sep 17 00:00:00 2001
+From: Siva Addepalli <siva.addepalli@amd.com>
+Date: Thu, 21 May 2026 17:07:45 +0530
+Subject: [CI AUTOMERGE meta-xilinx][2026.1][PATCH] gen-machine-conf: Updated Commit ID
+
+Auto-merge: integrate 23f5dec2869f3af8c0eab3a23e9c9a058b0d401d into xlnx_rel_v2026.1
+docs: add boot-mode, dual-PDI, multi-PL, and multi-machine guides
+docs: update MicroBlaze-V support documentation
+lib: Add MB-V RISC-V and AXI UARTLite serial support
+---
+ meta-xilinx-core/gen-machine-conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meta-xilinx-core/gen-machine-conf b/meta-xilinx-core/gen-machine-conf
+index 37eff1e..f3c1c7f 160000
+--- a/meta-xilinx-core/gen-machine-conf
++++ b/meta-xilinx-core/gen-machine-conf
+@@ -1 +1 @@
+-Subproject commit 37eff1ef62ab137772f868fae852ede40ace3d8a
++Subproject commit f3c1c7f0f7cf26ef009841982af62430dcd899e0
+-- 
+1.8.3.1
+
