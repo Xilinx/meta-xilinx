@@ -9,8 +9,8 @@ applications load onto the RPU on the AMD Versal Series Gen 2 VEK385 \
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/versal-2ve-2vm-vek385-revb-multidomain_openamp-zephyr-demo/LICENSE.md;md5=0b96a4c07d631aa5141bd3f058ba43b0"
 
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/05290534/external/openamp-zephyr-demo/versal-2ve-2vm-vek385-revb-multidomain_openamp-zephyr-demo_05290534.tar.gz"
-SRC_URI[sha256sum] = "80983c1e5bae1326dc07ce2ad4031b9f2de197f78602b34c22f4fc12a934afc3"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/05300528/external/openamp-zephyr-demo/versal-2ve-2vm-vek385-revb-multidomain_openamp-zephyr-demo_05300528.tar.gz"
+SRC_URI[sha256sum] = "bba3635c69d15df7705cfc8cfac3d6a5877a21876ac574a4062c38acd0571e5b"
 
 OPENAMPFW_BOARD = "vek385-revb"
 require conf/includes/openamp-fw-example.inc
