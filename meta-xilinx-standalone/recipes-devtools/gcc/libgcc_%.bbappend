@@ -30,4 +30,5 @@ do_install[postfuncs] .= "${FIXUP_FUNCTION}"
 FILES:${PN}-dev:append:xilinx-standalone:class-target = " \
 	${libdir}/*.a \
 	${libdir}/*.o \
-"
+	${libdir}/*.specs \
+	"
