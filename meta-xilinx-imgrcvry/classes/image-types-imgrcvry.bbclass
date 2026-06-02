@@ -100,6 +100,6 @@ do_imgrcvry_bif[vardeps] += "\
     SOC_FAMILY \
 "
 
-IMGRCVRY_ATTR_DEP = "${@(d.getVar('IMGRCVRY_ATTR') or "").replace('arm-trusted-firmware', 'virtual/arm-trusted-firmware').replace('bitstream', 'virtual/bitstream')}"
+IMGRCVRY_ATTR_DEP = "${@(d.getVar('IMGRCVRY_ATTR') or "").replace('bitstream', 'virtual/bitstream')}"
 do_imgrcvry_bif[depends] += "${@' '.join('%s:do_populate_sysroot' % r for r in d.getVar('IMGRCVRY_ATTR_DEP').split())}"
 do_imgrcvry_bif[depends] += "bootgen-native:do_populate_sysroot virtual/kernel:do_deploy"

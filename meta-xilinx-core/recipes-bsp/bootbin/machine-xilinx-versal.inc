@@ -9,11 +9,11 @@ BIF_OPTIONAL_DATA ?= ""
 
 #specify BIF partition attributes required for BOOT.bin
 BIF_FSBL_ATTR       ??= "base-pdi plmfw psmfw"
-BIF_ATF_ATTR        ??= "arm-trusted-firmware"
+BIF_TFA_ATTR        ??= "trusted-firmware-a"
 BIF_DEVICETREE_ATTR ??= "device-tree"
 BIF_SSBL_ATTR       ??= "u-boot-xlnx"
 BIF_APPS_ATTR       ??= ""
-BIF_PARTITION_ATTR  ??= "${BIF_FSBL_ATTR} ${BIF_DEVICETREE_ATTR} ${BIF_ATF_ATTR} ${BIF_SSBL_ATTR} ${BIF_APPS_ATTR}"
+BIF_PARTITION_ATTR  ??= "${BIF_FSBL_ATTR} ${BIF_DEVICETREE_ATTR} ${BIF_TFA_ATTR} ${BIF_SSBL_ATTR} ${BIF_APPS_ATTR}"
 
 # specify BIF partition attributes for base-pdi
 BIF_PARTITION_ATTR[base-pdi] ?= "type=bootimage"
@@ -40,10 +40,10 @@ BIF_PARTITION_ATTR[u-boot-xlnx] ?= "core=a72-0, exception_level = el-2"
 BIF_PARTITION_IMAGE[u-boot-xlnx] ?= "${RECIPE_SYSROOT}/boot/u-boot.elf"
 BIF_PARTITION_ID[u-boot-xlnx] ?= "0x1c000000"
 
-# specify BIF partition attributes for arm-trusted-firmware
-BIF_PARTITION_ATTR[arm-trusted-firmware] ?= "core=a72-0, exception_level = el-3, trustzone"
-BIF_PARTITION_IMAGE[arm-trusted-firmware] ?= "${RECIPE_SYSROOT}/boot/arm-trusted-firmware.elf"
-BIF_PARTITION_ID[arm-trusted-firmware] ?= "0x1c000000"
+# specify BIF partition attributes for trusted-firmware-a
+BIF_PARTITION_ATTR[trusted-firmware-a] ?= "core=a72-0, exception_level = el-3, trustzone"
+BIF_PARTITION_IMAGE[trusted-firmware-a] ?= "${RECIPE_SYSROOT}/boot/trusted-firmware-a.elf"
+BIF_PARTITION_ID[trusted-firmware-a] ?= "0x1c000000"
 
 # Force the newly created CDO file to be made available in the deploy directory
 do_extract_cdo() {

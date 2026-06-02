@@ -6,23 +6,23 @@ BIF_COMMON_ATTR ?= ""
 #   https://xilinx-wiki.atlassian.net/wiki/spaces/A/pages/18842019/Zynq+UltraScale+FSBL#ZynqUltraScale%2BFSBL-IsthereanyorderinwhichIhavetospecifybitstreaminBIFfile(forbootimagecreation)%3F
 #
 # The loading rules:
-# From the 2017.1 release, bistreams should be loaded bfore ATF...
+# From the 2017.1 release, bistreams should be loaded bfore TFA...
 # ...preferably immediately after the FSBL and PMUFW.
 #
 # While the first few components must be fsbl and pmufw per:
 # https://www.xilinx.com/support/documentation/sw_manuals/xilinx2021_2/ug1283-bootgen-user-guide.pdf
 #
 # This combination restricts the boot order to be:
-# FSBL & PMUFW -> Bitstream (if available) -> ATF -> Device Tree (if available) -> Second Stage Bootloader
+# FSBL & PMUFW -> Bitstream (if available) -> TFA -> Device Tree (if available) -> Second Stage Bootloader
 #
 BIF_FSBL_ATTR       ??= "fsbl pmufw"
 BIF_BITSTREAM_ATTR  ??= ""
-BIF_ATF_ATTR        ??= "arm-trusted-firmware"
+BIF_TFA_ATTR        ??= "trusted-firmware-a"
 BIF_DEVICETREE_ATTR ??= "device-tree"
 BIF_SSBL_ATTR       ??= "u-boot-xlnx"
 BIF_UDFBH_ATTR      ??= ""
 BIF_APPS_ATTR       ??= ""
-BIF_PARTITION_ATTR  ??= "${BIF_FSBL_ATTR} ${BIF_BITSTREAM_ATTR} ${BIF_ATF_ATTR} ${BIF_DEVICETREE_ATTR} ${BIF_SSBL_ATTR} ${BIF_UDFBH_ATTR} ${BIF_APPS_ATTR}"
+BIF_PARTITION_ATTR  ??= "${BIF_FSBL_ATTR} ${BIF_BITSTREAM_ATTR} ${BIF_TFA_ATTR} ${BIF_DEVICETREE_ATTR} ${BIF_SSBL_ATTR} ${BIF_UDFBH_ATTR} ${BIF_APPS_ATTR}"
 
 # specify BIF partition attributes for FSBL
 # bootloader is FSBL. Location where FSBL binary is present and dependency to build FSBL
@@ -34,10 +34,10 @@ BIF_PARTITION_IMAGE[fsbl] ?= "${RECIPE_SYSROOT}/boot/fsbl.elf"
 BIF_PARTITION_ATTR[pmufw] ?= "destination_cpu=pmu"
 BIF_PARTITION_IMAGE[pmufw] ?= "${RECIPE_SYSROOT}/boot/pmufw.elf"
 
-# specify BIF partition attributes for ATF
-# destination cpu for ATF, security levels. Location where ATF binary is present (dependency is not required as ATF is always built for ZU+, see zcu102-zynqmp.conf)
-BIF_PARTITION_ATTR[arm-trusted-firmware] ?= "destination_cpu=a53-0,exception_level=el-3,trustzone"
-BIF_PARTITION_IMAGE[arm-trusted-firmware] ?= "${RECIPE_SYSROOT}/boot/arm-trusted-firmware.elf"
+# specify BIF partition attributes for TFA
+# destination cpu for TFA, security levels. Location where TFA binary is present (dependency is not required as TFA is always built for ZU+, see zcu102-zynqmp.conf)
+BIF_PARTITION_ATTR[trusted-firmware-a] ?= "destination_cpu=a53-0,exception_level=el-3,trustzone"
+BIF_PARTITION_IMAGE[trusted-firmware-a] ?= "${RECIPE_SYSROOT}/boot/trusted-firmware-a.elf"
 
 # specify BIF partition attributes for u-boot
 # destination cpu for u-boot, security levels. Location where u-boot binary is present (dependency is not required as u-boot is always built for ZU+, see zcu102-zynqmp.conf)

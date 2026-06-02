@@ -14,9 +14,6 @@ LIC_FILES_CHKSUM = "file://docs/license.rst;md5=83b7626b8c7a37263c6a58af8d19bee1
 
 # mbedtls-3.4.1 is not enabled in this configuration
 
-# The following are Xilinx specific settings
-PROVIDES = "virtual/arm-trusted-firmware"
-
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
@@ -98,8 +95,7 @@ TFA_INSTALL_TARGET = "bl31"
 
 inherit image-artifact-names
 
-# arm-trusted-firmware instead of ${PN} for compatibility
-ATF_BASE_NAME ?= "arm-trusted-firmware-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
+ATF_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
 
 do_install:append() {
     # The first TFA_INSTALL_TARGET found will be copied as the standard boot firmware
@@ -107,17 +103,17 @@ do_install:append() {
         install -d ${D}/boot
         if [ -e ${D}/firmware/$atfbin-${TFA_PLATFORM}.elf ]; then
             ln ${D}/firmware/$atfbin-${TFA_PLATFORM}.elf ${D}/boot/${ATF_BASE_NAME}.elf
-            ln -sf ${ATF_BASE_NAME}.elf ${D}/boot/arm-trusted-firmware.elf
+            ln -sf ${ATF_BASE_NAME}.elf ${D}/boot/${PN}.elf
             ln ${D}/firmware/$atfbin-${TFA_PLATFORM}.bin ${D}/boot/${ATF_BASE_NAME}.bin
-            ln -sf ${ATF_BASE_NAME}.bin ${D}/boot/arm-trusted-firmware.bin
+            ln -sf ${ATF_BASE_NAME}.bin ${D}/boot/${PN}.bin
 
             # Get the entry point address from the elf.
             BL31_BASE_ADDR=$(${READELF} -h ${D}/boot/${ATF_BASE_NAME}.elf | egrep -m 1 -i "entry point.*?0x" | sed -r 's/.*?(0x.*?)/\1/g')
-            mkimage -A arm64 -O arm-trusted-firmware -T kernel -C none \
+            mkimage -A arm64 -O trusted-firmware-a -T kernel -C none \
                     -a $BL31_BASE_ADDR -e $BL31_BASE_ADDR \
                     -d ${D}/firmware/$atfbin-${TFA_PLATFORM}.bin ${D}/boot/${ATF_BASE_NAME}.ub
-            ln -sf ${ATF_BASE_NAME}.ub ${D}/boot/arm-trusted-firmware.ub
-            ln -sf ${ATF_BASE_NAME}.ub ${D}/boot/atf-uboot.ub
+            ln -sf ${ATF_BASE_NAME}.ub ${D}/boot/${PN}.ub
+            ln -sf ${ATF_BASE_NAME}.ub ${D}/boot/tfa-uboot.ub
             break
         fi
     done
@@ -137,7 +133,6 @@ addtask deploy before do_build after do_compile
 
 SYSROOT_DIRS += "/boot"
 FILES:${PN} += "/boot/*.elf /boot/*.bin /boot/*.ub"
-RPROVIDES:${PN} += "arm-trusted-firmware"
 
 python() {
     soc_family = d.getVar('SOC_FAMILY')

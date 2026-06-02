@@ -29,10 +29,10 @@ MANIFEST_AGGREGATE_DEPLOY_NAME = "${BOOTBIN_BASE_NAME}.manifest.json"
 MANIFEST_AGGREGATE_LINK_NAME = "boot.bin.manifest.json"
 
 MANIFEST_AGGREGATE_DEPENDS:zynq = "device-tree virtual/bootloader fsbl"
-MANIFEST_AGGREGATE_DEPENDS:zynqmp = "device-tree virtual/bootloader fsbl pmufw virtual/arm-trusted-firmware"
-MANIFEST_AGGREGATE_DEPENDS:versal = "device-tree virtual/bootloader plmfw psmfw virtual/arm-trusted-firmware virtual/base-pdi"
-MANIFEST_AGGREGATE_DEPENDS:versal-net = "device-tree virtual/bootloader plmfw psmfw virtual/arm-trusted-firmware virtual/base-pdi"
-MANIFEST_AGGREGATE_DEPENDS:versal-2ve-2vm = "device-tree virtual/bootloader plmfw virtual/arm-trusted-firmware virtual/base-pdi"
+MANIFEST_AGGREGATE_DEPENDS:zynqmp = "device-tree virtual/bootloader fsbl pmufw trusted-firmware-a"
+MANIFEST_AGGREGATE_DEPENDS:versal = "device-tree virtual/bootloader plmfw psmfw trusted-firmware-a virtual/base-pdi"
+MANIFEST_AGGREGATE_DEPENDS:versal-net = "device-tree virtual/bootloader plmfw psmfw trusted-firmware-a virtual/base-pdi"
+MANIFEST_AGGREGATE_DEPENDS:versal-2ve-2vm = "device-tree virtual/bootloader plmfw trusted-firmware-a virtual/base-pdi"
 
 # Don't allow building for microblaze MACHINE
 COMPATIBLE_MACHINE ?= "^$"
@@ -53,12 +53,6 @@ def bif_partition_attr_to_depends(d):
     # Convert bitstream to virtual/bitstream
     try:
         depends[depends.index("bitstream")] = "virtual/bitstream"
-    except ValueError:
-        pass
-
-    # Convert arm-trusted-firmware to virtual/arm-trusted-firmware
-    try:
-        depends[depends.index("arm-trusted-firmware")] = "virtual/arm-trusted-firmware"
     except ValueError:
         pass
 
@@ -97,7 +91,7 @@ python do_configure() {
 }
 
 do_configure[vardeps] += "BIF_PARTITION_ATTR BIF_PARTITION_IMAGE BIF_COMMON_ATTR"
-do_configure[vardeps] += "BIF_FSBL_ATTR BIF_BITSTREAM_ATTR BIF_ATF_ATTR BIF_DEVICETREE_ATTR BIF_SSBL_ATTR BIF_OPTIONAL_DATA"
+do_configure[vardeps] += "BIF_FSBL_ATTR BIF_BITSTREAM_ATTR BIF_TFA_ATTR BIF_DEVICETREE_ATTR BIF_SSBL_ATTR BIF_OPTIONAL_DATA"
 do_configure[vardeps] += "BIF_PARTITION_ID BIF_PARTITION_NAME"
 
 do_compile() {

@@ -2,7 +2,7 @@
 ZynqMP - PMU ROM
 ----------------
 
-Since Xilinx tool release v2017.1 multiple components (arm-trusted-firmware,
+Since Xilinx tool release v2017.1 multiple components (trusted-firmware-a,
 linux, u-boot, etc.) require the PMU firmware to be loaded. For QEMU this also
 means that the PMU ROM must be loaded so that the PMU firmware can be used.
 

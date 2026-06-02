@@ -87,7 +87,7 @@ def bootjtag(args, config, basepath, workspace):
         data['fsbl'] = os.path.join(deploy_dir, 'fsbl-' + machine + '.elf')
 
     if soc == 'zynqmp':
-        data['atf'] = os.path.join(deploy_dir, 'arm-trusted-firmware.elf')
+        data['atf'] = os.path.join(deploy_dir, 'trusted-firmware-a.elf')
         data['pmufw'] = os.path.join(deploy_dir, 'pmu-firmware-' + machine + '.elf')
 
     if soc in ('versal', 'versal-net', 'versal-2ve-2vm'):

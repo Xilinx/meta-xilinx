@@ -33,11 +33,8 @@ SRCREV = "e9b1373a7dd9fce25b5a2fe6189dd5ec6eedf24a"
 SRCREV_FORMAT:append = "${@bb.utils.contains('TFA_SCMI_SERVER', '1', '_scmi-server', '', d)}"
 
 # Pass SCMI server path to TF-A build
-EXTRA_OEMAKE += "${@bb.utils.contains('TFA_SCMI_SERVER', '1', 'CUSTOM_PKG_PATH=${WORKDIR}/scmi-server', '', d)}"
+EXTRA_OEMAKE += "${@bb.utils.contains('TFA_SCMI_SERVER', '1', 'CUSTOM_PKG_PATH=${UNPACKDIR}/scmi-server', '', d)}"
 
-
-# The following are Xilinx specific settings
-PROVIDES = "virtual/arm-trusted-firmware"
 
 COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE:zynqmp = ".*"
@@ -58,11 +55,7 @@ TFA_CONSOLE_DEFAULT:versal = "pl011"
 TFA_CONSOLE_DEFAULT:versal-net = "pl011"
 TFA_CONSOLE_DEFAULT:versal-2ve-2vm = "pl011"
 
-# Use old name for compatibility
-ATF_CONSOLE ?= "${TFA_CONSOLE_DEFAULT}"
-
-# Old name to new name
-TFA_CONSOLE ?= "${ATF_CONSOLE}"
+TFA_CONSOLE ?= "${TFA_CONSOLE_DEFAULT}"
 
 TFA_CONSOLE_OEMAKE = ""
 TFA_CONSOLE_OEMAKE:append:zynqmp = "${@' ZYNQMP_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
@@ -73,28 +66,22 @@ TFA_CONSOLE_OEMAKE:append:versal-2ve-2vm = "${@' CONSOLE=${TFA_CONSOLE}' if d.ge
 EXTRA_OEMAKE += "${TFA_CONSOLE_OEMAKE}"
 
 ### Debug settings
-DEBUG_ATF ?= "0"
-
-# Translate old to new name
-TFA_DEBUG = "${DEBUG_ATF}"
+TFA_DEBUG ?= "0"
 
 
 ### Mem Settings
-ATF_MEM_BASE ?= ""
-ATF_MEM_SIZE ?= ""
-
-TFA_MEM_BASE ?= "${ATF_MEM_BASE}"
-TFA_MEM_SIZE ?= "${ATF_MEM_SIZE}"
+TFA_MEM_BASE ?= ""
+TFA_MEM_SIZE ?= ""
 
 TFA_MEM_OEMAKE = ""
-TFA_MEM_OEMAKE:append:zynqmp     = "${@' ZYNQMP_ATF_MEM_BASE=${ATF_MEM_BASE}'     if d.getVar('ATF_MEM_BASE') != '' else ''}"
-TFA_MEM_OEMAKE:append:zynqmp     = "${@' ZYNQMP_ATF_MEM_SIZE=${ATF_MEM_SIZE}'     if d.getVar('ATF_MEM_SIZE') != '' else ''}"
-TFA_MEM_OEMAKE:append:versal     = "${@' VERSAL_ATF_MEM_BASE=${ATF_MEM_BASE}'     if d.getVar('ATF_MEM_BASE') != '' else ''}"
-TFA_MEM_OEMAKE:append:versal     = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}'     if d.getVar('ATF_MEM_SIZE') != '' else ''}"
-TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE') != '' else ''}"
-TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE') != '' else ''}"
-TFA_MEM_OEMAKE:append:versal-2ve-2vm    = "${@' MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE') != '' else ''}"
-TFA_MEM_OEMAKE:append:versal-2ve-2vm    = "${@' MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE') != '' else ''}"
+TFA_MEM_OEMAKE:append:zynqmp     = "${@' ZYNQMP_ATF_MEM_BASE=${TFA_MEM_BASE}'     if d.getVar('TFA_MEM_BASE') != '' else ''}"
+TFA_MEM_OEMAKE:append:zynqmp     = "${@' ZYNQMP_ATF_MEM_SIZE=${TFA_MEM_SIZE}'     if d.getVar('TFA_MEM_SIZE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal     = "${@' VERSAL_ATF_MEM_BASE=${TFA_MEM_BASE}'     if d.getVar('TFA_MEM_BASE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal     = "${@' VERSAL_ATF_MEM_SIZE=${TFA_MEM_SIZE}'     if d.getVar('TFA_MEM_SIZE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_BASE=${TFA_MEM_BASE}' if d.getVar('TFA_MEM_BASE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${TFA_MEM_SIZE}' if d.getVar('TFA_MEM_SIZE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal-2ve-2vm    = "${@' MEM_BASE=${TFA_MEM_BASE}' if d.getVar('TFA_MEM_BASE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal-2ve-2vm    = "${@' MEM_SIZE=${TFA_MEM_SIZE}' if d.getVar('TFA_MEM_SIZE') != '' else ''}"
 
 EXTRA_OEMAKE += "${TFA_MEM_OEMAKE}"
 
@@ -110,8 +97,11 @@ EXTRA_OEMAKE:append:versal-2ve-2vm = " RESET_TO_BL31=1"
 # MACHINE FEATURES is enabled.
 TFA_SPD:versal-2ve-2vm ?= "${@bb.utils.contains('MACHINE_FEATURES', 'optee', 'opteed', '', d)}"
 
-# TFA 2.12 seems to want to use gcc for linking instead of ld
-LD = "${CCLD}"
+# TFA 2.12+ with ENABLE_LTO=1 (zynqmp) requires gcc as linker driver for -fuse-linker-plugin
+# The LD = "${CC}" approach does not reliably propagate via d.getVar('LD') in meta-arm.inc's
+# Python expression; directly override LD in EXTRA_OEMAKE instead. Because GNU make uses the
+# last command-line assignment for a variable, this appended LD= overrides the earlier one.
+EXTRA_OEMAKE:append = " LD='${TARGET_PREFIX}gcc'"
 
 
 # We use bl31
@@ -120,26 +110,27 @@ TFA_INSTALL_TARGET = "bl31"
 
 inherit image-artifact-names
 
-# arm-trusted-firmware instead of ${PN} for compatibility
-ATF_BASE_NAME ?= "arm-trusted-firmware-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
+TFA_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
 
 do_install:append() {
     # The first TFA_INSTALL_TARGET found will be copied as the standard boot firmware
-    for atfbin in ${TFA_INSTALL_TARGET} ; do
+    # Uses ${FIRMWARE_DIR} (from firmware.bbclass: /firmware/${PN}) to match
+    # meta-arm's install layout since commit 7bce36a2 (switched to firmware.bbclass).
+    for tfabin in ${TFA_INSTALL_TARGET} ; do
         install -d ${D}/boot
-        if [ -e ${D}/firmware/$atfbin-${TFA_PLATFORM}.elf ]; then
-            ln ${D}/firmware/$atfbin-${TFA_PLATFORM}.elf ${D}/boot/${ATF_BASE_NAME}.elf
-            ln -sf ${ATF_BASE_NAME}.elf ${D}/boot/arm-trusted-firmware.elf
-            ln ${D}/firmware/$atfbin-${TFA_PLATFORM}.bin ${D}/boot/${ATF_BASE_NAME}.bin
-            ln -sf ${ATF_BASE_NAME}.bin ${D}/boot/arm-trusted-firmware.bin
+        if [ -e ${D}${FIRMWARE_DIR}/$tfabin${TFA_INSTALL_SUFFIX}.elf ]; then
+            ln ${D}${FIRMWARE_DIR}/$tfabin${TFA_INSTALL_SUFFIX}.elf ${D}/boot/${TFA_BASE_NAME}.elf
+            ln -sf ${TFA_BASE_NAME}.elf ${D}/boot/${PN}.elf
+            ln ${D}${FIRMWARE_DIR}/$tfabin${TFA_INSTALL_SUFFIX}.bin ${D}/boot/${TFA_BASE_NAME}.bin
+            ln -sf ${TFA_BASE_NAME}.bin ${D}/boot/${PN}.bin
 
             # Get the entry point address from the elf.
-            BL31_BASE_ADDR=$(${READELF} -h ${D}/boot/${ATF_BASE_NAME}.elf | egrep -m 1 -i "entry point.*?0x" | sed -r 's/.*?(0x.*?)/\1/g')
-            mkimage -A arm64 -O arm-trusted-firmware -T kernel -C none \
+            BL31_BASE_ADDR=$(${READELF} -h ${D}/boot/${TFA_BASE_NAME}.elf | egrep -m 1 -i "entry point.*?0x" | sed -r 's/.*?(0x.*?)/\1/g')
+            mkimage -A arm64 -O trusted-firmware-a -T kernel -C none \
                     -a $BL31_BASE_ADDR -e $BL31_BASE_ADDR \
-                    -d ${D}/firmware/$atfbin-${TFA_PLATFORM}.bin ${D}/boot/${ATF_BASE_NAME}.ub
-            ln -sf ${ATF_BASE_NAME}.ub ${D}/boot/arm-trusted-firmware.ub
-            ln -sf ${ATF_BASE_NAME}.ub ${D}/boot/atf-uboot.ub
+                    -d ${D}${FIRMWARE_DIR}/$tfabin${TFA_INSTALL_SUFFIX}.bin ${D}/boot/${TFA_BASE_NAME}.ub
+            ln -sf ${TFA_BASE_NAME}.ub ${D}/boot/arm-trusted-firmware.ub
+            ln -sf ${TFA_BASE_NAME}.ub ${D}/boot/tfa-uboot.ub
             break
         fi
     done
@@ -159,7 +150,6 @@ addtask deploy before do_build after do_compile
 
 SYSROOT_DIRS += "/boot"
 FILES:${PN} += "/boot/*.elf /boot/*.bin /boot/*.ub"
-RPROVIDES:${PN} += "arm-trusted-firmware"
 
 python() {
     soc_family = d.getVar('SOC_FAMILY')
