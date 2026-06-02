@@ -16,7 +16,7 @@ COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
 
-S = "${WORKDIR}/git/src/runtime_src/core/edge/drm/zocl"
+S = "${UNPACKDIR}/${BP}/src/runtime_src/core/edge/drm/zocl"
 
 inherit module
 

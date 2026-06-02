@@ -15,9 +15,11 @@ LIC_FILES_CHKSUM = " \
     file://runtime_src/core/common/elf/LICENSE.txt;md5=b996e8b74af169e7e72e22d9e7d05b06 \
 "
 
-S = "${WORKDIR}/git/src"
+S = "${UNPACKDIR}/${BP}/src"
 
-inherit cmake pkgconfig native
+inherit cmake pkgconfig native features_check
+
+REQUIRED_DISTRO_FEATURES = "opencl"
 
 DEPENDS = "libdrm-native opencl-headers-native ocl-icd-native boost-native rapidjson-native protobuf-native python3-pybind11-native systemtap-native"
 
@@ -25,5 +27,5 @@ EXTRA_OECMAKE += " -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMANDS=ON"
 
 do_install() {
     install -d ${D}${bindir}
-    install -Dm 0755 ${WORKDIR}/build/runtime_src/tools/xclbinutil/xclbinutil ${D}${bindir}
+    install -Dm 0755 ${B}/runtime_src/tools/xclbinutil/xclbinutil ${D}${bindir}
 }
