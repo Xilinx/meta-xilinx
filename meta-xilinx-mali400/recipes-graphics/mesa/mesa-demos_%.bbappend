@@ -3,6 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/mesa-demos:"
 SRC_URI += " \
     file://0001-src-egl-eglinfo-Align-EXT_platform_device-extension-.patch \
     file://0002-src-egl-eglinfo-Use-EGL_PLATFORM_DEVICE_EXT-only-if-.patch \
+    file://0003-src-egl-eglinfo-Use-KHR-context-attribute-macros.patch \
     file://libmali-egl-workaround.patch \
 "
 

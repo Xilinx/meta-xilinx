@@ -1,0 +1,45 @@
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Thu, 05 Jun 2026 00:00:00 +0000
+Subject: [PATCH] src: egl: eglinfo: Use KHR context attribute macros
+
+Mali EGL headers only define the _KHR suffixed variants of context
+attribute macros. Use those for compatibility.
+
+AI-Generated: GitHub Copilot (Claude Sonnet 4.6)
+
+Upstream-Status: Inappropriate [libmali specific]
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ src/egl/opengl/eglinfo.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/egl/opengl/eglinfo.c b/src/egl/opengl/eglinfo.c
+--- a/src/egl/opengl/eglinfo.c
++++ b/src/egl/opengl/eglinfo.c
+@@ -422,11 +422,11 @@
+             return NULL;
+ 
+          const int attribs_new[] = {
+-            EGL_CONTEXT_MAJOR_VERSION, gl_versions[i].major,
+-            EGL_CONTEXT_MINOR_VERSION, gl_versions[i].minor,
+-            EGL_CONTEXT_OPENGL_PROFILE_MASK,
+-            core_profile ? EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT :
+-                           EGL_CONTEXT_OPENGL_COMPATIBILITY_PROFILE_BIT,
++            EGL_CONTEXT_MAJOR_VERSION_KHR, gl_versions[i].major,
++            EGL_CONTEXT_MINOR_VERSION_KHR, gl_versions[i].minor,
++            EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR,
++            core_profile ? EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR :
++                           EGL_CONTEXT_OPENGL_COMPATIBILITY_PROFILE_BIT_KHR,
+             EGL_NONE,
+          };
+ 
+@@ -461,7 +461,7 @@
+        */
+       for (int i = 3; i > 0; i--) {
+          const int attribs[] = {
+-            EGL_CONTEXT_MAJOR_VERSION, i,
++            EGL_CONTEXT_MAJOR_VERSION_KHR, i,
+             EGL_NONE,
+          };
+          ctx = eglCreateContext(d, conf, EGL_NO_CONTEXT, attribs);

@@ -15,30 +15,31 @@ Signed-off-by: Mark Hatle <mark.hatle@amd.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/egl/opengl/eglinfo.c b/src/egl/opengl/eglinfo.c
-index 72fe45a..e8a0225 100644
 --- a/src/egl/opengl/eglinfo.c
 +++ b/src/egl/opengl/eglinfo.c
-@@ -305,17 +305,17 @@ main(int argc, char *argv[])
-                                                   NULL), "Android platform");
-        if (strstr(clientext, "EGL_MESA_platform_gbm") ||
-            strstr(clientext, "EGL_KHR_platform_gbm"))
--           ret += doOneDisplay(getPlatformDisplay(EGL_PLATFORM_GBM_MESA,
-+           ret += doOneDisplay(getPlatformDisplay(EGL_PLATFORM_GBM_KHR,
-                                                   EGL_DEFAULT_DISPLAY,
-                                                   NULL), "GBM platform");
-        if (strstr(clientext, "EGL_EXT_platform_wayland") ||
-            strstr(clientext, "EGL_KHR_platform_wayland"))
--           ret += doOneDisplay(getPlatformDisplay(EGL_PLATFORM_WAYLAND_EXT,
-+           ret += doOneDisplay(getPlatformDisplay(EGL_PLATFORM_WAYLAND_KHR,
-                                                   EGL_DEFAULT_DISPLAY,
-                                                   NULL), "Wayland platform");
-        if (strstr(clientext, "EGL_EXT_platform_x11") ||
-            strstr(clientext, "EGL_KHR_platform_x11"))
--           ret += doOneDisplay(getPlatformDisplay(EGL_PLATFORM_X11_EXT,
-+           ret += doOneDisplay(getPlatformDisplay(EGL_PLATFORM_X11_KHR,
-                                                   EGL_DEFAULT_DISPLAY,
-                                                   NULL), "X11 platform");
-        if (strstr(clientext, "EGL_MESA_platform_surfaceless"))
+@@ -80,19 +80,19 @@
+       .names = { "EGL_MESA_platform_gbm", "EGL_KHR_platform_gbm" },
+       .short_name = "gbm",
+       .human_name = "GBM",
+-      .platform_enum = EGL_PLATFORM_GBM_MESA,
++      .platform_enum = EGL_PLATFORM_GBM_KHR,
+    },
+    {
+       .names = { "EGL_EXT_platform_wayland", "EGL_KHR_platform_wayland" },
+       .short_name = "wayland",
+       .human_name = "Wayland",
+-      .platform_enum = EGL_PLATFORM_WAYLAND_EXT,
++      .platform_enum = EGL_PLATFORM_WAYLAND_KHR,
+    },
+    {
+       .names = { "EGL_EXT_platform_x11", "EGL_KHR_platform_x11" },
+       .short_name = "x11",
+       .human_name = "X11",
+-      .platform_enum = EGL_PLATFORM_X11_EXT,
++      .platform_enum = EGL_PLATFORM_X11_KHR,
+    },
+    {
+       .names = { "EGL_MESA_platform_surfaceless" },
 -- 
 2.17.1
 

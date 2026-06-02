@@ -15,21 +15,20 @@ Signed-off-by: Mark Hatle <mark.hatle@amd.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/src/egl/opengl/eglinfo.c b/src/egl/opengl/eglinfo.c
-index e8a0225..bc0e869 100644
 --- a/src/egl/opengl/eglinfo.c
 +++ b/src/egl/opengl/eglinfo.c
-@@ -243,6 +243,7 @@ doOneDisplay(EGLDisplay d, const char *name)
+@@ -635,6 +635,7 @@
  static int
- doOneDevice(EGLDeviceEXT d, int i)
+ doOneDevice(EGLDeviceEXT d, int i, struct options opts)
  {
 +#ifdef EGL_PLATFORM_DEVICE_EXT
     PFNEGLGETPLATFORMDISPLAYEXTPROC getPlatformDisplay =
       (PFNEGLGETPLATFORMDISPLAYEXTPROC)
       eglGetProcAddress("eglGetPlatformDisplayEXT");
-@@ -253,6 +254,9 @@ doOneDevice(EGLDeviceEXT d, int i)
+@@ -646,6 +647,9 @@
  
     return doOneDisplay(getPlatformDisplay(EGL_PLATFORM_DEVICE_EXT, d, NULL),
-                        "Platform Device");
+                        "Platform Device", opts);
 +#else
 +   return 0;
 +#endif

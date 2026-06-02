@@ -1,9 +1,8 @@
-PACKAGECONFIG:append = " dri3 gallium"
-
 # If we're using libmali-xlnx, then we need to bring it in for the KHR/khrplatform.h file
 DEPENDS .= "${@' libmali-xlnx' if d.getVar('PREFERRED_PROVIDER_virtual/libgles1') == 'libmali-xlnx' else ''}"
 RDEPENDS:libgl-mesa-dev .= "${@' libmali-xlnx-dev' if d.getVar('PREFERRED_PROVIDER_virtual/libgles1') == 'libmali-xlnx' else ''}"
 
+# Avoid duplicate KHR/khrplatform.h from libmali and mesa-gl
 do_install:append () {
     if ${@'true' if d.getVar('PREFERRED_PROVIDER_virtual/libgles1') == 'libmali-xlnx' else 'false'} ; then
         rm -rf ${D}${includedir}/KHR/*

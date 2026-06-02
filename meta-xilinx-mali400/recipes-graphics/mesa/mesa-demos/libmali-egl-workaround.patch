@@ -4,66 +4,74 @@ Index: mesa-demos-8.5.0/src/egl/opengl/eglinfo.c
 ===================================================================
 --- mesa-demos-8.5.0.orig/src/egl/opengl/eglinfo.c
 +++ mesa-demos-8.5.0/src/egl/opengl/eglinfo.c
-@@ -195,6 +195,7 @@ PrintDisplayExtensions(EGLDisplay d)
+@@ -94,12 +94,14 @@
+       .human_name = "X11",
+       .platform_enum = EGL_PLATFORM_X11_KHR,
+    },
++#ifdef EGL_PLATFORM_SURFACELESS_MESA
+    {
+       .names = { "EGL_MESA_platform_surfaceless" },
+       .short_name = "surfaceless",
+       .human_name = "Surfaceless",
+       .platform_enum = EGL_PLATFORM_SURFACELESS_MESA,
+    },
++#endif
+ };
+ 
+ struct eglconfig_info {
+@@ -330,6 +332,7 @@
  }
  
  
 +#ifdef EGL_EXT_device_base
  static const char *
- PrintDeviceExtensions(EGLDeviceEXT d)
+ PrintDeviceExtensions(EGLDeviceEXT d, EGLBoolean single_line)
  {
-@@ -211,7 +212,7 @@ PrintDeviceExtensions(EGLDeviceEXT d)
- 
-    return PrintExtensions(extensions);
+@@ -347,6 +350,7 @@
+    print_extension_list(extensions, single_line);
+    return extensions;
  }
--
 +#endif
  
- static int
- doOneDisplay(EGLDisplay d, const char *name)
-@@ -240,6 +241,7 @@ doOneDisplay(EGLDisplay d, const char *n
+ 
+ static const char*
+@@ -632,6 +636,7 @@
  }
  
  
 +#ifdef EGL_EXT_device_base
  static int
- doOneDevice(EGLDeviceEXT d, int i)
+ doOneDevice(EGLDeviceEXT d, int i, struct options opts)
  {
-@@ -258,8 +260,9 @@ doOneDevice(EGLDeviceEXT d, int i)
+@@ -651,8 +656,10 @@
     return 0;
  #endif
  }
 +#endif
  
--
+ 
 +#ifdef EGL_EXT_device_base
  static int
- doDevices(const char *name)
+ doDevices(const char *name, struct options opts)
  {
-@@ -288,7 +291,7 @@ doDevices(const char *name)
+@@ -681,6 +688,7 @@
  
     return ret;
  }
--
 +#endif
  
- int
- main(int argc, char *argv[])
-@@ -322,13 +325,17 @@ main(int argc, char *argv[])
-            ret += doOneDisplay(getPlatformDisplay(EGL_PLATFORM_X11_KHR,
-                                                   EGL_DEFAULT_DISPLAY,
-                                                   NULL), "X11 platform");
-+#ifdef EGL_PLATFORM_SURFACELESS_MESA
-        if (strstr(clientext, "EGL_MESA_platform_surfaceless"))
-            ret += doOneDisplay(getPlatformDisplay(EGL_PLATFORM_SURFACELESS_MESA,
-                                                   EGL_DEFAULT_DISPLAY,
-                                                   NULL), "Surfaceless platform");
-+#endif
+ 
+ static void
+@@ -857,10 +865,12 @@
+          }
+       }
+ 
 +#ifdef EGL_EXT_device_base
-        if (strstr(clientext, "EGL_EXT_device_enumeration") &&
-            strstr(clientext, "EGL_EXT_platform_device"))
-            ret += doDevices("Device platform");
+       if (strstr(clientext, "EGL_EXT_device_enumeration") &&
+           strstr(clientext, "EGL_EXT_platform_device") &&
+           opts.platform == ALL)
+          ret += doDevices("Device platform", opts);
 +#endif
     }
     else {
-       ret = doOneDisplay(eglGetDisplay(EGL_DEFAULT_DISPLAY), "Default display");
+       ret = doOneDisplay(eglGetDisplay(EGL_DEFAULT_DISPLAY), "Default display", opts);
