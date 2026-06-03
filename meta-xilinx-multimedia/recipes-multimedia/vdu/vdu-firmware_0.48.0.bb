@@ -23,6 +23,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 EXTRA_OEMAKE += "INSTALL_PATH=${D}/${nonarch_base_libdir}/firmware"
 
+do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 do_install[dirs] = "${S}"
 

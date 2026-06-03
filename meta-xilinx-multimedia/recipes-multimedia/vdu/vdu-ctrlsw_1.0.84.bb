@@ -28,6 +28,7 @@ DEPENDS += "kernel-module-vdu"
 RDEPENDS:${PN} = "kernel-module-vdu"
 RDEPENDS:libvdu-ctrlsw = "kernel-module-vdu"
 
+do_configure[noexec] = "1"
 do_compile[dirs] = "${S}"
 do_install[dirs] = "${S}"
 
