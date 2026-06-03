@@ -94,6 +94,12 @@ IMAGE_CMD:wic.ufs () {
 IMAGE_CMD:wic.ufs[vardepsexclude] = "WKS_FULL_PATH WKS_FILES TOPDIR"
 do_image_wic_ufs[cleandirs] = "${WORKDIR}/build-wic-ufs"
 
+# image_types.bbclass splits "wic.ufs" on all dots and validates CONVERSION_CMD
+# for each suffix.  Define a no-op here so that validation passes; image.bbclass
+# dispatches "wic.ufs" as a standalone IMAGE_CMD (not a conversion) because "ufs"
+# is not listed in CONVERSIONTYPES.
+CONVERSION_CMD:ufs = ":"
+
 PSEUDO_IGNORE_PATHS .= ",${WORKDIR}/build-wic-ufs"
 
 # Rebuild when the wks file or vars in WICUFSVARS change
