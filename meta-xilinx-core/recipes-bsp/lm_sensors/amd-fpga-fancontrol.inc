@@ -20,7 +20,7 @@ RRECOMMENDS:${PN}-fancontrol = ""
 RDEPENDS:${PN}-fancontrol += "freeipmi"
 
 do_install:append() {
-    install -D -m 0755 ${WORKDIR}/fancontrol_config.sh ${D}${sbindir}/fancontrol_config.sh
+    install -D -m 0755 ${UNPACKDIR}/fancontrol_config.sh ${D}${sbindir}/fancontrol_config.sh
 }
 
 FILES:${PN}-fancontrol += "${sbindir}/fancontrol_config.sh"

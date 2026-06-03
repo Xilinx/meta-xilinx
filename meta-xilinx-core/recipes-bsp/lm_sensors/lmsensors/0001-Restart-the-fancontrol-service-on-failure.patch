@@ -7,7 +7,16 @@ Subject: [PATCH] fancontrol.services: Automatically restart fancontrol
  can go away and the process dies.  We need to auto restart this so the
  fan is running properly.
 
- Signed-off-by: Jonathan Stroud <jonathan.stroud@amd.com>
+Upstream-Status: Inappropriate [Xilinx-specific]
+
+Signed-off-by: Jonathan Stroud <jonathan.stroud@amd.com>
+
+Add Upstream-Status tag to indicate this patch is xilinx-specific and
+not intended for upstream.
+
+AI-Generated: GitHub Copilot (Claude Sonnet 4.6)
+
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
 ---
  prog/init/fancontrol.service | 2 ++
  1 file changed, 2 insertions(+)
