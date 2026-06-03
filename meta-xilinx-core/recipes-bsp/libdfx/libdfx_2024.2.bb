@@ -19,6 +19,9 @@ COMPATIBLE_MACHINE:versal-net = ".*"
 
 inherit cmake
 
+# CMakeLists.txt requires VERSION 2.8.9 which CMake 4.x no longer accepts.
+EXTRA_OECMAKE += "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+
 # Due to an update where the soname/version was defined, we need to use an RREPLACES
 # so updates will work properly.
 RREPLACES:${PN} = "libdfx"
