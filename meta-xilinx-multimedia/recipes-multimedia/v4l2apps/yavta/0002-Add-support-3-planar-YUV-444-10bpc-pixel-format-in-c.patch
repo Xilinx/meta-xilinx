@@ -7,31 +7,31 @@ Subject: [PATCH 2/2] Add support 3 planar YUV 444 10bpc pixel format in
 The new format X403 is added to support 3 planar YUV 444 10bpc
 30 bits per sample image data in a single contiguous buffer.
 
+Upstream-Status: Pending
+
 Signed-off-by: Rohit Visavalia <rohit.visavalia@xilinx.com>
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
----
- include/linux/videodev2.h | 2 ++
- yavta.c                   | 1 +
- 2 files changed, 3 insertions(+)
 
-Index: git/include/linux/videodev2.h
-===================================================================
---- git.orig/include/linux/videodev2.h
-+++ git/include/linux/videodev2.h
-@@ -585,6 +585,8 @@ struct v4l2_pix_format {
- #define V4L2_PIX_FMT_YUV444M v4l2_fourcc('Y', 'M', '2', '4') /* 24  YUV444 planar */
- #define V4L2_PIX_FMT_YVU444M v4l2_fourcc('Y', 'M', '4', '2') /* 24  YVU444 planar */
+Rebase with wrynose.
+
+AI-Generated: GitHub Copilot (Claude Sonnet 4.6)
+
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+---
+--- a/include/linux/videodev2.h
++++ b/include/linux/videodev2.h
+@@ -657,6 +657,8 @@
+ #define V4L2_PIX_FMT_NV12M_8L128      v4l2_fourcc('N', 'A', '1', '2') /* Y/CbCr 4:2:0 8x128 tiles */
+ #define V4L2_PIX_FMT_NV12M_10BE_8L128 v4l2_fourcc_be('N', 'T', '1', '2') /* Y/CbCr 4:2:0 10-bit 8x128 tiles */
  
 +#define V4L2_PIX_FMT_X403    v4l2_fourcc('X', '4', '0', '3') /* 32  YUV planar 4:4:4 10-bit */
 +
  /* Bayer formats - see http://www.siliconimaging.com/RGB%20Bayer.htm */
  #define V4L2_PIX_FMT_SBGGR8  v4l2_fourcc('B', 'A', '8', '1') /*  8  BGBG.. GRGR.. */
  #define V4L2_PIX_FMT_SGBRG8  v4l2_fourcc('G', 'B', 'R', 'G') /*  8  GBGB.. RGRG.. */
-Index: git/yavta.c
-===================================================================
---- git.orig/yavta.c
-+++ git/yavta.c
-@@ -324,6 +324,7 @@ static struct v4l2_format_info {
+--- a/yavta.c
++++ b/yavta.c
+@@ -393,6 +393,7 @@
  	{ "YVU420M", V4L2_PIX_FMT_YVU420M, 3 },
  	{ "YVU422M", V4L2_PIX_FMT_YVU422M, 3 },
  	{ "YVU444M", V4L2_PIX_FMT_YVU444M, 3 },
