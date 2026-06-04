@@ -8,8 +8,8 @@ evaluation kit."
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/versal-2ve-2vm-vek385-multidomain_openamp-zephyr-demo/LICENSE.md;md5=0b96a4c07d631aa5141bd3f058ba43b0"
 
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/06030659/external/openamp-zephyr-demo/versal-2ve-2vm-vek385-multidomain_openamp-zephyr-demo_06030659.tar.gz"
-SRC_URI[sha256sum] = "ace54c806c45f4d0b845a0b22dda9f3663edca391ab807d8b06c81cf55018f70"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/06040630/external/openamp-zephyr-demo/versal-2ve-2vm-vek385-multidomain_openamp-zephyr-demo_06040630.tar.gz"
+SRC_URI[sha256sum] = "d1e8dbcf21f176a16111bb1fac55c9d9459c4e15e0de3b3d4df4672ebdea60c1"
 
 OPENAMPFW_BOARD = "vek385"
 require conf/includes/openamp-fw-example.inc
