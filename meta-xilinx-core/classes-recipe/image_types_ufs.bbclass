@@ -10,12 +10,15 @@ WICUFSVARS ?= "\
 	APPEND \
 	ASSUME_PROVIDED \
 	BBLAYERS \
+	BBPATH \
 	DEPLOY_DIR_IMAGE \
 	FAKEROOTCMD \
 	HOSTTOOLS_DIR \
 	IMAGE_BASENAME \
 	IMAGE_BOOT_FILES \
+	IMAGE_CLASSES \
 	IMAGE_EFI_BOOT_FILES \
+	IMAGE_EXTRA_PARTITION_FILES \
 	IMAGE_LINK_NAME \
 	IMAGE_ROOTFS \
 	IMGDEPLOYDIR \
@@ -26,9 +29,10 @@ WICUFSVARS ?= "\
 	INITRD \
 	INITRD_LIVE \
 	ISODIR \
+	KERNEL_CONSOLE \
 	KERNEL_IMAGETYPE \
 	MACHINE \
-	PSEUDO_IGNORE_PATHS \
+	PSEUDO_INCLUDE_PATHS \
 	RECIPE_SYSROOT_NATIVE \
 	ROOTFS_SIZE \
 	STAGING_DATADIR \
@@ -42,7 +46,7 @@ inherit_defer ${@bb.utils.contains('INITRAMFS_IMAGE_BUNDLE', '1', 'kernel-artifa
 
 WKS_FILE ??= "${IMAGE_BASENAME}.${MACHINE}.wks"
 WKS_FILES ?= "${WKS_FILE} ${IMAGE_BASENAME}.wks"
-WKS_SEARCH_PATH ?= "${THISDIR}:${@':'.join('%s/wic' % p for p in '${BBPATH}'.split(':'))}:${@':'.join('%s/scripts/lib/wic/canned-wks' % l for l in '${BBPATH}:${COREBASE}'.split(':'))}"
+WKS_SEARCH_PATH ?= "${THISDIR}:${@':'.join('%s/files/wic' % p for p in '${BBPATH}'.split(':'))}"
 WKS_FULL_PATH = "${@wks_search(d.getVar('WKS_FILES').split(), d.getVar('WKS_SEARCH_PATH')) or ''}"
 
 def wks_search(files, search_path):
@@ -70,8 +74,7 @@ IMAGE_CMD:wic.ufs () {
 	if [ -z "$wks" ]; then
 		bbfatal "No kickstart files from WKS_FILES were found: ${WKS_FILES}. Please set WKS_FILE or WKS_FILES appropriately."
 	fi
-        BUILDDIR="${TOPDIR}" PSEUDO_UNLOAD=1 ${LAYERPATH_xilinx}/scripts/wic --version
-	BUILDDIR="${TOPDIR}" PSEUDO_UNLOAD=1 ${LAYERPATH_xilinx}/scripts/wic create "$wks" --vars "${STAGING_DIR}/${MACHINE}/imgdata/" --sector-size 4096 -e "${IMAGE_BASENAME}-ufs" -o "$build_wic_ufs/" -w "$tmp_wic_ufs" ${WIC_CREATE_EXTRA_ARGS}
+	BUILDDIR="${TOPDIR}" PSEUDO_UNLOAD=1 wic create "$wks" --debug --vars "${STAGING_DIR}/${MACHINE}/imgdata/" --sector-size 4096 -e "${IMAGE_BASENAME}-ufs" -o "$build_wic_ufs/" -w "$tmp_wic_ufs" ${WIC_CREATE_EXTRA_ARGS}
 
 	# look to see if the user specifies a custom imager
 	IMAGER=direct
@@ -92,6 +95,7 @@ IMAGE_CMD:wic.ufs () {
 	mv "$build_wic_ufs/$(basename "${wks%.wks}")"*.${IMAGER} "$out.wic.ufs"
 }
 IMAGE_CMD:wic.ufs[vardepsexclude] = "WKS_FULL_PATH WKS_FILES TOPDIR"
+SPDX_IMAGE_PURPOSE:wic.ufs = "diskImage"
 do_image_wic_ufs[cleandirs] = "${WORKDIR}/build-wic-ufs"
 
 # image_types.bbclass splits "wic.ufs" on all dots and validates CONVERSION_CMD
@@ -100,26 +104,25 @@ do_image_wic_ufs[cleandirs] = "${WORKDIR}/build-wic-ufs"
 # is not listed in CONVERSIONTYPES.
 CONVERSION_CMD:ufs = ":"
 
-PSEUDO_IGNORE_PATHS .= ",${WORKDIR}/build-wic-ufs"
-
 # Rebuild when the wks file or vars in WICUFSVARS change
 USING_WIC_UFS = "${@bb.utils.contains_any('IMAGE_FSTYPES', 'wic.ufs ' + ' '.join('wic.ufs.%s' % c for c in '${CONVERSIONTYPES}'.split()), '1', '', d)}"
-WKS_FILE_CHECKSUM = "${@'${WKS_FULL_PATH}:%s' % os.path.exists('${WKS_FULL_PATH}') if '${USING_WIC_UFS}' else ''}"
-do_image_wic_ufs[file-checksums] += "${WKS_FILE_CHECKSUM}"
+WKS_FILE_CHECKSUM_UFS = "${@'${WKS_FULL_PATH}:%s' % os.path.exists('${WKS_FULL_PATH}') if '${USING_WIC_UFS}' else ''}"
+do_image_wic_ufs[file-checksums] += "${WKS_FILE_CHECKSUM_UFS}"
 do_image_wic_ufs[depends] += "${@' '.join('%s-native:do_populate_sysroot' % r for r in ('parted', 'gptfdisk', 'dosfstools', 'mtools'))}"
 
 # We ensure all artfacts are deployed (e.g virtual/bootloader)
 do_image_wic_ufs[recrdeptask] += "do_deploy"
 do_image_wic_ufs[deptask] += "do_image_complete"
 
-## Keep the following WKS_FILE_* and do_write_wks_template in sync with poky image_types_wic
 WKS_FILE_DEPENDS_DEFAULT = '${@bb.utils.contains_any("BUILD_ARCH", [ 'x86_64', 'i686' ], "syslinux-native", "",d)}'
-WKS_FILE_DEPENDS_DEFAULT += "bmaptool-native cdrtools-native btrfs-tools-native squashfs-tools-native e2fsprogs-native erofs-utils-native"
+WKS_FILE_DEPENDS_DEFAULT += "wic-native bmaptool-native cdrtools-native btrfs-tools-native squashfs-tools-native e2fsprogs-native erofs-utils-native"
 # Unified kernel images need objcopy
-WKS_FILE_DEPENDS_DEFAULT += "virtual/${TARGET_PREFIX}binutils"
+WKS_FILE_DEPENDS_DEFAULT += "virtual/cross-binutils"
 WKS_FILE_DEPENDS_BOOTLOADERS = ""
-WKS_FILE_DEPENDS_BOOTLOADERS:x86 = "syslinux grub-efi systemd-boot os-release"
-WKS_FILE_DEPENDS_BOOTLOADERS:x86-64 = "syslinux grub-efi systemd-boot os-release"
+WKS_FILE_DEPENDS_BOOTLOADERS:aarch64 = "grub-efi systemd-boot"
+WKS_FILE_DEPENDS_BOOTLOADERS:arm = "systemd-boot"
+WKS_FILE_DEPENDS_BOOTLOADERS:x86 = "syslinux grub-efi systemd-boot"
+WKS_FILE_DEPENDS_BOOTLOADERS:x86-64 = "syslinux grub-efi systemd-boot"
 WKS_FILE_DEPENDS_BOOTLOADERS:x86-x32 = "syslinux grub-efi"
 
 WKS_FILE_DEPENDS ??= "${WKS_FILE_DEPENDS_DEFAULT} ${WKS_FILE_DEPENDS_BOOTLOADERS}"
