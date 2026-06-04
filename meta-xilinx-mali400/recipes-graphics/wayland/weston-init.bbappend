@@ -14,7 +14,7 @@ SRC_URI += "file://kmscon-weston.sh"
 
 do_install:append() {
     install -d ${D}${sysconfdir}/profile.d
-    install -m 0644 ${WORKDIR}/kmscon-weston.sh \
+    install -m 0644 ${UNPACKDIR}/kmscon-weston.sh \
         ${D}${sysconfdir}/profile.d/kmscon-weston.sh
 }
 
