@@ -7,7 +7,16 @@ Subject: [PATCH] Update driver to make it compatible with 6.12 kernel
 - Use strscpy instead of strlcpy
 - .remove handler now returns void instead of int
 
+Upstream-Status: Inappropriate [Xilinx specific]
+
 Signed-off-by: Yash Ladani <yash.ladani@amd.com>
+
+Add Upstream-Status tag to indicate this patch is xilinx-specific and not
+intended for upstream.
+
+AI-Generated: GitHub Copilot (Claude Sonnet 4.6)
+
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
 ---
  linux/mali_internal_sync.c |  4 ++++
  linux/mali_kernel_linux.c  | 12 ++++++++++++
