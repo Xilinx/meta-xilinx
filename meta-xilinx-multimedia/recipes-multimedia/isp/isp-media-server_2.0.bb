@@ -17,7 +17,7 @@ do_install() {
 
     install -d ${D}${datadir}
 
-    cp -r ${WORKDIR}/Tuning_files ${D}${datadir}
+    cp -r ${UNPACKDIR}/Tuning_files ${D}${datadir}
 
     # Make sure necessary symlinks are created
     for fullso in *.so.*.* *.so.* *.so ; do
