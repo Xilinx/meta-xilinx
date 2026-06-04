@@ -8,11 +8,6 @@ SRC_URI:append:zynqmp = " \
     file://0002-drm2d-Use-ARGB8888-framebuffer-format.patch \
 "
 
-# Fix cross-compilation: genunifont is a native tool that needs
-# native zlib, not the target zlib
-DEPENDS += "zlib-native"
-SRC_URI += "file://0001-meson-Use-native-zlib-for-genunifont.patch"
-
 # Software DRM rendering, pango fonts, systemd
 # seat management. No OpenGL (avoids drm3d which conflicts with
 # render-only GPUs like mali400).
@@ -34,12 +29,12 @@ SRC_URI += " \
 do_install:append() {
     # udev rule: restart kmsconvt when a display cable is plugged in
     install -d ${D}${sysconfdir}/udev/rules.d
-    install -m 0644 ${WORKDIR}/99-kmscon-hotplug.rules \
+    install -m 0644 ${UNPACKDIR}/99-kmscon-hotplug.rules \
         ${D}${sysconfdir}/udev/rules.d/
 
     # systemd drop-in: fail kmsconvt if no display is connected
     install -d ${D}${systemd_system_unitdir}/kmsconvt@tty1.service.d
-    install -m 0644 ${WORKDIR}/10-check-display.conf \
+    install -m 0644 ${UNPACKDIR}/10-check-display.conf \
         ${D}${systemd_system_unitdir}/kmsconvt@tty1.service.d/
 
     # Enable kmsconvt@tty1
