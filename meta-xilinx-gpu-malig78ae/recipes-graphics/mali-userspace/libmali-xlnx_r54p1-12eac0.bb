@@ -104,4 +104,5 @@ FILES:${PN} += " \
 	${datadir} \
 	"
 
-INSANE_SKIP:${PN} = "already-stripped dev-so"
+# libdir: VkLayer .so is intentionally placed in /usr/share/vulkan/implicit_layer.d/
+INSANE_SKIP:${PN} = "already-stripped dev-so libdir"
