@@ -14,6 +14,9 @@ REPO = "git://github.com/Xilinx/libmetal.git;protocol=https"
 
 include ${LAYER_PATH_openamp-layer}/recipes-openamp/libmetal/libmetal.inc
 PACKAGE_ARCH = "${TUNE_PKGARCH}"
+
+# udev/eudev are Linux-only; strip them from DEPENDS for baremetal targets
+DEPENDS:remove = "${@'' if 'linux' in (d.getVar('TARGET_OS') or '') else bb.utils.contains('DISTRO_FEATURES', 'systemd', 'udev', 'eudev', d)}"
 EXTRA_OECMAKE:append = " -DPROJECT_VENDOR=xlnx "
 
 RPROVIDES:${PN}-dbg += "libmetal-dbg"

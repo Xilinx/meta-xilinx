@@ -1,13 +1,7 @@
 inherit cmake ccmake deploy
 
-S:xilinx-standalone = "${WORKDIR}/git"
-B:xilinx-standalone = "${WORKDIR}/build"
-
 OECMAKE_SOURCEPATH:xilinx-standalone = "${S}/"
 PROVIDES:xilinx-standalone = "libmetal"
-
-S:xilinx-freertos = "${WORKDIR}/git"
-B:xilinx-freertos = "${WORKDIR}/build"
 
 OECMAKE_SOURCEPATH:xilinx-freertos = "${S}/"
 PROVIDES:xilinx-freertos = "libmetal libmetal-xlnx"
@@ -51,7 +45,7 @@ CFLAGS:append = " -DSDT -DXLNX_PLATFORM "
 FILES:${PN}:xilinx-standalone = " ${libdir}/*.a ${bindir}/*elf ${bindir}/*bin "
 
 cmake_do_generate_toolchain_file:append:armv7r() {
-    cat >> ${WORKDIR}/toolchain.cmake <<EOF
+    cat >> ${S}/toolchain.cmake <<EOF
     set (CMAKE_SYSTEM_PROCESSOR "${LIBMETAL_CMAKE_SYSTEM_PROCESSOR}" )
     set (CROSS_PREFIX           "${LIBMETAL_CROSS_PREFIX}" CACHE STRING "")
     set (MACHINE "${LIBMETAL_MACHINE}" )
