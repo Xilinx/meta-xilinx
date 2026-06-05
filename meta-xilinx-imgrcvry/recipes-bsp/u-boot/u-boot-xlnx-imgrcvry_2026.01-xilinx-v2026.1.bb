@@ -24,6 +24,6 @@ do_unpack:append () {
 
 do_copy_defconfig () {
 	if [ -n "${UBOOT_MACHINE_IMGRCVRY}" ]; then
-		cp ${WORKDIR}/${UBOOT_MACHINE_IMGRCVRY} ${S}/configs/
+		cp ${UNPACKDIR}/${UBOOT_MACHINE_IMGRCVRY} ${S}/configs/
 	fi
 }

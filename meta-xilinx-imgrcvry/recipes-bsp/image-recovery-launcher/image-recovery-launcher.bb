@@ -8,6 +8,8 @@ SRC_URI = " \
     file://image-recovery-launcher.sh \
 "
 
+S = "${UNPACKDIR}"
+
 REQUIRED_DISTRO_FEATURES = "sysvinit"
 
 inherit update-rc.d features_check
@@ -17,7 +19,7 @@ INITSCRIPT_PARAMS = "start 60 5 ."
 
 do_install () {
         install -d ${D}${sysconfdir}/init.d/
-        install -m 0755 ${WORKDIR}/image-recovery-launcher.sh ${D}${sysconfdir}/init.d/
+        install -m 0755 ${UNPACKDIR}/image-recovery-launcher.sh ${D}${sysconfdir}/init.d/
 }
 
 FILES:${PN} += "${sysconfdir}/init.d/image-recovery-launcher.sh"

@@ -9,9 +9,11 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += "file://fw_env.config"
 
+S = "${UNPACKDIR}"
+
 do_install() {
     install -d ${D}${sysconfdir}
-    install -m 0644 ${WORKDIR}/fw_env.config ${D}${sysconfdir}/fw_env.config
+    install -m 0644 ${UNPACKDIR}/fw_env.config ${D}${sysconfdir}/fw_env.config
 }
 
 FILES:${PN} = "${sysconfdir}/fw_env.config"
