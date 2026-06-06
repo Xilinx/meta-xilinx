@@ -6,7 +6,6 @@ OVERRIDES .= ":qemuboot-xilinx"
 QB_RNG = ""
 
 DEFAULT_QB_SYSTEM_NAME = "qemu-system-amd-fpga-multiarch"
-DEFAULT_QB_SYSTEM_NAME:microblaze = "qemu-system-microblazeel"
 DEFAULT_QB_SYSTEM_NAME:microblaze-v:riscv32 = "qemu-system-riscv32"
 DEFAULT_QB_SYSTEM_NAME:microblaze-v:riscv64 = "qemu-system-riscv64"
 QB_SYSTEM_NAME ?= "${DEFAULT_QB_SYSTEM_NAME}"
@@ -79,9 +78,7 @@ def qemu_rootfs_params(data, param):
     bundle_image = data.getVar('INITRAMFS_IMAGE_BUNDLE') or ""
     soc_family = data.getVar('SOC_FAMILY') or ""
     tune_features = (data.getVar('TUNE_FEATURES') or '').split()
-    if 'microblaze' in tune_features:
-        soc_family = 'microblaze'
-    elif 'rv' in tune_features:
+    if 'rv' in tune_features:
         soc_family = 'microblaze-v'
 
     if param == 'rootfs':
@@ -89,7 +86,6 @@ def qemu_rootfs_params(data, param):
 
     elif param == 'fstype':
         fstype_dict = {
-            "microblaze": "cpio.gz",
             "microblaze-v": "ext4",
             "zynq": "cpio.gz",
             "zynqmp": "cpio.gz.u-boot",
@@ -153,9 +149,7 @@ QEMU_FLASH_FILE[doc] = "Filename for the created flash file that qemu will boot"
 def qemu_mtd_params(data):
     soc_family = data.getVar('SOC_FAMILY') or ""
     tune_features = (data.getVar('TUNE_FEATURES') or '').split()
-    if 'microblaze' in tune_features:
-        soc_family = 'microblaze'
-    elif 'rv' in tune_features:
+    if 'rv' in tune_features:
         soc_family = 'microblaze-v'
 
     file = data.getVar("QEMU_FLASH_FILE") or ""

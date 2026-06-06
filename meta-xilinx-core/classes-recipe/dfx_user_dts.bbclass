@@ -11,9 +11,6 @@ inherit devicetree bootgen-bif
 
 DEPENDS = "dtc-native bootgen-native"
 
-# Don't allow building for microblaze architectures
-COMPATIBLE_HOST:microblaze = "null"
-
 PROVIDES = ""
 
 do_fetch[cleandirs] = "${B}"

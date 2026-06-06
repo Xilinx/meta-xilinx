@@ -42,6 +42,5 @@ EXTRA_IMAGEDEPENDS += "${@'qemu-${QEMU_FLASH_TYPE}:do_deploy' if d.getVar('QEMU_
 # The file is not required by the wrapper, but if present is used
 # to verify that the used boot.bin is the expected on.
 QB_DEFAULT_KERNEL = "BOOT-${MACHINE}.bin"
-QB_KERNEL_CMDLINE:microblaze = "none"
 QB_KERNEL_CMDLINE:arm = "none"
 QB_KERNEL_CMDLINE:aarch64 = "none"
