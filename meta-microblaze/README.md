@@ -41,4 +41,7 @@ This layer depends on:
         https://git.yoctoproject.org/meta-xilinx (official version)
         https://github.com/Xilinx/meta-xilinx (development and AMD release)
 	layers: meta-xilinx-core
+
+	URI: https://git.yoctoproject.org/openembedded-core
+	layers: meta
 	branch: wrynose
