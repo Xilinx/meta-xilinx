@@ -21,7 +21,7 @@ do_fetch[cleandirs] = "${B}"
 DT_PADDING_SIZE = "0x1000"
 BOOTGEN_FLAGS ?= " -arch ${BOOTGEN_ARCH} -w ${@bb.utils.contains('SOC_FAMILY','zynqmp','','-process_bitstream bin',d)}"
 
-S ?= "${WORKDIR}"
+S ?= "${UNPACKDIR}"
 FW_DIR ?= ""
 FW_INSTALL_DIR ?= "${PN}"
 DTSI_PATH ?= ""
@@ -51,10 +51,10 @@ python() {
     uri = bb.fetch.URI(srcuri)
     if uri.scheme in ("git", "gitsm"):
         bb.debug(2, "SRC_URI scheme is git or gitsm")
-        d.setVar("S",'${WORKDIR}/git/'+d.getVar("FW_DIR"))
+        d.setVar("S",'${UNPACKDIR}/${BP}/'+d.getVar("FW_DIR"))
     elif uri.scheme in ("http", "https", "ftp"):
         bb.debug(2, "SRC_URI scheme is http or https or ftp")
-        d.setVar("S",'${WORKDIR}/'+d.getVar("FW_DIR"))
+        d.setVar("S",'${UNPACKDIR}/'+d.getVar("FW_DIR"))
     else:
         dtsi_found = False
         dtbo_found = False
