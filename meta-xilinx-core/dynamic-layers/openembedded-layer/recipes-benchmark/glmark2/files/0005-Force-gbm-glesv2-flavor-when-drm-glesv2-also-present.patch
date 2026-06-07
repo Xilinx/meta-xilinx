@@ -3,7 +3,7 @@ From: Daniel Levin <daniel.levin@amd.com>
 Date: Tue, 23 Sep 2025 17:02:10 -0500
 Subject: [PATCH 2/2] Force gbm-glesv2 flavor when drm-glesv2 also present
 
-Upstream-Status: Inapprorpiate [local layer workaround]
+Upstream-Status: Inappropriate [local layer workaround]
 
 ---
  meson.build | 4 ++++

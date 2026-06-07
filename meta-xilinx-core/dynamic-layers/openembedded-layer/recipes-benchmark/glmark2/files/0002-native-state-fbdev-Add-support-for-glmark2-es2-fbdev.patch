@@ -6,7 +6,9 @@ Subject: [PATCH 2/3] native-state-fbdev: Add support for glmark2-es2-fbdev
 This patch add support for mali specific fbdev backend.
 
 Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
-Upstream-status: Inappropriate [Xilinx specific]
+
+Upstream-Status: Inappropriate [Xilinx specific]
+
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 ---
  src/gl-state-egl.cpp       |   4 +

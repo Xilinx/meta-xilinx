@@ -18,6 +18,8 @@ L0010 Uniform 'uCurrentTime' differ on precision
 Added highp in jellyfish fragment shader file to avoid this.
 
 Signed-off-by: Yash Ladani <yash.ladani@amd.com>
+
+Upstream-Status: Pending
 ---
  data/shaders/jellyfish.frag    | 4 ++++
  src/libmatrix/shader-source.cc | 3 +++
