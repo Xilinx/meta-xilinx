@@ -8,7 +8,7 @@ REPO = "git://github.com/Xilinx/openamp-system-reference.git;protocol=https"
 SRCREV = "fab6139f6dd306383a4d4b666667993b91ac2bd9"
 BRANCH = "2026"
 
-inherit ccmake cmake python3-dir deploy
+inherit ccmake cmake pkgconfig python3-dir deploy
 
 SYSTEM_DTFILE_DEPENDS ??= ""
 LIBMETAL_DEPENDS ?= "${SYSTEM_DTFILE_DEPENDS}"
@@ -22,7 +22,7 @@ PM_DEPENDS:versal-2ve-2vm = " xilpm-ng "
 DEPENDS:append = " ${PM_DEPENDS} "
 
 B = "${WORKDIR}/build"
-S = "${WORKDIR}/git/examples/libmetal"
+S = "${UNPACKDIR}/${BP}/examples/libmetal"
 OECMAKE_SOURCEPATH = "${S}"
 
 OECMAKE_C_LINK_FLAGS:append = " --sysroot=${STAGING_DIR_HOST} -lxil -lxilstandalone -lxiltimer -lmetal "
@@ -40,6 +40,7 @@ PM_LIB:versal-2ve-2vm = ""
 
 EXTRA_OECMAKE:append:xilinx-standalone = " \
 	-DCMAKE_LIBRARY_PATH=${PKG_CONFIG_SYSROOT_DIR}/usr/lib/ \
+	-DCMAKE_INCLUDE_PATH=${PKG_CONFIG_SYSROOT_DIR}/usr/include/ \
 	-DPROJECT_MACHINE=amd_rpu \
 	-DPROJECT_SYSTEM=generic \
 	-DROLE=remote \
