@@ -14,6 +14,6 @@ DEPENDS += " \
 
 SRC_URI[sha256sum] = "4d8908b3bee1c889e547867ca4cdc54e5ab6be6d3e078556814a22457f49423c"
 
-inherit pypi python_mesonpy
+inherit pypi pkgconfig python_mesonpy
 
 RDEPENDS:${PN} = "python3-numpy"
