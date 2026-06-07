@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+Date: Thu, 04 Jun 2026 00:00:00 +0000
+Subject: [PATCH] gstgldisplay_egl: define EGL_PLATFORM_SURFACELESS_MESA if
+ missing
+
+EGL_PLATFORM_SURFACELESS_MESA (0x31DD) is defined in Mesa's
+eglmesaext.h which is not installed when using non-Mesa EGL
+implementations such as libmali-xlnx. The code that references this
+symbol is already guarded by a runtime extension string check
+(gst_gl_check_extension("EGL_MESA_platform_surfaceless", ...)), but
+the compile-time symbol is missing.
+
+Add a conditional #ifndef guard to provide the standard value when the
+symbol is not already defined by the EGL headers.
+
+Upstream-Status: Inappropriate [libmali-xlnx does not install eglmesaext.h; not applicable upstream]
+
+AI-Generated: GitHub Copilot (Claude Sonnet 4.6)
+
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+---
+ gst-libs/gst/gl/egl/gstgldisplay_egl.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/gst-libs/gst/gl/egl/gstgldisplay_egl.c b/gst-libs/gst/gl/egl/gstgldisplay_egl.c
+index 1111111..2222222 100644
+--- a/gst-libs/gst/gl/egl/gstgldisplay_egl.c
++++ b/gst-libs/gst/gl/egl/gstgldisplay_egl.c
+@@ -62,6 +62,9 @@
+ #ifndef EGL_PLATFORM_ANGLE_ANGLE
+ #define EGL_PLATFORM_ANGLE_ANGLE 0x3202
+ #endif
++#ifndef EGL_PLATFORM_SURFACELESS_MESA
++#define EGL_PLATFORM_SURFACELESS_MESA 0x31DD
++#endif
+ 
+ typedef EGLDisplay (*_gst_eglGetPlatformDisplay_type) (EGLenum platform,
+     void *native_display, const EGLint * attrib_list);
