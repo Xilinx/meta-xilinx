@@ -1,9 +1,14 @@
 #!/bin/sh
 
 export LC_ALL=en_US.UTF-8
+
+# The pipefail option is now part of POSIX (POSIX.1-2024) and available in more
+# and more shells. Enable it if available to make the SDK installer more robust.
+(set -o pipefail 2> /dev/null) && set -o pipefail
+
 #Make sure at least one python is installed
-INIT_PYTHON=$(which python3 2>/dev/null )
-[ -z "$INIT_PYTHON" ] && INIT_PYTHON=$(which python2 2>/dev/null)
+INIT_PYTHON=$(command -v python3 2>/dev/null )
+[ -z "$INIT_PYTHON" ] && INIT_PYTHON=$(command -v python2 2>/dev/null)
 [ -z "$INIT_PYTHON" ] && echo "Error: The SDK needs a python installed" && exit 1
 
 # Remove invalid PATH elements first (maybe from a previously setup toolchain now deleted
@@ -25,9 +30,6 @@ tweakpath /sbin
 
 INST_ARCH=$(uname -m | sed -e "s/i[3-6]86/ix86/" -e "s/x86[-_]64/x86_64/")
 SDK_ARCH=$(echo @SDK_ARCH@ | sed -e "s/i[3-6]86/ix86/" -e "s/x86[-_]64/x86_64/")
-
-INST_GCC_VER=$(gcc --version 2>/dev/null | sed -ne 's/.* \([0-9]\+\.[0-9]\+\)\.[0-9]\+.*/\1/p')
-SDK_GCC_VER='@SDK_GCC_VER@'
 
 verlte () {
 	[  "$1" = "`printf "$1\n$2" | sort -V | head -n1`" ]
@@ -102,11 +104,11 @@ while getopts ":yd:npDRrSl" OPT; do
 		echo "Usage: $(basename "$0") [-y] [-d <dir>]"
 		echo "  -y         Automatic yes to all prompts"
 		echo "  -d <dir>   Install the SDK to <dir>"
-		echo "======== PetaLinux SDK only options ============"
+		echo "======== AMD SDK only options ==================="
 		echo "  -r         Enable runtime relocation, note this is slower"
-		#echo "======== Extensible SDK only options ============"
-		#echo "  -n         Do not prepare the build system"
-		#echo "  -p         Publish mode (implies -n)"
+		echo "======== Extensible SDK only options ============"
+		echo "  -n         Do not prepare the build system"
+		echo "  -p         Publish mode (implies -n)"
 		echo "======== Advanced DEBUGGING ONLY OPTIONS ========"
 		echo "  -S         Save relocation scripts"
 		echo "  -R         Do not relocate executables"
@@ -145,11 +147,6 @@ fi
 # SDK_EXTENSIBLE is exposed from the SDK_PRE_INSTALL_COMMAND above
 if [ "$SDK_EXTENSIBLE" = "1" ]; then
 	DEFAULT_INSTALL_DIR="@SDKEXTPATH@"
-	if [ "$INST_GCC_VER" = '4.8' -a "$SDK_GCC_VER" = '4.9' ] || [ "$INST_GCC_VER" = '4.8' -a "$SDK_GCC_VER" = '' ] || \
-		[ "$INST_GCC_VER" = '4.9' -a "$SDK_GCC_VER" = '' ]; then
-		echo "Error: Incompatible SDK installer! Your host gcc version is $INST_GCC_VER and this SDK was built by gcc higher version."
-		exit 1
-	fi
 fi
 
 if [ "$target_sdk_dir" = "" ]; then
@@ -169,7 +166,9 @@ else
 fi
 
 # limit the length for target_sdk_dir, ensure the relocation behaviour in relocate_sdk.py has right result.
-if [ ${#target_sdk_dir} -gt 2048 ]; then
+# This is due to ELF interpreter being set to 'a'*1024 in
+# meta/recipes-core/meta/uninative-tarball.bb
+if [ ${#target_sdk_dir} -gt 1024 ]; then
 	echo "Error: The target directory path is too long!!!"
 	exit 1
 fi
@@ -232,7 +231,7 @@ if [ ! -x $target_sdk_dir -o ! -w $target_sdk_dir -o ! -r $target_sdk_dir ]; the
 		exit 1
 	fi
 
-	SUDO_EXEC=$(which "sudo")
+	SUDO_EXEC=$(command -v "sudo")
 	if [ -z $SUDO_EXEC ]; then
 		echo "No command 'sudo' found, please install sudo first. Abort!"
 		exit 1
@@ -248,13 +247,27 @@ fi
 
 printf "Extracting SDK..."
 if [ @SDK_ARCHIVE_TYPE@ = "zip" ]; then
+    if [ -z "$(command -v unzip)" ]; then
+        echo "Aborted, unzip is required to extract the SDK archive, please make sure it's installed on your system!"
+        exit 1
+    fi
     tail -n +$payload_offset "$0" > sdk.zip
     if $SUDO_EXEC unzip $EXTRA_TAR_OPTIONS sdk.zip -d $target_sdk_dir;then
         rm sdk.zip
     else
         rm sdk.zip && exit 1
     fi
+elif [ @SDK_ARCHIVE_TYPE@ = "tar.zst" ]; then
+    if [ -z "$(command -v zstd)" ]; then
+        echo "Aborted, zstd is required to extract the SDK archive, please make sure it's installed on your system!"
+        exit 1
+    fi
+    tail -n +$payload_offset "$0"| zstd -T0 -dc | $SUDO_EXEC tar mx -C $target_sdk_dir --checkpoint=.2500 $EXTRA_TAR_OPTIONS || exit 1
 else
+    if [ -z "$(command -v xz)" ]; then
+        echo "Aborted, xz is required to extract the SDK archive, please make sure it's installed on your system!"
+        exit 1
+    fi
     tail -n +$payload_offset "$0"| $SUDO_EXEC tar mxJ -C $target_sdk_dir --checkpoint=.2500 $EXTRA_TAR_OPTIONS || exit 1
 fi
 echo "done"
@@ -289,6 +302,10 @@ post_relocate="$target_sdk_dir/post-relocate-setup.sh"
 if [ -e "$post_relocate" ]; then
 	$SUDO_EXEC sed -e "s:@SDKPATH@:$target_sdk_dir:g" -i $post_relocate
 	$SUDO_EXEC /bin/sh $post_relocate "$target_sdk_dir" "@SDKPATH@"
+	if [ $? -ne 0 ]; then
+		echo "Executing $post_relocate failed"
+		exit 1
+	fi
 	$SUDO_EXEC rm -f $post_relocate
 fi
 
