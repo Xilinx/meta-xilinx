@@ -10,7 +10,7 @@ SRCREV = "b8a532d310b942005123dcb9f3c977a5819f03be"
 BRANCH = "2026"
 PV .= "+git"
 
-S = "${WORKDIR}/git/examples/libmetal"
+S = "${UNPACKDIR}/${BP}/examples/libmetal"
 inherit pkgconfig cmake
 
 DEPENDS:append = " libmetal "

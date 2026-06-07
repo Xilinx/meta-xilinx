@@ -33,7 +33,7 @@ PROVIDES:remove = "virtual/dtb"
 
 DEPENDS += "python3-dtc-native"
 
-S = "${WORKDIR}/source"
+S = "${UNPACKDIR}"
 
 # Set a default so something resolves
 SOC_FAMILY ??= "SOC_FAMILY"
@@ -41,12 +41,12 @@ SOC_FAMILY ??= "SOC_FAMILY"
 do_configure:prepend() {
 	mkdir -p source
 
-	if [ -e ${WORKDIR}/${MACHINE}-openamp-overlay.dts ]; then
-		install ${WORKDIR}/${MACHINE}-openamp.dtsi ${WORKDIR}/source/. || :
-		install ${WORKDIR}/${MACHINE}-openamp-overlay.dts ${WORKDIR}/source/openamp.dts
-	elif [ -e ${WORKDIR}/${SOC_FAMILY}-openamp-overlay.dts ]; then
-		install ${WORKDIR}/${SOC_FAMILY}-openamp.dtsi ${WORKDIR}/source/. || :
-		install ${WORKDIR}/${SOC_FAMILY}-openamp-overlay.dts ${WORKDIR}/source/openamp.dts
+	if [ -e ${S}/${MACHINE}-openamp-overlay.dts ]; then
+		install ${S}/${MACHINE}-openamp.dtsi ${S}/. || :
+		install ${S}/${MACHINE}-openamp-overlay.dts ${S}/openamp.dts
+	elif [ -e ${S}/${SOC_FAMILY}-openamp-overlay.dts ]; then
+		install ${S}/${SOC_FAMILY}-openamp.dtsi ${S}/. || :
+		install ${S}/${SOC_FAMILY}-openamp-overlay.dts ${S}/openamp.dts
 	else
 		bbfatal "${MACHINE}-openamp-overlay.dts or ${SOC_FAMILY}-openamp-overlay.dts file is not available.  Cannot automatically add OpenAMP dtbo file."
 	fi
