@@ -12,13 +12,11 @@ DEPENDS += "${IMGSEL_DEPENDS}"
 
 RCONFLICTS:${PN} = "image-selector-xsct"
 
-ESW_COMPONENT_SRC = "/src/"
+ESW_COMPONENT_SRC = "src"
 ESW_EXECUTABLE_NAME = "imgsel"
 
-SRC_URI:append = " git://github.com/Xilinx/image-selector.git;protocol=https;branch=main;destsuffix=image-selector;name=image-selector"
-SRCREV_image-selector = "283bcb2b49eaa2ff1eae2f0d926e1844797352c2"
-
-OECMAKE_SOURCEPATH = "${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}"
+SRC_URI:append = " git://github.com/Xilinx/image-selector.git;protocol=https;branch=main"
+SRCREV = "283bcb2b49eaa2ff1eae2f0d926e1844797352c2"
 
 # BIF configuration
 BIF_FILE_PATH = "${B}/${PN}.bif"
@@ -60,8 +58,6 @@ BIF_PARTITION_ID[imgsel] = "0x1c000001"
 
 BIF_PARTITION_NAME[0x1c000001] = "pmc_subsys"
 BIF_PARTITION_NAME[0x4210002] = "lpd"
-
-OECMAKE_SOURCEPATH = "${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}"
 
 # BIF configuration
 BIF_FILE_PATH = "${B}/${PN}.bif"
@@ -107,9 +103,9 @@ BIF_PARTITION_NAME[0x4210002] = "lpd"
 do_configure:prepend() {
     (
     cd ${S}
-    lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}
-    install -m 0644 *.cmake ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}/
-    install -m 0644 ${S}/cmake/UserConfig.cmake ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}
+    lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${OECMAKE_SOURCEPATH}
+    install -m 0644 *.cmake ${OECMAKE_SOURCEPATH}/
+    install -m 0644 ${S}/cmake/UserConfig.cmake ${OECMAKE_SOURCEPATH}
     )
 }
 

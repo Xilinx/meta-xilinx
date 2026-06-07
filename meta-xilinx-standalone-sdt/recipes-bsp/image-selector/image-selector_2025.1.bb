@@ -10,26 +10,24 @@ DEPENDS += "${IMGSEL_DEPENDS}"
 
 RCONFLICTS:${PN} = "image-selector-xsct"
 
-ESW_COMPONENT_SRC = "/src/"
+ESW_COMPONENT_SRC = "src"
 ESW_EXECUTABLE_NAME = "imgsel"
 
-SRC_URI:append = " git://github.com/Xilinx/image-selector.git;protocol=https;branch=main;destsuffix=image-selector;name=image-selector"
-SRCREV_image-selector = "0d2110e33ebf6023a19b43f0a6fa06e08507d3e1"
+SRC_URI:append = " git://github.com/Xilinx/image-selector.git;protocol=https;branch=main"
+SRCREV = "0d2110e33ebf6023a19b43f0a6fa06e08507d3e1"
 
 do_configure:prepend() {
     (
     cd ${S}
-    lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}
-    install -m 0644 *.cmake ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}/
-    install -m 0644 ${S}/cmake/UserConfig.cmake ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}
+    lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
+    install -m 0644 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+    install -m 0644 ${S}/cmake/UserConfig.cmake ${S}/${ESW_COMPONENT_SRC}
     )
 }
 
-OECMAKE_SOURCEPATH = "${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}"
-
 do_compile:append:zynqmp () {
 	# Generate .bif for zynqmp platforms
-cat > ${WORKDIR}/${PN}.bif << EOF
+cat > ${B}/${PN}.bif << EOF
     the_ROM_image:
     {
             [bootloader,destination_cpu=a53-0] ${B}/${ESW_EXECUTABLE_NAME}.elf
@@ -63,18 +61,18 @@ gen_imgsel_bif () {
 	else
 		bbwarn "Unable to find the pdi file ${RECIPE_SYSROOT}/boot/base-design.pdi to get ID_CODE, using ${base_idcode} as id_code."
 	fi
-cat > ${WORKDIR}/${PN}.bif << EOF
+cat > ${B}/${PN}.bif << EOF
     the_ROM_image:
     {
 EOF
 
 	for opt_data in $(echo "${IMGSEL_BIF_OPTIONAL_DATA}" | tr ';' '\n'); do
-cat >> ${WORKDIR}/${PN}.bif << EOF
+cat >> ${B}/${PN}.bif << EOF
 	optionaldata { ${opt_data} }
 EOF
 	done
 
-cat >> ${WORKDIR}/${PN}.bif << EOF
+cat >> ${B}/${PN}.bif << EOF
 	id_code = ${base_idcode}
 	extended_id_code = 0x01
 	id = 0x2
@@ -105,7 +103,7 @@ do_compile:append:versal-2ve-2vm () {
 }
 
 do_compile:append () {
-    bootgen -image ${WORKDIR}/${PN}.bif -arch ${BOOTGEN_ARCH} -w -o ${B}/${PN}.bin
+    bootgen -image ${B}/${PN}.bif -arch ${BOOTGEN_ARCH} -w -o ${B}/${PN}.bin
 }
 
 do_install[noexec] = "1"

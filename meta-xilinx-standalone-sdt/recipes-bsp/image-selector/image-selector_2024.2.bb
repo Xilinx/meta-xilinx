@@ -4,32 +4,30 @@ DEPENDS += "libxil xiltimer bootgen-native"
 
 RCONFLICTS:${PN} = "image-selector-xsct"
 
-ESW_COMPONENT_SRC = "/src/"
+ESW_COMPONENT_SRC = "src"
 ESW_EXECUTABLE_NAME = "imgsel"
 
-SRC_URI:append = " git://github.com/Xilinx/image-selector.git;protocol=https;branch=main;destsuffix=image-selector;name=image-selector"
-SRCREV_image-selector = "809441712855a64a35496192c180e31328a78b7b"
+SRC_URI:append = " git://github.com/Xilinx/image-selector.git;protocol=https;branch=main"
+SRCREV = "809441712855a64a35496192c180e31328a78b7b"
 
 do_configure:prepend() {
     (
     cd ${S}
-    lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}
-    install -m 0644 *.cmake ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}/
-    install -m 0644 ${S}/cmake/UserConfig.cmake ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}
+    lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
+    install -m 0644 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+    install -m 0644 ${S}/cmake/UserConfig.cmake ${S}/${ESW_COMPONENT_SRC}
     )
 }
 
-OECMAKE_SOURCEPATH = "${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}"
-
 do_compile:append () {
-cat > ${WORKDIR}/${PN}.bif << EOF
+cat > ${B}/${PN}.bif << EOF
     the_ROM_image:
     {
             [bootloader,destination_cpu=a53-0] ${B}/${ESW_EXECUTABLE_NAME}.elf
     }
 EOF
 
-    bootgen -image ${WORKDIR}/${PN}.bif -arch ${BOOTGEN_ARCH} -w -o ${B}/${PN}.bin
+    bootgen -image ${B}/${PN}.bif -arch ${BOOTGEN_ARCH} -w -o ${B}/${PN}.bin
 }
 
 do_install[noexec] = "1"
