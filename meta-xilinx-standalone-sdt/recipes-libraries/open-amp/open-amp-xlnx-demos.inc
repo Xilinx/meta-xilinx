@@ -19,7 +19,7 @@ DEPENDS_FREERTOS:xilinx-freertos = "freertos10-xilinx"
 DEPENDS += "${DEPENDS_FREERTOS}"
 
 B = "${WORKDIR}/build"
-S = "${WORKDIR}/git/examples/legacy_apps"
+S = "${UNPACKDIR}/${BP}/examples/legacy_apps"
 OECMAKE_SOURCEPATH = "${S}"
 
 OECMAKE_C_LINK_FLAGS:append = " --sysroot=${STAGING_DIR_HOST} -lxil -lxilstandalone -lxiltimer -lopen_amp "
