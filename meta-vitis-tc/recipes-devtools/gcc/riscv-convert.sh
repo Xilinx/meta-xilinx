@@ -34,7 +34,7 @@ sed -e 's,;, ,' |
     echo "DEFAULTTUNE:virtclass-multilib-$multilib = \"$tune\"" >> $tempfile
     echo >> $tempfile
     echo "AVAILTUNES += \"$tune\"" >> $tempfile
-    echo "TUNE_FEATURES:tune-$tune = \"\${@mbv.tune.riscv_isa_to_tune(\"$tune\")}\"" >> $tempfile
+    echo "TUNE_FEATURES:tune-$tune = \"\${@oe.tune.riscv_isa_to_tune(\"$tune\")}\"" >> $tempfile
     echo "PACKAGE_EXTRA_ARCHS:tune-$tune = \"\${TUNE_RISCV_PKGARCH}\"" >> $tempfile
     echo "BASE_LIB:tune-$tune = \"lib/$mlib\"" >> $tempfile
   done
