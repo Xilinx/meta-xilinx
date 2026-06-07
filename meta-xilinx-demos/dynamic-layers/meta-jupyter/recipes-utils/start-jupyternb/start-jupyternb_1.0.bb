@@ -30,7 +30,7 @@ SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "jupyter-setup.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 FILES:${PN} += "${base_sbindir} ${systemd_user_unitdir} ${datadir}"
 
@@ -38,20 +38,20 @@ do_install() {
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
        install -d ${D}${sysconfdir}/init.d/
-       install -m 0755 ${WORKDIR}/jupyter-setup.sh ${D}${sysconfdir}/init.d/jupyter-setup.sh
+       install -m 0755 ${UNPACKDIR}/jupyter-setup.sh ${D}${sysconfdir}/init.d/jupyter-setup.sh
     fi
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${WORKDIR}/jupyter-setup.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/jupyter-setup.service ${D}${systemd_system_unitdir}
 
     install -d ${D}${systemd_user_unitdir}
-    install -m 0644 ${WORKDIR}/jupyter-setup.service ${D}${systemd_user_unitdir}
+    install -m 0644 ${UNPACKDIR}/jupyter-setup.service ${D}${systemd_user_unitdir}
 
     install -d ${D}${base_sbindir}
-    install -m 0755 ${WORKDIR}/start-jupyter.sh ${D}${base_sbindir}/start-jupyter.sh
+    install -m 0755 ${UNPACKDIR}/start-jupyter.sh ${D}${base_sbindir}/start-jupyter.sh
 
     install -d ${D}${sysconfdir}/jupyter/
-    install -m 0644 ${WORKDIR}/jupyter_notebook_config.py ${D}${sysconfdir}/jupyter
+    install -m 0644 ${UNPACKDIR}/jupyter_notebook_config.py ${D}${sysconfdir}/jupyter
 
     install -d ${D}${datadir}/example-notebooks
 }

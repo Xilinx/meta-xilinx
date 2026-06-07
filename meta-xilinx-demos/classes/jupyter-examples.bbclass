@@ -1,4 +1,4 @@
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 FILES:${PN} += "${JUPYTER_DIR}"
 
