@@ -10,6 +10,8 @@ ESW_COMPONENT_NAME = "libmetal_xlnx_extension.a"
 DEPENDS += "libxil ipipsu xiltimer libmetal-xlnx"
 DEPENDS:append:xilinx-freertos = "freertos10-xilinx"
 
+EXTRA_OECMAKE:append = " -DCMAKE_INCLUDE_PATH=${STAGING_INCDIR}"
+
 do_install() {
     install -d ${D}${libdir}
     install -m 0755  ${B}/lib/${ESW_COMPONENT_NAME} ${D}${libdir}
