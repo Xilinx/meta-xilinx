@@ -1,0 +1,53 @@
+From 0000000000000000000000000000000000000000 Mon Sep 00 00:00:00 0000
+From: Mark Hatle <mark.hatle@amd.com>
+Subject: [PATCH] utils/src/cdo-load: Fix incompatible pointer type in
+ cdoseq_load_cdo_from_buffer
+
+The function parameter 'data' is 'char *' but CdoRawInfo::data is
+'uint32_t *'. Assigning raw->data directly to the char* parameter
+causes a -Wincompatible-pointer-types error (treated as an error by
+newer GCC).
+
+Introduce a local 'void *buf' to hold the active data pointer, matching
+the pattern used in the sibling function cdoseq_load_cdo() where 'data'
+is already declared as 'void *'.
+
+AI-Generated: GitHub Copilot (Claude Sonnet 4.6)
+
+Upstream-Status: Pending
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ utils/src/cdo-load.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/utils/src/cdo-load.c b/utils/src/cdo-load.c
+--- a/utils/src/cdo-load.c
++++ b/utils/src/cdo-load.c
+@@ -133,22 +133,23 @@
+     #if defined(__linux__)
+     CdoSequence * seq = NULL;
+     CdoRawInfo * raw = NULL;
++    void * buf = data;
+ 
+     if (data == NULL) goto done;
+     raw = cdoraw_decode(data, size);
+     if (raw != NULL) {
+-        data = raw->data;
++        buf = raw->data;
+         size = raw->size;
+     }
+-    if (is_cdo_data(data, size)) {
+-        seq = decode_cdo_binary(data, size);
++    if (is_cdo_data(buf, size)) {
++        seq = decode_cdo_binary(buf, size);
+         if (seq == NULL) {
+             fprintf(stderr, "cannot decode binary cdo buffer\n");
+             goto done;
+         }
+         cdometa_add_markers(&raw->meta, seq);
+     } else {
+-        FILE *memfile = fmemopen(data, size, "r");
++        FILE *memfile = fmemopen(buf, size, "r");
+         if (memfile == NULL) {
+             fprintf(stderr, "fmemopen failed\n");
+             goto done;

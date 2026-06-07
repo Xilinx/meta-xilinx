@@ -13,7 +13,9 @@ BRANCH = "master"
 SRCREV = "e576e5e1e227a74c31e54607623c1bb7f38eec12"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
-SRC_URI = "${REPO};${BRANCHARG}"
+SRC_URI = "${REPO};${BRANCHARG} \
+    file://0001-utils-src-cdo-load-Fix-incompatible-pointer-type-in-.patch \
+    "
 
 do_install() {
     install -d ${D}${bindir}
