@@ -23,7 +23,7 @@ SRC_URI:append = "\
 python do_compare_config_files() {
     import filecmp
     kernel_source_dir = d.getVar('S')
-    kernel_work_dir = d.getVar('WORKDIR')
+    kernel_work_dir = d.getVar('UNPACKDIR')
 
     linux_32bit_config = os.path.join(kernel_source_dir + '/arch/riscv/configs/32-bit.config')
     linux_64bit_config = os.path.join(kernel_source_dir + '/arch/riscv/configs/64-bit.config')
@@ -33,7 +33,7 @@ python do_compare_config_files() {
     yocto_64bit_config = os.path.join(kernel_work_dir + '/riscv-64-bit.cfg')
     yocto_amd_config = os.path.join(kernel_work_dir + '/riscv-amd.cfg')
 
-    # Compare linux-xlnx/arch/riscv/configs/32-bit.config with ${WORKDIR}/riscv-32-bit.cfg
+    # Compare linux-xlnx/arch/riscv/configs/32-bit.config with ${UNPACKDIR}/riscv-32-bit.cfg
     if os.path.isfile(linux_32bit_config) and os.path.isfile(yocto_32bit_config):
         if not filecmp.cmp(linux_32bit_config, yocto_32bit_config):
             bb.fatal("Linux repo Kernel Config Fragment: %s doesn't match with Yocto Config Fragment: %s. \
@@ -43,7 +43,7 @@ python do_compare_config_files() {
             bb.debug(2, "Linux repo Kernel Config Fragment: %s matches with Yocto Config Fragment: %s"
                 % (linux_32bit_config, yocto_32bit_config))
 
-    # Compare linux-xlnx/arch/riscv/configs/64-bit.config with ${WORKDIR}/riscv-64-bit.cfg
+    # Compare linux-xlnx/arch/riscv/configs/64-bit.config with ${UNPACKDIR}/riscv-64-bit.cfg
     if os.path.isfile(linux_64bit_config) and os.path.isfile(yocto_64bit_config):
         if not filecmp.cmp(linux_64bit_config, yocto_64bit_config):
             bb.fatal("Linux repo Kernel Config Fragment: %s doesn't match with Yocto Config Fragment: %s. \
@@ -53,7 +53,7 @@ python do_compare_config_files() {
             bb.debug(2, "Linux repo Kernel Config Fragment: %s matches with Yocto Config Fragment: %s"
                 % (linux_64bit_config, yocto_64bit_config))
 
-    # Compare linux-xlnx/arch/riscv/configs/amd.config with ${WORKDIR}/riscv-amd.cfg
+    # Compare linux-xlnx/arch/riscv/configs/amd.config with ${UNPACKDIR}/riscv-amd.cfg
     if os.path.isfile(linux_amd_config) and os.path.isfile(yocto_amd_config):
         if not filecmp.cmp(linux_amd_config, yocto_amd_config):
             bb.fatal("Linux repo Kernel Config Fragment: %s doesn't match with Yocto Config Fragment: %s. \
