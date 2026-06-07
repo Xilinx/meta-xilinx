@@ -20,8 +20,8 @@ ESW_EXECUTABLE_NAME = "img_rcvry"
 RCONFLICTS:${PN} = "image-recovery-linux"
 
 do_generate_app_data() {
-    lopper ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${ESW_MACHINE} ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
-    install -m 0644 *.cmake ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}/
+    lopper ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
+    install -m 0644 *.cmake ${S}/${ESW_COMPONENT_SRC}/
 }
 do_generate_app_data[dirs] = "${S}"
 addtask do_generate_app_data before do_configure after do_prepare_recipe_sysroot
@@ -30,13 +30,13 @@ do_prepare_recipe_sysroot[rdeptask] = "do_unpack"
 do_configure:prepend() {
     (
     cd ${S}
-    lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}
-    install -m 0755 *.cmake ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}/
-    install -m 0644 ${S}/cmake/UserConfig.cmake ${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}
+    lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
+    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+    install -m 0644 ${S}/cmake/UserConfig.cmake ${S}/${ESW_COMPONENT_SRC}
     )
 }
 
-OECMAKE_SOURCEPATH = "${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}"
+OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"
 
 do_install () {
     :

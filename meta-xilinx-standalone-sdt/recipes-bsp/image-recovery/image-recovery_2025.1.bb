@@ -17,16 +17,16 @@ include image-recovery-repository.inc
 
 SRC_URI = "${IR_PATH};name=${MACHINE}_ir ${WEB_PATH};name=${MACHINE}_web"
 
-S = "${WORKDIR}/git/lib/sw_apps/img_rcvry/src"
+S = "${UNPACKDIR}/${BP}/lib/sw_apps/img_rcvry/src"
 
 do_configure () {
 
-cat > ${WORKDIR}/${PN}.bif << EOF
+cat > ${S}/${PN}.bif << EOF
     the_ROM_image:
     {
         [bootloader, destination_cpu=a53-0] ${DEPLOY_DIR_IMAGE}/fsbl-${MACHINE}.elf
-        [load=0x10000000] ${WORKDIR}/web.img
-        [destination_cpu=a53-0] ${WORKDIR}/ImgRecovery.elf
+        [load=0x10000000] ${B}/web.img
+        [destination_cpu=a53-0] ${B}/ImgRecovery.elf
     }
 EOF
 }
@@ -36,11 +36,11 @@ do_install () {
 }
 
 do_compile () {
-    bootgen -image ${WORKDIR}/${PN}.bif -arch ${BOOTGEN_ARCH} -w -o ${WORKDIR}/${PN}.bin
+    bootgen -image ${S}/${PN}.bif -arch ${BOOTGEN_ARCH} -w -o ${B}/${PN}.bin
 }
 
 do_deploy() {
-    install -m 0644 ${WORKDIR}/${PN}.bin ${DEPLOYDIR}/${PN}-${MACHINE}.bin
+    install -m 0644 ${B}/${PN}.bin ${DEPLOYDIR}/${PN}-${MACHINE}.bin
     ln -sf ${PN}-${MACHINE}.bin ${DEPLOYDIR}/${PN}.bin
 }
 

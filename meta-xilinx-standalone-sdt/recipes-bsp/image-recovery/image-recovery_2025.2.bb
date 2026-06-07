@@ -15,7 +15,7 @@ include image-recovery-repository.inc
 
 SRC_URI = "${IR_PATH};name=${MACHINE}_ir ${WEB_PATH};name=${MACHINE}_web"
 
-S = "${WORKDIR}/git/lib/sw_apps/img_rcvry/src"
+S = "${UNPACKDIR}/${BP}/lib/sw_apps/img_rcvry/src"
 
 BIF_FILE_PATH = "${B}/${PN}.bif"
 
@@ -25,10 +25,10 @@ BIF_PARTITION_ATTR[fsbl] = "bootloader, destination_cpu=a53-0"
 BIF_PARTITION_IMAGE[fsbl] = "${DEPLOY_DIR_IMAGE}/fsbl-${MACHINE}.elf"
 
 BIF_PARTITION_ATTR[web-img] = "load=0x10000000"
-BIF_PARTITION_IMAGE[web-img] = "${WORKDIR}/web.img"
+BIF_PARTITION_IMAGE[web-img] = "${B}/web.img"
 
 BIF_PARTITION_ATTR[imgrcvry-elf] = "destination_cpu=a53-0"
-BIF_PARTITION_IMAGE[imgrcvry-elf] = "${WORKDIR}/ImgRecovery.elf"
+BIF_PARTITION_IMAGE[imgrcvry-elf] = "${B}/ImgRecovery.elf"
 
 python do_generate_bif() {
     bootgen_bif_generate(d)
