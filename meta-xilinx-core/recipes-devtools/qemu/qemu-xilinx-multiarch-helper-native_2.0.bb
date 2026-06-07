@@ -9,6 +9,8 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 # This is a typo in the older version of the package name
 PROVIDES += "flashstrip-native"
 
+DEPENDS += "wic-native"
+
 inherit setuptools3 native
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
