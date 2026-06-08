@@ -3,6 +3,8 @@ From: Mark Hatle <mark.hatle@amd.com>
 Date: Fri, 17 May 2024 10:44:37 -0600
 Subject: [PATCH] Support both pre 6.4.0 and current kernels
 
+Upstream-Status: Pending
+
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
 ---
  hdmi/xilinx_drm_hdmi.c |  3 +++
