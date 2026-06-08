@@ -1,0 +1,33 @@
+From 59b773ce04eac30f33a478301306abd585d00a43 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Mon, 8 Jun 2026 12:20:53 -0600
+Subject: [PATCH] xilsecure: xsecure_plat_elliptic_ipihandler.c: Add
+ xsecure_plat.h
+
+Fix for:
+xsecure_plat_elliptic_ipihandler.c:205:18: error: implicit declaration of function 'XSecure_GetRandomNum' [-Wimplicit-function-declaration]
+  205 |         Status = XSecure_GetRandomNum(Seed, XSECURE_ECC_SEED_LEN);
+      |                  ^~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ .../server/core/ecc_keypair/xsecure_plat_elliptic_ipihandler.c   | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/sw_services/xilsecure/src/server/core/ecc_keypair/xsecure_plat_elliptic_ipihandler.c b/lib/sw_services/xilsecure/src/server/core/ecc_keypair/xsecure_plat_elliptic_ipihandler.c
+index 87827e0ff0..9e19d23103 100644
+--- a/lib/sw_services/xilsecure/src/server/core/ecc_keypair/xsecure_plat_elliptic_ipihandler.c
++++ b/lib/sw_services/xilsecure/src/server/core/ecc_keypair/xsecure_plat_elliptic_ipihandler.c
+@@ -35,6 +35,7 @@
+ 
+ #ifndef PLM_ECDSA_EXCLUDE
+ #include "xsecure_defs.h"
++#include "xsecure_plat.h"
+ #include "xsecure_plat_defs.h"
+ #include "xsecure_ellipticplat.h"
+ #include "xplmi_dma.h"
+-- 
+2.34.1
+
