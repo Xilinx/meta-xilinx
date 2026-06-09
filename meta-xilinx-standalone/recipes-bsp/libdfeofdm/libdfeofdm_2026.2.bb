@@ -1,0 +1,39 @@
+SUMMARY = "Linux dfeofdm library"
+DESCRIPTION = "Linux user-space library for the AMD OFDM (DFE-OFDM) PL \
+DSP IP block, used in Versal RFSoC / Versal Adaptive Compute DFE \
+designs to configure and drive the OFDM modulator/demodulator at \
+runtime."
+SECTION = "libdfeofdm"
+LICENSE = "BSD-3-Clause"
+
+inherit pkgconfig xlnx-embeddedsw features_check
+
+REQUIRED_MACHINE_FEATURES = "rfsoc"
+
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+DEPENDS = "libmetal"
+
+PROVIDES = "libdfeofdm"
+
+DFEOFDM_SUBDIR = "XilinxProcessorIPLib/drivers/dfeofdm/src"
+
+do_compile:prepend() {
+    cd ${S}/${DFEOFDM_SUBDIR}
+    install Makefile.Linux Makefile
+}
+
+do_install() {
+    install -d ${D}${libdir}
+    install -d ${D}${includedir}
+
+    cd ${S}/${DFEOFDM_SUBDIR}
+    oe_libinstall -so libdfeofdm ${D}${libdir}
+    install -m 0644 xdfeofdm_hw.h ${D}${includedir}/xdfeofdm_hw.h
+    install -m 0644 xdfeofdm.h ${D}${includedir}/xdfeofdm.h
+}
+
+FILES:${PN} = "${libdir}/*.so.*"
+FILES:${PN}-dev = "${libdir}/*.so  ${includedir}/*"
