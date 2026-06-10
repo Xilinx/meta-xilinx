@@ -10,8 +10,6 @@ require image-recovery-src_2026.1.inc
 SRC_URI = "${IMG_RCVRY_REPO};${IMG_RCVRY_BRANCHARG}"
 SRCREV ?= "${IMG_RCVRY_SRCREV}"
 
-S = "${WORKDIR}/git"
-
 DEPENDS += "dosfstools-native mtools-native"
 
 WEBIMG_DIR ?= "${B}/webimg"
@@ -29,7 +27,7 @@ do_create_webimg() {
 do_create_webimg[cleandirs] = "${WEBIMG_DIR}"
 do_create_webimg[depends] += "dosfstools-native:do_populate_sysroot mtools-native:do_populate_sysroot"
 
-addtask do_create_webimg after do_prepare_recipe_sysroot before do_install
+addtask do_create_webimg after do_prepare_recipe_sysroot do_patch before do_install
 
 do_install () {
     :
