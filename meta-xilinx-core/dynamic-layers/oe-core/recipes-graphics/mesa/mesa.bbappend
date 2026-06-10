@@ -27,6 +27,7 @@ python __anonymous () {
         d.setVar('TUNE_CCARGS', fixed)
 }
 
+DISTRO_FEATURES:remove:class-native = "opencl"
 
 # Override the default bindgen_args with ones that will work.
 #
