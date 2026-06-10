@@ -1,0 +1,16 @@
+xis_qspi.c: fix missing include
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
+--- a/src/versal/xis_qspi.c	2026-06-09 17:09:48.593579098 -0600
++++ b/src/versal/xis_qspi.c	2026-06-09 17:08:17.292532716 -0600
+@@ -33,6 +33,7 @@
+ #include "xpm_defs.h"
+ #include "xpm_nodeid.h"
+ #include "xplmi.h"
++#include "xpm_api.h"
+ 
+ #ifdef XIS_UPDATE_A_B_MECHANISM
+ #ifdef XIS_QSPI_FLSH

@@ -18,6 +18,8 @@ ESW_EXECUTABLE_NAME = "imgsel"
 SRC_URI:append = " git://github.com/Xilinx/image-selector.git;protocol=https;branch=main"
 SRCREV = "283bcb2b49eaa2ff1eae2f0d926e1844797352c2"
 
+SRC_URI += "file://0001-xis_qspi_fix_missing_include.patch"
+
 # BIF configuration
 BIF_FILE_PATH = "${B}/${PN}.bif"
 
