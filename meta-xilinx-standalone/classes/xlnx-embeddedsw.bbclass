@@ -14,7 +14,7 @@ ESW_BRANCH[2024.2] = "xlnx_rel_v2024.2"
 ESW_BRANCH[2025.1] = "xlnx_rel_v2025.1"
 ESW_BRANCH[2025.2] = "xlnx_rel_v2025.2"
 ESW_BRANCH[2026.1] = "xlnx_rel_v2026.1"
-ESW_BRANCH[2026.2] = "xlnx_rel_v2026.1"
+ESW_BRANCH[2026.2] = "master"
 ESW_BRANCH = "${@d.getVarFlag('ESW_BRANCH', d.getVar('ESW_VER')) or '${ESW_VER}'}"
 ESW_BRANCH[vardeps] += "ESW_VER"
 BRANCH ??= "${ESW_BRANCH}"
@@ -29,7 +29,7 @@ ESW_REV[2024.2] = "6e4d0b89d2958994ab9b3531eb4c6e648a63f201"
 ESW_REV[2025.1] = "cc89abdc1c394c19f0b72d5b498c0b5ed7403442"
 ESW_REV[2025.2] = "145cea8fcf98268c8b163f732c181f008e887e53"
 ESW_REV[2026.1] = "2fb454742f9d42e23a46a13c0eb09e29dc52c6d1"
-ESW_REV[2026.2] = "2fb454742f9d42e23a46a13c0eb09e29dc52c6d1"
+ESW_REV[2026.2] = "2528f7be62ac33e7d30a31fc6dbe8cdaefe5d15c"
 ESW_REV = "${@d.getVarFlag('ESW_REV', d.getVar('ESW_VER')) or 'INVALID'}"
 ESW_REV[vardeps] += "ESW_VER"
 SRCREV_embeddedsw ??= "${ESW_REV}"
@@ -38,7 +38,7 @@ EMBEDDEDSW_BRANCHARG ?= "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH'
 EMBEDDEDSW_SRCURI ?= "${REPO};${EMBEDDEDSW_BRANCHARG}"
 
 LICENSE = "MIT"
-ESW_LIC_FILES_CHKSUM[master] = 'c225c4cbc07b5aceeb804f4abad3c693'
+ESW_LIC_FILES_CHKSUM[master] = '0561181a071e077aa5d47cc51b84dc6d'
 ESW_LIC_FILES_CHKSUM[xlnx_rel_v2022.1_update] = 'e62cb7a722c4430999e0a55a7234035d'
 ESW_LIC_FILES_CHKSUM[xlnx_rel_v2022.2]  = 'ce611484168a6000bd35df68fc4f4290'
 ESW_LIC_FILES_CHKSUM[xlnx_rel_v2023.1_update] = '3c310a3ee2197a4c92c6a0e2937c207c'
