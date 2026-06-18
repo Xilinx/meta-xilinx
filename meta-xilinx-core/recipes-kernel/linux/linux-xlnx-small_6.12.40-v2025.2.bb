@@ -18,7 +18,6 @@ KBUILD_DEFCONFIG:forcevariable = ""
 # Only aarch64 is currently supported
 COMPATIBLE_MACHINE:aarch64 = ".*"
 
-COMPATIBLE_MACHINE:microblaze = "^$"
 COMPATIBLE_MACHINE:riscv32 = "^$"
 COMPATIBLE_MACHINE:riscv64 = "^$"
 COMPATIBLE_MACHINE:zynq = "^$"

@@ -46,10 +46,6 @@ KERNEL_IMAGETYPE := "${KERNEL_IMAGETYPE}"
 
 require recipes-kernel/linux/linux-yocto.inc
 
-LINUX_MB_INC = ""
-LINUX_MB_INC:microblaze = "linux-microblaze.inc"
-require ${LINUX_MB_INC}
-
 SUMMARY = "AMD Xilinx Linux kernel (linux-xlnx)."
 DESCRIPTION = "Xilinx Kernel"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
@@ -71,7 +67,6 @@ inherit kernel-simpleimage
 
 # Default to be only compatible with specific machines or soc families
 COMPATIBLE_MACHINE ?= "^$"
-COMPATIBLE_MACHINE:microblaze = ".*"
 COMPATIBLE_MACHINE:riscv32 = ".*"
 COMPATIBLE_MACHINE:riscv64 = ".*"
 COMPATIBLE_MACHINE:zynq = ".*"
@@ -83,7 +78,6 @@ COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
 # Use DEFCONFIGs for configuring linux-xlnx kernels
 KCONFIG_MODE ?= "alldefconfig"
 KBUILD_DEFCONFIG_DEFAULT ?= ""
-KBUILD_DEFCONFIG_DEFAULT:microblaze ?= "mmu_defconfig"
 KBUILD_DEFCONFIG_DEFAULT:riscv32 ?= "defconfig"
 KBUILD_DEFCONFIG_DEFAULT:riscv64 ?= "defconfig"
 KBUILD_DEFCONFIG_DEFAULT:zynq ?= "xilinx_zynq_defconfig"
@@ -122,8 +116,5 @@ SRC_URI:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'fi
 
 # To enable lttng, we need kprobes
 KERNEL_FEATURES_KPROBES = " features/kprobes"
-
-# Not supported on Microblaze
-KERNEL_FEATURES_KPROBES:microblaze = ""
 
 KERNEL_FEATURES:append = "${KERNEL_FEATURES_KPROBES}"
