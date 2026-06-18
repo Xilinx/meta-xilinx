@@ -2,7 +2,7 @@
 # Due to this, if MACHINE_FEATURES includes vdu, vcu or vdu2 this recipe is now machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-SRC_URI += " git://github.com/Xilinx/opencv_modules_xlnx.git;protocol=https;branch=main;name=xlnx-modules;destsuffix=git/contrib_xlnx"
+SRC_URI += " git://github.com/Xilinx/opencv_modules_xlnx.git;protocol=https;branch=main;name=xlnx-modules;destsuffix=${BP}/contrib_xlnx"
 
 # Update this hash when you make changes to the opencv_modules_xlnx repository
 SRCREV_xlnx-modules = "6eb9d4a23c0401f20a0f6802c9805af898d7b6c4"
