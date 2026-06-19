@@ -33,7 +33,7 @@ class BootimgEFIPlugin(SourcePlugin):
     This plugin supports GRUB 2 and systemd-boot bootloaders.
     """
 
-    name = 'bootimg-efi-amd'
+    name = 'bootimg_efi_amd'
 
     @classmethod
     def _copy_additional_files(cls, hdddir, initrd, dtb):
