@@ -45,3 +45,13 @@ addtask deploy after do_compile
 
 SYSROOT_DIRS += "/boot"
 FILES:${PN} += "/boot/${ROLLBACK_COUNTER_FILE}"
+
+python() {
+    counter = d.getVar('BOOTBIN_ROLLBACK_COUNTER')
+    if not counter:
+        raise bb.parse.SkipRecipe("BOOTBIN_ROLLBACK_COUNTER is not set")
+    try:
+        value = int(counter)
+    except ValueError:
+        raise bb.parse.SkipRecipe("BOOTBIN_ROLLBACK_COUNTER must be an integer, got: %s" % counter)
+}
