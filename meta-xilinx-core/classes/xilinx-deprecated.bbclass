@@ -11,7 +11,7 @@ python xilinx_deprecated_config_eventhandler () {
 
     # Check for 'generic' machines, warn the user this isn't what they want
     if d.getVar('MACHINE').endswith('-generic'):
-        bb.warn('The %s machine is intended to be included by other machines, it should not be used by itself.  For a non-machine, SoC specific filesystem, please use one of the common machines defined in meta-xilinx-core.' % d.getVar('MACHINE'))
+        bb.warn('The %s machine is intended to be included by other machines, it should not be used by itself.' % d.getVar('MACHINE'))
 
     msg_list = d.getVarFlags('XILINX_DEPRECATED') or []
     for msg_source in msg_list:
