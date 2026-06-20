@@ -431,6 +431,7 @@ SRC_URI = " \
     > at runtime linux. For more details refer.
     > 1. [fpgautil](https://github.com/Xilinx/meta-xilinx/blob/master/meta-xilinx-core/recipes-bsp/fpga-manager-script/files/fpgautil.c#L96)
     > 2. [dfx-mgr-client](https://github.com/Xilinx/dfx-mgr/blob/master/README.md)
+    > **Note:** dfx-mgr requires the meta-oe layer
 
     ```
     MACHINE_FEATURES += "fpga-overlay"
