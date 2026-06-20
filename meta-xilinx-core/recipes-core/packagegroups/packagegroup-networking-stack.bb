@@ -5,15 +5,15 @@ inherit packagegroup
 
 NETWORKING_STACK_PACKAGES = " \
 	ethtool \
-	phytool \
-	netcat \
+	${@bb.utils.contains('BBFILE_COLLECTIONS', 'networking-layer', 'phytool', '', d)} \
+	${@bb.utils.contains('BBFILE_COLLECTIONS', 'networking-layer', 'netcat', '', d)} \
 	net-tools \
-	dnsmasq \
+	${@bb.utils.contains('BBFILE_COLLECTIONS', 'networking-layer', 'dnsmasq', '', d)} \
 	iproute2 \
 	iptables \
 	rpcbind \
-	iperf2 \
-	iperf3 \
+	${@bb.utils.contains('BBFILE_COLLECTIONS', 'openembedded-layer', 'iperf2', '', d)} \
+	${@bb.utils.contains('BBFILE_COLLECTIONS', 'openembedded-layer', 'iperf3', '', d)} \
 	"
 
 RDEPENDS:${PN} = "${NETWORKING_STACK_PACKAGES}"

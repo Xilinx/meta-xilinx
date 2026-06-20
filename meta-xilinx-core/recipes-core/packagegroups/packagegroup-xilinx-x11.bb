@@ -9,9 +9,9 @@ inherit packagegroup
 X11_PACKAGES = " \
     packagegroup-core-x11 \
     packagegroup-core-x11-xserver \
-    libxaw7 \
+    ${@bb.utils.contains('BBFILE_COLLECTIONS', 'openembedded-layer', 'libxaw7', '', d)} \
     libxpm \
-    xclock \
+    ${@bb.utils.contains('BBFILE_COLLECTIONS', 'openembedded-layer', 'xclock', '', d)} \
     xcursor-transparent-theme \
     xeyes \
 	"
