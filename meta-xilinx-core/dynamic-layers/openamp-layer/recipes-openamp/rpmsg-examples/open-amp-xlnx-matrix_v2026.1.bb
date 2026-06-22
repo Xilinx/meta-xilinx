@@ -13,3 +13,8 @@ RPROVIDES:${PN}-dev += "open-amp-xlnx-matrix-dev"
 RPROVIDES:${PN}-lic += "open-amp-xlnx-matrix-lic"
 RPROVIDES:${PN}-src += "open-amp-xlnx-matrix-src"
 RPROVIDES:${PN}-staticdev += "open-amp-xlnx-matrix-staticdev"
+
+# Workaround: this unblocks build. Note this is warning only, not a 
+# runtime difference
+CFLAGS:append = " -Wno-error=incompatible-pointer-types "
+
