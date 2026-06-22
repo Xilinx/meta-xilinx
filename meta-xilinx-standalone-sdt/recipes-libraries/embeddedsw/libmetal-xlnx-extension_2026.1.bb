@@ -18,6 +18,6 @@ do_install() {
 }
 
 # this is same for r5 and r52
-EXTRA_OECMAKE = ""
-EXTRA_OECMAKE:armv7r += " -DMACHINE=zynqmp_r5 "
-EXTRA_OECMAKE:armv8r += " -DMACHINE=zynqmp_r5 "
+EXTRA_OECMAKE:append = " -DCMAKE_INCLUDE_PATH:PATH=${STAGING_INCDIR}"
+EXTRA_OECMAKE:append:armv7r = " -DMACHINE=zynqmp_r5"
+EXTRA_OECMAKE:append:armv8r = " -DMACHINE=zynqmp_r5"
