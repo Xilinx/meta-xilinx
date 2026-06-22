@@ -26,7 +26,10 @@ S = "${UNPACKDIR}/${BP}/examples/libmetal"
 OECMAKE_SOURCEPATH = "${S}"
 
 OECMAKE_C_LINK_FLAGS:append = " --sysroot=${STAGING_DIR_HOST} -lxil -lxilstandalone -lxiltimer -lmetal "
-CFLAGS:append = " -DSDT ${DEBUG_PREFIX_MAP} -specs=${PKG_CONFIG_SYSROOT_DIR}/usr/include/Xilinx.spec ${ESW_CFLAGS} "
+CFLAGS:append = " -DSDT ${DEBUG_PREFIX_MAP} -fno-pie -specs=${STAGING_INCDIR}/Xilinx.spec ${ESW_CFLAGS} "
+LDFLAGS:append = " -no-pie "
+TARGET_LINK_HASH_STYLE = ""
+SECURITY_LDFLAGS = ""
 
 LIBMETAL_CMAKE_SYSTEM_NAME = "unknown"
 LIBMETAL_CMAKE_SYSTEM_NAME:xilinx-standalone = "Generic"
@@ -35,12 +38,12 @@ COMPATIBLE_HOST = ".*"
 COMPATIBLE_HOST:armv7r = "[^-]*-[^-]*-eabi"
 COMPATIBLE_HOST:armv8r = "[^-]*-[^-]*-eabi"
 
-PM_LIB ?= "-D_xilpm_lib_path=${PKG_CONFIG_SYSROOT_DIR}/usr/lib/xilpm.a"
+PM_LIB ?= "-D_xilpm_lib_path=${STAGING_LIBDIR}/xilpm.a"
 PM_LIB:versal-2ve-2vm = ""
 
 EXTRA_OECMAKE:append:xilinx-standalone = " \
-	-DCMAKE_LIBRARY_PATH=${PKG_CONFIG_SYSROOT_DIR}/usr/lib/ \
-	-DCMAKE_INCLUDE_PATH=${PKG_CONFIG_SYSROOT_DIR}/usr/include/ \
+	-DCMAKE_LIBRARY_PATH=${STAGING_LIBDIR}/ \
+	-DCMAKE_INCLUDE_PATH=${STAGING_INCDIR}/ \
 	-DPROJECT_MACHINE=amd_rpu \
 	-DPROJECT_SYSTEM=generic \
 	-DROLE=remote \
@@ -62,15 +65,15 @@ cmake_do_generate_toolchain_file:append:arm() {
 	CMAKE_FORCE_C_COMPILER("${OECMAKE_C_COMPILER}" GNU)
 	set (CMAKE_SYSTEM_PROCESSOR "${TRANSLATED_TARGET_ARCH}" )
 	set (CMAKE_SYSTEM_NAME      "${LIBMETAL_CMAKE_SYSTEM_NAME}")
-	set (CMAKE_LIBRARY_PATH     "${CMAKE_LIBRARY_PATH}:${PKG_CONFIG_SYSROOT_DIR}/usr/lib" CACHE STRING "" FORCE)
-	set (CMAKE_INCLUDE_PATH     "${CMAKE_INCLUDE_PATH} ${PKG_CONFIG_SYSROOT_DIR}/usr/include/" CACHE STRING "")
+	set (CMAKE_LIBRARY_PATH     "${CMAKE_LIBRARY_PATH}:${STAGING_LIBDIR}" CACHE STRING "" FORCE)
+	set (CMAKE_INCLUDE_PATH     "${CMAKE_INCLUDE_PATH} ${STAGING_INCDIR}/" CACHE STRING "")
 	set (CMAKE_FIND_ROOT_PATH   "${CMAKE_FIND_ROOT_PATH} ${STAGING_LIBDIR} ${CMAKE_INCLUDE_PATH} " CACHE STRING "")
 
-	set (LIBMETAL_INCLUDE_DIR   " ${PKG_CONFIG_SYSROOT_DIR}/usr/include/" CACHE STRING "")
-	set (LIBMETAL_LIB_DIR       " ${PKG_CONFIG_SYSROOT_DIR}/usr/lib" CACHE STRING "")
+	set (LIBMETAL_INCLUDE_DIR   " ${STAGING_INCDIR}/" CACHE STRING "")
+	set (LIBMETAL_LIB_DIR       " ${STAGING_LIBDIR}" CACHE STRING "")
 
-	set (XIL_INCLUDE_DIR        " ${PKG_CONFIG_SYSROOT_DIR}/usr/include/" CACHE STRING "")
-	set (CMAKE_C_FLAGS          " ${CMAKE_C_FLAGS}  ${PKG_CONFIG_SYSROOT_DIR}/usr/include/" CACHE STRING "")
+	set (XIL_INCLUDE_DIR        " ${STAGING_INCDIR}/" CACHE STRING "")
+	set (CMAKE_C_FLAGS          " ${CMAKE_C_FLAGS}  ${STAGING_INCDIR}/" CACHE STRING "")
         set_property(GLOBAL PROPERTY DEMO_CFG_FILE "${S}/${DEMO_CFG_FILE}")
         set_property(GLOBAL PROPERTY LINKER_METADATA_FILE ${S}/${LINKER_METADATA_FILE})
         set_property(GLOBAL PROPERTY SOC ${SOC})
