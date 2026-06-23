@@ -6,6 +6,8 @@ Subject: [PATCH] xf86-video-armosc: Option to control acceleration
 Add xorg config option to enable / disable GPU accelerated picture
 composition. Enable acceleration by default.
 
+Upstream-Status: Inappropriate [AMD Mali-400 specific]
+
 Signed-off-by: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
 ---
  man/armsoc.man      |  6 ++++++

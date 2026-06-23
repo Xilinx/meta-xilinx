@@ -6,6 +6,8 @@ Subject: [PATCH] xf86-video-armsoc: Update xilinx drm driver name
 The DP driver name has been changed from xlnx to zynqmp-dpsub.
 Updating the driver name resolving display issues.
 
+Upstream-Status: Inappropriate [Xilinx ZynqMP DPSUB-specific]
+
 Signed-off-by: Ashish Kumar Vishwakarma <ashishkumar.vishwakarma@amd.com>
 ---
  src/drmmode_xilinx/drmmode_xilinx.c | 2 +-

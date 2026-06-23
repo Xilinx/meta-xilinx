@@ -15,6 +15,8 @@ Provide access to dma-buf fd from ARSOC buffer object.
 
 Attach shadow buffer object to corresponding pixmap.
 
+Upstream-Status: Inappropriate [AMD Mali-400 specific]
+
 Signed-off-by: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
 ---
  src/Makefile.am        |   3 +-

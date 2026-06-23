@@ -9,6 +9,8 @@ the exa layer is not aware of the pixmap resulting in the assertion
 to fail. Instead, we can directly invoke fbDestroyPixmap, thereby
 freeing the pixmap and avoiding a memory leak.
 
+Upstream-Status: Inactive-Upstream [lastrelease: 1.4.1 (2016-08-25)]
+
 Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
 ---
  src/armsoc_driver.c | 3 ++-

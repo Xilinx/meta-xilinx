@@ -5,9 +5,10 @@ Subject: [PATCH] src: drmmode_xilinx: Add the dumb gem support for Xilinx
 
 Add the dumb gem support for Xilinx
 
+Upstream-Status: Inappropriate [Xilinx-specific]
+
 Signed-off-by: Hyun Kwon <hyun.kwon@xilinx.com>
 Signed-off-by: Nathan Rossi <nathan@nathanrossi.com>
-Upstream-Status: Pending
 ---
  src/Makefile.am                     |  3 +-
  src/armsoc_driver.c                 |  1 +

@@ -8,6 +8,8 @@ RandR extension to operate. Implement the shadow buffer as a dumb DRM
 framebuffer. Use the shadow buffer as page flip souce. Fix armsoc_dri2.c
 file mode (drop exec bits).
 
+Upstream-Status: Inactive-Upstream [lastrelease: 1.4.1 (2016-08-25)]
+
 Signed-off-by: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
 ---
  src/armsoc_dri2.c     |  3 ++
