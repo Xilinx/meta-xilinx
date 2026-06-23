@@ -130,6 +130,9 @@ python do_configure() {
 }
 
 do_configure[vardeps] += "BIF_PARTITION_ATTR BIF_PARTITION_IMAGE BIF_COMMON_ATTR"
+# Track per-name BIF_COMMON_ATTR flag values so changing a value (without
+# changing the list) still invalidates the configure signature.
+do_configure[vardeps] += "${@' '.join('BIF_COMMON_ATTR[%s]' % n for n in (d.getVar('BIF_COMMON_ATTR') or '').split())}"
 do_configure[vardeps] += "BIF_FSBL_ATTR BIF_BITSTREAM_ATTR BIF_TFA_ATTR BIF_DEVICETREE_ATTR BIF_SSBL_ATTR BIF_OPTIONAL_DATA"
 do_configure[vardeps] += "BIF_PARTITION_ID BIF_PARTITION_NAME"
 

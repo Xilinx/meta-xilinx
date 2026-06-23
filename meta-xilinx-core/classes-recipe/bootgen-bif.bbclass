@@ -12,7 +12,17 @@
 #   BIF_TOPLEVEL_ATTR      - Space-separated top-level attribute names
 #   BIF_TOPLEVEL_ATTR[a]   - Value for top-level attribute 'a' (emitted as: a = value)
 #   BIF_COMMON_ATTR        - Space-separated common attribute names
-#   BIF_COMMON_ATTR[name]  - Flags for common attribute
+#   BIF_COMMON_ATTR[name]  - Common attribute value. The emission differs by
+#                            SoC family:
+#                            * Versal/Versal-net/Versal-2ve-2vm: emitted
+#                              verbatim as "name <value>", so the value must
+#                              carry the full bootgen syntax following the name:
+#                                [boot_config] = "{ <options> }"
+#                                [boot_device] = "{ <options>, address=<addr> }"
+#                                [metaheader]  = "{ }"
+#                                [puf_file]    = "= <puf data file>"
+#                            * Zynq/ZynqMP: value is a comma-separated flag list
+#                              emitted as "[name] flag1, flag2".
 #   BIF_OPTIONAL_DATA      - Semicolon-separated: "<filepath>, id=<id>;"
 #   BIF_PARTITION_ATTR     - Space-separated partition names (boot order)
 #   BIF_PARTITION_ATTR[p]  - Attribute flags for partition 'p'
@@ -101,9 +111,21 @@ def bootgen_bif_create_versal(common_attrs, partitions, local_files, biffd, d):
     for name in common_attrs:
         if name not in common_attrflags:
             bb.fatal("BIF_COMMON_ATTR[%s] not defined, but '%s' is listed in BIF_COMMON_ATTR" % (name, name))
-        flags = d.expand(common_attrflags[name])
-        flag_list = [f.strip() for f in flags.split(',') if f.strip()]
-        biffd.write("\t { %s %s }\n" % (name, ', '.join(flag_list)))
+        # The attribute value carries the full bootgen syntax that follows the
+        # name, so the emission stays open to the different common-attribute
+        # forms in UG1283, e.g.:
+        #   boot_config { <options> }
+        #   boot_device { <options>, address=<address> }
+        #   metaheader { }
+        #   puf_file = <puf data file>
+        # The value is emitted verbatim after the name; the caller supplies the
+        # braces / '=' as required by the attribute.
+        value = d.expand(common_attrflags[name]).strip()
+        if not value:
+            bb.fatal("BIF_COMMON_ATTR[%s] is empty; it must carry the full "
+                     "bootgen syntax following the name (e.g. '{ <options> }' "
+                     "or '= <file>')" % name)
+        biffd.write("\t%s %s\n" % (name, value))
 
     # Group partitions by ID, preserving order of first occurrence
     id_partitions = []  # [(id, [entries]), ...]

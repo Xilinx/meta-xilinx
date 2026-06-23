@@ -99,6 +99,9 @@ do_imgrcvry_bif[vardeps] += "\
     BIF_COMMON_ATTR \
     SOC_FAMILY \
 "
+# Track per-name BIF_COMMON_ATTR flag values so changing a value (without
+# changing the list) still invalidates the task signature.
+do_imgrcvry_bif[vardeps] += "${@' '.join('BIF_COMMON_ATTR[%s]' % n for n in (d.getVar('BIF_COMMON_ATTR') or '').split())}"
 
 IMGRCVRY_ATTR_DEP = "${@(d.getVar('IMGRCVRY_ATTR') or "").replace('bitstream', 'virtual/bitstream')}"
 do_imgrcvry_bif[depends] += "${@' '.join('%s:do_populate_sysroot' % r for r in d.getVar('IMGRCVRY_ATTR_DEP').split())}"
