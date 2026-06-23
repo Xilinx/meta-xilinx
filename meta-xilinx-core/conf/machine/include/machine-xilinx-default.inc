@@ -33,7 +33,6 @@ UBOOT_ELF ?= "u-boot.elf"
 XSERVER ?= " \
 	xserver-xorg \
 	xf86-input-evdev \
-	xf86-input-mouse \
 	xf86-video-fbdev \
 	${XSERVER_EXT} \
 	"
