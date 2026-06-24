@@ -139,7 +139,7 @@ devicetree_do_install:append() {
             install -Dm 0644 ${DT_FILES_PATH}/${DTB_FILE_NAME} ${D}/boot/devicetree/${DTB_FILE_NAME}
         fi
         if [ -e "${D}/boot/devicetree/${DTB_FILE_NAME}" ]; then
-            # We need the output to be system.dtb for WIC setup to match XSCT flow
+            # We need the output to be system.dtb for WIC setup to match former XSCT flow
             cp ${D}/boot/devicetree/${DTB_FILE_NAME} ${D}/boot/system.dtb
         else
             bberror "Expected filename ${DTB_FILE_NAME} doesn't exist in ${DEPLOYDIR}/devicetree"
@@ -154,7 +154,7 @@ devicetree_do_deploy:append() {
             install -Dm 0644 ${DT_FILES_PATH}/${DTB_FILE_NAME} ${DEPLOYDIR}/devicetree/${DTB_FILE_NAME}
         fi
         if [ -e "${DEPLOYDIR}/devicetree/${DTB_FILE_NAME}" ]; then
-            # We need the output to be system.dtb for WIC setup to match XSCT flow
+            # We need the output to be system.dtb for WIC setup to match former XSCT flow
             ln -sf devicetree/${DTB_FILE_NAME} ${DEPLOYDIR}/${DTB_BASE_NAME}.dtb
             ln -sf devicetree/${DTB_FILE_NAME} ${DEPLOYDIR}/${MACHINE}-system.dtb
             ln -sf devicetree/${DTB_FILE_NAME} ${DEPLOYDIR}/system.dtb

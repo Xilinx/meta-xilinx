@@ -346,12 +346,10 @@ SRC_URI = " \
 
 ## How to create a firmware recipe app
 
-1. Follow SDT or XSCT Build instructions whichever build method is used but not
-   both.
+1. Follow SDT Build instructions
     1. [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.bsp.md)
         upto step 4 (With SDT overlay).
-    2. [XSCT Building Instructions](../README.building.md)
-    3. Below example uses zynqmp-zcu111 machine fw files.
+    2. Below example uses zynqmp-zcu111 machine fw files.
 
 2. Create recipes-firmware and files directory in distribution or bsp meta layer.
     > **Note:**
@@ -441,11 +439,8 @@ SRC_URI = " \
         "
     ```
 
-3. Follow SDT or XSCT Build instructions whichever build method is used but not
-   both.
+3. Follow SDT Build instructions
     a. [SDT Building Instructions](../meta-xilinx-standalone-sdt/README.md ) and continue from step 5.
-    b. [XSCT Building Instructions](../README.building.md)
-       and continue from step 5.
 
 4. Once images are built firmware app files will be installed on target_rootfs.
     ```

@@ -4,9 +4,6 @@ This layer is meant to augment Yocto/OE functionality to provide a
 Baremetal/Standalone distribution as well as a generic version of various
 firmware that is required to boot a ZynqMP or Versal system.
 
-For optimized versions of the firmware and additional components you must use
-the meta-xilinx-tools layer.
-
 ## Building
 
 The software in this layer may be used in either a standard single configuration
@@ -56,7 +53,7 @@ $ MACHINE=versal-generic bitbake plmfw psmfw
 ### How to patch embeddedsw components
 
 This section describes on how to patches to embeddedsw-source recipe in Yocto
-XSCT or SDT build flows. In 2025.2 and later release all embeddedsw firmware
+SDT build flows. In 2025.2 and later release all embeddedsw firmware
 recipes such as pmu-firmware, plm-firmware etc. uses source from embeddedsw-source
 recipe. If you apply the patch to embeddedsw-source recipe it will be applied to
 all embeddedsw firmware recipes. Also it is recommended to create a new custom

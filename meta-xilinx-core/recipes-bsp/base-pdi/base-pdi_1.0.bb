@@ -29,7 +29,6 @@ python() {
 }
 
 #base install will just take from PDI_PATH variable
-#will need to bbappend to this in meta-xilinx-tools to use xsct to extract pdi from xsa and install
 do_install() {
 
     if [ -f ${WORKDIR}/${PDI_PATH} ];then

@@ -111,7 +111,7 @@ IMAGE_BOOT_FILES ?= "${@'boot.bin ' if d.getVar('SOC_ON_DISK_BOOT_BIN') == '1' e
 IMAGE_EFI_BOOT_FILES ?= "${@'boot.bin' if d.getVar('SOC_ON_DISK_BOOT_BIN') == '1' else ''}"
 
 # These dependencies are SOC specific, and only apply if building with
-# XSCT or SDT modes
+# SDT mode
 SOC_EXTRA_IMAGEDEPENDS[microblaze] = "virtual/bitstream"
 SOC_EXTRA_IMAGEDEPENDS[microblaze-v] = ""
 SOC_EXTRA_IMAGEDEPENDS[zynq] = "virtual/boot-bin"

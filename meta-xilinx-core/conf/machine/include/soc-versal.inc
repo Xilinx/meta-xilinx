@@ -17,7 +17,6 @@ ARCH_DEFAULT_KERNELIMAGETYPE:versal = "Image"
 UBOOT_ELF ?= "u-boot.elf"
 
 # Default, if multiconfig is off, call plm/psm-firmware directly, otherwise call the versal-fw multiconfig version
-# The Linux compatible plm/psm-firmware though requires meta-xilinx-tools
 PLM_DEPENDS ??= ""
 PLM_MCDEPENDS ??= ""
 PLM_DEPLOY_DIR ??= "${DEPLOY_DIR_IMAGE}"

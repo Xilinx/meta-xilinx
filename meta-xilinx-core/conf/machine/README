@@ -146,57 +146,12 @@ local.conf
 System wide setting:
 TUNE_FEATURES:tune-<tune> - Specific tune features
 
-XILINX_WITH_ESW = "xsct" or "sdt" - Specify xsct or sdt workflow
-
-external-hdf recipe from meta-xilinx-tools:
-XILINX_XSCT_VERSION - Version of the XSCT tool and associated ESW software
-HDF_URI - URL for the .xsa file
-HDF_URI[sha256sum] - sha256sum of the .xsa
+XILINX_WITH_ESW = "sdt" - Specify sdt workflow
 
 sdt-artifacts recipe from meta-xilinx-standalone-sdt:
 SDT_URI - URI for the system device tree artifacts (usually a tarball)
 SDT_URI[sha256sum] - sha256sum of the SDT artifacts file
 SDT_URI[S] - the 'S' (source) directory where the artifacts are extracted
-
-fs-boot recipe from meta-xilinx-tools:
-YAML_SERIAL_CONSOLE_STDIN:pn-fs-boot - YAML based uart stdin configuration for
-MicroBlaze. Example: axi_uartlite_0 or axi_uart16550_0 etc,.
-YAML_SERIAL_CONSOLE_STDOUT:pn-fs-boot - YAML based uart stdout configuration for
-MicroBlaze. Example: axi_uartlite_0 or axi_uart16550_0 etc,.
-YAML_MAIN_MEMORY_CONFIG:pn-fs-boot - YAML based DDR4 or MIG configuration for
-MicroBlaze. Example: DDR4_0 or MIG_7SERIES_0 etc,.
-YAML_FLASH_MEMORY_CONFIG:pn-fs-boot - YAML based flash configuration for
-MicroBlaze. Example: axi_emc_0 or axi_quad_spi_0 etc,.
-XSCTH_PROC:pn-fs-boot - Processor IP used while configuring embeddedsw compoments.
-Example: microblaze_0 or microblaze_1 etc,.
-
-fsbl-firmware recipe from meta-xilinx-tools:
-YAML_SERIAL_CONSOLE_STDIN:pn-fsbl-firmware - YAML based FSBL uart stdin configuration
-for Zynq-7000 and ZynqMP devices.
-YAML_SERIAL_CONSOLE_STDOUT:pn-fsbl-firmware - YAML based FSBL uart stdout configuration
-for Zynq-7000 and ZynqMP devices.
-
-pmu-firmware recipe from meta-xilinx-tools:
-YAML_SERIAL_CONSOLE_STDIN:pn-pmu-firmware - YAML based PMUFW uart stdin configuration
-for ZynqMP devices.
-YAML_SERIAL_CONSOLE_STDOUT:pn-pmu-firmware - YAML based PMUFW uart stdout configuration
-for ZynqMP devices.
-
-plm-firmware recipe from meta-xilinx-tools:
-YAML_SERIAL_CONSOLE_STDIN:pn-plm-firmware - YAML based PLM uart stdin configuration
-for Versal devices.
-YAML_SERIAL_CONSOLE_STDOUT:pn-fplmsbl-firmware - YAML based PLM uart stdout
-configuration for Versal devices.
-
-device-tree recipe from meta-xilinx-tools:
-YAML_CONSOLE_DEVICE_CONFIG:pn-device-tree - YAML based uart console configuration
-for all device families. Example: axi_uartlite_0 or psu_uart_0 etc,.
-YAML_MAIN_MEMORY_CONFIG:pn-device-tree - YAML based memory configuration for all
-device families. Example: DDR4_0 or PS7_DDR_0 or PSU_DDR_0 etc,.
-XSCTH_PROC:pn-device-tree - Processor IP used while configuring device-tree
-compoments. Example: microblaze_0 or microblaze_1 etc,.
-YAML_DT_BOARD_FLAGS:pn-device-tree - YAML based configuration for setting eval
-board specific dtsi files available in DTG repo.
 
 trusted-firmware-a recipe from meta-xilinx-core:
 ATF_CONSOLE - Uart console configuration for all aarch64 device families.

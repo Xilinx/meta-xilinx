@@ -13,8 +13,7 @@ components, kernel etc.
 Standalone Toolchains metadata to build baremetal firmware and applications.
 
 * **meta-xilinx-standalone-sdt**: layer containing metadata to build
-all the boot images using lopper and system device tree without using the
-meta-xilinx-tools layer.
+all the boot images using lopper and system device tree.
 
 * **meta-xilinx-multimedia**: layer contains AMD Xilinx specific multimedia packages
 including recipes for the fork of GStreamer.

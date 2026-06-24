@@ -33,7 +33,6 @@ $ git clone -b <release-branch> https://git.yoctoproject.org/meta-virtualization
 $ git clone -b <release-branch> https://git.yoctoproject.org/meta-arm
 $ git clone -b <release-branch> https://github.com/OpenAMP/meta-openamp
 $ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx --recurse-submodules
-$ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx-tools
 ```
 > **Note:**
 > * When meta-xilinx layer is cloned using git tool by default it will clone
@@ -44,7 +43,6 @@ $ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx-tools
 > * If you are using pre-built target machines then clone these layers and add
 >   these layers in step 4. For more details see meta layer README files.
 >   * [meta-amd-adaptive-socs-bsp README](https://github.com/Xilinx/meta-amd-adaptive-socs/blob/master/meta-amd-adaptive-socs-bsp/README.asoc.bsp.md)
->   * [meta-xilinx-tools README](https://github.com/Xilinx/meta-xilinx-tools/blob/master/README.xsct.bsp.md)
 >   * [meta-kria README](https://github.com/Xilinx/meta-kria/blob/master/README.kria.bsp.md)
 
 3. Initialize a build environment using the `oe-init-build-env` script. 
@@ -70,13 +68,10 @@ $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-microblaze
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-core
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone-sdt
-$ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-tools
 ```
 > **Note:**
 > 1. If any of the layers depends on other layers then add those layers first.
-> 2. For SDT build flow user can remove meta-xilinx-tools as this layer is
-> optional.
-> 3. If user wants to use MALI400 or MALIG78AE GPU or Multimedia or PL firmware
+> 2. If user wants to use MALI400 or MALIG78AE GPU or Multimedia or PL firmware
 >    demos or Virtualization then add these respective layers. For more details
 >    see layer README files.
 > ```
@@ -87,7 +82,7 @@ $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-tools
 > $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-gpu-malig78ae
 > ```
 
-5. Create a new layer to for SDT or XSCT machine files geneated using gen-machineconf
+5. Create a new layer to for SDT machine files geneated using gen-machineconf
    tool. If user already has a custom-bsp layer then you can skip this step.
 ```
 $ bitbake-layers create-layer --add-layer --layerid <layerid> <layername>
@@ -99,11 +94,10 @@ $ bitbake-layers create-layer --add-layer --layerid <layerid> <layername>
 TMPDIR = "/tmp/$USER/yocto/release_version/build"
 ```
 
-7. Follow generating SDT or XSCT machine configuration file instructions using
-   gen-machineconf tool. SDT or XSCT machine files are generated using sdtgen
-   output or xsa.
+7. Follow generating SDT machine configuration file instructions using
+   gen-machineconf tool. SDT machine files are generated using sdtgen
+   output.
    * [SDT](https://github.com/Xilinx/meta-xilinx/blob/master/meta-xilinx-standalone-sdt/README.sdt.bsp.md)
-   * [XSCT](https://github.com/Xilinx/meta-xilinx-tools/blob/master/README.xsct.bsp.md)
 
 8. Set hardware `MACHINE` configuration variable in <proj-dir>/build/conf/local.conf
    file for a specific target which can boot and run the in the board or QEMU.
@@ -111,7 +105,7 @@ TMPDIR = "/tmp/$USER/yocto/release_version/build"
 MACHINE = "<target_machine_name>"
 ```
 
-9. Once machine files are generated in <conf-directory>/machine/<soc-family>-<board-name>-<sdt-or-xsct>-<design-name>.conf,
+9. Once machine files are generated in <conf-directory>/machine/<soc-family>-<board-name>-<sdt>-<design-name>.conf,
    include the QEMU DT files, See [QEMU Configurations](#qemu-configurations)
    section for more details. This step can be skipped if you are using pre-built
    target machines files.
@@ -153,8 +147,8 @@ $ bitbake <target-image>
 
 This section describes the QEMU settings which must be added to the generated
 machine configuration file in order to use the runqemu command. The following
-board settings need to be added in sdt or xsct machine configuration file to
-define which QEMU device trees should be used.
+board settings need to be added in sdt machine configuration file to define
+which QEMU device trees should be used.
 
 > **Variable usage examples:**
 >
