@@ -24,7 +24,7 @@ COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
 
 inherit cmake update-rc.d systemd
 
-DEPENDS += " libwebsockets inotify-tools libdfx zocl libdrm systemd"
+DEPENDS += " libwebsockets inotify-tools libdfx libdrm systemd"
 RDEPENDS:${PN} += " freeipmi ${PN}-client"
 EXTRA_OECMAKE += " \
                -DCMAKE_SYSROOT:PATH=${RECIPE_SYSROOT} \
