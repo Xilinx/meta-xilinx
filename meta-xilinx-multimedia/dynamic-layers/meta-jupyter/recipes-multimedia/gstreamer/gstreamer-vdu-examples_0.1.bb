@@ -1,4 +1,7 @@
-DESCRIPTION = "Demo scripts to run common usecases involving VDU in Versal"
+SUMMARY = "GStreamer demo scripts exercising the AV1/HEVC Video \
+Decoder Unit (VDU) on AMD Versal devices."
+DESCRIPTION = "Demo scripts to run common usecases involving VDU in \
+Versal"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=17e31b2e971eed6471a361c7dc4faa18"
 

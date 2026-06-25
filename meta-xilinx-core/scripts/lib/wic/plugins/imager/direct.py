@@ -612,22 +612,22 @@ class PartitionedImage():
             if self.ptable_format in ("gpt", "gpt-hybrid") and part.part_name:
                 logger.debug("partition %d: set name to %s",
                              part.num, part.part_name)
-                exec_native_cmd("sgdisk --change-name=%d:%s %s" % \
-                                         (part.num, part.part_name,
-                                          self.path), self.native_sysroot)
+                exec_native_cmd("sfdisk --sector-size %d --part-label %s %s %s" % \
+                                         (self.sector_size, self.path, part.num, part.part_name),
+                                         self.native_sysroot)
 
             if part.part_type:
                 logger.debug("partition %d: set type UID to %s",
                              part.num, part.part_type)
-                exec_native_cmd("sgdisk --typecode=%d:%s %s" % \
-                                         (part.num, part.part_type,
-                                          self.path), self.native_sysroot)
+                exec_native_cmd("sfdisk --sector-size %d --part-type %s %s %s" % \
+                                         (self.sector_size, self.path, part.num, part.part_type),
+                                         self.native_sysroot)
 
             if part.uuid and self.ptable_format in ("gpt", "gpt-hybrid"):
                 logger.debug("partition %d: set UUID to %s",
                              part.num, part.uuid)
-                exec_native_cmd("sgdisk --partition-guid=%d:%s %s" % \
-                                (part.num, part.uuid, self.path),
+                exec_native_cmd("sfdisk --sector-size %d --part-uuid %s %d %s" % \
+                                (self.sector_size, self.path, part.num, part.uuid),
                                 self.native_sysroot)
 
             if part.active:

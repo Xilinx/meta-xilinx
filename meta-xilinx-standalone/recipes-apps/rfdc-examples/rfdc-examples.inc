@@ -1,3 +1,7 @@
+DESCRIPTION = "AMD Xilinx baremetal example application built against \
+the RFdc (RF data converter) driver, demonstrating runtime usage of \
+the on-die ADC/DAC blocks on Zynq UltraScale+ RFSoC and Versal RF \
+devices."
 LICENSE = "BSD"
 
 inherit xlnx-embeddedsw features_check

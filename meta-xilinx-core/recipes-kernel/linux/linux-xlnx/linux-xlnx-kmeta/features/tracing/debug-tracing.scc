@@ -1,0 +1,3 @@
+define KFEATURE_DESCRIPTION "Enable kernel tracing debug options"
+
+kconf non-hardware debug-tracing.cfg

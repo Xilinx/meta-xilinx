@@ -26,3 +26,9 @@ OPTEE_CONSOLE ?= "${OPTEE_CONSOLE_DEFAULT}"
 EXTRA_OEMAKE:append = "${@' CFG_CONSOLE_UART=${OPTEE_CONSOLE}' if d.getVar('OPTEE_CONSOLE', True) != '' else ''}"
 
 EXTRA_OEMAKE:append = " CFG_TEE_CORE_LOG_LEVEL=2 CFG_TEE_TA_LOG_LEVEL=2 CFG_DT=y"
+
+OPTEE_TZDRAM_START ?= ""
+OPTEE_TZDRAM_SIZE ?= ""
+
+EXTRA_OEMAKE:append:versal-2ve-2vm = "${@' OPTEE_TZDRAM_START=${OPTEE_TZDRAM_START}' if d.getVar('OPTEE_TZDRAM_START') != '' else ''}"
+EXTRA_OEMAKE:append:versal-2ve-2vm = "${@' OPTEE_TZDRAM_SIZE=${OPTEE_TZDRAM_SIZE}' if d.getVar('OPTEE_TZDRAM_SIZE') != '' else ''}"

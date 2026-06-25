@@ -49,6 +49,7 @@
                                            n.tune_type = val.split('-')[0]
 
                                         else:
+                                           n.tunes = OrderedDict()
                                            n.tune_type = re.split('@', n.name)[0]
                         ";
                       };

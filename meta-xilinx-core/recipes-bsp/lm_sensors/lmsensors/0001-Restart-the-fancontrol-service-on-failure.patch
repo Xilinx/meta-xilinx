@@ -1,0 +1,30 @@
+From a5a819bc19b3e6eab7adda15303f4dcb4e702da5 Mon Sep 17 00:00:00 2001
+From: Jonathan Stroud <jonathan.stroud@amd.com>
+Date: Tue, 18 Jul 2023 18:03:28 -0500
+Subject: [PATCH] fancontrol.services: Automatically restart fancontrol
+
+ On versal, when the FPGA is erased / programmed / modified, the sensor
+ can go away and the process dies.  We need to auto restart this so the
+ fan is running properly.
+
+ Signed-off-by: Jonathan Stroud <jonathan.stroud@amd.com>
+---
+ prog/init/fancontrol.service | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/prog/init/fancontrol.service b/prog/init/fancontrol.service
+index 3ac1ed02..3b75a7c4 100644
+--- a/prog/init/fancontrol.service
++++ b/prog/init/fancontrol.service
+@@ -5,6 +5,8 @@ After=lm_sensors.service
+ 
+ [Service]
+ Type=simple
++Restart=on-failure
++RestartSec=5s
+ PIDFile=/run/fancontrol.pid
+ ExecStart=/usr/sbin/fancontrol
+ 
+-- 
+2.34.1
+

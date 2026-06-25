@@ -6,7 +6,7 @@ Subject: [PATCH] versal_fw: Fixup core makefiles
 The Yocto Project build environment needs to be able to override a few
 additional variables that may not be appropriate to do on the regular
 command line build version.  This patch preserves the default while
-allowing it to be overriden as necessary.
+allowing it to be overridden as necessary.
 
 Upstream-Status: Inappropriate [YP integration specific]
 
@@ -100,4 +100,3 @@ index 92d95d0896..acc20bcccf 100644
  	$(MAKE) -C $(subst /make.clean,,$@) -s clean
 -- 
 2.34.1
-

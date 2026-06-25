@@ -21,7 +21,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 # A machine, multiconfig, or local.conf should override this
 PSM_DEPENDS ??= ""
 PSM_MCDEPENDS ??= ""
-PSM_DEPLOY_DIR ??= "${DEPLOY_DIR_IMAGE}"
+PSM_FIRMWARE_DEPLOY_DIR ??= "${DEPLOY_DIR_IMAGE}"
 PSM_FIRMWARE_DEPLOY_DIR[vardepsexclude] += "TOPDIR"
 PSM_FIRMWARE_IMAGE_NAME ??= "psm-firmware-${MACHINE}"
 
@@ -29,10 +29,14 @@ PSM_FIRMWARE_IMAGE_NAME ??= "psm-firmware-${MACHINE}"
 PSM_FILE ??= "${PSM_FIRMWARE_DEPLOY_DIR}/${PSM_FIRMWARE_IMAGE_NAME}"
 PSM_FILE[vardepsexclude] = "PSM_FIRMWARE_DEPLOY_DIR"
 
+# Manifest copying from multiconfig deploy
+FW_MANIFEST_SRC = "${PSM_FIRMWARE_DEPLOY_DIR}/psm-firmware"
+FW_MANIFEST_NAME = "psm-firmware"
+
 do_fetch[depends] += "${PSM_DEPENDS}"
 do_fetch[mcdepends] += "${PSM_MCDEPENDS}"
 
-inherit deploy
+inherit deploy firmware-copy-manifest
 
 do_install() {
     if [ ! -e ${PSM_FILE}.elf ]; then

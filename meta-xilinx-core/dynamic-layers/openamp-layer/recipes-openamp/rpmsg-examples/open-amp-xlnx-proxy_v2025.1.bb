@@ -1,6 +1,7 @@
-require ${LAYER_PATH_openamp-layer}/recipes-openamp/rpmsg-examples/rpmsg-example.inc
-require ${LAYER_PATH_openamp-layer}/vendor/xilinx/meta-xilinx-standalone-sdt/recipes-openamp/open-amp/open-amp-xlnx-demos.inc
-
+SUMMARY = "OpenAMP rpmsg RPC/proxy example application (xlnx)."
+DESCRIPTION = "OpenAMP rpmsg RPC/proxy example app, demonstrating \
+remote POSIX system-call proxying from a remote firmware back to Linux \
+running on the APU."
 require open-amp-xlnx-demos_v2025.1.inc
 
 PROVIDES += "open-amp-xlnx-proxy"

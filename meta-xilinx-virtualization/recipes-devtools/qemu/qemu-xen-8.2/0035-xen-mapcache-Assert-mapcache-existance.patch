@@ -1,0 +1,67 @@
+From 73254a9f6fc02cb99aad1c6e82c8279f2cff3ed5 Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Wed, 23 Jul 2025 11:29:15 +0200
+Subject: [PATCH 35/41] xen: mapcache: Assert mapcache existance
+
+Assert that the mapcache was created prior to being used.
+
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/xen/xen-mapcache.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/hw/xen/xen-mapcache.c b/hw/xen/xen-mapcache.c
+index cb7a1ad758..fd8ac21cbd 100644
+--- a/hw/xen/xen-mapcache.c
++++ b/hw/xen/xen-mapcache.c
+@@ -375,6 +375,8 @@ uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
+ {
+     uint8_t *p;
+ 
++    assert(mapcache);
++
+     mapcache_lock();
+     p = xen_map_cache_unlocked(phys_addr, size, lock, dma);
+     mapcache_unlock();
+@@ -495,6 +497,8 @@ static void xen_invalidate_map_cache_entry_bh(void *opaque)
+ 
+ void coroutine_mixed_fn xen_invalidate_map_cache_entry(uint8_t *buffer)
+ {
++    assert(mapcache);
++
+     if (qemu_in_coroutine()) {
+         XenMapCacheData data = {
+             .co = qemu_coroutine_self(),
+@@ -515,6 +519,8 @@ void xen_invalidate_map_cache(void)
+     unsigned long i;
+     MapCacheRev *reventry;
+ 
++    assert(mapcache);
++
+     /* Flush pending AIO before destroying the mapcache */
+     bdrv_drain_all();
+ 
+@@ -612,6 +618,8 @@ uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
+ {
+     uint8_t *p;
+ 
++    assert(mapcache);
++
+     mapcache_lock();
+     p = xen_replace_cache_entry_unlocked(old_phys_addr, new_phys_addr, size);
+     mapcache_unlock();
+@@ -765,6 +773,8 @@ ram_addr_t xen_ram_addr_from_mapcache(void *ptr)
+ {
+     ram_addr_t raddr;
+ 
++    assert(mapcache);
++
+     raddr = xen_ram_addr_from_mapcache_try(ptr);
+     if (raddr == RAM_ADDR_INVALID) {
+         raddr = xen_ram_addr_from_grant_cache(ptr);
+-- 
+2.34.1
+

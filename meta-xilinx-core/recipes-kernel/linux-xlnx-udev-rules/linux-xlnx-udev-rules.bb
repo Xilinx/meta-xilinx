@@ -5,6 +5,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 SRC_URI = "\
     file://99-aie-device.rules \
+    file://99-dma-heap.rules \
 "
 
 S = "${WORKDIR}"
@@ -15,6 +16,8 @@ COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE:zynq = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:microblaze = ".*"
+COMPATIBLE_MACHINE:riscv32 = ".*"
+COMPATIBLE_MACHINE:riscv64 = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"

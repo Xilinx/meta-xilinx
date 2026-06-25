@@ -1,0 +1,27 @@
+From 66212d92763587a29760ea3bd9e51dce5d44cb6a Mon Sep 17 00:00:00 2001
+From: Daniel Levin <daniel.levin@amd.com>
+Date: Tue, 23 Sep 2025 04:25:26 -0500
+Subject: [PATCH 1/2] Add missing EGL platform for gbm- flavors
+
+Upstream-Status: Backport [https://github.com/glmark2/glmark2/commit/22c527cb0556f3a1ac4445aaa52cc532760928d5]
+
+---
+ src/gl-state-egl.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/gl-state-egl.cpp b/src/gl-state-egl.cpp
+index 0d73859..61e0cc2 100644
+--- a/src/gl-state-egl.cpp
++++ b/src/gl-state-egl.cpp
+@@ -479,6 +479,8 @@ GLStateEGL::getVisualConfig(GLVisualConfig& vc)
+ #define GLMARK2_NATIVE_EGL_DISPLAY_ENUM EGL_PLATFORM_WAYLAND_KHR
+ #elif  GLMARK2_USE_DRM
+ #define GLMARK2_NATIVE_EGL_DISPLAY_ENUM EGL_PLATFORM_GBM_KHR
++#elif  GLMARK2_USE_GBM
++#define GLMARK2_NATIVE_EGL_DISPLAY_ENUM EGL_PLATFORM_GBM_KHR
+ #else
+ // Platforms not in the above platform enums fall back to eglGetDisplay.
+ #define GLMARK2_NATIVE_EGL_DISPLAY_ENUM 0
+-- 
+2.34.1
+

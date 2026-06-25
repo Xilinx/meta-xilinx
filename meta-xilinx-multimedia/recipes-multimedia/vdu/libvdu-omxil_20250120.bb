@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ac7c6b649ce8caa4f4c517aaa77c8b17"
 PE = "1"
 PV .= "+git"
 
-BRANCH ?= "xlnx_rel_v2025.1"
+BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vdu-omx-il.git;protocol=https"
 SRCREV ?= "4126404dfce767870a672f07804d880106d6d5e2"
 

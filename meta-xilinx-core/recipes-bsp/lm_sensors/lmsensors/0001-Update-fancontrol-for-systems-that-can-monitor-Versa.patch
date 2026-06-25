@@ -1,0 +1,69 @@
+From f4c9acf7c299de912ef31bdcc440bb8309199c2e Mon Sep 17 00:00:00 2001
+From: Jonathan Stroud <jonathan.stroud@amd.com>
+Date: Fri, 7 Mar 2025 11:17:01 -0700
+Subject: [PATCH] Update fancontrol for systems that can monitor Versal Done
+ bit
+
+On systems that can monitor Versal DONE bit, set the fans to minumum
+speed when the device is unprogrammed
+
+Signed-off-by: Jonathan Stroud <jonathan.stroud@amd.com>
+
+This is the  incremental change on top of original patch.
+With the introduction of the updated libgpiod version(2.1.2)
+in 2025.2 release, the gpiodfind command is no longer available.
+To address this, an alternative approach has been implemented
+without compromising the existing functionality.
+
+Upstream-Status: Inappropriate [This change is specific to xilinx]
+
+Signed-off-by: Nithish Kumar Naroju <nithishkumar.naroju@amd.com>
+---
+ prog/pwm/fancontrol | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/prog/pwm/fancontrol b/prog/pwm/fancontrol
+index 886a7367..8653940d 100755
+--- a/prog/pwm/fancontrol
++++ b/prog/pwm/fancontrol
+@@ -521,6 +521,7 @@ trap 'restorefans 1' SIGHUP SIGINT
+ # main function
+ function UpdateFanSpeeds
+ {
++	local HAS_VDONE=$1
+ 	local fcvcount
+ 	local pwmo tsens fan mint maxt minsa minso minpwm maxpwm
+ 	local tval tlastval pwmpval fanval min_fanval one_fan one_fanval
+@@ -621,7 +622,9 @@ function UpdateFanSpeeds
+ 			echo "min_fanval=$min_fanval"
+ 		fi
+ 
+-		if (( $tval <= $mint ))
++		if [ "$HAS_VDONE" = true ] && [ $(gpioget VERSAL_DONE | grep "inactive") ];
++		  then pwmval=$minpwm
++		elif (( $tval <= $mint ))
+ 		  then pwmval=$minpwm # below min temp, use defined min pwm
+ 		elif (( $tval >= $maxt ))
+ 		  then pwmval=$maxpwm # over max temp, use defined max pwm
+@@ -650,6 +653,9 @@ function UpdateFanSpeeds
+ 	done
+ }
+ 
++HAS_VDONE=false
++gpioinfo VERSAL_DONE >/dev/null 2>&1 && HAS_VDONE=true
++
+ echo 'Enabling PWM on fans...'
+ let fcvcount=0
+ while (( $fcvcount < ${#AFCPWM[@]} )) # go through all pwm outputs
+@@ -669,7 +675,7 @@ echo 'Starting automatic fan control...'
+ # main loop calling the main function at specified intervals
+ while true
+ do
+-	UpdateFanSpeeds
++	UpdateFanSpeeds $HAS_VDONE
+ 	# Sleep while still handling signals
+ 	sleep $INTERVAL &
+ 	wait
+-- 
+2.43.0
+

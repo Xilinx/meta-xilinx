@@ -56,7 +56,7 @@ $ MACHINE=versal-generic bitbake plmfw psmfw
 ### How to patch embeddedsw components
 
 This section describes on how to patches to embeddedsw-source recipe in Yocto
-XSCT or SDT build flows. In 2025.1 and later release all embeddedsw firmware
+XSCT or SDT build flows. In 2025.2 and later release all embeddedsw firmware
 recipes such as pmu-firmware, plm-firmware etc. uses source from embeddedsw-source
 recipe. If you apply the patch to embeddedsw-source recipe it will be applied to
 all embeddedsw firmware recipes. Also it is recommended to create a new custom
@@ -75,7 +75,7 @@ $ bitbake-layers add-layer /<path-to-layer>/sources/meta-custom
 ```
 
 $ mkdir -p /<path-to-layer>/sources/meta-custom/recipes-bsp/embeddedsw-source/files
-$ touch /<path-to-layer>/sources/meta-custom/recipes-bsp/embeddedsw-source/embeddedsw-source_2025.1.bbappend
+$ touch /<path-to-layer>/sources/meta-custom/recipes-bsp/embeddedsw-source/embeddedsw-source_2025.2.bbappend
 ```
 3. Create the patch for embeddedsw repo and copy the patch to files directory.
 ```
@@ -127,4 +127,4 @@ This layer depends on:
         https://git.yoctoproject.org/meta-xilinx (official version)
         https://github.com/Xilinx/meta-xilinx (development and AMD release)
 	layers: meta-xilinx-microblaze, meta-xilinx-core, meta-xilinx-bsp
-	branch: scarthgap or AMD release version (e.g. rel-v2025.1)
+	branch: scarthgap or AMD release version (e.g. rel-v2026.1)

@@ -1,0 +1,93 @@
+axi:
+    shm@3ed80000:
+        compatible: "uio"
+        reg: [ 0, 0x3ed80000, 0, 0x1000000]
+    mailbox@ff360000:
+        compatible: "foo" # this will cause node to be deleted
+    ttc0@ff0e0000:
+        compatible: "uio"
+        reg: [ 0, 0xff0e0000, 0, 0x1000]
+    ipi@ff360000:
+        reg: [ 0, 0xff360000, 0, 0x1000]
+        interrupt-parent: gic
+        interrupts: [ 0, 33, 4]
+        compatible: "uio"
+
+definitions:
+    OpenAMP:
+         rproc0: &rproc0
+             - start: 0x3ed00000
+               size: 0x2000000
+               no-map: 1
+
+domains:
+    openamp_a72_0_cluster: # host in channel from a72-0
+        compatible:
+            - "openamp,domain-v1"
+        cpus:
+            - cluster: cpus_a72
+              cpumask: 0x1
+              mode:
+                 secure: true
+                 el: 0x3
+        os,type: linux
+        access:
+             - dev: psv_r5_0_atcm_global@ffe00000
+               flags: 0
+             - dev: psv_r5_0_btcm_global@ffe20000
+               flags: 0
+             - dev: /axi/ipi0@ff360000
+               flags: 0
+             - dev: /axi/ttc0@ff0e0000
+               flags: 0
+             - dev: ps_wizard_0_pmcps_0_psv_rpu_0@ff9a0000
+               flags: 0
+             - dev: CIPS_0_pspmc_0_psv_rpu_0@ff9a0000
+               flags: 0
+             - dev: cpus_r5_0
+               flags: 0
+             - dev: /axi/shm@3ed80000
+               flags: 0
+        reserved-memory:
+            ranges: true
+            "#size-cells": 2
+            "#address-cells": 2
+            <<+: [ *rproc0 ]
+
+        domain-to-domain:
+            compatible: openamp,domain-to-domain-v1
+            remoteproc-relation:
+                compatible: openamp,remoteproc-v2
+                remote:
+                     - openamp_r5_0_cluster
+                elfload:
+                    - [ psv_r5_0_atcm_global, psv_r5_0_btcm_global, rproc0 ]
+
+
+    openamp_r5_0_cluster:
+        compatible:
+            - "openamp,domain-v1"
+        cpus:
+            - cluster: cpus_r5_0
+              cpumask: 0x1
+              mode:
+              secure: true
+        os,type: freertos
+        access:
+             - dev: psv_r5_0_atcm_global@ffe00000
+               flags: 0
+             - dev: psv_r5_0_btcm_global@ffe20000
+               flags: 0
+             - dev: ipi1
+               flags: 0
+             - dev: ps_wizard_0_pmcps_0_psv_rpu_0@ff9a0000
+               flags: 0
+             - dev: CIPS_0_pspmc_0_psv_rpu_0@ff9a0000
+               flags: 0
+ 
+        reserved-memory:
+            ranges: true
+            <<+: [ *rproc0 ]
+
+        domain-to-domain:
+             compatible: openamp,domain-to-domain-v1

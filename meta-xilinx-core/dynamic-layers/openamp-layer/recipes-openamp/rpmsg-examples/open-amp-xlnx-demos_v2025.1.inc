@@ -1,3 +1,5 @@
+require ${LAYER_PATH_openamp-layer}/recipes-openamp/rpmsg-examples/rpmsg-example.inc
+require open-amp-xlnx-demos.inc
 
 OPENAMP_SYS_REF_SRCREV = "02236aefc4d21fa19d29dfcfd889e4405b8ee2f0"
 OPENAMP_SYS_REF_BRANCH = "main"

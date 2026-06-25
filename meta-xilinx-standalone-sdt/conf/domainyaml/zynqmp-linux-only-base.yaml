@@ -1,0 +1,10 @@
+domains:
+  APU_Linux:
+    compatible: openamp,domain-v1
+    cpus:
+      - cluster: cpus_a53
+        cpumask: 0xf
+        mode:
+          secure: true
+          el: 0x3
+    os,type: linux

@@ -1,0 +1,128 @@
+From a6545ba89ad9ca17a45fa85fd90710100e658bb9 Mon Sep 17 00:00:00 2001
+From: Nishant Vinodbhai Thummar <Nishant.VinodbhaiThummar@amd.com>
+Date: Fri, 9 Jan 2026 08:15:50 +0000
+Subject: [PATCH] make module compatible with 6.18 kernel version
+
+Updated DMA_BUF namespace import usage.
+Rename del_timer and del_timer_sync API as they updated in 6.15 kernel.
+Replace hrtimer_init() with hrtimer_setup() as per 6.15 kernel.
+API fence_value_str() is no longer supported from 6.16 kernel.
+Convert symbol namespace to string literal
+
+Upstream-Status: Inappropriate [Xilinx specific]
+Signed-off-by: Nishant Vinodbhai Thummar <Nishant.VinodbhaiThummar@amd.com>
+---
+ linux/mali_internal_sync.c  | 5 ++++-
+ linux/mali_memory_dma_buf.c | 4 +++-
+ linux/mali_memory_secure.c  | 4 +++-
+ linux/mali_osk_profiling.c  | 4 ++++
+ linux/mali_osk_timers.c     | 8 ++++++++
+ 5 files changed, 22 insertions(+), 3 deletions(-)
+
+diff --git a/linux/mali_internal_sync.c b/linux/mali_internal_sync.c
+index c5fb701..419d9ef 100644
+--- a/linux/mali_internal_sync.c
++++ b/linux/mali_internal_sync.c
+@@ -747,7 +747,7 @@ static bool mali_internal_fence_enable_signaling(struct fence *fence)
+ 	list_add_tail(&sync_pt->sync_pt_list, &parent->sync_pt_list_head);
+ 	return true;
+ }
+-
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 16, 0)
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
+ static void mali_internal_fence_value_str(struct dma_fence *fence, char *str, int size)
+ #else
+@@ -766,6 +766,7 @@ static void mali_internal_fence_value_str(struct fence *fence, char *str, int si
+ 
+ 	parent->ops->print_sync_pt(sync_pt);
+ }
++#endif
+ 
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
+ static const struct dma_fence_ops fence_ops = {
+@@ -782,6 +783,8 @@ static const struct fence_ops fence_ops = {
+ 	.wait = fence_default_wait,
+ #endif
+ 	.release = mali_internal_fence_release,
++#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 16, 0)
+ 	.fence_value_str = mali_internal_fence_value_str,
++#endif
+ };
+ #endif
+diff --git a/linux/mali_memory_dma_buf.c b/linux/mali_memory_dma_buf.c
+index f85a41e..949695c 100644
+--- a/linux/mali_memory_dma_buf.c
++++ b/linux/mali_memory_dma_buf.c
+@@ -34,7 +34,9 @@
+ #include "mali_memory_virtual.h"
+ #include "mali_pp_job.h"
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,13,0)
++MODULE_IMPORT_NS("DMA_BUF");
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0)
+ MODULE_IMPORT_NS(DMA_BUF);
+ #endif
+ 
+diff --git a/linux/mali_memory_secure.c b/linux/mali_memory_secure.c
+index b0d5c40..8d705ab 100644
+--- a/linux/mali_memory_secure.c
++++ b/linux/mali_memory_secure.c
+@@ -20,7 +20,9 @@
+ #endif
+ #include <linux/dma-buf.h>
+ 
+-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,13,0)
++MODULE_IMPORT_NS("DMA_BUF");
++#elif LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0)
+ MODULE_IMPORT_NS(DMA_BUF);
+ #endif
+ 
+diff --git a/linux/mali_osk_profiling.c b/linux/mali_osk_profiling.c
+index 020cf17..fe1b4ee 100644
+--- a/linux/mali_osk_profiling.c
++++ b/linux/mali_osk_profiling.c
+@@ -692,9 +692,13 @@ _mali_osk_errcode_t _mali_osk_profiling_init(mali_bool auto_start)
+ 	_mali_osk_atomic_init(&stream_fd_if_used, 0);
+ 	init_waitqueue_head(&stream_fd_wait_queue);
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
++	hrtimer_setup(&profiling_sampling_timer, _mali_profiling_sampling_counters, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
++#else
+ 	hrtimer_init(&profiling_sampling_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+ 
+ 	profiling_sampling_timer.function = _mali_profiling_sampling_counters;
++#endif
+ 
+ 	global_mali_stream_list = new_mali_profiling_stream_list;
+ 
+diff --git a/linux/mali_osk_timers.c b/linux/mali_osk_timers.c
+index 8b70060..f051003 100644
+--- a/linux/mali_osk_timers.c
++++ b/linux/mali_osk_timers.c
+@@ -58,13 +58,21 @@ void _mali_osk_timer_mod(_mali_osk_timer_t *tim, unsigned long ticks_to_expire)
+ void _mali_osk_timer_del(_mali_osk_timer_t *tim)
+ {
+ 	MALI_DEBUG_ASSERT_POINTER(tim);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
++	timer_delete_sync(&(tim->timer));
++#else
+ 	del_timer_sync(&(tim->timer));
++#endif
+ }
+ 
+ void _mali_osk_timer_del_async(_mali_osk_timer_t *tim)
+ {
+ 	MALI_DEBUG_ASSERT_POINTER(tim);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
++	timer_delete(&(tim->timer));
++#else
+ 	del_timer(&(tim->timer));
++#endif
+ }
+ 
+ mali_bool _mali_osk_timer_pending(_mali_osk_timer_t *tim)
+-- 
+2.25.1
+

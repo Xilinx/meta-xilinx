@@ -10,3 +10,5 @@ python() {
     if d.getVar('ZYNQMP_WARN') == "1":
         raise bb.parse.SkipRecipe("Weston %s requires GLES 3 interfaces which are not available when libmali enabled.  Use Weston 9.0.0.0 instead." % (d.getVar('PV')))
 }
+
+PACKAGECONFIG:append = " vnc"

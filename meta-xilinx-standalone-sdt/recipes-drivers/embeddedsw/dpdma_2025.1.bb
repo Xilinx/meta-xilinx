@@ -1,3 +1,6 @@
+SUMMARY = "AMD DisplayPort DMA driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD DisplayPort DMA (DPDMA) \
+controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "dpdma"

@@ -1,3 +1,7 @@
+SUMMARY = "OpenAMP matrix-multiply RPU firmware payload."
+DESCRIPTION = "Pre-built RPU OpenAMP firmware payload \
+(matrix-multiplyd) loaded by the APU-side OpenAMP example application \
+on Zynq UltraScale+ / Versal / Versal NET boards."
 require openamp-fw.inc
 
 PROVIDES:append:armv7r = " openamp-fw-mat-muld "

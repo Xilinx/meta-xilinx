@@ -11,6 +11,17 @@ do_install:append () {
             cp -a --parents arch/arm64/tools/syscall_64.tbl $kerneldir/build/   2>/dev/null || :
             cp -a --parents arch/arm64/tools/syscall_32.tbl $kerneldir/build/   2>/dev/null || :
         fi
+
+        # v6.18+ rq offset generation needs these scheduler sources/headers
+        cp -a --parents kernel/sched/rq-offsets.c $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/sched/sched.h $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/sched/cpudeadline.h $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/sched/cpupri.h $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/sched/features.h $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/sched/stats.h $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/sched/ext.h $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/workqueue_internal.h $kerneldir/build 2>/dev/null || :
+
     )
 
     chown -R root:root ${D}

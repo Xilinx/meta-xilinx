@@ -1,0 +1,62 @@
+From 0ee9c60e0ff1d8df1e99631ba289d4fd4f179025 Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Wed, 23 Jul 2025 11:41:26 +0200
+Subject: [PATCH 36/41] xen: mapcache: Add function to check if the mapcache is
+ enabled
+
+Add function to check if the mapcache is enabled.
+No functional change.
+
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/xen/xen-mapcache.c         | 6 ++++++
+ include/sysemu/xen-mapcache.h | 6 ++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/hw/xen/xen-mapcache.c b/hw/xen/xen-mapcache.c
+index fd8ac21cbd..b796d542d3 100644
+--- a/hw/xen/xen-mapcache.c
++++ b/hw/xen/xen-mapcache.c
+@@ -80,6 +80,12 @@ typedef struct MapCache {
+ 
+ static MapCache *mapcache;
+ 
++bool xen_map_cache_enabled(void)
++{
++    /* Map cache enabled implies xen_enabled().  */
++    return xen_enabled() && mapcache;
++}
++
+ static inline void mapcache_lock(void)
+ {
+     qemu_mutex_lock(&mapcache->lock);
+diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
+index 82b98ef22a..07b7131280 100644
+--- a/include/sysemu/xen-mapcache.h
++++ b/include/sysemu/xen-mapcache.h
+@@ -17,6 +17,7 @@ typedef hwaddr (*phys_offset_to_gaddr_t)(hwaddr phys_offset,
+                                          ram_addr_t size);
+ #ifdef CONFIG_XEN
+ 
++bool xen_map_cache_enabled(void);
+ void xen_map_cache_init(phys_offset_to_gaddr_t f,
+                         void *opaque);
+ uint8_t *xen_map_cache(hwaddr phys_addr, hwaddr size,
+@@ -31,6 +32,11 @@ MemoryRegion *xen_init_grant_ram(void);
+ 
+ #else
+ 
++static inline bool xen_map_cache_enabled(void)
++{
++    return false;
++}
++
+ static inline void xen_map_cache_init(phys_offset_to_gaddr_t f,
+                                       void *opaque)
+ {
+-- 
+2.34.1
+

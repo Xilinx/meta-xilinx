@@ -1,3 +1,6 @@
+SUMMARY = "AMD Zynq PS SPI controller driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD Zynq / Zynq UltraScale+ \
+MPSoC PS-side SPI controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "spips"

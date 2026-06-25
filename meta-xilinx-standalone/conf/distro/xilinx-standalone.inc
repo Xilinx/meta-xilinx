@@ -1,4 +1,4 @@
-DISTRO_NAME = "Xilinx Standalone Distro"
+DISTRO_NAME = "AMD Xilinx Standalone distribution"
 DISTRO_VERSION = "1.0"
 TARGET_VENDOR = "-xilinx"
 

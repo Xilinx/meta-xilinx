@@ -1,0 +1,41 @@
+From 61a061e43c86a78aaddb2efdcefeff29d13812c2 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@gmail.com>
+Date: Thu, 20 Nov 2025 20:57:46 -0500
+Subject: [PATCH] libxl_nocpuid: fix build error
+
+The Yocto build requires an explict include of tye yajl headers to avoid
+this compile error:
+
+e/libnl3 -Wshadow -include poky/build/tmp/work/armv8a-poky-linux/xen-tools/4.21+stable/sources/xen-tools-4.21+stable/tools/libs/light/../../../tools/config.h  -c -o libxl_aoutils.o libxl_aoutils.c
+| libxl_nocpuid.c:43:1: error: unknown type name 'yajl_gen_status'
+|    43 | yajl_gen_status libxl_cpuid_policy_list_gen_json(yajl_gen hand,
+|       | ^~~~~~~~~~~~~~~
+| libxl_nocpuid.c:43:50: error: unknown type name 'yajl_gen'
+|    43 | yajl_gen_status libxl_cpuid_policy_list_gen_json(yajl_gen hand,
+|       |                                                  ^~~~~~~~
+| make[6]: *** [poky/build/tmp/work/armv8a-poky-linux/xen-tools/4.21+stable/sources/xen-tools-4.21+stable/tools/libs/light/../../../tools/Rules.mk:178: libxl_nocpuid.o] Error 1
+| make[6]: *** Waiting for unfinished jobs....
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ tools/libs/light/libxl_nocpuid.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tools/libs/light/libxl_nocpuid.c b/tools/libs/light/libxl_nocpuid.c
+index 0630959e76..00f6ac3233 100644
+--- a/tools/libs/light/libxl_nocpuid.c
++++ b/tools/libs/light/libxl_nocpuid.c
+@@ -14,6 +14,8 @@
+ 
+ #include "libxl_internal.h"
+ 
++#include <yajl/yajl_gen.h>
++
+ int libxl__cpuid_policy_is_empty(libxl_cpuid_policy_list *pl)
+ {
+     return 1;
+-- 
+2.39.2
+

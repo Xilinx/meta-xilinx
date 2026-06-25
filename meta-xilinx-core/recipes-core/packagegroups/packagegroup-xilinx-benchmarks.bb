@@ -1,3 +1,5 @@
+SUMMARY = "Userspace benchmarking and IO-profiling utilities for AMD \
+Xilinx boards."
 DESCRIPTION = "Packages for Benchmarks"
 
 inherit packagegroup

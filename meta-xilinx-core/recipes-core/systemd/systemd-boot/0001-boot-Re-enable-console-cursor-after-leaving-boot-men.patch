@@ -1,0 +1,43 @@
+From 8ec53142e8e97a92a8f2f2eb06a244c387759822 Mon Sep 17 00:00:00 2001
+From: John Toomey <john.toomey@amd.com>
+Date: Wed, 10 Dec 2025 08:32:35 +0000
+Subject: [PATCH] boot: Re-enable console cursor after leaving boot menu
+
+Upstream-Status: Submitted [https://github.com/systemd/systemd/issues/39292]
+
+The menu_run() function disables the console cursor at entry via
+ST->ConOut->EnableCursor(ST->ConOut, false) to hide it during menu
+display, but never re-enables it when exiting. This leaves the cursor
+permanently hidden after the boot menu closes.
+
+This can cause the cursor to remain invisible when:
+- Returning to the firmware (ACTION_QUIT)
+- Booting an OS that expects the cursor to be in its default state
+- Any subsequent text-mode console operations
+
+Fix this by calling EnableCursor(true) before clearing the screen and
+returning from menu_run(), restoring the cursor to its normal visible
+state.
+
+AI-Generated: Claude Opus 4.5
+
+Signed-off-by: John Toomey <john.toomey@amd.com>
+---
+ src/boot/efi/boot.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/boot/efi/boot.c b/src/boot/efi/boot.c
+index 5c0f0ab10a..c80ea7f395 100644
+--- a/src/boot/efi/boot.c
++++ b/src/boot/efi/boot.c
+@@ -1142,6 +1142,7 @@ static bool menu_run(
+         }
+ 
+         *chosen_entry = config->entries[idx_highlight];
++        ST->ConOut->EnableCursor(ST->ConOut, true);
+         clear_screen(COLOR_NORMAL);
+         return action == ACTION_RUN;
+ }
+-- 
+2.34.1
+

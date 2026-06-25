@@ -1,0 +1,126 @@
+From b92ad5e7619101c72bf9925d6e2de22b6c36b8ab Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Wed, 23 Jul 2025 12:06:18 +0200
+Subject: [PATCH 38/41] hw/xen-hvm: Add a mapcache arg to xen_register_ioreq()
+
+Add a mapcache argument to xen_register_ioreq() allowing
+the caller to optionally disable the mapcache.
+
+All callers still call it with mapcache = true so there's no
+functional change yet.
+
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/i386/xen/xen-hvm.c           |  2 +-
+ hw/xen/xen-hvm-common.c         | 18 ++++++++++++------
+ hw/xen/xen-pvh-common.c         |  3 ++-
+ include/hw/xen/xen-hvm-common.h |  3 ++-
+ 4 files changed, 17 insertions(+), 9 deletions(-)
+
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index e24b914f68..7e07389aa9 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -587,7 +587,7 @@ void xen_hvm_init_pc(PCMachineState *pcms, MemoryRegion **ram_memory)
+ 
+     xen_register_ioreq(state, max_cpus,
+                        HVM_IOREQSRV_BUFIOREQ_ATOMIC,
+-                       &xen_memory_listener);
++                       &xen_memory_listener, true);
+ 
+     QLIST_INIT(&xen_physmap);
+     xen_read_physmap(state);
+diff --git a/hw/xen/xen-hvm-common.c b/hw/xen/xen-hvm-common.c
+index 0baaf647fe..43558218d5 100644
+--- a/hw/xen/xen-hvm-common.c
++++ b/hw/xen/xen-hvm-common.c
+@@ -447,7 +447,9 @@ static void handle_ioreq(XenIOState *state, ioreq_t *req)
+         case IOREQ_TYPE_TIMEOFFSET:
+             break;
+         case IOREQ_TYPE_INVALIDATE:
+-            xen_invalidate_map_cache();
++            if (xen_map_cache_enabled()) {
++                xen_invalidate_map_cache();
++            }
+             break;
+         case IOREQ_TYPE_PCI_CONFIG:
+             cpu_ioreq_config(state, req);
+@@ -788,7 +790,8 @@ void xen_shutdown_fatal_error(const char *fmt, ...)
+ 
+ static void xen_do_ioreq_register(XenIOState *state,
+                                   unsigned int max_cpus,
+-                                  const MemoryListener *xen_memory_listener)
++                                  const MemoryListener *xen_memory_listener,
++                                  bool mapcache)
+ {
+     int i, rc;
+ 
+@@ -839,11 +842,13 @@ static void xen_do_ioreq_register(XenIOState *state,
+         state->bufioreq_local_port = rc;
+     }
+     /* Init RAM management */
++    if (mapcache) {
+ #ifdef XEN_COMPAT_PHYSMAP
+-    xen_map_cache_init(xen_phys_offset_to_gaddr, state);
++        xen_map_cache_init(xen_phys_offset_to_gaddr, state);
+ #else
+-    xen_map_cache_init(NULL, state);
++        xen_map_cache_init(NULL, state);
+ #endif
++    }
+ 
+     qemu_add_vm_change_state_handler(xen_hvm_change_state_handler, state);
+ 
+@@ -866,7 +871,8 @@ err:
+ 
+ void xen_register_ioreq(XenIOState *state, unsigned int max_cpus,
+                         uint8_t handle_bufioreq,
+-                        const MemoryListener *xen_memory_listener)
++                        const MemoryListener *xen_memory_listener,
++                        bool mapcache)
+ {
+     int rc;
+ 
+@@ -887,7 +893,7 @@ void xen_register_ioreq(XenIOState *state, unsigned int max_cpus,
+     state->has_bufioreq = handle_bufioreq != HVM_IOREQSRV_BUFIOREQ_OFF;
+     rc = xen_create_ioreq_server(xen_domid, handle_bufioreq, &state->ioservid);
+     if (!rc) {
+-        xen_do_ioreq_register(state, max_cpus, xen_memory_listener);
++        xen_do_ioreq_register(state, max_cpus, xen_memory_listener, mapcache);
+     } else {
+         warn_report("xen: failed to create ioreq server");
+     }
+diff --git a/hw/xen/xen-pvh-common.c b/hw/xen/xen-pvh-common.c
+index fe6b15f796..fdf6e5e603 100644
+--- a/hw/xen/xen-pvh-common.c
++++ b/hw/xen/xen-pvh-common.c
+@@ -208,7 +208,8 @@ static void xen_pvh_init(MachineState *ms)
+     xen_pvh_init_ram(s, sysmem);
+     xen_register_ioreq(&s->ioreq, ms->smp.max_cpus,
+                        xpc->handle_bufioreq,
+-                       &xen_memory_listener);
++                       &xen_memory_listener,
++                       true);
+ 
+     if (s->cfg.virtio_mmio_num) {
+         xen_create_virtio_mmio_devices(s);
+diff --git a/include/hw/xen/xen-hvm-common.h b/include/hw/xen/xen-hvm-common.h
+index 8a199f78ca..6ae1167a74 100644
+--- a/include/hw/xen/xen-hvm-common.h
++++ b/include/hw/xen/xen-hvm-common.h
+@@ -98,7 +98,8 @@ void xen_device_unrealize(DeviceListener *listener, DeviceState *dev);
+ void xen_hvm_change_state_handler(void *opaque, bool running, RunState rstate);
+ void xen_register_ioreq(XenIOState *state, unsigned int max_cpus,
+                         uint8_t handle_bufioreq,
+-                        const MemoryListener *xen_memory_listener);
++                        const MemoryListener *xen_memory_listener,
++                        bool mapcache);
+ 
+ void cpu_ioreq_pio(ioreq_t *req);
+ #endif /* HW_XEN_HVM_COMMON_H */
+-- 
+2.34.1
+

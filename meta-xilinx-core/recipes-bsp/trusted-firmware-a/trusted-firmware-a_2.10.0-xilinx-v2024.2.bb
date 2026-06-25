@@ -1,4 +1,5 @@
 require recipes-bsp/trusted-firmware-a/trusted-firmware-a.inc
+require trusted-firmware-a-xlnx.inc
 
 DEPENDS:remove:zynqmp:qemuall = " optee-os"
 DEPENDS:remove:versal:qemuall = " optee-os"

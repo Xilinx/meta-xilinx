@@ -1,6 +1,7 @@
 DEFAULT_PREFERENCE = "-1"
 
 require recipes-bsp/trusted-firmware-a/trusted-firmware-a.inc
+require trusted-firmware-a-xlnx.inc
 
 # TF-A v2.12.0
 SRCREV_tfa = "4ec2948fe3f65dba2f19e691e702f7de2949179c"

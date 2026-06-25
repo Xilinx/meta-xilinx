@@ -1,0 +1,3 @@
+define KFEATURE_DESCRIPTION "Enable ETM debug options"
+
+kconf hardware etm-debug.cfg

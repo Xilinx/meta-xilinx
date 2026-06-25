@@ -1,0 +1,33 @@
+From 9530cdb2de5bc3da182b4273fa706f8354721e7c Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@gmail.com>
+Date: Fri, 21 Nov 2025 15:05:25 -0500
+Subject: [PATCH] tests/vpci: drop explicit -g use
+
+The explicit use of -g is embedded debug information and paths
+into the output files, which breaks QA. Investigating how to
+mitigate this via prefix maps is a future TODO item. For now,
+we just stop using -g
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ tools/tests/vpci/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/tests/vpci/Makefile b/tools/tests/vpci/Makefile
+index 97359ff67f..39c582cded 100644
+--- a/tools/tests/vpci/Makefile
++++ b/tools/tests/vpci/Makefile
+@@ -15,7 +15,7 @@ else
+ endif
+ 
+ $(TARGET): vpci.c vpci.h list.h main.c emul.h
+-	$(CC) $(CFLAGS_xeninclude) -g -o $@ vpci.c main.c
++	$(CC) $(CFLAGS_xeninclude) -o $@ vpci.c main.c
+ 
+ .PHONY: clean
+ clean:
+-- 
+2.39.2
+

@@ -1,0 +1,29 @@
+From 333e9f447e110f712a5b85124860b07c4e732f7c Mon Sep 17 00:00:00 2001
+From: Daniel Levin <daniel.levin@amd.com>
+Date: Tue, 23 Sep 2025 17:02:10 -0500
+Subject: [PATCH 2/2] Force gbm-glesv2 flavor when drm-glesv2 also present
+
+Upstream-Status: Inapprorpiate [local layer workaround]
+
+---
+ meson.build | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index abc92a1..62b4044 100644
+--- a/meson.build
++++ b/meson.build
+@@ -33,6 +33,10 @@ if flavors.length() == 0
+           'See meson_options.txt contents for available flavors')
+ endif
+ 
++if 'drm-glesv2' in flavors and 'gbm-glesv2' not in flavors
++    flavors += ['gbm-glesv2']
++endif
++
+ flavors_str = ', '.join(flavors)
+ need_x11 = flavors_str.contains('x11-')
+ need_drm = flavors_str.contains('drm-')
+-- 
+2.34.1
+

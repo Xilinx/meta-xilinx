@@ -24,6 +24,7 @@ REQUIRED_MACHINE_FEATURES = "vdu"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+DEPENDS += "kernel-module-vdu"
 RDEPENDS:${PN} = "kernel-module-vdu"
 RDEPENDS:libvdu-ctrlsw = "kernel-module-vdu"
 

@@ -1,3 +1,7 @@
+SUMMARY = "AMD AXI DMA controller driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD AXI DMA controller, \
+providing scatter/gather and simple DMA transfer primitives in the \
+embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "axidma"

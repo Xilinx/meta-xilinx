@@ -1,3 +1,5 @@
+SUMMARY = "OpenAMP rpmsg example applications, helpers and remote-core \
+firmware packages for AMD Xilinx adaptive SoCs."
 DESCRIPTION = "OpenAMP supported packages"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -13,6 +15,7 @@ PACKAGES = "\
 	packagegroup-openamp-echo-test \
 	packagegroup-openamp-matrix-mul \
 	packagegroup-openamp-rpc-demo \
+	packagegroup-openamp-zephyr-test \
 	packagegroup-openamp \
 	"
 
@@ -24,6 +27,8 @@ RDEPENDS:${PN}-matrix-mul:append:zcu102-zynqmp = " openamp-fw-mat-muld"
 
 RDEPENDS:${PN}-rpc-demo = "rpmsg-proxy-app"
 RDEPENDS:${PN}-rpc-demo:append:zcu102-zynqmp = " openamp-fw-rpc-demo"
+
+RDEPENDS:${PN}-zephyr-test = "zephyr-rpmsg-test"
 
 # Ensure that each of these kernel modules is present regardless of defconfig used
 RDEPENDS:${PN}:append = " kernel-module-uio-pdrv-genirq kernel-module-rpmsg-char kernel-module-rpmsg-ctrl "
@@ -41,4 +46,7 @@ RDEPENDS:${PN}:append = " \
 	packagegroup-openamp-echo-test \
 	packagegroup-openamp-matrix-mul \
 	packagegroup-openamp-rpc-demo \
+	packagegroup-openamp-zephyr-test \
+	rpmsg-utils \
+	libmetal-demo-host \
 	"

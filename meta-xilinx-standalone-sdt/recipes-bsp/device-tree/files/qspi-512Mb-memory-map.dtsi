@@ -1,0 +1,85 @@
+/ {
+	/* Empty root node resets Lopper's label tracking to avoid false duplicate label errors */
+};
+/* QSPI partitions for basecamp Image-recovery */
+&qspi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	qspi_flash: flash@0 {
+		/delete-node/ partitions;
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			partition@0 {
+				label = "Image Selector";
+				reg = <0 0x60000>;
+			};
+			partition@60000 {
+				label = "Image Selector Backup";
+				reg = <0x60000 0x60000>;
+			};
+			partition@c0000 {
+				label = "Image Selector Scratchpad";
+				reg = <0xc0000 0x20000>;
+			};
+			partition@e0000 {
+				label = "Image Recovery";
+				reg = <0xe0000 0x1400000>;
+			};
+			partition@14e0000 {
+				label = "Image Recovery Scratchpad";
+				reg = <0x14e0000 0x20000>;
+			};
+			partition@1500000 {
+				label = "SystemReady-DT Update Metadata";
+				reg = <0x1500000 0x20000>;
+			};
+			partition@1520000 {
+				label = "SystemReady-DT Update Metadata Backup";
+				reg = <0x1520000 0x20000>;
+			};
+			partition@1540000 {
+				label = "U-Boot storage variables";
+				reg = <0x1540000 0x20000>;
+			};
+			partition@1560000 {
+				label = "U-Boot storage variables backup";
+				reg = <0x1560000 0x20000>;
+			};
+			partition@1580000 {
+				label = "U-Boot UEFI Variables";
+				reg = <0x1580000 0x40000>;
+			};
+			partition@15c0000 {
+				label = "Bank A Space";
+				reg = <0x15c0000 0x1000000>;
+			};
+			partition@25c0000 {
+				label = "U-Boot Variables Bank A";
+				reg = <0x25c0000 0x20000>;
+			};
+			partition@25e0000 {
+				label = "U-Boot Variables Bank A Backup";
+				reg = <0x25e0000 0x20000>;
+			};
+			partition@2600000 {
+				label = "Bank B Space";
+				reg = <0x2600000 0x1000000>;
+			};
+			partition@3600000 {
+				label = "U-Boot Variables Bank B";
+				reg = <0x3600000 0x20000>;
+			};
+			partition@3620000 {
+				label = "U-Boot Variables Bank B Backup";
+				reg = <0x3620000 0x20000>;
+			};
+			partition@3640000 {
+				label = "User Scratchpad";
+				reg = <0x3640000 0x9c0000>;
+			};
+			/* 0x3FF0000-0x4000000: Reserved for QSPI manifest (64KB) */
+		};
+	};
+};

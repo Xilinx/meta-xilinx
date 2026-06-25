@@ -1,3 +1,4 @@
+SUMMARY = "OpenCV runtime libraries and helper modules."
 DESCRIPTION = "PetaLinux opencv supported packages"
 
 PACKAGE_ARCH = "${TUNE_PKGARCH}"

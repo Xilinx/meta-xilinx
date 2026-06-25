@@ -1,4 +1,7 @@
+SUMMARY = "AMD HDMI RX subsystem driver (baremetal)."
 
+DESCRIPTION = "Baremetal driver for the AMD HDMI Receiver Subsystem IP \
+block in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "v-hdmirxss"

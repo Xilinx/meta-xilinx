@@ -1,3 +1,6 @@
+SUMMARY = "Zynq-7000 DRAM test application (baremetal)."
+DESCRIPTION = "AMD Xilinx baremetal application for stressing and \
+validating the DRAM controller on Zynq-7000 boards."
 inherit esw python3native esw_apps_common
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/zynq_dram_test/src/"

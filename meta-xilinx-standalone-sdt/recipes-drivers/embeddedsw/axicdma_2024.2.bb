@@ -1,3 +1,7 @@
+SUMMARY = "AMD AXI Central DMA controller driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD AXI Central DMA (CDMA) \
+controller, providing memory-to-memory DMA transfer primitives in the \
+embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "axicdma"

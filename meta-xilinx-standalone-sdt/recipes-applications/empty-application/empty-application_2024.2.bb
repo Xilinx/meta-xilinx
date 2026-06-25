@@ -1,3 +1,6 @@
+SUMMARY = "Empty baremetal application skeleton (template)."
+DESCRIPTION = "Minimal AMD Xilinx baremetal application skeleton \
+intended as a starting point/template for new ESW applications."
 inherit esw deploy python3native
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/empty_application/src/"

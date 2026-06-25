@@ -1,3 +1,9 @@
+SUMMARY = "AMD Xilinx security services library (xilsecure)."
+DESCRIPTION = "Library from the AMD Xilinx embeddedsw stack that \
+exposes the AES, SHA, RSA and ECDSA crypto engines on Zynq UltraScale+ \
+MPSoC and Versal devices to baremetal firmware. This recipe builds the \
+driver self-test/example ELF that ships alongside the driver in the \
+embeddedsw tree."
 inherit esw deploy
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilsecure/examples/"

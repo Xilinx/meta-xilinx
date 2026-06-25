@@ -7,7 +7,7 @@ IMGSEL_MC_TARGET:versal ?= "${MACHINE}-microblaze-pmc"
 IMGSEL_MC_TARGET:versal-2ve-2vm ?= "${MACHINE}-microblaze-pmc"
 
 IMGSEL_MCDEPENDS ?= "mc::${IMGSEL_MC_TARGET}:image-selector:do_deploy"
-IMGSEL_DEPLOY_DIR ?= "${TOPDIR}/tmp-${IMGSEL_MC_TARGET}/deploy/images/${MACHINE}/"
+IMGSEL_DEPLOY_DIR ?= "${TMPDIR}-${IMGSEL_MC_TARGET}/deploy/images/${MACHINE}/"
 IMGSEL_IMAGE_NAME ?= "image-selector-${MACHINE}"
 
 def check_imgsel_variables(d):

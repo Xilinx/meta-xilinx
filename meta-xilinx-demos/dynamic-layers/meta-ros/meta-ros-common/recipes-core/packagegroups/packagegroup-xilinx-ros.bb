@@ -1,4 +1,7 @@
-DESCRIPTION = "Packages for ROS2 Base and Demos including some basic pub/sub examples"
+SUMMARY = "Packagegroup pulling in the ROS 2 base runtime plus example \
+publisher/subscriber nodes for the AMD Xilinx ROS demos."
+DESCRIPTION = "Packages for ROS2 Base and Demos including some basic \
+pub/sub examples"
 
 PACKAGE_ARCH = "${TUNE_PKGARCH}"
 
@@ -146,17 +149,14 @@ RDEPENDS:${PN}-demo:aarch64 = "\
     ${ROS_DEMO_PACKAGES} \
 "
 
-#RDEPENDS:${PN}-control:aarch64 = "\
-#    ${ROS_BASE_PACKAGES} \
-#    ${ROS_CONTROL_PACKAGES} \
-#"
+RDEPENDS:${PN}-control:aarch64 = "\
+    ${ROS_BASE_PACKAGES} \
+    ${ROS_CONTROL_PACKAGES} \
+"
 
 RDEPENDS:${PN}-dev:aarch64 = "\
     ${ROS_BUILDESSENTIAL_PACKAGES} \
 "
-
-# TODO
-# 1. Due to failing hardware-interfaces disable ${PN}-control
 
 RDEPENDS:${PN}:aarch64 = "\
     ${PN}-demo \

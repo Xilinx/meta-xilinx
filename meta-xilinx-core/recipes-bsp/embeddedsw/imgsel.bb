@@ -1,3 +1,5 @@
+SUMMARY = "Deploys a pre-built AMD Image Selector (imgsel) binary for \
+Zynq UltraScale+ MPSoC and Versal targets as virtual/imgsel."
 DESCRIPTION = "Image Selector"
 
 LICENSE = "CLOSED"
@@ -20,7 +22,6 @@ COMPATIBLE_HOST = ".*"
 IMGSEL_DEPENDS ??= ""
 IMGSEL_MCDEPENDS ??= ""
 IMGSEL_DEPLOY_DIR ??= "${DEPLOY_DIR_IMAGE}"
-IMGSEL_DEPLOY_DIR[vardepsexclude] += "TOPDIR"
 IMGSEL_IMAGE_NAME ??= "image-selector-${MACHINE}"
 
 # Default is for the multilib case (without the extension .bin)
@@ -39,7 +40,6 @@ do_deploy() {
     if ${SHOULD_DEPLOY}; then
         install -Dm 0644 ${IMGSEL_FILE}.bin ${DEPLOYDIR}/${IMGSEL_IMAGE_NAME}.bin
         install -Dm 0644 ${IMGSEL_FILE}.elf ${DEPLOYDIR}/${IMGSEL_IMAGE_NAME}.elf
-        install -Dm 0644 ${IMGSEL_FILE}.manifest ${DEPLOYDIR}/${IMGSEL_IMAGE_NAME}.manifest
     fi
 }
 

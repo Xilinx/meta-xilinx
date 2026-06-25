@@ -4,6 +4,9 @@
 
 SUMMARY = "Start Jupyter-lab server at system boot"
 
+DESCRIPTION = "systemd unit that starts a JupyterLab server at system \
+boot, binding to the on-target interface so AMD Xilinx Jupyter \
+notebook demos are reachable from a host browser."
 SRC_URI = " \
 	file://jupyter_server_config.py \
 	file://jupyter-setup.sh \

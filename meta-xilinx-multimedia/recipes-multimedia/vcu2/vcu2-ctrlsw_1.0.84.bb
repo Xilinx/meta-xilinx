@@ -5,9 +5,9 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=003bf8ee942bb6256905b58e9b1b19c2"
 
 PV .= "+git"
 
-BRANCH ?= "xlnx_rel_v2025.1"
+BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vcu2-ctrl-sw.git;protocol=https"
-SRCREV = "8bc7b4c27e2420d9d88cbdbbc0150a45cfe97957"
+SRCREV = "cefa58d585d0bf3296ee470cf16438803fc28fa8"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
@@ -20,6 +20,7 @@ REQUIRED_MACHINE_FEATURES = "vcu2"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+DEPENDS += "kernel-module-vcu2"
 RDEPENDS:${PN} = "kernel-module-vcu2"
 RDEPENDS:libvcu2-ctrlsw = "kernel-module-vcu2"
 

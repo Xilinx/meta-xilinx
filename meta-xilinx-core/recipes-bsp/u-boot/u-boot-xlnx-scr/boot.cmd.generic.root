@@ -44,44 +44,45 @@ do
 		fi
 		echo "Checking for /${kernel_name}"
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /${kernel_name}; then
-			echo "Loading ${kernel_name} at @@KERNEL_LOAD_ADDRESS@@";
-			fatload ${devtype} ${devnum}:${distro_bootpart} @@KERNEL_LOAD_ADDRESS@@ ${kernel_name};
+			echo "Loading ${kernel_name} at ${kernel_addr_r}";
+			fatload ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} ${kernel_name};
 		fi
 		echo "Checking for /system.dtb"
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /system.dtb; then
 			echo "Loading system.dtb at @@DEVICETREE_ADDRESS@@";
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_ADDRESS@@ system.dtb;
+			setenv fdtcontroladdr @@DEVICETREE_ADDRESS@@
 		fi
 		echo "Checking for /devicetree/openamp.dtbo"
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /devicetree/openamp.dtbo; then
 			echo "Loading and merging openamp.dtbo into device tree at @@DEVICETREE_OVERLAY_ADDRESS@@";
 			fatload ${devtype} ${devnum}:${distro_bootpart} @@DEVICETREE_OVERLAY_ADDRESS@@ devicetree/openamp.dtbo;
-			fdt addr @@DEVICETREE_ADDRESS@@
+			fdt addr $fdtcontroladdr
 			fdt resize 8192
 			fdt apply @@DEVICETREE_OVERLAY_ADDRESS@@
 		fi
 		echo "Checking for /${ramdisk_name}"
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /${ramdisk_name} && test "${skip_tinyramdisk}" != "yes"; then
-			echo "Loading ${ramdisk_name} at @@RAMDISK_IMAGE_ADDRESS@@";
-			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${ramdisk_name};
-			fdt addr @@DEVICETREE_ADDRESS@@
+			echo "Loading ${ramdisk_name} at ${ramdisk_addr_r}";
+			fatload ${devtype} ${devnum}:${distro_bootpart} ${ramdisk_addr_r} ${ramdisk_name};
+			fdt addr $fdtcontroladdr
 			fdt get value bootargs /chosen bootargs
 			setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@
-			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
+			@@KERNEL_BOOTCMD@@ ${kernel_addr_r} ${ramdisk_addr_r} $fdtcontroladdr
 		fi
 		echo "Checking for /${rootfs_name}"
 		if test -e ${devtype} ${devnum}:${distro_bootpart} /${rootfs_name} && test "${skip_ramdisk}" != "yes"; then
-			echo "Loading ${rootfs_name} at @@RAMDISK_IMAGE_ADDRESS@@";
-			fatload ${devtype} ${devnum}:${distro_bootpart} @@RAMDISK_IMAGE_ADDRESS@@ ${rootfs_name};
-			fdt addr @@DEVICETREE_ADDRESS@@
+			echo "Loading ${rootfs_name} at ${ramdisk_addr_r}";
+			fatload ${devtype} ${devnum}:${distro_bootpart} ${ramdisk_addr_r} ${rootfs_name};
+			fdt addr $fdtcontroladdr
 			fdt get value bootargs /chosen bootargs
 			setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@
-			@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@
+			@@KERNEL_BOOTCMD@@ ${kernel_addr_r} ${ramdisk_addr_r} $fdtcontroladdr
 		fi
-		fdt addr @@DEVICETREE_ADDRESS@@
+		fdt addr $fdtcontroladdr
 		fdt get value bootargs /chosen bootargs
 		setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_SD@@
-		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ - @@DEVICETREE_ADDRESS@@
+		@@KERNEL_BOOTCMD@@ ${kernel_addr_r} - $fdtcontroladdr
 	fi
 	if test "${boot_target}" = "xspi0" || test "${boot_target}" = "qspi" || test "${boot_target}" = "qspi0"; then
 		sf probe 0 0 0;
@@ -90,12 +91,12 @@ do
 		bootm @@FIT_IMAGE_LOAD_ADDRESS@@;
 		echo "Booting using Fit image failed"
 
-		sf read @@KERNEL_LOAD_ADDRESS@@ @@QSPI_KERNEL_OFFSET@@ @@QSPI_KERNEL_SIZE@@
-		sf read @@RAMDISK_IMAGE_ADDRESS@@ @@QSPI_RAMDISK_OFFSET@@ @@QSPI_RAMDISK_SIZE@@
-		fdt addr @@DEVICETREE_ADDRESS@@
+		sf read ${kernel_addr_r} @@QSPI_KERNEL_OFFSET@@ @@QSPI_KERNEL_SIZE@@
+		sf read ${ramdisk_addr_r} @@QSPI_RAMDISK_OFFSET@@ @@QSPI_RAMDISK_SIZE@@
+		fdt addr $fdtcontroladdr
 		fdt get value bootargs /chosen bootargs
 		setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@
-		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@;
+		@@KERNEL_BOOTCMD@@ ${kernel_addr_r} ${ramdisk_addr_r} $fdtcontroladdr
 		echo "Booting using Separate images failed"
 	fi
 	if test "${boot_target}" = "nand" || test "${boot_target}" = "nand0"; then
@@ -105,12 +106,12 @@ do
 		bootm @@FIT_IMAGE_LOAD_ADDRESS@@;
 		echo "Booting using Fit image failed"
 
-		nand read @@KERNEL_LOAD_ADDRESS@@ @@NAND_KERNEL_OFFSET@@ @@NAND_KERNEL_SIZE@@
-		nand read @@RAMDISK_IMAGE_ADDRESS@@ @@NAND_RAMDISK_OFFSET@@ @@NAND_RAMDISK_SIZE@@
-		fdt addr @@DEVICETREE_ADDRESS@@
+		nand read ${kernel_addr_r} @@NAND_KERNEL_OFFSET@@ @@NAND_KERNEL_SIZE@@
+		nand read ${ramdisk_addr_r} @@NAND_RAMDISK_OFFSET@@ @@NAND_RAMDISK_SIZE@@
+		fdt addr $fdtcontroladdr
 		fdt get value bootargs /chosen bootargs
 		setenv bootargs $bootargs @@KERNEL_COMMAND_APPEND@@ @@KERNEL_ROOT_RAMDISK@@
-		@@KERNEL_BOOTCMD@@ @@KERNEL_LOAD_ADDRESS@@ @@RAMDISK_IMAGE_ADDRESS@@ @@DEVICETREE_ADDRESS@@;
+		@@KERNEL_BOOTCMD@@ ${kernel_addr_r} ${ramdisk_addr_r} $fdtcontroladdr
 		echo "Booting using Separate images failed"
 	fi
 done

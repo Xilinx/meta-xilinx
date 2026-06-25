@@ -15,5 +15,3 @@ PREFERRED_PROVIDER_virtual/libgles2 = "${@'libmali-xlnx' if xlnx_is_libmalig78ae
 PREFERRED_PROVIDER_virtual/libgles3 = "${@'libmali-xlnx' if xlnx_is_libmalig78ae_enabled(d) else 'mesa'}"
 PREFERRED_PROVIDER_virtual/libgbm = "${@'libmali-xlnx' if xlnx_is_libmalig78ae_enabled(d) else 'mesa'}"
 PREFERRED_PROVIDER_virtual/mesa = "${@'mesa-gl' if xlnx_is_libmalig78ae_enabled(d) else 'mesa'}"
-PREFERRED_PROVIDER_virtual/opencl-icd = "${@'libmali-xlnx' if xlnx_is_libmalig78ae_enabled(d) else 'opencl-icd-loader'}"
-PREFERRED_RPROVIDER_virtual-opencl-icd = "${@'libmali-xlnx' if xlnx_is_libmalig78ae_enabled(d) else 'opencl-icd-loader'}"

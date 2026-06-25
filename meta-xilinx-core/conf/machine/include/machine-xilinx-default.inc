@@ -57,9 +57,7 @@ WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'boot.bi
 WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'system.dtb',   ' virtual/dtb', '', d)}"
 WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'boot.scr',     ' ${UBOOT_BOOT_SCRIPT}', '', d)}"
 WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'uEnv.txt',     ' u-boot-xlnx-uenv', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'Image',        ' virtual/kernel', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'uImage',       ' virtual/kernel', '', d)}"
-WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'zImage',       ' virtual/kernel', '', d)}"
+WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', d.getVar('KERNEL_IMAGETYPE') or 'Image',        ' virtual/kernel', '', d)}"
 WKS_FILE_DEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', '${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot', ' ${INITRAMFS_IMAGE}', '', d)}"
 
 # Automatically add IMAGE_BOOT_FILES to /boot via packages
@@ -67,88 +65,64 @@ MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INST
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'system.dtb',   ' ${PREFERRED_PROVIDER_virtual/dtb}', '', d)}"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'boot.scr',     ' ${UBOOT_BOOT_SCRIPT}', '', d)}"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'uEnv.txt',     ' u-boot-xlnx-uenv', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'Image',        ' kernel-image-image', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'uImage',       ' kernel-image-uimage', '', d)}"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', 'zImage',       ' kernel-image-zimage', '', d)}"
+MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', d.getVar('KERNEL_IMAGETYPE') or 'Image',        ' kernel-image-' + d.getVar('KERNEL_IMAGETYPE').lower(), '', d)}"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS .= "${@bb.utils.contains('IMAGE_BOOT_FILES_INSTALLED', '${INITRAMFS_IMAGE}-${MACHINE}.cpio.gz.u-boot', ' initramdisk-${INITRAMFS_IMAGE}', '', d)}"
 
-# Default SD card wks file, split /boot and /
-WKS_FILES ?= "xilinx-default-sd.wks"
+# xilinx-default-sd.wks - u-boot/boot.scr based
+# xilinx-default-sd-efi.wks - u-boot/EFI based
+WKS_FILE ?= "${@bb.utils.contains('DISTRO_FEATURES', 'efi', 'xilinx-default-sd-efi.wks', 'xilinx-default-sd.wks', d)}"
 
-IMAGE_BOOT_FILES ?= "${@get_default_image_boot_files(d)}"
+# Set the EFI_PROVIDER only if EFI is enabled in the distro
+EFI_PROVIDER ??= "${@bb.utils.contains('DISTRO_FEATURES', 'efi', bb.utils.contains("DISTRO_FEATURES", "systemd", "systemd-boot", "grub-efi", d), '', d)}"
+WICVARS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'efi', ' EFI_PROVIDER', '', d)}"
+WICUFSVARS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'efi', ' EFI_PROVIDER', '', d)}"
 
-def get_default_image_boot_files(d):
-    files = []
+# Transfer the DEFAULT_HW_BOOT_MODE to HW_BOOT_MODE
+# This indirection allows for an image to override it
+DEFAULT_HW_BOOT_MODE ??= "5"
+HW_BOOT_MODE ?= "${DEFAULT_HW_BOOT_MODE}"
+HW_BOOT_MODE[doc] = "The hardware boot mode as defined by the SoC TRM.  This should be set by the machine.conf, but the user or image recipe can override as necessary."
 
-    esw_type = d.getVar('XILINX_WITH_ESW') or ''
-    if esw_type:
-        if 'zynq' in d.getVar('OVERRIDES').split(':'):
-            files.append('boot.bin')
-        if 'zynqmp' in d.getVar('OVERRIDES').split(':'):
-            files.append('boot.bin')
-        if 'versal' in d.getVar('OVERRIDES').split(':'):
-            files.append('boot.bin')
-        if 'versal-net' in d.getVar('OVERRIDES').split(':'):
-            files.append('boot.bin')
-        if 'versal-2ve-2vm' in d.getVar('OVERRIDES').split(':'):
-            files.append('boot.bin')
+HW_BOOT_MODE_TYPE = "${@get_verbose_boot_mode(d)}"
+HW_BOOT_MODE_TYPE[docs] = "Verbose description of the boot mode intended to be used for debugging and log message.  The values should not be relied on as they may change."
 
-    # kernel images
-    kerneltypes = set((d.getVar("KERNEL_IMAGETYPE") or "").split())
-    kerneltypes |= set((d.getVar("KERNEL_IMAGETYPES") or "").split())
-    kerneltypes |= set((d.getVar("KERNEL_ALT_IMAGETYPE") or "").split())
-    for i in kerneltypes:
-        files.append(i)
+BUILDCFG_VARS:append = " HW_BOOT_MODE HW_BOOT_MODE_TYPE SOC_ON_DISK_BOOT_BIN"
 
-    # u-boot image
-    if d.getVar("UBOOT_BINARY"):
-        files.append(d.getVar("UBOOT_BINARY"))
+def get_verbose_boot_mode(d):
+    hw_boot_mode = d.getVar('HW_BOOT_MODE')
+    soc_boot_mode_mapping = d.getVar('SOC_BOOT_MODE_MAPPING')
+    if not hw_boot_mode or not soc_boot_mode_mapping:
+        return ''
 
-    # device trees (device-tree only), these are first as they are likely desired over the kernel ones
-    if "device-tree" in (d.getVar("PREFERRED_PROVIDER_virtual/dtb") or ""):
-        files.append("system.dtb")
-        files.append("devicetree/*.dtb;devicetree/")
-        files.append("devicetree/*.dtbo;devicetree/")
+    # Parse the mapping string into a dictionary
+    mapping = dict(entry.split(":", 1) for entry in soc_boot_mode_mapping.split())
 
-    # device trees (kernel only)
-    if d.getVar("KERNEL_DEVICETREE"):
-        dtbs = d.getVar("KERNEL_DEVICETREE").split(" ")
-        dtbs = [os.path.basename(d) for d in dtbs]
-        for dtb in dtbs:
-            files.append(dtb)
+    if hw_boot_mode in mapping:
+        return mapping[hw_boot_mode]
+    return ''
 
-    return " ".join(files)
+# Does this configuration require a boot.bin on the image?
+SOC_ON_DISK_BOOT_BIN ?= "${@'1' if (d.getVar('HW_BOOT_MODE') or '') in (d.getVar('SOC_DISK_BOOT_MODE_MAPPING') or '').split() and d.getVar('XILINX_WITH_ESW') else ''}"
+SOC_ON_DISK_BOOT_BIN[doc] = "When set to 1, the boot.bin should be added to the boot media."
 
-EXTRA_IMAGEDEPENDS += "${@get_default_extra_imagedepends(d)}"
+# This is generally distro boot and processed via bootimg-partition
+IMAGE_BOOT_FILES ?= "${@'boot.bin ' if d.getVar('SOC_ON_DISK_BOOT_BIN') == '1' else ''}${KERNEL_IMAGETYPE}"
 
-def get_default_extra_imagedepends(d):
-    depends = []
+# This is EFI boot bootimg-efi(-amd)
+IMAGE_EFI_BOOT_FILES ?= "${@'boot.bin' if d.getVar('SOC_ON_DISK_BOOT_BIN') == '1' else ''}"
 
-    # Add firmware dependencies
-    esw_type = d.getVar('XILINX_WITH_ESW') or ''
-    if esw_type:
-        depends.append('libyaml-native')
-        depends.append('python3-cython-native')
-        depends.append('python3-pyyaml-native')
-        if 'microblaze' in d.getVar('OVERRIDES').split(':'):
-            depends.append('virtual/bitstream')
-        if 'zynq' in d.getVar('OVERRIDES').split(':'):
-            depends.append('virtual/boot-bin')
-        if 'zynqmp' in d.getVar('OVERRIDES').split(':'):
-            depends.append('virtual/boot-bin')
-        if 'versal' in d.getVar('OVERRIDES').split(':'):
-            depends.append('virtual/boot-bin')
-            depends.append('virtual/cdo')
-        if 'versal-net' in d.getVar('OVERRIDES').split(':'):
-            depends.append('virtual/boot-bin')
-            depends.append('virtual/cdo')
-        if 'versal-2ve-2vm' in d.getVar('OVERRIDES').split(':'):
-            depends.append('virtual/boot-bin')
-            depends.append('virtual/cdo')
+# These dependencies are SOC specific, and only apply if building with
+# XSCT or SDT modes
+SOC_EXTRA_IMAGEDEPENDS[microblaze] = "virtual/bitstream"
+SOC_EXTRA_IMAGEDEPENDS[microblaze-v] = ""
+SOC_EXTRA_IMAGEDEPENDS[zynq] = "virtual/boot-bin"
+SOC_EXTRA_IMAGEDEPENDS[zynqmp] = "virtual/boot-bin"
+SOC_EXTRA_IMAGEDEPENDS[versal] = "virtual/boot-bin virtual/cdo"
+SOC_EXTRA_IMAGEDEPENDS[versal-net] = "virtual/boot-bin virtual/cdo"
+SOC_EXTRA_IMAGEDEPENDS[versal-2ve-2vm] = "virtual/boot-bin virtual/cdo"
+SOC_EXTRA_IMAGEDEPENDS = "${@d.getVarFlag('SOC_EXTRA_IMAGEDEPENDS', d.getVar('SOC_FAMILY') or '') or '' if d.getVar('XILINX_WITH_ESW') else ''}"
 
-    return " ".join(depends)
-
-
+EXTRA_IMAGEDEPENDS += "${SOC_EXTRA_IMAGEDEPENDS}"
 
 XSERVER_EXT ?= ""
 

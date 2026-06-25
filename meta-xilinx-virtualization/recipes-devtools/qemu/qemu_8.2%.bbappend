@@ -3,3 +3,8 @@ require qemu-xen_8.2.inc
 
 # We do not want QEMU, on the target to be configured with OpenGL
 PACKAGECONFIG:remove:class-target = "virglrenderer epoxy gtk+"
+
+# Enable vhost when kvm is in DISTRO_FEATURES
+PACKAGECONFIG:append:class-target = " \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'kvm', ' vhost', '', d)} \
+    "

@@ -14,7 +14,7 @@ LIC_FILES_CHKSUM = " \
 # with a linux kernel by default.
 KERNEL_INCLUDE ?= ""
 
-inherit devicetree image-artifact-names
+inherit devicetree image-artifact-names shared-manifest
 
 # Fall back to SYSTEM_DTFILE if specified...
 # CONFIG_DTFILE is intended to hold a specific configuration's (multiconfig)
@@ -54,6 +54,7 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
+COMPATIBLE_MACHINE:microblaze-v = ".*"
 
 DEPENDS += "python3-dtc-native"
 
@@ -65,6 +66,10 @@ SRC_URI:append:zynq = " file://zynq-7000-qspi-dummy.dtsi"
 DTB_FILE_NAME ?= "${BASE_DTS}.dtb"
 
 DTB_BASE_NAME ?= "${MACHINE}-system${IMAGE_VERSION_SUFFIX}"
+
+MANIFEST_COMPONENT_NAME ?= "device-tree"
+MANIFEST_BRANCH_VARS = "DT_UBOOT_BRANCH BRANCH SRCBRANCH"
+MANIFEST_SRCREV_VARS = "DT_UBOOT_SRCREV SRCREV"
 
 # Copy the EXTRA_DT_FILES and EXTRA_DT_INCLUDE_FILES files in prepend operation so that
 # it can be preprocessed.

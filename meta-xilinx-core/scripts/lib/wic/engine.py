@@ -533,7 +533,7 @@ class Disk:
                             label = part.get("name")
                             label_str = "-n {}".format(label) if label else ''
 
-                            cmd = "{} {} -C {} {}".format(self.mkdosfs, label_str, partfname,
+                            cmd = "{} {} -S {} -C {} {}".format(self.mkdosfs, label_str, self._lsector_size, partfname,
                                                           part['size'])
                             exec_cmd(cmd)
                             # copy content from the temporary directory to the new partition

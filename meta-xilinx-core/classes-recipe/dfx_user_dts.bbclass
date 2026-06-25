@@ -7,7 +7,7 @@
 # dfx_user_dts.bbclass expects user to generate pl dtsi for flat, DFx Static
 # and DFx RP xsa outside of yocto.
 
-inherit devicetree
+inherit devicetree bootgen-bif
 
 DEPENDS = "dtc-native bootgen-native"
 
@@ -19,24 +19,25 @@ PROVIDES = ""
 do_fetch[cleandirs] = "${B}"
 
 DT_PADDING_SIZE = "0x1000"
-BOOTGEN_FLAGS ?= " -arch ${SOC_FAMILY} -w ${@bb.utils.contains('SOC_FAMILY','zynqmp','','-process_bitstream bin',d)}"
+BOOTGEN_FLAGS ?= " -arch ${BOOTGEN_ARCH} -w ${@bb.utils.contains('SOC_FAMILY','zynqmp','','-process_bitstream bin',d)}"
 
 S ?= "${WORKDIR}"
 FW_DIR ?= ""
+FW_INSTALL_DIR ?= "${PN}"
 DTSI_PATH ?= ""
 DTBO_PATH ?= ""
 BIT_PATH ?= ""
 BIN_PATH ?= ""
 PDI_PATH ?= ""
 JSON_PATH ?= ""
-XCl_PATH ?= ""
+XCL_PATH ?= ""
 DT_FILES_PATH = "${S}/${DTSI_PATH}"
 FIRMWARE_NAME_DT_FILE ?= ""
 USER_DTS_FILE ?= ""
 
 FIRMWARE_NAME_DT_FILE[doc] = "DT file which has firmware-name device-tree property"
-USER_DTS_FILE[doc] = "Final DTSI or DTS file which is used for packaging final DT overlay"
-DTSI_PATH[doc] = "Absolute '.dtsi' or ''.dts' file path as input to SRC_URI"
+USER_DTS_FILE[doc] = "Final DTSO, DTSI or DTS file which is used for packaging final DT overlay"
+DTSI_PATH[doc] = "Absolute '.dtso', '.dtsi' or '.dts' file path as input to SRC_URI"
 DTBO_PATH[doc] = "Absolute '.dtbo' file path as input to SRC_URI"
 BIT_PATH[doc] = "Absolute '.bit' file path as input to SRC_URI"
 BIN_PATH[doc] = "Absolute '.bin' file path as input to SRC_URI"
@@ -63,7 +64,7 @@ python() {
 
         # Required Inputs
         for s in d.getVar("SRC_URI").split():
-            if s.endswith(('.dtsi', '.dts')):
+            if s.endswith(('.dtso', '.dtsi', '.dts')):
                 dtsi_found = True
                 d.setVar("DTSI_PATH",os.path.dirname(s.removeprefix('file://')))
             if s.endswith('.dtbo'):
@@ -107,7 +108,7 @@ python() {
         # 7. Both bit or bin and pdi exits.
         # 8. Both dts or dtsi and dtbo exists.
         if bit_found or bin_found or pdi_found:
-            bb.debug(2, "dtsi or dtbo or bitstream or pdi found in SRC_URI")
+            bb.debug(2, "dtso or dtsi or dts or dtbo or bitstream or pdi found in SRC_URI")
             if bit_found and pdi_found :
                 raise bb.parse.SkipRecipe("Both '.bit' and '.pdi' file found in SRC_URI, this is invalid use case.")
 
@@ -118,40 +119,67 @@ python() {
                 raise bb.parse.SkipRecipe("Both '.bit' and '.bin' file found in SRC_URI, either .bit or .bin file is supported but not both.")
 
             if dtsi_found and dtbo_found:
-                raise bb.parse.SkipRecipe("Both '.dts or dtsi' and '.dtbo' file found in SRC_URI, either .dts/dtsi or .dtbo file is supported but not both.")
+                raise bb.parse.SkipRecipe("Both '.dtso or dtsi or dts' and '.dtbo' file found in SRC_URI, either .dtso/dtsi/dts or .dtbo file is supported but not both.")
         else:
             raise bb.parse.SkipRecipe("Need one '.bit' or '.bin' or '.pdi' file added to SRC_URI.")
 
-        # Check for valid combination of dtsi and dts files in SRC_URI
+        # Check for valid combination of dtso, dtsi and dts files in SRC_URI
         # Following file combinations are not supported use case.
-        # 1. More than one '.dtsi' and zero '.dts' file.
-        # 2. More than one '.dts' and zero or more than one '.dtsi'file .
-        pattern_dts = re.compile(r'[.]+dts\b')
+        # 1. More than one '.dtso'.
+        # 2. More than one '.dtsi' and zero '.dts' file.
+        # 3. More than one '.dts' and zero or more than one '.dtsi' file.
+        pattern_dtso = re.compile(r'[.]+dtso\b')
         pattern_dtsi = re.compile(r'[.]+dtsi\b')
-        dts_count = len([*re.finditer(pattern_dts, d.getVar('SRC_URI'))])
+        pattern_dts = re.compile(r'[.]+dts\b')
+        dtso_count = len([*re.finditer(pattern_dtso, d.getVar("SRC_URI"))])
         dtsi_count = len([*re.finditer(pattern_dtsi, d.getVar("SRC_URI"))])
+        dts_count = len([*re.finditer(pattern_dts, d.getVar('SRC_URI'))])
 
-        if dtsi_count > 1 and dts_count == 0:
+        if dtso_count > 1:
+            raise bb.parse.SkipRecipe("Recipe has more than one '.dtso' found, this is an unsupported use case")
+        elif dtsi_count > 1 and dts_count == 0:
             raise bb.parse.SkipRecipe("Recipe has more than one '.dtsi' and zero '.dts' found, this is an unsupported use case")
         elif dts_count > 1:
             raise bb.parse.SkipRecipe("Recipe has more than one '.dts' and zero or more than one '.dtsi' found, this is an unsupported use case")
 }
 
-# Function to search for dt firmware-name property in dts or dtsi file.
+# Function to search for dt firmware-name property in dtso, dtsi or dts file.
+# Priority order: .dtso > .dtsi > .dts
 python find_firmware_file() {
     import glob
     pattern_fw = 'firmware-name'
-    search_count = 0
+    files_with_firmware_name = []
+
     for dt_files in glob.iglob((d.getVar('S') + '/' + (d.getVar('DTSI_PATH')) + '/*.dts*'),recursive=True):
         with open(dt_files, "r") as f:
             current_fd = f.read()
             if pattern_fw in current_fd:
-                search_count += 1
-                if search_count > 1:
-                    bb.error("firmware-name dt property found in more than one dt files! Please fix the dts or dtsi file.")
-                    break
-                else:
-                    d.setVar('FIRMWARE_NAME_DT_FILE', os.path.basename(dt_files))
+                files_with_firmware_name.append(dt_files)
+
+    if len(files_with_firmware_name) > 1:
+        # Multiple files have firmware-name, pick based on priority: .dtso > .dtsi > .dts
+        dtso_files = [f for f in files_with_firmware_name if f.endswith('.dtso')]
+        dtsi_files = [f for f in files_with_firmware_name if f.endswith('.dtsi')]
+        dts_files = [f for f in files_with_firmware_name if f.endswith('.dts') and not f.endswith('.dtsi') and not f.endswith('.dtso')]
+
+        all_files_str = ', '.join([os.path.basename(f) for f in files_with_firmware_name])
+
+        if dtso_files:
+            selected_file = dtso_files[0]
+            bb.debug(2, "firmware-name found in multiple dt files: [%s]. Using .dtso file: %s" % (all_files_str, os.path.basename(selected_file)))
+        elif dtsi_files:
+            selected_file = dtsi_files[0]
+            bb.debug(2, "firmware-name found in multiple dt files: [%s]. Using .dtsi file: %s" % (all_files_str, os.path.basename(selected_file)))
+        elif dts_files:
+            selected_file = dts_files[0]
+            bb.debug(2, "firmware-name found in multiple dt files: [%s]. Using .dts file: %s" % (all_files_str, os.path.basename(selected_file)))
+        else:
+            bb.error("firmware-name dt property found but unable to select file!")
+            return
+
+        d.setVar('FIRMWARE_NAME_DT_FILE', os.path.basename(selected_file))
+    elif len(files_with_firmware_name) == 1:
+        d.setVar('FIRMWARE_NAME_DT_FILE', os.path.basename(files_with_firmware_name[0]))
 }
 
 do_configure[prefuncs] += "find_firmware_file"
@@ -193,7 +221,7 @@ python devicetree_do_compile:append() {
         # In case of dtbo as input, bbclass doesn't know if firmware-name is .bit
         # or .bin format and corresponding file name. Hence we are not doing .bin
         # conversion.
-        if soc_family == 'zynq' or soc_family == 'zynqmp' and glob.glob(d.getVar('S') + '/' +(d.getVar('DTSI_PATH') or '') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE')):
+        if (soc_family == 'zynq' or soc_family == 'zynqmp') and glob.glob(d.getVar('S') + '/' +(d.getVar('DTSI_PATH') or '') + '/' + d.getVar('FIRMWARE_NAME_DT_FILE')):
             pn = d.getVar('PN')
             biffile = pn + '.bif'
             with open(biffile, 'w') as f:
@@ -225,18 +253,23 @@ python devicetree_do_compile:append() {
 python find_user_dts_overlay_file() {
     import glob
     dtbo_count = sum(1 for f in glob.iglob((d.getVar('S') + '/' + d.getVar('DTBO_PATH') + '/*.dtbo'),recursive=True) if os.path.isfile(f))
-    dts_count = sum(1 for f in glob.iglob((d.getVar('S') + '/' + d.getVar('DTSI_PATH') + '/*.dts'),recursive=True) if os.path.isfile(f))
+    dtso_count = sum(1 for f in glob.iglob((d.getVar('S') + '/' + d.getVar('DTSI_PATH') + '/*.dtso'),recursive=True) if os.path.isfile(f))
     dtsi_count = sum(1 for f in glob.iglob((d.getVar('S') + '/' + d.getVar('DTSI_PATH') + '/*.dtsi'),recursive=True) if os.path.isfile(f))
-    # Set USER_DTS_FILE if input file is dts/dtsi in SRC_URI else skip operation.
-    if not dtbo_count and dts_count or dtsi_count:
-        if dtsi_count == 1 and dts_count == 0:
+    dts_count = sum(1 for f in glob.iglob((d.getVar('S') + '/' + d.getVar('DTSI_PATH') + '/*.dts'),recursive=True) if os.path.isfile(f))
+    # Set USER_DTS_FILE if input file is dtso/dtsi/dts in SRC_URI else skip operation.
+    # Priority order: .dtso > .dtsi > .dts
+    if not dtbo_count and (dtso_count or dtsi_count or dts_count):
+        if dtso_count == 1:
+            dts_file = glob.glob(d.getVar('S') + '/' + (d.getVar('DTSI_PATH') or '') + '/*.dtso')[0]
+        elif dtsi_count == 1:
             dts_file = glob.glob(d.getVar('S') + '/' + (d.getVar('DTSI_PATH') or '') + '/*.dtsi')[0]
-        elif dtsi_count >=0 and dts_count == 1:
+        elif dts_count == 1:
             dts_file = glob.glob(d.getVar('S') + '/' + (d.getVar('DTSI_PATH') or '') + '/*.dts')[0]
         else:
             dts_file = ''
 
         d.setVar('USER_DTS_FILE', os.path.splitext(os.path.basename(dts_file))[0])
+        bb.debug(2, "Using USER_DTS_FILE as: %s" % os.path.basename(dts_file))
     elif dtbo_count:
         bb.debug(2, "Firmware recipe input file is dtbo in SRC_URI")
     else:
@@ -246,7 +279,7 @@ python find_user_dts_overlay_file() {
 do_install[prefuncs] += "find_user_dts_overlay_file"
 
 do_install() {
-    install -d ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+    install -d ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/
 
     # Install dtbo
     # In case of dtbo as input, dtbo will be copied from directly from ${S}
@@ -255,15 +288,15 @@ do_install() {
     # If no dtbo file is found add warning message as in some use case if IP
     # doesn't have any driver then user can load pdi/bit/bin file.
     if [ `ls ${S}/*.dtbo | wc -l` -eq 1 ]; then
-        install -Dm 0644 ${S}/*.dtbo ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+        install -Dm 0644 ${S}/*.dtbo ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/
     elif [ `ls ${S}/${DTBO_PATH}/*.dtbo | wc -l` -eq 1 ]; then
-        install -Dm 0644 ${S}/${DTBO_PATH}/*.dtbo ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+        install -Dm 0644 ${S}/${DTBO_PATH}/*.dtbo ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/
     elif [ `ls ${S}/*.dtbo | wc -l` -gt 1 ]; then
         bbfatal "Multiple DTBO found, use the right DTBO in SRC_URI from the following:\n$(basename -a ${S}/*.dtbo)"
     elif [ `ls ${S}/${DTBO_PATH}/*.dtbo | wc -l` -gt 1 ]; then
         bbfatal "Multiple DTBO found, use the right DTBO in SRC_URI from the following:\n$(basename -a ${S}/${DTBO_PATH}/*.dtbo)"
     elif [ -f ${B}/${USER_DTS_FILE}.dtbo ]; then
-        install -Dm 0644 ${B}/${USER_DTS_FILE}.dtbo ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.dtbo
+        install -Dm 0644 ${B}/${USER_DTS_FILE}.dtbo ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/${PN}.dtbo
     else
         bbnote "A dtbo ending '.dtbo' expected but not found in ${S} or ${B}, This means firmware can be loaded without dtbo dependency."
     fi
@@ -284,15 +317,15 @@ do_install() {
         elif [ `ls ${S}/${BIN_PATH}/*.bin | wc -l` -gt 1 ]; then
             bbfatal "Multiple .bin found, use the right .bin in SRC_URI from the following:\n$(basename -a ${S}/${BIN_PATH}/*.bin)"
         elif [ `ls ${S}/*.bit | wc -l` -eq 1 ] && [ ! -f ${B}/${USER_DTS_FILE}.dtbo ]; then
-            install -Dm 0644 ${S}/*.bit ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+            install -Dm 0644 ${S}/*.bit ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/
         elif [ `ls ${S}/${BIT_PATH}/*.bit | wc -l` -eq 1 ] && [ ! -f ${B}/${USER_DTS_FILE}.dtbo ]; then
-            install -Dm 0644 ${S}/${BIT_PATH}/*.bit ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+            install -Dm 0644 ${S}/${BIT_PATH}/*.bit ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/
         elif [ `ls ${S}/*.bin | wc -l` -eq 1 ]; then
-            install -Dm 0644 ${S}/*.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+            install -Dm 0644 ${S}/*.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/
         elif [ `ls ${S}/${BIN_PATH}/*.bin | wc -l` -eq 1 ]; then
-            install -Dm 0644 ${S}/${BIN_PATH}/*.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+            install -Dm 0644 ${S}/${BIN_PATH}/*.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/
         elif [ -f ${B}/${PN}.bin ] && [ -f ${B}/${USER_DTS_FILE}.dtbo ]; then
-            install -Dm 0644 ${B}/${PN}.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.bin
+            install -Dm 0644 ${B}/${PN}.bin ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/${PN}.bin
         else
             bbfatal "A bitstream file with '.bit' or '.bin' expected but not found"
         fi
@@ -307,17 +340,17 @@ do_install() {
     # whether it is static pdi or not, hence change fatal to warn if no PDI is found.
     if [ "${SOC_FAMILY}" != "zynq" ] && [ "${SOC_FAMILY}" != "zynqmp" ]; then
         if [ `ls ${S}/*.pdi | wc -l` -eq 1 ] && [ ! -f ${B}/${USER_DTS_FILE}.dtbo ]; then
-            install -Dm 0644 ${S}/*.pdi ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+            install -Dm 0644 ${S}/*.pdi ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/
         elif [ `ls ${S}/${PDI_PATH}/*.pdi | wc -l` -eq 1 ] && [ ! -f ${B}/${USER_DTS_FILE}.dtbo ]; then
-            install -Dm 0644 ${S}/${PDI_PATH}/*.pdi ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+            install -Dm 0644 ${S}/${PDI_PATH}/*.pdi ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/
         elif [ `ls ${S}/*.pdi | wc -l` -gt 1 ]; then
             bbfatal "Multiple PDI found, use the right PDI in SRC_URI from the following:\n$(basename -a ${S}/*.pdi)"
         elif [ `ls ${S}/${PDI_PATH}/*.pdi | wc -l` -gt 1 ]; then
             bbfatal "Multiple PDI found, use the right PDI in SRC_URI from the following:\n$(basename -a ${S}/${PDI_PATH}/*.pdi)"
         elif [ `ls ${S}/*.pdi | wc -l` -eq 1 ] && [ -f ${B}/${USER_DTS_FILE}.dtbo ]; then
-            install -Dm 0644 ${S}/*.pdi ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.pdi
+            install -Dm 0644 ${S}/*.pdi ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/${PN}.pdi
         elif [ `ls ${S}/${PDI_PATH}/*.pdi | wc -l` -eq 1 ] && [ -f ${B}/${USER_DTS_FILE}.dtbo ]; then
-            install -Dm 0644 ${S}/${PDI_PATH}/*.pdi ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.pdi
+            install -Dm 0644 ${S}/${PDI_PATH}/*.pdi ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/${PN}.pdi
         else
             bbwarn "A PDI file with '.pdi' expected but not found"
         fi
@@ -325,15 +358,15 @@ do_install() {
 
     # Install xclbin
     if ls ${S}/${XCL_PATH}/*.xclbin >/dev/null 2>&1; then
-        install -Dm 0644 ${S}/${XCL_PATH}/*.xclbin ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/${PN}.xclbin
+        install -Dm 0644 ${S}/${XCL_PATH}/*.xclbin ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/${PN}.xclbin
     fi
 
     # Install shell.json or accel.json
     if [ -f ${S}/${JSON_PATH}/shell.json ] || [ -f ${S}/${JSON_PATH}/accel.json ]; then
-        install -Dm 0644 ${S}/${JSON_PATH}/*.json ${D}/${nonarch_base_libdir}/firmware/xilinx/${PN}/
+        install -Dm 0644 ${S}/${JSON_PATH}/*.json ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/
     fi
 }
 
 do_deploy[noexec] = "1"
 
-FILES:${PN} += "${nonarch_base_libdir}/firmware/xilinx/${PN}"
+FILES:${PN} += "${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}"

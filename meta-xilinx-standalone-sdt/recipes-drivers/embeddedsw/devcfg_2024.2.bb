@@ -1,3 +1,8 @@
+SUMMARY = "AMD Zynq-7000 device configuration (DevCfg) driver \
+(baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD Zynq-7000 Device \
+Configuration (DevCfg) controller used for PL programming in the \
+embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "devcfg"

@@ -9,8 +9,8 @@ PV .= "+git"
 S = "${WORKDIR}/git"
 
 BRANCH ?= "xlnx_rel_v2025.1"
-REPO   ?= "git://github.com/xilinx/dp-modules.git;protocol=https"
-SRCREV ?= "5cceb0fdd414b7a453066a57cc693ac8c0532fca"
+REPO   ?= "git://github.com/Xilinx/dp-modules.git;protocol=https"
+SRCREV ?= "709d08e99f6f7fbd558312ae6bcb3762352be877"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"

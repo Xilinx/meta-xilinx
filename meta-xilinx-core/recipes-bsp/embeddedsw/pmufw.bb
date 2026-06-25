@@ -1,3 +1,5 @@
+SUMMARY = "Deploys a pre-built AMD Zynq UltraScale+ MPSoC Platform \
+Management Unit (PMU) firmware ELF as virtual/pmu-firmware."
 DESCRIPTION = "PMU Firmware"
 
 LICENSE = "CLOSED"
@@ -27,10 +29,14 @@ PMU_FIRMWARE_IMAGE_NAME ??= "pmu-firmware-${MACHINE}"
 PMU_FILE ??= "${PMU_FIRMWARE_DEPLOY_DIR}/${PMU_FIRMWARE_IMAGE_NAME}"
 PMU_FILE[vardepsexclude] = "PMU_FIRMWARE_DEPLOY_DIR"
 
+# Manifest copying from multiconfig deploy
+FW_MANIFEST_SRC = "${PMU_FIRMWARE_DEPLOY_DIR}/pmu-firmware"
+FW_MANIFEST_NAME = "pmu-firmware"
+
 do_fetch[depends] += "${PMU_DEPENDS}"
 do_fetch[mcdepends] += "${PMU_MCDEPENDS}"
 
-inherit deploy
+inherit deploy firmware-copy-manifest
 
 do_install() {
     if [ ! -e ${PMU_FILE}.elf ]; then

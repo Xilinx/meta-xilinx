@@ -1,0 +1,43 @@
+From 9ce9061aedd988477c29acf697dd2759c3060279 Mon Sep 17 00:00:00 2001
+From: Parth Gajjar <parth.gajjar@amd.com>
+Date: Tue, 5 Aug 2025 06:37:43 +0000
+Subject: [PATCH] DRI: Add zynqmp-dpsub dri
+
+Add the zynqmp-dpsub dri target
+
+Upstream-Status: Pending
+
+Signed-off-by: Parth Gajjar <parth.gajjar@amd.com>
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ src/gallium/targets/dri/meson.build | 1 +
+ src/gallium/targets/dri/target.c    | 1 +
+ 2 files changed, 2 insertions(+)
+
+Index: mesa-24.0.1/src/gallium/targets/dri/meson.build
+===================================================================
+--- mesa-24.0.1.orig/src/gallium/targets/dri/meson.build
++++ mesa-24.0.1/src/gallium/targets/dri/meson.build
+@@ -101,6 +101,7 @@ foreach d : [[with_gallium_kmsro, [
+                'stm_dri.so',
+                'sun4i-drm_dri.so',
+                'udl_dri.so',
++               'zynqmp-dpsub_dri.so',
+              ]],
+              [with_gallium_radeonsi, 'radeonsi_dri.so'],
+              [with_gallium_nouveau, 'nouveau_dri.so'],
+Index: mesa-24.0.1/src/gallium/targets/dri/target.c
+===================================================================
+--- mesa-24.0.1.orig/src/gallium/targets/dri/target.c
++++ mesa-24.0.1/src/gallium/targets/dri/target.c
+@@ -129,6 +129,7 @@ DEFINE_LOADER_DRM_ENTRYPOINT(sti)
+ DEFINE_LOADER_DRM_ENTRYPOINT(stm)
+ DEFINE_LOADER_DRM_ENTRYPOINT(sun4i_drm)
+ DEFINE_LOADER_DRM_ENTRYPOINT(udl)
++DEFINE_LOADER_DRM_ENTRYPOINT(zynqmp_dpsub)
+ #endif
+ 
+ #if defined(GALLIUM_LIMA)
+-- 
+2.43.0
+

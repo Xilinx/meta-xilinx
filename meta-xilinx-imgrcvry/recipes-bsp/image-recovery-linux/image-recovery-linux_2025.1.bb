@@ -1,4 +1,9 @@
-DESCRIPTION = "Image Recovery"
+SUMMARY = "AMD Xilinx image-recovery Linux helper kernel for \
+boot-image fall-back on supported boards."
+DESCRIPTION = "Slim Linux kernel image used by the AMD Xilinx \
+image-recovery boot path: when the primary boot partition is corrupt, \
+the boot ROM falls back to this image so the system can still come up \
+and re-flash a working primary image."
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
@@ -9,7 +14,7 @@ BRANCH ??= "main"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '']}"
 
 SRC_URI = "${REPO};${BRANCHARG}"
-SRCREV ??= "71b46904f3a4ef5e8402da13a91365756407b1de"
+SRCREV ??= "acbe5b61f6ee2245abfa53f6fc7d08de6a757338"
 
 S = "${WORKDIR}/git"
 

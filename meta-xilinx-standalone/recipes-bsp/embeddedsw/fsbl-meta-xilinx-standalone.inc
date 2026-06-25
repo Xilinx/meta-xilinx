@@ -1,6 +1,7 @@
 # Include the fsbl-fw setting, if it's enabled
 FSBL_INC = "${@bb.utils.contains('BBMULTICONFIG', 'fsbl-fw', 'fsbl-fw-cfg.inc', '', d)}"
 require ${FSBL_INC}
+require fsbl-pmu-conf.inc
 
 def check_fsbl_variables(d):
     # If both are blank, the user MUST pass in the path to the firmware!

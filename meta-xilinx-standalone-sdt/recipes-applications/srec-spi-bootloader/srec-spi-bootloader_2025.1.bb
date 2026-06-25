@@ -1,3 +1,6 @@
+SUMMARY = "SREC over SPI flash secondary bootloader (baremetal)."
+DESCRIPTION = "AMD Xilinx baremetal secondary bootloader that loads an \
+S-Record (SREC) ELF from SPI/QSPI flash."
 inherit esw python3native esw_apps_common
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/srec_spi_bootloader/src/"

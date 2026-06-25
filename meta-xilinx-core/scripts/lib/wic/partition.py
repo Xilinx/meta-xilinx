@@ -188,7 +188,7 @@ class Partition():
                                   kernel_dir, native_sysroot)
         plugin.do_prepare_partition(self, srcparams_dict, creator,
                                     cr_workdir, oe_builddir, bootimg_dir,
-                                    kernel_dir, rootfs_dir, native_sysroot)
+                                    kernel_dir, rootfs_dir, native_sysroot, sector_size=self.sector_size)
         plugin.do_post_partition(self, srcparams_dict, creator,
                                     cr_workdir, oe_builddir, bootimg_dir,
                                     kernel_dir, rootfs_dir, native_sysroot)
@@ -397,14 +397,16 @@ class Partition():
         extraopts = self.mkfs_extraopts
         extraopts += " -S %d" % self.sector_size
 
-        dosfs_cmd = "mkdosfs %s -i %s %s %s -C %s %d" % \
-                    (label_str, self.fsuuid, size_str, extraopts, rootfs,
+        dosfs_cmd = "mkdosfs %s -S %d -i %s %s %s -C %s %d" % \
+                    (label_str, self.sector_size, self.fsuuid, size_str, extraopts, rootfs,
                      rootfs_size)
         logger.info("dosfs_cmd(rootfs): %s" % dosfs_cmd)
         exec_native_cmd(dosfs_cmd, native_sysroot)
 
-        mcopy_cmd = "mcopy -i %s -s %s/* ::/" % (rootfs, rootfs_dir)
-        exec_native_cmd(mcopy_cmd, native_sysroot)
+        if os.listdir(rootfs_dir):
+            mcopy_cmd = "mcopy -i %s -s %s/* ::/" % (rootfs, rootfs_dir)
+            logger.info("mcopy_cmd(rootfs): %s" % mcopy_cmd)
+            exec_native_cmd(mcopy_cmd, native_sysroot)
 
         if self.updated_fstab_path and self.has_fstab and not self.no_fstab_update:
             mcopy_cmd = "mcopy -m -i %s %s ::/etc/fstab" % (rootfs, self.updated_fstab_path)
@@ -499,8 +501,8 @@ class Partition():
         extraopts = self.mkfs_extraopts
         extraopts += " -S %d" % self.sector_size
 
-        dosfs_cmd = "mkdosfs %s -i %s %s %s -C %s %d" % \
-                    (label_str, self.fsuuid, extraopts, size_str, rootfs,
+        dosfs_cmd = "mkdosfs %s -S %d -i %s %s %s -C %s %d" % \
+                    (label_str, self.sector_size, self.fsuuid, extraopts, size_str, rootfs,
                      blocks)
         logger.info("dosfs_cmd(empty): %s" % dosfs_cmd)
         exec_native_cmd(dosfs_cmd, native_sysroot)

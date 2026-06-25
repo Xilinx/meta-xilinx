@@ -1,0 +1,3 @@
+define KFEATURE_DESCRIPTION "Enable RCU stall debug options"
+
+kconf non-hardware rcu-debug.cfg

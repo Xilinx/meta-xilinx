@@ -30,10 +30,14 @@ PLM_IMAGE_NAME ??= "plm-${MACHINE}"
 PLM_FILE ??= "${PLM_DEPLOY_DIR}/${PLM_IMAGE_NAME}"
 PLM_FILE[vardepsexclude] = "PLM_DEPLOY_DIR"
 
+# Manifest copying from multiconfig deploy
+FW_MANIFEST_SRC = "${PLM_DEPLOY_DIR}/plm"
+FW_MANIFEST_NAME = "plm"
+
 do_fetch[depends] += "${PLM_DEPENDS}"
 do_fetch[mcdepends] += "${PLM_MCDEPENDS}"
 
-inherit deploy
+inherit deploy firmware-copy-manifest
 
 do_install() {
     if [ ! -e ${PLM_FILE}.elf ]; then

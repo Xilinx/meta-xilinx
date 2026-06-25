@@ -1,0 +1,94 @@
+reserved-memory:
+  ranges: true
+  "#size-cells": 2
+  "#address-cells": 2
+
+  ddrboot@9800100:
+    label: ddrboot
+    no-map: 1
+    start: 0x9800100
+    size: 0x5FF00
+  vdev0vring0@9860000:
+    label: vdev0vring0
+    start: 0x9860000
+    size: 0x4000
+    no-map: 1
+  vdev0vring1@9864000:
+    label: vdev0vring1
+    start: 0x9864000
+    size: 0x4000
+    no-map: 1
+  vdev0buffer@9868000:
+    label: vdev0buffer
+    size: 0x40000
+    start: 0x9868000
+    no-map: 1
+  rsctbl@9800000:
+    label: rsctbl
+    start: 0x9800000
+    size: 0x100
+    no-map: 1
+
+domains:
+  APU_Linux:
+    compatible: openamp,domain-v1
+    reserved-memory:
+      - vdev0vring0@9860000
+      - vdev0vring1@9864000
+      - vdev0buffer@9868000
+      - ddrboot@9800100
+      - rsctbl@9800000
+
+    domain-to-domain:
+      compatible: openamp,domain-to-domain-v1
+      remoteproc-relation:
+        compatible: openamp,remoteproc-v2
+        relation0:
+          remote: RPU_Zephyr
+          elfload: [ r52_0a_atcm_global, r52_0a_btcm_global, r52_0a_ctcm_global, ddrboot@9800100, rsctbl@9800000 ]
+
+      rpmsg-relation:
+        compatible: openamp,rpmsg-v1
+        relation0:
+          remote: RPU_Zephyr
+          carveouts: [ vdev0vring0@9860000, vdev0vring1@9864000, vdev0buffer@9868000 ]
+          mbox: ipi_1_nobuf_to_ipi_2_nobuf #IPI_BO_BUF1 OpenAMP example app (APU)
+
+  RPU_Zephyr:
+    compatible: openamp,domain-v1
+    chosen:
+      stdout-path: "serial0:115200n8"
+      bootargs: "earlycon=pl011,mmio32,0xf1920000 console=ttyAMA0,115200"
+      zephyr,console: "serial0"
+      zephyr,shell-uart: "serial0"
+    xlnx,ddr-boot: true
+    xlnx,zephyr,mems: [ ddrboot@9800100 ]
+    domain-to-domain:
+      compatible: openamp,domain-to-domain-v1
+      rpmsg-relation:
+        compatible: openamp,rpmsg-v1
+        relation0:
+          host: APU_Linux
+          mbox: ipi_2_nobuf_to_ipi_1_nobuf #IPI_NO_BUF2 OpenAMP example app (RPU)
+          carveouts: [ vdev0vring0@9860000, vdev0vring1@9864000, vdev0buffer@9868000 ]
+    sram:
+      - dev: ddrboot@9800100
+        start: 0x9800100
+        size: 0x5FF00
+      - dev: r52_0a_atcm_global@eba00000
+        label: r52_0a_atcm_global
+        size: 64K
+        spec_name: R52_0A_ATCM_GLOBAL
+        start: '0xeba00000'
+      - dev: r52_0a_btcm_global@eba10000
+        label: r52_0a_btcm_global
+        size: 32K
+        spec_name: R52_0A_BTCM_GLOBAL
+        start: '0xeba10000'
+      - dev: r52_0a_ctcm_global@eba20000
+        label: r52_0a_ctcm_global
+        size: 32K
+        spec_name: R52_0A_CTCM_GLOBAL
+        start: '0xeba20000'
+    reserved-memory:
+        - ddrboot@9800100

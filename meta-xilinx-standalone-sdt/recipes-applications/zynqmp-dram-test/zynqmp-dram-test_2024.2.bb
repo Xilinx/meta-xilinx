@@ -1,3 +1,6 @@
+SUMMARY = "Zynq UltraScale+ MPSoC DRAM test application (baremetal)."
+DESCRIPTION = "AMD Xilinx baremetal application for stressing and \
+validating the DRAM controller on Zynq UltraScale+ MPSoC boards."
 inherit esw python3native esw_apps_common
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/zynqmp_dram_test/src/"

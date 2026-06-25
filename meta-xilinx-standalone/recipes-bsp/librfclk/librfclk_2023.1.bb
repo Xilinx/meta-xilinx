@@ -1,4 +1,7 @@
 SUMMARY = "Linux rfclk library"
+DESCRIPTION = "Linux user-space library for configuring the on-board \
+RF clock generators (LMK/LMX) found on AMD Zynq UltraScale+ RFSoC and \
+Versal RF evaluation boards."
 SECTION = "librfclk"
 
 inherit pkgconfig xlnx-embeddedsw features_check

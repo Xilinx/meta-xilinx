@@ -1,0 +1,6 @@
+# Description: Creates a partitioned SD card image. Boot files
+# are located in the first vfat partition.
+
+part  --source bootimg-partition  --fstype=vfat  --use-label  --label boot  --active  --align 4
+
+bootloader --ptable msdos

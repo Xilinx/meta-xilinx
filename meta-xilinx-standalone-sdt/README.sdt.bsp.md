@@ -16,7 +16,7 @@ Be sure to read everything below.
 > * meta-xilinx-standalone-sdt layer depends on meta-openamp layer make sure
 >   meta-openamp is cloned and add using `bitbake-layers` command.
 
-> **Note:** SDT builds for following devices are not supported in 2025.1 release.
+> **Note:** SDT builds for following devices are not supported in 2026.1 release.
 >  * MicroBlaze
 
 1. Follow [Building Instructions](../README.building.md) upto step 6.

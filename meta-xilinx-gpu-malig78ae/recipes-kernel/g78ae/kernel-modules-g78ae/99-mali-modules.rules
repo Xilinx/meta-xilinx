@@ -15,4 +15,5 @@ ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_kutf_clk_rate_trace_test_portal"
 ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_kutf_irq_test", MODE="0660", GROUP="video", TAG+="uaccess"
 ACTION=="add", SUBSYSTEM=="misc", KERNEL=="mali_kutf_mgm_integration_test", MODE="0660", GROUP="video", TAG+="uaccess"
 
-ACTION=="add", SUBSYSTEM=="misc", MODE="0660", GROUP="video", TAG+="uaccess", RUN+="/usr/bin/load-mali-modules.sh"
+# Trigger module loading script once when memory_group_manager appears
+ACTION=="add", SUBSYSTEM=="platform", KERNEL=="axi:physical-memory-group-manager", MODE="0660", GROUP="video", TAG+="uaccess", RUN+="/usr/bin/load-mali-modules.sh"

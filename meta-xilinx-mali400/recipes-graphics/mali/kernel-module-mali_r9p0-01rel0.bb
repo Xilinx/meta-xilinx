@@ -1,4 +1,6 @@
 SUMMARY = "A Mali 400 Linux Kernel module"
+DESCRIPTION = "Out-of-tree Linux kernel module for the Arm Mali-400 \
+GPU as found on Zynq UltraScale+ MPSoC EG/EV variants."
 SECTION = "kernel/modules"
 
 LICENSE = "GPL-2.0-only"
@@ -34,7 +36,9 @@ SRC_URI = " \
 	file://0027-Updated-clock-name-and-structure-to-match-LIMA-drive.patch \
 	file://0028-Replace-vma-vm_flags-direct-modifications-with-modif.patch \
 	file://0029-Fixed-buildpath-QA-warning.patch \
-    file://0030-Update-driver-to-make-it-compatible-with-6.12-kernel.patch \
+	file://0030-Update-driver-to-make-it-compatible-with-6.12-kernel.patch \
+	file://0031-make-module-compatible-with-6.18-kernel-version.patch \
+	file://0032-Fix-GPU-subsystem-reboot-failure-with-6.18-kernel.patch \
 	"
 SRC_URI[md5sum] = "85ea110dd6675c70b7d01af87ec9633c"
 SRC_URI[sha256sum] = "7a67127341d17640c1fff5dad80258fb2a37c8a2121b81525fe2327e4532ce2b"

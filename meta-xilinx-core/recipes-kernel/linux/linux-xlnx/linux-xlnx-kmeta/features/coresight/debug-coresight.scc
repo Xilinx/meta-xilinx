@@ -1,0 +1,3 @@
+define KFEATURE_DESCRIPTION "Enable CoreSight debug options"
+
+kconf hardware debug-coresight.cfg

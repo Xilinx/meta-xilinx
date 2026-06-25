@@ -1,0 +1,3 @@
+define KFEATURE_DESCRIPTION "Enable DWARF5 debug information"
+
+kconf non-hardware debug-info-dwarf5.cfg

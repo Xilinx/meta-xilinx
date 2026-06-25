@@ -1,0 +1,41 @@
+From 533e801b20bd20ea8b5b7e05fd3765e6d5c9e033 Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Thu, 28 Aug 2025 20:14:47 +0200
+Subject: [PATCH 34/41] hw/x86: xenpvh: Enable virtio-msg
+
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Acked-by: Stefano Stabellini <stefano.stabellini@amd.com>
+---
+ hw/i386/Kconfig       | 1 +
+ hw/i386/xen/xen-pvh.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+index 55850791df..a8721ef975 100644
+--- a/hw/i386/Kconfig
++++ b/hw/i386/Kconfig
+@@ -46,6 +46,7 @@ config PC
+     select VIRTIO_PMEM_SUPPORTED
+     select VIRTIO_MEM_SUPPORTED
+     select HV_BALLOON_SUPPORTED
++    select VIRTIO_MSG
+ 
+ config PC_PCI
+     bool
+diff --git a/hw/i386/xen/xen-pvh.c b/hw/i386/xen/xen-pvh.c
+index 3ca75bd7c4..c568e2921a 100644
+--- a/hw/i386/xen/xen-pvh.c
++++ b/hw/i386/xen/xen-pvh.c
+@@ -105,6 +105,7 @@ static void xen_pvh_machine_class_init(ObjectClass *oc, void *data)
+ 
+     /* List of supported features known to work on PVH x86.  */
+     xpc->has_pci = true;
++    xpc->has_virtio_msg = true;
+ 
+     xen_pvh_class_setup_common_props(xpc);
+ }
+-- 
+2.34.1
+

@@ -1,0 +1,111 @@
+From ef0f55d62d15c5b8d74f951aa02ba80bc12e4ccd Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Tue, 26 Aug 2025 21:20:23 +0200
+Subject: [PATCH 33/41] hw/arm: xenpvh: Enable virtio-msg
+
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Acked-by: Stefano Stabellini <stefano.stabellini@amd.com>
+---
+ hw/arm/Kconfig                  |  1 +
+ hw/arm/xen-pvh.c                |  1 +
+ hw/xen/xen-pvh-common.c         | 17 +++++++++++++++++
+ include/hw/xen/xen-pvh-common.h |  8 ++++++++
+ 4 files changed, 27 insertions(+)
+
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index 3ada335a24..2caf64a696 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -23,6 +23,7 @@ config ARM_VIRT
+     select PLATFORM_BUS
+     select SMBIOS
+     select VIRTIO_MMIO
++    select VIRTIO_MSG
+     select ACPI_PCI
+     select MEM_DEVICE
+     select DIMM
+diff --git a/hw/arm/xen-pvh.c b/hw/arm/xen-pvh.c
+index 33f0dd5982..6a9bd9ccd2 100644
+--- a/hw/arm/xen-pvh.c
++++ b/hw/arm/xen-pvh.c
+@@ -86,6 +86,7 @@ static void xen_arm_machine_class_init(ObjectClass *oc, void *data)
+     xpc->has_pci = true;
+     xpc->has_tpm = true;
+     xpc->has_virtio_mmio = true;
++    xpc->has_virtio_msg = true;
+ 
+     xen_pvh_class_setup_common_props(xpc);
+ }
+diff --git a/hw/xen/xen-pvh-common.c b/hw/xen/xen-pvh-common.c
+index d9e79b5d0a..fe6b15f796 100644
+--- a/hw/xen/xen-pvh-common.c
++++ b/hw/xen/xen-pvh-common.c
+@@ -70,6 +70,19 @@ static void xen_set_irq(void *opaque, int irq, int level)
+     }
+ }
+ 
++static void xen_create_virtio_msg_devices(XenPVHMachineState *s)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(s->virtio_msg.backends); i++) {
++        object_initialize_child(OBJECT(s), "backend[*]",
++                                &s->virtio_msg.backends[i], TYPE_VIRTIO_MSG);
++
++        sysbus_realize(SYS_BUS_DEVICE(&s->virtio_msg.backends[i]),
++                       &error_fatal);
++    }
++}
++
+ static void xen_create_virtio_mmio_devices(XenPVHMachineState *s)
+ {
+     int i;
+@@ -201,6 +214,10 @@ static void xen_pvh_init(MachineState *ms)
+         xen_create_virtio_mmio_devices(s);
+     }
+ 
++    if (xpc->has_virtio_msg) {
++        xen_create_virtio_msg_devices(s);
++    }
++
+ #ifdef CONFIG_TPM
+     if (xpc->has_tpm) {
+         if (s->cfg.tpm.base) {
+diff --git a/include/hw/xen/xen-pvh-common.h b/include/hw/xen/xen-pvh-common.h
+index 5cdd23c2f4..ee50c0ecc2 100644
+--- a/include/hw/xen/xen-pvh-common.h
++++ b/include/hw/xen/xen-pvh-common.h
+@@ -15,6 +15,8 @@
+ #include "hw/xen/xen-hvm-common.h"
+ #include "hw/pci-host/gpex.h"
+ 
++#include "hw/virtio/virtio-msg.h"
++
+ #define TYPE_XEN_PVH_MACHINE MACHINE_TYPE_NAME("xen-pvh-base")
+ OBJECT_DECLARE_TYPE(XenPVHMachineState, XenPVHMachineClass,
+                     XEN_PVH_MACHINE)
+@@ -53,6 +55,7 @@ struct XenPVHMachineClass {
+     bool has_pci;
+     bool has_tpm;
+     bool has_virtio_mmio;
++    bool has_virtio_msg;
+ };
+ 
+ struct XenPVHMachineState {
+@@ -72,6 +75,11 @@ struct XenPVHMachineState {
+         MemoryRegion mmio_high_alias;
+     } pci;
+ 
++    struct {
++        BusState bus;
++        VirtIOMSGProxy backends[16];
++    } virtio_msg;
++
+     struct {
+         MemMapEntry ram_low, ram_high;
+         MemMapEntry tpm;
+-- 
+2.34.1
+

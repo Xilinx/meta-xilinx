@@ -1,3 +1,5 @@
+SUMMARY = "Arm Mali-400 user-space GLES driver libraries for Zynq \
+UltraScale+ MPSoC (EG/EV variants)."
 DESCRIPTION = "libGLES for ZynqMP with Mali 400"
 
 LICENSE = "Proprietary"

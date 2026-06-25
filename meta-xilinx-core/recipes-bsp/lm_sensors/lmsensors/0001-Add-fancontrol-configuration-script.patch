@@ -1,0 +1,30 @@
+From abb896fba51027c99ae6bf6363aa0ebc8a909478 Mon Sep 17 00:00:00 2001
+From: Jesus De Haro <jesus.de-haro@amd.com>
+Date: Fri, 19 Dec 2025 10:54:48 -0800
+Subject: [PATCH] Add fancontrol configuration script
+
+ Enable service to execute fancontrol_config.sh so it may search for and use
+ custom fancontrol configurations when present.
+
+Upstream-Status: Inappropriate [This change is specific to xilinx]
+
+Signed-off-by: Jesus De Haro <jesus.de-haro@amd.com>
+---
+ prog/init/fancontrol.service | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/prog/init/fancontrol.service b/prog/init/fancontrol.service
+index 6d019c90..5799c1d0 100644
+--- a/prog/init/fancontrol.service
++++ b/prog/init/fancontrol.service
+@@ -8,6 +8,7 @@ Type=simple
+ Restart=on-failure
+ RestartSec=5s
+ PIDFile=/run/fancontrol.pid
++ExecStartPre=/usr/sbin/fancontrol_config.sh
+ ExecStart=/usr/sbin/fancontrol
+ 
+ [Install]
+-- 
+2.34.1
+

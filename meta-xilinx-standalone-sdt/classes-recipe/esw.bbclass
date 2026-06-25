@@ -1,5 +1,11 @@
 inherit check_sdt_enabled python3native xlnx-embeddedsw pkgconfig cmake
 
+# Poky always tries to enable EXPORT_COMPILE_COMMANDS, but ESW changes
+# behavior when this is enabled and will generate:
+#    -isystem /usr/include
+# which will cause a build failures.
+OECMAKE_ARGS:remove = "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON"
+
 SRCREV_FORMAT = "src_decouple"
 
 OECMAKE_SOURCEPATH = "${S}/${ESW_COMPONENT_SRC}"

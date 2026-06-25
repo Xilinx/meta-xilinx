@@ -1,6 +1,6 @@
 SUMMARY = "Systemd system container for ${SYSTEMD_CONTAINER_APP}"
-DESCRIPTION = "A small systemd system container which will run \
-                ${SYSTEMD_CONTAINER_APP}."
+DESCRIPTION = "Base layer for AMD Xilinx OCI/Docker container images \
+that use systemd as PID 1 inside the container."
 
 SYSTEMD_CONTAINER_APP ?= ""
 

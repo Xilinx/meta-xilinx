@@ -1,0 +1,1514 @@
+From 6690707b91a4581afea34f2b6827ec903c1a56f5 Mon Sep 17 00:00:00 2001
+From: Neel Gandhi <neel.gandhi@amd.com>
+Date: Sat, 10 Jan 2026 17:50:39 +0530
+Subject: [PATCH 7/7] modetest: Add pattern support for xilinx tiled formats in
+ modetest
+
+In modetest, implemented support of SMPTE and tiles patterns
+generation for xilinx tile formats of YUV400, YUV420, YUV422
+& YUV444 formats with 8/10/12 bpc
+
+Upstream-Status: Inappropriate [Xilinx specific]
+Signed-off-by: Neel Gandhi <neel.gandhi@amd.com>
+---
+ tests/modetest/buffers.c |  142 ++++-
+ tests/util/format.c      |   24 +
+ tests/util/pattern.c     | 1133 +++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 1283 insertions(+), 16 deletions(-)
+
+diff --git a/tests/modetest/buffers.c b/tests/modetest/buffers.c
+index b642e8cd..f4716ba3 100644
+--- a/tests/modetest/buffers.c
++++ b/tests/modetest/buffers.c
+@@ -38,6 +38,7 @@
+ #include "libdrm_macros.h"
+ #include "xf86drm.h"
+ #include "xf86drmMode.h"
++#include "util_math.h"
+ 
+ #include "buffers.h"
+ 
+@@ -146,12 +147,28 @@ bo_create(int fd, unsigned int format,
+ 	case DRM_FORMAT_YUV420:
+ 	case DRM_FORMAT_YVU420:
+ 	case DRM_FORMAT_YUV444:
++	case DRM_FORMAT_T5M8:
++	case DRM_FORMAT_T6M8:
++	case DRM_FORMAT_T508:
++	case DRM_FORMAT_T608:
++	case DRM_FORMAT_T528:
++	case DRM_FORMAT_T628:
++	case DRM_FORMAT_T548:
++	case DRM_FORMAT_T648:
+ 		bpp = 8;
+ 		break;
+ 
+ 	case DRM_FORMAT_NV15:
+ 	case DRM_FORMAT_NV20:
+ 	case DRM_FORMAT_NV30:
++	case DRM_FORMAT_T5MA:
++	case DRM_FORMAT_T6MA:
++	case DRM_FORMAT_T50A:
++	case DRM_FORMAT_T60A:
++	case DRM_FORMAT_T52A:
++	case DRM_FORMAT_T62A:
++	case DRM_FORMAT_T54A:
++	case DRM_FORMAT_T64A:
+ 		bpp = 10;
+ 		break;
+ 
+@@ -161,6 +178,17 @@ bo_create(int fd, unsigned int format,
+ 		bpp = 10;
+ 		break;
+ 
++	case DRM_FORMAT_T5MC:
++	case DRM_FORMAT_T6MC:
++	case DRM_FORMAT_T50C:
++	case DRM_FORMAT_T60C:
++	case DRM_FORMAT_T52C:
++	case DRM_FORMAT_T62C:
++	case DRM_FORMAT_T54C:
++	case DRM_FORMAT_T64C:
++		bpp = 12;
++		break;
++
+ 	case DRM_FORMAT_S410:
+ 	case DRM_FORMAT_S412:
+ 	case DRM_FORMAT_P210:
+@@ -241,6 +269,34 @@ bo_create(int fd, unsigned int format,
+ 	}
+ 
+ 	switch (format) {
++	case DRM_FORMAT_T5M8:
++	case DRM_FORMAT_T5MA:
++	case DRM_FORMAT_T5MC:
++		virtual_width = ALIGN(width, 32);
++		virtual_height = height;
++		break;
++
++	case DRM_FORMAT_T6M8:
++	case DRM_FORMAT_T6MA:
++	case DRM_FORMAT_T6MC:
++		virtual_width = ALIGN(width, 64);
++		virtual_height = height;
++		break;
++
++	case DRM_FORMAT_T508:
++	case DRM_FORMAT_T50A:
++	case DRM_FORMAT_T50C:
++		virtual_width = ALIGN(width, 32);
++		virtual_height = height * 3 / 2;
++		break;
++
++	case DRM_FORMAT_T608:
++	case DRM_FORMAT_T60A:
++	case DRM_FORMAT_T60C:
++		virtual_width = ALIGN(width, 64);
++		virtual_height = height * 3 / 2;
++		break;
++
+ 	case DRM_FORMAT_NV12:
+ 	case DRM_FORMAT_NV21:
+ 	case DRM_FORMAT_NV15:
+@@ -255,14 +311,18 @@ bo_create(int fd, unsigned int format,
+ 		virtual_height = height * 3 / 2;
+ 		break;
+ 
+-	case DRM_FORMAT_XV20:
+-		virtual_width = (width * 32) / 30;
++	case DRM_FORMAT_T528:
++	case DRM_FORMAT_T52A:
++	case DRM_FORMAT_T52C:
++		virtual_width = ALIGN(width, 32);
+ 		virtual_height = height * 2;
+ 		break;
+ 
+-	case DRM_FORMAT_X403:
+-		virtual_width = (width * 32) / 30;
+-		virtual_height = height * 3;
++	case DRM_FORMAT_T628:
++	case DRM_FORMAT_T62A:
++	case DRM_FORMAT_T62C:
++		virtual_width = ALIGN(width, 64);
++		virtual_height = height * 2;
+ 		break;
+ 
+ 	case DRM_FORMAT_NV16:
+@@ -275,6 +335,11 @@ bo_create(int fd, unsigned int format,
+ 		virtual_height = height * 2;
+ 		break;
+ 
++	case DRM_FORMAT_XV20:
++		virtual_width = (width * 32) / 30;
++		virtual_height = height * 2;
++		break;
++
+ 	case DRM_FORMAT_YUV444:
+ 	case DRM_FORMAT_S410:
+ 	case DRM_FORMAT_S412:
+@@ -282,6 +347,20 @@ bo_create(int fd, unsigned int format,
+ 		virtual_height = height * 3;
+ 		break;
+ 
++	case DRM_FORMAT_T548:
++	case DRM_FORMAT_T54A:
++	case DRM_FORMAT_T54C:
++		virtual_width = ALIGN(width, 32);
++		virtual_height = height * 3;
++		break;
++
++	case DRM_FORMAT_T648:
++	case DRM_FORMAT_T64A:
++	case DRM_FORMAT_T64C:
++		virtual_width = ALIGN(width, 64);
++		virtual_height = height * 3;
++		break;
++
+ 	case DRM_FORMAT_NV24:
+ 	case DRM_FORMAT_NV42:
+ 	case DRM_FORMAT_NV30:
+@@ -289,6 +368,11 @@ bo_create(int fd, unsigned int format,
+ 		virtual_height = height * 3;
+ 		break;
+ 
++	case DRM_FORMAT_X403:
++		virtual_width = (width * 32) / 30;
++		virtual_height = height * 3;
++		break;
++
+ 	default:
+ 		virtual_width = width;
+ 		virtual_height = height;
+@@ -323,9 +407,20 @@ bo_create(int fd, unsigned int format,
+ 	case DRM_FORMAT_Y12:
+ #endif
+ 	case DRM_FORMAT_R12:
++	case DRM_FORMAT_T5M8:
++	case DRM_FORMAT_T5MA:
++	case DRM_FORMAT_T5MC:
++	case DRM_FORMAT_T6M8:
++	case DRM_FORMAT_T6MA:
++	case DRM_FORMAT_T6MC:
+ 		offsets[0] = 0;
+ 		handles[0] = bo->handle;
+-		pitches[0] = bo->pitch;
++		if (format == DRM_FORMAT_T5M8 || format == DRM_FORMAT_T5MA || format == DRM_FORMAT_T5MC)
++			pitches[0] = ALIGN(width, 32) * bpp / 8;
++		else if (format == DRM_FORMAT_T6M8 || format == DRM_FORMAT_T6MA || format == DRM_FORMAT_T6MC)
++			pitches[0] = ALIGN(width, 64) * bpp / 8;
++		else
++			pitches[0] = bo->pitch;
+ 
+ 		planes[0] = virtual;
+ 		break;
+@@ -341,9 +436,28 @@ bo_create(int fd, unsigned int format,
+ 	case DRM_FORMAT_P210:
+ 	case DRM_FORMAT_P010:
+ 	case DRM_FORMAT_P012:
++	case DRM_FORMAT_T508:
++	case DRM_FORMAT_T50A:
++	case DRM_FORMAT_T50C:
++	case DRM_FORMAT_T608:
++	case DRM_FORMAT_T60A:
++	case DRM_FORMAT_T60C:
++	case DRM_FORMAT_T528:
++	case DRM_FORMAT_T52A:
++	case DRM_FORMAT_T52C:
++	case DRM_FORMAT_T628:
++	case DRM_FORMAT_T62A:
++	case DRM_FORMAT_T62C:
+ 		offsets[0] = 0;
+ 		handles[0] = bo->handle;
+-		pitches[0] = bo->pitch;
++		if (format == DRM_FORMAT_T508 || format == DRM_FORMAT_T50A || format == DRM_FORMAT_T50C ||
++			format == DRM_FORMAT_T528 || format == DRM_FORMAT_T52A || format == DRM_FORMAT_T52C)
++			pitches[0] = ALIGN(width, 32) * bpp / 8;
++		else if (format == DRM_FORMAT_T608 || format == DRM_FORMAT_T60A || format == DRM_FORMAT_T60C ||
++			 format == DRM_FORMAT_T628 || format == DRM_FORMAT_T62A || format == DRM_FORMAT_T62C)
++			pitches[0] = ALIGN(width, 64) * bpp / 8;
++		else
++			pitches[0] = bo->pitch;
+ 		pitches[1] = pitches[0];
+ 		offsets[1] = pitches[0] * height;
+ 		handles[1] = bo->handle;
+@@ -370,9 +484,20 @@ bo_create(int fd, unsigned int format,
+ 	case DRM_FORMAT_YUV444:
+ 	case DRM_FORMAT_S410:
+ 	case DRM_FORMAT_S412:
++	case DRM_FORMAT_T548:
++	case DRM_FORMAT_T648:
++	case DRM_FORMAT_T54A:
++	case DRM_FORMAT_T64A:
++	case DRM_FORMAT_T54C:
++	case DRM_FORMAT_T64C:
+ 		offsets[0] = 0;
+ 		handles[0] = bo->handle;
+-		pitches[0] = bo->pitch;
++		if (format == DRM_FORMAT_T548 || format == DRM_FORMAT_T54A || format == DRM_FORMAT_T54C)
++			pitches[0] = ALIGN(width, 32) * bpp / 8;
++		else if (format == DRM_FORMAT_T648 || format == DRM_FORMAT_T64A || format == DRM_FORMAT_T64C)
++			pitches[0] = ALIGN(width, 64) * bpp / 8;
++		else
++			pitches[0] = bo->pitch;
+ 		pitches[1] = pitches[0];
+ 		offsets[1] = pitches[0] * height;
+ 		handles[1] = bo->handle;
+@@ -380,7 +505,6 @@ bo_create(int fd, unsigned int format,
+ 		offsets[2] = offsets[1] + pitches[1] * height;
+ 		handles[2] = bo->handle;
+ 
+-
+ 		planes[0] = virtual;
+ 		planes[1] = virtual + offsets[1];
+ 		planes[2] = virtual + offsets[2];
+diff --git a/tests/util/format.c b/tests/util/format.c
+index 39cdf2ee..69798a70 100644
+--- a/tests/util/format.c
++++ b/tests/util/format.c
+@@ -64,6 +64,18 @@ static const struct util_format_info format_info[] = {
+ 	{ DRM_FORMAT_P210, "P210", MAKE_YUV_INFO(YUV_YCbCr, 2, 1, 2) },
+ 	{ DRM_FORMAT_P010, "P010", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
+ 	{ DRM_FORMAT_P012, "P012", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
++	{ DRM_FORMAT_T508, "T508", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
++	{ DRM_FORMAT_T608, "T608", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
++	{ DRM_FORMAT_T50A, "T50A", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
++	{ DRM_FORMAT_T60A, "T60A", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
++	{ DRM_FORMAT_T50C, "T50C", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
++	{ DRM_FORMAT_T60C, "T60C", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
++	{ DRM_FORMAT_T528, "T528", MAKE_YUV_INFO(YUV_YCbCr, 2, 1, 2) },
++	{ DRM_FORMAT_T628, "T628", MAKE_YUV_INFO(YUV_YCbCr, 2, 1, 2) },
++	{ DRM_FORMAT_T52A, "T52A", MAKE_YUV_INFO(YUV_YCbCr, 2, 1, 2) },
++	{ DRM_FORMAT_T62A, "T62A", MAKE_YUV_INFO(YUV_YCbCr, 2, 1, 2) },
++	{ DRM_FORMAT_T52C, "T52C", MAKE_YUV_INFO(YUV_YCbCr, 2, 1, 2) },
++	{ DRM_FORMAT_T62C, "T62C", MAKE_YUV_INFO(YUV_YCbCr, 2, 1, 2) },
+ 	/* YUV planar */
+ 	{ DRM_FORMAT_YUV420, "YU12", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 1) },
+ 	{ DRM_FORMAT_YVU420, "YV12", MAKE_YUV_INFO(YUV_YCrCb, 2, 2, 1) },
+@@ -72,6 +84,18 @@ static const struct util_format_info format_info[] = {
+ 	{ DRM_FORMAT_X403, "X403", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
+ 	{ DRM_FORMAT_S410, "S410", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
+ 	{ DRM_FORMAT_S412, "S412", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_T5M8, "T5M8", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_T6M8, "T6M8", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_T5MA, "T5MA", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_T6MA, "T6MA", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_T5MC, "T5MC", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_T6MC, "T6MC", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_T548, "T548", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_T648, "T648", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_T54A, "T54A", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_T64A, "T64A", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_T54C, "T54C", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_T64C, "T64C", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
+ #ifdef DRM_FORMAT_Y10
+ 	{ DRM_FORMAT_Y10, "Y10 ", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
+ #endif
+diff --git a/tests/util/pattern.c b/tests/util/pattern.c
+index e9da2e06..2718869f 100644
+--- a/tests/util/pattern.c
++++ b/tests/util/pattern.c
+@@ -289,6 +289,46 @@ static void fill_smpte_yuv_planar(const struct util_yuv_info *yuv,
+ 	}
+ }
+ 
++/*
++ * Helper function to determine SMPTE color index based on pixel position
++ *
++ * SMPTE color bar pattern has 3 vertical sections:
++ *   - Top section (0-6/9 height): 7 vertical color bars
++ *   - Middle section (6/9-7/9 height): 7 vertical bars with alternating pattern
++ *   - Bottom section (7/9-9/9 height): Complex pattern with 3 horizontal regions
++ *     * Left region (0-5/7 width): 4 colors
++ *     * Middle region (5/7-6/7 width): 3 colors
++ *     * Right region (6/7-7/7 width): 1 color
++ */
++static inline unsigned int get_smpte_color_index(unsigned int x, unsigned int y,
++						 unsigned int width, unsigned int height)
++{
++	/* Determine which vertical section this pixel belongs to */
++	if (y < height * 6 / 9) {
++		/* Top section: 7 equal vertical bars (colors 0-6) */
++		return (x * 7) / width;
++	} else if (y < height * 7 / 9) {
++		/* Middle section: 7 equal vertical bars (colors 7-13) */
++		return 7 + (x * 7) / width;
++	} else {
++		/* Bottom section: Complex 3-region pattern (colors 14-21) */
++		unsigned int width_5_7 = width * 5 / 7;
++		unsigned int width_6_7 = width * 6 / 7;
++
++		if (x < width_5_7) {
++			/* Left region: 4 colors (indices 14-17) */
++			return 14 + (x * 4) / width_5_7;
++		} else if (x < width_6_7) {
++			/* Middle region: 3 colors (indices 18-20) */
++			unsigned int width_1_7 = width / 7;
++			return 18 + ((x - width_5_7) * 3) / width_1_7;
++		} else {
++			/* Right region: Single color (index 21) */
++			return 21;
++		}
++	}
++}
++
+ static void write_pixels_10bpp(unsigned char *mem,
+ 			       unsigned short a,
+ 			       unsigned short b,
+@@ -302,6 +342,545 @@ static void write_pixels_10bpp(unsigned char *mem,
+ 	  mem[4] = ((d >> 2) & 0xff);
+ }
+ 
++static void write_pixels_12bpp(unsigned char *mem,
++			       unsigned short a,
++			       unsigned short b)
++{
++	  mem[0] = (a & 0xff);
++	  mem[1] = ((a >> 8) & 0xf) | ((b & 0xf) << 4);
++	  mem[2] = ((b >> 4) & 0xff);
++}
++
++/*
++ * SMPTE tiled format generator for 8/10/12-bit YUV formats
++ *
++ * This function generates SMPTE color bars directly in tiled format.
++ * Tiled format organizes pixels into 32x4/64x4 blocks, with multiple blocks per frame.
++ *
++ * Tile structure:
++ *   - Each tile is 32/64 pixels wide (determined by format)
++ *   - Each tile is having 4 pixels height
++ *   - Each tile contains pixel data stored in packed format (8/10/12 bits per channel)
++ *   - Tiles are arranged row by row
++ *
++ * Supports YUV444 (4:4:4), YUV422 (4:2:2), and YUV420 (4:2:0) formats
++ */
++static void fill_smpte_tiled_yuv(const struct util_yuv_info *yuv,
++				  unsigned char *y_mem, unsigned char *u_mem,
++				  unsigned char *v_mem, unsigned int width,
++				  unsigned int height, unsigned int stride,
++				  uint32_t format)
++{
++	/* SMPTE color bar colors in YUV format */
++	static const struct color_yuv colors_all[] = {
++		/* Top section: 7 color bars (white, yellow, cyan, green, magenta, red, blue) */
++		MAKE_YUV_601(192, 192, 192),  /* 0: White */
++		MAKE_YUV_601(192, 192, 0),    /* 1: Yellow */
++		MAKE_YUV_601(0, 192, 192),    /* 2: Cyan */
++		MAKE_YUV_601(0, 192, 0),      /* 3: Green */
++		MAKE_YUV_601(192, 0, 192),    /* 4: Magenta */
++		MAKE_YUV_601(192, 0, 0),      /* 5: Red */
++		MAKE_YUV_601(0, 0, 192),      /* 6: Blue */
++		/* Middle section: 7 bars with alternating pattern */
++		MAKE_YUV_601(0, 0, 192),      /* 7: Blue */
++		MAKE_YUV_601(19, 19, 19),     /* 8: Black */
++		MAKE_YUV_601(192, 0, 192),    /* 9: Magenta */
++		MAKE_YUV_601(19, 19, 19),     /* 10: Black */
++		MAKE_YUV_601(0, 192, 192),    /* 11: Cyan */
++		MAKE_YUV_601(19, 19, 19),     /* 12: Black */
++		MAKE_YUV_601(192, 192, 192),  /* 13: White */
++		/* Bottom section: Test signal colors */
++		MAKE_YUV_601(0, 33, 76),      /* 14: I signal */
++		MAKE_YUV_601(255, 255, 255),  /* 15: White */
++		MAKE_YUV_601(50, 0, 106),     /* 16: Q signal */
++		MAKE_YUV_601(19, 19, 19),     /* 17: Black */
++		MAKE_YUV_601(9, 9, 9),        /* 18: -4 IRE */
++		MAKE_YUV_601(19, 19, 19),     /* 19: 0 IRE (Black) */
++		MAKE_YUV_601(29, 29, 29),     /* 20: +4 IRE */
++		MAKE_YUV_601(19, 19, 19),     /* 21: 0 IRE (Black) */
++	};
++
++	/* Get chroma subsampling factors (1 for 444, 2 for horizontal/vertical subsampling) */
++	const unsigned int xsub = yuv->xsub;  /* Horizontal chroma subsampling */
++	const unsigned int ysub = yuv->ysub;  /* Vertical chroma subsampling */
++
++	/* Bit depth configuration default to 8-bit */
++	unsigned char bitdepth = 8;
++
++	/* Will be set to 10, or 12 based on format */
++	if (((format >> 24) & 0xFF) == 'A') {
++		bitdepth = 10;
++	} else if (((format >> 24) & 0xFF) == 'C') {
++		bitdepth = 12;
++	}
++
++	/* Calculate bytes per 4 pixels based on bit depth (packed formats) */
++	/* 8-bit: 4 pixels = 4 bytes, 10-bit: 4 pixels = 5 bytes, 12-bit: 4 pixels = 6 bytes */
++	unsigned int bytes_per_4px = (bitdepth == 8) ? 4 : (bitdepth == 10) ? 5 : 6;
++
++	/* Tile configuration */
++	const unsigned int tile_width = ((format >> 8) & 0xFF) == '5' ? 32 : 64;	/* Width of each tile in pixels */
++	const unsigned int blocks_per_tile = tile_width / 4;     /* Number of 4x4 blocks per tile */
++
++	/* Calculate tile dimensions */
++	const unsigned int num_tiles_h_y = height / 4;           /* Number of 4-pixel-high tile rows for Y */
++	const unsigned int num_tiles_h_c = (height / ysub) / 4;  /* Number of tile rows for chroma */
++	const unsigned int full_tiles_w = width / tile_width;    /* Number of complete tiles per row */
++	const unsigned int partial_blocks = (width % tile_width) / 4;  /* Remaining partial blocks */
++
++	/* ===================================================================
++	 * STEP 1: Generate Y (Luma) plane in tiled format
++	 * Each Y tile row represents 4 pixel rows
++	 * =================================================================== */
++	for (unsigned int tile_row = 0; tile_row < num_tiles_h_y; tile_row++) {
++		/* Calculate the starting Y coordinate for this tile row */
++		const unsigned int base_y = tile_row * 4;
++
++		/* Get pointer to the start of this tile row in memory */
++		unsigned char *y_tile = y_mem + (size_t)tile_row * stride * 4;
++
++		/* Process each complete tile in this row */
++		for (unsigned int tile_col = 0; tile_col < full_tiles_w; tile_col++) {
++			/* Calculate the starting X coordinate for this tile */
++			const unsigned int base_x = tile_col * tile_width;
++
++			/* Get pointer to this tile (bytes depend on bit depth packing) */
++			unsigned char *y_block = y_tile + (size_t)tile_col * (tile_width / 4) * 4 * bytes_per_4px;
++
++			/* Process each 4x4 block within the tile */
++			for (unsigned int block = 0; block < blocks_per_tile; block++) {
++				/* Calculate X coordinate for this block (blocks are 4 pixels wide) */
++				const unsigned int block_x = base_x + block * 4;
++
++				/* Fill the 4x4 block with Y values */
++				for (unsigned int row = 0; row < 4; row++) {
++					const unsigned int pixel_y = base_y + row;
++
++					/* Collect 4 pixel values for packed writing */
++					unsigned int color_idx[4];
++					for (unsigned int col = 0; col < 4; col++) {
++						const unsigned int pixel_x = block_x + col;
++						color_idx[col] = get_smpte_color_index(pixel_x, pixel_y, width, height);
++					}
++
++					/* Write 4 pixels based on bit depth */
++					if (bitdepth == 8) {
++						y_block[0] = colors_all[color_idx[0]].y;
++						y_block[1] = colors_all[color_idx[1]].y;
++						y_block[2] = colors_all[color_idx[2]].y;
++						y_block[3] = colors_all[color_idx[3]].y;
++						y_block += 4;
++					} else if (bitdepth == 10) {
++						write_pixels_10bpp(y_block,
++							(colors_all[color_idx[0]].y << 2),
++							(colors_all[color_idx[1]].y << 2),
++							(colors_all[color_idx[2]].y << 2),
++							(colors_all[color_idx[3]].y << 2));
++						y_block += 5;
++					} else {  /* 12-bit */
++						write_pixels_12bpp(y_block,
++							(colors_all[color_idx[0]].y << 4),
++							(colors_all[color_idx[1]].y << 4));
++						write_pixels_12bpp(y_block + 3,
++							(colors_all[color_idx[2]].y << 4),
++							(colors_all[color_idx[3]].y << 4));
++						y_block += 6;
++					}
++				}
++			}
++		}
++
++		/* Handle partial blocks at the end of the row (if width not divisible by tile_width) */
++		if (partial_blocks > 0) {
++			const unsigned int base_x = full_tiles_w * tile_width;
++			unsigned char *y_block = y_tile + (size_t)full_tiles_w * (tile_width / 4) * 4 * bytes_per_4px;
++
++			for (unsigned int block = 0; block < partial_blocks; block++) {
++				const unsigned int block_x = base_x + block * 4;
++
++				for (unsigned int row = 0; row < 4; row++) {
++					const unsigned int pixel_y = base_y + row;
++
++					/* Collect 4 pixel values */
++					unsigned int color_idx[4];
++					for (unsigned int col = 0; col < 4; col++) {
++						const unsigned int pixel_x = block_x + col;
++						color_idx[col] = (pixel_x < width) ?
++							get_smpte_color_index(pixel_x, pixel_y, width, height) : 0;
++					}
++
++					/* Write based on bit depth */
++					if (bitdepth == 8) {
++						y_block[0] = (block_x < width) ? colors_all[color_idx[0]].y : 0;
++						y_block[1] = (block_x + 1 < width) ? colors_all[color_idx[1]].y : 0;
++						y_block[2] = (block_x + 2 < width) ? colors_all[color_idx[2]].y : 0;
++						y_block[3] = (block_x + 3 < width) ? colors_all[color_idx[3]].y : 0;
++						y_block += 4;
++					} else if (bitdepth == 10) {
++						write_pixels_10bpp(y_block,
++							((block_x < width) ? colors_all[color_idx[0]].y : 0) << 2,
++							((block_x + 1 < width) ? colors_all[color_idx[1]].y : 0) << 2,
++							((block_x + 2 < width) ? colors_all[color_idx[2]].y : 0) << 2,
++							((block_x + 3 < width) ? colors_all[color_idx[3]].y : 0) << 2);
++						y_block += 5;
++					} else {  /* 12-bit */
++						write_pixels_12bpp(y_block,
++							((block_x < width) ? colors_all[color_idx[0]].y : 0) << 4,
++							((block_x + 1 < width) ? colors_all[color_idx[1]].y : 0) << 4);
++						write_pixels_12bpp(y_block + 3,
++							((block_x + 2 < width) ? colors_all[color_idx[2]].y : 0) << 4,
++							((block_x + 3 < width) ? colors_all[color_idx[3]].y : 0) << 4);
++						y_block += 6;
++					}
++				}
++			}
++		}
++	}
++
++	/* Luma only format */
++	if (!u_mem || !v_mem)
++		return;
++
++	/* ===================================================================
++	 * STEP 2: Generate U and V (Chroma) planes in tiled format
++	 * Chroma handling differs based on subsampling:
++	 *   - YUV444 (xsub=1, ysub=1): Full resolution, same as Y
++	 *   - YUV422 (xsub=2, ysub=1): Half horizontal resolution
++	 *   - YUV420 (xsub=2, ysub=2): Half horizontal and vertical resolution
++	 * =================================================================== */
++	for (unsigned int tile_row = 0; tile_row < num_tiles_h_c; tile_row++) {
++		/* Calculate Y coordinate (accounting for vertical subsampling) */
++		const unsigned int base_y = tile_row * 4 * ysub;
++
++		/* Get pointers to chroma tile rows */
++		unsigned char *u_tile = u_mem + (size_t)tile_row * stride * 4;
++		unsigned char *v_tile = v_mem + (size_t)tile_row * stride * 4;
++
++		/* Process each complete tile in this row */
++		for (unsigned int tile_col = 0; tile_col < full_tiles_w; tile_col++) {
++			const unsigned int base_x = tile_col * tile_width;
++			unsigned char *u_block = u_tile + (size_t)tile_col * (tile_width / 4) * 4 * bytes_per_4px;
++			unsigned char *v_block = v_tile + (size_t)tile_col * (tile_width / 4) * 4 * bytes_per_4px;
++
++			/* Process each 4x4 block within the tile */
++			for (unsigned int block = 0; block < blocks_per_tile; block++) {
++				const unsigned int block_x = base_x + block * 4;
++
++				/* YUV444: Full chroma resolution (no subsampling) */
++				if (xsub == 1 && ysub == 1) {
++					/* Process all 4 rows and 4 columns */
++					for (unsigned int row = 0; row < 4; row++) {
++						const unsigned int pixel_y = base_y + row;
++
++						/* Collect 4 pixel values */
++						unsigned int color_idx[4];
++						for (unsigned int col = 0; col < 4; col++) {
++							const unsigned int pixel_x = block_x + col;
++							color_idx[col] = get_smpte_color_index(pixel_x, pixel_y, width, height);
++						}
++
++						/* Write U and V based on bit depth */
++						if (bitdepth == 8) {
++							u_block[0] = colors_all[color_idx[0]].u;
++							u_block[1] = colors_all[color_idx[1]].u;
++							u_block[2] = colors_all[color_idx[2]].u;
++							u_block[3] = colors_all[color_idx[3]].u;
++							v_block[0] = colors_all[color_idx[0]].v;
++							v_block[1] = colors_all[color_idx[1]].v;
++							v_block[2] = colors_all[color_idx[2]].v;
++							v_block[3] = colors_all[color_idx[3]].v;
++							u_block += 4;
++							v_block += 4;
++						} else if (bitdepth == 10) {
++							write_pixels_10bpp(u_block,
++								(colors_all[color_idx[0]].u << 2),
++								(colors_all[color_idx[1]].u << 2),
++								(colors_all[color_idx[2]].u << 2),
++								(colors_all[color_idx[3]].u << 2));
++							write_pixels_10bpp(v_block,
++								(colors_all[color_idx[0]].v << 2),
++								(colors_all[color_idx[1]].v << 2),
++								(colors_all[color_idx[2]].v << 2),
++								(colors_all[color_idx[3]].v << 2));
++							u_block += 5;
++							v_block += 5;
++						} else {  /* 12-bit */
++							write_pixels_12bpp(u_block,
++								(colors_all[color_idx[0]].u << 4),
++								(colors_all[color_idx[1]].u << 4));
++							write_pixels_12bpp(u_block + 3,
++								(colors_all[color_idx[2]].u << 4),
++								(colors_all[color_idx[3]].u << 4));
++							write_pixels_12bpp(v_block,
++								(colors_all[color_idx[0]].v << 4),
++								(colors_all[color_idx[1]].v << 4));
++							write_pixels_12bpp(v_block + 3,
++								(colors_all[color_idx[2]].v << 4),
++								(colors_all[color_idx[3]].v << 4));
++							u_block += 6;
++							v_block += 6;
++						}
++					}
++				}
++				/* YUV422: Horizontal subsampling (half width) */
++				else if (xsub == 2 && ysub == 1) {
++					/* Process all 4 rows, but only 2 chroma samples per row (at x=0 and x=2) */
++					for (unsigned int row = 0; row < 4; row++) {
++						const unsigned int pixel_y = base_y + row;
++
++						/* Collect 4 luma samples to average into 2 chroma samples */
++						unsigned int color_idx[4];
++						for (unsigned int i = 0; i < 4; i++) {
++							const unsigned int pixel_x = block_x + i;
++							color_idx[i] = get_smpte_color_index(pixel_x, pixel_y, width, height);
++						}
++
++						/* Average adjacent pairs for chroma subsampling */
++						unsigned char u0 = (colors_all[color_idx[0]].u + colors_all[color_idx[1]].u + 1) / 2;
++						unsigned char u1 = (colors_all[color_idx[2]].u + colors_all[color_idx[3]].u + 1) / 2;
++						unsigned char v0 = (colors_all[color_idx[0]].v + colors_all[color_idx[1]].v + 1) / 2;
++						unsigned char v1 = (colors_all[color_idx[2]].v + colors_all[color_idx[3]].v + 1) / 2;
++
++						/* Write 2 chroma samples based on bit depth */
++						if (bitdepth == 8) {
++							/* Semi-planar: interleaved UV (U0 V0 U1 V1) */
++							u_block[0] = u0;
++							u_block[1] = v0;
++							u_block[2] = u1;
++							u_block[3] = v1;
++							u_block += 4;
++						} else if (bitdepth == 10) {
++							/* For 10-bit, shift averaged values to 10-bit range */
++							/* Semi-planar: interleaved UV */
++							write_pixels_10bpp(u_block, u0 << 2, v0 << 2, u1 << 2, v1 << 2);
++							u_block += 5;
++						} else {  /* 12-bit */
++							/* Semi-planar: interleaved UV */
++							write_pixels_12bpp(u_block, (u0 << 4), (v0 << 4));
++							write_pixels_12bpp(u_block + 3, (u1 << 4), (v1 << 4));
++							u_block += 6;
++						}
++					}
++				}
++				/* YUV420: Both horizontal and vertical subsampling (half width and height) */
++				else {
++					/* YUV420: Average chroma from 2x2 pixel blocks */
++					/* Process all rows needed for this chroma tile (4 chroma rows = 4*ysub luma rows) */
++					for (unsigned int row = 0; row < 4 * ysub; row += 2) {
++						const unsigned int pixel_y = base_y + row;
++
++						/* Collect 2 chroma samples, each from a 2x2 pixel block */
++						struct color_yuv chroma[2];
++						for (unsigned int i = 0; i < 2; i++) {
++							const unsigned int pixel_x = block_x + i * 2;
++
++							/* Collect 2x2 block: (x,y), (x+1,y), (x,y+1), (x+1,y+1) */
++							unsigned int idx[4];
++							idx[0] = get_smpte_color_index(pixel_x, pixel_y, width, height);
++							idx[1] = get_smpte_color_index(pixel_x + 1, pixel_y, width, height);
++							idx[2] = get_smpte_color_index(pixel_x, pixel_y + 1, width, height);
++							idx[3] = get_smpte_color_index(pixel_x + 1, pixel_y + 1, width, height);
++
++							/* Average chroma from 2x2 block */
++							chroma[i].u = (colors_all[idx[0]].u + colors_all[idx[1]].u +
++							               colors_all[idx[2]].u + colors_all[idx[3]].u + 2) / 4;
++							chroma[i].v = (colors_all[idx[0]].v + colors_all[idx[1]].v +
++							               colors_all[idx[2]].v + colors_all[idx[3]].v + 2) / 4;
++						}
++
++						/* Write 2 chroma samples interleaved (semi-planar UV) based on bit depth */
++						if (bitdepth == 8) {
++							/* 8-bit: interleaved UV (U0 V0 U1 V1) */
++							u_block[0] = chroma[0].u;
++							u_block[1] = chroma[0].v;
++							u_block[2] = chroma[1].u;
++							u_block[3] = chroma[1].v;
++							u_block += 4;
++						} else if (bitdepth == 10) {
++							/* 10-bit: interleaved UV */
++							write_pixels_10bpp(u_block, chroma[0].u << 2, chroma[0].v << 2,
++								chroma[1].u << 2, chroma[1].v << 2);
++							u_block += 5;
++						} else {  /* 12-bit */
++							/* 12-bit: interleaved UV */
++							write_pixels_12bpp(u_block, (chroma[0].u << 4), (chroma[0].v << 4));
++							write_pixels_12bpp(u_block + 3, (chroma[1].u << 4), (chroma[1].v << 4));
++							u_block += 6;
++						}
++					}
++				}
++			}
++		}
++
++		/* Handle partial blocks at the end of the row */
++		if (partial_blocks > 0) {
++			const unsigned int base_x = full_tiles_w * tile_width;
++			unsigned char *u_block = u_tile + (size_t)full_tiles_w * (tile_width / 4) * 4 * bytes_per_4px;
++			unsigned char *v_block = v_tile + (size_t)full_tiles_w * (tile_width / 4) * 4 * bytes_per_4px;
++
++			for (unsigned int block = 0; block < partial_blocks; block++) {
++				const unsigned int block_x = base_x + block * 4;
++
++				if (xsub == 1 && ysub == 1) {
++					/* YUV444: Full resolution */
++					for (unsigned int row = 0; row < 4; row++) {
++						const unsigned int pixel_y = base_y + row;
++
++						/* Collect 4 pixel values */
++						unsigned int color_idx[4];
++						for (unsigned int col = 0; col < 4; col++) {
++							const unsigned int pixel_x = block_x + col;
++							color_idx[col] = (pixel_x < width) ?
++								get_smpte_color_index(pixel_x, pixel_y, width, height) : 0;
++						}
++
++						/* Write U and V based on bit depth */
++						if (bitdepth == 8) {
++							u_block[0] = (block_x < width) ? colors_all[color_idx[0]].u : 0;
++							u_block[1] = (block_x + 1 < width) ? colors_all[color_idx[1]].u : 0;
++							u_block[2] = (block_x + 2 < width) ? colors_all[color_idx[2]].u : 0;
++							u_block[3] = (block_x + 3 < width) ? colors_all[color_idx[3]].u : 0;
++							v_block[0] = (block_x < width) ? colors_all[color_idx[0]].v : 0;
++							v_block[1] = (block_x + 1 < width) ? colors_all[color_idx[1]].v : 0;
++							v_block[2] = (block_x + 2 < width) ? colors_all[color_idx[2]].v : 0;
++							v_block[3] = (block_x + 3 < width) ? colors_all[color_idx[3]].v : 0;
++							u_block += 4;
++							v_block += 4;
++						} else if (bitdepth == 10) {
++							write_pixels_10bpp(u_block,
++								((block_x < width) ? colors_all[color_idx[0]].u : 0) << 2,
++								((block_x + 1 < width) ? colors_all[color_idx[1]].u : 0) << 2,
++								((block_x + 2 < width) ? colors_all[color_idx[2]].u : 0) << 2,
++								((block_x + 3 < width) ? colors_all[color_idx[3]].u : 0) << 2);
++							write_pixels_10bpp(v_block,
++								((block_x < width) ? colors_all[color_idx[0]].v : 0) << 2,
++								((block_x + 1 < width) ? colors_all[color_idx[1]].v : 0) << 2,
++								((block_x + 2 < width) ? colors_all[color_idx[2]].v : 0) << 2,
++								((block_x + 3 < width) ? colors_all[color_idx[3]].v : 0) << 2);
++							u_block += 5;
++							v_block += 5;
++						} else {  /* 12-bit */
++							write_pixels_12bpp(u_block,
++								((block_x < width) ? colors_all[color_idx[0]].u : 0) << 4,
++								((block_x + 1 < width) ? colors_all[color_idx[1]].u : 0) << 4);
++							write_pixels_12bpp(u_block + 3,
++								((block_x + 2 < width) ? colors_all[color_idx[2]].u : 0) << 4,
++								((block_x + 3 < width) ? colors_all[color_idx[3]].u : 0) << 4);
++							write_pixels_12bpp(v_block,
++								((block_x < width) ? colors_all[color_idx[0]].v : 0) << 4,
++								((block_x + 1 < width) ? colors_all[color_idx[1]].v : 0) << 4);
++							write_pixels_12bpp(v_block + 3,
++								((block_x + 2 < width) ? colors_all[color_idx[2]].v : 0) << 4,
++								((block_x + 3 < width) ? colors_all[color_idx[3]].v : 0) << 4);
++							u_block += 6;
++							v_block += 6;
++						}
++					}
++				} else if (xsub == 2 && ysub == 1) {
++					/* YUV422: Horizontal subsampling */
++					for (unsigned int row = 0; row < 4; row++) {
++						const unsigned int pixel_y = base_y + row;
++
++						/* Collect 4 luma samples to average into 2 chroma samples */
++						unsigned int color_idx[4];
++						for (unsigned int i = 0; i < 4; i++) {
++							const unsigned int pixel_x = block_x + i;
++							color_idx[i] = (pixel_x < width) ?
++								get_smpte_color_index(pixel_x, pixel_y, width, height) : 0;
++						}
++
++						/* Average adjacent pairs for chroma subsampling */
++						unsigned char u0 = (block_x < width) ?
++							((block_x + 1 < width) ?
++								(colors_all[color_idx[0]].u + colors_all[color_idx[1]].u + 1) / 2 :
++								colors_all[color_idx[0]].u) : 0;
++						unsigned char u1 = (block_x + 2 < width) ?
++							((block_x + 3 < width) ?
++								(colors_all[color_idx[2]].u + colors_all[color_idx[3]].u + 1) / 2 :
++								colors_all[color_idx[2]].u) : 0;
++						unsigned char v0 = (block_x < width) ?
++							((block_x + 1 < width) ?
++								(colors_all[color_idx[0]].v + colors_all[color_idx[1]].v + 1) / 2 :
++								colors_all[color_idx[0]].v) : 0;
++						unsigned char v1 = (block_x + 2 < width) ?
++							((block_x + 3 < width) ?
++								(colors_all[color_idx[2]].v + colors_all[color_idx[3]].v + 1) / 2 :
++								colors_all[color_idx[2]].v) : 0;
++
++						/* Write based on bit depth */
++						if (bitdepth == 8) {
++							/* Semi-planar: interleaved UV (U0 V0 U1 V1) */
++							u_block[0] = u0;
++							u_block[1] = v0;
++							u_block[2] = u1;
++							u_block[3] = v1;
++							u_block += 4;
++						} else if (bitdepth == 10) {
++							/* Semi-planar: interleaved UV */
++							write_pixels_10bpp(u_block, u0 << 2, v0 << 2, u1 << 2, v1 << 2);
++							u_block += 5;
++						} else {  /* 12-bit */
++							/* Semi-planar: interleaved UV */
++							write_pixels_12bpp(u_block, u0 << 4, v0 << 4);
++							write_pixels_12bpp(u_block + 3, u1 << 4,v1 << 4);
++							u_block += 6;
++						}
++					}
++				} else {
++					/* YUV420: Average chroma from 2x2 pixel blocks */
++					/* Process all rows needed for this chroma tile (4 chroma rows = 4*ysub luma rows) */
++					for (unsigned int row = 0; row < 4 * ysub; row += 2) {
++						const unsigned int pixel_y = base_y + row;
++
++						/* Collect 2 chroma samples, each from a 2x2 pixel block */
++						struct color_yuv chroma[2];
++						for (unsigned int i = 0; i < 2; i++) {
++							const unsigned int pixel_x = block_x + i * 2;
++
++							/* Collect 2x2 block with boundary checks */
++							unsigned int idx[4];
++							idx[0] = (pixel_x < width) ?
++								get_smpte_color_index(pixel_x, pixel_y, width, height) : 0;
++							idx[1] = (pixel_x + 1 < width) ?
++								get_smpte_color_index(pixel_x + 1, pixel_y, width, height) : idx[0];
++							idx[2] = (pixel_x < width && pixel_y + 1 < height) ?
++								get_smpte_color_index(pixel_x, pixel_y + 1, width, height) : idx[0];
++							idx[3] = (pixel_x + 1 < width && pixel_y + 1 < height) ?
++								get_smpte_color_index(pixel_x + 1, pixel_y + 1, width, height) : idx[0];
++
++							/* Average chroma from 2x2 block */
++							chroma[i].u = (colors_all[idx[0]].u + colors_all[idx[1]].u +
++							               colors_all[idx[2]].u + colors_all[idx[3]].u + 2) / 4;
++							chroma[i].v = (colors_all[idx[0]].v + colors_all[idx[1]].v +
++							               colors_all[idx[2]].v + colors_all[idx[3]].v + 2) / 4;
++						}
++
++						/* Write interleaved chroma (semi-planar UV) based on bit depth */
++						if (bitdepth == 8) {
++							/* 8-bit: interleaved UV (U0 V0 U1 V1) */
++							u_block[0] = chroma[0].u;
++							u_block[1] = chroma[0].v;
++							u_block[2] = chroma[1].u;
++							u_block[3] = chroma[1].v;
++							u_block += 4;
++						} else if (bitdepth == 10) {
++							/* 10-bit: interleaved UV */
++							write_pixels_10bpp(u_block, chroma[0].u << 2, chroma[0].v << 2,
++								chroma[1].u << 2, chroma[1].v << 2);
++							u_block += 5;
++						} else {  /* 12-bit */
++							/* 12-bit: interleaved UV */
++							write_pixels_12bpp(u_block, (chroma[0].u << 4), (chroma[0].v << 4));
++							write_pixels_12bpp(u_block + 3, (chroma[1].u << 4), (chroma[1].v << 4));
++							u_block += 6;
++						}
++					}
++				}
++			}
++		}
++	}
++}
++
+ static inline void write_cc_xx_bpc_16(unsigned char *mem,
+ 				      unsigned char bpc,
+ 				      bool msb,
+@@ -1919,12 +2498,38 @@ static void fill_smpte(const struct util_format_info *info,
+ 	case DRM_FORMAT_YVYU:
+ 		return fill_smpte_yuv_packed(&info->yuv, planes[0], width,
+ 					     height, stride);
++
++	case DRM_FORMAT_T5M8:
++	case DRM_FORMAT_T6M8:
++	case DRM_FORMAT_T5MA:
++	case DRM_FORMAT_T6MA:
++	case DRM_FORMAT_T5MC:
++	case DRM_FORMAT_T6MC:
++		return fill_smpte_tiled_yuv(&info->yuv, planes[0], NULL, NULL,
++					     width, height, stride, info->format);
++
+ 	case DRM_FORMAT_XV20:
+ 		return fill_smpte_yuv_semiplanar_10b(&info->yuv, planes[0], planes[1],
+ 					     width, height, stride);
+ 	case DRM_FORMAT_XV15:
+ 		return fill_smpte_yuv_semiplanar_10b(&info->yuv, planes[0], planes[1],
+ 					     width, height, stride);
++
++	case DRM_FORMAT_T508:
++	case DRM_FORMAT_T608:
++	case DRM_FORMAT_T50A:
++	case DRM_FORMAT_T60A:
++	case DRM_FORMAT_T50C:
++	case DRM_FORMAT_T60C:
++	case DRM_FORMAT_T528:
++	case DRM_FORMAT_T628:
++	case DRM_FORMAT_T52A:
++	case DRM_FORMAT_T62A:
++	case DRM_FORMAT_T52C:
++	case DRM_FORMAT_T62C:
++		return fill_smpte_tiled_yuv(&info->yuv, planes[0], planes[1],
++					     planes[1] + 1, width, height, stride, info->format);
++
+ 	case DRM_FORMAT_NV12:
+ 	case DRM_FORMAT_NV21:
+ 	case DRM_FORMAT_NV16:
+@@ -1944,13 +2549,19 @@ static void fill_smpte(const struct util_format_info *info,
+ 						   stride);
+ 
+ 	case DRM_FORMAT_X403:
+-			return fill_smpte_yuv_planar_x403(&info->yuv, planes[0], planes[1],
++		return fill_smpte_yuv_planar_x403(&info->yuv, planes[0], planes[1],
+ 					     planes[2], width, height, stride);
+ 
+-	case DRM_FORMAT_YUV420:
+-		return fill_smpte_yuv_planar(&info->yuv, planes[0], planes[1],
+-					     planes[2], width, height, stride);
++	case DRM_FORMAT_T548:
++	case DRM_FORMAT_T648:
++	case DRM_FORMAT_T54A:
++	case DRM_FORMAT_T64A:
++	case DRM_FORMAT_T54C:
++	case DRM_FORMAT_T64C:
++		return fill_smpte_tiled_yuv(&info->yuv, planes[0], planes[1],
++					     planes[2], width, height, stride, info->format);
+ 
++	case DRM_FORMAT_YUV420:
+ 	case DRM_FORMAT_YUV444:
+ 		return fill_smpte_yuv_planar(&info->yuv, planes[0], planes[1],
+ 					     planes[2], width, height, stride);
+@@ -2212,6 +2823,485 @@ static void fill_tiles_yuv_planar(const struct util_format_info *info,
+ 	}
+ }
+ 
++/*
++ * Tiles pattern generator for 8/10/12-bit YUV tiled formats
++ *
++ * This function generates a gradient tile pattern directly in tiled format.
++ * Tiled format organizes pixels into 32x4/64x4 blocks, with multiple blocks per frame.
++ *
++ * Tile structure:
++ *   - Each tile is 32/64 pixels wide (determined by format)
++ *   - Each tile is having 4 pixels height
++ *   - Each tile contains pixel data stored in packed format (8/10/12 bits per channel)
++ *   - Tiles are arranged row by row
++ *
++ * Supports YUV444 (4:4:4), YUV422 (4:2:2), and YUV420 (4:2:0) formats
++ */
++static void fill_tiles_tiled_yuv(const struct util_format_info *info,
++				  unsigned char *y_mem, unsigned char *u_mem,
++				  unsigned char *v_mem, unsigned int width,
++				  unsigned int height, unsigned int stride,
++				  uint32_t format)
++{
++	const struct util_yuv_info *yuv = &info->yuv;
++
++	/* Get chroma subsampling factors */
++	const unsigned int xsub = yuv->xsub;  /* Horizontal chroma subsampling */
++	const unsigned int ysub = yuv->ysub;  /* Vertical chroma subsampling */
++
++	/* Bit depth configuration default to 8-bit */
++	unsigned char bitdepth = 8;
++
++	/* Will be set to 10, or 12 based on format */
++	if (((format >> 24) & 0xFF) == 'A') {
++		bitdepth = 10;
++	} else if (((format >> 24) & 0xFF) == 'C') {
++		bitdepth = 12;
++	}
++
++	/* Calculate bytes per 4 pixels based on bit depth (packed formats) */
++	/* 8-bit: 4 pixels = 4 bytes, 10-bit: 4 pixels = 5 bytes, 12-bit: 4 pixels = 6 bytes */
++	unsigned int bytes_per_4px = (bitdepth == 8) ? 4 : (bitdepth == 10) ? 5 : 6;
++
++	/* Tile configuration */
++	const unsigned int tile_width = ((format >> 8) & 0xFF) == '5' ? 32 : 64;	/* Width of each tile in pixels */
++	const unsigned int blocks_per_tile = tile_width / 4;     /* Number of 4x4 blocks per tile */
++
++	/* Calculate tile dimensions */
++	const unsigned int num_tiles_h_y = height / 4;           /* Number of 4-pixel-high tile rows for Y */
++	const unsigned int num_tiles_h_c = (height / ysub) / 4;  /* Number of tile rows for chroma */
++	const unsigned int full_tiles_w = width / tile_width;    /* Number of complete tiles per row */
++	const unsigned int partial_blocks = (width % tile_width) / 4;  /* Remaining partial blocks */
++
++	/* ===================================================================
++	 * STEP 1: Generate Y (Luma) plane in tiled format
++	 * Each Y tile row represents 4 pixel rows
++	 * =================================================================== */
++	for (unsigned int tile_row = 0; tile_row < num_tiles_h_y; tile_row++) {
++		/* Calculate the starting Y coordinate for this tile row */
++		const unsigned int base_y = tile_row * 4;
++
++		/* Get pointer to the start of this tile row in memory */
++		unsigned char *y_tile = y_mem + (size_t)tile_row * stride * 4;
++
++		/* Process each complete tile in this row */
++		for (unsigned int tile_col = 0; tile_col < full_tiles_w; tile_col++) {
++			/* Calculate the starting X coordinate for this tile */
++			const unsigned int base_x = tile_col * tile_width;
++
++			/* Get pointer to this tile (bytes depend on bit depth packing) */
++			unsigned char *y_block = y_tile + (size_t)tile_col * (tile_width / 4) * 4 * bytes_per_4px;
++
++			/* Process each 4x4 block within the tile */
++			for (unsigned int block = 0; block < blocks_per_tile; block++) {
++				/* Calculate X coordinate for this block (blocks are 4 pixels wide) */
++				const unsigned int block_x = base_x + block * 4;
++
++				/* Fill the 4x4 block with Y values */
++				for (unsigned int row = 0; row < 4; row++) {
++					const unsigned int pixel_y = base_y + row;
++
++					/* Collect 4 pixel values for packed writing */
++					struct color_yuv colors[4];
++					for (unsigned int col = 0; col < 4; col++) {
++						const unsigned int pixel_x = block_x + col;
++						colors[col] = make_tiles_yuv_color(pixel_x, pixel_y, width);
++					}
++
++					/* Write 4 pixels based on bit depth */
++					if (bitdepth == 8) {
++						y_block[0] = colors[0].y;
++						y_block[1] = colors[1].y;
++						y_block[2] = colors[2].y;
++						y_block[3] = colors[3].y;
++						y_block += 4;
++					} else if (bitdepth == 10) {
++						write_pixels_10bpp(y_block, (colors[0].y << 2), (colors[1].y << 2),
++							(colors[2].y << 2), (colors[3].y << 2));
++						y_block += 5;
++					} else {  /* 12-bit */
++						write_pixels_12bpp(y_block, (colors[0].y << 4), (colors[1].y << 4));
++						write_pixels_12bpp(y_block + 3, (colors[2].y << 4), (colors[3].y << 4));
++						y_block += 6;
++					}
++				}
++			}
++		}
++
++		/* Handle partial blocks at the end of the row (if width not divisible by tile_width) */
++		if (partial_blocks > 0) {
++			const unsigned int base_x = full_tiles_w * tile_width;
++			unsigned char *y_block = y_tile + (size_t)full_tiles_w * (tile_width / 4) * 4 * bytes_per_4px;
++
++			for (unsigned int block = 0; block < partial_blocks; block++) {
++				const unsigned int block_x = base_x + block * 4;
++
++				for (unsigned int row = 0; row < 4; row++) {
++					const unsigned int pixel_y = base_y + row;
++
++					/* Collect 4 pixel values */
++					struct color_yuv colors[4];
++					for (unsigned int col = 0; col < 4; col++) {
++						const unsigned int pixel_x = block_x + col;
++						if (pixel_x < width) {
++							colors[col] = make_tiles_yuv_color(pixel_x, pixel_y, width);
++						} else {
++							colors[col].y = 0;
++						}
++					}
++
++					/* Write based on bit depth */
++					if (bitdepth == 8) {
++						y_block[0] = (block_x < width) ? colors[0].y : 0;
++						y_block[1] = (block_x + 1 < width) ? colors[1].y : 0;
++						y_block[2] = (block_x + 2 < width) ? colors[2].y : 0;
++						y_block[3] = (block_x + 3 < width) ? colors[3].y : 0;
++						y_block += 4;
++					} else if (bitdepth == 10) {
++						write_pixels_10bpp(y_block,
++							((block_x < width) ? colors[0].y : 0) << 2,
++							((block_x + 1 < width) ? colors[1].y : 0) << 2,
++							((block_x + 2 < width) ? colors[2].y : 0) << 2,
++							((block_x + 3 < width) ? colors[3].y : 0) << 2);
++						y_block += 5;
++					} else {  /* 12-bit */
++						write_pixels_12bpp(y_block,
++							((block_x < width) ? colors[0].y : 0) << 4,
++							((block_x + 1 < width) ? colors[1].y : 0) << 4);
++						write_pixels_12bpp(y_block + 3,
++							((block_x + 2 < width) ? colors[2].y : 0) << 4,
++							((block_x + 3 < width) ? colors[3].y : 0) << 4);
++						y_block += 6;
++					}
++				}
++			}
++		}
++	}
++
++	/* Luma only format */
++	if (!u_mem || !v_mem)
++		return;
++
++	/* ===================================================================
++	 * STEP 2: Generate U and V (Chroma) planes in tiled format
++	 * Chroma handling differs based on subsampling:
++	 *   - YUV444 (xsub=1, ysub=1): Full resolution, same as Y
++	 *   - YUV422 (xsub=2, ysub=1): Half horizontal resolution
++	 *   - YUV420 (xsub=2, ysub=2): Half horizontal and vertical resolution
++	 * =================================================================== */
++	for (unsigned int tile_row = 0; tile_row < num_tiles_h_c; tile_row++) {
++		/* Calculate Y coordinate (accounting for vertical subsampling) */
++		const unsigned int base_y = tile_row * 4 * ysub;
++
++		/* Get pointers to chroma tile rows */
++		unsigned char *u_tile = u_mem + (size_t)tile_row * stride * 4;
++		unsigned char *v_tile = v_mem + (size_t)tile_row * stride * 4;
++
++		/* Process each complete tile in this row */
++		for (unsigned int tile_col = 0; tile_col < full_tiles_w; tile_col++) {
++			const unsigned int base_x = tile_col * tile_width;
++			unsigned char *u_block = u_tile + (size_t)tile_col * (tile_width / 4) * 4 * bytes_per_4px;
++			unsigned char *v_block = v_tile + (size_t)tile_col * (tile_width / 4) * 4 * bytes_per_4px;
++
++			/* Process each 4x4 block within the tile */
++			for (unsigned int block = 0; block < blocks_per_tile; block++) {
++				const unsigned int block_x = base_x + block * 4;
++
++				/* YUV444: Full chroma resolution (no subsampling) */
++				if (xsub == 1 && ysub == 1) {
++					/* Process all 4 rows and 4 columns */
++					for (unsigned int row = 0; row < 4; row++) {
++						const unsigned int pixel_y = base_y + row;
++
++						/* Collect 4 pixel values */
++						struct color_yuv colors[4];
++						for (unsigned int col = 0; col < 4; col++) {
++							const unsigned int pixel_x = block_x + col;
++							colors[col] = make_tiles_yuv_color(pixel_x, pixel_y, width);
++						}
++
++						/* Write U and V based on bit depth */
++						if (bitdepth == 8) {
++							u_block[0] = colors[0].u;
++							u_block[1] = colors[1].u;
++							u_block[2] = colors[2].u;
++							u_block[3] = colors[3].u;
++							v_block[0] = colors[0].v;
++							v_block[1] = colors[1].v;
++							v_block[2] = colors[2].v;
++							v_block[3] = colors[3].v;
++							u_block += 4;
++							v_block += 4;
++						} else if (bitdepth == 10) {
++							write_pixels_10bpp(u_block, (colors[0].u << 2), (colors[1].u << 2),
++								(colors[2].u << 2), (colors[3].u << 2));
++							write_pixels_10bpp(v_block, (colors[0].v << 2), (colors[1].v << 2),
++								(colors[2].v << 2), (colors[3].v << 2));
++							u_block += 5;
++							v_block += 5;
++						} else {  /* 12-bit */
++							write_pixels_12bpp(u_block, (colors[0].u << 4), (colors[1].u << 4));
++							write_pixels_12bpp(u_block + 3, (colors[2].u << 4), (colors[3].u << 4));
++							write_pixels_12bpp(v_block, (colors[0].v << 4), (colors[1].v << 4));
++							write_pixels_12bpp(v_block + 3, (colors[2].v << 4), (colors[3].v << 4));
++							u_block += 6;
++							v_block += 6;
++						}
++					}
++				}
++				/* YUV422: Horizontal subsampling (half width) */
++				else if (xsub == 2 && ysub == 1) {
++					/* Process all 4 rows, but only 2 chroma samples per row (at x=0 and x=2) */
++					for (unsigned int row = 0; row < 4; row++) {
++						const unsigned int pixel_y = base_y + row;
++
++						/* Collect all 4 pixels and average chroma for adjacent pairs */
++						struct color_yuv colors[4];
++						for (unsigned int col = 0; col < 4; col++) {
++							const unsigned int pixel_x = block_x + col;
++							colors[col] = make_tiles_yuv_color(pixel_x, pixel_y, width);
++						}
++
++						/* Average chroma from adjacent pixel pairs for YUV422 subsampling */
++						unsigned char u0 = (colors[0].u + colors[1].u + 1) / 2;
++						unsigned char v0 = (colors[0].v + colors[1].v + 1) / 2;
++						unsigned char u1 = (colors[2].u + colors[3].u + 1) / 2;
++						unsigned char v1 = (colors[2].v + colors[3].v + 1) / 2;
++
++						/* Write 2 chroma samples based on bit depth */
++						if (bitdepth == 8) {
++							/* Semi-planar: interleaved UV (U0 V0 U1 V1) */
++							u_block[0] = u0;
++							u_block[1] = v0;
++							u_block[2] = u1;
++							u_block[3] = v1;
++							u_block += 4;
++						} else if (bitdepth == 10) {
++							/* For 10-bit, write 2 pixels but need 4-pixel groups for packing
++							 * Duplicate the 2 values to fill 4 positions for write_pixels_10bpp */
++							/* Semi-planar: interleaved UV */
++							write_pixels_10bpp(u_block, u0 << 2, v0 << 2, u1 << 2, v1 << 2);
++							u_block += 5;
++						} else {  /* 12-bit */
++							/* Semi-planar: interleaved UV */
++							write_pixels_12bpp(u_block, (u0 << 4), (v0 << 4));
++							write_pixels_12bpp(u_block + 3, (u1 << 4), (v1 << 4));
++							u_block += 6;
++						}
++					}
++				}
++				/* YUV420: Both horizontal and vertical subsampling (half width and height) */
++				else {
++					/* YUV420: Average chroma from 2x2 pixel blocks */
++					/* Process all rows needed for this chroma tile (4 chroma rows = 4*ysub luma rows) */
++					for (unsigned int row = 0; row < 4 * ysub; row += 2) {
++						const unsigned int pixel_y = base_y + row;
++
++						/* Collect 2 chroma samples, each from a 2x2 pixel block */
++						struct color_yuv chroma[2];
++						for (unsigned int i = 0; i < 2; i++) {
++							const unsigned int pixel_x = block_x + i * 2;
++
++							/* Collect 2x2 block: (x,y), (x+1,y), (x,y+1), (x+1,y+1) */
++							struct color_yuv colors[4];
++							colors[0] = make_tiles_yuv_color(pixel_x, pixel_y, width);
++							colors[1] = make_tiles_yuv_color(pixel_x + 1, pixel_y, width);
++							colors[2] = make_tiles_yuv_color(pixel_x, pixel_y + 1, width);
++							colors[3] = make_tiles_yuv_color(pixel_x + 1, pixel_y + 1, width);
++
++							/* Average chroma from 2x2 block */
++							chroma[i].u = (colors[0].u + colors[1].u +
++							               colors[2].u + colors[3].u + 2) / 4;
++							chroma[i].v = (colors[0].v + colors[1].v +
++							               colors[2].v + colors[3].v + 2) / 4;
++						}
++
++						/* Write 2 chroma samples interleaved (semi-planar UV) based on bit depth */
++						if (bitdepth == 8) {
++							/* 8-bit: interleaved UV (U0 V0 U1 V1) */
++							u_block[0] = chroma[0].u;
++							u_block[1] = chroma[0].v;
++							u_block[2] = chroma[1].u;
++							u_block[3] = chroma[1].v;
++							u_block += 4;
++						} else if (bitdepth == 10) {
++							/* 10-bit: interleaved UV */
++							write_pixels_10bpp(u_block, chroma[0].u << 2, chroma[0].v << 2,
++								chroma[1].u << 2, chroma[1].v << 2);
++							u_block += 5;
++						} else {  /* 12-bit */
++							/* 12-bit: interleaved UV */
++							write_pixels_12bpp(u_block, (chroma[0].u << 4), (chroma[0].v << 4));
++							write_pixels_12bpp(u_block + 3, (chroma[1].u << 4), (chroma[1].v << 4));
++							u_block += 6;
++						}
++					}
++				}
++			}
++		}
++
++		/* Handle partial blocks at the end of the row */
++		if (partial_blocks > 0) {
++			const unsigned int base_x = full_tiles_w * tile_width;
++			unsigned char *u_block = u_tile + (size_t)full_tiles_w * (tile_width / 4) * 4 * bytes_per_4px;
++			unsigned char *v_block = v_tile + (size_t)full_tiles_w * (tile_width / 4) * 4 * bytes_per_4px;
++
++			for (unsigned int block = 0; block < partial_blocks; block++) {
++				const unsigned int block_x = base_x + block * 4;
++
++				if (xsub == 1 && ysub == 1) {
++					/* YUV444: Full resolution */
++					for (unsigned int row = 0; row < 4; row++) {
++						const unsigned int pixel_y = base_y + row;
++
++						/* Collect 4 pixel values */
++						struct color_yuv colors[4];
++						for (unsigned int col = 0; col < 4; col++) {
++							const unsigned int pixel_x = block_x + col;
++							if (pixel_x < width) {
++								colors[col] = make_tiles_yuv_color(pixel_x, pixel_y, width);
++							} else {
++								colors[col].u = 0;
++								colors[col].v = 0;
++							}
++						}
++
++						/* Write U and V based on bit depth */
++						if (bitdepth == 8) {
++							u_block[0] = (block_x < width) ? colors[0].u : 0;
++							u_block[1] = (block_x + 1 < width) ? colors[1].u : 0;
++							u_block[2] = (block_x + 2 < width) ? colors[2].u : 0;
++							u_block[3] = (block_x + 3 < width) ? colors[3].u : 0;
++							v_block[0] = (block_x < width) ? colors[0].v : 0;
++							v_block[1] = (block_x + 1 < width) ? colors[1].v : 0;
++							v_block[2] = (block_x + 2 < width) ? colors[2].v : 0;
++							v_block[3] = (block_x + 3 < width) ? colors[3].v : 0;
++							u_block += 4;
++							v_block += 4;
++						} else if (bitdepth == 10) {
++							write_pixels_10bpp(u_block,
++								((block_x < width) ? colors[0].u : 0) << 2,
++								((block_x + 1 < width) ? colors[1].u : 0) << 2,
++								((block_x + 2 < width) ? colors[2].u : 0) << 2,
++								((block_x + 3 < width) ? colors[3].u : 0) << 2);
++							write_pixels_10bpp(v_block,
++								((block_x < width) ? colors[0].v : 0) << 2,
++								((block_x + 1 < width) ? colors[1].v : 0) << 2,
++								((block_x + 2 < width) ? colors[2].v : 0) << 2,
++								((block_x + 3 < width) ? colors[3].v : 0) << 2);
++							u_block += 5;
++							v_block += 5;
++						} else {  /* 12-bit */
++							write_pixels_12bpp(u_block,
++								((block_x < width) ? colors[0].u : 0) << 4,
++								((block_x + 1 < width) ? colors[1].u : 0) << 4);
++							write_pixels_12bpp(u_block + 3,
++								((block_x + 2 < width) ? colors[2].u : 0) << 4,
++								((block_x + 3 < width) ? colors[3].u : 0) << 4);
++							write_pixels_12bpp(v_block,
++								((block_x < width) ? colors[0].v : 0) << 4,
++								((block_x + 1 < width) ? colors[1].v : 0) << 4);
++							write_pixels_12bpp(v_block + 3,
++								((block_x + 2 < width) ? colors[2].v : 0) << 4,
++								((block_x + 3 < width) ? colors[3].v : 0) << 4);
++							u_block += 6;
++							v_block += 6;
++						}
++					}
++				} else if (xsub == 2 && ysub == 1) {
++					/* YUV422: Horizontal subsampling */
++					for (unsigned int row = 0; row < 4; row++) {
++						const unsigned int pixel_y = base_y + row;
++
++						/* Collect all 4 pixels and average chroma for adjacent pairs */
++						struct color_yuv colors[4];
++						for (unsigned int col = 0; col < 4; col++) {
++							const unsigned int pixel_x = block_x + col;
++							if (pixel_x < width) {
++								colors[col] = make_tiles_yuv_color(pixel_x, pixel_y, width);
++							} else {
++								colors[col].u = 0;
++								colors[col].v = 0;
++							}
++						}
++
++						/* Average chroma from adjacent pixel pairs for YUV422 subsampling */
++						unsigned char u0 = (colors[0].u + colors[1].u + 1) / 2;
++						unsigned char v0 = (colors[0].v + colors[1].v + 1) / 2;
++						unsigned char u1 = (colors[2].u + colors[3].u + 1) / 2;
++						unsigned char v1 = (colors[2].v + colors[3].v + 1) / 2;
++
++						/* Write based on bit depth */
++						if (bitdepth == 8) {
++							/* Semi-planar: interleaved UV (U0 V0 U1 V1) */
++							u_block[0] = u0;
++							u_block[1] = v0;
++							u_block[2] = u1;
++							u_block[3] = v1;
++							u_block += 4;
++						} else if (bitdepth == 10) {
++							/* Semi-planar: interleaved UV */
++							write_pixels_10bpp(u_block, u0 << 2, v0 << 2, u1 << 2, v1 << 2);
++							u_block += 5;
++						} else {  /* 12-bit */
++							/* Semi-planar: interleaved UV */
++							write_pixels_12bpp(u_block, u0 << 4, v0 << 4);
++							write_pixels_12bpp(u_block + 3, u1 << 4, v1 << 4);
++							u_block += 6;
++						}
++					}
++				} else {
++					/* YUV420: Both horizontal and vertical subsampling (half width and height) */
++					/* YUV420: Average chroma from 2x2 pixel blocks */
++					/* Process all rows needed for this chroma tile (4 chroma rows = 4*ysub luma rows) */
++					for (unsigned int row = 0; row < 4 * ysub; row += 2) {
++						const unsigned int pixel_y = base_y + row;
++
++						/* Collect 2 chroma samples, each from a 2x2 pixel block */
++						struct color_yuv chroma[2];
++						for (unsigned int i = 0; i < 2; i++) {
++							const unsigned int pixel_x = block_x + i * 2;
++
++							/* Collect 2x2 block: (x,y), (x+1,y), (x,y+1), (x+1,y+1) */
++							struct color_yuv colors[4];
++							colors[0] = make_tiles_yuv_color(pixel_x, pixel_y, width);
++							colors[1] = make_tiles_yuv_color(pixel_x + 1, pixel_y, width);
++							colors[2] = make_tiles_yuv_color(pixel_x, pixel_y + 1, width);
++							colors[3] = make_tiles_yuv_color(pixel_x + 1, pixel_y + 1, width);
++
++							/* Average chroma from 2x2 block */
++							chroma[i].u = (colors[0].u + colors[1].u +
++							               colors[2].u + colors[3].u + 2) / 4;
++							chroma[i].v = (colors[0].v + colors[1].v +
++							               colors[2].v + colors[3].v + 2) / 4;
++						}
++
++						/* Write 2 chroma samples interleaved (semi-planar UV) based on bit depth */
++						if (bitdepth == 8) {
++							/* 8-bit: interleaved UV (U0 V0 U1 V1) */
++							u_block[0] = chroma[0].u;
++							u_block[1] = chroma[0].v;
++							u_block[2] = chroma[1].u;
++							u_block[3] = chroma[1].v;
++							u_block += 4;
++						} else if (bitdepth == 10) {
++							/* 10-bit: interleaved UV */
++							write_pixels_10bpp(u_block, chroma[0].u << 2, chroma[0].v << 2,
++								chroma[1].u << 2, chroma[1].v << 2);
++							u_block += 5;
++						} else {  /* 12-bit */
++							/* 12-bit: interleaved UV */
++							write_pixels_12bpp(u_block, (chroma[0].u << 4), (chroma[0].v << 4));
++							write_pixels_12bpp(u_block + 3, (chroma[1].u << 4), (chroma[1].v << 4));
++							u_block += 6;
++						}
++					}
++				}
++			}
++		}
++	}
++}
++
+ static void fill_tiles_yuv_planar_xx_bpc_16(const struct util_format_info *info,
+ 					    unsigned char *y_mem,
+ 					    unsigned char *u_mem,
+@@ -2434,6 +3524,15 @@ static void fill_tiles(const struct util_format_info *info,
+ 	unsigned char *u, *v;
+ 
+ 	switch (info->format) {
++	case DRM_FORMAT_T5M8:
++	case DRM_FORMAT_T6M8:
++	case DRM_FORMAT_T5MA:
++	case DRM_FORMAT_T6MA:
++	case DRM_FORMAT_T5MC:
++	case DRM_FORMAT_T6MC:
++		return fill_tiles_tiled_yuv(info, planes[0], NULL, NULL,
++					     width, height, stride, info->format);
++
+ 	case DRM_FORMAT_UYVY:
+ 	case DRM_FORMAT_VYUY:
+ 	case DRM_FORMAT_YUYV:
+@@ -2441,6 +3540,21 @@ static void fill_tiles(const struct util_format_info *info,
+ 		return fill_tiles_yuv_packed(info, planes[0],
+ 					     width, height, stride);
+ 
++	case DRM_FORMAT_T508:
++	case DRM_FORMAT_T608:
++	case DRM_FORMAT_T50A:
++	case DRM_FORMAT_T60A:
++	case DRM_FORMAT_T50C:
++	case DRM_FORMAT_T60C:
++	case DRM_FORMAT_T528:
++	case DRM_FORMAT_T628:
++	case DRM_FORMAT_T52A:
++	case DRM_FORMAT_T62A:
++	case DRM_FORMAT_T52C:
++	case DRM_FORMAT_T62C:
++		return fill_tiles_tiled_yuv(info, planes[0], planes[1],
++					     planes[1]+1, width, height, stride, info->format);
++
+ 	case DRM_FORMAT_NV12:
+ 	case DRM_FORMAT_NV21:
+ 	case DRM_FORMAT_NV16:
+@@ -2459,13 +3573,18 @@ static void fill_tiles(const struct util_format_info *info,
+ 						   width, height, stride);
+ 
+ 	case DRM_FORMAT_YUV420:
+-		return fill_tiles_yuv_planar(info, planes[0], planes[1],
+-					     planes[2], width, height, stride);
+-
+ 	case DRM_FORMAT_YUV444:
+ 		return fill_tiles_yuv_planar(info, planes[0], planes[1],
+ 					     planes[2], width, height, stride);
+ 
++	case DRM_FORMAT_T548:
++	case DRM_FORMAT_T648:
++	case DRM_FORMAT_T54A:
++	case DRM_FORMAT_T64A:
++	case DRM_FORMAT_T54C:
++	case DRM_FORMAT_T64C:
++		return fill_tiles_tiled_yuv(info, planes[0], planes[1],
++					     planes[2], width, height, stride, info->format);
+ 
+ 	case DRM_FORMAT_YVU420:
+ 		return fill_tiles_yuv_planar(info, planes[0], planes[2],
+-- 
+2.34.1
+

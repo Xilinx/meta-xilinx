@@ -1,4 +1,8 @@
-SUMMARY = "Python framework to process interdependent tasks in a pool of workers"
+SUMMARY = "Python framework to process interdependent tasks in a pool \
+of workers"
+DESCRIPTION = "GitPython 'async' module: a small framework for \
+processing interdependent tasks in a worker pool; bundled here as a \
+build-time dependency for the RAFT application."
 HOMEPAGE = "http://github.com/gitpython-developers/async"
 SECTION = "devel/python"
 LICENSE = "BSD-3-Clause"

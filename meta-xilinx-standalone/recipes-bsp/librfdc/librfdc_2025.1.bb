@@ -1,4 +1,8 @@
 SUMMARY = "Linux rfdc library"
+DESCRIPTION = "Linux user-space library for the AMD RFdc (RF data \
+converter) block on Zynq UltraScale+ RFSoC and Versal RF devices, used \
+to configure and stream samples through the on-die ADCs and DACs at \
+runtime."
 SECTION = "librfdc"
 LICENSE = "BSD"
 

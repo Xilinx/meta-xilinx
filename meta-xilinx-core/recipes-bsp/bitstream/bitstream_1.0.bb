@@ -1,3 +1,4 @@
+SUMMARY = "Deploys a pre-built FPGA bitstream as virtual/bitstream."
 DESCRIPTION = "Recipe to provide a bitstream via virtual/bitstream"
 
 LICENSE = "MIT"

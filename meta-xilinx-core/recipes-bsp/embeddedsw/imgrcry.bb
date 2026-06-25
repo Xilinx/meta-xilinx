@@ -1,3 +1,5 @@
+SUMMARY = "Deploys a pre-built AMD Zynq UltraScale+ MPSoC Image \
+Recovery binary as virtual/imgrcry."
 DESCRIPTION = "Image Recovery"
 
 LICENSE = "CLOSED"
@@ -18,7 +20,6 @@ COMPATIBLE_HOST = ".*"
 IMGRCRY_DEPENDS ??= ""
 IMGRCRY_MCDEPENDS ??= ""
 IMGRCRY_DEPLOY_DIR ??= "${DEPLOY_DIR_IMAGE}"
-IMGRCRY_DEPLOY_DIR[vardepsexclude] += "TOPDIR"
 IMGRCRY_IMAGE_NAME ??= "image-recovery-${MACHINE}"
 
 # Default is for the multilib case (without the extension .bin)

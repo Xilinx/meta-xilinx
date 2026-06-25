@@ -1,0 +1,53 @@
+From 57cca1c40b85772abb950975d98fcfd389e2562a Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Tue, 26 Aug 2025 19:13:18 +0200
+Subject: [PATCH 28/41] virtio: Introduce notify_queue
+
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Acked-by: Stefano Stabellini <stefano.stabellini@amd.com>
+---
+ hw/virtio/virtio.c             | 7 +++++++
+ include/hw/virtio/virtio-bus.h | 1 +
+ 2 files changed, 8 insertions(+)
+
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index b066cdd4f1..5df3c41510 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -2556,12 +2556,19 @@ static void virtio_irq(VirtQueue *vq)
+ 
+ void virtio_notify(VirtIODevice *vdev, VirtQueue *vq)
+ {
++    BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
++    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
++
+     WITH_RCU_READ_LOCK_GUARD() {
+         if (!virtio_should_notify(vdev, vq)) {
+             return;
+         }
+     }
+ 
++    if (k->notify_queue) {
++        k->notify_queue(qbus->parent, virtio_get_queue_index(vq));
++    }
++
+     trace_virtio_notify(vdev, vq);
+     virtio_irq(vq);
+ }
+diff --git a/include/hw/virtio/virtio-bus.h b/include/hw/virtio/virtio-bus.h
+index 7ab8c9dab0..043dbeb4cf 100644
+--- a/include/hw/virtio/virtio-bus.h
++++ b/include/hw/virtio/virtio-bus.h
+@@ -39,6 +39,7 @@ DECLARE_OBJ_CHECKERS(VirtioBusState, VirtioBusClass,
+ struct VirtioBusClass {
+     /* This is what a VirtioBus must implement */
+     BusClass parent;
++    void (*notify_queue)(DeviceState *d, uint16_t index);
+     void (*notify)(DeviceState *d, uint16_t vector);
+     void (*save_config)(DeviceState *d, QEMUFile *f);
+     void (*save_queue)(DeviceState *d, int n, QEMUFile *f);
+-- 
+2.34.1
+

@@ -17,7 +17,7 @@ following use cases.
 > **Note:** Refer https://github.com/Xilinx/dfx-mgr/blob/master/README.md for
 > shell.json and accel.json file content.
 
-* **Zynq 7000, ZynqMP and Versal**:
+* **Zynq 7000, ZynqMP, Versal and Versal-2ve-2vm**:
   * Design: Vivado flat or Segmented Configuration design.
     * Input files to firmware recipes: .bit or .bin or _pld.pdi, .dtsi or dtbo and shell.json (optional)
     * Usage Examples:
@@ -278,6 +278,70 @@ SRC_URI = " \
     file://<dfx_design_rp_rm_pl>.xclbin \
     "
 ```
+
+* **Versal-2ve-2vm**:
+  * Design: Vivado Segmented DFx design.
+    * Input files to firmware recipes: .pdi, .dtsi or dtbo
+      shell.json or accel.json (optional) and .xclbin (optional).
+    * Usage Examples:
+
+```
+# Versal-2ve-2vm Segmented DFx Static
+SRC_URI = " \
+    file://<seg_dfx_design_static_pl>.pdi \
+    file://<seg_dfx_design_static_pl>.dtsi \
+    file://shell.json \
+    file://<seg_dfx_design_static_pl>.xclbin \
+    "
+```
+
+```
+# Versal-2ve-2vm Segmented DFx Static
+SRC_URI = " \
+    file://<seg_dfx_design_static_pl>.pdi \
+    file://<seg_dfx_design_static_pl>.dtbo \
+    file://shell.json \
+    file://<seg_dfx_design_static_pl>.xclbin \
+    "
+```
+
+```
+# Versal-2ve-2vm Segmented DFx Static
+SRC_URI = " \
+    file://<seg_dfx_design_static_pl>.pdi \
+    file://shell.json \
+    file://<seg_dfx_design_static_pl>.xclbin \
+    "
+```
+
+```
+# Versal-2ve-2vm Segmented DFx RP
+SRC_URI = " \
+    file://<seg_dfx_design_rp_rm_pl>.pdi \
+    file://<seg_dfx_design_rp_rm_pl>.dtsi \
+    file://accel.json \
+    file://<seg_dfx_design_rp_rm_pl>.xclbin \
+    "
+```
+
+```
+# Versal-2ve-2vm Segmented DFx RP
+SRC_URI = " \
+    file://<seg_dfx_design_rp_rm_pl>.pdi \
+    file://<seg_dfx_design_rp_rm_pl>.dtbo \
+    file://accel.json \
+    file://<seg_dfx_design_rp_rm_pl>.xclbin \
+    "
+```
+
+```
+# Versal-2ve-2vm Segmented DFx RP
+SRC_URI = " \
+    file://<seg_dfx_design_rp_rm_pl>.pdi \
+    file://accel.json \
+    file://<seg_dfx_design_rp_rm_pl>.xclbin \
+    "
+```
 ---
 
 ## How to create a firmware recipe app
@@ -334,10 +398,14 @@ SRC_URI = " \
 1. Modify the recipe `<path-to-meta-layer>/recipes-firmware/<firmware-app-name>/firmware-app-name.bb`
    inherit dfx_user_dts bbclass and set the COMPATIBLE_MACHINE as shown below.
 
-   > **Note:** COMPATIBLE_MACHINE should match machine fw files.
+   > **Note:**
+   > 1. COMPATIBLE_MACHINE should match machine fw files or EDF common machine.
+   > 2. In 2025.2 and later release dfx_user_dts bbclass supports FW_INSTALL_DIR
+   >    where user can install the fw files to a specific directory structure. By
+   >    default bbclass will install fw files into `/lib/firmaware/xilinx/${PN}`
 
     ```
-    SUMMARY = "<board-name> {full|dfx|segmented} loading app firmware using dfx_user_dts bbclass"
+    SUMMARY = "<board-name> {full|dfx|segmented|segmented-dfx} loading app firmware using dfx_user_dts bbclass"
     LICENSE = "MIT"
     LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
@@ -350,20 +418,26 @@ SRC_URI = " \
         "
 
     COMPATIBLE_MACHINE ?= "^$"
-    COMPATIBLE_MACHINE:zynqmp-zcu111 = "${MACHINE}"
+    COMPATIBLE_MACHINE:zynqmp-zcu111-sdt-full = "${MACHINE}"
+    COMPATIBLE_MACHINE:amd-cortexa53-common = "${MACHINE}"
+    # Optional variable to install fw files to a specific directory
+    FW_INSTALL_DIR = "zcu111/pl"
     ```
 
 2. Add firmware-recipe app to target image recipe and enable fpga-overlay machine
    features in local.conf as shown below.
 
-    > **Note:** fpga-manager-script provides fpgautil tool to load .bin/pdi and dtbo
-    > at runtime linux.
+    > **Note:** User can use fpgautil or dfx-mgr tool to load .bin/pdi and dtbo
+    > at runtime linux. For more details refer.
+    > 1. [fpgautil](https://github.com/Xilinx/meta-xilinx/blob/master/meta-xilinx-core/recipes-bsp/fpga-manager-script/files/fpgautil.c#L96)
+    > 2. [dfx-mgr-client](https://github.com/Xilinx/dfx-mgr/blob/master/README.md)
 
     ```
     MACHINE_FEATURES += "fpga-overlay"
     IMAGE_INSTALL:append = " \
-    firmware-app-name \
-    fpga-manager-script \
+        firmware-app-name \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'fpga-overlay', 'dfx-mgr', '', d)} \
+        "
     ```
 
 3. Follow SDT or XSCT Build instructions whichever build method is used but not
@@ -374,7 +448,7 @@ SRC_URI = " \
 
 4. Once images are built firmware app files will be installed on target_rootfs.
     ```
-    # <target_rootfs>/lib/firmware/xilinx/firmware-app-name
+    # <target_rootfs>/lib/firmware/xilinx/${FW_INSTALL_DIR}
     ```
 
 ---
@@ -517,7 +591,7 @@ Time taken to load BIN is 99.000000 Milli Seconds
 BIN FILE loaded through FPGA manager successfully
 yocto-vck190-versal:/#
 ```
-* Versal (Segmented Configuration)
+* Versal or Versal-2ve-2vm (Segmented Configuration)
 ```
 yocto-vck190-versal:/$ sudo su
 yocto-vck190-versal:/# fpgautil -b /lib/firmware/xilinx/vck190-dfx-full/vck190-dfx-full.pdi -o /lib/firmware/xilinx/vck190-dfx-full/vck190-dfx-full.dtbo
@@ -572,11 +646,63 @@ PMC ERR1: 0x00000000, PMC ERR2: 0x00000000
 [  643.198059] input: axi:pl-gpio-keys as /devices/platform/axi/axi:pl-gpio-keys/input/input0
 yocto-vck190-versal:/#
 ```
+* Versal-2ve-2vm (Segmented DFx Static)
+```
+amd-edf:/lib/firmware/xilinx# fpgautil -b /lib/firmware/xilinx/vek385-seg-dfx-static-fw/vek385-seg-dfx-static-fw.pdi -o /lib/firmware/xilinx/vek385-seg-dfx-static-fw/vek385-seg-dfx-static-fw.dtbo
+Time taken to load BIN is 260.000000 Milli Seconds
+BIN FILE loaded through FPGA manager successfully
+amd-edf:/lib/firmware/xilinx#
+amd-edf:/lib/firmware/xilinx#
+amd-edf:/lib/firmware/xilinx# dmesg | tail -n 10
+[  147.064749] audit: type=1325 audit(1763078520.218:46): table=filter family=2 entries=4 op=xt_replace pid=990 comm="iptables"
+[ 1239.725270] fpga_manager fpga0: writing vek385-seg-dfx-static-fw.pdi to Xilinx Versal FPGA Manager
+[ 1239.882597] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /fpga-region/firmware-name
+[ 1239.882721] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /__symbols__/fpga_PR1
+[ 1239.882727] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /__symbols__/fpga_PR0
+[ 1239.882732] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /__symbols__/misc_clk_1
+[ 1239.882737] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /__symbols__/misc_clk_0
+[ 1239.882743] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /__symbols__/pl_mmi_clk_wiz
+[ 1239.980561] of-fpga-region fpga-region:fpga-PR1: FPGA Region probed
+[ 1239.980637] of-fpga-region fpga-region:fpga-PR0: FPGA Region probed
+amd-edf:/lib/firmware/xilinx#
+```
+* Versal-2ve-2vm (Segmented DFx RP)
+```
+amd-edf:/lib/firmware/xilinx# gpiodetect
+gpiochip0 [versal_gpio] (58 lines)
+gpiochip1 [pmc_gpio] (116 lines)
+gpiochip2 [9-0020] (16 lines)
+amd-edf:/lib/firmware/xilinx# fpgautil -b /lib/firmware/xilinx/vek385-seg-dfx-static-fw/vek385-seg-dfx-rp0rm0-gpio-fw/rp0rm0_slot0/vek385-seg-dfx-rp0rm0-gpio-fw.pdi -o /lib/firmware/xilinx/vek385-s
+eg-dfx-static-fw/vek385-seg-dfx-rp0rm0-gpio-fw/rp0rm0_slot0/vek385-seg-dfx-rp0rm0-gpio-fw.dtbo -f Partial -n PR0
+Time taken to load BIN is 102.000000 Milli Seconds
+BIN FILE loaded through FPGA manager successfully
+amd-edf:/lib/firmware/xilinx#
+amd-edf:/lib/firmware/xilinx# dmesg | tail -n 10
+[ 1239.882737] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /__symbols__/misc_clk_0
+[ 1239.882743] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /__symbols__/pl_mmi_clk_wiz
+[ 1239.980561] of-fpga-region fpga-region:fpga-PR1: FPGA Region probed
+[ 1239.980637] of-fpga-region fpga-region:fpga-PR0: FPGA Region probed
+[ 1392.478189] fpga_manager fpga0: writing vek385-seg-dfx-rp0rm0-gpio-fw.pdi to Xilinx Versal FPGA Manager
+[ 1392.576085] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /__symbols__/rp0rm0_partial_misc_clk_1
+[ 1392.576095] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /__symbols__/rp0rm0_partial_rp0_axi_gpio_0
+[ 1392.576100] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /__symbols__/rp0rm0_partial_rp0_axi_gpio_1
+[ 1392.576106] OF: overlay: WARNING: memory leak will occur if overlay removed, property: /__symbols__/rp0rm0_partial_rp0_axi_gpio_2
+[ 1392.578968] of_fixed_clk axi:misc_clk_1: probe with driver of_fixed_clk failed with error -17
+amd-edf:/lib/firmware/xilinx#
+amd-edf:/lib/firmware/xilinx# gpiodetect
+gpiochip0 [versal_gpio] (58 lines)
+gpiochip1 [pmc_gpio] (116 lines)
+gpiochip2 [9-0020] (16 lines)
+gpiochip3 [b2020000.rp0_axi_gpio_0] (4 lines)
+gpiochip4 [b2030000.rp0_axi_gpio_1] (2 lines)
+gpiochip5 [b2040000.rp0_axi_gpio_2] (4 lines)
+amd-edf:/lib/firmware/xilinx#
+```
 ---
 
 ### Testing PL functionality 
 
-* This examples uses PL GPIO DIP switches and Push buttons to capture interrupts.
+* This example uses PL GPIO DIP switches and Push buttons to capture interrupts.
 * Verify PL GPIO DIP switches and Push buttons are registered.
 * Move the DIP Switches ON/OFF and verify the interrupt counts.
 ```
@@ -722,6 +848,18 @@ yocto-vck190-versal:/# fpgautil -R -n PR0
 * Versal (DFx Static)
 ```
 yocto-vck190-versal:/# fpgautil -R -n Full
+```
+* Versal or Versal-2ve-2vm (Segmented)
+```
+amd-edf:/lib/firmware/xilinx# fpgautil -R
+```
+* Versal-2ve-2vm (Segmented DFx RP)
+```
+amd-edf:/lib/firmware/xilinx# fpgautil -R -n PR0
+```
+* Versal-2ve-2vm (Segmented DFx Static)
+```
+amd-edf:/lib/firmware/xilinx# fpgautil -R -n Full
 ```
 ---
 

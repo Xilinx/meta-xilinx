@@ -1,14 +1,10 @@
-inherit esw python3native esw_apps_common deploy
+inherit esw python3native esw_apps_common deploy bootgen-bif
 
 IMGSEL_DEPENDS ?= ""
 IMGSEL_DEPENDS:zynqmp ?= "libxil xiltimer bootgen-native"
 IMGSEL_DEPENDS:versal ?= "xilpdi xilplmi xilloader xilpm xilsecure xilpuf xiltimer xilffs bootgen-native base-pdi"
 IMGSEL_DEPENDS:versal-2ve-2vm ?= "xilpdi xilplmi xilloader xilpm-ng xilsecure xilpuf xiltimer xilffs xilocp xilcert bootgen-native base-pdi"
 
-BOOTGEN_ARCH_DEFAULT:zynqmp = "zynqmp"
-BOOTGEN_ARCH_DEFAULT:versal = "versal"
-BOOTGEN_ARCH_DEFAULT:versal-2ve-2vm = "versal_2ve_2vm"
-BOOTGEN_ARCH ?= "${BOOTGEN_ARCH_DEFAULT}"
 
 DEPENDS += "${IMGSEL_DEPENDS}"
 
@@ -18,7 +14,7 @@ ESW_COMPONENT_SRC = "/src/"
 ESW_EXECUTABLE_NAME = "imgsel"
 
 SRC_URI:append = " git://github.com/Xilinx/image-selector.git;protocol=https;branch=main;destsuffix=image-selector;name=image-selector"
-SRCREV_image-selector = "877cb268c8f524b746846f981a8b3e809c8719ef"
+SRCREV_image-selector = "0d2110e33ebf6023a19b43f0a6fa06e08507d3e1"
 
 do_configure:prepend() {
     (
@@ -110,8 +106,6 @@ do_compile:append:versal-2ve-2vm () {
 
 do_compile:append () {
     bootgen -image ${WORKDIR}/${PN}.bif -arch ${BOOTGEN_ARCH} -w -o ${B}/${PN}.bin
-
-    printf "* ${PN}\nSRCREV: ${SRCREV}\nBRANCH: ${BRANCH}\n\n" > ${S}/${PN}.manifest
 }
 
 do_install[noexec] = "1"
@@ -121,8 +115,6 @@ do_deploy() {
     ln -sf ${PN}.elf ${DEPLOYDIR}/${PN}-${MACHINE}.elf
     install -Dm 0644 ${B}/${PN}.bin ${DEPLOYDIR}/${PN}.bin
     ln -sf ${PN}.bin ${DEPLOYDIR}/${PN}-${MACHINE}.bin
-
-    install -Dm 0644 ${S}/${PN}.manifest ${DEPLOYDIR}/${PN}-${MACHINE}.manifest
 }
 
 addtask deploy before do_build after do_install

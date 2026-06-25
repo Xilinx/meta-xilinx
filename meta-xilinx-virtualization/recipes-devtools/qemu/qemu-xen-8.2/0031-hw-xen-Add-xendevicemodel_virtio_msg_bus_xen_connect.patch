@@ -1,0 +1,39 @@
+From d81ac8065977492d763145c0c9c0e3256ecd4b0f Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Tue, 26 Aug 2025 21:14:54 +0200
+Subject: [PATCH 31/41] hw/xen: Add xendevicemodel_virtio_msg_bus_xen_connect
+
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/]
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Acked-by: Stefano Stabellini <stefano.stabellini@amd.com>
+---
+ include/hw/xen/xen_native.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/include/hw/xen/xen_native.h b/include/hw/xen/xen_native.h
+index 5caf91a616..63c179547a 100644
+--- a/include/hw/xen/xen_native.h
++++ b/include/hw/xen/xen_native.h
+@@ -548,4 +548,18 @@ static inline int xendevicemodel_set_irq_level(xendevicemodel_handle *dmod,
+ #define GUEST_RAM1_SIZE   0xfe00000000ULL
+ #endif
+ 
++#ifndef XEN_DMOP_virtio_msg_bus
++static inline int
++xendevicemodel_virtio_msg_bus_xen_connect(xendevicemodel_handle *dmod,
++                                          domid_t domid,
++                                          uint32_t bus_id,
++                                          uint16_t dev_num,
++                                          uint64_t shm_fifo_gfn,
++                                          uint32_t *port)
++{
++    errno = EOPNOTSUPP;
++    return -1;
++}
++#endif
++
+ #endif /* QEMU_HW_XEN_NATIVE_H */
+-- 
+2.34.1
+

@@ -1,4 +1,7 @@
 SUMMARY = "Source of XYZ tiles providers"
+DESCRIPTION = "Curated catalogue of XYZ map-tile providers, used as a \
+data dependency by Bokeh and similar geospatial-aware plotting \
+libraries."
 HOMEPAGE = "https://github.com/geopandas/xyzservices"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=6a3e440ffacb99f21fa410467c048574"

@@ -9,7 +9,7 @@ PV .= "+git"
 S = "${WORKDIR}/git"
 B = "${S}"
 
-BRANCH ?= "xlnx_rel_v2025.1"
+BRANCH ?= "master"
 REPO ?= "git://github.com/Xilinx/vdu-firmware.git;protocol=https"
 SRCREV ?= "e14e7614fbcbd72f0aa75b953e089bf4634ee128"
 

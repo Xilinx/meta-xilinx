@@ -1,0 +1,100 @@
+From a556bae5ceebda354bcab397afa21b0f59da2408 Mon Sep 17 00:00:00 2001
+From: Parth Gajjar <parth.gajjar@amd.com>
+Date: Wed, 18 Feb 2026 11:39:18 +0000
+Subject: [PATCH] Force weston to select ARGB if XRGB is not available on the
+ primary DRM plane
+
+Added support for weston 13.0.1 to fallback for ARGB of XRGB is not supported
+in primary DRM plane
+
+Upstream-Status: Inappropriate [Xilinx specific]
+Signed-off-by: Parth Gajjar <parth.gajjar@amd.com>
+---
+ libweston/backend-drm/drm-gbm.c | 56 ++++++++++++++++++++++-----------
+ 1 file changed, 38 insertions(+), 18 deletions(-)
+
+diff --git a/libweston/backend-drm/drm-gbm.c b/libweston/backend-drm/drm-gbm.c
+index 5b02b38..75d404b 100644
+--- a/libweston/backend-drm/drm-gbm.c
++++ b/libweston/backend-drm/drm-gbm.c
+@@ -235,30 +235,43 @@ drm_output_init_egl(struct drm_output *output, struct drm_backend *b)
+ {
+ 	const struct weston_renderer *renderer = b->compositor->renderer;
+ 	const struct weston_mode *mode = output->base.current_mode;
+-	const struct pixel_format_info *format[2] = {
+-		output->format,
+-		fallback_format_for(output->format),
+-	};
+-	struct gl_renderer_output_options options = {
+-		.formats = format,
+-		.formats_count = 1,
+-		.area.x = 0,
+-		.area.y = 0,
+-		.area.width = mode->width,
+-		.area.height = mode->height,
+-		.fb_size.width = mode->width,
+-		.fb_size.height = mode->height,
+-	};
++	const struct pixel_format_info *format[2];
++	const struct pixel_format_info *fallback;
++	struct gl_renderer_output_options options;
+ 
+ 	assert(output->gbm_surface == NULL);
+ 	create_gbm_surface(b->gbm, output);
++
++	/* If primary format failed, try the fallback format
++	 * (e.g., ARGB8888 for XRGB8888) */
++	if (!output->gbm_surface) {
++		fallback = fallback_format_for(output->format);
++		if (fallback) {
++			weston_log("Trying fallback format %s for output %s\n",
++				   fallback->drm_format_name,
++				   output->base.name);
++			output->format = fallback;
++			create_gbm_surface(b->gbm, output);
++		}
++	}
++
+ 	if (!output->gbm_surface) {
+ 		weston_log("failed to create gbm surface\n");
+ 		return -1;
+ 	}
+ 
+-	if (options.formats[1])
+-		options.formats_count = 2;
++	/* Initialize format array after potential fallback */
++	format[0] = output->format;
++	format[1] = fallback_format_for(output->format);
++
++	options.formats = format;
++	options.formats_count = format[1] ? 2 : 1;
++	options.area.x = 0;
++	options.area.y = 0;
++	options.area.width = mode->width;
++	options.area.height = mode->height;
++	options.fb_size.width = mode->width;
++	options.fb_size.height = mode->height;
+ 	options.window_for_legacy = (EGLNativeWindowType) output->gbm_surface;
+ 	options.window_for_platform = output->gbm_surface;
+ 	if (renderer->gl->output_window_create(&output->base, &options) < 0) {
+@@ -311,8 +324,15 @@ drm_output_render_gl(struct drm_output_state *state, pixman_region32_t *damage)
+ 		return NULL;
+ 	}
+ 
+-	/* The renderer always produces an opaque image. */
+-	ret = drm_fb_get_from_bo(bo, device, true, BUFFER_GBM_SURFACE);
++	/* Output transparent/opaque image according to the output format.
++	 * If the format has an opaque substitute, it means we specifically
++	 * chose an alpha format (e.g., ARGB8888) because the opaque format
++	 * (XRGB8888) isn't supported by the scanout plane. In this case,
++	 * we should NOT convert to opaque. If there's no opaque substitute,
++	 * the format is already opaque, so the conversion is a no-op.
++	 */
++	ret = drm_fb_get_from_bo(bo, device, !output->format->opaque_substitute,
++				 BUFFER_GBM_SURFACE);
+ 	if (!ret) {
+ 		weston_log("failed to get drm_fb for bo\n");
+ 		gbm_surface_release_buffer(output->gbm_surface, bo);
+-- 
+2.44.4
+

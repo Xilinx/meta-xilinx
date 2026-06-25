@@ -1,3 +1,5 @@
+SUMMARY = "Deploys a pre-built AMD Zynq / Zynq UltraScale+ MPSoC First \
+Stage Boot Loader (FSBL) ELF as virtual/fsbl."
 DESCRIPTION = "Xilinx First Stage Boot Loader"
 
 LICENSE = "CLOSED"
@@ -28,10 +30,14 @@ FSBL_IMAGE_NAME ??= "fsbl-${MACHINE}"
 FSBL_FILE ??= "${FSBL_DEPLOY_DIR}/${FSBL_IMAGE_NAME}"
 FSBL_FILE[vardepsexclude] = "FSBL_DEPLOY_DIR"
 
+# Manifest copying from multiconfig deploy
+FW_MANIFEST_SRC = "${FSBL_DEPLOY_DIR}/fsbl"
+FW_MANIFEST_NAME = "fsbl"
+
 do_fetch[depends] += "${FSBL_DEPENDS}"
 do_fetch[mcdepends] += "${FSBL_MCDEPENDS}"
 
-inherit deploy
+inherit deploy firmware-copy-manifest
 
 do_install() {
     if [ ! -e ${FSBL_FILE}.elf ]; then

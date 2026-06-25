@@ -23,6 +23,22 @@ DISTRO = "xilinx-image-recovery"
 bitbake image-recovery-tiny-initramfs
 ```
 
+# Alternative Build Instructions
+A machine may also include the provided enable-xilinx-imgrcvry.conf file similar to:
+
+   include conf/enable-xilinx-imgrcvry.conf
+
+Which will automatically configure the multiconfig system to include the appropriate
+configuration for this layer.
+
+The user may then use:
+```
+bitbake imgrcry
+```
+
+This will follow the steps and trigger a multiconfig build, and copy the resulting
+binary into the default multiconfig.
+
 ## Dependencies
 
 This layer depends on:
@@ -39,9 +55,9 @@ This layer depends on:
         https://git.yoctoproject.org/meta-xilinx (official version)
         https://github.com/Xilinx/meta-xilinx (development and AMD release)
 	layers: meta-xilinx-core, meta-xilinx-standalone, meta-xilinx-standalone-sdt.
-	branch: scarthgap or AMD release version (e.g. rel-v2025.1)
+	branch: scarthgap or AMD release version (e.g. rel-v2026.1)
 
 	URI:
         https://github.com/Xilinx/meta-amd-adaptive-socs (development and AMD release)
 	layers: meta-amd-adaptive-socs-core, meta-amd-adaptive-socs-bsp
-	branch: scarthgap or AMD release version (e.g. rel-v2025.1)
+	branch: scarthgap or AMD release version (e.g. rel-v2026.1)

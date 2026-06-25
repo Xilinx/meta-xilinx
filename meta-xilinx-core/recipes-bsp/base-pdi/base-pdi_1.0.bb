@@ -1,3 +1,5 @@
+SUMMARY = "Deploys a pre-built AMD Versal Programmable Device Image \
+(base PDI)."
 DESCRIPTION = "Recipe to deploy base pdi"
 
 LICENSE = "CLOSED"

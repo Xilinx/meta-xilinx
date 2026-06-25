@@ -1,3 +1,5 @@
+SUMMARY = "Packagegroup pulling in the Matchbox window manager and \
+supporting components used by the AMD Xilinx GUI demos."
 DESCRIPTION = "Matchbox related packages"
 
 inherit packagegroup features_check

@@ -1,0 +1,118 @@
+/ {
+	/* Empty root node resets Lopper's label tracking to avoid false duplicate label errors */
+};
+/* OSPI partitions for basecamp Image-recovery */
+&ospi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	spi_flash: flash@0 {
+		/delete-node/ partitions;
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			partition@0 {
+				label = "Image Selector";
+				reg = <0 0x60000>;
+			};
+			partition@60000 {
+				label = "Image Selector Backup";
+				reg = <0x60000 0x60000>;
+			};
+			partition@c0000 {
+				label = "Image Selector Scratchpad";
+				reg = <0xc0000 0x20000>;
+			};
+			partition@e0000 {
+				label = "Image Recovery";
+				reg = <0xe0000 0x1400000>;
+			};
+			partition@14e0000 {
+				label = "Image Recovery Scratchpad";
+				reg = <0x14e0000 0x20000>;
+			};
+			partition@1500000 {
+				label = "SystemReady-DT Update Metadata";
+				reg = <0x1500000 0x20000>;
+			};
+			partition@1520000 {
+				label = "SystemReady-DT Update Metadata Backup";
+				reg = <0x1520000 0x20000>;
+			};
+			partition@1540000 {
+				label = "U-Boot Variables";
+				reg = <0x1540000 0x20000>;
+			};
+			partition@1560000 {
+				label = "U-Boot Variables Backup";
+				reg = <0x1560000 0x20000>;
+			};
+			partition@1580000 {
+				label = "U-Boot UEFI Variables";
+				reg = <0x1580000 0x40000>;
+			};
+			partition@15c0000 {
+				label = "Bank A Space";
+				reg = <0x15c0000 0x7200000>;
+			};
+			partition@87c0000 {
+				label = "U-Boot Variables Bank A";
+				reg = <0x87c0000 0x20000>;
+			};
+			partition@87e0000 {
+				label = "U-Boot Variables Bank A Backup";
+				reg = <0x87e0000 0x20000>;
+			};
+			partition@8800000 {
+				label = "Bank B Space";
+				reg = <0x8800000 0x7200000>;
+			};
+			partition@fa00000 {
+				label = "U-Boot Variables Bank B";
+				reg = <0xFa00000 0x20000>;
+			};
+			partition@fa20000 {
+				label = "U-Boot Variables Bank B Backup";
+				reg = <0xFa20000 0x20000>;
+			};
+			partition@fa40000 {
+				label = "User Scratchpad";
+				reg = <0xFa40000 0x5c0000>;
+			};
+			/* 0xFFE0000-0x10000000: Reserved for OSPI manifest (128KB) */
+		};
+	};
+};
+
+/ {
+	/* System-ready metadata partitions for bank0 and bank1 with uuid info */
+	firmware {
+		fwu-mdata {
+			compatible = "u-boot,fwu-mdata-mtd";
+			fwu-mdata-store = <&spi_flash>;
+			mdata-parts = "SystemReady-DT Update Metadata", "SystemReady-DT Update Metadata Backup";
+
+			fwu-bank0 {
+				id = <0>;
+				label = "Bank A Space";
+				fwu-image0 {
+					id = <0>;
+					offset = <0>;
+					size = <0x7200000>;
+					uuid = "0b931b7e-b2f6-11ef-8565-eb65d140066b";
+				};
+			};
+
+			fwu-bank1 {
+				id = <1>;
+				label = "Bank B Space";
+				fwu-image0 {
+					id = <0>;
+					offset = <0>;
+					size = <0x7200000>;
+					uuid = "1243d800-b2f6-11ef-8f4f-8bddc3aa326d";
+				};
+			};
+		};
+	};
+};

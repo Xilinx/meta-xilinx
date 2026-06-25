@@ -1,42 +1,35 @@
-DESCRIPTION = "Bootbin version string file"
-SUMMARY = "The BIF file for bootbin requires a version file in a specific format"
+DESCRIPTION = "Bootbin version string file in hex format for boot header"
+SUMMARY = "Generates a hex-encoded version string for the Zynq/ZynqMP User Defined Field Boot Header (udf_bh)"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 COMPATIBLE_MACHINE = "^$"
+COMPATIBLE_MACHINE:zynq = "${MACHINE}"
+COMPATIBLE_MACHINE:zynqmp = "${MACHINE}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-BOOTBIN_VER_MAIN ?= ""
+BOOTBIN_VER_MAIN ??= "${PV}"
+BOOTBIN_VERSION_STRING ??= "${MACHINE}-v${BOOTBIN_VER_MAIN}"
 
 BOOTBIN_VER_FILE = "bootbin-version-header.txt"
-BOOTBIN_VER_MAX_LEN = "36"
+BOOTBIN_VER_MAX_LEN = "40"
+BOOTBIN_VER_MAX_LEN:zynq = "76"
 
-BOOTBIN_MANIFEST_FILE ?= "bootbin-version-header.manifest"
-
-inherit deploy image-artifact-names
+inherit deploy image-artifact-names shared-manifest
 
 IMAGE_NAME_SUFFIX = ""
+MANIFEST_COMPONENT_NAME = "bootbin-version-header"
+MANIFEST_COMPONENT_FIELDS = "version"
+MANIFEST_COMPONENT_FIELD_version = "${BOOTBIN_VERSION_STRING}"
 
 python do_configure() {
-
-    if not 'version' in locals():
-        version = d.getVar("MACHINE") + "-v" + d.getVar("BOOTBIN_VER_MAIN")
-    version += d.getVar("IMAGE_VERSION_SUFFIX")
-
+    version = d.getVar('BOOTBIN_VERSION_STRING')
     if len(version) > int(d.getVar("BOOTBIN_VER_MAX_LEN")):
-        bb.fatal("version string too long")
+        bb.fatal("version string too long (%s) [%d > %d]" % (version, len(version), int(d.getVar("BOOTBIN_VER_MAX_LEN"))))
 
-    with open(d.expand("${B}/${BOOTBIN_VER_FILE}"), "w") as f:
+    with open(d.expand("${B}/${BOOTBIN_VER_FILE}"), 'w') as f:
         f.write(version.encode("utf-8").hex())
-
-    with open(d.expand("${B}/${BOOTBIN_MANIFEST_FILE}"), "w") as f:
-        f.write("* %s\n" % d.getVar('PN'))
-        f.write("VERSION: %s\n" % version)
-        f.write("PV: %s\n" % d.getVar('PV'))
-        f.write("XILINX_VER_MAIN: %s\n" % d.getVar('XILINX_VER_MAIN'))
-        f.write("XILINX_VER_UPDATE: %s\n" % d.getVar('XILINX_VER_UPDATE'))
-        f.write("XILINX_VER_BUILD: %s\n\n" % d.getVar('XILINX_VER_BUILD'))
 }
 
 do_install() {
@@ -47,8 +40,6 @@ do_install() {
 do_deploy() {
     install -m 0644 ${B}/${BOOTBIN_VER_FILE} ${DEPLOYDIR}/${IMAGE_NAME}.txt
     ln -s ${IMAGE_NAME}.txt ${DEPLOYDIR}/${IMAGE_LINK_NAME}.txt
-    install -m 0644 ${B}/${BOOTBIN_MANIFEST_FILE} ${DEPLOYDIR}/${IMAGE_NAME}.manifest
-    ln -s ${IMAGE_NAME}.manifest ${DEPLOYDIR}/${IMAGE_LINK_NAME}.manifest
 }
 
 addtask deploy after do_compile

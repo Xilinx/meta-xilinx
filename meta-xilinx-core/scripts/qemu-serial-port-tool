@@ -1,0 +1,551 @@
+#! /usr/bin/env python3
+#
+# SPDX-License-Identifier: MIT
+#
+# Copyright (C) 2026, Advanced Micro Devices, Inc.  All rights reserved.
+# Portions of this file consist of AI-generated content.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+"""qemu-serial-port-tool: List QEMU serial ports from hardware DTB files
+and correlate with domain-specific DTBs."""
+
+import argparse
+import os
+import re
+import subprocess
+import sys
+
+
+class DTNode:
+    """A node in a parsed device tree."""
+
+    def __init__(self, name, parent=None):
+        self.name = name
+        self.parent = parent
+        self.properties = {}
+        self.children = []
+
+    @property
+    def path(self):
+        if self.parent is None:
+            return '/'
+        parent_path = self.parent.path
+        if parent_path == '/':
+            return '/' + self.name
+        return parent_path + '/' + self.name
+
+    def find_all(self, predicate):
+        """Find all descendant nodes matching a predicate."""
+        results = []
+        if predicate(self):
+            results.append(self)
+        for child in self.children:
+            results.extend(child.find_all(predicate))
+        return results
+
+    def find_by_path(self, path):
+        """Find a node by path relative to this node."""
+        parts = [p for p in path.split('/') if p]
+        node = self
+        for part in parts:
+            found = None
+            for child in node.children:
+                if child.name == part:
+                    found = child
+                    break
+            if found is None:
+                return None
+            node = found
+        return node
+
+
+# ---------------------------------------------------------------------------
+# DTS parsing
+# ---------------------------------------------------------------------------
+
+def is_dts_file(path):
+    """Check if a file is already in DTS (text) format rather than DTB (binary)."""
+    try:
+        with open(path, 'rb') as f:
+            header = f.read(4)
+            # DTB files start with the magic number 0xd00dfeed
+            if header == b'\xd0\x0d\xfe\xed':
+                return False
+        return True
+    except OSError:
+        return False
+
+
+def dtb_to_dts(dtb_path):
+    """Convert a DTB file to DTS text using dtc, or read directly if already DTS."""
+    if not os.path.exists(dtb_path):
+        sys.exit(f"Error: {dtb_path} does not exist")
+
+    if is_dts_file(dtb_path):
+        with open(dtb_path, 'r') as f:
+            return f.read()
+
+    try:
+        result = subprocess.run(
+            ['dtc', '-I', 'dtb', '-O', 'dts', dtb_path],
+            capture_output=True, text=True
+        )
+    except FileNotFoundError:
+        sys.exit("Error: 'dtc' not found. Install the device-tree-compiler package.")
+
+    if result.returncode != 0 and not result.stdout:
+        sys.exit(f"Error converting {dtb_path}: {result.stderr}")
+
+    return result.stdout
+
+
+def parse_dts(text):
+    """Parse DTS text into a DTNode tree."""
+    # Strip comments
+    text = re.sub(r'/\*.*?\*/', '', text, flags=re.DOTALL)
+    text = re.sub(r'//[^\n]*', '', text)
+
+    root = DTNode('/')
+    match = re.search(r'/\s*\{', text)
+    if not match:
+        sys.exit("Error: no root node found in DTS")
+
+    _parse_body(text, match.end(), root)
+    return root
+
+
+# Regex for a DTS identifier (property name or node name).
+# Covers letters, digits, and the characters #,._+-@? commonly seen in DTS.
+_IDENT_RE = re.compile(r'([#a-zA-Z0-9,._+?][#a-zA-Z0-9,._+?@-]*)\s*')
+
+
+def _parse_body(text, pos, parent):
+    """Parse the body between { and } of a DTS node."""
+    length = len(text)
+
+    while pos < length:
+        # Skip whitespace
+        while pos < length and text[pos] in ' \t\n\r':
+            pos += 1
+
+        if pos >= length or text[pos] == '}':
+            return pos + 1  # consume '}'
+
+        # Skip labels  (label: ...)
+        label_m = re.match(r'[a-zA-Z_][a-zA-Z0-9_]*\s*:\s*', text[pos:])
+        if label_m:
+            pos += label_m.end()
+            continue
+
+        m = _IDENT_RE.match(text, pos)
+        if not m:
+            pos += 1
+            continue
+
+        name = m.group(1)
+        pos = m.end()
+
+        if pos >= length:
+            break
+
+        if text[pos] == '{':
+            # Child node
+            child = DTNode(name, parent)
+            parent.children.append(child)
+            pos = _parse_body(text, pos + 1, child)
+            # consume optional trailing ';'
+            while pos < length and text[pos] in ' \t\n\r;':
+                pos += 1
+        elif text[pos] == '=':
+            # Property with value
+            pos += 1
+            value, pos = _parse_value(text, pos)
+            parent.properties[name] = value
+            # consume ';'
+            while pos < length and text[pos] in ' \t\n\r;':
+                pos += 1
+        elif text[pos] == ';':
+            # Boolean / empty property
+            parent.properties[name] = True
+            pos += 1
+        else:
+            pos += 1
+
+    return pos
+
+
+def _parse_value(text, pos):
+    """Read a property value up to the terminating ';'. Returns (value, pos)."""
+    length = len(text)
+    start = pos
+    depth = 0
+    in_string = False
+
+    while pos < length:
+        c = text[pos]
+        if c == '"' and (pos == start or text[pos - 1] != '\\'):
+            in_string = not in_string
+        elif not in_string:
+            if c in '<[':
+                depth += 1
+            elif c in '>]':
+                depth -= 1
+            elif c == ';' and depth <= 0:
+                break
+        pos += 1
+
+    return text[start:pos].strip(), pos
+
+
+# ---------------------------------------------------------------------------
+# Value helpers
+# ---------------------------------------------------------------------------
+
+def get_string_value(value):
+    """Return the first quoted string from a DTS property value."""
+    if isinstance(value, str):
+        m = re.match(r'\s*"(.*?)"', value)
+        if m:
+            return m.group(1)
+    return ''
+
+
+def get_type_name(compatible_value):
+    """Simplify a compatible string for the 'type' column."""
+    compat = get_string_value(compatible_value)
+    # Take the first compatible entry (before any \0 separator)
+    compat = compat.split('\\0')[0].split('\0')[0]
+    # Strip vendor prefix (e.g. "xlnx,xps-uartlite" -> "xps-uartlite")
+    if ',' in compat:
+        compat = compat.split(',', 1)[1]
+    return compat
+
+
+def extract_address_from_name(node_name):
+    """Extract the numeric address from a node name like 'serial@0xf1920000'."""
+    if '@' not in node_name:
+        return None
+    addr_str = node_name.split('@', 1)[1]
+    try:
+        if addr_str.lower().startswith('0x'):
+            return int(addr_str, 16)
+        return int(addr_str, 16)
+    except ValueError:
+        return None
+
+
+def get_device_name(node_name):
+    """Get the device name portion before any '@'."""
+    return node_name.split('@', 1)[0]
+
+
+# ---------------------------------------------------------------------------
+# Hardware DTB parsing
+# ---------------------------------------------------------------------------
+
+def parse_hw_serials(root):
+    """Find all serial ports in a hardware DTB.
+
+    Supports two styles:
+    1. Nodes with a 'chardev' property (e.g. chardev = "serial2")
+    2. Serial aliases in the root 'aliases' node pointing to serial nodes
+    """
+    serials = []
+
+    # --- Style 1: chardev property ---
+    nodes = root.find_all(lambda n: 'chardev' in n.properties)
+
+    for node in nodes:
+        chardev = get_string_value(node.properties['chardev'])
+        m = re.match(r'serial(\d+)$', chardev)
+        if not m:
+            continue
+
+        serial_num = int(m.group(1))
+        device = get_device_name(node.name)
+        compat = get_type_name(node.properties.get('compatible', '')) if 'compatible' in node.properties else ''
+        address = extract_address_from_name(node.name)
+
+        serials.append({
+            'serial_num': serial_num,
+            'chardev': chardev,
+            'device': device,
+            'type': compat,
+            'address': address,
+        })
+
+    # --- Style 2: aliases node with serialN entries ---
+    if not serials:
+        aliases_node = root.find_by_path('aliases')
+        if aliases_node:
+            for name, value in aliases_node.properties.items():
+                m = re.match(r'serial(\d+)$', name)
+                if not m or not isinstance(value, str):
+                    continue
+
+                serial_num = int(m.group(1))
+                path = get_string_value(value)
+                node = root.find_by_path(path.lstrip('/'))
+
+                device = ''
+                compat = ''
+                address = None
+                if node:
+                    device = get_device_name(node.name)
+                    address = extract_address_from_name(node.name)
+                    if 'compatible' in node.properties:
+                        compat = get_type_name(node.properties['compatible'])
+                else:
+                    # Extract from path
+                    last_part = path.rstrip('/').rsplit('/', 1)[-1]
+                    device = get_device_name(last_part)
+                    address = extract_address_from_name(last_part)
+
+                serials.append({
+                    'serial_num': serial_num,
+                    'chardev': name,
+                    'device': device,
+                    'type': compat,
+                    'address': address,
+                })
+
+    serials.sort(key=lambda s: s['serial_num'])
+    return serials
+
+
+# ---------------------------------------------------------------------------
+# Domain DTB parsing
+# ---------------------------------------------------------------------------
+
+def parse_domain_info(root):
+    """Extract serial aliases, stdout-path, and related info from a domain DTB."""
+    info = {
+        'aliases': {},       # serial name -> path
+        'stdout_path': None, # e.g. "serial1"
+        'stdout_path_raw': None, # original value e.g. "serial1:115200n8"
+    }
+
+    # Collect serial aliases from the aliases node
+    aliases_node = root.find_by_path('aliases')
+    if aliases_node:
+        for name, value in aliases_node.properties.items():
+            if re.match(r'serial\d+$', name) and isinstance(value, str):
+                info['aliases'][name] = get_string_value(value)
+
+    # Fall back to __symbols__ for any serial entries not already found
+    symbols_node = root.find_by_path('__symbols__')
+    if symbols_node:
+        for name, value in symbols_node.properties.items():
+            if re.match(r'serial\d+$', name) and name not in info['aliases'] and isinstance(value, str):
+                info['aliases'][name] = get_string_value(value)
+
+    # stdout-path from chosen node
+    chosen_node = root.find_by_path('chosen')
+    if chosen_node and 'stdout-path' in chosen_node.properties:
+        stdout = get_string_value(chosen_node.properties['stdout-path'])
+        info['stdout_path_raw'] = stdout
+        # Value may be "serial1:115200n8" — strip the baudrate suffix
+        info['stdout_path'] = stdout.split(':')[0]
+
+    return info
+
+
+def correlate(hw_serials, domain_info, domain_tree):
+    """Match domain serial ports to hardware serial ports by address."""
+    # Map address -> hw serial entry
+    addr_to_hw = {}
+    for s in hw_serials:
+        if s['address'] is not None:
+            addr_to_hw[s['address']] = s
+
+    domain_serials = []
+    for alias_name in sorted(domain_info['aliases'], key=lambda n: int(re.search(r'\d+', n).group())):
+        path = domain_info['aliases'][alias_name]
+        last_part = path.rstrip('/').rsplit('/', 1)[-1]
+        address = extract_address_from_name(last_part)
+        device = get_device_name(last_part)
+
+        hw_match = addr_to_hw.get(address) if address is not None else None
+
+        # For domain-only entries, try to look up compatible in the domain tree
+        dtype = device  # default: use node name
+        if hw_match:
+            dtype = hw_match['type']
+        else:
+            node = domain_tree.find_by_path(path.lstrip('/'))
+            if node and 'compatible' in node.properties:
+                dtype = get_type_name(node.properties['compatible'])
+
+        domain_serials.append({
+            'domain_serial': alias_name,
+            'path': path,
+            'address': address,
+            'device': device,
+            'type': dtype,
+            'hw_serial': hw_match,
+        })
+
+    return domain_serials
+
+
+# ---------------------------------------------------------------------------
+# Output formatting
+# ---------------------------------------------------------------------------
+
+def format_table(headers, rows):
+    """Render an ASCII table."""
+    col_widths = [len(h) for h in headers]
+    for row in rows:
+        for i, cell in enumerate(row):
+            col_widths[i] = max(col_widths[i], len(cell))
+
+    sep = '+' + '+'.join('-' * (w + 2) for w in col_widths) + '+'
+    fmt_row = lambda cells: '|' + '|'.join(f' {c:<{w}} ' for c, w in zip(cells, col_widths)) + '|'
+
+    lines = [sep, fmt_row(headers), sep]
+    for row in rows:
+        lines.append(fmt_row(row))
+    lines.append(sep)
+    return '\n'.join(lines)
+
+
+# ---------------------------------------------------------------------------
+# qemuboot.conf support
+# ---------------------------------------------------------------------------
+
+def resolve_hw_dtb(path):
+    """If path is a qemuboot.conf file, read qb_dtb from it; otherwise return as-is."""
+    if not os.path.exists(path):
+        sys.exit(f"Error: {path} does not exist")
+
+    # Check if this looks like a qemuboot.conf (text file with key = value pairs)
+    if path.endswith('.conf') or path.endswith('.qemuboot.conf'):
+        conf_dir = os.path.dirname(os.path.abspath(path))
+        with open(path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith('qb_dtb'):
+                    parts = line.split('=', 1)
+                    if len(parts) == 2:
+                        dtb_rel = parts[1].strip()
+                        dtb_path = os.path.join(conf_dir, dtb_rel)
+                        if not os.path.exists(dtb_path):
+                            sys.exit(f"Error: qb_dtb path '{dtb_path}' (from {path}) does not exist")
+                        return dtb_path
+        sys.exit(f"Error: no 'qb_dtb' entry found in {path}")
+
+    return path
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog='qemu-serial-port-tool',
+        description='List QEMU serial ports from hardware DTB and correlate with domain DTBs',
+    )
+    parser.add_argument('hardware_dtb', help='Path to the hardware DTB file or a qemuboot.conf file')
+    parser.add_argument('--domain', nargs='+', default=[],
+                        help='Path(s) to domain DTB/DTS file(s)')
+    parser.add_argument('--stdout', action='store_true',
+                        help='Generate QEMU -serial command line directing stdout to mon:stdio')
+
+    args = parser.parse_args()
+
+    # --- Resolve hardware DTB ---
+    hw_dtb_path = resolve_hw_dtb(args.hardware_dtb)
+    hw_dts = dtb_to_dts(hw_dtb_path)
+    hw_tree = parse_dts(hw_dts)
+    hw_serials = parse_hw_serials(hw_tree)
+
+    if not hw_serials:
+        print(f"No serial ports found in hardware DTB: {hw_dtb_path}")
+        return
+
+    if not args.domain:
+        # Hardware-only table
+        headers = ['hw serial', 'device', 'type', 'address']
+        rows = []
+        for s in hw_serials:
+            addr = f"0x{s['address']:08x}" if s['address'] is not None else ''
+            rows.append([s['chardev'], s['device'], s['type'], addr])
+        print(format_table(headers, rows))
+        return
+
+    # --- Parse domain DTB(s) and correlate ---
+    for domain_dtb in args.domain:
+        domain_dts = dtb_to_dts(domain_dtb)
+        domain_tree = parse_dts(domain_dts)
+        domain_info = parse_domain_info(domain_tree)
+        domain_correlated = correlate(hw_serials, domain_info, domain_tree)
+
+        # Print domain header and table
+        print(f"\nDomain: {domain_dtb}")
+
+        headers = ['hw serial', 'domain serial', 'device', 'type', 'address']
+        rows = []
+
+        for s in hw_serials:
+            domain_name = ''
+            for ds in domain_correlated:
+                if ds['hw_serial'] and ds['hw_serial']['chardev'] == s['chardev']:
+                    domain_name = ds['domain_serial']
+                    break
+            addr = f"0x{s['address']:08x}" if s['address'] is not None else ''
+            rows.append([s['chardev'], domain_name, s['device'], s['type'], addr])
+
+        for ds in domain_correlated:
+            if ds['hw_serial'] is None:
+                addr = f"0x{ds['address']:08x}" if ds['address'] is not None else ''
+                rows.append(['', ds['domain_serial'], ds['device'], ds['type'], addr])
+
+        print(format_table(headers, rows))
+
+        # stdout info for this domain
+        if args.stdout and domain_info['stdout_path']:
+            stdout_domain_serial = domain_info['stdout_path']
+            stdout_path_raw = domain_info['stdout_path_raw']
+
+            stdout_hw = None
+            for ds in domain_correlated:
+                if ds['domain_serial'] == stdout_domain_serial and ds['hw_serial']:
+                    stdout_hw = ds['hw_serial']['chardev']
+                    break
+
+            if stdout_hw:
+                print(f"\nstdout-path: ({stdout_path_raw})")
+                print(f"domain {stdout_domain_serial} is hardware {stdout_hw}")
+
+                max_serial = max(s['serial_num'] for s in hw_serials)
+                qemu_args = []
+                for i in range(max_serial + 1):
+                    if f'serial{i}' == stdout_hw:
+                        qemu_args.append('mon:stdio')
+                    else:
+                        qemu_args.append('null')
+
+                cmdline = ' '.join(f'-serial {a}' for a in qemu_args)
+                print(f"\nqemu configuration: {cmdline}")
+
+
+if __name__ == '__main__':
+    main()

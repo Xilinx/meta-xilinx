@@ -1,3 +1,13 @@
+SUMMARY = "AMD Xilinx Embedded Software (embeddedsw) source tree."
+DESCRIPTION = "Source-only recipe that fetches the AMD Xilinx Embedded \
+Software (embeddedsw) git tree and exports it for the per-PN ESW \
+driver, library and firmware recipes to consume via shared-S. Not \
+built or deployed on its own."
+
+# Somewhere we need to verify the LIC_FILES_CHKSUM
+# normally part of deployment, but there is no deployment
+do_patch[postfuncs] += "populate_lic_qa_checksum"
+
 python do_configure () {
     externalsrc = d.getVar('EXTERNALSRC')
     if externalsrc:
@@ -14,9 +24,13 @@ deltask do_compile
 deltask do_install
 deltask do_populate_sysroot
 deltask do_populate_lic
+
+addtask configure before do_build after do_patch
+addtask patch before do_build after do_unpack
+
 RM_WORK_EXCLUDE += "${PN}"
 
-inherit xlnx-embeddedsw nopackages
+inherit xlnx-embeddedsw nopackages allarch
 
 COMPATIBLE_HOST = ".*"
 COMPATIBLE_MACHINE = ".*"
@@ -28,14 +42,8 @@ SSTATE_SWSPEC = "sstate:embeddedsw::${ESW_VER}:r0::${SSTATE_VERSION}:"
 STAMP = "${STAMPS_DIR}/work-shared/embeddedsw-${PV}-${PR}"
 STAMPCLEAN = "${STAMPS_DIR}/work-shared/embeddedsw-${PV}-*"
 
-INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = ""
 PACKAGES = ""
-TARGET_ARCH = "allarch"
-TARGET_AS_ARCH = "none"
-TARGET_CC_ARCH = "none"
-TARGET_LD_ARCH = "none"
-TARGET_OS = "linux"
 baselib = "lib"
 PACKAGE_ARCH = "all"
 

@@ -1,4 +1,7 @@
+SUMMARY = "AMD AXI SPI controller driver (baremetal)."
 
+DESCRIPTION = "Baremetal driver for the AMD AXI SPI master/slave IP \
+block in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "spi"

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+modprobe mali_gpu_pm
 modprobe mali_gpu_power
 modprobe mali_gpu_system
 modprobe mali_gpu_assign ptm_config='A:S0:S1:P0:W0'
@@ -12,5 +13,5 @@ echo 0x3 > /sys/module/mali_gpu_resource_group/drivers/*/*/arbiter/partitions/pa
 echo 0x1 > /sys/module/mali_gpu_resource_group/drivers/*/*/arbiter/partitions/partition0/assigned_access_windows
 
 modprobe mali_gpu_aw
-modprobe mali_kbase
+modprobe mali_kbase gpu_req_timeout=100
 modprobe dma-buf-test-exporter

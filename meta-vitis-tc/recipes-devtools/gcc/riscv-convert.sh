@@ -14,27 +14,18 @@ sed -e 's,;, ,' |
     if [ $mlib = '.' ]; then
       echo '# Base configuration' >> $tempfile
       echo '# CFLAGS:' >> $tempfile
-      echo 'DEFAULTTUNE = "riscv"' >> $tempfile
+      echo 'DEFAULTTUNE = "rv32"' >> $tempfile
       echo >> $tempfile
-      echo 'AVAILTUNES += "riscv"' >> $tempfile
-      echo 'PACKAGE_EXTRA_ARCHS:tune-riscv = "${TUNE_PKGARCH:tune-riscv}"' >> $tempfile
-      echo 'BASE_LIB:tune-riscv = "lib"' >> $tempfile
-      echo 'TUNE_FEATURES:tune-riscv = "riscv riscv32"' >> $tempfile
-      echo 'TUNE_CCARGS:tune-riscv = ""' >> $tempfile
-      echo 'TUNE_PKGARCH:tune-riscv = "riscv32"' >> $tempfile
-      echo 'TUNE_ARCH:tune-riscv = "riscv32"' >> $tempfile
+      echo 'AVAILTUNES += "rv32"' >> $tempfile
+      echo 'TUNE_FEATURES:tune-rv32 = "rv 32 i"' >> $tempfile
+      echo 'PACKAGE_EXTRA_ARCHS:tune-rv32 = "${TUNE_RISCV_PKGARCH}"' >> $tempfile
+      echo 'BASE_LIB:tune-rv32 = "lib"' >> $tempfile
       continue
     fi
 
     cflags=$(echo $args | sed -e 's,@, -,g')
-    multilib="lib$(echo $mlib | sed -e 's,/,,g' -e 's,_,,g')"
-    tune="$(echo $mlib | sed -e 's,/,,g')"
-    case $mlib in
-        .)  arch="riscv32" ;;
-        rv32*) arch="riscv32" ;;
-        rv64*) arch="riscv64" ;;
-        *) arch="unknwon" ;;
-    esac
+    tune=$(echo $cflags | sed -e 's,-march=\([a-z0-9_]*\).*,\1,')
+    multilib="lib$tune"
     echo "MULTILIBS += \"multilib:${multilib}\""
     echo >> $tempfile
     echo >> $tempfile
@@ -43,16 +34,9 @@ sed -e 's,;, ,' |
     echo "DEFAULTTUNE:virtclass-multilib-$multilib = \"$tune\"" >> $tempfile
     echo >> $tempfile
     echo "AVAILTUNES += \"$tune\"" >> $tempfile
-    echo "PACKAGE_EXTRA_ARCHS:tune-$tune = \"\${TUNE_PKGARCH:tune-$tune}\"" >> $tempfile
+    echo "TUNE_FEATURES:tune-$tune = \"\${@mbv.tune.riscv_isa_to_tune(\"$tune\")}\"" >> $tempfile
+    echo "PACKAGE_EXTRA_ARCHS:tune-$tune = \"\${TUNE_RISCV_PKGARCH}\"" >> $tempfile
     echo "BASE_LIB:tune-$tune = \"lib/$mlib\"" >> $tempfile
-    if [ "${tune/rv32/}" != "${tune}" ]; then
-        echo "TUNE_FEATURES:tune-$tune = \"riscv riscv32\"" >> $tempfile
-    elif [ "${tune/rv64/}" != "${tune}" ]; then
-        echo "TUNE_FEATURES:tune-$tune = \"riscv riscv64\"" >> $tempfile
-    fi
-    echo "TUNE_CCARGS:tune-$tune = \"$cflags\"" >> $tempfile
-    echo "TUNE_PKGARCH:tune-$tune = \"$tune\"" >> $tempfile
-    echo "TUNE_ARCH:tune-$tune = \"$arch\"" >> $tempfile
   done
 
 echo

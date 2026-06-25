@@ -71,7 +71,7 @@ IMAGE_CMD:wic.ufs () {
 		bbfatal "No kickstart files from WKS_FILES were found: ${WKS_FILES}. Please set WKS_FILE or WKS_FILES appropriately."
 	fi
         BUILDDIR="${TOPDIR}" PSEUDO_UNLOAD=1 ${LAYERPATH_xilinx}/scripts/wic --version
-	BUILDDIR="${TOPDIR}" PSEUDO_UNLOAD=1 ${LAYERPATH_xilinx}/scripts/wic create "$wks" --vars "${STAGING_DIR}/${MACHINE}/imgdata/" --sector-size 4096 -e "${IMAGE_BASENAME}" -o "$build_wic_ufs/" -w "$tmp_wic_ufs" ${WIC_CREATE_EXTRA_ARGS}
+	BUILDDIR="${TOPDIR}" PSEUDO_UNLOAD=1 ${LAYERPATH_xilinx}/scripts/wic create "$wks" --vars "${STAGING_DIR}/${MACHINE}/imgdata/" --sector-size 4096 -e "${IMAGE_BASENAME}-ufs" -o "$build_wic_ufs/" -w "$tmp_wic_ufs" ${WIC_CREATE_EXTRA_ARGS}
 
 	# look to see if the user specifies a custom imager
 	IMAGER=direct
@@ -183,7 +183,7 @@ python () {
 
 #
 # Write environment variables used by wic
-# to tmp/sysroots/<machine>/imgdata/<image>.env
+# to tmp/sysroots/<machine>/imgdata/<image>-ufs.env
 #
 python do_rootfs_wicufsenv () {
     wicvars = d.getVar('WICUFSVARS')
@@ -193,7 +193,7 @@ python do_rootfs_wicufsenv () {
     stdir = d.getVar('STAGING_DIR')
     outdir = os.path.join(stdir, d.getVar('MACHINE'), 'imgdata')
     bb.utils.mkdirhier(outdir)
-    basename = d.getVar('IMAGE_BASENAME')
+    basename = d.getVar('IMAGE_BASENAME') + '-ufs'
     with open(os.path.join(outdir, basename) + '.env', 'w') as envf:
         for var in wicvars.split():
             value = d.getVar(var)

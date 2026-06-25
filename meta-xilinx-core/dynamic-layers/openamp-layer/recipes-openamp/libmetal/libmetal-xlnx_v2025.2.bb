@@ -1,0 +1,25 @@
+SUMMARY = "AMD Xilinx libmetal hardware abstraction library (xlnx \
+fork)."
+DESCRIPTION = "AMD Xilinx fork of the OpenAMP libmetal library, \
+providing the user-space and baremetal hardware abstraction layer \
+(memory, IRQ, I/O) used by open-amp on Zynq UltraScale+ MPSoC, Versal \
+and Versal NET inter-processor communication."
+SRCBRANCH ?= "2025"
+SRCREV = "2ebf3a70bb310bcaed01f0d8352b4818660e8c21"
+BRANCH = "xlnx_rel_v2025.2"
+LIC_FILES_CHKSUM ?= "file://LICENSE.md;md5=f4d5df0f12dcea1b1a0124219c0dbab4"
+PV .= "+git"
+
+REPO = "git://github.com/Xilinx/libmetal.git;protocol=https"
+
+include ${LAYER_PATH_openamp-layer}/recipes-openamp/libmetal/libmetal.inc
+include ${LAYER_PATH_openamp-layer}/vendor/xilinx/recipes-openamp/libmetal/libmetal-xlnx.inc
+
+RPROVIDES:${PN}-dbg += "libmetal-dbg"
+RPROVIDES:${PN}-dev += "libmetal-dev"
+RPROVIDES:${PN}-lic += "libmetal-lic"
+RPROVIDES:${PN}-src += "libmetal-src"
+RPROVIDES:${PN}-staticdev += "libmetal-staticdev"
+
+# Zynq is no longer supported
+COMPATIBLE_MACHINE:zynq = "$^"

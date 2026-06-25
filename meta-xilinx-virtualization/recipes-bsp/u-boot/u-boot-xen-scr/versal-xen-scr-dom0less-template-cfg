@@ -1,0 +1,37 @@
+# Versal Xen image-builder Dom0less boot load configurations without dtb file.
+
+# This config file serves as template based on edf platform disk image layout.
+# User can refer this can create their own config. For more details on variable
+# usage refer image-builder readme file.
+# https://gitlab.com/xen-project/imagebuilder/-/blob/master/README.md?ref_type=heads
+
+# Configure address based on the design memory layout
+MEMORY_START="0x20000000"
+MEMORY_END="0x70000000"
+
+XEN="xen"
+
+# Xen Dom0 load configurations
+DOM0_KERNEL="Image"
+
+# User configurable bootparams
+DOM0_CMD="console=hvc0 clk_ignore_unused root=/dev/mmcblk0p3 ro rootwait"
+XEN_CMD="console=dtuart dom0_mem=1500M dom0_max_vcpus=1 bootscrub=0 vwfi=native sched=null"
+
+# Xen Dom0-less load configurations
+NUM_DOMUS=1
+
+DOMU_KERNEL[0]="Image"
+DOMU_RAMDISK[0]="root/core-image-minimal-amd-cortexa72-common.rootfs.cpio.gz"
+DOMU_MEM[0]="800"
+DOMU_VCPUS[0]=1
+DOMU_CMD[0]="console=hvc0 init=/bin/sh root=/dev/ram0"
+
+# User configurable image load boot medium.
+LOAD_CMD="fatload mmc 0:1"
+
+# Image builder output name, For recipe this is fixed to a static name.
+# If user changes this output file name then it needs to be update in recipe as
+# well.
+UBOOT_SOURCE="xen_boot.source"
+UBOOT_SCRIPT="xen_boot.scr"

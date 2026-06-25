@@ -1,0 +1,86 @@
+axi:
+    ipi@ff340000: &uio_ipi
+        compatible: "ipi_uio"
+        device_type: "cpu"
+    shm@3ed80000: &uio_shm
+        compatible: "shm_uio"
+        reg: [0, 0x3ed80000, 0, 0x1000000]
+    timer@ff110000: &uio_ttc
+        compatible: "ttc_uio"
+        reg: [0, 0xff110000, 0, 0x1000]
+        device_type: "cpu"
+
+definitions:
+    OpenAMP:
+         rproc0: &rproc0
+             - start: 0x3ed00000
+               size: 0x2000000
+               no-map: 1
+
+domains:
+    openamp_a53_0_cluster: # host in channel from a53-0
+        compatible:
+            - "openamp,domain-v1"
+        os,type: linux
+        cpus:
+            - cluster: cpus_a53
+              cpumask: 0x1
+              mode:
+                 secure: true
+                 el: 0x3
+        access:
+            - dev: /axi/ipi0@ff340000
+              flags: {}
+            - dev: /axi/ttc0@ff110000
+              flags: {}
+            - dev: /axi/shm@3ed80000
+            - dev: cpus_r5_0
+              flags: {}
+            - dev: psu_r5_0_atcm_global@ffe00000
+              flags: {}
+            - dev: psu_r5_0_btcm_global@ffe20000
+              flags: {}
+        reserved-memory:
+            ranges: true
+            "#size-cells": 2
+            "#address-cells": 2
+            <<+: [ *rproc0 ]
+
+        domain-to-domain:
+            compatible: openamp,domain-to-domain-v1
+            remoteproc-relation:
+                compatible: openamp,remoteproc-v2
+                remote:
+                    - openamp_r5_0_cluster
+                elfload:
+                    - [ psu_r5_0_atcm_global, psu_r5_0_btcm_global, rproc0 ]
+
+    openamp_r5_0_cluster:
+        compatible:
+            - "openamp,domain-v1"
+        cpus:
+            - cluster: cpus_r5_0
+              cpumask: 0x1
+              mode:
+              secure: true
+        reserved-memory:
+            ranges: true
+            <<+: [ *rproc0 ]
+        domain-to-domain:
+             compatible: openamp,domain-to-domain-v1
+        os,type: freertos
+        access:
+            - dev: psu_r5_0_atcm_global@ffe00000
+              label: psu_r5_0_atcm_global
+              flags: {}
+            - dev: psu_r5_0_btcm_global@ffe20000
+              flags: {}
+              label: psu_r5_0_btcm_global
+            - dev: ipi1
+              flags: {}
+            - dev: memory@100000
+              flags: {}
+            - dev: psu_rpu
+              flags: {}
+            - dev: ttc3
+              flags: {}

@@ -1,0 +1,61 @@
+From 9b7072697616ffd19fcefcd3ec48eec481faf4e6 Mon Sep 17 00:00:00 2001
+From: Bruce Ashfield <bruce.ashfield@gmail.com>
+Date: Thu, 20 Nov 2025 23:22:59 -0500
+Subject: [PATCH] tools/libxl: Fix build with NOCPUID and json-c
+
+The stub file `tools/libs/light/libxl_nocpuid.c`, used when CPUID
+support is disabled via `CONFIG_NOCPUID`, was incomplete. It was
+missing a stub implementation for the `json-c` function
+`libxl_cpuid_policy_list_gen_jso`.
+
+When building with both `CONFIG_NOCPUID` and `HAVE_LIBJSONC` (which
+is preferred by configure over yajl), auto-generated code in
+`_libxl_types.c` would reference `libxl_cpuid_policy_list_gen_jso`,
+leading to a linker error due to the undefined reference.
+
+Additionally, the file was missing a prototype for the `yajl` function
+`libxl_cpuid_policy_list_gen_json`, causing a compiler error
+(`-Werror=missing-prototypes`) in builds that did manage to select
+`yajl`.
+
+This commit fixes both issues by:
+1. Adding the missing function prototype for the `yajl` function.
+2. Adding the missing stub implementation for the `json-c` function,
+   guarded by `HAVE_LIBJSONC`.
+
+This ensures that xen-tools can be built successfully in all
+configurations related to CPUID and JSON library selection.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
+---
+ tools/libs/light/libxl_nocpuid.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+Index: xen-tools-4.21+stable/tools/libs/light/libxl_nocpuid.c
+===================================================================
+--- xen-tools-4.21+stable.orig/tools/libs/light/libxl_nocpuid.c
++++ xen-tools-4.21+stable/tools/libs/light/libxl_nocpuid.c
+@@ -16,6 +16,21 @@
+ 
+ #include <yajl/yajl_gen.h>
+ 
++#include "libxl_json.h"
++
++#include <yajl/yajl_gen.h>
++
++yajl_gen_status libxl_cpuid_policy_list_gen_json(yajl_gen hand,
++                                                 libxl_cpuid_policy_list *pcpuid);
++
++#ifdef HAVE_LIBJSONC
++int libxl_cpuid_policy_list_gen_jso(json_object **jso_r,
++                                    libxl_cpuid_policy_list *pcpuid)
++{
++    return 0;
++}
++#endif
++
+ int libxl__cpuid_policy_is_empty(libxl_cpuid_policy_list *pl)
+ {
+     return 1;

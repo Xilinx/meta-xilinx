@@ -4,9 +4,9 @@ Date: Mon, 3 Feb 2020 13:00:36 -0800
 Subject: [PATCH] src: gl-state-egl: Use native_display to load EGL funcs
  through glad
 
-EGL_DEFAULT_DISPLAY may not be suiitable for all the backends like GBM.
+EGL_DEFAULT_DISPLAY may not be suitable for all the backends like GBM.
 Instead, use the already initialized display and only fallback to
-EGL_DEFAULT_DISPLAY if the display is unintialized (which is already
+EGL_DEFAULT_DISPLAY if the display is uninitialized (which is already
 been taken care).
 
 Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
@@ -30,4 +30,3 @@ index 8d7d66e..316b856 100644
      }
 -- 
 2.7.4
-

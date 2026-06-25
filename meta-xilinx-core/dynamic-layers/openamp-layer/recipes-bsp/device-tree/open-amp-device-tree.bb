@@ -1,4 +1,8 @@
 SUMMARY = "OpenAMP Device Tree Overlay for Xilinx devices."
+DESCRIPTION = "Builds the OpenAMP device-tree overlays (.dtbo) for \
+Zynq UltraScale+ MPSoC, Versal and Versal NET that reserve the shared \
+memory and mailbox/IPI resources used by libmetal and open-amp at \
+runtime."
 SECTION = "bsp"
 
 LICENSE = "MIT"

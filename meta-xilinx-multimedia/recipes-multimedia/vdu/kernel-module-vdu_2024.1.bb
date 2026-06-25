@@ -32,3 +32,5 @@ do_install:append() {
 }
 
 FILES:${PN} = "${sysconfdir}/udev/rules.d/*"
+
+SKIP_RECIPE[kernel-module-vdu] = "${@'Only kernel 6.6.10 is supported.' if bb.utils.vercmp_string(d.getVarFlag('XILINX_LINUX_VERSION', d.getVar('XILINX_RELEASE_VERSION')) or 'undefined', "6.6.10") != 0 else ''}"

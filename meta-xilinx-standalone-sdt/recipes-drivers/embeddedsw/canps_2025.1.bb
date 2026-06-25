@@ -1,3 +1,6 @@
+SUMMARY = "AMD Zynq UltraScale+ CAN-PS controller driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD Zynq UltraScale+ MPSoC \
+PS-side CAN controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "canps"

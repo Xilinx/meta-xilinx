@@ -1,7 +1,7 @@
 DESCRIPTION = "Platform Loader and Manager"
 SUMMARY = "Platform Loader and Manager for Versal devices"
 
-inherit xlnx-embeddedsw deploy
+inherit xlnx-embeddedsw deploy shared-manifest
 
 COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "none"
@@ -15,6 +15,9 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 PLM_IMAGE_NAME ??= "plm-${MACHINE}"
 
 inherit image-artifact-names
+
+MANIFEST_COMPONENT_NAME ?= "plm"
+MANIFEST_SRCREV_VARS = "SRCREV SRCREV_embeddedsw ESW_REV"
 
 PLM_BASE_NAME ?= "${PLM_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 

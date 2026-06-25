@@ -9,7 +9,7 @@ do_configure() {
     ${B}/../misc/copy_bsp.sh
 }
 
-# All do_compiles need this, even if it's overriden
+# All do_compiles need this, even if it's overridden
 MB_OBJCOPY ??= "${OBJCOPY}"
 
 # Only add a dependency if we need to use OUR binutils

@@ -1,4 +1,4 @@
-inherit esw python3native esw_apps_common deploy
+inherit esw python3native esw_apps_common deploy bootgen-bif
 
 DEPENDS += "libxil xiltimer bootgen-native"
 
@@ -29,9 +29,7 @@ cat > ${WORKDIR}/${PN}.bif << EOF
     }
 EOF
 
-    bootgen -image ${WORKDIR}/${PN}.bif -arch ${SOC_FAMILY} -w -o ${B}/${PN}.bin
-
-    printf "* ${PN}\nSRCREV: ${SRCREV}\nBRANCH: ${BRANCH}\n\n" > ${S}/${PN}.manifest
+    bootgen -image ${WORKDIR}/${PN}.bif -arch ${BOOTGEN_ARCH} -w -o ${B}/${PN}.bin
 }
 
 do_install[noexec] = "1"
@@ -41,8 +39,6 @@ do_deploy() {
     ln -sf ${PN}.elf ${DEPLOYDIR}/${PN}-${MACHINE}.elf
     install -Dm 0644 ${B}/${PN}.bin ${DEPLOYDIR}/${PN}.bin
     ln -sf ${PN}.bin ${DEPLOYDIR}/${PN}-${MACHINE}.bin
-
-    install -Dm 0644 ${S}/${PN}.manifest ${DEPLOYDIR}/${PN}-${MACHINE}.manifest
 }
 
 addtask deploy before do_build after do_install

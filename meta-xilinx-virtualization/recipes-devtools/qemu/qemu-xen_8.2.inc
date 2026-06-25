@@ -28,8 +28,22 @@ SRC_URI_XEN:class-target = " \
     file://0025-hw-xen-xenpvh-Add-pci-intx-irq-base-property.patch \
     file://0026-hw-arm-xenpvh-Enable-PCI-for-ARM-PVH.patch \
     file://0027-memory-Fix-use-of-uninitialized-variable.patch \
+    file://0028-virtio-Introduce-notify_queue.patch \
+    file://0029-virtio-Add-virtio_queue_get_rings.patch \
+    file://0030-virtio-Add-the-virtio-msg-transport.patch \
+    file://0031-hw-xen-Add-xendevicemodel_virtio_msg_bus_xen_connect.patch \
+    file://0032-virtio-Add-a-virtio-msg-bus-between-backend-and-Xen.patch \
+    file://0033-hw-arm-xenpvh-Enable-virtio-msg.patch \
+    file://0034-hw-x86-xenpvh-Enable-virtio-msg.patch \
+    file://0035-xen-mapcache-Assert-mapcache-existance.patch \
+    file://0036-xen-mapcache-Add-function-to-check-if-the-mapcache-i.patch \
+    file://0037-physmem-xen-Conditionalize-use-of-the-mapcache.patch \
+    file://0038-hw-xen-hvm-Add-a-mapcache-arg-to-xen_register_ioreq.patch \
+    file://0039-hw-xen-xenpvh-Add-prop-to-enable-disable-the-mapcach.patch \
+    file://0040-xen-pvh-Fix-order-of-virtio-mmio-devices.patch \
+    file://0041-hw-xen-pvh-Unify-mapcache-off-RAM-layout-with-mapcac.patch \
     "
 
-FILESEXTRAPATHS:prepend:class-target := "${THISDIR}/qemu-xilinx-8.2:"
+FILESEXTRAPATHS:prepend:class-target := "${THISDIR}/qemu-xen-8.2:"
 
 SRC_URI .= "${@bb.utils.contains('DISTRO_FEATURES', 'xen', '${SRC_URI_XEN}', '', d)}"

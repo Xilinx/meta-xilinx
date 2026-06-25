@@ -81,7 +81,7 @@ QSPI_RAMDISK_OFFSET = "0x4000000"
 QSPI_RAMDISK_SIZE = "0x4000000"
 ```
 4. Build the images and make sure images are copied to tftp directory.
-5. Once images are built, to ensure taget is booted using JTAG or SD boot modes.
+5. Once the images are built, ensure the target is booted using JTAG or SD boot modes.
 6. Also have boot.bin copied to DDR location using XSCT `dow` or `tftpboot` or 
    `fatload` command.
 7. Halt at U-Boot then run the following commands to flash the images on the

@@ -1,3 +1,6 @@
+SUMMARY = "AMD AXI GPIO driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD AXI GPIO IP block in the \
+embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "gpio"

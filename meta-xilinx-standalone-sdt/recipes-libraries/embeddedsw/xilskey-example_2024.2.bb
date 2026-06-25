@@ -1,3 +1,9 @@
+SUMMARY = "AMD Xilinx eFUSE / BBRAM key programming library (xilskey)."
+DESCRIPTION = "Library from the AMD Xilinx embeddedsw stack that \
+programs the secure key (eFUSE, BBRAM) registers on Zynq, Zynq \
+UltraScale+ MPSoC and Versal devices from baremetal firmware. This \
+recipe builds the driver self-test/example ELF that ships alongside \
+the driver in the embeddedsw tree."
 inherit esw deploy
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilskey/examples/"

@@ -1,4 +1,5 @@
 SUMMARY = "Web mercator XYZ tile utilities"
+DESCRIPTION = "Spherical-mercator XYZ map-tile utilities for Python."
 HOMEPAGE = "https://github.com/mapbox/mercantile"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=11e1a3a1ec3801b170b9152c135e8f74 \

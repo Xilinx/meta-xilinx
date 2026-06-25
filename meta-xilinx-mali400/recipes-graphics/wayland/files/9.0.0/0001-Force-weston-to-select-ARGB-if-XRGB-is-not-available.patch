@@ -1,0 +1,82 @@
+From 51ac5d1ce8a0f13801ed270119de28a711992330 Mon Sep 17 00:00:00 2001
+From: Parth Gajjar <parth.gajjar@amd.com>
+Date: Thu, 12 Feb 2026 23:16:48 -0800
+Subject: [PATCH] Force weston to select ARGB if XRGB is not available on the
+ primary DRM plane
+
+Added support for weston 9.0.0 to fallback for ARGB of XRGB is not supported
+in primary DRM plane
+
+Upstream-Status: Inappropriate [Xilinx specific]
+Signed-off-by: Parth Gajjar <parth.gajjar@amd.com>
+---
+ libweston/backend-drm/drm-gbm.c | 39 ++++++++++++++++++++++++++++-----
+ 1 file changed, 34 insertions(+), 5 deletions(-)
+
+diff --git a/libweston/backend-drm/drm-gbm.c b/libweston/backend-drm/drm-gbm.c
+index 30609e3..203f2b1 100644
+--- a/libweston/backend-drm/drm-gbm.c
++++ b/libweston/backend-drm/drm-gbm.c
+@@ -201,9 +201,27 @@ drm_output_init_egl(struct drm_output *output, struct drm_backend *b)
+ 	}
+ 
+ 	if (i == plane->count_formats) {
+-		weston_log("format 0x%x not supported by output %s\n",
+-			   output->gbm_format, output->base.name);
+-		return -1;
++		/* Primary format not found, try the fallback format (e.g., ARGB8888 for XRGB8888) */
++		if (format[1]) {
++			for (i = 0; i < plane->count_formats; i++) {
++				if (plane->formats[i].format == format[1])
++					break;
++			}
++			if (i < plane->count_formats) {
++				weston_log("format 0x%x not supported by output %s, "
++					   "using fallback format 0x%x\n",
++					   output->gbm_format, output->base.name, format[1]);
++				output->gbm_format = format[1];
++				format[0] = format[1];
++			}
++		}
++
++		/* If still not found, fail */
++		if (i == plane->count_formats) {
++			weston_log("format 0x%x not supported by output %s\n",
++				   output->gbm_format, output->base.name);
++			return -1;
++		}
+ 	}
+ 
+ #ifdef HAVE_GBM_MODIFIERS
+@@ -276,6 +294,7 @@ drm_output_render_gl(struct drm_output_state *state, pixman_region32_t *damage)
+ 	struct drm_backend *b = to_drm_backend(output->base.compositor);
+ 	struct gbm_bo *bo;
+ 	struct drm_fb *ret;
++	const struct pixel_format_info *format;
+ 
+ 	output->base.compositor->renderer->repaint_output(&output->base,
+ 							  damage);
+@@ -287,8 +306,18 @@ drm_output_render_gl(struct drm_output_state *state, pixman_region32_t *damage)
+ 		return NULL;
+ 	}
+ 
+-	/* The renderer always produces an opaque image. */
+-	ret = drm_fb_get_from_bo(bo, b, true, BUFFER_GBM_SURFACE);
++	/* Output transparent/opaque image according to the output format.
++	 * If the format has an opaque substitute, it means we specifically
++	 * chose an alpha format (e.g., ARGB8888) because the opaque format
++	 * (XRGB8888) isn't supported by the scanout plane. In this case,
++	 * we should NOT convert to opaque. If there's no opaque substitute,
++	 * the format is already opaque, so the conversion is a no-op.
++	 *
++	 * Approach from Weston 13+: use !opaque_substitute to determine
++	 * whether to use opaque format. */
++	format = pixel_format_get_info(output->gbm_format);
++	ret = drm_fb_get_from_bo(bo, b, format && !format->opaque_substitute,
++				 BUFFER_GBM_SURFACE);
+ 	if (!ret) {
+ 		weston_log("failed to get drm_fb for bo\n");
+ 		gbm_surface_release_buffer(output->gbm_surface, bo);
+-- 
+2.43.0
+

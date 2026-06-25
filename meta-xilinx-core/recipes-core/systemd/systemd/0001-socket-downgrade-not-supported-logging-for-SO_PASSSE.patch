@@ -1,0 +1,77 @@
+From 02d03a05cbca6a5250dbe516f923ce7cc8037125 Mon Sep 17 00:00:00 2001
+From: Luca Boccassi <luca.boccassi@gmail.com>
+Date: Mon, 9 Jun 2025 17:24:24 +0100
+Subject: [PATCH] socket: downgrade not-supported logging for SO_PASSSEC
+
+Kernel 6.16 started returning EOPNOTSUPP when a required kconfig
+is disabled. Downgrade to debug level in that case.
+
+Fixes https://github.com/systemd/systemd/issues/37783
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/commit/bb887cf22e68b6c83ff8a9c9bccda04d95ac23b3]
+
+Signed-off-by: Christian Kohn <chris.kohn@amd.com>
+---
+ src/core/socket.c             | 2 +-
+ src/journal/journald-native.c | 3 ++-
+ src/journal/journald-syslog.c | 3 ++-
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/core/socket.c b/src/core/socket.c
+index 23bc8ceb71..4818e73fc3 100644
+--- a/src/core/socket.c
++++ b/src/core/socket.c
+@@ -1006,7 +1006,7 @@ static void socket_apply_socket_options(Socket *s, SocketPort *p, int fd) {
+         if (s->pass_sec) {
+                 r = setsockopt_int(fd, SOL_SOCKET, SO_PASSSEC, true);
+                 if (r < 0)
+-                        log_unit_warning_errno(UNIT(s), r, "SO_PASSSEC failed: %m");
++                        log_unit_full_errno(UNIT(s), ERRNO_IS_NEG_NOT_SUPPORTED(r) ? LOG_DEBUG : LOG_WARNING, r, "SO_PASSSEC failed: %m");
+         }
+
+         if (s->pass_pktinfo) {
+diff --git a/src/journal/journald-native.c b/src/journal/journald-native.c
+index 315ec0b513..f30bc651f4 100644
+--- a/src/journal/journald-native.c
++++ b/src/journal/journald-native.c
+@@ -7,6 +7,7 @@
+ #include <unistd.h>
+
+ #include "alloc-util.h"
++#include "errno-util.h"
+ #include "fd-util.h"
+ #include "fs-util.h"
+ #include "iovec-util.h"
+@@ -517,7 +518,7 @@ int server_open_native_socket(Server *s, const char *native_socket) {
+         if (mac_selinux_use()) {
+                 r = setsockopt_int(s->native_fd, SOL_SOCKET, SO_PASSSEC, true);
+                 if (r < 0)
+-                        log_warning_errno(r, "SO_PASSSEC failed: %m");
++                        log_full_errno(ERRNO_IS_NEG_NOT_SUPPORTED(r) ? LOG_DEBUG : LOG_WARNING, r, "SO_PASSSEC failed: %m");
+         }
+
+         r = setsockopt_int(s->native_fd, SOL_SOCKET, SO_TIMESTAMP, true);
+diff --git a/src/journal/journald-syslog.c b/src/journal/journald-syslog.c
+index f6accb5b44..b8f9d4a577 100644
+--- a/src/journal/journald-syslog.c
++++ b/src/journal/journald-syslog.c
+@@ -7,6 +7,7 @@
+ #include "sd-messages.h"
+
+ #include "alloc-util.h"
++#include "errno-util.h"
+ #include "fd-util.h"
+ #include "format-util.h"
+ #include "iovec-util.h"
+@@ -492,7 +493,7 @@ int server_open_syslog_socket(Server *s, const char *syslog_socket) {
+         if (mac_selinux_use()) {
+                 r = setsockopt_int(s->syslog_fd, SOL_SOCKET, SO_PASSSEC, true);
+                 if (r < 0)
+-                        log_warning_errno(r, "SO_PASSSEC failed: %m");
++                        log_full_errno(ERRNO_IS_NEG_NOT_SUPPORTED(r) ? LOG_DEBUG : LOG_WARNING, r, "SO_PASSSEC failed: %m");
+         }
+
+         r = setsockopt_int(s->syslog_fd, SOL_SOCKET, SO_TIMESTAMP, true);
+--
+2.34.1
+

@@ -1,3 +1,6 @@
+SUMMARY = "AMD Zynq UltraScale+ USB controller driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD Zynq UltraScale+ MPSoC \
+PS-side USB 3.0 (USBPSU) controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "usbpsu"

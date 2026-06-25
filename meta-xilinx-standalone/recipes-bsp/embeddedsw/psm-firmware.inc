@@ -1,7 +1,9 @@
-ESCRIPTION = "PSM Firmware"
 SUMMARY = "PSM firmware for versal devices"
 
-inherit xlnx-embeddedsw deploy
+DESCRIPTION = "AMD Versal / Versal NET Platform Security Manager (PSM) \
+firmware (MicroBlaze) that handles system-level power-management and \
+security operations."
+inherit xlnx-embeddedsw deploy shared-manifest
 
 COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "none"
@@ -14,6 +16,9 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 PSM_FIRMWARE_IMAGE_NAME ??= "psm-firmware-${MACHINE}"
 
 inherit image-artifact-names
+
+MANIFEST_COMPONENT_NAME ?= "psm-firmware"
+MANIFEST_SRCREV_VARS = "SRCREV SRCREV_embeddedsw ESW_REV"
 
 PSM_FIRMWARE_BASE_NAME ?= "${PSM_FIRMWARE_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 

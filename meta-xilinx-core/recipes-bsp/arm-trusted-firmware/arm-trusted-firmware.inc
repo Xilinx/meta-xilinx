@@ -1,3 +1,5 @@
+SUMMARY = "AMD Xilinx fork of ARM Trusted Firmware (TF-A) for Zynq \
+UltraScale+ MPSoC, Versal and Versal NET."
 DESCRIPTION = "ARM Trusted Firmware"
 
 LICENSE = "BSD-3-Clause"
@@ -5,7 +7,7 @@ LIC_FILES_CHKSUM ?= "file://license.rst;md5=1dd070c98a281d18d9eefd938729b031"
 
 PROVIDES = "virtual/arm-trusted-firmware"
 
-inherit deploy
+inherit deploy shared-manifest
 
 DEPENDS += "u-boot-mkimage-native"
 
@@ -22,6 +24,8 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH', True) != '
 SRC_URI = "${REPO};${BRANCHARG}"
 
 inherit image-artifact-names
+
+MANIFEST_COMPONENT_NAME ?= "arm-trusted-firmware"
 
 ATF_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
 

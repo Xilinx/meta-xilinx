@@ -1,9 +1,9 @@
-SRC_URI = "git://github.com/Xilinx/lopper.git;branch=xlnx_rel_v2025.1;protocol=https"
-SRCREV = "c8a6edf0625b3dffce21729b3ccb9d00006bd8f0"
+SRC_URI = "git://github.com/Xilinx/lopper.git;branch=xlnx_rel_v2026.1;protocol=https"
+SRCREV = "05dc7e4bf359b60f1e6f7ed7074740afd7955a63"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/lopper:"
 
-BASEVERSION = "1.2.0"
+BASEVERSION = "1.3.0"
 
 RDEPENDS:${PN} += " \
     python3-ruamel-yaml \

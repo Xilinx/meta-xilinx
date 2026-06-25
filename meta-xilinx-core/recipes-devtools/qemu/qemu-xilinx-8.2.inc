@@ -8,10 +8,33 @@ CVE_PRODUCT = "qemu"
 COMPATIBLE_HOST:arm = "null"
 
 # x86_64 is needed to build nativesdks
-QEMU_TARGETS = "aarch64 arm microblaze microblazeel riscv32 x86_64"
+QEMU_TARGETS = "aarch64 arm microblaze microblazeel riscv32 riscv64 x86_64"
 
-BRANCH = "xlnx_rel_v2025.1"
-SRCREV = "b05c9752662eb4b8120a57454a323445d78d1463"
+BRANCH = "master"
+SRCREV = "10586110f06f8e40b607308166cee09a79fef2bf"
+
+# qemu:qemu-native:qemu-system-native https://nvd.nist.gov/vuln/detail/CVE-2019-12067
+CVE_STATUS[CVE-2019-12067] = "upstream-wontfix: \
+There was a proposed patch but rejected by upstream qemu. It is unclear if the issue can \
+still be reproduced or where exactly any bug is. \
+Xilinx QEMU does not support the use case of launching 'production' servers subject to \
+denial of service attacks."
+
+# qemu:qemu-native:qemu-system-native https://nvd.nist.gov/vuln/detail/CVE-2021-20255
+CVE_STATUS[CVE-2021-20255] = "upstream-wontfix: \
+There was a proposed patch https://lists.gnu.org/archive/html/qemu-devel/2021-02/msg06098.html \
+qemu maintainers say the patch is incorrect and should not be applied \
+The issue is of low impact, at worst sitting in an infinite loop rather than exploitable. \
+Xilinx QEMU does not support the use case of launching 'production' servers subject to \
+denial of service attacks."
+
+# qemu-xilinx does not support the use case of launching "production" servers subject to denial of service attacks
+CVE_STATUS[CVE-2024-7730]  = "upstream-wontfix: Xilinx QEMU does not support the use case of launching 'production' servers subject to denial of service attacks"
+CVE_STATUS[CVE-2024-8354]  = "upstream-wontfix: Xilinx QEMU does not support the use case of launching 'production' servers subject to denial of service attacks"
+
+# qemu-xilinx does not enable the LSI53C895A SCSI Host Bus Adapter
+CVE_STATUS[CVE-2024-6519]  = "not-applicable-config: We do not enable the LSI53C895A SCSI Host Bus Adapter"
+
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=441c28d2cf86e15a37fa47e15a72fbac \
                     file://COPYING.LIB;endline=24;md5=8c5efda6cf1e1b03dcfd0e6c0d271c7f"

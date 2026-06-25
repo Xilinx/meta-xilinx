@@ -1,4 +1,6 @@
 SUMMARY = "Big Buck Bunny Movie - 3840*2160@30fps"
+DESCRIPTION = "Big Buck Bunny sample 4K (3840x2160) 30fps video clip \
+used by the AMD Xilinx multimedia demos."
 LICENSE = "CC-BY-3.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/CC-BY-3.0;md5=dfa02b5755629022e267f10b9c0a2ab7"
 

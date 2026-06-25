@@ -53,7 +53,7 @@ disable_systemd_services () {
 		echo "Disabling systemd services:"
 		for service in $SERVICES_TO_DISABLE; do
 			echo "    $service"
-			systemctl --root="${IMAGE_ROOTFS}" mask $service > /dev/null >1
+			systemctl --root="${IMAGE_ROOTFS}" mask $service > /dev/null 2>&1
 		done
 	fi
 }
@@ -64,7 +64,7 @@ enable_systemd_services () {
 		echo "Enabling additional systemd services:"
 		for service in $SERVICES_TO_ENABLE; do
 			echo "    $service"
-			systemctl --root="${IMAGE_ROOTFS}" enable $service > /dev/null >1
+			systemctl --root="${IMAGE_ROOTFS}" enable $service > /dev/null 2>&1
 		done
 	fi
 }

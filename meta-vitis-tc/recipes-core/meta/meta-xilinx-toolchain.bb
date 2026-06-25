@@ -1,4 +1,8 @@
-SUMMARY = "Meta package for building a Xilinx prebuilt installable toolchain"
+SUMMARY = "Meta package for building a Xilinx prebuilt installable \
+toolchain"
+DESCRIPTION = "Meta-recipe that aggregates the AMD Xilinx pre-built \
+baremetal cross-toolchains (Arm, MicroBlaze, MicroBlaze-V/RISC-V) into \
+an installable SDK tarball used by AMD Vitis embedded software flows."
 LICENSE = "MIT"
 
 FILESEXTRAPATHS:append = ":${VITIS_TC_PATH}/scripts"

@@ -1,4 +1,7 @@
 SUMMARY = "Basic container image with development tools"
+DESCRIPTION = "Base layer for AMD Xilinx OCI/Docker developer-tooling \
+container images: container-base plus compilers, debuggers and \
+headers."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 

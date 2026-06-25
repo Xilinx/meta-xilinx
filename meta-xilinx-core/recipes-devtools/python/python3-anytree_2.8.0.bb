@@ -1,4 +1,7 @@
 SUMMARY = "Powerful and Lightweight Python Tree Data Structure"
+DESCRIPTION = "Pure-Python tree data-structure library with a clean \
+object-oriented API and rendering helpers; commonly pulled in by \
+OpenAMP / lopper tooling."
 
 HOMEPAGE = "https://github.com/c0fec0de/anytree"
 LICENSE = "Apache-2.0"

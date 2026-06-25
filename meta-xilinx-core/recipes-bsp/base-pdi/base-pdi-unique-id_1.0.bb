@@ -7,15 +7,13 @@ COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
 
-BOOTGEN_ARCH_DEFAULT:versal = "versal"
-BOOTGEN_ARCH_DEFAULT:versal-2ve-2vm = "versal_2ve_2vm"
-BOOTGEN_ARCH ?= "${BOOTGEN_ARCH_DEFAULT}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 BASEPDI_ID_FILE = "${B}/base-pdi-unique-id-string.txt"
 
-inherit deploy image-artifact-names
+inherit deploy image-artifact-names bootgen-bif
+# bootgen-bif provides BOOTGEN_ARCH definitions
 
 IMAGE_NAME_SUFFIX = ""
 

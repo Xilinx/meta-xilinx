@@ -1,4 +1,7 @@
-SUMMARY = "U-Boot uEnv.txt SD boot environment generation for Zynq targets"
+SUMMARY = "U-Boot uEnv.txt SD boot environment generation for Zynq \
+targets"
+DESCRIPTION = "Generates the uEnv.txt environment file consumed by \
+U-Boot during SD-card boot on Zynq and Zynq UltraScale+ MPSoC targets."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
@@ -29,7 +32,8 @@ def uboot_boot_cmd(d):
         return "bootm"
     if (d.getVar("KERNEL_IMAGETYPE") or '') in ["zImage"]:
         return "bootz"
-    if (d.getVar("KERNEL_IMAGETYPE") or '') in ["Image"]:
+    # Match kernels like Image.gz, Image.lzma, etc.
+    if (d.getVar("KERNEL_IMAGETYPE") or '').startswith("Image"):
         return "booti"
     raise bb.parse.SkipRecipe("Unsupport kernel image type")
 

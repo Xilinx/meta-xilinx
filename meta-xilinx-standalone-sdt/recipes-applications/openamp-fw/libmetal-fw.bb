@@ -1,3 +1,7 @@
+SUMMARY = "libmetal-only RPU firmware payload (OpenAMP base)."
+DESCRIPTION = "Pre-built RPU baremetal payload that only initialises \
+libmetal (no OpenAMP demo on top), used as a base for custom RPU \
+firmware."
 require openamp-fw.inc
 
 FW_MCDEPENDS = "mc::${MACHINE}-${TARGET_MC}:libmetal-xlnx:do_deploy"

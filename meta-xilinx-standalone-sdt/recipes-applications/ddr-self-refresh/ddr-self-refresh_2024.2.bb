@@ -1,3 +1,6 @@
+SUMMARY = "DDR self-refresh test application (baremetal)."
+DESCRIPTION = "AMD Xilinx baremetal application that exercises DDR \
+self-refresh entry/exit on supported boards."
 inherit esw python3native esw_apps_common
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/ddr_self_refresh/src/"

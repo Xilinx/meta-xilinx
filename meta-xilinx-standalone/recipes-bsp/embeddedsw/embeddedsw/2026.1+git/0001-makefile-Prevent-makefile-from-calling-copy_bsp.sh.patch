@@ -1,0 +1,49 @@
+From 22c866271143fdec14bdcfac04342ed340bb01fe Mon Sep 17 00:00:00 2001
+From: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+Date: Tue, 28 May 2024 14:50:03 -0600
+Subject: [PATCH] makefile: Prevent makefile from calling copy_bsp.sh
+
+If we call copy_bsp.sh we will undo any manual compliation steps we
+have already done. Avoid this.
+
+YP integration specific.
+
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+---
+ lib/sw_apps/asufw/src/Makefile                    | 4 ++--
+ lib/sw_apps/versal_plm/src/versal_aiepg2/Makefile | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/sw_apps/asufw/src/Makefile b/lib/sw_apps/asufw/src/Makefile
+index a5c32b60c1..ac7436d157 100644
+--- a/lib/sw_apps/asufw/src/Makefile
++++ b/lib/sw_apps/asufw/src/Makefile
+@@ -37,8 +37,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ 
+ $(LIBS):
+ 	echo "Copying BSP files"
+-	../misc/copy_bsp.sh
+-	echo "Compiling bsp"
++	#../misc/copy_bsp.sh
++	#echo "Compiling bsp"
+ 	$(MAKE) -C ../misc/asufw_bsp/
+ 
+ %.o:%.c
+diff --git a/lib/sw_apps/versal_plm/src/versal_aiepg2/Makefile b/lib/sw_apps/versal_plm/src/versal_aiepg2/Makefile
+index 9574465ad9..f53dbba671 100755
+--- a/lib/sw_apps/versal_plm/src/versal_aiepg2/Makefile
++++ b/lib/sw_apps/versal_plm/src/versal_aiepg2/Makefile
+@@ -35,8 +35,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+ $(OBJS): $(LIBS)
+ 
+ $(LIBS):
+-	echo "Copying BSP files"
+-	../../misc/versal_aiepg2/copy_bsp.sh
++	#echo "Copying BSP files"
++	#../../misc/versal_aiepg2/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../../misc/versal_aiepg2/versal_plm_bsp
+ 
+-- 
+2.34.1
+

@@ -12,7 +12,8 @@ BIF_FSBL_ATTR       ??= "base-pdi plmfw psmfw"
 BIF_ATF_ATTR        ??= "arm-trusted-firmware"
 BIF_DEVICETREE_ATTR ??= "device-tree"
 BIF_SSBL_ATTR       ??= "u-boot-xlnx"
-BIF_PARTITION_ATTR  ??= "${BIF_FSBL_ATTR} ${BIF_DEVICETREE_ATTR} ${BIF_ATF_ATTR} ${BIF_SSBL_ATTR}"
+BIF_APPS_ATTR       ??= ""
+BIF_PARTITION_ATTR  ??= "${BIF_FSBL_ATTR} ${BIF_DEVICETREE_ATTR} ${BIF_ATF_ATTR} ${BIF_SSBL_ATTR} ${BIF_APPS_ATTR}"
 
 # specify BIF partition attributes for base-pdi
 BIF_PARTITION_ATTR[base-pdi] ?= "type=bootimage"
@@ -25,6 +26,9 @@ BIF_PARTITION_IMAGE[plmfw] ?= "${RECIPE_SYSROOT}/boot/plmfw.elf"
 # specify BIF partition attributes for psmfw
 BIF_PARTITION_ATTR[psmfw] ?= "core=psm"
 BIF_PARTITION_IMAGE[psmfw] ?= "${RECIPE_SYSROOT}/boot/psmfw.elf"
+
+# Specify BIF image name for given ID
+BIF_PARTITION_NAME[0x1c000000] ?= "apu_ss"
 
 # specify BIF partition attributes for device-tree
 BIF_PARTITION_ATTR[device-tree] ?= "type=raw, load=0x1000"

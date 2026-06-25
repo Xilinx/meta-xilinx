@@ -1,3 +1,6 @@
+SUMMARY = "AMD Zynq PS GPIO driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD Zynq / Zynq UltraScale+ \
+MPSoC PS-side GPIO controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "gpiops"

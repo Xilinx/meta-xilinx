@@ -1,4 +1,6 @@
-SUMMARY = "Sample recipe to package and deploy baremetal or freertos elf or bin to linux rootfs"
+SUMMARY = "Sample baremetal firmware package recipe (template)."
+DESCRIPTION = "Template recipe demonstrating how to package a custom \
+baremetal firmware ELF as part of a multiconfig BSP build."
 LICENSE = "CLOSED"
 
 inherit fw-package

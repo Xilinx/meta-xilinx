@@ -1,3 +1,8 @@
+SUMMARY = "FreeRTOS 10 port for AMD Xilinx Zynq / Zynq UltraScale+ / \
+Versal."
+DESCRIPTION = "AMD Xilinx port of FreeRTOS 10 for the Cortex-A9, \
+Cortex-A53, Cortex-R5 and Cortex-R52 cores in Zynq, Zynq UltraScale+ \
+MPSoC, Versal and Versal NET devices, packaged as a baremetal library."
 inherit esw python3native
 
 ESW_COMPONENT_SRC = "/ThirdParty/bsp/freertos10_xilinx/src/"

@@ -9,7 +9,7 @@ PROVIDES += "libvdu-ctrlsw"
 PE = "1"
 PV .= "+git"
 
-BRANCH ?= "xlnx_rel_v2025.1"
+BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vdu-ctrl-sw.git;protocol=https"
 SRCREV ?= "1bbaf265b6d0a9fa25fd4d67133e55cbf0e6daa7"
 
@@ -25,6 +25,7 @@ REQUIRED_MACHINE_FEATURES = "vdu"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
+DEPENDS += "kernel-module-vdu"
 RDEPENDS:${PN} = "kernel-module-vdu"
 RDEPENDS:libvdu-ctrlsw = "kernel-module-vdu"
 

@@ -1,7 +1,7 @@
 # Default imgrcry configuration, using fsbl multiconfig
-IMGRCRY_DEPENDS ?= "image-recovery:do_deploy"
+IMGRCRY_DEPENDS ?= "image-recovery-bootbin:do_deploy"
 IMGRCRY_MCDEPENDS ?= ""
-IMGRCRY_DEPLOY_DIR ?= "${TOPDIR}/tmp/deploy/images/${MACHINE}/"
+IMGRCRY_DEPLOY_DIR ?= "${TMPDIR}/deploy/images/${MACHINE}/"
 IMGRCRY_IMAGE_NAME ?= "image-recovery-${MACHINE}"
 
 def check_imgrcry_variables(d):

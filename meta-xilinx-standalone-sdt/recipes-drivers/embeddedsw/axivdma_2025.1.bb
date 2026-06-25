@@ -1,3 +1,6 @@
+SUMMARY = "AMD AXI Video DMA driver (baremetal)."
+DESCRIPTION = "Baremetal driver for the AMD AXI Video DMA (VDMA) \
+controller in the embeddedsw stack."
 inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "axivdma"

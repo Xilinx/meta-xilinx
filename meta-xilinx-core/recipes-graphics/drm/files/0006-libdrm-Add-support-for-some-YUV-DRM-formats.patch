@@ -1,0 +1,612 @@
+From 1a11000062d9594fb2abab98e1a545ad6d69f19e Mon Sep 17 00:00:00 2001
+From: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
+Date: Tue, 18 Nov 2025 14:57:50 -0800
+Subject: [PATCH 6/7] libdrm: Add support for some YUV DRM formats
+
+Add support for 10 and 12 bpc YUV 444 DRM formats that were introduced in
+Linux version 6.17.
+
+Add support for some 10,12 bpc YUV 422, 420 and Y-only formats.
+
+Update libdrm core with new S410 and S412 formats.
+
+Add modetest support for corresponding framebuffers formats.
+
+Remove unused function.
+
+Signed-off-by: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
+
+Upstream-Status: Pending
+---
+ include/drm/drm_fourcc.h |  36 ++++
+ tests/modetest/buffers.c |  34 ++++
+ tests/util/format.c      |  13 ++
+ tests/util/pattern.c     | 375 ++++++++++++++++++++++++++++-----------
+ 4 files changed, 352 insertions(+), 106 deletions(-)
+
+diff --git a/include/drm/drm_fourcc.h b/include/drm/drm_fourcc.h
+index 7e27bfd9..83d4c260 100644
+--- a/include/drm/drm_fourcc.h
++++ b/include/drm/drm_fourcc.h
+@@ -413,6 +413,42 @@ extern "C" {
+ #define DRM_FORMAT_YUV444	fourcc_code('Y', 'U', '2', '4') /* non-subsampled Cb (1) and Cr (2) planes */
+ #define DRM_FORMAT_YVU444	fourcc_code('Y', 'V', '2', '4') /* non-subsampled Cr (1) and Cb (2) planes */
+ 
++/*
++ * 3 plane YCbCr LSB aligned
++ * In order to use these formats in a similar fashion to MSB aligned ones
++ * implementation can multiply the values by 2^6=64. For that reason the padding
++ * must only contain zeros.
++ * index 0 = Y plane, [15:0] z:Y [6:10] little endian
++ * index 1 = Cr plane, [15:0] z:Cr [6:10] little endian
++ * index 2 = Cb plane, [15:0] z:Cb [6:10] little endian
++ */
++#define DRM_FORMAT_S010	fourcc_code('S', '0', '1', '0') /* 2x2 subsampled Cb (1) and Cr (2) planes 10 bits per channel */
++#define DRM_FORMAT_S210	fourcc_code('S', '2', '1', '0') /* 2x1 subsampled Cb (1) and Cr (2) planes 10 bits per channel */
++#define DRM_FORMAT_S410	fourcc_code('S', '4', '1', '0') /* non-subsampled Cb (1) and Cr (2) planes 10 bits per channel */
++
++/*
++ * 3 plane YCbCr LSB aligned
++ * In order to use these formats in a similar fashion to MSB aligned ones
++ * implementation can multiply the values by 2^4=16. For that reason the padding
++ * must only contain zeros.
++ * index 0 = Y plane, [15:0] z:Y [4:12] little endian
++ * index 1 = Cr plane, [15:0] z:Cr [4:12] little endian
++ * index 2 = Cb plane, [15:0] z:Cb [4:12] little endian
++ */
++#define DRM_FORMAT_S012	fourcc_code('S', '0', '1', '2') /* 2x2 subsampled Cb (1) and Cr (2) planes 12 bits per channel */
++#define DRM_FORMAT_S212	fourcc_code('S', '2', '1', '2') /* 2x1 subsampled Cb (1) and Cr (2) planes 12 bits per channel */
++#define DRM_FORMAT_S412	fourcc_code('S', '4', '1', '2') /* non-subsampled Cb (1) and Cr (2) planes 12 bits per channel */
++
++/*
++ * 3 plane YCbCr
++ * index 0 = Y plane, [15:0] Y little endian
++ * index 1 = Cr plane, [15:0] Cr little endian
++ * index 2 = Cb plane, [15:0] Cb little endian
++ */
++#define DRM_FORMAT_S016	fourcc_code('S', '0', '1', '6') /* 2x2 subsampled Cb (1) and Cr (2) planes 16 bits per channel */
++#define DRM_FORMAT_S216	fourcc_code('S', '2', '1', '6') /* 2x1 subsampled Cb (1) and Cr (2) planes 16 bits per channel */
++#define DRM_FORMAT_S416	fourcc_code('S', '4', '1', '6') /* non-subsampled Cb (1) and Cr (2) planes 16 bits per channel */
++
+ /* tile formats */
+ #define DRM_FORMAT_T5M8  fourcc_code('T', '5', 'M', '8') /* Y/CbCr 4:0:0 8-bit 32x4 tiles */
+ #define DRM_FORMAT_T5MA  fourcc_code('T', '5', 'M', 'A') /* Y/CbCr 4:0:0 10-bit 32x4 tiles */
+diff --git a/tests/modetest/buffers.c b/tests/modetest/buffers.c
+index 264fe5db..b642e8cd 100644
+--- a/tests/modetest/buffers.c
++++ b/tests/modetest/buffers.c
+@@ -161,6 +161,22 @@ bo_create(int fd, unsigned int format,
+ 		bpp = 10;
+ 		break;
+ 
++	case DRM_FORMAT_S410:
++	case DRM_FORMAT_S412:
++	case DRM_FORMAT_P210:
++	case DRM_FORMAT_P010:
++	case DRM_FORMAT_P012:
++#ifdef DRM_FORMAT_Y10
++	case DRM_FORMAT_Y10:
++#endif
++	case DRM_FORMAT_R10:
++#ifdef DRM_FORMAT_Y12
++	case DRM_FORMAT_Y12:
++#endif
++	case DRM_FORMAT_R12:
++		bpp = 16;
++		break;
++
+ 	case DRM_FORMAT_ARGB4444:
+ 	case DRM_FORMAT_XRGB4444:
+ 	case DRM_FORMAT_ABGR4444:
+@@ -252,11 +268,16 @@ bo_create(int fd, unsigned int format,
+ 	case DRM_FORMAT_NV16:
+ 	case DRM_FORMAT_NV61:
+ 	case DRM_FORMAT_NV20:
++	case DRM_FORMAT_P210:
++	case DRM_FORMAT_P010:
++	case DRM_FORMAT_P012:
+ 		virtual_width = width;
+ 		virtual_height = height * 2;
+ 		break;
+ 
+ 	case DRM_FORMAT_YUV444:
++	case DRM_FORMAT_S410:
++	case DRM_FORMAT_S412:
+ 		virtual_width = width;
+ 		virtual_height = height * 3;
+ 		break;
+@@ -294,6 +315,14 @@ bo_create(int fd, unsigned int format,
+ 	case DRM_FORMAT_VYUY:
+ 	case DRM_FORMAT_YUYV:
+ 	case DRM_FORMAT_YVYU:
++#ifdef DRM_FORMAT_Y10
++	case DRM_FORMAT_Y10:
++#endif
++	case DRM_FORMAT_R10:
++#ifdef DRM_FORMAT_Y12
++	case DRM_FORMAT_Y12:
++#endif
++	case DRM_FORMAT_R12:
+ 		offsets[0] = 0;
+ 		handles[0] = bo->handle;
+ 		pitches[0] = bo->pitch;
+@@ -309,6 +338,9 @@ bo_create(int fd, unsigned int format,
+ 	case DRM_FORMAT_NV20:
+ 	case DRM_FORMAT_XV15:
+ 	case DRM_FORMAT_XV20:
++	case DRM_FORMAT_P210:
++	case DRM_FORMAT_P010:
++	case DRM_FORMAT_P012:
+ 		offsets[0] = 0;
+ 		handles[0] = bo->handle;
+ 		pitches[0] = bo->pitch;
+@@ -336,6 +368,8 @@ bo_create(int fd, unsigned int format,
+ 
+ 	case DRM_FORMAT_X403:
+ 	case DRM_FORMAT_YUV444:
++	case DRM_FORMAT_S410:
++	case DRM_FORMAT_S412:
+ 		offsets[0] = 0;
+ 		handles[0] = bo->handle;
+ 		pitches[0] = bo->pitch;
+diff --git a/tests/util/format.c b/tests/util/format.c
+index 876eaf30..39cdf2ee 100644
+--- a/tests/util/format.c
++++ b/tests/util/format.c
+@@ -61,12 +61,25 @@ static const struct util_format_info format_info[] = {
+ 	{ DRM_FORMAT_NV30, "NV30", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 2) },
+ 	{ DRM_FORMAT_XV15, "XV15", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
+ 	{ DRM_FORMAT_XV20, "XV20", MAKE_YUV_INFO(YUV_YCbCr, 2, 1, 2) },
++	{ DRM_FORMAT_P210, "P210", MAKE_YUV_INFO(YUV_YCbCr, 2, 1, 2) },
++	{ DRM_FORMAT_P010, "P010", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
++	{ DRM_FORMAT_P012, "P012", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
+ 	/* YUV planar */
+ 	{ DRM_FORMAT_YUV420, "YU12", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 1) },
+ 	{ DRM_FORMAT_YVU420, "YV12", MAKE_YUV_INFO(YUV_YCrCb, 2, 2, 1) },
+ 	{ DRM_FORMAT_YUV444, "YU24", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
+ 	{ DRM_FORMAT_YVU444, "YV24", MAKE_YUV_INFO(YUV_YCrCb, 1, 1, 1) },
+ 	{ DRM_FORMAT_X403, "X403", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_S410, "S410", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++	{ DRM_FORMAT_S412, "S412", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++#ifdef DRM_FORMAT_Y10
++	{ DRM_FORMAT_Y10, "Y10 ", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++#endif
++	{ DRM_FORMAT_R10, "R10 ", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++#ifdef DRM_FORMAT_Y12
++	{ DRM_FORMAT_Y12, "Y12 ", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
++#endif
++	{ DRM_FORMAT_R12, "R12 ", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
+ 
+ 	/* RGB16 */
+ 	{ DRM_FORMAT_ARGB4444, "AR12", MAKE_RGB_INFO(4, 8, 4, 4, 4, 0, 4, 12) },
+diff --git a/tests/util/pattern.c b/tests/util/pattern.c
+index e01a311e..e9da2e06 100644
+--- a/tests/util/pattern.c
++++ b/tests/util/pattern.c
+@@ -23,6 +23,7 @@
+  * IN THE SOFTWARE.
+  */
+ 
++#include <assert.h>
+ #include <stdbool.h>
+ #include <stdint.h>
+ #include <stdio.h>
+@@ -301,6 +302,142 @@ static void write_pixels_10bpp(unsigned char *mem,
+ 	  mem[4] = ((d >> 2) & 0xff);
+ }
+ 
++static inline void write_cc_xx_bpc_16(unsigned char *mem,
++				      unsigned char bpc,
++				      bool msb,
++				      unsigned char cc)
++{
++	assert(bpc >= 8 && bpc <= 16);
++	unsigned short mask = msb ? ~(1 << (16 - bpc) - 1) : (1 << bpc) - 1;
++	unsigned short shift = msb ? 8 : bpc - 8;
++	unsigned short *dst = (unsigned short *)mem;
++
++	*dst = ((unsigned short)cc << shift) & mask;
++}
++
++static void fill_smpte_yuv_planar_xx_bpc_16(const struct util_yuv_info *yuv,
++					    unsigned char *y_mem,
++					    unsigned char *u_mem,
++					    unsigned char *v_mem,
++					    unsigned int width,
++					    unsigned int height,
++					    unsigned int stride,
++					    unsigned char bpc,
++					    bool msb)
++{
++	const struct color_yuv colors_top[] = {
++		MAKE_YUV_601(192, 192, 192),	/* grey */
++		MAKE_YUV_601(192, 192, 0),	/* yellow */
++		MAKE_YUV_601(0, 192, 192),	/* cyan */
++		MAKE_YUV_601(0, 192, 0),	/* green */
++		MAKE_YUV_601(192, 0, 192),	/* magenta */
++		MAKE_YUV_601(192, 0, 0),	/* red */
++		MAKE_YUV_601(0, 0, 192),	/* blue */
++	};
++	const struct color_yuv colors_middle[] = {
++		MAKE_YUV_601(0, 0, 192),	/* blue */
++		MAKE_YUV_601(19, 19, 19),	/* black */
++		MAKE_YUV_601(192, 0, 192),	/* magenta */
++		MAKE_YUV_601(19, 19, 19),	/* black */
++		MAKE_YUV_601(0, 192, 192),	/* cyan */
++		MAKE_YUV_601(19, 19, 19),	/* black */
++		MAKE_YUV_601(192, 192, 192),	/* grey */
++	};
++	const struct color_yuv colors_bottom[] = {
++		MAKE_YUV_601(0, 33, 76),	/* in-phase */
++		MAKE_YUV_601(255, 255, 255),	/* super white */
++		MAKE_YUV_601(50, 0, 106),	/* quadrature */
++		MAKE_YUV_601(19, 19, 19),	/* black */
++		MAKE_YUV_601(9, 9, 9),		/* 3.5% */
++		MAKE_YUV_601(19, 19, 19),	/* 7.5% */
++		MAKE_YUV_601(29, 29, 29),	/* 11.5% */
++		MAKE_YUV_601(19, 19, 19),	/* black */
++	};
++	unsigned int cs = yuv->chroma_stride;
++	unsigned int xsub = yuv->xsub;
++	unsigned int ysub = yuv->ysub;
++	unsigned int x;
++	unsigned int y;
++
++	/* Luma */
++	for (y = 0; y < height * 6 / 9; ++y) {
++		for (x = 0; x < width; ++x)
++			write_cc_xx_bpc_16(&y_mem[x * 2], bpc, msb,
++					   colors_top[x * 7 / width].y);
++		y_mem += stride;
++	}
++
++	for (; y < height * 7 / 9; ++y) {
++		for (x = 0; x < width; ++x)
++			write_cc_xx_bpc_16(&y_mem[x * 2], bpc, msb,
++					   colors_middle[x * 7 / width].y);
++		y_mem += stride;
++	}
++
++	for (; y < height; ++y) {
++		for (x = 0; x < width * 5 / 7; ++x)
++			write_cc_xx_bpc_16(&y_mem[x * 2], bpc, msb,
++					   colors_bottom[x * 4 / (width * 5 / 7)].y);
++		for (; x < width * 6 / 7; ++x)
++			write_cc_xx_bpc_16(&y_mem[x * 2], bpc, msb,
++					   colors_bottom[(x - width * 5 / 7) * 3 / (width / 7) + 4].y);
++		for (; x < width; ++x)
++			write_cc_xx_bpc_16(&y_mem[x * 2], bpc, msb,
++					   colors_bottom[7].y);
++		y_mem += stride;
++	}
++
++	/* Luma only format */
++	if (!u_mem || !v_mem)
++		return;
++
++	/* Chroma */
++	for (y = 0; y < height * 6 / 9; y += ysub) {
++		for (x = 0; x < width; x += xsub) {
++			write_cc_xx_bpc_16(&u_mem[x * 2], bpc, msb,
++					   colors_top[x * 7 / width].u);
++			write_cc_xx_bpc_16(&v_mem[x * 2], bpc, msb,
++					   colors_top[x * 7 / width].v);
++		}
++		u_mem += stride * cs / xsub;
++		v_mem += stride * cs / xsub;
++	}
++
++	for (; y < height * 7 / 9; y += ysub) {
++		for (x = 0; x < width; x += xsub) {
++			write_cc_xx_bpc_16(&u_mem[x * 2], bpc, msb,
++					   colors_middle[x * 7 / width].u);
++			write_cc_xx_bpc_16(&v_mem[x * 2], bpc, msb,
++					   colors_middle[x * 7 / width].v);
++		}
++		u_mem += stride * cs / xsub;
++		v_mem += stride * cs / xsub;
++	}
++
++	for (; y < height; y += ysub) {
++		for (x = 0; x < width * 5 / 7; x += xsub) {
++			write_cc_xx_bpc_16(&u_mem[x * 2], bpc, msb,
++					   colors_bottom[x * 4 / (width * 5 / 7)].u);
++			write_cc_xx_bpc_16(&v_mem[x * 2], bpc, msb,
++					   colors_bottom[x * 4 / (width * 5 / 7)].v);
++		}
++		for (; x < width * 6 / 7; x += xsub) {
++			write_cc_xx_bpc_16(&u_mem[x * 2], bpc, msb,
++					   colors_bottom[(x - width * 5 / 7) * 3 / (width / 7) + 4].u);
++			write_cc_xx_bpc_16(&v_mem[x * 2], bpc, msb,
++					   colors_bottom[(x - width * 5 / 7) * 3 / (width / 7) + 4].v);
++		}
++		for (; x < width; x += xsub) {
++			write_cc_xx_bpc_16(&u_mem[x * 2], bpc, msb,
++					   colors_bottom[7].u);
++			write_cc_xx_bpc_16(&v_mem[x * 2], bpc, msb,
++					   colors_bottom[7].v);
++		}
++		u_mem += stride * cs / xsub;
++		v_mem += stride * cs / xsub;
++	}
++}
++
+ static void fill_smpte_yuv_planar_10bpp(const struct util_yuv_info *yuv,
+ 					unsigned char *y_mem,
+ 					unsigned char *uv_mem,
+@@ -765,111 +902,6 @@ static void fill_smpte_yuv_planar_x403(
+ 	}
+ }
+ 
+-static void fill_smpte_yuv_planar_10b(
+-				const struct util_yuv_info *yuv,
+-				unsigned char *y_mem, unsigned char *u_mem,
+-				unsigned char *v_mem, unsigned int width,
+-				unsigned int height, unsigned int stride)
+-{
+-	const struct color_yuv colors_top[] = {
+-		MAKE_YUV_601(191, 192, 192),	/* grey */
+-		MAKE_YUV_601(192, 192, 0),	/* yellow */
+-		MAKE_YUV_601(0, 192, 192),	/* cyan */
+-		MAKE_YUV_601(0, 192, 0),	/* green */
+-		MAKE_YUV_601(192, 0, 192),	/* magenta */
+-		MAKE_YUV_601(192, 0, 0),	/* red */
+-		MAKE_YUV_601(0, 0, 192),	/* blue */
+-	};
+-	const struct color_yuv colors_middle[] = {
+-		MAKE_YUV_601(0, 0, 192),	/* blue */
+-		MAKE_YUV_601(19, 19, 19),	/* black */
+-		MAKE_YUV_601(192, 0, 192),	/* magenta */
+-		MAKE_YUV_601(19, 19, 19),	/* black */
+-		MAKE_YUV_601(0, 192, 192),	/* cyan */
+-		MAKE_YUV_601(19, 19, 19),	/* black */
+-		MAKE_YUV_601(192, 192, 192),	/* grey */
+-	};
+-	const struct color_yuv colors_bottom[] = {
+-		MAKE_YUV_601(0, 33, 76),	/* in-phase */
+-		MAKE_YUV_601(255, 255, 255),	/* super white */
+-		MAKE_YUV_601(50, 0, 106),	/* quadrature */
+-		MAKE_YUV_601(19, 19, 19),	/* black */
+-		MAKE_YUV_601(9, 9, 9),		/* 3.5% */
+-		MAKE_YUV_601(19, 19, 19),	/* 7.5% */
+-		MAKE_YUV_601(29, 29, 29),	/* 11.5% */
+-		MAKE_YUV_601(19, 19, 19),	/* black */
+-	};
+-	unsigned int cs = yuv->chroma_stride;
+-	unsigned int xsub = yuv->xsub;
+-	unsigned int ysub = yuv->ysub;
+-	unsigned int x;
+-	unsigned int y;
+-
+-	/* Luma */
+-	for (y = 0; y < height * 6 / 9; ++y) {
+-		for (x = 0; x < width; ++x)
+-			y_mem[x] = colors_top[x * 7 / width].y;
+-		y_mem += stride;
+-	}
+-
+-	for (; y < height * 7 / 9; ++y) {
+-		for (x = 0; x < width; ++x)
+-			y_mem[x] = colors_middle[x * 7 / width].y;
+-		y_mem += stride;
+-	}
+-
+-	for (; y < height; ++y) {
+-		for (x = 0; x < width * 5 / 7; ++x)
+-			y_mem[x] = colors_bottom[x * 4 / (width * 5 / 7)].y;
+-		for (; x < width * 6 / 7; ++x)
+-			y_mem[x] = colors_bottom[(x - width * 5 / 7) * 3 /
+-			(width / 7) + 4].y;
+-		for (; x < width; ++x)
+-			y_mem[x] = colors_bottom[7].y;
+-		y_mem += stride;
+-	}
+-
+-	/* Chroma */
+-	for (y = 0; y < height / ysub * 6 / 9; ++y) {
+-		for (x = 0; x < width; x += xsub) {
+-			u_mem[x*cs/xsub] = colors_top[x * 7 / width].u;
+-			v_mem[x*cs/xsub] = colors_top[x * 7 / width].v;
+-		}
+-		u_mem += stride * cs / xsub;
+-		v_mem += stride * cs / xsub;
+-	}
+-
+-	for (; y < height / ysub * 7 / 9; ++y) {
+-		for (x = 0; x < width; x += xsub) {
+-			u_mem[x*cs/xsub] = colors_middle[x * 7 / width].u;
+-			v_mem[x*cs/xsub] = colors_middle[x * 7 / width].v;
+-		}
+-		u_mem += stride * cs / xsub;
+-		v_mem += stride * cs / xsub;
+-	}
+-
+-	for (; y < height / ysub; ++y) {
+-		for (x = 0; x < width * 5 / 7; x += xsub) {
+-			u_mem[x*cs/xsub] =
+-		colors_bottom[x * 4 / (width * 5 / 7)].u;
+-			v_mem[x*cs/xsub] =
+-		colors_bottom[x * 4 / (width * 5 / 7)].v;
+-		}
+-		for (; x < width * 6 / 7; x += xsub) {
+-			u_mem[x*cs/xsub] =
+-		colors_bottom[(x - width * 5 / 7) * 3 / (width / 7) + 4].u;
+-			v_mem[x*cs/xsub] =
+-		colors_bottom[(x - width * 5 / 7) * 3 / (width / 7) + 4].v;
+-		}
+-		for (; x < width; x += xsub) {
+-			u_mem[x*cs/xsub] = colors_bottom[7].u;
+-			v_mem[x*cs/xsub] = colors_bottom[7].v;
+-		}
+-		u_mem += stride * cs / xsub;
+-		v_mem += stride * cs / xsub;
+-	}
+-}
+-
+ static void fill_tiles_xv15(
+ 				const struct util_format_info *info,
+ 				unsigned char *y_mem, unsigned char *u_mem,
+@@ -1915,7 +1947,6 @@ static void fill_smpte(const struct util_format_info *info,
+ 			return fill_smpte_yuv_planar_x403(&info->yuv, planes[0], planes[1],
+ 					     planes[2], width, height, stride);
+ 
+-
+ 	case DRM_FORMAT_YUV420:
+ 		return fill_smpte_yuv_planar(&info->yuv, planes[0], planes[1],
+ 					     planes[2], width, height, stride);
+@@ -1928,6 +1959,48 @@ static void fill_smpte(const struct util_format_info *info,
+ 		return fill_smpte_yuv_planar(&info->yuv, planes[0], planes[2],
+ 					     planes[1], width, height, stride);
+ 
++	case DRM_FORMAT_S410:
++		return fill_smpte_yuv_planar_xx_bpc_16(&info->yuv, planes[0],
++						       planes[1], planes[2],
++						       width, height, stride,
++						       10 /* bpc */, false /* lsb */);
++
++	case DRM_FORMAT_S412:
++		return fill_smpte_yuv_planar_xx_bpc_16(&info->yuv, planes[0],
++						       planes[1], planes[2],
++						       width, height, stride,
++						       12 /* bpc */, false /* lsb */);
++
++	case DRM_FORMAT_P210:
++	case DRM_FORMAT_P010:
++		return fill_smpte_yuv_planar_xx_bpc_16(&info->yuv, planes[0],
++						       planes[1], planes[1] + 2,
++						       width, height, stride,
++						       10 /* bpc */, true /* msb */);
++
++	case DRM_FORMAT_P012:
++		return fill_smpte_yuv_planar_xx_bpc_16(&info->yuv, planes[0],
++						       planes[1], planes[1] + 2,
++						       width, height, stride,
++						       12 /* bpc */, true /* msb */);
++
++#ifdef DRM_FORMAT_Y10
++	case DRM_FORMAT_Y10:
++#endif
++	case DRM_FORMAT_R10:
++		return fill_smpte_yuv_planar_xx_bpc_16(&info->yuv, planes[0],
++						       NULL, NULL,
++						       width, height, stride,
++						       10 /* bpc */, false /* lsb */);
++#ifdef DRM_FORMAT_Y12
++	case DRM_FORMAT_Y12:
++#endif
++	case DRM_FORMAT_R12:
++		return fill_smpte_yuv_planar_xx_bpc_16(&info->yuv, planes[0],
++						       NULL, NULL,
++						       width, height, stride,
++						       12 /* bpc */, false /* lsb */);
++
+ 	case DRM_FORMAT_ARGB4444:
+ 	case DRM_FORMAT_XRGB4444:
+ 	case DRM_FORMAT_ABGR4444:
+@@ -2139,6 +2212,53 @@ static void fill_tiles_yuv_planar(const struct util_format_info *info,
+ 	}
+ }
+ 
++static void fill_tiles_yuv_planar_xx_bpc_16(const struct util_format_info *info,
++					    unsigned char *y_mem,
++					    unsigned char *u_mem,
++					    unsigned char *v_mem,
++					    unsigned int width,
++					    unsigned int height,
++					    unsigned int stride,
++					    unsigned char bpc,
++					    bool msb)
++{
++	assert(bpc >= 8 && bpc <= 16);
++
++	const struct util_yuv_info *yuv = &info->yuv;
++	unsigned int cs = yuv->chroma_stride;
++	unsigned int xsub = yuv->xsub;
++	unsigned int ysub = yuv->ysub;
++	unsigned int x;
++	unsigned int y;
++	unsigned short mask = msb ? ~(1 << (16 - bpc) - 1) : (1 << bpc) - 1;
++	unsigned short shift = msb ? 8 : bpc - 8;
++
++	for (y = 0; y < height; ++y) {
++		unsigned short *y_dst = (unsigned short *)y_mem;
++		unsigned short *u_dst = (unsigned short *)u_mem;
++		unsigned short *v_dst = (unsigned short *)v_mem;
++
++		for (x = 0; x < width; ++x) {
++			struct color_yuv color =
++				make_tiles_yuv_color(x, y, width);
++
++			y_dst[x] = ((unsigned int)color.y << shift) & mask;
++			if (u_dst)
++				u_dst[x/xsub*cs] = ((unsigned int)color.u << shift) & mask;
++			if (v_dst)
++				v_dst[x/xsub*cs] = ((unsigned int)color.v << shift) & mask;
++		}
++
++		y_mem += stride;
++		if ((y + 1) % ysub == 0) {
++			if (u_mem)
++				u_mem += stride * cs / xsub;
++			if (v_mem)
++				v_mem += stride * cs / xsub;
++		}
++	}
++}
++
+ static void fill_tiles_yuv_planar_10bpp(const struct util_format_info *info,
+ 					unsigned char *y_mem,
+ 					unsigned char *uv_mem,
+@@ -2364,6 +2484,49 @@ static void fill_tiles(const struct util_format_info *info,
+ 		return fill_tiles_xv15(info, planes[0], planes[1],
+ 			 planes[2], width, height, stride);
+ 
++	case DRM_FORMAT_S410:
++		return fill_tiles_yuv_planar_xx_bpc_16(info, planes[0],
++						       planes[1], planes[2],
++						       width, height, stride,
++						       10 /* bpc */, false /* lsb */);
++
++	case DRM_FORMAT_S412:
++		return fill_tiles_yuv_planar_xx_bpc_16(info, planes[0],
++						       planes[1], planes[2],
++						       width, height, stride,
++						       12 /* bpc */, false /* lsb */);
++
++	case DRM_FORMAT_P210:
++	case DRM_FORMAT_P010:
++		return fill_tiles_yuv_planar_xx_bpc_16(info, planes[0],
++						       planes[1], planes[1] + 2,
++						       width, height, stride,
++						       10 /* bpc */, true /* msb */);
++
++	case DRM_FORMAT_P012:
++		return fill_tiles_yuv_planar_xx_bpc_16(info, planes[0],
++						       planes[1], planes[1] + 2,
++						       width, height, stride,
++						       12 /* bpc */, true /* msb */);
++
++#ifdef DRM_FORMAT_Y10
++	case DRM_FORMAT_Y10:
++#endif
++	case DRM_FORMAT_R10:
++		return fill_tiles_yuv_planar_xx_bpc_16(info, planes[0],
++						       NULL, NULL,
++						       width, height, stride,
++						       10 /* bpc */, false /* lsb */);
++
++#ifdef DRM_FORMAT_Y12
++	case DRM_FORMAT_Y12:
++#endif
++	case DRM_FORMAT_R12:
++		return fill_tiles_yuv_planar_xx_bpc_16(info, planes[0],
++						       NULL, NULL,
++						       width, height, stride,
++						       12 /* bpc */, false /* lsb */);
++
+ 	case DRM_FORMAT_ARGB4444:
+ 	case DRM_FORMAT_XRGB4444:
+ 	case DRM_FORMAT_ABGR4444:
+-- 
+2.34.1
+

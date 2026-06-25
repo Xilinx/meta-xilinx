@@ -1,4 +1,5 @@
 require recipes-bsp/trusted-firmware-a/trusted-firmware-a.inc
+require trusted-firmware-a-xlnx.inc
 
 DEPENDS:remove:zynqmp:qemuall = " optee-os"
 DEPENDS:remove:versal:qemuall = " optee-os"
@@ -6,7 +7,7 @@ DEPENDS:remove:versal-net:qemuall = " optee-os"
 
 # Xilinx TF-A v2.12
 SRC_URI_TRUSTED_FIRMWARE_A = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https"
-SRCREV_tfa = "dd3512287a17eea866d5c82fa7b86ad58de59163"
+SRCREV_tfa = "12f045bd3a81d6fd99dc7470c12a459ae797888f"
 SRCBRANCH = "xlnx_rebase_v2.12"
 
 LIC_FILES_CHKSUM = "file://docs/license.rst;md5=83b7626b8c7a37263c6a58af8d19bee1"

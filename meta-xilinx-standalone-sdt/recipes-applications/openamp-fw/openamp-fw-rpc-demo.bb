@@ -1,3 +1,7 @@
+SUMMARY = "OpenAMP RPC-demo RPU firmware payload."
+DESCRIPTION = "Pre-built RPU OpenAMP firmware payload (rpc-demo) \
+loaded by the APU-side OpenAMP example application on Zynq UltraScale+ \
+/ Versal / Versal NET boards."
 require openamp-fw.inc
 
 PROVIDES:append:armv7r = " openamp-fw-rpc-demo "

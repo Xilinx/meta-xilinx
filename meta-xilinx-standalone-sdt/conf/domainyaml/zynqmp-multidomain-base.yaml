@@ -1,0 +1,37 @@
+domains:
+  APU_Linux:
+    compatible: openamp,domain-v1
+    cpus:
+      - cluster: cpus_a53
+        cpumask: 0xf
+        mode:
+          secure: true
+          el: 0x3
+    os,type: linux
+
+  R5_0_FREERTOS:
+    compatible: openamp,domain-v1
+    cpus:
+      - cluster: cpus_r5_0
+        cpumask: 0x1
+        mode:
+          secure: true
+        # cluster_cpu is required for RPU domains. Lopper uses it to auto-generate
+        # cpu_config_str, rpu_pd_val, core_num and cluster_cpu properties in the
+        # output DTS. Without it, remoteproc nodes will not be generated.
+        cluster_cpu: psu_cortexr5_0
+    os,type: freertos
+
+  R5_1_BAREMETAL:
+    compatible: openamp,domain-v1
+    cpus:
+      - cluster: cpus_r5_1
+        cpumask: 0x2
+        mode:
+          secure: true
+          el: 0x3
+        # cluster_cpu is required for RPU domains. Lopper uses it to auto-generate
+        # cpu_config_str, rpu_pd_val, core_num and cluster_cpu properties in the
+        # output DTS. Without it, remoteproc nodes will not be generated.
+        cluster_cpu: psu_cortexr5_1
+    os,type: baremetal
