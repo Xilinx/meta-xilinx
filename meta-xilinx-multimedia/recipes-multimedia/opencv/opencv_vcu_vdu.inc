@@ -10,6 +10,9 @@ SRCREV_xlnx-modules = "6eb9d4a23c0401f20a0f6802c9805af898d7b6c4"
 # This extends the existing OPENCV_EXTRA_MODULES_PATH to include both official contrib and contrib_xlnx modules
 EXTRA_OECMAKE += "-DOPENCV_EXTRA_MODULES_PATH='${S}/contrib/modules;${S}/contrib_xlnx/modules'"
 
+# Set C++17 standard required for vcucodec public headers (uses std::string_view)
+EXTRA_OECMAKE += "-DCMAKE_CXX_STANDARD=17"
+
 # Conditionally enable vcucodec module based on machine features
 # Only add the configuration if the machine has the corresponding feature
 
@@ -27,3 +30,7 @@ DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'vcu', 'vcu-ctrlsw', '', d)
 PACKAGECONFIG:append = "${@bb.utils.contains('MACHINE_FEATURES', 'vcu2', ' vcucodec-vcu2', '', d)}"
 PACKAGECONFIG[vcucodec-vcu2] = "-DBUILD_opencv_vcucodec=ON -DHAVE_VCU2_CTRLSW=1 -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF,,vcu2-ctrlsw,vcu2-ctrlsw"
 DEPENDS += "${@bb.utils.contains('MACHINE_FEATURES', 'vcu2', 'vcu2-ctrlsw', '', d)}"
+
+# Skip buildpaths QA check for packages containing vcucodec debug/source paths
+INSANE_SKIP:libopencv-vcucodec += "buildpaths"
+INSANE_SKIP:${PN}-dbg += "buildpaths"
