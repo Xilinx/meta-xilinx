@@ -13,6 +13,9 @@ EXTRA_OECMAKE += "-DOPENCV_EXTRA_MODULES_PATH='${S}/contrib/modules;${S}/contrib
 # Set C++17 standard required for vcucodec public headers (uses std::string_view)
 EXTRA_OECMAKE += "-DCMAKE_CXX_STANDARD=17"
 
+# Set C++17 standard required for vcucodec public headers (uses std::string_view)
+EXTRA_OECMAKE += "-DCMAKE_CXX_STANDARD=17"
+
 # Conditionally enable vcucodec module based on machine features
 # Only add the configuration if the machine has the corresponding feature
 
