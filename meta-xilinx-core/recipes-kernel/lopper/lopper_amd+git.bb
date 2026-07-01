@@ -6,7 +6,7 @@ LICENSE = "BSD-3-Clause"
 SECTION = "bootloader"
 
 SRC_URI = "git://github.com/Xilinx/lopper.git;branch=master;protocol=https"
-SRCREV = "d412c41b0d14a03e664984ab303e663820cabae4"
+SRCREV = "ac6af5f59ec499e956881dc6b38886979a6d89c0"
 S = "${WORKDIR}/git"
 
 BASEVERSION = "1.5.0"
