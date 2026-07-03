@@ -1,4 +1,4 @@
-From 915155a752f741327c56d5102001e7835112f4ac Mon Sep 17 00:00:00 2001
+From a06ad193aea7bdae6be1669c8f8a8834579afd61 Mon Sep 17 00:00:00 2001
 From: Anil Kumar M <amamidal@xilinx.com>
 Date: Fri, 10 Apr 2020 21:35:47 +0530
 Subject: [PATCH 2/7] modetest: Add semiplanar 10bit pattern support for
@@ -15,16 +15,16 @@ Rebase with libdrm-2.4.131
 
 Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
 ---
- tests/modetest/buffers.c |  17 +++++++++++++++--
- tests/util/format.c      |   2 ++
- tests/util/pattern.c     | 455 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ tests/modetest/buffers.c |  17 +-
+ tests/util/format.c      |   2 +
+ tests/util/pattern.c     | 455 ++++++++++++++++++++++++++++++++++++++-
  3 files changed, 465 insertions(+), 9 deletions(-)
 
 diff --git a/tests/modetest/buffers.c b/tests/modetest/buffers.c
 index 81ca77f..d1b7075 100644
---- a/tests/modetest/buffers.c	2026-04-27 09:47:19.000000000 -0600
-+++ b/tests/modetest/buffers.c	2026-05-27 08:33:16.455448499 -0600
-@@ -117,7 +117,7 @@
+--- a/tests/modetest/buffers.c
++++ b/tests/modetest/buffers.c
+@@ -117,7 +117,7 @@ bo_create(int fd, unsigned int format,
  	  unsigned int offsets[4], enum util_fill_pattern pattern,
  	  unsigned long seed)
  {
@@ -33,7 +33,7 @@ index 81ca77f..d1b7075 100644
  	struct bo *bo;
  	unsigned int bpp;
  	bool is_planar;
-@@ -160,6 +160,11 @@
+@@ -160,6 +160,11 @@ bo_create(int fd, unsigned int format,
  		bpp = 10;
  		break;
  
@@ -45,7 +45,7 @@ index 81ca77f..d1b7075 100644
  	case DRM_FORMAT_ARGB4444:
  	case DRM_FORMAT_XRGB4444:
  	case DRM_FORMAT_ABGR4444:
-@@ -227,6 +232,7 @@
+@@ -227,6 +232,7 @@ bo_create(int fd, unsigned int format,
  	case DRM_FORMAT_NV12:
  	case DRM_FORMAT_NV21:
  	case DRM_FORMAT_NV15:
@@ -53,7 +53,7 @@ index 81ca77f..d1b7075 100644
  	case DRM_FORMAT_YUV420:
  	case DRM_FORMAT_YVU420:
  		is_planar = true;
-@@ -237,6 +243,7 @@
+@@ -237,6 +243,7 @@ bo_create(int fd, unsigned int format,
  	case DRM_FORMAT_NV16:
  	case DRM_FORMAT_NV61:
  	case DRM_FORMAT_NV20:
@@ -61,7 +61,7 @@ index 81ca77f..d1b7075 100644
  	case DRM_FORMAT_YUV422:
  	case DRM_FORMAT_YVU422:
  		is_planar = true;
-@@ -265,7 +272,11 @@
+@@ -265,7 +272,11 @@ bo_create(int fd, unsigned int format,
  	if (is_planar)
  		virtual_height += height * 2 / xsub / ysub;
  
@@ -74,7 +74,7 @@ index 81ca77f..d1b7075 100644
  	if (!bo)
  		return NULL;
  
-@@ -297,6 +308,8 @@
+@@ -297,6 +308,8 @@ bo_create(int fd, unsigned int format,
  	case DRM_FORMAT_NV16:
  	case DRM_FORMAT_NV61:
  	case DRM_FORMAT_NV15:
@@ -85,9 +85,9 @@ index 81ca77f..d1b7075 100644
  	case DRM_FORMAT_NV20:
 diff --git a/tests/util/format.c b/tests/util/format.c
 index c623544..f6a55e0 100644
---- a/tests/util/format.c	2026-04-27 09:47:19.000000000 -0600
-+++ b/tests/util/format.c	2026-05-27 08:33:16.455448499 -0600
-@@ -59,6 +59,8 @@
+--- a/tests/util/format.c
++++ b/tests/util/format.c
+@@ -59,6 +59,8 @@ static const struct util_format_info format_info[] = {
  	{ DRM_FORMAT_NV15, "NV15", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
  	{ DRM_FORMAT_NV20, "NV20", MAKE_YUV_INFO(YUV_YCbCr, 2, 1, 2) },
  	{ DRM_FORMAT_NV30, "NV30", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 2) },
@@ -98,9 +98,9 @@ index c623544..f6a55e0 100644
  	{ DRM_FORMAT_YVU420, "YV12", MAKE_YUV_INFO(YUV_YCrCb, 2, 2, 1) },
 diff --git a/tests/util/pattern.c b/tests/util/pattern.c
 index 358699a..32f28a3 100644
---- a/tests/util/pattern.c	2026-04-27 09:47:19.000000000 -0600
-+++ b/tests/util/pattern.c	2026-05-27 08:33:16.455448499 -0600
-@@ -449,6 +449,432 @@
+--- a/tests/util/pattern.c
++++ b/tests/util/pattern.c
+@@ -449,6 +449,432 @@ static void fill_smpte_yuv_planar_10bpp(const struct util_yuv_info *yuv,
  	}
  }
  
@@ -533,7 +533,7 @@ index 358699a..32f28a3 100644
  static void fill_smpte_yuv_packed(const struct util_yuv_info *yuv, void *mem,
  				  unsigned int width, unsigned int height,
  				  unsigned int stride)
-@@ -1207,9 +1633,10 @@
+@@ -1207,9 +1633,10 @@ void util_smpte_fill_lut(unsigned int ncolors, struct drm_color_lut *lut)
  		memcpy(lut, smpte_color_lut, sizeof(smpte_color_lut));
  }
  
@@ -547,7 +547,7 @@ index 358699a..32f28a3 100644
  {
  	unsigned char *u, *v;
  
-@@ -1228,7 +1655,12 @@
+@@ -1228,7 +1655,12 @@ static void fill_smpte(const struct util_format_info *info, void *planes[3],
  	case DRM_FORMAT_YVYU:
  		return fill_smpte_yuv_packed(&info->yuv, planes[0], width,
  					     height, stride);
@@ -561,7 +561,7 @@ index 358699a..32f28a3 100644
  	case DRM_FORMAT_NV12:
  	case DRM_FORMAT_NV21:
  	case DRM_FORMAT_NV16:
-@@ -1637,9 +2069,10 @@
+@@ -1637,9 +2069,10 @@ static void fill_tiles_rgb16fp(const struct util_format_info *info, void *mem,
  	}
  }
  
@@ -575,7 +575,7 @@ index 358699a..32f28a3 100644
  {
  	unsigned char *u, *v;
  
-@@ -1680,6 +2113,14 @@
+@@ -1680,6 +2113,14 @@ static void fill_tiles(const struct util_format_info *info, void *planes[3],
  		return fill_tiles_yuv_planar(info, planes[0], planes[2],
  					     planes[1], width, height, stride);
  
@@ -591,4 +591,5 @@ index 358699a..32f28a3 100644
  	case DRM_FORMAT_XRGB4444:
  	case DRM_FORMAT_ABGR4444:
 -- 
-2.34.1
+2.54.0
+

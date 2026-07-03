@@ -1,4 +1,4 @@
-From 1a11000062d9594fb2abab98e1a545ad6d69f19e Mon Sep 17 00:00:00 2001
+From 39bbd65b1a3e59e0ff0fbe1217bb5545e56bc769 Mon Sep 17 00:00:00 2001
 From: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
 Date: Tue, 18 Nov 2025 14:57:50 -0800
 Subject: [PATCH 6/7] libdrm: Add support for some YUV DRM formats
@@ -21,14 +21,14 @@ Upstream-Status: Pending
  include/drm/drm_fourcc.h |  36 ++++
  tests/modetest/buffers.c |  34 ++++
  tests/util/format.c      |  13 ++
- tests/util/pattern.c     | 375 ++++++++++++++++++++++++++++-----------
- 4 files changed, 352 insertions(+), 106 deletions(-)
+ tests/util/pattern.c     | 371 ++++++++++++++++++++++++++++-----------
+ 4 files changed, 349 insertions(+), 105 deletions(-)
 
 diff --git a/include/drm/drm_fourcc.h b/include/drm/drm_fourcc.h
-index 7e27bfd9..83d4c260 100644
+index b259947..6d31626 100644
 --- a/include/drm/drm_fourcc.h
 +++ b/include/drm/drm_fourcc.h
-@@ -413,6 +413,42 @@ extern "C" {
+@@ -467,6 +467,42 @@ extern "C" {
  #define DRM_FORMAT_YUV444	fourcc_code('Y', 'U', '2', '4') /* non-subsampled Cb (1) and Cr (2) planes */
  #define DRM_FORMAT_YVU444	fourcc_code('Y', 'V', '2', '4') /* non-subsampled Cr (1) and Cb (2) planes */
  
@@ -72,10 +72,10 @@ index 7e27bfd9..83d4c260 100644
  #define DRM_FORMAT_T5M8  fourcc_code('T', '5', 'M', '8') /* Y/CbCr 4:0:0 8-bit 32x4 tiles */
  #define DRM_FORMAT_T5MA  fourcc_code('T', '5', 'M', 'A') /* Y/CbCr 4:0:0 10-bit 32x4 tiles */
 diff --git a/tests/modetest/buffers.c b/tests/modetest/buffers.c
-index 264fe5db..b642e8cd 100644
+index 4181893..9c10cc2 100644
 --- a/tests/modetest/buffers.c
 +++ b/tests/modetest/buffers.c
-@@ -161,6 +161,22 @@ bo_create(int fd, unsigned int format,
+@@ -166,6 +166,22 @@ bo_create(int fd, unsigned int format,
  		bpp = 10;
  		break;
  
@@ -98,24 +98,26 @@ index 264fe5db..b642e8cd 100644
  	case DRM_FORMAT_ARGB4444:
  	case DRM_FORMAT_XRGB4444:
  	case DRM_FORMAT_ABGR4444:
-@@ -252,11 +268,16 @@ bo_create(int fd, unsigned int format,
- 	case DRM_FORMAT_NV16:
- 	case DRM_FORMAT_NV61:
- 	case DRM_FORMAT_NV20:
+@@ -247,6 +263,9 @@ bo_create(int fd, unsigned int format,
+ 	case DRM_FORMAT_XV20:
+ 	case DRM_FORMAT_YUV422:
+ 	case DRM_FORMAT_YVU422:
 +	case DRM_FORMAT_P210:
 +	case DRM_FORMAT_P010:
 +	case DRM_FORMAT_P012:
- 		virtual_width = width;
- 		virtual_height = height * 2;
- 		break;
- 
+ 		is_planar = true;
+ 		xsub = 2;
+ 		ysub = 1;
+@@ -258,6 +277,8 @@ bo_create(int fd, unsigned int format,
  	case DRM_FORMAT_YUV444:
+ 	case DRM_FORMAT_YVU444:
+ 	case DRM_FORMAT_X403:
 +	case DRM_FORMAT_S410:
 +	case DRM_FORMAT_S412:
- 		virtual_width = width;
- 		virtual_height = height * 3;
- 		break;
-@@ -294,6 +315,14 @@ bo_create(int fd, unsigned int format,
+ 		is_planar = true;
+ 		xsub = 1;
+ 		ysub = 1;
+@@ -298,6 +319,14 @@ bo_create(int fd, unsigned int format,
  	case DRM_FORMAT_VYUY:
  	case DRM_FORMAT_YUYV:
  	case DRM_FORMAT_YVYU:
@@ -130,30 +132,30 @@ index 264fe5db..b642e8cd 100644
  		offsets[0] = 0;
  		handles[0] = bo->handle;
  		pitches[0] = bo->pitch;
-@@ -309,6 +338,9 @@ bo_create(int fd, unsigned int format,
+@@ -316,6 +345,9 @@ bo_create(int fd, unsigned int format,
+ 	case DRM_FORMAT_NV42:
  	case DRM_FORMAT_NV20:
- 	case DRM_FORMAT_XV15:
- 	case DRM_FORMAT_XV20:
+ 	case DRM_FORMAT_NV30:
 +	case DRM_FORMAT_P210:
 +	case DRM_FORMAT_P010:
 +	case DRM_FORMAT_P012:
  		offsets[0] = 0;
  		handles[0] = bo->handle;
  		pitches[0] = bo->pitch;
-@@ -336,6 +368,8 @@ bo_create(int fd, unsigned int format,
- 
- 	case DRM_FORMAT_X403:
+@@ -334,6 +366,8 @@ bo_create(int fd, unsigned int format,
  	case DRM_FORMAT_YUV444:
+ 	case DRM_FORMAT_YVU444:
+ 	case DRM_FORMAT_X403:
 +	case DRM_FORMAT_S410:
 +	case DRM_FORMAT_S412:
  		offsets[0] = 0;
  		handles[0] = bo->handle;
  		pitches[0] = bo->pitch;
 diff --git a/tests/util/format.c b/tests/util/format.c
-index 876eaf30..39cdf2ee 100644
+index 0017f9e..4f659c0 100644
 --- a/tests/util/format.c
 +++ b/tests/util/format.c
-@@ -61,12 +61,25 @@ static const struct util_format_info format_info[] = {
+@@ -61,6 +61,9 @@ static const struct util_format_info format_info[] = {
  	{ DRM_FORMAT_NV30, "NV30", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 2) },
  	{ DRM_FORMAT_XV15, "XV15", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 2) },
  	{ DRM_FORMAT_XV20, "XV20", MAKE_YUV_INFO(YUV_YCbCr, 2, 1, 2) },
@@ -163,6 +165,7 @@ index 876eaf30..39cdf2ee 100644
  	/* YUV planar */
  	{ DRM_FORMAT_YUV420, "YU12", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 1) },
  	{ DRM_FORMAT_YVU420, "YV12", MAKE_YUV_INFO(YUV_YCrCb, 2, 2, 1) },
+@@ -69,6 +72,16 @@ static const struct util_format_info format_info[] = {
  	{ DRM_FORMAT_YUV444, "YU24", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
  	{ DRM_FORMAT_YVU444, "YV24", MAKE_YUV_INFO(YUV_YCrCb, 1, 1, 1) },
  	{ DRM_FORMAT_X403, "X403", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
@@ -176,23 +179,15 @@ index 876eaf30..39cdf2ee 100644
 +	{ DRM_FORMAT_Y12, "Y12 ", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
 +#endif
 +	{ DRM_FORMAT_R12, "R12 ", MAKE_YUV_INFO(YUV_YCbCr, 1, 1, 1) },
- 
  	/* RGB16 */
  	{ DRM_FORMAT_ARGB4444, "AR12", MAKE_RGB_INFO(4, 8, 4, 4, 4, 0, 4, 12) },
+ 	{ DRM_FORMAT_XRGB4444, "XR12", MAKE_RGB_INFO(4, 8, 4, 4, 4, 0, 0, 0) },
 diff --git a/tests/util/pattern.c b/tests/util/pattern.c
-index e01a311e..e9da2e06 100644
+index cf488cf..608f256 100644
 --- a/tests/util/pattern.c
 +++ b/tests/util/pattern.c
-@@ -23,6 +23,7 @@
-  * IN THE SOFTWARE.
-  */
- 
-+#include <assert.h>
- #include <stdbool.h>
- #include <stdint.h>
- #include <stdio.h>
-@@ -301,6 +302,142 @@ static void write_pixels_10bpp(unsigned char *mem,
- 	  mem[4] = ((d >> 2) & 0xff);
+@@ -320,6 +320,142 @@ static void update_pixels_10bpp(unsigned char *mem, uint64_t val, uint64_t mask)
+ 	}
  }
  
 +static inline void write_cc_xx_bpc_16(unsigned char *mem,
@@ -334,7 +329,7 @@ index e01a311e..e9da2e06 100644
  static void fill_smpte_yuv_planar_10bpp(const struct util_yuv_info *yuv,
  					unsigned char *y_mem,
  					unsigned char *uv_mem,
-@@ -765,111 +902,6 @@ static void fill_smpte_yuv_planar_x403(
+@@ -784,111 +920,6 @@ static void fill_smpte_yuv_planar_x403(
  	}
  }
  
@@ -446,15 +441,7 @@ index e01a311e..e9da2e06 100644
  static void fill_tiles_xv15(
  				const struct util_format_info *info,
  				unsigned char *y_mem, unsigned char *u_mem,
-@@ -1915,7 +1947,6 @@ static void fill_smpte(const struct util_format_info *info,
- 			return fill_smpte_yuv_planar_x403(&info->yuv, planes[0], planes[1],
- 					     planes[2], width, height, stride);
- 
--
- 	case DRM_FORMAT_YUV420:
- 		return fill_smpte_yuv_planar(&info->yuv, planes[0], planes[1],
- 					     planes[2], width, height, stride);
-@@ -1928,6 +1959,48 @@ static void fill_smpte(const struct util_format_info *info,
+@@ -1946,6 +1977,47 @@ static void fill_smpte(const struct util_format_info *info,
  		return fill_smpte_yuv_planar(&info->yuv, planes[0], planes[2],
  					     planes[1], width, height, stride);
  
@@ -499,11 +486,10 @@ index e01a311e..e9da2e06 100644
 +						       NULL, NULL,
 +						       width, height, stride,
 +						       12 /* bpc */, false /* lsb */);
-+
  	case DRM_FORMAT_ARGB4444:
  	case DRM_FORMAT_XRGB4444:
  	case DRM_FORMAT_ABGR4444:
-@@ -2139,6 +2212,53 @@ static void fill_tiles_yuv_planar(const struct util_format_info *info,
+@@ -2157,6 +2229,53 @@ static void fill_tiles_yuv_planar(const struct util_format_info *info,
  	}
  }
  
@@ -557,10 +543,10 @@ index e01a311e..e9da2e06 100644
  static void fill_tiles_yuv_planar_10bpp(const struct util_format_info *info,
  					unsigned char *y_mem,
  					unsigned char *uv_mem,
-@@ -2364,6 +2484,49 @@ static void fill_tiles(const struct util_format_info *info,
+@@ -2380,6 +2499,48 @@ static void fill_tiles(const struct util_format_info *info,
+ 	case DRM_FORMAT_XV15:
  		return fill_tiles_xv15(info, planes[0], planes[1],
  			 planes[2], width, height, stride);
- 
 +	case DRM_FORMAT_S410:
 +		return fill_tiles_yuv_planar_xx_bpc_16(info, planes[0],
 +						       planes[1], planes[2],
@@ -603,10 +589,9 @@ index e01a311e..e9da2e06 100644
 +						       NULL, NULL,
 +						       width, height, stride,
 +						       12 /* bpc */, false /* lsb */);
-+
+ 
  	case DRM_FORMAT_ARGB4444:
  	case DRM_FORMAT_XRGB4444:
- 	case DRM_FORMAT_ABGR4444:
 -- 
-2.34.1
+2.54.0
 

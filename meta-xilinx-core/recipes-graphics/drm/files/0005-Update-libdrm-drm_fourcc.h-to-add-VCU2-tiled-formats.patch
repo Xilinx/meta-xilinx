@@ -1,4 +1,4 @@
-From b2da306fed6821f272e72134174198cb1087e291 Mon Sep 17 00:00:00 2001
+From b8a9ff454a1b71b30c013e402576fef41034fca7 Mon Sep 17 00:00:00 2001
 From: Arno Glim <arno.glim@amd.com>
 Date: Wed, 9 Apr 2025 10:48:47 -0700
 Subject: [PATCH 5/7] Update libdrm drm_fourcc.h to add VCU2 tiled formats
@@ -16,10 +16,10 @@ Signed-off-by: Arno Glim <arno.glim@amd.com>
  1 file changed, 41 insertions(+), 14 deletions(-)
 
 diff --git a/include/drm/drm_fourcc.h b/include/drm/drm_fourcc.h
-index 804b2f22..7e27bfd9 100644
+index 0644709..b259947 100644
 --- a/include/drm/drm_fourcc.h
 +++ b/include/drm/drm_fourcc.h
-@@ -326,6 +326,14 @@ extern "C" {
+@@ -344,6 +344,14 @@ extern "C" {
  #define DRM_FORMAT_NV20		fourcc_code('N', 'V', '2', '0') /* 2x1 subsampled Cr:Cb plane */
  #define DRM_FORMAT_NV30		fourcc_code('N', 'V', '3', '0') /* non-subsampled Cr:Cb plane */
  
@@ -34,9 +34,9 @@ index 804b2f22..7e27bfd9 100644
  /*
   * 2 plane YCbCr MSB aligned
   * index 0 = Y plane, [15:0] Y:x [10:6] little endian
-@@ -377,13 +385,13 @@ extern "C" {
+@@ -365,13 +373,13 @@ extern "C" {
   */
- #define DRM_FORMAT_Q401		fourcc_code('Q', '4', '0', '1')
+ #define DRM_FORMAT_P012		fourcc_code('P', '0', '1', '2') /* 2x2 subsampled Cr:Cb plane 12 bits per channel */
  
 -/*
 - * 2 plane 10 bit per component YCbCr
@@ -53,8 +53,8 @@ index 804b2f22..7e27bfd9 100644
 +#define DRM_FORMAT_X403		fourcc_code('X', '4', '0', '3') /* non-subsampled Cb:Cr plane, 10 bit per channel */
  
  /*
-  * 3 plane YCbCr
-@@ -405,13 +413,32 @@ extern "C" {
+  * 2 plane YCbCr MSB aligned
+@@ -459,13 +467,32 @@ extern "C" {
  #define DRM_FORMAT_YUV444	fourcc_code('Y', 'U', '2', '4') /* non-subsampled Cb (1) and Cr (2) planes */
  #define DRM_FORMAT_YVU444	fourcc_code('Y', 'V', '2', '4') /* non-subsampled Cr (1) and Cb (2) planes */
  
@@ -94,7 +94,7 @@ index 804b2f22..7e27bfd9 100644
  
  /*
   * Format Modifiers:
-@@ -951,7 +978,7 @@ extern "C" {
+@@ -1039,7 +1066,7 @@ extern "C" {
   * which corresponds to the "generic" kind used for simple single-sample
   * uncompressed color formats on Fermi - Volta GPUs.
   */
@@ -104,5 +104,5 @@ index 804b2f22..7e27bfd9 100644
  {
  	if (!(modifier & 0x10) || (modifier & (0xff << 12)))
 -- 
-2.34.1
+2.54.0
 

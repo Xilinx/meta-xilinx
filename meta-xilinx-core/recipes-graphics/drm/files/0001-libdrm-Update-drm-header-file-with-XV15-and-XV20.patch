@@ -1,4 +1,4 @@
-From 5a35ea655c68a10f10f58bd3b377e52189235b63 Mon Sep 17 00:00:00 2001
+From e880a6f71080e4d8c3ef31900a2921109d7e9e6b Mon Sep 17 00:00:00 2001
 From: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
 Date: Mon, 1 Nov 2021 12:59:36 -0700
 Subject: [PATCH 1/7] libdrm: Update drm header file with XV15 and XV20
@@ -14,12 +14,12 @@ Signed-off-by: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
  1 file changed, 8 insertions(+)
 
 diff --git a/include/drm/drm_fourcc.h b/include/drm/drm_fourcc.h
-index 9b250480..e23d5e42 100644
+index 4a138b5..1b1eabe 100644
 --- a/include/drm/drm_fourcc.h
 +++ b/include/drm/drm_fourcc.h
-@@ -377,6 +377,14 @@ extern "C" {
+@@ -365,6 +365,14 @@ extern "C" {
   */
- #define DRM_FORMAT_Q401		fourcc_code('Q', '4', '0', '1')
+ #define DRM_FORMAT_P012		fourcc_code('P', '0', '1', '2') /* 2x2 subsampled Cr:Cb plane 12 bits per channel */
  
 +/*
 + * 2 plane 10 bit per component YCbCr
@@ -30,8 +30,8 @@ index 9b250480..e23d5e42 100644
 +#define DRM_FORMAT_XV20                fourcc_code('X', 'V', '2', '0') /* 2x1 subsampled Cb:Cr plane 2:10:10:10 */
 +
  /*
-  * 3 plane YCbCr
-  * index 0: Y plane, [7:0] Y
+  * 2 plane YCbCr MSB aligned
+  * index 0 = Y plane, [15:0] Y little endian
 -- 
-2.34.1
+2.54.0
 
