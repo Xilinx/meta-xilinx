@@ -16,7 +16,7 @@ ESW_COMPONENT_SRC = "src"
 ESW_EXECUTABLE_NAME = "imgsel"
 
 SRC_URI:append = " git://github.com/Xilinx/image-selector.git;protocol=https;branch=main"
-SRCREV = "283bcb2b49eaa2ff1eae2f0d926e1844797352c2"
+SRCREV = "3a7b59a8475fd020d40ad296b3b865583489ee9f"
 
 SRC_URI += "file://0001-xis_qspi_fix_missing_include.patch"
 
