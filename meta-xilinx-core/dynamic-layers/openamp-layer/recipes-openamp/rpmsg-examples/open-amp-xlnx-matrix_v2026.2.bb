@@ -2,7 +2,7 @@ SUMMARY = "OpenAMP rpmsg matrix-multiply example application (xlnx)."
 DESCRIPTION = "OpenAMP rpmsg matrix-multiplication example app: Linux \
 on the APU offloads a matrix multiply to the RPU/MicroBlaze remote \
 core and reads back the result over rpmsg."
-require open-amp-xlnx-demos_v2026.1.inc
+require open-amp-xlnx-demos_v2026.2.inc
 
 PROVIDES += "open-amp-xlnx-matrix"
 
@@ -13,8 +13,3 @@ RPROVIDES:${PN}-dev += "open-amp-xlnx-matrix-dev"
 RPROVIDES:${PN}-lic += "open-amp-xlnx-matrix-lic"
 RPROVIDES:${PN}-src += "open-amp-xlnx-matrix-src"
 RPROVIDES:${PN}-staticdev += "open-amp-xlnx-matrix-staticdev"
-
-# While there are commits upstream that need to be downstreamed
-# this unblocks build. Note this is warning only, not a runtime
-# difference
-CFLAGS:append = " -Wno-error=incompatible-pointer-types "
