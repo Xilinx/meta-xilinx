@@ -8,7 +8,7 @@ ESW_COMPONENT_SRC = "/ThirdParty/sw_services/libmetal_xlnx_extension/src/"
 ESW_COMPONENT_NAME = "libmetal_xlnx_extension.a"
 
 DEPENDS += "libxil ipipsu xiltimer libmetal-xlnx"
-DEPENDS:append:xilinx-freertos = "freertos10-xilinx"
+DEPENDS:append:xilinx-freertos = " freertos10-xilinx"
 
 EXTRA_OECMAKE:append = " -DCMAKE_INCLUDE_PATH=${STAGING_INCDIR}"
 
