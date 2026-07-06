@@ -19,6 +19,19 @@ TUNE_CCARGS:append:versal = " -Dversal"
 TUNE_CCARGS:append:versal-net = " -DVERSAL_NET"
 TUNE_CCARGS:append:versal-2ve-2vm = " -DVERSAL_NET"
 
+# Bare-metal toolchains do not support Linux dynamic-linking or security
+# hardening linker flags.  In particular:
+# - --hash-style=gnu (TARGET_LINK_HASH_STYLE) and -Wl,-z,relro,-z,now
+#   (SECURITY_LDFLAGS) are Linux ELF-only and meaningless for bare-metal.
+# - arm-xilinx-eabi-gcc 15.x is built with --enable-default-pie, so it
+#   implicitly adds -fpie/-pie to every build.  On ARM 32-bit bare-metal this
+#   causes binutils 2.46 to reject crtbegin.o's R_ARM_MOVW_ABS_NC relocations
+#   with "can not be used when making a shared object".
+# Suppress PIE and all Linux-specific LDFLAGS for bare-metal targets.
+LINKER_HASH_STYLE:xilinx-standalone = ""
+SECURITY_CFLAGS:xilinx-standalone = "-no-pie -fno-PIE"
+SECURITY_LDFLAGS:xilinx-standalone = "-no-pie"
+
 # Make sure all regular recipes are excluded from compatibility
 # Avoid using this for native, nativesdk or cross recipes
 COMPATOS = ""
