@@ -4,9 +4,6 @@ LTTNGUST:microblaze = ""
 # Add MicroBlaze patches
 FILESEXTRAPATHS:append := ":${THISDIR}/gdb"
 
-# Our changes are all local, no real patch-status
-ERROR_QA:remove = "patch-status"
-
 LDFLAGS:append:class-target:microblaze = " -latomic"
 
 SRC_URI:append:microblaze = " \

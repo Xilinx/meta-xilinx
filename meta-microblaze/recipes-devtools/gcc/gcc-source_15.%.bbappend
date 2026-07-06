@@ -1,9 +1,6 @@
 # Add MicroBlaze Patches (only when using MicroBlaze)
 FILESEXTRAPATHS:append := ":${THISDIR}/gcc-15"
 
-# Our changes are all local, no real patch-status
-ERROR_QA:remove = "patch-status"
-
 # MicroBlaze patches use mixed tab/space indentation; ignore whitespace differences
 QUILT_PATCHES_FUZZ = "2"
 export QUILT_PATCH_OPTS = "--ignore-whitespace"
