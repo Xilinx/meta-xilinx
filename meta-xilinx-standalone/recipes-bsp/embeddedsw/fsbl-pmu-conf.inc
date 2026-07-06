@@ -3,7 +3,7 @@ PMU_CONF_NAME ?= "pmu-conf"
 PMU_CONF_BASE_NAME ?= "${PMU_CONF_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 # Required so we can run objcopy in do_compile
-DEPENDS:append:zynqmp = " virtual/${TARGET_PREFIX}binutils"
+DEPENDS:append:zynqmp = " virtual/cross-binutils"
 
 do_compile:append:zynqmp () {
     ${OBJCOPY} --dump-section .sys_cfg_data=${B}/${PMU_CONF_NAME}.bin ${FSBL_FILE}.elf
