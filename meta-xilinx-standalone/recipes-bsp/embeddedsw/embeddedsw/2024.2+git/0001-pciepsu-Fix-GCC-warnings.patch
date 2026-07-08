@@ -1,0 +1,140 @@
+From 504d909171aeac92d1529a3f27792e262debbb55 Mon Sep 17 00:00:00 2001
+From: Bhavana Jupalli <Bhavana.Jupalli@amd.com>
+Date: Thu, 16 Jan 2025 23:04:04 -1200
+Subject: [PATCH] pciepsu: Fix GCC warnings
+
+Fix pciepsu GCC warnings
+
+Upstream-Status: Backport
+
+Signed-off-by: Bhavana Jupalli <Bhavana.Jupalli@amd.com>
+Acked-by: Bharat Kumar Gogada <bharat.kumar.gogada@amd.com>
+---
+ .../drivers/pciepsu/data/pciepsu.mdd          |  4 ++--
+ .../drivers/pciepsu/src/xpciepsu.c            | 23 ++++++++++---------
+ .../drivers/pciepsu/src/xpciepsu_ep.c         |  2 +-
+ .../drivers/pciepsu/src/xpciepsu_g.c          |  3 ++-
+ 4 files changed, 17 insertions(+), 15 deletions(-)
+
+diff --git a/XilinxProcessorIPLib/drivers/pciepsu/data/pciepsu.mdd b/XilinxProcessorIPLib/drivers/pciepsu/data/pciepsu.mdd
+index 48f5182d37..c6ed298d78 100644
+--- a/XilinxProcessorIPLib/drivers/pciepsu/data/pciepsu.mdd
++++ b/XilinxProcessorIPLib/drivers/pciepsu/data/pciepsu.mdd
+@@ -1,6 +1,6 @@
+ ###############################################################################
+ # Copyright (C) 2018 - 2020 Xilinx, Inc.  All rights reserved.
+-# Copyright (C) 2022 - 2024 Advanced Micro Devices, Inc.  All rights reserved.
++# Copyright (C) 2022 - 2025 Advanced Micro Devices, Inc.  All rights reserved.
+ # SPDX-License-Identifier: MIT
+ #
+ # MODIFICATION HISTORY:
+@@ -15,7 +15,7 @@ BEGIN driver pciepsu
+  OPTION supported_peripherals = (psu_pcie_low psu_pcie_high1 psu_pcie_high2 psu_pcie psu_pcie_attrib_0 psu_pcie_dma );
+  OPTION driver_state = ACTIVE;
+  OPTION copyfiles = all;
+- OPTION VERSION = 2.0;
++ OPTION VERSION = 2.1;
+  OPTION NAME = pciepsu;
+ 
+ END driver
+diff --git a/XilinxProcessorIPLib/drivers/pciepsu/src/xpciepsu.c b/XilinxProcessorIPLib/drivers/pciepsu/src/xpciepsu.c
+index b0ddb5d5d0..1e9abe7c83 100644
+--- a/XilinxProcessorIPLib/drivers/pciepsu/src/xpciepsu.c
++++ b/XilinxProcessorIPLib/drivers/pciepsu/src/xpciepsu.c
+@@ -1,6 +1,6 @@
+ /******************************************************************************
+ * Copyright (C) 2018 - 2020 Xilinx, Inc.  All rights reserved.
+-* Copyright (C) 2022 - 2024 Advanced Micro Devices, Inc.  All rights reserved.
++* Copyright (C) 2022 - 2025 Advanced Micro Devices, Inc.  All rights reserved.
+ * SPDX-License-Identifier: MIT
+ *******************************************************************************/
+ 
+@@ -649,15 +649,16 @@ static void XPciePsu_BarMemoryAlloc(XPciePsu *InstancePtr, u8 Bus,u8 Device,u8 F
+ {
+ 	u32 Data = DATA_MASK_32;
+ 	u32 Location = 0, Location_1 = 0;
+-	u32 TestWrite;
++	u32 TestWrite = 0;
+ 	u32 Size_1 = 0;
+ 	u8 BarNo = 0;
+-	u64 MaxBarSize = 0;
+ #if defined(__aarch64__) || defined(__arch64__)
+-	u64 BarAddr;
+-	u8 MemAs;
++	u64 BarAddr = 0;
++	u8 MemAs = 0;
++	u64 MaxBarSize = 0;
+ #else
+-	u32 BarAddr;
++	u32 BarAddr = 0;
++	u32 MaxBarSize = 0;
+ #endif
+ 	u64 Tmp;
+ 	u8 BarIndex;
+@@ -731,7 +732,7 @@ static void XPciePsu_BarMemoryAlloc(XPciePsu *InstancePtr, u8 Bus,u8 Device,u8 F
+ 						"function: %02X is out of range \n",
+ 						(Value[BarNo] / 1024),Bus,Device,Function);
+ 
+-					return XST_SUCCESS;
++					return;
+ 				}
+ 				/* actual bar size is 2 << TestWrite */
+ 				BarAddr =
+@@ -788,7 +789,7 @@ static void XPciePsu_BarMemoryAlloc(XPciePsu *InstancePtr, u8 Bus,u8 Device,u8 F
+ 						"Requested BAR size of %uK for bus: %02X, dev: %02X, "
+ 						"function: %02X is out of range \n",
+ 						(Value[BarNo] / 1024),Bus,Device,Function);
+-					return XST_SUCCESS;
++					return;
+ 				}
+ 
+ 			/* actual bar size is 2 << TestWrite */
+@@ -839,7 +840,7 @@ static int XPciePsu_AllocBarSpace(XPciePsu *InstancePtr, u32 Headertype, u8 Bus,
+ {
+ 	u8 BarAllocControl = 0;
+ 	u8 MaxBars = 0;
+-	u64 ReqSize;
++	u64 ReqSize = 0;
+ 	u32 Location;
+ 	u32 Position;
+ #if defined(__aarch64__) || defined(__arch64__)
+@@ -849,8 +850,8 @@ static int XPciePsu_AllocBarSpace(XPciePsu *InstancePtr, u32 Headertype, u8 Bus,
+ 	u64 ReqBar, ReqBar_1;
+ 	u64 MaxBarSize;
+ #else
+-	u32 ReqAddr;
+-	u32 MaxBarSize;
++	u32 ReqAddr = 0;
++	u32 MaxBarSize = 0;
+ #endif
+ 
+ 	/*Static array declarations for BAR Alignment */
+diff --git a/XilinxProcessorIPLib/drivers/pciepsu/src/xpciepsu_ep.c b/XilinxProcessorIPLib/drivers/pciepsu/src/xpciepsu_ep.c
+index e40599112d..19a95269d6 100644
+--- a/XilinxProcessorIPLib/drivers/pciepsu/src/xpciepsu_ep.c
++++ b/XilinxProcessorIPLib/drivers/pciepsu/src/xpciepsu_ep.c
+@@ -237,7 +237,7 @@ static void XPciePSU_ReadBar(XPciePsu *PciePsuPtr, u32 BarNum, u32 *BarLo,
+ 
+ void Do_Egress_Test(u32 *egress_src_lo)
+ {
+-	u32 buf[2];
++	u32 buf[2] = {0};
+ 
+ 	xil_printf("Inside of egress test: egress_src_lo: %llx\n", egress_src_lo);
+ 	buf[0] = *egress_src_lo;
+diff --git a/XilinxProcessorIPLib/drivers/pciepsu/src/xpciepsu_g.c b/XilinxProcessorIPLib/drivers/pciepsu/src/xpciepsu_g.c
+index b10bff5231..f12be28dd2 100644
+--- a/XilinxProcessorIPLib/drivers/pciepsu/src/xpciepsu_g.c
++++ b/XilinxProcessorIPLib/drivers/pciepsu/src/xpciepsu_g.c
+@@ -21,6 +21,7 @@ XPciePsu_Config XPciePsu_ConfigTable[] =
+ 		XPAR_PSU_PCIE_LOW_BASEADDR,
+ 		XPAR_PSU_PCIE_HIGH1_BASEADDR,
+ 		XPAR_PSU_PCIE_LOW_HIGHADDR,
+-		XPAR_PSU_PCIE_HIGH1_HIGHADDR
++		XPAR_PSU_PCIE_HIGH1_HIGHADDR,
++		XPAR_PSU_PCIE_PCIE_MODE
+ 	}
+ };
+-- 
+2.34.1
+
