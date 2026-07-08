@@ -128,10 +128,28 @@ do_configure:prepend() {
     )
 }
 
-# We need to find the license file, which vaires depending on the component
-# recurse a maximum of x times, could be fancier but it gets complicated since
-# we dont know for certain we are running devtool or just externalsrc
 python(){
+    # Even though we have preferred versions, we found instances where the
+    # wrong version was selected by the build environment on certain ESW
+    # components.  Use some basic code to try to lock down versioning.
+    pn = d.getVar('BPN')
+    pv = d.getVar('PV')
+    preferred_version = d.getVar('PREFERRED_VERSION_%s' % pn)
+    if preferred_version:
+        if not pv.startswith(preferred_version.rstrip('%')):
+            raise bb.parse.SkipRecipe('Skip non-preferred version %s, looking for %s' % (pv, preferred_version))
+
+    if not preferred_version:
+        esw = d.getVar('ESW_VER')
+        esw_preferred_version = d.getVar('PREFERRED_VERSION_esw')
+
+        if esw_preferred_version:
+            if not esw.startswith(esw_preferred_version.rstrip('%')):
+                raise bb.parse.SkipRecipe('Skip non-preferred version %s, looking for %s' % (esw, esw_preferred_version))
+
+    # We need to find the license file, which vaires depending on the component
+    # recurse a maximum of x times, could be fancier but it gets complicated since
+    # we dont know for certain we are running devtool or just externalsrc
     import os.path
     if bb.data.inherits_class('externalsrc', d) and d.getVar('EXTERNALSRC'):
         externalsrc = d.getVar('EXTERNALSRC')
