@@ -45,16 +45,6 @@ TFA_CONSOLE_OEMAKE:append:versal-net = "${@' VERSAL_NET_CONSOLE=${TFA_CONSOLE}' 
 EXTRA_OEMAKE += "${TFA_CONSOLE_OEMAKE}"
 
 
-### Debug settings
-DEBUG_ATF_DEFAULT = ""
-DEBUG_ATF_DEFAULT:versal = "1"
-DEBUG_ATF_DEFAULT:versal-net = "1"
-DEBUG_ATF ?= "${DEBUG_ATF_DEFAULT}"
-
-# Translate old to new name
-TFA_DEBUG = "${DEBUG_ATF}"
-
-
 ### Mem Settings
 ATF_MEM_BASE ?= ""
 ATF_MEM_SIZE ?= ""
@@ -87,51 +77,49 @@ TFA_INSTALL_TARGET = "bl31"
 
 inherit image-artifact-names
 
-ATF_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
-
-do_install:append() {
-    # The first TFA_INSTALL_TARGET found will be copied as the standard boot firmware
-    for atfbin in ${TFA_INSTALL_TARGET} ; do
-        install -d ${D}/boot
-        if [ -e ${D}/firmware/$atfbin-${TFA_PLATFORM}.elf ]; then
-            ln ${D}/firmware/$atfbin-${TFA_PLATFORM}.elf ${D}/boot/${ATF_BASE_NAME}.elf
-            ln -sf ${ATF_BASE_NAME}.elf ${D}/boot/${PN}.elf
-            ln ${D}/firmware/$atfbin-${TFA_PLATFORM}.bin ${D}/boot/${ATF_BASE_NAME}.bin
-            ln -sf ${ATF_BASE_NAME}.bin ${D}/boot/${PN}.bin
-
-            # Get the entry point address from the elf.
-            BL31_BASE_ADDR=$(${READELF} -h ${D}/boot/${ATF_BASE_NAME}.elf | egrep -m 1 -i "entry point.*?0x" | sed -r 's/.*?(0x.*?)/\1/g')
-            mkimage -A arm64 -O trusted-firmware-a -T kernel -C none \
-                    -a $BL31_BASE_ADDR -e $BL31_BASE_ADDR \
-                    -d ${D}/firmware/$atfbin-${TFA_PLATFORM}.bin ${D}/boot/${ATF_BASE_NAME}.ub
-            ln -sf ${ATF_BASE_NAME}.ub ${D}/boot/${PN}.ub
-            ln -sf ${ATF_BASE_NAME}.ub ${D}/boot/tfa-uboot.ub
-            break
-        fi
-    done
-}
-
 inherit deploy
 
 DEPENDS += "u-boot-mkimage-native"
 
 do_deploy() {
-    # Copy the /boot items to deploy
-    install -d ${DEPLOYDIR}
-    install -m 0644 ${D}/boot/${ATF_BASE_NAME}.elf ${DEPLOYDIR}/${ATF_BASE_NAME}.elf
-    ln -sf ${ATF_BASE_NAME}.elf ${DEPLOYDIR}/${PN}.elf
-    install -m 0644 ${D}/boot/${ATF_BASE_NAME}.bin ${DEPLOYDIR}/${ATF_BASE_NAME}.bin
-    ln -sf ${ATF_BASE_NAME}.bin ${DEPLOYDIR}/${PN}.bin
+    install -d -m 755 ${DEPLOYDIR}
 
-    install -m 0644 ${D}/boot/${ATF_BASE_NAME}.ub ${DEPLOYDIR}/${ATF_BASE_NAME}.ub
-    ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/${PN}.ub
-    ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/tfa-uboot.ub
+    for atfbin in ${TFA_INSTALL_TARGET}; do
+        processed="0"
+        if [ "$atfbin" = "all" ]; then
+            # Target all is not handled by default
+            bberror "all as TFA_INSTALL_TARGET is not handled by do_install"
+            bberror "Please specify valid targets in TFA_INSTALL_TARGET or"
+            bberror "rewrite or turn off do_install"
+            exit 1
+        fi
+
+        if [ -f ${BUILD_DIR}/$atfbin.bin ]; then
+            echo "Install $atfbin.bin"
+            install -m 0644 ${BUILD_DIR}/$atfbin.bin \
+                ${DEPLOYDIR}/$atfbin${TFA_INSTALL_SUFFIX}.bin
+            processed="1"
+        fi
+        if [ -f ${BUILD_DIR}/$atfbin/$atfbin.elf ]; then
+            echo "Install $atfbin.elf"
+            install -m 0644 ${BUILD_DIR}/$atfbin/$atfbin.elf \
+                ${DEPLOYDIR}/$atfbin${TFA_INSTALL_SUFFIX}.elf
+            processed="1"
+        fi
+        if [ -f ${BUILD_DIR}/$atfbin ]; then
+            echo "Install $atfbin"
+            install -m 0644 ${BUILD_DIR}/$atfbin \
+                ${DEPLOYDIR}/$atfbin${TFA_INSTALL_SUFFIX}
+            processed="1"
+        fi
+        if [ "$processed" = "0" ]; then
+            bberror "Unsupported TFA_INSTALL_TARGET target $atfbin"
+            exit 1
+        fi
+    done
 }
 
 addtask deploy before do_build after do_compile
-
-SYSROOT_DIRS += "/boot"
-FILES:${PN} += "/boot/*.elf /boot/*.bin /boot/*.ub"
 
 python() {
     soc_family = d.getVar('SOC_FAMILY')

@@ -32,12 +32,7 @@ TFA_CONSOLE_DEFAULT:zynqmp = "cadence"
 TFA_CONSOLE_DEFAULT:versal = "pl011"
 TFA_CONSOLE_DEFAULT:versal-net = "pl011"
 TFA_CONSOLE_DEFAULT:versal-2ve-2vm = "pl011"
-
-# Use old name for compatibility
-ATF_CONSOLE ?= "${TFA_CONSOLE_DEFAULT}"
-
-# Old name to new name
-TFA_CONSOLE ?= "${ATF_CONSOLE}"
+TFA_CONSOLE ?= "${TFA_CONSOLE_DEFAULT}"
 
 TFA_CONSOLE_OEMAKE = ""
 TFA_CONSOLE_OEMAKE:append:zynqmp = "${@' ZYNQMP_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
@@ -47,33 +42,20 @@ TFA_CONSOLE_OEMAKE:append:versal-2ve-2vm = "${@' CONSOLE=${TFA_CONSOLE}' if d.ge
 
 EXTRA_OEMAKE += "${TFA_CONSOLE_OEMAKE}"
 
-### Debug settings
-DEBUG_ATF_DEFAULT = ""
-DEBUG_ATF_DEFAULT:versal = "1"
-DEBUG_ATF_DEFAULT:versal-net = "1"
-DEBUG_ATF_DEFAULT:versal-2ve-2vm = "1"
-DEBUG_ATF ?= "${DEBUG_ATF_DEFAULT}"
-
-# Translate old to new name
-TFA_DEBUG = "${DEBUG_ATF}"
-
 
 ### Mem Settings
-ATF_MEM_BASE ?= ""
-ATF_MEM_SIZE ?= ""
-
-TFA_MEM_BASE ?= "${ATF_MEM_BASE}"
-TFA_MEM_SIZE ?= "${ATF_MEM_SIZE}"
+TFA_MEM_BASE ?= ""
+TFA_MEM_SIZE ?= ""
 
 TFA_MEM_OEMAKE = ""
-TFA_MEM_OEMAKE:append:zynqmp     = "${@' ZYNQMP_ATF_MEM_BASE=${ATF_MEM_BASE}'     if d.getVar('ATF_MEM_BASE') != '' else ''}"
-TFA_MEM_OEMAKE:append:zynqmp     = "${@' ZYNQMP_ATF_MEM_SIZE=${ATF_MEM_SIZE}'     if d.getVar('ATF_MEM_SIZE') != '' else ''}"
-TFA_MEM_OEMAKE:append:versal     = "${@' VERSAL_ATF_MEM_BASE=${ATF_MEM_BASE}'     if d.getVar('ATF_MEM_BASE') != '' else ''}"
-TFA_MEM_OEMAKE:append:versal     = "${@' VERSAL_ATF_MEM_SIZE=${ATF_MEM_SIZE}'     if d.getVar('ATF_MEM_SIZE') != '' else ''}"
-TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE') != '' else ''}"
-TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE') != '' else ''}"
-TFA_MEM_OEMAKE:append:versal-2ve-2vm    = "${@' MEM_BASE=${ATF_MEM_BASE}' if d.getVar('ATF_MEM_BASE') != '' else ''}"
-TFA_MEM_OEMAKE:append:versal-2ve-2vm    = "${@' MEM_SIZE=${ATF_MEM_SIZE}' if d.getVar('ATF_MEM_SIZE') != '' else ''}"
+TFA_MEM_OEMAKE:append:zynqmp     = "${@' ZYNQMP_ATF_MEM_BASE=${TFA_MEM_BASE}'     if d.getVar('TFA_MEM_BASE') != '' else ''}"
+TFA_MEM_OEMAKE:append:zynqmp     = "${@' ZYNQMP_ATF_MEM_SIZE=${TFA_MEM_SIZE}'     if d.getVar('TFA_MEM_SIZE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal     = "${@' VERSAL_ATF_MEM_BASE=${TFA_MEM_BASE}'     if d.getVar('TFA_MEM_BASE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal     = "${@' VERSAL_ATF_MEM_SIZE=${TFA_MEM_SIZE}'     if d.getVar('TFA_MEM_SIZE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_BASE=${TFA_MEM_BASE}' if d.getVar('TFA_MEM_BASE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${TFA_MEM_SIZE}' if d.getVar('TFA_MEM_SIZE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal-2ve-2vm    = "${@' MEM_BASE=${TFA_MEM_BASE}' if d.getVar('TFA_MEM_BASE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal-2ve-2vm    = "${@' MEM_SIZE=${TFA_MEM_SIZE}' if d.getVar('TFA_MEM_SIZE') != '' else ''}"
 
 EXTRA_OEMAKE += "${TFA_MEM_OEMAKE}"
 
@@ -89,9 +71,11 @@ EXTRA_OEMAKE:append:versal-2ve-2vm = " RESET_TO_BL31=1"
 # MACHINE FEATURES is enabled.
 TFA_SPD:versal-2ve-2vm ?= "${@bb.utils.contains('MACHINE_FEATURES', 'optee', 'opteed', '', d)}"
 
-# TFA 2.12 seems to want to use gcc for linking instead of ld
-LD = "${CCLD}"
-
+# TFA 2.12+ with ENABLE_LTO=1 (zynqmp) requires gcc as linker driver for -fuse-linker-plugin
+# The LD = "${CC}" approach does not reliably propagate via d.getVar('LD') in meta-arm.inc's
+# Python expression; directly override LD in EXTRA_OEMAKE instead. Because GNU make uses the
+# last command-line assignment for a variable, this appended LD= overrides the earlier one.
+EXTRA_OEMAKE:append = " LD='${@remove_options_tail(d.getVar('CC'))}'"
 
 # We use bl31
 TFA_BUILD_TARGET = "bl31"
@@ -99,51 +83,49 @@ TFA_INSTALL_TARGET = "bl31"
 
 inherit image-artifact-names
 
-ATF_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
-
-do_install:append() {
-    # The first TFA_INSTALL_TARGET found will be copied as the standard boot firmware
-    for atfbin in ${TFA_INSTALL_TARGET} ; do
-        install -d ${D}/boot
-        if [ -e ${D}/firmware/$atfbin-${TFA_PLATFORM}.elf ]; then
-            ln ${D}/firmware/$atfbin-${TFA_PLATFORM}.elf ${D}/boot/${ATF_BASE_NAME}.elf
-            ln -sf ${ATF_BASE_NAME}.elf ${D}/boot/${PN}.elf
-            ln ${D}/firmware/$atfbin-${TFA_PLATFORM}.bin ${D}/boot/${ATF_BASE_NAME}.bin
-            ln -sf ${ATF_BASE_NAME}.bin ${D}/boot/${PN}.bin
-
-            # Get the entry point address from the elf.
-            BL31_BASE_ADDR=$(${READELF} -h ${D}/boot/${ATF_BASE_NAME}.elf | egrep -m 1 -i "entry point.*?0x" | sed -r 's/.*?(0x.*?)/\1/g')
-            mkimage -A arm64 -O trusted-firmware-a -T kernel -C none \
-                    -a $BL31_BASE_ADDR -e $BL31_BASE_ADDR \
-                    -d ${D}/firmware/$atfbin-${TFA_PLATFORM}.bin ${D}/boot/${ATF_BASE_NAME}.ub
-            ln -sf ${ATF_BASE_NAME}.ub ${D}/boot/${PN}.ub
-            ln -sf ${ATF_BASE_NAME}.ub ${D}/boot/tfa-uboot.ub
-            break
-        fi
-    done
-}
-
 inherit deploy
 
 DEPENDS += "u-boot-mkimage-native"
 
 do_deploy() {
-    # Copy the /boot items to deploy
-    install -d ${DEPLOYDIR}
-    install -m 0644 ${D}/boot/${ATF_BASE_NAME}.elf ${DEPLOYDIR}/${ATF_BASE_NAME}.elf
-    ln -sf ${ATF_BASE_NAME}.elf ${DEPLOYDIR}/${PN}.elf
-    install -m 0644 ${D}/boot/${ATF_BASE_NAME}.bin ${DEPLOYDIR}/${ATF_BASE_NAME}.bin
-    ln -sf ${ATF_BASE_NAME}.bin ${DEPLOYDIR}/${PN}.bin
+    install -d -m 755 ${DEPLOYDIR}
 
-    install -m 0644 ${D}/boot/${ATF_BASE_NAME}.ub ${DEPLOYDIR}/${ATF_BASE_NAME}.ub
-    ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/${PN}.ub
-    ln -sf ${ATF_BASE_NAME}.ub ${DEPLOYDIR}/tfa-uboot.ub
+    for atfbin in ${TFA_INSTALL_TARGET}; do
+        processed="0"
+        if [ "$atfbin" = "all" ]; then
+            # Target all is not handled by default
+            bberror "all as TFA_INSTALL_TARGET is not handled by do_install"
+            bberror "Please specify valid targets in TFA_INSTALL_TARGET or"
+            bberror "rewrite or turn off do_install"
+            exit 1
+        fi
+
+        if [ -f ${BUILD_DIR}/$atfbin.bin ]; then
+            echo "Install $atfbin.bin"
+            install -m 0644 ${BUILD_DIR}/$atfbin.bin \
+                ${DEPLOYDIR}/$atfbin${TFA_INSTALL_SUFFIX}.bin
+            processed="1"
+        fi
+        if [ -f ${BUILD_DIR}/$atfbin/$atfbin.elf ]; then
+            echo "Install $atfbin.elf"
+            install -m 0644 ${BUILD_DIR}/$atfbin/$atfbin.elf \
+                ${DEPLOYDIR}/$atfbin${TFA_INSTALL_SUFFIX}.elf
+            processed="1"
+        fi
+        if [ -f ${BUILD_DIR}/$atfbin ]; then
+            echo "Install $atfbin"
+            install -m 0644 ${BUILD_DIR}/$atfbin \
+                ${DEPLOYDIR}/$atfbin${TFA_INSTALL_SUFFIX}
+            processed="1"
+        fi
+        if [ "$processed" = "0" ]; then
+            bberror "Unsupported TFA_INSTALL_TARGET target $atfbin"
+            exit 1
+        fi
+    done
 }
 
 addtask deploy before do_build after do_compile
-
-SYSROOT_DIRS += "/boot"
-FILES:${PN} += "/boot/*.elf /boot/*.bin /boot/*.ub"
 
 python() {
     soc_family = d.getVar('SOC_FAMILY')
@@ -159,4 +141,7 @@ python() {
     elif soc_family and soc_family == "versal-net":
         if not tfa_console in [ 'pl011', 'pl011_0', 'pl011_1', 'dcc' ]:
             raise bb.parse.SkipRecipe('TFA_CONSOLE (%s) is not configured properly for Versal-Net, only pl011, pl011_0, pl011_1, and dcc are valid options.' % (tfa_console))
+    elif soc_family and soc_family == "versal-2ve-2vm":
+        if not tfa_console in [ 'pl011', 'pl011_0', 'pl011_1', 'dcc' ]:
+            raise bb.parse.SkipRecipe('TFA_CONSOLE (%s) is not configured properly for Versal-2ve-2vm, only pl011, pl011_0, pl011_1, and dcc are valid options.' % (tfa_console))
 }

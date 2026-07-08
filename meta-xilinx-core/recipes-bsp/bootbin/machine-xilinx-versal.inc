@@ -42,7 +42,7 @@ BIF_PARTITION_ID[u-boot-xlnx] ?= "0x1c000000"
 
 # specify BIF partition attributes for trusted-firmware-a
 BIF_PARTITION_ATTR[trusted-firmware-a] ?= "core=a72-0, exception_level = el-3, trustzone"
-BIF_PARTITION_IMAGE[trusted-firmware-a] ?= "${RECIPE_SYSROOT}/boot/trusted-firmware-a.elf"
+BIF_PARTITION_IMAGE[trusted-firmware-a] ?= "${RECIPE_SYSROOT}/firmware/trusted-firmware-a/bl31.elf"
 BIF_PARTITION_ID[trusted-firmware-a] ?= "0x1c000000"
 
 # Force the newly created CDO file to be made available in the deploy directory

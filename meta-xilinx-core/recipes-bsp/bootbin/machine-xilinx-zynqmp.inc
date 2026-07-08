@@ -37,7 +37,7 @@ BIF_PARTITION_IMAGE[pmufw] ?= "${RECIPE_SYSROOT}/boot/pmufw.elf"
 # specify BIF partition attributes for TFA
 # destination cpu for TFA, security levels. Location where TFA binary is present (dependency is not required as TFA is always built for ZU+, see zcu102-zynqmp.conf)
 BIF_PARTITION_ATTR[trusted-firmware-a] ?= "destination_cpu=a53-0,exception_level=el-3,trustzone"
-BIF_PARTITION_IMAGE[trusted-firmware-a] ?= "${RECIPE_SYSROOT}/boot/trusted-firmware-a.elf"
+BIF_PARTITION_IMAGE[trusted-firmware-a] ?= "${RECIPE_SYSROOT}/firmware/trusted-firmware-a/bl31.elf"
 
 # specify BIF partition attributes for u-boot
 # destination cpu for u-boot, security levels. Location where u-boot binary is present (dependency is not required as u-boot is always built for ZU+, see zcu102-zynqmp.conf)

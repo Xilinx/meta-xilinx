@@ -54,7 +54,6 @@ TFA_CONSOLE_DEFAULT:zynqmp = "cadence"
 TFA_CONSOLE_DEFAULT:versal = "pl011"
 TFA_CONSOLE_DEFAULT:versal-net = "pl011"
 TFA_CONSOLE_DEFAULT:versal-2ve-2vm = "pl011"
-
 TFA_CONSOLE ?= "${TFA_CONSOLE_DEFAULT}"
 
 TFA_CONSOLE_OEMAKE = ""
@@ -64,9 +63,6 @@ TFA_CONSOLE_OEMAKE:append:versal-net = "${@' VERSAL_NET_CONSOLE=${TFA_CONSOLE}' 
 TFA_CONSOLE_OEMAKE:append:versal-2ve-2vm = "${@' CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
 
 EXTRA_OEMAKE += "${TFA_CONSOLE_OEMAKE}"
-
-### Debug settings
-TFA_DEBUG ?= "0"
 
 
 ### Mem Settings
@@ -101,8 +97,7 @@ TFA_SPD:versal-2ve-2vm ?= "${@bb.utils.contains('MACHINE_FEATURES', 'optee', 'op
 # The LD = "${CC}" approach does not reliably propagate via d.getVar('LD') in meta-arm.inc's
 # Python expression; directly override LD in EXTRA_OEMAKE instead. Because GNU make uses the
 # last command-line assignment for a variable, this appended LD= overrides the earlier one.
-EXTRA_OEMAKE:append = " LD='${TARGET_PREFIX}gcc'"
-
+EXTRA_OEMAKE:append = " LD='${@remove_options_tail(d.getVar('CC'))}'"
 
 # We use bl31
 TFA_BUILD_TARGET = "bl31"
@@ -110,46 +105,49 @@ TFA_INSTALL_TARGET = "bl31"
 
 inherit image-artifact-names
 
-TFA_BASE_NAME ?= "${PN}-${PKGE}-${PKGV}-${PKGR}${IMAGE_VERSION_SUFFIX}"
-
-do_install:append() {
-    # The first TFA_INSTALL_TARGET found will be copied as the standard boot firmware
-    # Uses ${FIRMWARE_DIR} (from firmware.bbclass: /firmware/${PN}) to match
-    # meta-arm's install layout since commit 7bce36a2 (switched to firmware.bbclass).
-    for tfabin in ${TFA_INSTALL_TARGET} ; do
-        install -d ${D}/boot
-        if [ -e ${D}${FIRMWARE_DIR}/$tfabin${TFA_INSTALL_SUFFIX}.elf ]; then
-            ln ${D}${FIRMWARE_DIR}/$tfabin${TFA_INSTALL_SUFFIX}.elf ${D}/boot/${TFA_BASE_NAME}.elf
-            ln -sf ${TFA_BASE_NAME}.elf ${D}/boot/${PN}.elf
-            ln ${D}${FIRMWARE_DIR}/$tfabin${TFA_INSTALL_SUFFIX}.bin ${D}/boot/${TFA_BASE_NAME}.bin
-            ln -sf ${TFA_BASE_NAME}.bin ${D}/boot/${PN}.bin
-
-            # Get the entry point address from the elf.
-            BL31_BASE_ADDR=$(${READELF} -h ${D}/boot/${TFA_BASE_NAME}.elf | egrep -m 1 -i "entry point.*?0x" | sed -r 's/.*?(0x.*?)/\1/g')
-            mkimage -A arm64 -O trusted-firmware-a -T kernel -C none \
-                    -a $BL31_BASE_ADDR -e $BL31_BASE_ADDR \
-                    -d ${D}${FIRMWARE_DIR}/$tfabin${TFA_INSTALL_SUFFIX}.bin ${D}/boot/${TFA_BASE_NAME}.ub
-            ln -sf ${TFA_BASE_NAME}.ub ${D}/boot/arm-trusted-firmware.ub
-            ln -sf ${TFA_BASE_NAME}.ub ${D}/boot/tfa-uboot.ub
-            break
-        fi
-    done
-}
-
 inherit deploy
 
 DEPENDS += "u-boot-mkimage-native"
 
 do_deploy() {
-    # Copy the /boot items to deploy
-    install -d ${DEPLOYDIR}
-    cp -rf ${D}/boot/* ${DEPLOYDIR}/
+    install -d -m 755 ${DEPLOYDIR}
+
+    for atfbin in ${TFA_INSTALL_TARGET}; do
+        processed="0"
+        if [ "$atfbin" = "all" ]; then
+            # Target all is not handled by default
+            bberror "all as TFA_INSTALL_TARGET is not handled by do_install"
+            bberror "Please specify valid targets in TFA_INSTALL_TARGET or"
+            bberror "rewrite or turn off do_install"
+            exit 1
+        fi
+
+        if [ -f ${BUILD_DIR}/$atfbin.bin ]; then
+            echo "Install $atfbin.bin"
+            install -m 0644 ${BUILD_DIR}/$atfbin.bin \
+                ${DEPLOYDIR}/$atfbin${TFA_INSTALL_SUFFIX}.bin
+            processed="1"
+        fi
+        if [ -f ${BUILD_DIR}/$atfbin/$atfbin.elf ]; then
+            echo "Install $atfbin.elf"
+            install -m 0644 ${BUILD_DIR}/$atfbin/$atfbin.elf \
+                ${DEPLOYDIR}/$atfbin${TFA_INSTALL_SUFFIX}.elf
+            processed="1"
+        fi
+        if [ -f ${BUILD_DIR}/$atfbin ]; then
+            echo "Install $atfbin"
+            install -m 0644 ${BUILD_DIR}/$atfbin \
+                ${DEPLOYDIR}/$atfbin${TFA_INSTALL_SUFFIX}
+            processed="1"
+        fi
+        if [ "$processed" = "0" ]; then
+            bberror "Unsupported TFA_INSTALL_TARGET target $atfbin"
+            exit 1
+        fi
+    done
 }
 
 addtask deploy before do_build after do_compile
-
-SYSROOT_DIRS += "/boot"
-FILES:${PN} += "/boot/*.elf /boot/*.bin /boot/*.ub"
 
 python() {
     soc_family = d.getVar('SOC_FAMILY')
