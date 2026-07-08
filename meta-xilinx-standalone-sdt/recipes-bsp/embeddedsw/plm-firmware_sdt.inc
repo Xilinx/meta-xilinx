@@ -11,9 +11,9 @@ DEPENDS += "\
     xilsecure \
     xilsem \
     xilnvm \
-    xiltpm \
-    xilocp \
-    xilcert \
+    ${@'xiltpm' if d.getVar('ESW_VER') not in ['2024.2', '2025.1'] else ''} \
+    ${@'xilocp' if d.getVar('ESW_VER') not in ['2024.2'] else ''} \
+    ${@'xilcert' if d.getVar('ESW_VER') not in ['2024.2'] else ''} \
     "
 
 TARGET_LDFLAGS:append:pmc_0 = " -T${RECIPE_SYSROOT}${libdir}/xpm_memory_pools.ld"
