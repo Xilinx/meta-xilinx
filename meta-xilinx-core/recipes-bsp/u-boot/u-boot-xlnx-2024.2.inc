@@ -2,6 +2,11 @@ UBRANCH = "xlnx_rebase_v2024.01"
 
 SRCREV = "20b67799856b578b1c79f29575448421c86b6161"
 
+SRC_URI += " \
+	file://0001-scripts-dtc-pylibfdt-libfdt.i_shipped-Use-SWIG_Appen.patch \
+	file://0001-binman-migrate-from-pkg_resources-to-importlib.patch \
+"
+
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=4;md5=744e7e3bb0c94b4b9f6b3db3bf893897"
 

@@ -2,6 +2,10 @@ UBRANCH = "xlnx_rebase_v2025.01"
 
 SRCREV = "5e0d8abc7e092b62a5de17aa7aadfad7af5f0f59"
 
+SRC_URI += " \
+	file://0001-binman-migrate-from-pkg_resources-to-importlib.patch \
+	"
+
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=1;endline=4;md5=744e7e3bb0c94b4b9f6b3db3bf893897"
 

@@ -1,0 +1,81 @@
+From 743298b8e643160f8803458fcbaf143c872eaddf Mon Sep 17 00:00:00 2001
+From: Yannic Moog <y.moog@phytec.de>
+Date: Tue, 1 Jul 2025 07:45:37 +0200
+Subject: [PATCH] binman: migrate from pkg_resources to importlib
+
+pkg_resources is deprecated, use migration guide in [1] to migrate to
+importlib.resources.
+Keep the Python 3.6 backwards compatibility.
+This also fixes the binman version test which failed for setuptools
+versions that print the deprecation warning.
+Change from __name__ to __package__ as with the transition from
+pkg_resources to importlib_resources using __name__ results in
+TypeErrors [2].
+
+[1] https://importlib-resources.readthedocs.io/en/latest/migration.html
+[2] https://github.com/python/importlib_resources/issues/60
+
+Reviewed-by: Bryan Brattlof <bb@ti.com>
+Signed-off-by: Yannic Moog <y.moog@phytec.de>
+
+Upstream-Status: Backport
+
+(cherry picked from commit 538719cb6a77934d069e0e64f264457a59a9ebfc)
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ tools/binman/control.py | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/tools/binman/control.py b/tools/binman/control.py
+index 2f00279232b..f80355a6f74 100644
+--- a/tools/binman/control.py
++++ b/tools/binman/control.py
+@@ -8,12 +8,11 @@
+ from collections import OrderedDict
+ import glob
+ try:
+-    import importlib.resources
++    import importlib.resources as importlib_resources
+ except ImportError:  # pragma: no cover
+     # for Python 3.6
+     import importlib_resources
+ import os
+-import pkg_resources
+ import re
+ 
+ import sys
+@@ -96,8 +95,8 @@ def _ReadMissingBlobHelp():
+             msg = ''
+         return tag, msg
+ 
+-    my_data = pkg_resources.resource_string(__name__, 'missing-blob-help')
+-    re_tag = re.compile('^([-a-z0-9]+):$')
++    my_data = importlib_resources.files(__package__).joinpath('missing-blob-help').read_bytes()
++    re_tag = re.compile(r"^([-\.a-z0-9]+):$")
+     result = {}
+     tag = None
+     msg = ''
+@@ -151,8 +150,9 @@ def GetEntryModules(include_testing=True):
+     Returns:
+         Set of paths to entry class filenames
+     """
+-    glob_list = pkg_resources.resource_listdir(__name__, 'etype')
+-    glob_list = [fname for fname in glob_list if fname.endswith('.py')]
++    entries = importlib_resources.files(__package__).joinpath('etype')
++    glob_list = [entry.name for entry in entries.iterdir()
++                 if entry.name.endswith('.py') and entry.is_file()]
+     return set([os.path.splitext(os.path.basename(item))[0]
+                 for item in glob_list
+                 if include_testing or '_testing' not in item])
+@@ -735,7 +735,7 @@ def Binman(args):
+     global state
+ 
+     if args.full_help:
+-        with importlib.resources.path('binman', 'README.rst') as readme:
++        with importlib_resources.path('binman', 'README.rst') as readme:
+             tools.print_full_help(str(readme))
+         return 0
+ 
+-- 
+2.34.1
+
