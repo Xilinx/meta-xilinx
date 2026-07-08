@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MIT;md5=0835ad
 
 inherit deploy
 
-require image-recovery-src_2026.1.inc
+require image-recovery-src_2026.2.inc
 
 SRC_URI = "${IMG_RCVRY_REPO};${IMG_RCVRY_BRANCHARG}"
 SRCREV ?= "${IMG_RCVRY_SRCREV}"
