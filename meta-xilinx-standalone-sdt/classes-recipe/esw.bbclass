@@ -4,6 +4,9 @@ inherit check_sdt_enabled python3native xlnx-embeddedsw pkgconfig cmake
 # behavior when this is enabled and will generate:
 #    -isystem /usr/include
 # which will cause a build failures.
+#
+# Note, the -DYOCTO=ON below should make this obsolete, but it is left to
+# support older versions of ESW where YOCTO=ON did not yet exist.
 OECMAKE_ARGS:remove = "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON"
 
 # cmake 4.3 changed CMP0000 to fatal when cmake_minimum_required() is absent.
@@ -118,7 +121,7 @@ do_install() {
 }
 
 CFLAGS:append = " ${ESW_CFLAGS}"
-EXTRA_OECMAKE += "-DYOCTO=ON"
+EXTRA_OECMAKE:append = " -DYOCTO=ON"
 
 do_configure:prepend() {
     (
