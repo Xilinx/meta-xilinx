@@ -15,7 +15,7 @@ SRCREV ?= "e14e7614fbcbd72f0aa75b953e089bf4634ee128"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI   = "${REPO};${BRANCHARG}"
 
-inherit autotools features_check
+inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "vdu"
 
@@ -26,6 +26,10 @@ EXTRA_OEMAKE += "INSTALL_PATH=${D}/${nonarch_base_libdir}/firmware"
 do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 do_install[dirs] = "${S}"
+
+do_install:append() {
+    oe_runmake install
+}
 
 # Inhibit warnings about files being stripped
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
