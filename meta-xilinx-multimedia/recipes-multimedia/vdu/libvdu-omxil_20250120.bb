@@ -13,9 +13,9 @@ SRCREV ?= "4126404dfce767870a672f07804d880106d6d5e2"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
-B = "${WORKDIR}/git"
+B = "${S}"
 
-inherit autotools features_check
+inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "vdu"
 
@@ -35,6 +35,9 @@ EXTRA_OEMAKE = " \
     INSTALL_PATH=${D}${bindir} \
     INCLUDE_INST_PATH=${D}${includedir} \
     "
+do_install() {
+    oe_runmake install
+}
 
 do_install:append() {
     install -d ${D}${libdir}

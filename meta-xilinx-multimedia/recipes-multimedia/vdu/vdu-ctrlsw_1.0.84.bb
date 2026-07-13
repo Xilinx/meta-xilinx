@@ -18,7 +18,7 @@ SRC_URI = "${REPO};${BRANCHARG}"
 
 B = "${S}"
 
-inherit autotools features_check
+inherit features_check
 
 REQUIRED_MACHINE_FEATURES = "vdu"
 
@@ -28,12 +28,15 @@ DEPENDS += "kernel-module-vdu"
 RDEPENDS:${PN} = "kernel-module-vdu"
 RDEPENDS:libvdu-ctrlsw = "kernel-module-vdu"
 
-do_configure[noexec] = "1"
 do_compile[dirs] = "${S}"
 do_install[dirs] = "${S}"
 
 EXTRA_OEMAKE = "CC='${CC}' CXX='${CXX} ${CXXFLAGS}'"
 EXTRA_OEMAKE += "INSTALL_HDR_PATH=${D}${includedir}/vdu-ctrl-sw/include INSTALL_PATH=${D}${bindir}"
+
+do_install:append() {
+    oe_runmake install
+}
 
 do_install:append() {
 
