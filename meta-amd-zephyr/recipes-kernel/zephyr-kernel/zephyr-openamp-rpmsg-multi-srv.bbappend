@@ -19,3 +19,9 @@ EXTRA_OECMAKE += " \
     -DOVERLAY_CONFIG="${S}/open-amp-sys-ref/examples/zephyr/rpmsg_multi_services/boards/${BOARD}.conf" \
     -DCONFIG_GIC_SAFE_CONFIG=y \
     "
+
+# The Versal Net and Versal Gen 2 machine overrides are also present when
+# building for Cortex-A.  Enable this RPU application only in the Zephyr
+# multiconfigs, where the generated RPU board is selected.
+COMPATIBLE_MACHINE:versal-net = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') == 'versalnet_rpu' else '^$'}"
+COMPATIBLE_MACHINE:versal-2ve-2vm = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') == 'versal2_rpu' else '^$'}"
