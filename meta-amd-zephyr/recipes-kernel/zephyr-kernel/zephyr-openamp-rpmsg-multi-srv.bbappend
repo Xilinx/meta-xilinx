@@ -25,3 +25,23 @@ EXTRA_OECMAKE += " \
 # multiconfigs, where the generated RPU board is selected.
 COMPATIBLE_MACHINE:versal-net = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') == 'versalnet_rpu' else '^$'}"
 COMPATIBLE_MACHINE:versal-2ve-2vm = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') == 'versal2_rpu' else '^$'}"
+
+# ZEPHYR_MAKE_OUTPUT is "rpmsg_multi_services.elf", so replacing "zephyr"
+# leaves both output_img and output_img_link unchanged.  Avoid replacing the
+# deployed ELF with a self-referential symlink.
+do_deploy() {
+    for output in ${ZEPHYR_MAKE_OUTPUT}; do
+        if [ -f ${B}/zephyr/${output} ]; then
+            output_img=$(echo ${output} | sed -e "s/zephyr/${ZEPHYR_IMAGE_BASE_NAME}/g")
+            output_img_link=$(echo ${output} | sed -e "s/zephyr/${ZEPHYR_IMAGE_LINK_NAME}/g")
+
+            # Remove a self-referential link left by an earlier deployment.
+            rm -f ${DEPLOYDIR}/${output_img}
+            cp ${B}/zephyr/${output} ${DEPLOYDIR}/${output_img}
+
+            if [ "${output_img}" != "${output_img_link}" ]; then
+                ln -sf ${output_img} ${DEPLOYDIR}/${output_img_link}
+            fi
+        fi
+    done
+}
