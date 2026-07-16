@@ -15,8 +15,7 @@ DEPENDS += "\
     libxil \
     xiltimer \
     ${@'xilplmi' if d.getVar('ESW_MACHINE') in ['psv_pmc_0', 'psv_cortexa72_0', 'pmc_0', 'psv_cortexr5_0', 'psx_pmc_0', 'psx_psm_0'] else ''} \
-    ${@'xilmailbox' if d.getVar('ESW_MACHINE') == 'psv_cortexa72_0' \
-        or d.getVar('ESW_MACHINE') == 'psv_cortexr5_0' else ''} \
+    ${@'xilmailbox' if d.getVar('ESW_MACHINE') in ['psv_cortexa72_0', 'psv_cortexr5_0', 'cortexa78_0'] else ''} \
     "
 
 do_install:append() {

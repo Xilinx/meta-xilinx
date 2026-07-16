@@ -25,14 +25,21 @@ do_configure:prepend() {
 ESW_CUSTOM_LINKER_FILE ?= "None"
 EXTRA_OECMAKE = "-DCUSTOM_LINKER_FILE=${@d.getVar('ESW_CUSTOM_LINKER_FILE')}"
 
+ALLOW_EMPTY:${PN} = "1"
+
 do_install() {
-    install -d ${D}/${base_libdir}/firmware
-    install -m 0755  ${B}/*.elf ${D}/${base_libdir}/firmware
+    if ls ${B}/*.elf >/dev/null 2>&1; then
+        install -d ${D}/${base_libdir}/firmware
+        install -m 0755 ${B}/*.elf ${D}/${base_libdir}/firmware
+    fi
 }
 
 do_deploy() {
-    install -d ${DEPLOYDIR}/${BPN}/
-    install -Dm 0644 ${WORKDIR}/package/${base_libdir}/firmware/*.elf ${DEPLOYDIR}/${BPN}/
+    if [ -d ${WORKDIR}/package/${base_libdir}/firmware ] && \
+       ls ${WORKDIR}/package/${base_libdir}/firmware/*.elf >/dev/null 2>&1; then
+        install -d ${DEPLOYDIR}/${BPN}/
+        install -Dm 0644 ${WORKDIR}/package/${base_libdir}/firmware/*.elf ${DEPLOYDIR}/${BPN}/
+    fi
 }
 addtask deploy before do_build after do_package
 
