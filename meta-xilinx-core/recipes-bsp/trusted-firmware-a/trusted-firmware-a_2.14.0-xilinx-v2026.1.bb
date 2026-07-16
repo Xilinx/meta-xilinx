@@ -132,6 +132,9 @@ do_deploy() {
             echo "Install $atfbin.elf"
             install -m 0644 ${BUILD_DIR}/$atfbin/$atfbin.elf \
                 ${DEPLOYDIR}/$atfbin${TFA_INSTALL_SUFFIX}.elf
+            # Temporary compatibility symlink
+            ln -sf $atfbin${TFA_INSTALL_SUFFIX}.elf \
+                ${DEPLOYDIR}/arm-trusted-firmware.elf
             processed="1"
         fi
         if [ -f ${BUILD_DIR}/$atfbin ]; then
