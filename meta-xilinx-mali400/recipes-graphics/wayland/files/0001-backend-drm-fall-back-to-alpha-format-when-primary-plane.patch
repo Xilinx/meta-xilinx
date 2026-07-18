@@ -1,0 +1,89 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Trevor Woerner <twoerner@gmail.com>
+Date: Thu, 16 Jul 2026 00:00:00 +0000
+Subject: [PATCH] backend-drm: fall back to the alpha format when the primary
+ plane lacks the opaque one
+
+drm_output_pick_format_egl() computes the intersection of the renderer's
+EGL-renderable formats and the scanout (primary) plane formats, then
+requires the configured/default output format (b->format, typically the
+opaque XRGB8888) to be a member of that set. If it is not, output init
+fails hard with:
+
+  Error: format XRGB8888 unsupported by EGL GBM or the primary plane
+         for output 'DP-1'.
+  Failed to init output gl state
+
+Some KMS drivers only advertise the alpha variant (ARGB8888 / AR24) on
+the primary plane and expose the opaque XRGB8888 (XR24) only on overlay
+planes. When EGL/GBM offers both AR24 and XR24 as window-capable configs
+but the primary plane exposes only AR24, the default opaque format is
+rejected and the output never comes up.
+
+Only the min_bpc == 0 (default SDR) path has this problem; the HDR /
+underlay path (min_bpc != 0) already searches for a compatible format
+via find_compatible_format(). Bring the same resilience to the default
+path: when the requested opaque format is unavailable, try its matching
+alpha format before failing. fallback_format_for() maps an opaque format
+to the alpha format whose opaque_substitute is that format (XRGB8888 ->
+ARGB8888), so the color depth is preserved. drm_output_render_gl()
+already avoids forcing the framebuffer opaque when the chosen format has
+an opaque_substitute, so scanning out the alpha format is correct and
+the alpha channel is left untouched.
+
+Upstream-Status: Pending
+AI-Generated: codex/claude-opus 4.8 (xhigh)
+Signed-off-by: Trevor Woerner <twoerner@gmail.com>
+---
+--- a/libweston/backend-drm/drm-gbm.c
++++ b/libweston/backend-drm/drm-gbm.c
+@@ -478,9 +478,44 @@
+ 		}
+ 	}
+ 	if (!found) {
+-		weston_log("Error: format %s unsupported by EGL GBM or the primary plane for output '%s'.\n",
+-			   b->format->drm_format_name, output->base.name);
+-		ret = false;
++		/*
++		 * The configured/default format (typically the opaque
++		 * XRGB8888) is not offered by both the renderer and the
++		 * scanout (primary) plane. Some KMS drivers only advertise the
++		 * alpha variant (e.g. ARGB8888) on the primary plane. Try the
++		 * matching alpha format for the requested one before failing:
++		 * fallback_format_for() maps an opaque format to the alpha
++		 * format whose opaque_substitute is that format (XRGB8888 ->
++		 * ARGB8888), preserving the color depth. drm_output_render_gl()
++		 * already keeps the alpha contents when the chosen format has an
++		 * opaque_substitute, so scanning out the alpha format is
++		 * correct.
++		 */
++		const struct pixel_format_info *fallback =
++			fallback_format_for(b->format);
++
++		if (fallback) {
++			wl_array_for_each(f, &supported_formats) {
++				if ((*f)->format == fallback->format) {
++					found = true;
++					break;
++				}
++			}
++		}
++
++		if (!found) {
++			weston_log("Error: format %s unsupported by EGL GBM or the primary plane for output '%s'.\n",
++				   b->format->drm_format_name, output->base.name);
++			ret = false;
++			goto done;
++		}
++
++		weston_log("Format %s unavailable on the primary plane for output '%s'; "
++			   "falling back to %s.\n",
++			   b->format->drm_format_name, output->base.name,
++			   fallback->drm_format_name);
++
++		output->format = fallback;
+ 		goto done;
+ 	}
+ 
+-- 
+2.50.0.173.g8b6f19ccfc3a
