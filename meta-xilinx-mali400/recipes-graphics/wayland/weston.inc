@@ -1,9 +1,5 @@
-SRC_URI:append:zynqmp = " file://0001-Force-weston-to-select-ARGB-if-XRGB-is-not-available.patch"
-
-# Due to the SRC_URI zynqmp specific change, this needs to be MACHINE_ARCH specific
-PACKAGE_ARCH:zynqmp = "${MACHINE_ARCH}"
-
-# Links to libmali-xlnx, so it becomes MACHINE_ARCH specific
+# Weston links to libmali-xlnx (via virtual/egl and friends) when the closed
+# driver is selected, so it must become MACHINE_ARCH specific in that case.
 DEFAULT_PACKAGE_ARCH := "${PACKAGE_ARCH}"
 MALI_PACKAGE_ARCH[vardepsexclude] = "MACHINE_ARCH"
 MALI_PACKAGE_ARCH = "${@'${MACHINE_ARCH}' if d.getVar('PREFERRED_PROVIDER_virtual/libgles1') == 'libmali-xlnx' else '${DEFAULT_PACKAGE_ARCH}'}"
