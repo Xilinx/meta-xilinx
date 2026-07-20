@@ -566,9 +566,8 @@ index 42ce97b3..cc48fdfe 100644
    opcode_hash_control = str_htab_create ();
  
    /* Insert unique names into hash table.  */
--  for (opcode = microblaze_opcodes; opcode->name; opcode ++)
+   for (opcode = microblaze_opcodes; opcode->name; opcode ++)
 -    str_hash_insert (opcode_hash_control, opcode->name, opcode, 0);
-+  for (opcode = (struct microblaze_opcodes *)microblaze_opcodes; opcode->name; opcode ++)
 +    {
 +      if (strcmp (prev_name, opcode->name))
 +	{
@@ -701,7 +700,7 @@ index 42ce97b3..cc48fdfe 100644
    unsigned isize;
 -  unsigned int immed = 0, immed2 = 0, temp;
 -  expressionS exp;
-+  unsigned long long immed = 0, immed2 = 0, temp;
++  unsigned int immed = 0, immed2 = 0, temp;
 +  expressionS exp,exp1;
    char name[20];
 +  long immedl;
