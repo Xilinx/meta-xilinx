@@ -58,28 +58,22 @@ Upstream-Status: Inappropriate [AMD Microblaze specific]
 
 Signed-off-by: Mark Hatle <mark.hatle@xilinx.com>
 
-Index: gcc-12.2.0/gcc/config/microblaze/t-microblaze
+Index: gcc-15.3.0/gcc/config/microblaze/t-microblaze
 ===================================================================
---- gcc-12.2.0.orig/gcc/config/microblaze/t-microblaze
-+++ gcc-12.2.0/gcc/config/microblaze/t-microblaze
-@@ -1,17 +1,11 @@
--MULTILIB_OPTIONS = m64 mxl-barrel-shift mlittle-endian mno-xl-soft-mul mxl-multiply-high
--#MULTILIB_DIRNAMES = m64 bs le m mh
--MULTILIB_DIRNAMES = . . . . .
--MULTILIB_EXCEPTIONS = *m64/mxl-multiply-high mxl-multiply-high
--MULTILIB_EXCEPTIONS += *m64
--MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift
--MULTILIB_EXCEPTIONS += *m64/mno-xl-soft-mul
--MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift/mno-xl-soft-mul
--MULTILIB_EXCEPTIONS += *m64/mno-xl-soft-mul
--MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift/mno-xl-soft-mul/mxl-multiply-high
--MULTILIB_EXCEPTIONS += *m64/mno-xl-soft-mul/mxl-multiply-high
+--- gcc-15.3.0.orig/gcc/config/microblaze/t-microblaze
++++ gcc-15.3.0/gcc/config/microblaze/t-microblaze
+@@ -1,9 +1,11 @@
+-MULTILIB_OPTIONS = mxl-barrel-shift mno-xl-soft-mul mxl-multiply-high mlittle-endian
+-#MULTILIB_DIRNAMES = bs m mh le
+-MULTILIB_DIRNAMES = . . . .
+-MULTILIB_EXCEPTIONS = *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high
+-MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high/mlittle-endian
+-MULTILIB_EXCEPTIONS += mxl-multiply-high/mlittle-endian
 +MULTILIB_OPTIONS = mlittle-endian m64 mxl-barrel-shift mxl-pattern-compare mno-xl-soft-mul mhard-float
 +MULTILIB_DIRNAMES = le m64 bs p m fpd
 +MULTILIB_EXCEPTIONS = mxl-multiply-high
- MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high
- MULTILIB_EXCEPTIONS += *mlittle-endian/mxl-multiply-high mxl-multiply-high
--MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift/mlittle-endian/mxl-multiply-high
++MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high
++MULTILIB_EXCEPTIONS += *mlittle-endian/mxl-multiply-high mxl-multiply-high
 +MULTILIB_EXCEPTIONS += *mxl-pattern-compare*/*mxl-multiply-high*
 +# Big endian m64 is not supported
 +MULTILIB_EXCEPTIONS += m64*
