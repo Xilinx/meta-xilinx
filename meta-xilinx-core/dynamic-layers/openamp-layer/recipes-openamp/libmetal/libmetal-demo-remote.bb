@@ -15,11 +15,7 @@ LIBMETAL_DEPENDS ?= "${SYSTEM_DTFILE_DEPENDS}"
 LIBMETAL_DTFILE ?= "${CONFIG_DTFILE}"
 
 DEPENDS:append = "${LIBMETAL_DEPENDS}"
-DEPENDS:append = " libmetal-xlnx device-tree python3-native python3-pyyaml-native  python3-dtc-native libmetal-xlnx-extension xiltimer ttcps libxil xilstandalone xiltimer ipipsu "
-
-PM_DEPENDS ?= " xilpm "
-PM_DEPENDS:versal-2ve-2vm = " xilpm-ng "
-DEPENDS:append = " ${PM_DEPENDS} "
+DEPENDS:append = " libmetal-xlnx device-tree python3-native python3-pyyaml-native  python3-dtc-native libmetal-xlnx-extension xiltimer ttcps libxil xilstandalone xiltimer ipipsu xilpm "
 
 B = "${WORKDIR}/build"
 S = "${UNPACKDIR}/${BP}/examples/libmetal"
