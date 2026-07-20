@@ -112,8 +112,8 @@ KERNEL_FEATURES:append:aarch64 = " \
 
 KERNEL_MODULE_AUTOLOAD += "${@bb.utils.contains('DISTRO_FEATURES', 'kvm', 'vhost', '', d)}"
 
-# xlnx- prefix avoids a basename collision with meta-virtualization's extra-configs.cfg (FILESEXTRAPATHS prepend would otherwise win).
-SRC_URI:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'file://xlnx-extra-configs.cfg', '', d)}"
+# Distinct name avoids a basename collision with meta-virtualization's extra-configs.cfg (FILESEXTRAPATHS prepend would otherwise win) and conveys what it enables.
+SRC_URI:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'file://virt-iptables-legacy.cfg', '', d)}"
 
 # To enable lttng, we need kprobes
 KERNEL_FEATURES_KPROBES = " features/kprobes"
