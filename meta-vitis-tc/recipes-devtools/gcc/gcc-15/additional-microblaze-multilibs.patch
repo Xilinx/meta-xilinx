@@ -19,7 +19,6 @@ bs/m/fpd;@mxl-barrel-shift@mno-xl-soft-mul@mhard-float
 bs/p/m;@mxl-barrel-shift@mxl-pattern-compare@mno-xl-soft-mul
 bs/p/fpd;@mxl-barrel-shift@mxl-pattern-compare@mhard-float
 bs/p/m/fpd;@mxl-barrel-shift@mxl-pattern-compare@mno-xl-soft-mul@mhard-float
-le/m64;@mlittle-endian@m64
 le/bs;@mlittle-endian@mxl-barrel-shift
 le/p;@mlittle-endian@mxl-pattern-compare
 le/m;@mlittle-endian@mno-xl-soft-mul
@@ -35,24 +34,6 @@ le/bs/m/fpd;@mlittle-endian@mxl-barrel-shift@mno-xl-soft-mul@mhard-float
 le/bs/p/m;@mlittle-endian@mxl-barrel-shift@mxl-pattern-compare@mno-xl-soft-mul
 le/bs/p/fpd;@mlittle-endian@mxl-barrel-shift@mxl-pattern-compare@mhard-float
 le/bs/p/m/fpd;@mlittle-endian@mxl-barrel-shift@mxl-pattern-compare@mno-xl-soft-mul@mhard-float
-le/m64/bs;@mlittle-endian@m64@mxl-barrel-shift
-le/m64/p;@mlittle-endian@m64@mxl-pattern-compare
-le/m64/m;@mlittle-endian@m64@mno-xl-soft-mul
-le/m64/fpd;@mlittle-endian@m64@mhard-float
-le/m64/m/fpd;@mlittle-endian@m64@mno-xl-soft-mul@mhard-float
-le/m64/p/m;@mlittle-endian@m64@mxl-pattern-compare@mno-xl-soft-mul
-le/m64/p/fpd;@mlittle-endian@m64@mxl-pattern-compare@mhard-float
-le/m64/p/m/fpd;@mlittle-endian@m64@mxl-pattern-compare@mno-xl-soft-mul@mhard-float
-le/m64/bs/p;@mlittle-endian@m64@mxl-barrel-shift@mxl-pattern-compare
-le/m64/bs/m;@mlittle-endian@m64@mxl-barrel-shift@mno-xl-soft-mul
-le/m64/bs/fpd;@mlittle-endian@m64@mxl-barrel-shift@mhard-float
-le/m64/bs/m/fpd;@mlittle-endian@m64@mxl-barrel-shift@mno-xl-soft-mul@mhard-float
-le/m64/bs/p/m;@mlittle-endian@m64@mxl-barrel-shift@mxl-pattern-compare@mno-xl-soft-mul
-le/m64/bs/p/fpd;@mlittle-endian@m64@mxl-barrel-shift@mxl-pattern-compare@mhard-float
-le/m64/bs/p/m/fpd;@mlittle-endian@m64@mxl-barrel-shift@mxl-pattern-compare@mno-xl-soft-mul@mhard-float
-
-As part of this the order of the multilibs was changes from upstream to make
-it easier to avoid big-endian m64, which is not supported by the toolchain.
 
 Upstream-Status: Inappropriate [AMD Microblaze specific]
 
@@ -69,14 +50,14 @@ Index: gcc-15.3.0/gcc/config/microblaze/t-microblaze
 -MULTILIB_EXCEPTIONS = *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high
 -MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high/mlittle-endian
 -MULTILIB_EXCEPTIONS += mxl-multiply-high/mlittle-endian
-+MULTILIB_OPTIONS = mlittle-endian m64 mxl-barrel-shift mxl-pattern-compare mno-xl-soft-mul mhard-float
-+MULTILIB_DIRNAMES = le m64 bs p m fpd
++MULTILIB_OPTIONS = mlittle-endian mxl-barrel-shift mxl-pattern-compare mno-xl-soft-mul mhard-float
++MULTILIB_DIRNAMES = le bs p m fpd
 +MULTILIB_EXCEPTIONS = mxl-multiply-high
 +MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high
 +MULTILIB_EXCEPTIONS += *mlittle-endian/mxl-multiply-high mxl-multiply-high
 +MULTILIB_EXCEPTIONS += *mxl-pattern-compare*/*mxl-multiply-high*
 +# Big endian m64 is not supported
-+MULTILIB_EXCEPTIONS += m64*
++#MULTILIB_EXCEPTIONS += m64*
  
  # Extra files
  microblaze-c.o: $(srcdir)/config/microblaze/microblaze-c.cc \
