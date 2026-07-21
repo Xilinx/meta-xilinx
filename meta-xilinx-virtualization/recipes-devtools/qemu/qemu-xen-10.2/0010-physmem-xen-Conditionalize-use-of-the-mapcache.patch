@@ -1,0 +1,80 @@
+From e3ba2c0bcac0faa86d114cc09c59dca35d1008dd Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Wed, 23 Jul 2025 11:56:51 +0200
+Subject: [PATCH 10/14] physmem: xen: Conditionalize use of the mapcache
+
+Conditionalize use of the mapcache. This is in preparation
+to optionally disable the mapcache at runtime.
+
+Upstream-Status: Backport [QEMU 11 - https://gitlab.com/qemu-project/qemu/-/commit/8a39d34e65626116fad6f3166874a4e64d4ea190]
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Acked-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ system/physmem.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/system/physmem.c b/system/physmem.c
+index c9869e4049..7ee7ce7ad3 100644
+--- a/system/physmem.c
++++ b/system/physmem.c
+@@ -579,7 +579,9 @@ MemoryRegion *flatview_translate(FlatView *fv, hwaddr addr, hwaddr *xlat,
+                                     is_write, true, &as, attrs);
+     mr = section.mr;
+ 
+-    if (xen_enabled() && memory_access_is_direct(mr, is_write, attrs)) {
++    if (xen_map_cache_enabled() &&
++        memory_access_is_direct(mr, is_write, attrs)) {
++        /* mapcache: Next page may be unmapped or in a different bucket/VA. */
+         hwaddr page = ((addr & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE) - addr;
+         *plen = MIN(page, *plen);
+     }
+@@ -2590,7 +2592,7 @@ static void reclaim_ramblock(RAMBlock *block)
+ {
+     if (block->flags & RAM_PREALLOC) {
+         ;
+-    } else if (xen_enabled()) {
++    } else if (xen_map_cache_enabled()) {
+         xen_invalidate_map_cache_entry(block->host);
+ #if !defined(_WIN32) && !defined(EMSCRIPTEN)
+     } else if (block->fd >= 0) {
+@@ -2749,7 +2751,7 @@ static void *qemu_ram_ptr_length(RAMBlock *block, ram_addr_t addr,
+         len = *size;
+     }
+ 
+-    if (xen_enabled() && block->host == NULL) {
++    if (xen_map_cache_enabled() && block->host == NULL) {
+         /* We need to check if the requested address is in the RAM
+          * because we don't want to map the entire memory in QEMU.
+          * In that case just map the requested area.
+@@ -2798,7 +2800,7 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
+     RAMBlock *block;
+     uint8_t *host = ptr;
+ 
+-    if (xen_enabled()) {
++    if (xen_map_cache_enabled()) {
+         ram_addr_t ram_addr;
+         RCU_READ_LOCK_GUARD();
+         ram_addr = xen_ram_addr_from_mapcache(ptr);
+@@ -3787,7 +3789,7 @@ void address_space_unmap(AddressSpace *as, void *buffer, hwaddr len,
+         if (is_write) {
+             invalidate_and_set_dirty(mr, addr1, access_len);
+         }
+-        if (xen_enabled()) {
++        if (xen_map_cache_enabled()) {
+             xen_invalidate_map_cache_entry(buffer);
+         }
+         memory_region_unref(mr);
+@@ -3898,7 +3900,7 @@ void address_space_cache_destroy(MemoryRegionCache *cache)
+         return;
+     }
+ 
+-    if (xen_enabled()) {
++    if (xen_map_cache_enabled()) {
+         xen_invalidate_map_cache_entry(cache->ptr);
+     }
+     memory_region_unref(cache->mrs.mr);
+-- 
+2.34.1
+
