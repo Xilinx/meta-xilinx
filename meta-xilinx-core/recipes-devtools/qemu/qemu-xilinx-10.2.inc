@@ -83,17 +83,14 @@ SRC_URI += "\
            file://0001-qemu-Add-addition-environment-space-to-boot-loader-q.patch \
            file://0002-apic-fixup-fallthrough-to-PIC.patch \
            file://0004-qemu-Do-not-include-file-if-not-exists.patch \
-           file://0005-qemu-Add-some-user-space-mmap-tweaks-to-address-musl.patch \
            file://0006-qemu-Determinism-fixes.patch \
            file://0007-tests-meson.build-use-relative-path-to-refer-to-file.patch \
            file://0008-Define-MAP_SYNC-and-MAP_SHARED_VALIDATE-on-needed-li.patch \
            file://0010-configure-lookup-meson-exutable-from-PATH.patch \
            file://0011-qemu-Ensure-pip-and-the-python-venv-aren-t-used-for-.patch \
-           file://0001-linux-user-elfload.c-Correction-to-HWCAP2-accessor.patch \
            file://0001-accel-tcg-Fix-iotlb_to_section-for-different-Address.patch \
            file://qemu-guest-agent.init \
            file://qemu-guest-agent.udev \
-           file://CVE-2024-6519.patch \
            "
 
 # Based on qemu settings in openembedded-core/meta/conf/distro/include/no-static-libs.inc
