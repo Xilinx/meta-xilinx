@@ -1,1 +1,0 @@
-require qemu-tpm.inc
