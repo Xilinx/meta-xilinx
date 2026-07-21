@@ -1,0 +1,67 @@
+From 7f081953510aef6aa49dc555fb9d61b0ed70eb11 Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Wed, 23 Jul 2025 11:41:26 +0200
+Subject: [PATCH 09/14] xen: mapcache: Add function to check if the mapcache is
+ enabled
+
+Add function to check if the mapcache is enabled.
+No functional change.
+
+Upstream-Status: Backport [QEMU 11 - https://gitlab.com/qemu-project/qemu/-/commit/ded5f9a90925212b64da3bbad1651a1a455c14ea]
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/xen/xen-mapcache.c         | 6 ++++++
+ hw/xen/xen_stubs.c            | 5 +++++
+ include/system/xen-mapcache.h | 1 +
+ 3 files changed, 12 insertions(+)
+
+diff --git a/hw/xen/xen-mapcache.c b/hw/xen/xen-mapcache.c
+index f6c18258ee..ef13a60522 100644
+--- a/hw/xen/xen-mapcache.c
++++ b/hw/xen/xen-mapcache.c
+@@ -79,6 +79,12 @@ static MapCache *mapcache_grants_ro;
+ static MapCache *mapcache_grants_rw;
+ static xengnttab_handle *xen_region_gnttabdev;
+ 
++bool xen_map_cache_enabled(void)
++{
++    /* Map cache enabled implies xen_enabled().  */
++    return xen_enabled() && mapcache;
++}
++
+ static inline void mapcache_lock(MapCache *mc)
+ {
+     qemu_mutex_lock(&mc->lock);
+diff --git a/hw/xen/xen_stubs.c b/hw/xen/xen_stubs.c
+index 5e565df392..a39efb5062 100644
+--- a/hw/xen/xen_stubs.c
++++ b/hw/xen/xen_stubs.c
+@@ -29,6 +29,11 @@ bool xen_mr_is_memory(MemoryRegion *mr)
+     g_assert_not_reached();
+ }
+ 
++bool xen_map_cache_enabled(void)
++{
++    return false;
++}
++
+ void xen_invalidate_map_cache_entry(uint8_t *buffer)
+ {
+     g_assert_not_reached();
+diff --git a/include/system/xen-mapcache.h b/include/system/xen-mapcache.h
+index bb454a7c96..2faf4efe44 100644
+--- a/include/system/xen-mapcache.h
++++ b/include/system/xen-mapcache.h
+@@ -14,6 +14,7 @@
+ 
+ typedef hwaddr (*phys_offset_to_gaddr_t)(hwaddr phys_offset,
+                                          ram_addr_t size);
++bool xen_map_cache_enabled(void);
+ void xen_map_cache_init(phys_offset_to_gaddr_t f,
+                         void *opaque);
+ uint8_t *xen_map_cache(MemoryRegion *mr, hwaddr phys_addr, hwaddr size,
+-- 
+2.34.1
+

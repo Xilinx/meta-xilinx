@@ -1,0 +1,67 @@
+From 3e079b9aed74add33bbdadac098c750556e43bfc Mon Sep 17 00:00:00 2001
+From: "Edgar E. Iglesias" <edgar.iglesias@amd.com>
+Date: Wed, 23 Jul 2025 11:29:15 +0200
+Subject: [PATCH 08/14] xen: mapcache: Assert mapcache existance
+
+Assert that the mapcache was created prior to being used.
+
+Upstream-Status: Backport [QEMU 11 - https://gitlab.com/qemu-project/qemu/-/commit/8a39d34e65626116fad6f3166874a4e64d4ea190]
+
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@amd.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+---
+ hw/xen/xen-mapcache.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/hw/xen/xen-mapcache.c b/hw/xen/xen-mapcache.c
+index e31d379702..f6c18258ee 100644
+--- a/hw/xen/xen-mapcache.c
++++ b/hw/xen/xen-mapcache.c
+@@ -463,6 +463,8 @@ uint8_t *xen_map_cache(MemoryRegion *mr,
+     MapCache *mc = mapcache;
+     uint8_t *p;
+ 
++    assert(mapcache);
++
+     if (grant) {
+         mc = is_write ? mapcache_grants_rw : mapcache_grants_ro;
+     }
+@@ -529,6 +531,8 @@ ram_addr_t xen_ram_addr_from_mapcache(void *ptr)
+ {
+     ram_addr_t addr;
+ 
++    assert(mapcache);
++
+     addr = xen_ram_addr_from_mapcache_single(mapcache, ptr);
+     if (addr == RAM_ADDR_INVALID) {
+         addr = xen_ram_addr_from_mapcache_single(mapcache_grants_ro, ptr);
+@@ -651,6 +655,8 @@ static void xen_invalidate_map_cache_entry_bh(void *opaque)
+ 
+ void coroutine_mixed_fn xen_invalidate_map_cache_entry(uint8_t *buffer)
+ {
++    assert(mapcache);
++
+     if (qemu_in_coroutine()) {
+         XenMapCacheData data = {
+             .co = qemu_coroutine_self(),
+@@ -708,6 +714,8 @@ static void xen_invalidate_map_cache_single(MapCache *mc)
+ 
+ void xen_invalidate_map_cache(void)
+ {
++    assert(mapcache);
++
+     /* Flush pending AIO before destroying the mapcache */
+     bdrv_drain_all();
+ 
+@@ -775,6 +783,8 @@ uint8_t *xen_replace_cache_entry(hwaddr old_phys_addr,
+ {
+     uint8_t *p;
+ 
++    assert(mapcache);
++
+     mapcache_lock(mapcache);
+     p = xen_replace_cache_entry_unlocked(mapcache, old_phys_addr,
+                                          new_phys_addr, size);
+-- 
+2.34.1
+
