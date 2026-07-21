@@ -25,6 +25,7 @@ do_install:append() {
     # The following is also installed by qemu-native
     rm -f ${D}${datadir}/qemu-xilinx/trace-events-all
     rm -rf ${D}${datadir}/qemu-xilinx/keymaps
+    rm -rf ${D}${datadir}/qemu-xilinx/dtb
     rm -rf ${D}${datadir}/icons/
     rm -rf ${D}${includedir}/qemu-plugin.h
 
