@@ -1,6 +1,12 @@
 require xen-xilinx_4.21.inc
 require xen-tools-xilinx.inc
 
+# libxl_internal.c's libxl__dirname() assigns strrchr()'s result to a
+# non-const char *; with _FORTIFY_SOURCE=2 newer GCC can propagate the
+# constness of the input through its __builtin_strrchr, tripping
+# -Werror=discarded-qualifiers.
+CFLAGS += "-Wno-error=discarded-qualifiers"
+
 # Workaround to fix do_package QA Issue.
 RDEPENDS:${PN} += "\
     ${PN}-libxenmanage \
