@@ -9,6 +9,8 @@ DEFAULT_PREFERENCE = "+1"
 SRC_URI = " \
     ${XEN_URI};branch=${XEN_BRANCH} \
     file://0001-python-pygrub-pass-DISTUTILS-xen-4.19.patch \
+    file://0001-libxl_nocpuid-fix-build-error.patch \
+    file://0001-tools-libxl-Fix-build-with-NOCPUID-and-json-c.patch \
     "
 
 include cve-exclusion-4.21.inc
