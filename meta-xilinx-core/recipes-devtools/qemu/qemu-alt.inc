@@ -28,7 +28,13 @@ python split_qemu_packages () {
     archdir = d.expand('${bindir}/')
     syspackages = do_split_packages(d, archdir, r'^qemu-system-(.*)$', '${PN}-system-%s', 'QEMU full system emulation binaries(%s)' , prepend=True)
     if syspackages:
-        d.setVar('RDEPENDS:' + d.getVar('PN') + '-system-all', ' '.join(syspackages))
+        # Ensure installing the main ${PN} package pulls in all of the
+        # per-arch qemu-system-* subpackages (matches upstream qemu.inc
+        # behavior). Previously this set RDEPENDS on a non-existent
+        # "${PN}-system-all" package, which meant these subpackages were
+        # never actually installed (e.g. missing qemu-system-aarch64 in
+        # nativesdk-qemu-xilinx based SDKs).
+        d.appendVar('RDEPENDS:' + d.getVar('PN'), ' ' + ' '.join(syspackages))
 
         if (d.getVar('BPN') != 'qemu'):
             for pkg in syspackages:
@@ -36,7 +42,8 @@ python split_qemu_packages () {
 
     userpackages = do_split_packages(d, archdir, r'^qemu-((?!system|edid|ga|img|io|nbd|pr-helper|storage-daemon).*)$', '${PN}-user-%s', 'QEMU full user emulation binaries(%s)' , prepend=True)
     if userpackages:
-        d.setVar('RDEPENDS:' + d.getVar('PN') + '-user-all', ' '.join(userpackages))
+        # See comment above; pull in all qemu-user-* subpackages too.
+        d.appendVar('RDEPENDS:' + d.getVar('PN'), ' ' + ' '.join(userpackages))
 
         if (d.getVar('BPN') != 'qemu'):
             for pkg in userpackages:
