@@ -7,26 +7,10 @@ require xen-tools-xilinx.inc
 # -Werror=discarded-qualifiers.
 CFLAGS += "-Wno-error=discarded-qualifiers"
 
-# Workaround to fix do_package QA Issue.
-RDEPENDS:${PN} += "\
-    ${PN}-libxenmanage \
-    "
-
-PACKAGES += " \
-    ${PN}-libxenmanage \
-    ${PN}-libxenmanage-dev \
-    "
-
-FILES:${PN}-staticdev += "\
-    ${libdir}/libxenmanage.a \
-    "
-
-FILES:${PN}-libxenmanage = "${libdir}/libxenmanage.so.*"
-FILES:${PN}-libxenmanage-dev = " \
-    ${libdir}/libxenmanage.so \
-    ${libdir}/pkgconfig/xenmanage.pc \
-    ${datadir}/pkgconfig/xenmanage.pc \
-    "
+# NOTE: libxenmanage/libxenmanage-dev PACKAGES/FILES/staticdev are already
+# declared by xen-tools.inc (libxenmanage is in xen-4.21+). A local
+# workaround duplicating them here previously caused a do_package QA error:
+#   "xen-tools-libxenmanage is listed in PACKAGES multiple times"
 
 FILES:${PN}-xen-watchdog += "\
     ${systemd_unitdir}/system-sleep/xen-watchdog-sleep.sh \
