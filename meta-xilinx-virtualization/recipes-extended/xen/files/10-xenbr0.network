@@ -1,0 +1,5 @@
+[Match]
+Name=xenbr0
+
+[Network]
+DHCP=yes
