@@ -1,0 +1,108 @@
+From 5bbe1fe413f9d6a841b0bc70db024b1398391630 Mon Sep 17 00:00:00 2001
+From: Andrew Cooper <andrew.cooper3@citrix.com>
+Date: Wed, 3 Dec 2025 17:00:04 +0000
+Subject: [PATCH] ARM: Drop ThumbEE support
+
+Hans reports that Xen no longer builds on Debian unstable/sid:
+
+  Assembler messages:
+  {standard input}:474: Error: unknown or missing system register name at operand 1 -- `msr TEECR32_EL1,x0'
+  {standard input}:480: Error: unknown or missing system register name at operand 1 -- `msr TEEHBR32_EL1,x0'
+  {standard input}:488: Error: unknown or missing system register name at operand 2 -- `mrs x0,TEECR32_EL1'
+  {standard input}:494: Error: unknown or missing system register name at operand 2 -- `mrs x0,TEEHBR32_EL1'
+  make[5]: *** [Rules.mk:249: arch/arm/domain.o] Error 1
+
+This turns out to be an intentional change in binutils.  ThumbEE was dropped
+ahead of ARM v8 (i.e. AArch64).
+
+Xen supports ARM v7+virt extensions so in principle we could #ifdef
+CONFIG_ARM_32 to keep it working.  However, there was apparently no use of
+ThumbEE outside of demo code, so simply drop it.
+
+On ThumbEE capable hardware, unconditionally trap ThumbEE instructions, and
+drop the context switching logic for TEE{CR,HBR}32.
+
+Upstream-Status: Backport [commit 5bbe1fe413f9d6a841b0bc70db024b1398391630]
+
+Reported-by: Hans van Kranenburg <hans@knorrie.org>
+Signed-off-by: Andrew Cooper <andrew.cooper3@citrix.com>
+Reviewed-by: Bertrand Marquis <bertrand.marquis@arm.com>
+---
+ xen/arch/arm/domain.c                | 12 ------------
+ xen/arch/arm/include/asm/domain.h    |  1 -
+ xen/arch/arm/include/asm/processor.h |  1 +
+ xen/arch/arm/traps.c                 |  4 ++--
+ 4 files changed, 3 insertions(+), 15 deletions(-)
+
+diff --git a/xen/arch/arm/domain.c b/xen/arch/arm/domain.c
+index ab78444335..3e32a15cac 100644
+--- a/xen/arch/arm/domain.c
++++ b/xen/arch/arm/domain.c
+@@ -111,12 +111,6 @@ static void ctxt_switch_from(struct vcpu *p)
+     p->arch.cntkctl = READ_SYSREG(CNTKCTL_EL1);
+     virt_timer_save(p);
+ 
+-    if ( is_32bit_domain(p->domain) && cpu_has_thumbee )
+-    {
+-        p->arch.teecr = READ_SYSREG(TEECR32_EL1);
+-        p->arch.teehbr = READ_SYSREG(TEEHBR32_EL1);
+-    }
+-
+ #ifdef CONFIG_ARM_32
+     p->arch.joscr = READ_CP32(JOSCR);
+     p->arch.jmcr = READ_CP32(JMCR);
+@@ -244,12 +238,6 @@ static void ctxt_switch_to(struct vcpu *n)
+     WRITE_SYSREG(n->arch.tpidrro_el0, TPIDRRO_EL0);
+     WRITE_SYSREG(n->arch.tpidr_el1, TPIDR_EL1);
+ 
+-    if ( is_32bit_domain(n->domain) && cpu_has_thumbee )
+-    {
+-        WRITE_SYSREG(n->arch.teecr, TEECR32_EL1);
+-        WRITE_SYSREG(n->arch.teehbr, TEEHBR32_EL1);
+-    }
+-
+ #ifdef CONFIG_ARM_32
+     WRITE_CP32(n->arch.joscr, JOSCR);
+     WRITE_CP32(n->arch.jmcr, JMCR);
+diff --git a/xen/arch/arm/include/asm/domain.h b/xen/arch/arm/include/asm/domain.h
+index af3e168374..758ad807e4 100644
+--- a/xen/arch/arm/include/asm/domain.h
++++ b/xen/arch/arm/include/asm/domain.h
+@@ -211,7 +211,6 @@ struct arch_vcpu
+     register_t hcr_el2;
+     register_t mdcr_el2;
+ 
+-    uint32_t teecr, teehbr; /* ThumbEE, 32-bit guests only */
+ #ifdef CONFIG_ARM_32
+     /*
+      * ARMv8 only supports a trivial implementation on Jazelle when in AArch32
+diff --git a/xen/arch/arm/include/asm/processor.h b/xen/arch/arm/include/asm/processor.h
+index ed56746368..1a48c9ff3b 100644
+--- a/xen/arch/arm/include/asm/processor.h
++++ b/xen/arch/arm/include/asm/processor.h
+@@ -411,6 +411,7 @@
+ 
+ /* HSTR Hyp. System Trap Register */
+ #define HSTR_T(x)       ((_AC(1,U)<<(x)))       /* Trap Cp15 c<x> */
++#define HSTR_TTEE       (_AC(1,U)<<16)          /* Trap ThumbEE */
+ 
+ /* HDCR Hyp. Debug Configuration Register */
+ #define HDCR_TDRA       (_AC(1,U)<<11)          /* Trap Debug ROM access */
+diff --git a/xen/arch/arm/traps.c b/xen/arch/arm/traps.c
+index 2bc3e1df04..040c0f2e0d 100644
+--- a/xen/arch/arm/traps.c
++++ b/xen/arch/arm/traps.c
+@@ -158,8 +158,8 @@ void init_traps(void)
+     WRITE_SYSREG(HDCR_TDRA|HDCR_TDOSA|HDCR_TDA|HDCR_TPM|HDCR_TPMCR,
+                  MDCR_EL2);
+ 
+-    /* Trap CP15 c15 used for implementation defined registers */
+-    WRITE_SYSREG(HSTR_T(15), HSTR_EL2);
++    /* Trap CP15 c15 used for implementation defined registers, and ThumbEE. */
++    WRITE_SYSREG(HSTR_T(15) | (cpu_has_thumbee ? HSTR_TTEE : 0), HSTR_EL2);
+ 
+     WRITE_SYSREG(get_default_cptr_flags(), CPTR_EL2);
+ 
+-- 
+2.43.0
+
