@@ -12,7 +12,7 @@ DEPENDS += "qemu-xilinx-multiarch-helper-native bootgen-native"
 
 EXTRA_OECONF:append = " --target-list=${@get_qemu_system_target_list(d)}"
 
-PACKAGECONFIG ??= "fdt alsa kvm pie slirp png \
+PACKAGECONFIG ??= "fdt alsa kvm pie slirp png gcrypt \
     ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'virglrenderer epoxy', '', d)} \
 "
 
