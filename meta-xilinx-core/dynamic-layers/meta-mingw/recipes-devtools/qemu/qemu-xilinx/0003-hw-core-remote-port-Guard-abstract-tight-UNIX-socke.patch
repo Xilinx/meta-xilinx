@@ -1,0 +1,48 @@
+From 7b3c4d5e6f7081a2b3c4d5e6f7081a2b3c4d5e6 Mon Sep 17 00:00:00 2001
+From: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+Date: Wed, 22 Jul 2026 14:40:00 -0600
+Subject: [qemu-xilinx][PATCH] hw/core/remote-port: Guard abstract/tight
+ UNIX socket fields with CONFIG_LINUX
+
+The `abstract` and `tight` fields of QAPI's UnixSocketAddress struct
+are only defined "#if defined(CONFIG_LINUX)" (see
+qapi/qapi-types-sockets.h), since abstract UNIX domain sockets are a
+Linux-specific extension. rp_autoconnect() in hw/core/remote-port.c
+initializes these fields unconditionally, which fails to build for
+non-Linux hosts such as the mingw32/Windows nativesdk target:
+
+  hw/core/remote-port.c:497:18: error: 'UnixSocketAddress' has no
+  member named 'abstract'
+  hw/core/remote-port.c:498:18: error: 'UnixSocketAddress' has no
+  member named 'tight'
+
+Guard the field initialization with "#ifdef CONFIG_LINUX", matching
+the existing rp_serial_connect_chardesc() call site in the same file
+that already guards these same fields.
+
+Upstream-Status: Pending
+
+AI-Generated: GitHub Copilot (Claude Sonnet 5)
+
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+---
+ hw/core/remote-port.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/hw/core/remote-port.c b/hw/core/remote-port.c
+index 1111111..2222222 100644
+--- a/hw/core/remote-port.c
++++ b/hw/core/remote-port.c
+@@ -494,8 +494,10 @@ static QIOChannel *rp_autoconnect(RemotePort *s, Error **errp)
+     socket_exists = g_file_test(socket_path, G_FILE_TEST_EXISTS);
+ 
+     addr.type = SOCKET_ADDRESS_TYPE_UNIX;
++#ifdef CONFIG_LINUX
+     addr.u.q_unix.abstract = false;
+     addr.u.q_unix.tight = false;
++#endif
+     addr.u.q_unix.path = socket_path;
+ 
+     if (socket_exists) {
+-- 
+2.34.1
