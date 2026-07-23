@@ -1,7 +1,11 @@
 DESCRIPTION = "Application Security Unit"
 SUMMARY = "Application Security Unit for Versal 2ve 2vm devices"
 
-inherit xlnx-embeddedsw deploy
+inherit xlnx-embeddedsw deploy shared-manifest
+
+MANIFEST_COMPONENT_NAME ?= "asufw"
+MANIFEST_SRCREV_VARS = "SRCREV SRCREV_embeddedsw ESW_REV"
+MANIFEST_DEPLOY_BAREMETAL = "do_shared_manifest_deploy"
 
 COMPATIBLE_HOST = "riscv32-xilinx-elf"
 COMPATIBLE_MACHINE = "none"

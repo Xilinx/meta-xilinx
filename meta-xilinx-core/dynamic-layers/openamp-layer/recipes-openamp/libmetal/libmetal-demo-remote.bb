@@ -10,6 +10,9 @@ BRANCH = "2026"
 
 inherit ccmake cmake pkgconfig python3-dir deploy
 
+inherit shared-manifest
+MANIFEST_COMPONENT_NAME = "irq_shmem_demo"
+
 SYSTEM_DTFILE_DEPENDS ??= ""
 LIBMETAL_DEPENDS ?= "${SYSTEM_DTFILE_DEPENDS}"
 LIBMETAL_DTFILE ?= "${CONFIG_DTFILE}"

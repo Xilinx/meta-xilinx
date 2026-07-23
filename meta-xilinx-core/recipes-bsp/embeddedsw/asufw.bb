@@ -28,10 +28,14 @@ ASU_IMAGE_NAME ??= "asu-${MACHINE}"
 ASU_FILE ??= "${ASU_DEPLOY_DIR}/${ASU_IMAGE_NAME}"
 ASU_FILE[vardepsexclude] = "ASU_DEPLOY_DIR"
 
+FW_MANIFEST_SRC = "${ASU_DEPLOY_DIR}/asufw"
+FW_MANIFEST_SRC[vardepsexclude] = "ASU_DEPLOY_DIR"
+FW_MANIFEST_NAME = "asufw"
+
 do_fetch[depends] += "${ASU_DEPENDS}"
 do_fetch[mcdepends] += "${ASU_MCDEPENDS}"
 
-inherit deploy
+inherit deploy firmware-copy-manifest
 
 do_install() {
     if [ ! -e ${ASU_FILE}.elf ]; then
@@ -93,4 +97,3 @@ python() {
         else:
             d.setVar('ASU_MCDEPENDS', mcdepend.replace('mc::', 'mc:${BB_CURRENT_MC}:'))
 }
-
