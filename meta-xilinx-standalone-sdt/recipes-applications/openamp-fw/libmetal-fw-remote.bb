@@ -18,6 +18,12 @@ OPENAMP_XLNX_RECIPE = "${OPENAMP_FW_NAME}"
 FW_FILE = "${FW_DEPLOY_DIR}/${OPENAMP_FW_NAME}"
 PROVIDES:append = " libmetal-fw-remote "
 RPROVIDES:${PN} += "libmetal-fw-remote "
+PROVIDES:append = " libmetal-fw-remote-baremetal "
+
+inherit firmware-copy-manifest
+FW_MANIFEST_SRC = "${FW_DEPLOY_DIR}/irq_shmem_demo"
+FW_MANIFEST_SRC[vardepsexclude] = "FW_DEPLOY_DIR"
+FW_MANIFEST_NAME = "libmetal-fw-remote-baremetal"
 
 DESTDIR = "/boot"
 SYSROOT_DIRS += "/boot"
