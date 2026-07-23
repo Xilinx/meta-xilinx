@@ -8,6 +8,10 @@ REPO ?= "git://github.com/Xilinx/optee_os.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
+# Track optee-os when it lands in BOOT.BIN (versal-2ve-2vm optee feature).
+inherit shared-manifest
+MANIFEST_COMPONENT_NAME = "optee-os"
+
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
 
 OPTEEMACHINE:versal-2ve-2vm = "versal2"

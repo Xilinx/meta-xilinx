@@ -11,12 +11,9 @@ COMPATIBLE_MACHINE:versal-2ve-2vm = "${MACHINE}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 ROLLBACK_COUNTER_FILE = "bootbin-rollback-counter.bin"
 
-inherit deploy image-artifact-names shared-manifest
+inherit deploy image-artifact-names
 
 IMAGE_NAME_SUFFIX = ""
-MANIFEST_COMPONENT_NAME = "bootbin-rollback-counter"
-MANIFEST_COMPONENT_FIELDS = "rollback_counter"
-MANIFEST_COMPONENT_FIELD_rollback_counter = "${BOOTBIN_ROLLBACK_COUNTER}"
 
 python do_configure() {
     counter = d.getVar('BOOTBIN_ROLLBACK_COUNTER')

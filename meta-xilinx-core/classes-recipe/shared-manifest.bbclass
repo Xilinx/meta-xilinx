@@ -40,10 +40,10 @@ def _shared_manifest_entry(d):
 python do_shared_manifest_sysroot() {
     import json, os
     e = _shared_manifest_entry(d)
-    if not e:
-        bb.debug(1, "shared-manifest: %s has no metadata, skipping" % d.getVar("PN"))
-        return
     name = d.getVar("MANIFEST_COMPONENT_NAME")
+    # Always emit (even {}) so fragment-present == producer opted in.
+    if not e:
+        bb.debug(1, "shared-manifest: %s has no metadata; emitting empty entry" % d.getVar("PN"))
     path = os.path.join(d.getVar("D"), "sysroot-only/manifest-components", name + ".json")
     bb.utils.mkdirhier(os.path.dirname(path))
     with open(path, "w") as f:
@@ -54,9 +54,8 @@ python do_shared_manifest_sysroot() {
 python do_shared_manifest_deploy() {
     import json, os
     e = _shared_manifest_entry(d)
-    if not e:
-        return
     name = d.getVar("MANIFEST_COMPONENT_NAME")
+    # Always emit (even {}) so a collecting proxy always finds a file to stage.
     path = os.path.join(d.getVar("DEPLOYDIR"), name + ".manifest.json")
     bb.utils.mkdirhier(os.path.dirname(path))
     with open(path, "w") as f:

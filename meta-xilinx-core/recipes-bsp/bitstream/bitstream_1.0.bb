@@ -74,4 +74,3 @@ python() {
     # Need to allow bbappends to change the check
     check_bitstream_vars(d)
 }
-

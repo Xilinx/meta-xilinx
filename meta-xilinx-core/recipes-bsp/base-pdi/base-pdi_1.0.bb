@@ -20,6 +20,8 @@ PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
 do_compile[noexec] = "1"
 
+BASEPDI_INSTALLED_PATH ?= "${D}/boot/base-design.pdi"
+
 PDI_PATH ?= ""
 SRC_URI += "${@['file://'+d.getVar('PDI_PATH'),''][d.getVar('PDI_PATH') == '']}"
 
@@ -33,7 +35,7 @@ do_install() {
 
     if [ -f ${WORKDIR}/${PDI_PATH} ];then
         install -d ${D}/boot
-        install -m 0644 ${WORKDIR}/${PDI_PATH} ${D}/boot/base-design.pdi
+        install -m 0644 ${WORKDIR}/${PDI_PATH} ${BASEPDI_INSTALLED_PATH}
     else
         bbfatal "No base pdi supplied"
     fi

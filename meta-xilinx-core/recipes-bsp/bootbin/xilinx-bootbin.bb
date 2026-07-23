@@ -19,11 +19,16 @@ BOOTBIN_INCLUDE ?= ""
 inherit deploy bootgen-bif shared-manifest-aggregate
 
 
-MANIFEST_AGGREGATE_COMPONENTS:zynq = "device-tree u-boot fsbl"
-MANIFEST_AGGREGATE_COMPONENTS:zynqmp = "device-tree u-boot fsbl trusted-firmware-a pmu-firmware"
-MANIFEST_AGGREGATE_COMPONENTS:versal = "device-tree u-boot trusted-firmware-a plm psm-firmware"
-MANIFEST_AGGREGATE_COMPONENTS:versal-net = "device-tree u-boot trusted-firmware-a plm psm-firmware"
-MANIFEST_AGGREGATE_COMPONENTS:versal-2ve-2vm = "device-tree u-boot trusted-firmware-a plm"
+# Auto-derive the component list from BIF_PARTITION_ATTR (remapped below) so any
+# partition is tracked without a per-SOC static list. Separate from
+# MANIFEST_AGGREGATE_COMPONENTS so layers can add non-partition components.
+MANIFEST_COMPONENT_MAP = "\
+    u-boot-xlnx:u-boot \
+    plmfw:plm \
+    pmufw:pmu-firmware \
+    psmfw:psm-firmware \
+"
+MANIFEST_AGGREGATE_DERIVED = "${@bif_partition_attr_to_manifest_components(d)}"
 
 MANIFEST_AGGREGATE_DEPLOY_NAME = "${BOOTBIN_BASE_NAME}.manifest.json"
 MANIFEST_AGGREGATE_LINK_NAME = "boot.bin.manifest.json"
@@ -65,6 +70,40 @@ def bif_partition_attr_to_depends(d):
     return ' '.join(depends)
 
 DEPENDS += "${@bif_partition_attr_to_depends(d)}"
+
+# Map BIF partition names to component names for the aggregate list.
+def bif_partition_attr_to_manifest_components(d):
+    remap = {}
+    for pair in (d.getVar('MANIFEST_COMPONENT_MAP') or "").split():
+        if ':' in pair:
+            src, dst = pair.split(':', 1)
+            remap[src] = dst
+    seen = []
+    for name in (d.getVar('BIF_PARTITION_ATTR') or "").split():
+        comp = remap.get(name, name)
+        if comp not in seen:
+            seen.append(comp)
+    return ' '.join(seen)
+
+# Component -> image bootgen embeds, so the aggregator can hash it for content
+# identity. "comp=path" tokens; component name is post-remap, path is the
+# partition's BIF_PARTITION_IMAGE (the exact bytes placed in BOOT.BIN).
+def bif_partition_attr_to_manifest_images(d):
+    remap = {}
+    for pair in (d.getVar('MANIFEST_COMPONENT_MAP') or "").split():
+        if ':' in pair:
+            src, dst = pair.split(':', 1)
+            remap[src] = dst
+    out = []
+    for part in (d.getVar('BIF_PARTITION_ATTR') or "").split():
+        img = d.getVarFlag('BIF_PARTITION_IMAGE', part, True)
+        if img:
+            out.append("%s=%s" % (remap.get(part, part), img))
+    return ' '.join(out)
+
+MANIFEST_COMPONENT_IMAGES = "${@bif_partition_attr_to_manifest_images(d)}"
+# Changing an image path (e.g. AMR overlay swap) must invalidate the aggregate.
+do_manifest_aggregate[vardeps] += "MANIFEST_COMPONENT_IMAGES"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

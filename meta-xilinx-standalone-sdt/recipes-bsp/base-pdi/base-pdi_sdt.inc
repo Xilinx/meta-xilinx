@@ -10,7 +10,7 @@ PDI_SKIP_CHECK = "1"
 do_install() {
     if [ -f ${PDI_PATH} ]; then
         install -d ${D}/boot
-        install -m 0644 ${PDI_PATH} ${D}/boot/base-design.pdi
+        install -m 0644 ${PDI_PATH} ${BASEPDI_INSTALLED_PATH}
     else
         bbfatal "No base pdi supplied"
     fi
