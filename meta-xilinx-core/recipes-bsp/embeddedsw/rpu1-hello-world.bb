@@ -20,10 +20,14 @@ RPU1_IMAGE_NAME ??= "hello-world-${MACHINE}"
 RPU1_FILE ??= "${RPU1_DEPLOY_DIR}/${RPU1_IMAGE_NAME}"
 RPU1_FILE[vardepsexclude] = "RPU1_DEPLOY_DIR"
 
+FW_MANIFEST_SRC = "${RPU1_DEPLOY_DIR}/hello-world"
+FW_MANIFEST_SRC[vardepsexclude] = "RPU1_DEPLOY_DIR"
+FW_MANIFEST_NAME = "rpu1-hello-world"
+
 do_fetch[depends] += "${RPU1_DEPENDS}"
 do_fetch[mcdepends] += "${RPU1_MCDEPENDS}"
 
-inherit deploy
+inherit deploy firmware-copy-manifest
 
 do_install() {
     if [ ! -e ${RPU1_FILE}.elf ]; then
