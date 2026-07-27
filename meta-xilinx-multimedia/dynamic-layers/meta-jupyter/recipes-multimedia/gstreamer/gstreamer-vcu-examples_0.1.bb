@@ -13,7 +13,7 @@ inherit features_check
 REQUIRED_MACHINE_FEATURES = "vcu"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-RDEPENDS:${PN} = "gstreamer1.0-omx gstreamer1.0-plugins-bad bash python3-pip alsa-utils matchbox-desktop"
+RDEPENDS:${PN} = "gstreamer1.0-plugins-bad bash python3-pip alsa-utils matchbox-desktop"
 
 EXTRA_OEMAKE = 'D=${D} bindir=${bindir} datadir=${datadir}'
 

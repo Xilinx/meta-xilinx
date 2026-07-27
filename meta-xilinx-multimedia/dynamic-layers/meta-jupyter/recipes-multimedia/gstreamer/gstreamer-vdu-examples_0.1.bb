@@ -13,7 +13,7 @@ inherit features_check
 REQUIRED_MACHINE_FEATURES = "vdu"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-RDEPENDS:${PN} = "gstreamer1.0-omx gstreamer1.0-plugins-bad bash python3-pip alsa-utils"
+RDEPENDS:${PN} = "gstreamer1.0-plugins-bad bash python3-pip alsa-utils"
 
 EXTRA_OEMAKE = 'D=${D} bindir=${bindir} datadir=${datadir}'
 
