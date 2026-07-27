@@ -1,4 +1,5 @@
 require gstreamer1.0-plugins-common.inc
+require gstreamer1.0-xilinx-1.28.2+amd.inc
 
 SUMMARY = "'Base' GStreamer plugins and helper libraries"
 HOMEPAGE = "https://gstreamer.freedesktop.org/"
@@ -6,14 +7,13 @@ BUGTRACKER = "https://gitlab.freedesktop.org/gstreamer/gst-plugins-base/-/issues
 LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=69333daa044cb77e486cc36129f7a770"
 
-SRC_URI = "https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${PV}.tar.xz \
+SRC_URI += "\
            file://0001-ENGR00312515-get-caps-from-src-pad-when-query-caps.patch \
            file://0003-viv-fb-Make-sure-config.h-is-included.patch \
            file://0002-ssaparse-enhance-SSA-text-lines-parsing.patch \
            "
-SRC_URI[sha256sum] = "4db76b3619280037a4047de7d9dbb38613a4272dcc40efb333257124635a888d"
 
-S = "${UNPACKDIR}/gst-plugins-base-${PV}"
+S = "${UNPACKDIR}/${BP}/subprojects/gst-plugins-base"
 
 DEPENDS += "iso-codes util-linux zlib"
 
@@ -71,6 +71,9 @@ PACKAGECONFIG[dispmanx]     = ",,virtual/libomxil"
 PACKAGECONFIG[viv-fb]       = ",,virtual/libgles2 virtual/libg2d"
 
 OPENGL_WINSYS = "${@bb.utils.filter('PACKAGECONFIG', 'x11 gbm wayland dispmanx egl viv-fb', d)}"
+
+# Required for AMD Gstreamer
+PACKAGECONFIG:append = " opus"
 
 EXTRA_OEMESON += " \
     -Ddoc=disabled \

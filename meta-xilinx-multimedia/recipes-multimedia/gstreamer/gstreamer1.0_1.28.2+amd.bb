@@ -13,16 +13,17 @@ inherit meson pkgconfig gettext upstream-version-is-even gobject-introspection p
 LIC_FILES_CHKSUM = "file://COPYING;md5=69333daa044cb77e486cc36129f7a770 \
                     file://gst/gst.h;beginline=1;endline=21;md5=e059138481205ee2c6fc1c079c016d0d"
 
-S = "${UNPACKDIR}/gstreamer-${PV}"
+require gstreamer1.0-xilinx-1.28.2+amd.inc
 
-SRC_URI = "https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${PV}.tar.xz \
+S = "${UNPACKDIR}/${BP}/subprojects/gstreamer"
+
+SRC_URI += "\
            file://run-ptest \
            file://0001-tests-respect-the-idententaion-used-in-meson.patch \
            file://0002-tests-add-support-for-install-the-tests.patch \
            file://0003-tests-use-a-dictionaries-for-environment.patch \
            file://0004-tests-add-helper-script-to-run-the-installed_tests.patch \
            "
-SRC_URI[sha256sum] = "ce5cd44d4ffeafdcc3dddaa072b2179c0b7cb1abf4e6c5d18d4375f8a39fe491"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)} \
                    check \
@@ -39,6 +40,9 @@ PACKAGECONFIG[dw] = "-Dlibdw=enabled,-Dlibdw=disabled,elfutils"
 PACKAGECONFIG[bash-completion] = "-Dbash-completion=enabled,-Dbash-completion=disabled,bash-completion"
 PACKAGECONFIG[tools] = "-Dtools=enabled,-Dtools=disabled"
 PACKAGECONFIG[setcap] = "-Dptp-helper-permissions=capabilities,,libcap libcap-native"
+
+# Required for AMD Gstreamer
+PACKAGECONFIG:append = " tracer-hooks coretracers"
 
 # TODO: put this in a gettext.bbclass patch
 def gettext_oemeson(d):

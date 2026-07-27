@@ -1,5 +1,6 @@
 require gstreamer1.0-plugins-common.inc
 require gstreamer1.0-plugins-license.inc
+require gstreamer1.0-xilinx-1.28.2+amd.inc
 
 SUMMARY = "'Ugly GStreamer plugins"
 HOMEPAGE = "https://gstreamer.freedesktop.org/"
@@ -11,13 +12,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a6f89e2100d9b6cdffcea4f398e37343 \
 LICENSE = "LGPL-2.1-or-later & GPL-2.0-or-later"
 LICENSE_FLAGS = "commercial"
 
-SRC_URI = " \
-            https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${PV}.tar.xz \
-            "
-
-SRC_URI[sha256sum] = "fe39a5ee7115e37de9eb65d899ec84c93e6e26ed3ffe25c6d5176cececbab572"
-
-S = "${UNPACKDIR}/gst-plugins-ugly-${PV}"
+S = "${UNPACKDIR}/${BP}/subprojects/gst-plugins-ugly"
 
 DEPENDS += "gstreamer1.0-plugins-base"
 

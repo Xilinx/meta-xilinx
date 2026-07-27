@@ -1,14 +1,11 @@
 require gstreamer1.0-plugins-common.inc
+require gstreamer1.0-xilinx-1.28.2+amd.inc
 
 SUMMARY = "'Good' GStreamer plugins"
 HOMEPAGE = "https://gstreamer.freedesktop.org/"
 BUGTRACKER = "https://gitlab.freedesktop.org/gstreamer/gst-plugins-good/-/issues"
 
-SRC_URI = "https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${PV}.tar.xz"
-
-SRC_URI[sha256sum] = "1ace2d8ec74f632d82eab5006753a27fe0c2402db4ca94d63271e494b62f50bf"
-
-S = "${UNPACKDIR}/gst-plugins-good-${PV}"
+S = "${UNPACKDIR}/${BP}/subprojects/gst-plugins-good"
 
 LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a6f89e2100d9b6cdffcea4f398e37343 \
@@ -61,6 +58,9 @@ PACKAGECONFIG[v4l2]       = "-Dv4l2=enabled -Dv4l2-probe=true,-Dv4l2=disabled -D
 PACKAGECONFIG[vpx]        = "-Dvpx=enabled,-Dvpx=disabled,libvpx"
 PACKAGECONFIG[wavpack]    = "-Dwavpack=enabled,-Dwavpack=disabled,wavpack"
 PACKAGECONFIG[x11]        = "${X11ENABLEOPTS},${X11DISABLEOPTS},${X11DEPENDS}"
+
+# Required for AMD Gstreamer
+PACKAGECONFIG:append = " vpx"
 
 EXTRA_OEMESON += " \
     -Ddoc=disabled \

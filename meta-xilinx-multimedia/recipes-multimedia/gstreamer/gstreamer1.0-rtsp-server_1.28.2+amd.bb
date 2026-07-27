@@ -4,15 +4,13 @@ SECTION = "multimedia"
 LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=69333daa044cb77e486cc36129f7a770"
 
+require gstreamer1.0-xilinx-1.28.2+amd.inc
+
 DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base"
 
 PNREAL = "gst-rtsp-server"
 
-SRC_URI = "https://gstreamer.freedesktop.org/src/${PNREAL}/${PNREAL}-${PV}.tar.xz"
-
-SRC_URI[sha256sum] = "917c58b9ff14f91a6b5cd1c3af16c9fcfdf5d8d78d3d167c7e8fa5bdda35f947"
-
-S = "${UNPACKDIR}/${PNREAL}-${PV}"
+S = "${UNPACKDIR}/${BP}/subprojects/gst-rtsp-server"
 
 inherit meson pkgconfig upstream-version-is-even gobject-introspection
 
