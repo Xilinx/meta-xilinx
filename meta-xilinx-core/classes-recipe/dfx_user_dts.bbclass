@@ -364,6 +364,28 @@ do_install() {
     fi
 }
 
+# Log the PL firmware PDI UUIDs. Versal-only; best-effort, so a missing or
+# unreadable PDI is a no-op rather than a build failure.
+do_install:append() {
+    # Versal-only: only these families carry image-header UUIDs.
+    case "${SOC_FAMILY}" in
+        versal|versal-net|versal-2ve-2vm) ;;
+        *) return ;;
+    esac
+
+    # Check both locations, mirroring do_install.
+    pdi_file="$(ls ${S}/*.pdi ${S}/${PDI_PATH}/*.pdi 2>/dev/null | head -1)"
+    [ -n "$pdi_file" ] || return
+
+    ih="$(bootgen -arch ${BOOTGEN_ARCH} -read "$pdi_file" ih 2>/dev/null || true)"
+    uid="$(echo "$ih" | sed -n 's/.*[^_]unique_id (0x24) : \(0x[0-9a-fA-F]*\).*/\1/p')"
+    puid="$(echo "$ih" | sed -n 's/.*parent_unique_id (0x28) : \(0x[0-9a-fA-F]*\).*/\1/p')"
+
+    if [ -n "$uid" ] && [ -n "$puid" ]; then
+        bbnote "PL firmware UUID: $(basename "$pdi_file") unique_id=$uid parent_unique_id=$puid"
+    fi
+}
+
 do_deploy[noexec] = "1"
 
 FILES:${PN} += "${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}"
