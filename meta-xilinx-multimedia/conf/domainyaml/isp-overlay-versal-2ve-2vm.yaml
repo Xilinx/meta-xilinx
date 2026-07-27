@@ -9,12 +9,12 @@ reserved-memory:
     no-map: 1
     start: 0xc000000
     size: 56M
-  rpu6-calib-load:
+  rpu6-calib-load@f800000:
     label: rpu6_calib
     no-map: 1
     start: 0xf800000
     size: 160K
-  rpu6-hal-mem-priv:
+  rpu6-hal-mem-priv@f828000:
     label: rpu6_halpriv
     no-map: 1
     start: 0xf828000
@@ -25,12 +25,12 @@ reserved-memory:
     no-map: 1
     start: 0x1082a000
     size: 56M
-  rpu7-calib-load:
+  rpu7-calib-load@1402a000:
     label: rpu7_calib
     no-map: 1
     start: 0x1402a000
     size: 160K
-  rpu7-hal-mem-priv:
+  rpu7-hal-mem-priv@14052000:
     label: rpu7_halpriv
     no-map: 1
     start: 0x14052000
@@ -41,12 +41,12 @@ reserved-memory:
     no-map: 1
     start: 0x15054000
     size: 56M
-  rpu8-calib-load:
+  rpu8-calib-load@18854000:
     label: rpu8_calib
     no-map: 1
     start: 0x18854000
     size: 160K
-  rpu8-hal-mem-priv:
+  rpu8-hal-mem-priv@1887c000:
     label: rpu8_halpriv
     no-map: 1
     start: 0x1887c000
@@ -57,12 +57,12 @@ reserved-memory:
     no-map: 1
     start: 0x1987e000
     size: 56M
-  rpu9-calib-load:
+  rpu9-calib-load@1d07e000:
     label: rpu9_calib
     no-map: 1
     start: 0x1d07e000
     size: 160K
-  rpu9-hal-mem-priv:
+  rpu9-hal-mem-priv@1d0a6000:
     label: rpu9_halpriv
     no-map: 1
     start: 0x1d0a6000
@@ -115,17 +115,17 @@ domains:
         flags: 0
     reserved-memory:
       - rproc6@c000000
-      - rpu6-calib-load
-      - rpu6-hal-mem-priv
+      - rpu6-calib-load@f800000
+      - rpu6-hal-mem-priv@f828000
       - rproc7@1082a000
-      - rpu7-calib-load
-      - rpu7-hal-mem-priv
+      - rpu7-calib-load@1402a000
+      - rpu7-hal-mem-priv@14052000
       - rproc8@15054000
-      - rpu8-calib-load
-      - rpu8-hal-mem-priv
+      - rpu8-calib-load@18854000
+      - rpu8-hal-mem-priv@1887c000
       - rproc9@1987e000
-      - rpu9-calib-load
-      - rpu9-hal-mem-priv
+      - rpu9-calib-load@1d07e000
+      - rpu9-hal-mem-pri@1d0a6000
       - isp_mbox_buffer@1e0a8000
       - rpu-shared-mem@1e4a8000
       - vring@1fff7000
