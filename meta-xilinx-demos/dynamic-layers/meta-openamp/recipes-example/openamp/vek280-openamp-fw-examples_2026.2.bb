@@ -8,7 +8,7 @@ evaluation kit."
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${UNPACKDIR}/versal-vek280-multidomain_packagegroup-openamp-fw-examples/LICENSE.md;md5=0b96a4c07d631aa5141bd3f058ba43b0"
 
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/07270924/external/packagegroup-openamp-fw-examples/versal-vek280-multidomain_packagegroup-openamp-fw-examples_07270924.tar.gz"
-SRC_URI[sha256sum] = "c8299c1096d86cc70ab4d78f496b468214f442571c805f1cbe3bf3bff91e5baa"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/07280851/external/packagegroup-openamp-fw-examples/versal-vek280-multidomain_packagegroup-openamp-fw-examples_07280851.tar.gz"
+SRC_URI[sha256sum] = "bdcaee31fc5671f59bbfe79f651e97d943e1d435076089758cca45189d2e6163"
 
 require conf/includes/openamp-fw-example.inc
