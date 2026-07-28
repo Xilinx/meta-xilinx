@@ -8,7 +8,7 @@ tool and boot using QEMU or Hardware.
    UBOOT_BOOT_SCRIPT:append = " u-boot-xen-scr"
    ```
 
-2. [u-boot-xen-scr reciep](./recipes-bsp/u-boot/u-boot-xen-scr.bb) provides xen
+2. [u-boot-xen-scr recipe](./recipes-bsp/u-boot/u-boot-xen-scr.bb) provides xen
    dom0 and dom0less template configs. User can use these template configs to
    generate the xen_boot.scr file or create your own config. Default config is
    <soc>-xen-scr-dom0-template-cfg.
