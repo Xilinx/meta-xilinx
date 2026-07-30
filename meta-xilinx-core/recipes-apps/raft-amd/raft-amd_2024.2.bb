@@ -5,12 +5,12 @@ driver stack so a remote host can configure and stream samples through \
 the data converters and DFE PL DSP IP."
 LICENSE = "MIT & BSD-3-Clause"
 LIC_FILES_CHKSUM = " \
-    file://${WORKDIR}/git/LICENSE;md5=cc21c526211d34984839aa67dd16f172 \
-    file://${WORKDIR}/git/docs/LICENSE;md5=d8f0ffdbc8d019bc821a5a07bdca1406 \
+    file://${S}/LICENSE;md5=cc21c526211d34984839aa67dd16f172 \
+    file://${S}/docs/LICENSE;md5=d8f0ffdbc8d019bc821a5a07bdca1406 \
 "
-BRANCH = "2026.1"
+BRANCH = "2024.2"
 SRC_URI = "git://github.com/Xilinx/RAFT;protocol=https;branch=${BRANCH}"
-SRCREV = "62f487028ff420f0d230878c60cf118810ccb578"
+SRCREV = "d85fa20691c51cf6541f01424631f1b49c8c019a"
 
 inherit update-rc.d systemd
 
@@ -18,7 +18,6 @@ COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zcu208-zynqmp = "${MACHINE}"
 COMPATIBLE_MACHINE:zcu216-zynqmp = "${MACHINE}"
 COMPATIBLE_MACHINE:zynqmp-generic = "${MACHINE}"
-
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -37,12 +36,11 @@ RDEPENDS:${PN} += "\
     python3-cffi \
     python3-serpent \
     bash \
-    python3-gpiod \
     "
 
 PACKAGECONFIG[raftnotebooks] = "enabled,disabled,,packagegroup-xilinx-jupyter"
 PACKAGECONFIG[raftstartup] = "enabled,disabled,,librfdc librfclk libmetal"
-PACKAGECONFIG[raftstartupsc] = "enabled,disabled,,python3-psutil python3-periphery python3-gpiod"
+PACKAGECONFIG[raftstartupsc] = "enabled,disabled,,python3-psutil python3-periphery"
 
 do_install() {
     if ${@bb.utils.contains('DISTRO_FEATURES','sysvinit','true','false',d)}; then
