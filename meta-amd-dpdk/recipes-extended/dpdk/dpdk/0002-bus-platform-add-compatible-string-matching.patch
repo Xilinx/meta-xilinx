@@ -1,0 +1,86 @@
+From 3de08fff97eb066934d3c7430ad3fa9b7dbdc214 Mon Sep 17 00:00:00 2001
+From: Suraj Gupta <suraj.gupta2@amd.com>
+Date: Thu, 29 Jan 2026 17:37:40 +0530
+Subject: [PATCH 2/2] Add support to probe with compatible string matching
+
+Upstream-Status: Pending
+
+Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+---
+ drivers/bus/platform/bus_platform_driver.h |  1 +
+ drivers/bus/platform/platform.c            | 33 ++++++++++++++++++++--
+ 2 files changed, 32 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bus/platform/bus_platform_driver.h b/drivers/bus/platform/bus_platform_driver.h
+index 76403043c1..1275e64779 100644
+--- a/drivers/bus/platform/bus_platform_driver.h
++++ b/drivers/bus/platform/bus_platform_driver.h
+@@ -114,6 +114,7 @@ struct rte_platform_driver {
+ 	rte_platform_dma_map_t *dma_map; /**< Device DMA map function */
+ 	rte_platform_dma_unmap_t *dma_unmap; /**< Device DMA unmap function */
+ 	uint32_t drv_flags; /**< Driver flags RTE_PLATFORM_DRV_* */
++	const char *compatible;
+ };
+ 
+ /** Device driver needs IOVA as VA and cannot work with IOVA as PA */
+diff --git a/drivers/bus/platform/platform.c b/drivers/bus/platform/platform.c
+index f6673cf181..67d87be0f2 100644
+--- a/drivers/bus/platform/platform.c
++++ b/drivers/bus/platform/platform.c
+@@ -364,6 +364,21 @@ device_setup(struct rte_platform_device *pdev)
+ 	return ret;
+ }
+ 
++static char *
++of_get_compatible(const char *dev_name)
++{
++	char path[PATH_MAX], buf[BUFSIZ] = { };
++	int ret;
++
++	snprintf(path, sizeof(path), PLATFORM_BUS_DEVICES_PATH "/%s/of_node/compatible", dev_name);
++	ret = read_sysfs_string(path, buf, sizeof(buf) - 1);
++	if (ret)
++		return NULL;
++
++	/* Return first compatible string (most specific one) */
++	return strdup(buf);
++}
++
+ static int
+ driver_call_probe(struct rte_platform_driver *pdrv, struct rte_platform_device *pdev)
+ {
+@@ -412,7 +427,7 @@ static bool
+ driver_match_device(struct rte_platform_driver *pdrv, struct rte_platform_device *pdev)
+ {
+ 	bool match = false;
+-	char *kdrv;
++	char *kdrv, *compatible;
+ 
+ 	kdrv = dev_kernel_driver_name(pdev->name);
+ 	if (!kdrv)
+@@ -431,8 +446,22 @@ driver_match_device(struct rte_platform_driver *pdrv, struct rte_platform_device
+ 	}
+ 
+ 	/* match by device name */
+-	if (!strcmp(pdev->name, pdrv->driver.name))
++	if (!strcmp(pdev->name, pdrv->driver.name)) {
+ 		match = true;
++		goto out;
++	}
++
++	/* match by device tree compatible string */
++	compatible = of_get_compatible(pdev->name);
++
++	if (compatible != NULL) {
++		if (pdrv->compatible != NULL && !strcmp(compatible, pdrv->compatible)) {
++			match = true;
++			free(compatible);
++			goto out;
++		}
++		free(compatible);
++	}
+ 
+ out:
+ 	free(kdrv);
+-- 
+2.37.0
