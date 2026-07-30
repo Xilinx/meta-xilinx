@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000001 Mon Sep 17 00:00:00 2001
+From: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Date: Wed, 5 Sep 2018 14:08:16 -0700
+Subject: [PATCH] qwaylandeglwindow: Bind context before eglDestroySurface
+
+Call eglMakeCurrent to bind the context to the current rendering thread
+before calling eglDestroySurface to avoid a crash caused by post-processing
+activity in the GPU driver.
+
+In Qt6, qwaylandeglwindow.cpp moved from the qtwayland module into
+qtbase (src/plugins/platforms/wayland/plugins/hardwareintegration/).
+The fix is otherwise identical to the Qt5 version.
+
+Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
+Upstream-Status: Pending
+---
+ .../wayland-egl/qwaylandeglwindow.cpp        | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/plugins/platforms/wayland/plugins/hardwareintegration/wayland-egl/qwaylandeglwindow.cpp b/src/plugins/platforms/wayland/plugins/hardwareintegration/wayland-egl/qwaylandeglwindow.cpp
+index 1234567..abcdef0 100644
+--- a/src/plugins/platforms/wayland/plugins/hardwareintegration/wayland-egl/qwaylandeglwindow.cpp
++++ b/src/plugins/platforms/wayland/plugins/hardwareintegration/wayland-egl/qwaylandeglwindow.cpp
+@@ -143,6 +143,8 @@ void QWaylandEglWindow::invalidateSurface()
+     QMutexLocker lock (&m_eglSurfaceLock);
+
+     if (m_eglSurface) {
++        eglMakeCurrent(m_clientBufferIntegration->eglDisplay(), EGL_NO_SURFACE,
++                       EGL_NO_SURFACE, EGL_NO_CONTEXT);
+         eglDestroySurface(m_clientBufferIntegration->eglDisplay(), m_eglSurface);
+         m_eglSurface = 0;
+     }

@@ -1,16 +1,12 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/qtwayland:"
-# file://0001-qwaylandwindow.cpp-Do-not-destroy-shell-suface-befor.patch 
-# file://0002-Handle-maximize-minimize-fullscreen-in-xdg_shell_v6.patch
-SRC_URI:append = " \
-    file://0003-qwaylandeglwindow.cpp-Bind-the-context-before-callin.patch \
-"
-# file://0001-Fix-regression-in-QWaylandGlContext-makeCurrent-for-.patch
+FILESEXTRAPATHS:prepend := "${THISDIR}/qtbase:"
 
-PACKAGECONFIG = " \
-    wayland-client \
-    wayland-server \
-    wayland-egl \
-    wayland-drm-egl-server-buffer \
+# ZynqMP display fixes: RGB565 KMS default, hw-cursor disable, and the wayland
+# EGL bind-context crash fix (moved here from qtwayland, where its source lived
+# in Qt5).
+SRC_URI:append = " \
+    file://0002-egl_kms-Modify-the-default-color-format-to-RGB565.patch \
+    file://0003-qkmsdevice.cpp-Disable-hw-cursor-as-a-default-option.patch \
+    file://0004-qwaylandeglwindow-Bind-context-before-eglDestroySurface.patch \
 "
 
 # Links to libmali-xlnx, so it becomes MACHINE_ARCH specific
