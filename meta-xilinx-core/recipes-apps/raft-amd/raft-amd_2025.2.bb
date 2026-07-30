@@ -5,8 +5,8 @@ driver stack so a remote host can configure and stream samples through \
 the data converters and DFE PL DSP IP."
 LICENSE = "MIT & BSD-3-Clause"
 LIC_FILES_CHKSUM = " \
-    file://${WORKDIR}/git/LICENSE;md5=cc21c526211d34984839aa67dd16f172 \
-    file://${WORKDIR}/git/docs/LICENSE;md5=d8f0ffdbc8d019bc821a5a07bdca1406 \
+    file://${S}/LICENSE;md5=cc21c526211d34984839aa67dd16f172 \
+    file://${S}/docs/LICENSE;md5=d8f0ffdbc8d019bc821a5a07bdca1406 \
 "
 BRANCH = "2025.2"
 SRC_URI = "git://github.com/Xilinx/RAFT;protocol=https;branch=${BRANCH}"
