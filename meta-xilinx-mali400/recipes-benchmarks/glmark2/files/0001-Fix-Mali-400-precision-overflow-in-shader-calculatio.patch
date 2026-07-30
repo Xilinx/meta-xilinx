@@ -1,0 +1,65 @@
+From 64aaec319f97f280c9a66ef029e351e12a574069 Mon Sep 17 00:00:00 2001
+From: Parth Gajjar <parth.gajjar@amd.com>
+Date: Fri, 3 Jul 2026 00:28:27 -0700
+Subject: [PATCH] Fix Mali-400 precision overflow in shader calculations
+
+On Mali-400 GPU, the multiplication (FragCoord.x * FragCoord.y * 0.0001)
+can overflow when using mediump precision (fp16), causing black patches
+to appear on loop, function, and conditional tests.
+
+The fix changes the order of operations to:
+(FragCoord.x * (FragCoord.y * 0.0001))
+
+By multiplying FragCoord.y by 0.0001 first, the intermediate result is
+a small number that won't overflow when multiplied by FragCoord.x.
+
+Upstream-Status: Inappropriate [Xilinx specific]
+Signed-off-by: Parth Gajjar <parth.gajjar@amd.com>
+---
+ data/shaders/conditionals.frag | 2 +-
+ data/shaders/function.frag     | 2 +-
+ data/shaders/loop.frag         | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/data/shaders/conditionals.frag b/data/shaders/conditionals.frag
+index f985da8..b2e21bc 100644
+--- a/data/shaders/conditionals.frag
++++ b/data/shaders/conditionals.frag
+@@ -5,7 +5,7 @@ void main(void)
+     // should be declared highp since the multiplication can overflow in
+     // mediump, particularly if mediump is implemented as fp16
+     HIGHP_OR_DEFAULT vec2 FragCoord = gl_FragCoord.xy;
+-    float d = fract(FragCoord.x * FragCoord.y * 0.0001);
++    float d = fract(FragCoord.x * (FragCoord.y * 0.0001));
+ 
+ $MAIN$
+ 
+diff --git a/data/shaders/function.frag b/data/shaders/function.frag
+index a4fa902..1b207cc 100644
+--- a/data/shaders/function.frag
++++ b/data/shaders/function.frag
+@@ -11,7 +11,7 @@ void main(void)
+     // should be declared highp since the multiplication can overflow in
+     // mediump, particularly if mediump is implemented as fp16
+     HIGHP_OR_DEFAULT vec2 FragCoord = gl_FragCoord.xy;
+-    float d = fract(FragCoord.x * FragCoord.y * 0.0001);
++    float d = fract(FragCoord.x * (FragCoord.y * 0.0001));
+ 
+ $MAIN$
+ 
+diff --git a/data/shaders/loop.frag b/data/shaders/loop.frag
+index 905c1c6..c85dcc3 100644
+--- a/data/shaders/loop.frag
++++ b/data/shaders/loop.frag
+@@ -6,7 +6,7 @@ void main(void)
+     // should be declared highp since the multiplication can overflow in
+     // mediump, particularly if mediump is implemented as fp16
+     HIGHP_OR_DEFAULT vec2 FragCoord = gl_FragCoord.xy;
+-    float d = fract(FragCoord.x * FragCoord.y * 0.0001);
++    float d = fract(FragCoord.x * (FragCoord.y * 0.0001));
+ 
+ $MAIN$
+ 
+-- 
+2.54.0
+
