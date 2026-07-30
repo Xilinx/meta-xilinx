@@ -10,6 +10,24 @@ SRC_URI += "file://10-ether.network \
             file://10-xenbr0.network \
             "
 
+# xen-tools.inc (meta-virtualization) unconditionally RDEPENDS on
+# ${PN}-net-conf, which installs the systemd-networkd files above and
+# bridges every "Type=ether" interface into xenbr0, moving the
+# DHCP-assigned IP address from eth0 onto the bridge. Since
+# DISTRO_FEATURES containing 'xen' pulls packagegroup-xen (and hence
+# xen-tools) into essentially all amd-edf images, this silently hijacks
+# eth0 even when Xen isn't actually booted (plain Linux boot on
+# hardware/QEMU), losing the eth0 IP.
+#
+# TEMPORARY WORKAROUND: Make the Xen dom0 bridge networking
+# opt-in rather than automatic until a proper upstream/distro-level fix
+# is available (e.g. gating ${PN}-net-conf on a distro feature or image
+# request instead of always RDEPENDS-ing on it). Boards/images that
+# actually need dom0 bridged networking for DomU guests can re-enable
+# it explicitly with:
+#   IMAGE_INSTALL:append = " xen-tools-net-conf"
+RDEPENDS:${PN}:remove = "${PN}-net-conf"
+
 # Only include the sysvinit scripts if sysvinit is enabled.
 do_install:append () {
     if [ -e ${D}/usr/lib/xen/bin/pygrub ]; then
