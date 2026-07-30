@@ -1,4 +1,4 @@
-SUMMARY = "Packagegroup pulling in the Qt 5 runtime used by the AMD \
+SUMMARY = "Packagegroup pulling in the Qt 6 runtime used by the AMD \
 Xilinx graphical demos."
 DESCRIPTION = "Qt packages"
 
@@ -16,42 +16,38 @@ QT_PACKAGES = " \
 	qtbase \
 	qtbase-plugins \
 	qtbase-examples \
-	qtquickcontrols-qmlplugins \
+	qtdeclarative-qmlplugins \
 	qtcharts \
 	${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'qtwayland', '', d)} \
 	"
 RDEPENDS:${PN} = "${QT_PACKAGES}"
 
+# qtlocation-plugins/-qmlplugins and qttranslations-qt-help are only RRECOMMENDS
+# of their modules, so list them explicitly to keep them in the image.
 QT_EXTENDED_PACKAGES = " \
-	ruby \
-	qtbase-mkspecs \
 	qtbase-plugins \
-	qtsystems-mkspecs \
 	qttranslations-qtbase \
-	qttranslations-qthelp \
-	qtconnectivity-mkspecs \
+	qttranslations-qt-help \
+	qtconnectivity \
 	qttranslations-qtconnectivity \
-	qtdeclarative-mkspecs \
+	qtdeclarative \
 	qttranslations-qtdeclarative \
 	qtimageformats-plugins \
-	qtlocation-mkspecs \
+	qtlocation \
 	qtlocation-plugins \
+	qtlocation-qmlplugins \
 	qttranslations-qtmultimedia \
-	qtscript-mkspecs \
-	qttranslations-qtscript \
-	qtsensors-mkspecs \
+	qtmultimedia \
+	qtsensors \
 	qtsensors-plugins \
-	qtserialport-mkspecs \
-	qtsvg-mkspecs \
+	qtserialport \
+	qtsvg \
 	qtsvg-plugins \
-	qtwebsockets-mkspecs \
+	qtwebsockets \
 	qttranslations-qtwebsockets \
-	qtwebchannel-mkspecs \
-	qtxmlpatterns-mkspecs \
-	qttranslations-qtxmlpatterns \
-	qtwebkit-mkspecs \
-	${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'qtx11extras', '', d)} \
-	qtgraphicaleffects-qmlplugins \
+	qtwebchannel \
+	qt5compat \
+	qt5compat-qmlplugins \
 	"
 
 RDEPENDS:${PN}-extended = "${QT_PACKAGES} ${QT_EXTENDED_PACKAGES}"
