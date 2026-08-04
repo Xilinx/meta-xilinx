@@ -1,0 +1,124 @@
+name: Validate Commit Authors
+
+on:
+  push:
+
+jobs:
+  validate-authors:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate commit author names
+        id: validate
+        run: |
+          EXIT_CODE=0
+          INVALID_AUTHORS=""
+
+          # Handle new branch creation where 'before' is all zeros
+          if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            COMMITS=$(git rev-list ${{ github.event.after }} --not --remotes=origin 2>/dev/null || git rev-list ${{ github.event.after }})
+          else
+            COMMITS=$(git rev-list ${{ github.event.before }}..${{ github.event.after }})
+          fi
+
+          if [ -z "$COMMITS" ]; then
+            echo "No new commits to validate."
+            exit 0
+          fi
+
+          TOTAL=0
+          FAILED=0
+
+          for sha in $COMMITS; do
+            TOTAL=$((TOTAL + 1))
+            AUTHOR_NAME=$(git log -1 --pretty=format:'%an' "$sha")
+            AUTHOR_EMAIL=$(git log -1 --pretty=format:'%ae' "$sha")
+            COMMIT_SUBJECT=$(git log -1 --pretty=format:'%s' "$sha")
+
+            INVALID=0
+            if echo "$AUTHOR_NAME" | grep -qi "Openembedded-core"; then
+              INVALID=1
+            fi
+            if echo "$AUTHOR_NAME" | grep -q " via "; then
+              INVALID=1
+            fi
+            # TEST ONLY: remove after testing
+            if echo "$AUTHOR_NAME" | grep -qi "Manikanta Sreeram"; then
+              INVALID=1
+            fi
+
+            if [ "$INVALID" -eq 1 ]; then
+              FAILED=$((FAILED + 1))
+              echo "##############################################"
+              echo "ERROR: Invalid author in commit $sha"
+              echo "  Author: $AUTHOR_NAME <$AUTHOR_EMAIL>"
+              echo "  Subject: $COMMIT_SUBJECT"
+              echo "##############################################"
+              INVALID_AUTHORS="${INVALID_AUTHORS}\n- Commit: ${sha}\n  Author: ${AUTHOR_NAME} <${AUTHOR_EMAIL}>\n  Subject: ${COMMIT_SUBJECT}\n"
+              EXIT_CODE=1
+            fi
+          done
+
+          echo "Validated $TOTAL commits, $FAILED failed."
+
+          # Export results for email notification step
+          echo "total=$TOTAL" >> "$GITHUB_OUTPUT"
+          echo "failed=$FAILED" >> "$GITHUB_OUTPUT"
+          {
+            echo "invalid_authors<<EOF"
+            echo -e "$INVALID_AUTHORS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo ""
+            echo "================================================"
+            echo "Push contains commits with invalid author names."
+            echo "Author names must not contain 'Openembedded-core' or ' via '."
+            echo "Fix with: git commit --amend --author='Real Name <email@example.com>'"
+            echo "Or for multiple commits: git rebase -i and edit author info."
+            echo "================================================"
+            exit 1
+          fi
+
+          echo "All commit authors are valid."
+
+      - name: Create issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = context.ref.replace('refs/heads/', '');
+            const pusher = context.actor;
+            const failed = '${{ steps.validate.outputs.failed }}';
+            const total = '${{ steps.validate.outputs.total }}';
+            const invalidAuthors = `${{ steps.validate.outputs.invalid_authors }}`;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            const body = `### ⚠️ Invalid Commit Author Detected\n\n` +
+              `@AMD-AECG-SSW-PUBLIC/ssw_builds_team\n\n` +
+              `| Field | Details |\n` +
+              `|---|---|\n` +
+              `| **Branch** | \`${branch}\` |\n` +
+              `| **Pushed by** | @${pusher} |\n` +
+              `| **Failed commits** | ${failed} of ${total} |\n` +
+              `| **Workflow run** | [View logs](${runUrl}) |\n\n` +
+              `#### Invalid Commits\n\`\`\`\n${invalidAuthors}\n\`\`\`\n\n` +
+              `#### How to Fix\n` +
+              `- Single commit: \`git commit --amend --author='Real Name <email@example.com>'\`\n` +
+              `- Multiple commits: \`git rebase -i\` and edit author info\n` +
+              `- Then force-push the corrected branch`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `⚠️ Invalid commit author on ${branch} (pushed by ${pusher})`,
+              body
+            });
