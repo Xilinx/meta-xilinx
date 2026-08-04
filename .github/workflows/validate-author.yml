@@ -5,7 +5,8 @@ on:
 
 jobs:
   validate-authors:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: ypt
     permissions:
       contents: read
       issues: write
