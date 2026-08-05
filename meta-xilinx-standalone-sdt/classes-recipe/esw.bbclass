@@ -68,7 +68,10 @@ XLNX_CMAKE_MACHINE:zynqmp = "ZynqMP"
 XLNX_CMAKE_MACHINE:versal = "Versal"
 XLNX_CMAKE_MACHINE:versal-net = "VersalNet"
 XLNX_CMAKE_MACHINE:versal-2ve-2vm = "VersalNet"
+XLNX_CMAKE_MACHINE:versal-2vp = "Versal"
+
 XLNX_CMAKE_SUBMACHINE:versal-2ve-2vm = "Versal_2VE_2VM"
+XLNX_CMAKE_SUBMACHINE:versal-2vp = "Versal_2vp"
 
 XLNX_CMAKE_SUBMACHINE = "undefined"
 
