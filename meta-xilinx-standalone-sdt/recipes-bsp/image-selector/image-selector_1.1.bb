@@ -20,6 +20,10 @@ SRCREV_image-selector = "283bcb2b49eaa2ff1eae2f0d926e1844797352c2"
 
 OECMAKE_SOURCEPATH = "${WORKDIR}/${BPN}/${ESW_COMPONENT_SRC}"
 
+# Workaround for bug in bootgen id_code extraction
+# versal-2vp support is not yet implemented
+BOOTGEN_ARCH:versal-2vp:task-extract_idcode = "versal"
+
 # BIF configuration
 BIF_FILE_PATH = "${B}/${PN}.bif"
 
