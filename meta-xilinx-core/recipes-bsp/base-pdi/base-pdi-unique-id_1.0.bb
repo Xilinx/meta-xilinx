@@ -15,6 +15,10 @@ BASEPDI_ID_FILE = "${B}/base-pdi-unique-id-string.txt"
 inherit deploy image-artifact-names bootgen-bif
 # bootgen-bif provides BOOTGEN_ARCH definitions
 
+# Workaround for bug in bootgen -read extraction
+# versal-2vp support is not yet implemented
+BOOTGEN_ARCH:versal-2vp = "versal"
+
 IMAGE_NAME_SUFFIX = ""
 
 DEPENDS += "base-pdi bootgen-native"
