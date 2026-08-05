@@ -120,6 +120,7 @@ SOC_EXTRA_IMAGEDEPENDS[zynqmp] = "virtual/boot-bin"
 SOC_EXTRA_IMAGEDEPENDS[versal] = "virtual/boot-bin virtual/cdo"
 SOC_EXTRA_IMAGEDEPENDS[versal-net] = "virtual/boot-bin virtual/cdo"
 SOC_EXTRA_IMAGEDEPENDS[versal-2ve-2vm] = "virtual/boot-bin virtual/cdo"
+SOC_EXTRA_IMAGEDEPENDS[versal-2vp] = "virtual/boot-bin virtual/cdo"
 SOC_EXTRA_IMAGEDEPENDS = "${@d.getVarFlag('SOC_EXTRA_IMAGEDEPENDS', d.getVar('SOC_FAMILY') or '') or '' if d.getVar('XILINX_WITH_ESW') else ''}"
 
 EXTRA_IMAGEDEPENDS += "${SOC_EXTRA_IMAGEDEPENDS}"
