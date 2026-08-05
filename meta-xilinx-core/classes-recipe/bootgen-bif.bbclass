@@ -5,7 +5,7 @@
 # Generates Boot Image Format (BIF) files for bootgen to create BOOT.bin/PDI.
 # See AMD UG1283 "Bootgen User Guide" for the complete BIF specification.
 #
-# Supported: zynq, zynqmp, versal, versal-net, versal-2ve-2vm
+# Supported: zynq, zynqmp, versal, versal-net, versal-2ve-2vm, versal-2vp
 #
 # Variables (used as defaults when not passed as parameters):
 #   BIF_FILE_PATH          - Output path for generated BIF file
@@ -35,6 +35,7 @@ BOOTGEN_ARCH_DEFAULT:zynqmp = "zynqmp"
 BOOTGEN_ARCH_DEFAULT:versal = "versal"
 BOOTGEN_ARCH_DEFAULT:versal-net = "versalnet"
 BOOTGEN_ARCH_DEFAULT:versal-2ve-2vm = "versal_2ve_2vm"
+BOOTGEN_ARCH_DEFAULT:versal-2vp = "versal_2vp"
 
 # Define so the BSP can override if necessary
 BOOTGEN_ARCH ?= "${BOOTGEN_ARCH_DEFAULT}"
@@ -298,7 +299,7 @@ def bootgen_bif_generate(d, bif_path=None, workdir=None, partitions=None, option
 
         if soc_family in ('zynq', 'zynqmp'):
             bootgen_bif_create_zynq(common_attrs, part_list, local_files, biffd, d)
-        elif soc_family in ('versal', 'versal-net', 'versal-2ve-2vm'):
+        elif soc_family in ('versal', 'versal-net', 'versal-2ve-2vm', 'versal-2vp'):
             bootgen_bif_create_versal(common_attrs, part_list, local_files, biffd, d)
         else:
             bb.fatal("bootgen_bif_generate: unsupported SOC_FAMILY '%s'" % soc_family)
