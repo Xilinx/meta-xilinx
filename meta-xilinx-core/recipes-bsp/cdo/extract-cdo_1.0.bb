@@ -7,6 +7,10 @@ LICENSE = "CLOSED"
 inherit deploy bootgen-bif
 # bootgen-bif provides BOOTGEN_ARCH definitions
 
+# Workaround for bug in bootgen cdo extraction
+# versal-2vp support is not yet implemented
+BOOTGEN_ARCH:versal-2vp = "versal"
+
 PROVIDES = "virtual/cdo"
 
 DEPENDS += "bootgen-native"
