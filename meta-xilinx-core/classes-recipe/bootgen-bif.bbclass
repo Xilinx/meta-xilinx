@@ -29,13 +29,15 @@
 #
 # Map SOC_FAMILY to bootgen -arch argument
 # Most map directly, some need hyphen adjustments for bootgen
-BOOTGEN_ARCH = ""
-BOOTGEN_ARCH:zynq = "zynq"
-BOOTGEN_ARCH:zynqmp = "zynqmp"
-BOOTGEN_ARCH:versal = "versal"
-BOOTGEN_ARCH:versal-net = "versalnet"
-BOOTGEN_ARCH:versal-2ve-2vm = "versal_2ve_2vm"
+BOOTGEN_ARCH_DEFAULT = "undefined"
+BOOTGEN_ARCH_DEFAULT:zynq = "zynq"
+BOOTGEN_ARCH_DEFAULT:zynqmp = "zynqmp"
+BOOTGEN_ARCH_DEFAULT:versal = "versal"
+BOOTGEN_ARCH_DEFAULT:versal-net = "versalnet"
+BOOTGEN_ARCH_DEFAULT:versal-2ve-2vm = "versal_2ve_2vm"
 
+# Define so the BSP can override if necessary
+BOOTGEN_ARCH ?= "${BOOTGEN_ARCH_DEFAULT}"
 
 def bootgen_bif_write_toplevel_attrs(biffd, d, toplevel_attrs=None):
     """
