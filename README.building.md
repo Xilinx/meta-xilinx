@@ -63,14 +63,12 @@ $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-oe
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-python
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-networking
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-filesystems
-$ bitbake-layers add-layer ./<path-to-layer>/meta-virtualization
 $ bitbake-layers add-layer ./<path-to-layer>/meta-arm/meta-arm-toolchain
 $ bitbake-layers add-layer ./<path-to-layer>/meta-arm/meta-arm
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-microblaze
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-core
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone-sdt
-$ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-bsp
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-tools
 ```
 > **Note:**
@@ -81,11 +79,14 @@ $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-tools
 >    demos or Virtualization then add these respective layers. For more details
 >    see layer README files.
 > ```
-> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-mali400
-> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-demos
-> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-multimedia
-> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-virtualization
-> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-gpu-malig78ae
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-bsp
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-mali400
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-demos
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-multimedia
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-virtualization
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-virtualization
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-gpu-malig78ae
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-imgrcvry
 > ```
 > 4. If user wants to build machine files supported by meta-xilinx-vendor or
 > met-xilinx-contrib layer then include these layer running following commands.
