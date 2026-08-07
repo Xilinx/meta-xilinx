@@ -50,10 +50,6 @@ jobs:
             if echo "$AUTHOR_NAME" | grep -q " via "; then
               INVALID=1
             fi
-            # TEST ONLY: remove after testing
-            if echo "$AUTHOR_NAME" | grep -qi "Manikanta Sreeram"; then
-              INVALID=1
-            fi
 
             if [ "$INVALID" -eq 1 ]; then
               FAILED=$((FAILED + 1))
@@ -82,7 +78,9 @@ jobs:
             echo ""
             echo "================================================"
             echo "Push contains commits with invalid author names."
-            echo "Author names must not contain 'Openembedded-core' or ' via '."
+            echo "Invalid author(s) detected:"
+            echo -e "$INVALID_AUTHORS"
+            echo ""
             echo "Fix with: git commit --amend --author='Real Name <email@example.com>'"
             echo "Or for multiple commits: git rebase -i and edit author info."
             echo "================================================"
@@ -90,6 +88,43 @@ jobs:
           fi
 
           echo "All commit authors are valid."
+
+      - name: Send email notification on failure
+        if: failure()
+        run: |
+          SUBJECT="[meta-xilinx] Invalid commit author on ${{ github.ref_name }} (pushed by ${{ github.actor }})"
+          TO="yocto_dev@amd.com,ssw_buildops@amd.com"
+          FROM="github-actions@amd.com"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          BODY="Invalid commit author(s) detected in a push to meta-xilinx.
+
+          Repository: ${{ github.repository }}
+          Branch: ${{ github.ref_name }}
+          Pushed by: ${{ github.actor }}
+
+          Failed commits (${{ steps.validate.outputs.failed }} of ${{ steps.validate.outputs.total }}):
+          ${{ steps.validate.outputs.invalid_authors }}
+
+          How to Fix:
+          - Single commit: git commit --amend --author='Real Name <email@example.com>'
+          - Multiple commits: git rebase -i and edit author info
+          - Then force-push the corrected branch
+
+          Workflow run: ${RUN_URL}"
+
+          if command -v sendmail &>/dev/null; then
+            printf "From: %s\nTo: %s\nSubject: %s\nContent-Type: text/plain\n\n%s" \
+              "$FROM" "$TO" "$SUBJECT" "$BODY" | sendmail -t
+            echo "Email sent via sendmail"
+          elif command -v mailx &>/dev/null; then
+            echo "$BODY" | mailx -s "$SUBJECT" -r "$FROM" "$TO"
+            echo "Email sent via mailx"
+          elif command -v mail &>/dev/null; then
+            echo "$BODY" | mail -s "$SUBJECT" -r "$FROM" "$TO"
+            echo "Email sent via mail"
+          else
+            echo "WARNING: No mail command available on runner — skipping email"
+          fi
 
       - name: Create issue on failure
         if: failure()
@@ -104,7 +139,7 @@ jobs:
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
 
             const body = `### ⚠️ Invalid Commit Author Detected\n\n` +
-              `@AMD-AECG-SSW-PUBLIC/ssw_builds_team\n\n` +
+              `@AMD-AECG-SSW-PUBLIC/yocto-maintainers\n\n` +
               `| Field | Details |\n` +
               `|---|---|\n` +
               `| **Branch** | \`${branch}\` |\n` +
