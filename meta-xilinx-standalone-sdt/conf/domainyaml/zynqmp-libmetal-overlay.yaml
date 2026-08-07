@@ -26,23 +26,28 @@ reserved-memory:
 
 axi:
   libmetal_uio_desc0@99c8000:
+    linux,uio-name: "libmetal-desc0"
     start: 0x99c8000
     size: 0x4000
     compatible: "uio"
   libmetal_uio_desc1@99cc000:
+    linux,uio-name: "libmetal-desc1"
     start: 0x99cc000
     size: 0x4000
     compatible: "uio"
   libmetal_uio_data@99d0000:
+    linux,uio-name: "libmetal-data"
     start: 0x99d0000
     size: 0x40000
     compatible: "uio"
 
   timer@ff130000:
     compatible: "uio"
+    linux,uio-name: "libmetal-timer"
   # linux -> rpu1 libmetal IPI
   ipi@ff350000:
     compatible: "uio"
+    linux,uio-name: "libmetal-ipi"
 
 domains:
   APU_Linux: # host in channel from a53-0
