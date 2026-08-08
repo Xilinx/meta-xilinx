@@ -7,8 +7,8 @@ applications load onto the RPU on the AMD Versal VPK360 board."
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${UNPACKDIR}/versal-vpk360-multidomain_packagegroup-openamp-fw-examples/LICENSE.md;md5=0b96a4c07d631aa5141bd3f058ba43b0"
 
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/08060629/external/packagegroup-openamp-fw-examples/versal-vpk360-multidomain_packagegroup-openamp-fw-examples_08060629.tar.gz"
-SRC_URI[sha256sum] = "799a3ffd672c6096eb21c439aa967a81a6aabbd9240e38ada28716046d443147"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/08080727/external/packagegroup-openamp-fw-examples/versal-vpk360-multidomain_packagegroup-openamp-fw-examples_08080727.tar.gz"
+SRC_URI[sha256sum] = "1b5dc94d23fa2ef47f5de49aaa333f3bf18c13a54539525139d02f0ea49708af"
 
 require conf/includes/openamp-fw-example.inc
 OPENAMPFW_BOARD = "versal-vpk360"
