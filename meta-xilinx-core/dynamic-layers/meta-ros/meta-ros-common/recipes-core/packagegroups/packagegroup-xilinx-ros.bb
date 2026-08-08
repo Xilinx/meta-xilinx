@@ -22,7 +22,6 @@ ROS_BUILDESSENTIAL_PACKAGES = "\
     ament-cmake-export-definitions \
     ament-cmake-export-dependencies \
     ament-cmake-export-include-directories \
-    ament-cmake-export-interfaces \
     ament-cmake-export-libraries \
     ament-cmake-export-link-flags \
     ament-cmake-export-targets \
@@ -56,8 +55,7 @@ ROS_BUILDESSENTIAL_PACKAGES = "\
     cmake \
     eigen3-cmake-module \
     fastcdr \
-    fastrtps-cmake-module \
-    fastrtps \
+    fastdds \
     foonathan-memory-vendor \
     gmock-vendor \
     gtest-vendor \
