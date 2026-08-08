@@ -61,47 +61,6 @@ BIF_PARTITION_ID[imgsel] = "0x1c000001"
 BIF_PARTITION_NAME[0x1c000001] = "pmc_subsys"
 BIF_PARTITION_NAME[0x4210002] = "lpd"
 
-# BIF configuration
-BIF_FILE_PATH = "${B}/${PN}.bif"
-
-# imgsel partition attributes differ between ZynqMP and Versal BIF formats
-IMGSEL_BIF_ATTRS ?= ""
-IMGSEL_BIF_ATTRS:zynqmp = "bootloader, destination_cpu=a53-0"
-IMGSEL_BIF_ATTRS:versal = "id=0x01, type=bootloader"
-IMGSEL_BIF_ATTRS:versal-2ve-2vm = "id=0x01, type=bootloader"
-
-BIF_PARTITION_ATTR:zynqmp = "imgsel"
-BIF_PARTITION_ATTR[imgsel] = "${IMGSEL_BIF_ATTRS}"
-BIF_PARTITION_IMAGE[imgsel] = "${B}/${ESW_EXECUTABLE_NAME}.elf"
-
-# Versal: top-level attrs, image blocks with CDO partitions
-PMC_DATA_CDO ?= "${DEPLOY_DIR_IMAGE}/CDO/pmc_data.cdo"
-LPD_DATA_CDO ?= "${DEPLOY_DIR_IMAGE}/CDO/lpd_data.cdo"
-
-IMGSEL_ID_CODE_FILE = "${B}/imgsel-idcode.txt"
-IMGSEL_ID_CODE_DEFAULT = "0x14ca8093"
-
-BIF_TOPLEVEL_ATTR:versal = "id_code extended_id_code id"
-BIF_TOPLEVEL_ATTR:versal-2ve-2vm = "id_code extended_id_code id"
-BIF_TOPLEVEL_ATTR[extended_id_code] = "0x01"
-BIF_TOPLEVEL_ATTR[id] = "0x2"
-
-BIF_PARTITION_ATTR:versal = "imgsel pmc-data lpd-data"
-BIF_PARTITION_ATTR:versal-2ve-2vm = "imgsel pmc-data lpd-data"
-
-BIF_PARTITION_ATTR[pmc-data] = "id=0x09, type=pmcdata, load=0xf2000000"
-BIF_PARTITION_IMAGE[pmc-data] = "${PMC_DATA_CDO}"
-BIF_PARTITION_ID[pmc-data] = "0x1c000001"
-
-BIF_PARTITION_ATTR[lpd-data] = "id=0x0C, type=cdo"
-BIF_PARTITION_IMAGE[lpd-data] = "${LPD_DATA_CDO}"
-BIF_PARTITION_ID[lpd-data] = "0x4210002"
-
-BIF_PARTITION_ID[imgsel] = "0x1c000001"
-
-BIF_PARTITION_NAME[0x1c000001] = "pmc_subsys"
-BIF_PARTITION_NAME[0x4210002] = "lpd"
-
 do_configure:prepend() {
     (
     cd ${S}
