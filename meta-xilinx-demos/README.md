@@ -1,7 +1,7 @@
 # meta-xilinx-demos
 
 This layer contains demos recipes and packagegroup for PL firmware, openamp,
-jupyter notebook, ros, qt5, multimedia, sdfec etc for AMD Adaptive SoC's and
+jupyter notebook, qt6, multimedia, sdfec etc for AMD Adaptive SoC's and
 FPGA's target images.
 
 > **Note:** Some of the demos recipes and packagegroup are moved from meta-petalinux
@@ -51,11 +51,7 @@ This layer depends on:
 	URI: https://github.com/OpenAMP/meta-openamp
 	branch: wrynose
 
-	URI: https://github.com/meta-qt5/meta-qt5
-	branch: wrynose
-
-	URI: https://github.com/Xilinx/meta-ros
-	layers: meta-ros-common, meta-ros2, meta-ros2-jazzy
+	URI: https://github.com/Xilinx/meta-qt6
 	branch: wrynose
 
 	URI: https://git.yoctoproject.org/meta-arm
