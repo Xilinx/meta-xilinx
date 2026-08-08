@@ -18,6 +18,7 @@ COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 COMPATIBLE_MACHINE:versal = "versal"
 COMPATIBLE_MACHINE:versal-net = "versal-net"
+COMPATIBLE_MACHINE:versal-2vp = "versal-2vp"
 
 DEPENDS += " packagegroup-xilinx-jupyter \
              packagegroup-openamp"

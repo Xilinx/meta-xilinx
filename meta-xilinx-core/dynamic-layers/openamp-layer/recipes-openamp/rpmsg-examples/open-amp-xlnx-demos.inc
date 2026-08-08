@@ -45,6 +45,7 @@ OPENAMP_CMAKE_SOC = "unknown"
 OPENAMP_CMAKE_SOC:zynqmp = "ZYNQMP"
 OPENAMP_CMAKE_SOC:versal = "VERSAL"
 OPENAMP_CMAKE_SOC:versal-net = "VERSAL_NET"
+OPENAMP_CMAKE_SOC:versal-2vp = "VERSAL"
 
 LINKER_METADATA_FILE = "OpenAMP_Lopper_Linker_Cfg.cmake"
 
@@ -63,6 +64,7 @@ DEMO_LINK_FLAGS:append:xilinx-freertos = " -lfreertos"
 OPENAMP_CMAKE_MACHINE ?= ""
 OPENAMP_CMAKE_MACHINE:zynqmp = "ZYNQMP"
 OPENAMP_CMAKE_MACHINE:versal = "VERSAL"
+OPENAMP_CMAKE_MACHINE:versal-2vp = "VERSAL"
 
 OPENAMP_APP_NAME ?= "echo"
 
@@ -110,6 +112,7 @@ FW_MACHINE:zynqmp = "cortexr5-0"
 FW_MACHINE:versal = "cortexr5-0"
 FW_MACHINE:versal-net = "cortexr52-0"
 FW_MACHINE:versal-2ve-2vm = "cortexr52-0"
+FW_MACHINE:versal-2vp = "cortexr5-0"
 FW_OS ?= "${MCNAME}"
 SUPPORTED_OS_LIST = "baremetal freertos"
 BBCLASSEXTEND = "${@' '.join(['mcextend:'+x for x in d.getVar('SUPPORTED_OS_LIST').split()])}"

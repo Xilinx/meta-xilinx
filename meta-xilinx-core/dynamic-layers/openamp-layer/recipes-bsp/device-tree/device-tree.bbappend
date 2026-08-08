@@ -9,6 +9,7 @@ OPENAMP_EXTRA_DT_INCLUDE_FILES ?= ""
 OPENAMP_EXTRA_DT_INCLUDE_FILES:zynqmp = "zynqmp-openamp.dtsi"
 OPENAMP_EXTRA_DT_INCLUDE_FILES:versal = "versal-openamp.dtsi"
 OPENAMP_EXTRA_DT_INCLUDE_FILES:versal-net = "versal-net-openamp.dtsi"
+OPENAMP_EXTRA_DT_INCLUDE_FILES:versal-2vp = "versal-openamp.dtsi"
 
 # ENABLE_OPENAMP_DTSI = 0 or empty: Build a dtbo
 # ENABLE_OPENAMP_DTSI = 1: Bundle into the device-tree the openamp items

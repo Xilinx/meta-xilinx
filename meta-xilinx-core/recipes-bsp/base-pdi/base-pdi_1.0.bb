@@ -13,6 +13,7 @@ COMPATIBLE_MACHINE:microblaze = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
+COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 COMPATIBLE_HOST = ".*"
 

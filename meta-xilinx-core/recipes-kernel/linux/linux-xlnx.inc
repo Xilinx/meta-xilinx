@@ -74,6 +74,7 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
+COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 # Use DEFCONFIGs for configuring linux-xlnx kernels
 KCONFIG_MODE ?= "alldefconfig"
@@ -85,6 +86,7 @@ KBUILD_DEFCONFIG_DEFAULT:zynqmp ?= "xilinx_defconfig"
 KBUILD_DEFCONFIG_DEFAULT:versal ?= "xilinx_defconfig"
 KBUILD_DEFCONFIG_DEFAULT:versal-net ?= "xilinx_defconfig"
 KBUILD_DEFCONFIG_DEFAULT:versal-2ve-2vm ?= "xilinx_defconfig"
+KBUILD_DEFCONFIG_DEFAULT:versal-2vp ?= "xilinx_defconfig"
 
 KBUILD_DEFCONFIG ?= "${KBUILD_DEFCONFIG_DEFAULT}"
 

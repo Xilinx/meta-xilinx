@@ -23,6 +23,7 @@ KERNEL_INCLUDE = ""
 COMPATIBLE_MACHINE:zynqmp = "${MACHINE}"
 COMPATIBLE_MACHINE:versal = "${MACHINE}"
 COMPATIBLE_MACHINE:versal-net = "${MACHINE}"
+COMPATIBLE_MACHINE:versal-2vp = "${MACHINE}"
 
 inherit devicetree image-artifact-names features_check
 

@@ -4,6 +4,7 @@ require trusted-firmware-a-xlnx.inc
 DEPENDS:remove:zynqmp:qemuall = " optee-os"
 DEPENDS:remove:versal:qemuall = " optee-os"
 DEPENDS:remove:versal-net:qemuall = " optee-os"
+DEPENDS:remove:versal-2vp:qemuall = " optee-os"
 
 # Xilinx TF-A v2.14
 SRC_URI_TRUSTED_FIRMWARE_A = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https"
@@ -41,12 +42,14 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
+COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 ### Platform Settings
 TFA_PLATFORM:zynqmp     = "zynqmp"
 TFA_PLATFORM:versal     = "versal"
 TFA_PLATFORM:versal-net = "versal_net"
 TFA_PLATFORM:versal-2ve-2vm = "versal2"
+TFA_PLATFORM:versal-2vp     = "versal"
 
 ### Console settings
 TFA_CONSOLE_DEFAULT = ""
@@ -54,6 +57,7 @@ TFA_CONSOLE_DEFAULT:zynqmp = "cadence"
 TFA_CONSOLE_DEFAULT:versal = "pl011"
 TFA_CONSOLE_DEFAULT:versal-net = "pl011"
 TFA_CONSOLE_DEFAULT:versal-2ve-2vm = "pl011"
+TFA_CONSOLE_DEFAULT:versal-2vp = "pl011"
 TFA_CONSOLE ?= "${TFA_CONSOLE_DEFAULT}"
 
 TFA_CONSOLE_OEMAKE = ""
@@ -61,6 +65,7 @@ TFA_CONSOLE_OEMAKE:append:zynqmp = "${@' ZYNQMP_CONSOLE=${TFA_CONSOLE}' if d.get
 TFA_CONSOLE_OEMAKE:append:versal = "${@' VERSAL_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
 TFA_CONSOLE_OEMAKE:append:versal-net = "${@' VERSAL_NET_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
 TFA_CONSOLE_OEMAKE:append:versal-2ve-2vm = "${@' CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
+TFA_CONSOLE_OEMAKE:append:versal-2vp = "${@' VERSAL_CONSOLE=${TFA_CONSOLE}' if d.getVar('TFA_CONSOLE') != '' else ''}"
 
 EXTRA_OEMAKE += "${TFA_CONSOLE_OEMAKE}"
 
@@ -78,6 +83,8 @@ TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_BASE=${TFA_MEM_BASE}
 TFA_MEM_OEMAKE:append:versal-net = "${@' VERSAL_NET_ATF_MEM_SIZE=${TFA_MEM_SIZE}' if d.getVar('TFA_MEM_SIZE') != '' else ''}"
 TFA_MEM_OEMAKE:append:versal-2ve-2vm    = "${@' MEM_BASE=${TFA_MEM_BASE}' if d.getVar('TFA_MEM_BASE') != '' else ''}"
 TFA_MEM_OEMAKE:append:versal-2ve-2vm    = "${@' MEM_SIZE=${TFA_MEM_SIZE}' if d.getVar('TFA_MEM_SIZE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal-2vp = "${@' VERSAL_ATF_MEM_BASE=${TFA_MEM_BASE}'     if d.getVar('TFA_MEM_BASE') != '' else ''}"
+TFA_MEM_OEMAKE:append:versal-2vp = "${@' VERSAL_ATF_MEM_SIZE=${TFA_MEM_SIZE}'     if d.getVar('TFA_MEM_SIZE') != '' else ''}"
 
 EXTRA_OEMAKE += "${TFA_MEM_OEMAKE}"
 

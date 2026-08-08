@@ -7,6 +7,7 @@ IMGSEL_DEPENDS ?= ""
 IMGSEL_DEPENDS:zynqmp ?= "libxil xiltimer bootgen-native"
 IMGSEL_DEPENDS:versal ?= "xilpdi xilplmi xilloader xilpm xilsecure xilpuf xiltimer xilffs bootgen-native base-pdi"
 IMGSEL_DEPENDS:versal-2ve-2vm ?= "xilpdi xilplmi xilloader xilpm-ng xilsecure xilpuf xiltimer xilffs xilocp xilcert bootgen-native base-pdi"
+IMGSEL_DEPENDS:versal-2vp ?= "xilpdi xilplmi xilloader xilpm xilsecure xilpuf xiltimer xilffs bootgen-native base-pdi"
 
 DEPENDS += "${IMGSEL_DEPENDS}"
 
@@ -28,6 +29,7 @@ IMGSEL_BIF_ATTRS ?= ""
 IMGSEL_BIF_ATTRS:zynqmp = "bootloader, destination_cpu=a53-0"
 IMGSEL_BIF_ATTRS:versal = "id=0x01, type=bootloader"
 IMGSEL_BIF_ATTRS:versal-2ve-2vm = "id=0x01, type=bootloader"
+IMGSEL_BIF_ATTRS:versal-2vp = "id=0x01, type=bootloader"
 
 BIF_PARTITION_ATTR:zynqmp = "imgsel"
 BIF_PARTITION_ATTR[imgsel] = "${IMGSEL_BIF_ATTRS}"
@@ -42,11 +44,13 @@ IMGSEL_ID_CODE_DEFAULT = "${@d.getVarFlag('BIF_TOPLEVEL_ATTR', 'id_code') or '0x
 
 BIF_TOPLEVEL_ATTR:versal = "id_code extended_id_code id"
 BIF_TOPLEVEL_ATTR:versal-2ve-2vm = "id_code extended_id_code id"
+BIF_TOPLEVEL_ATTR:versal-2vp = "id_code extended_id_code id"
 BIF_TOPLEVEL_ATTR[extended_id_code] = "0x01"
 BIF_TOPLEVEL_ATTR[id] = "0x2"
 
 BIF_PARTITION_ATTR:versal = "imgsel pmc-data lpd-data"
 BIF_PARTITION_ATTR:versal-2ve-2vm = "imgsel pmc-data lpd-data"
+BIF_PARTITION_ATTR:versal-2vp = "imgsel pmc-data lpd-data"
 
 BIF_PARTITION_ATTR[pmc-data] = "id=0x09, type=pmcdata, load=0xf2000000"
 BIF_PARTITION_IMAGE[pmc-data] = "${PMC_DATA_CDO}"
@@ -116,6 +120,7 @@ python do_generate_bif() {
 CDO_DEPENDS ?= ""
 CDO_DEPENDS:versal ?= "cdo-deploy:do_deploy"
 CDO_DEPENDS:versal-2ve-2vm ?= "cdo-deploy:do_deploy"
+CDO_DEPENDS:versal-2vp ?= "cdo-deploy:do_deploy"
 
 do_generate_bif[depends] += "${CDO_DEPENDS}"
 do_generate_bif[vardeps] += "\

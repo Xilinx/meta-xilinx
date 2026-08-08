@@ -18,6 +18,7 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexr52', ' -DARMR5 -DA
 TUNE_CCARGS:append:versal = " -Dversal"
 TUNE_CCARGS:append:versal-net = " -DVERSAL_NET"
 TUNE_CCARGS:append:versal-2ve-2vm = " -DVERSAL_NET"
+TUNE_CCARGS:append:versal-2vp = " -Dversal"
 
 # Bare-metal toolchains do not support Linux dynamic-linking or security
 # hardening linker flags.  In particular:

@@ -38,6 +38,7 @@ MANIFEST_AGGREGATE_DEPENDS:zynqmp = "device-tree virtual/bootloader fsbl pmufw t
 MANIFEST_AGGREGATE_DEPENDS:versal = "device-tree virtual/bootloader plmfw psmfw trusted-firmware-a virtual/base-pdi"
 MANIFEST_AGGREGATE_DEPENDS:versal-net = "device-tree virtual/bootloader plmfw psmfw trusted-firmware-a virtual/base-pdi"
 MANIFEST_AGGREGATE_DEPENDS:versal-2ve-2vm = "device-tree virtual/bootloader plmfw trusted-firmware-a virtual/base-pdi"
+MANIFEST_AGGREGATE_DEPENDS:versal-2vp = "device-tree virtual/bootloader plmfw psmfw trusted-firmware-a virtual/base-pdi"
 
 # Don't allow building for microblaze MACHINE
 COMPATIBLE_MACHINE ?= "^$"
@@ -46,6 +47,7 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
+COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 PROVIDES = "virtual/boot-bin"
 

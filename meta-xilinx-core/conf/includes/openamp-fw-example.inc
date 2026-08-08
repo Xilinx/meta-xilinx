@@ -11,6 +11,7 @@
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:versal = "${MACHINE}"
 COMPATIBLE_MACHINE:versal-2ve-2vm = "${MACHINE}"
+COMPATIBLE_MACHINE:versal-2vp = "${MACHINE}"
 COMPATIBLE_MACHINE:kria = "${MACHINE}"
 COMPATIBLE_MACHINE:zynqmp = "${MACHINE}"
 
@@ -27,6 +28,7 @@ OPENAMPFW_PKGDIR_SUFFIX:zynqmp ?= "openamp-fw-examples"
 OPENAMPFW_PKGDIR_SUFFIX:versal ?= "openamp-fw-examples"
 OPENAMPFW_PKGDIR_SUFFIX:versal-net ?= "openamp-zephyr-demo"
 OPENAMPFW_PKGDIR_SUFFIX:versal-2ve-2vm ?= "openamp-zephyr-demo"
+OPENAMPFW_PKGDIR_SUFFIX:versal-2vp ?= "openamp-fw-examples"
 
 S = "${UNPACKDIR}"
 

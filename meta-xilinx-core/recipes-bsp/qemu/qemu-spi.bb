@@ -32,6 +32,7 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
+COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 # The bootbin may require us, but we require the bootbin's sysroot
 do_compile[depends] += "virtual/boot-bin:do_populate_sysroot"

@@ -3,6 +3,7 @@ RPU1_PROC:zynqmp = "r5-1"
 RPU1_PROC:versal = "r5-1"
 RPU1_PROC:versal-net = "r52-1"
 RPU1_PROC:versal-2ve-2vm = "r52-1"
+RPU1_PROC:versal-2vp = "r5-1"
 
 RPU1_OS ?= "baremetal"
 RPU1_MC ?= "${MACHINE}-cortex${RPU1_PROC}-${RPU1_OS}"

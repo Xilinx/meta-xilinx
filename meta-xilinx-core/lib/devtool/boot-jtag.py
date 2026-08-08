@@ -90,7 +90,7 @@ def bootjtag(args, config, basepath, workspace):
         data['atf'] = os.path.join(deploy_dir, 'bl31.elf')
         data['pmufw'] = os.path.join(deploy_dir, 'pmu-firmware-' + machine + '.elf')
 
-    if soc in ('versal', 'versal-net', 'versal-2ve-2vm'):
+    if soc in ('versal', 'versal-net', 'versal-2ve-2vm', 'versal-2vp'):
         data['bootbin'] = os.path.join(deploy_dir, 'boot.bin')
 
     data['bootscr'] = os.path.join(deploy_dir, 'boot.scr')
@@ -156,7 +156,7 @@ def bootjtag(args, config, basepath, workspace):
         # Further warnings will be suppressed
         lines.append('rst -processor -clear-registers')
         lines.append('')
-    elif soc == 'versal':
+    elif soc == 'versal' or soc == 'versal-2vp':
         # Download boot.bin to versal device
         lines.append('targets -set -nocase -filter {name =~ \"*PMC*\"}')
         lines.append('puts stderr "INFO: Downloading BOOT bin file: ' + data['bootbin'] + '"')
@@ -236,7 +236,7 @@ def bootjtag(args, config, basepath, workspace):
     lines.append('')
 
     # Select A72 or A78 Core 0 to load and run Versal/VersalNet/Versal-2ve-2vm images
-    if soc == 'versal':
+    if soc == 'versal' or soc == 'versal-2vp':
         lines.append('targets -set -nocase -filter {name =~ \"*A72*#0\"}')
 
     if soc == 'versal-net' or soc == 'versal-2ve-2vm':

@@ -21,6 +21,7 @@ COMPATIBLE_MACHINE:riscv64 = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
+COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 do_configure[noexec] = '1'
 do_compile[noexec] = '1'

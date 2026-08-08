@@ -49,6 +49,7 @@ IMGRCVRY_VERSION_STRING ?= "${DISTRO}-${MACHINE}-imgrcvry-v${IMGRCVRY_VERSION}"
 IMGRCVRY_OPTIONAL_DATA_DEFAULT = ""
 IMGRCVRY_OPTIONAL_DATA_DEFAULT:versal = "${IMGRCVRY_VERFILE}, id=0x21;"
 IMGRCVRY_OPTIONAL_DATA_DEFAULT:versal-2ve-2vm = "${IMGRCVRY_VERFILE}, id=0x21;"
+IMGRCVRY_OPTIONAL_DATA_DEFAULT:versal-2vp = "${IMGRCVRY_VERFILE}, id=0x21;"
 # FIXME: versal-net override missing (pre-existing)
 IMGRCVRY_OPTIONAL_DATA ?= "${IMGRCVRY_OPTIONAL_DATA_DEFAULT}"
 
@@ -62,7 +63,7 @@ python do_imgrcvry_bif () {
     partitions += (d.getVar("IMGRCVRY_KERNEL_ATTR") or "").split()
 
     soc_family = d.getVar('SOC_FAMILY')
-    if soc_family in ('versal', 'versal-2ve-2vm'):
+    if soc_family in ('versal', 'versal-2ve-2vm', 'versal-2vp'):
         write_imgrcvry_version(d)
 
     optional_data = d.getVar("IMGRCVRY_OPTIONAL_DATA") or ""

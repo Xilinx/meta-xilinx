@@ -14,6 +14,7 @@ SRC_URI[tarball.sha256sum] = "0596f7e75079c08ef265287dc3c1ae1d9539ba99151df22120
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:versal = "${MACHINE}"
 COMPATIBLE_MACHINE:versal-2ve-2vm = "${MACHINE}"
+COMPATIBLE_MACHINE:versal-2vp = "${MACHINE}"
 
 do_configure() {
 	:
