@@ -38,7 +38,7 @@ PMC_DATA_CDO ?= "${DEPLOY_DIR_IMAGE}/CDO/pmc_data.cdo"
 LPD_DATA_CDO ?= "${DEPLOY_DIR_IMAGE}/CDO/lpd_data.cdo"
 
 IMGSEL_ID_CODE_FILE = "${B}/imgsel-idcode.txt"
-IMGSEL_ID_CODE_DEFAULT = "0x14ca8093"
+IMGSEL_ID_CODE_DEFAULT = "${@d.getVarFlag('BIF_TOPLEVEL_ATTR', 'id_code') or '0x14ca8093'}"
 
 BIF_TOPLEVEL_ATTR:versal = "id_code extended_id_code id"
 BIF_TOPLEVEL_ATTR:versal-2ve-2vm = "id_code extended_id_code id"
@@ -90,6 +90,11 @@ do_extract_idcode() {
     if [ -z "$id_code" ]; then
         bbwarn "Failed to parse id_code from base-design.pdi, using default ${IMGSEL_ID_CODE_DEFAULT}"
         id_code="${IMGSEL_ID_CODE_DEFAULT}"
+    fi
+    # If BIF_TOPLEVEL_ATTR[id_code] is defined, verify the id_code matches
+    # It shouldn't be possible for the default and machine id_code to deviate, but just in case!
+    if [ -n "${@d.getVarFlag('BIF_TOPLEVEL_ATTR', 'id_code') or ''}" -a "$id_code" != "${@d.getVarFlag('BIF_TOPLEVEL_ATTR', 'id_code') or ''}" ]; then
+        bbwarn "Determined id_code $id_code does not match machine defined ${@d.getVarFlag('BIF_TOPLEVEL_ATTR', 'id_code')}"
     fi
     echo "$id_code" > ${IMGSEL_ID_CODE_FILE}
 }
