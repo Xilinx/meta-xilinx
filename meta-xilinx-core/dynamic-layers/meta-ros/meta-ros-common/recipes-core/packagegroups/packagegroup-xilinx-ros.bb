@@ -10,9 +10,9 @@ inherit ros_distro_${ROS_DISTRO}
 
 PROVIDES = "${PACKAGES}"
 
-PACKAGES += "${PN}-base ${PN}-demo ${PN}-control"
+PACKAGES += "${PN}-base ${PN}-devtools ${PN}-demo ${PN}-control"
 
-SUMMARY:${PN}-dev = "ROS packages required for on target development"
+SUMMARY:${PN}-devtools = "ROS packages required for on-target development"
 ROS_BUILDESSENTIAL_PACKAGES = "\
     ament-lint-auto \
     ament-cmake-auto \
@@ -68,6 +68,7 @@ ROS_BUILDESSENTIAL_PACKAGES = "\
     python3-empy \
     python3 \
     python3-pytest \
+    python3-rosdep \
     rcutils \
     rmw-implementation-cmake \
     rosidl-cmake \
@@ -152,7 +153,7 @@ RDEPENDS:${PN}-control:aarch64 = "\
     ${ROS_CONTROL_PACKAGES} \
 "
 
-RDEPENDS:${PN}-dev:aarch64 = "\
+RDEPENDS:${PN}-devtools:aarch64 = "\
     ${ROS_BUILDESSENTIAL_PACKAGES} \
 "
 
