@@ -90,19 +90,6 @@ KBUILD_DEFCONFIG ?= "${KBUILD_DEFCONFIG_DEFAULT}"
 
 KERNEL_FEATURES:append:zynqmp = "${@' features/xilinx/overlay_of/overlay_of.scc' if d.getVar('FPGA_MNGR_RECONFIG_ENABLE') == '1' else ''}"
 
-KERNEL_FEATURES:append:versal = " \
-    features/xilinx/hdmi-module/hdmi-module.scc \
-    features/xilinx/hdmi-module/hdmi-module-fix.scc \
-    "
-KERNEL_FEATURES:append:versal-net = " \
-    features/xilinx/hdmi-module/hdmi-module.scc \
-    features/xilinx/hdmi-module/hdmi-module-fix.scc \
-    "
-KERNEL_FEATURES:append:versal-2ve-2vm = " \
-    features/xilinx/hdmi-module/hdmi-module.scc \
-    features/xilinx/hdmi-module/hdmi-module-fix.scc \
-    "
-
 KERNEL_FEATURES:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', ' features/ocicontainer/ocicontainer.scc', '', d)}"
 
 KERNEL_FEATURES:append:aarch64 = " \
