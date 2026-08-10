@@ -1,10 +1,11 @@
 #
-# Copyright (C) 2025, Advanced Micro Devices, Inc.  All rights reserved.
+# Copyright (C) 2025-2026, Advanced Micro Devices, Inc.  All rights reserved.
 #
 # SPDX-License-Identifier: MIT
 #
-# This bbclass is inherited by zephyr recipes to copy lopper generated files to
-# Zephyr board directory before do_configure task.
+# This bbclass is inherited by Zephyr recipes to consume Lopper-generated
+# device-tree and Kconfig artifacts, with optional linker-script support,
+# before the do_configure task.
 
 DEPENDS += "lopper-native dtc-native python3-dtc-native"
 
@@ -19,10 +20,25 @@ ZEPHYR_BOARD_KCONFIG_DEFCONFIG ??= "${ZEPHYR_BASE}/boards/${ZEPHYR_BOARD_VENDOR}
 
 # Lopper transformed file variables.
 CONFIG_DTFILE ??= "undefined"
+ZEPHYR_SDT_LINKER_SCRIPT ??= ""
 
 # Lopper transformed file name is board_Kconfig.defconfig which needs to
 # set in zephyr machine or multiconfig file.
 ZEPHYR_SDT_BOARD_KCONFIG_DEFCONFIG ??= "undefined"
+
+def amd_zephyr_sdt_linker_args(d):
+    linker = d.getVar('ZEPHYR_SDT_LINKER_SCRIPT') or ''
+    if not linker:
+        return ''
+    return " -DCONFIG_HAVE_CUSTOM_LINKER_SCRIPT=y " \
+           "-DCONFIG_CUSTOM_LINKER_SCRIPT='\"%s\"'" % linker
+
+def amd_zephyr_sdt_linker_checksum(d):
+    linker = d.getVar('ZEPHYR_SDT_LINKER_SCRIPT') or ''
+    return '%s:True' % linker if linker else ''
+
+EXTRA_OECMAKE:append = "${@amd_zephyr_sdt_linker_args(d)}"
+do_configure[file-checksums] += "${@amd_zephyr_sdt_linker_checksum(d)}"
 
 python do_copy_lopper_zephyr_files() {
     zephyr_board_dts = d.getVar('ZEPHYR_BOARD_DTS')
@@ -36,6 +52,14 @@ python do_copy_lopper_zephyr_files() {
 
     zephyr_sdt_board_kconfig_defconfig = d.getVar('ZEPHYR_SDT_BOARD_KCONFIG_DEFCONFIG') or ''
     bb.debug(2, "ZEPHYR_SDT_BOARD_KCONFIG_DEFCONFIG File: %s" % (zephyr_sdt_board_kconfig_defconfig))
+
+    zephyr_sdt_linker_script = d.getVar('ZEPHYR_SDT_LINKER_SCRIPT') or ''
+    if zephyr_sdt_linker_script:
+        if not os.path.isfile(zephyr_sdt_linker_script):
+            bb.fatal("ZEPHYR_SDT_LINKER_SCRIPT does not exist: %s" % \
+                     zephyr_sdt_linker_script)
+        bb.note("Using Lopper generated Zephyr linker script: %s" % \
+                zephyr_sdt_linker_script)
 
     # Copy CONFIG_DTFILE to ZEPHYR_BOARD_DTS
     if os.path.isfile(zephyr_sdt_board_dts) and os.path.isfile(zephyr_board_dts):
