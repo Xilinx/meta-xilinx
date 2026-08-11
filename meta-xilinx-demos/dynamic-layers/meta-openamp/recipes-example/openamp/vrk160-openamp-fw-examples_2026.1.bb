@@ -8,8 +8,8 @@ kit."
 LICENSE = "BSD-3-Clause"
 BOARD_NAME = "versal-vrk160-multidomain_packagegroup-openamp-fw-examples"
 LIC_FILES_CHKSUM = "file://${BOARD_NAME}/LICENSE.md;md5=0b96a4c07d631aa5141bd3f058ba43b0"
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/08101412/external/packagegroup-openamp-fw-examples/versal-vrk160-multidomain_packagegroup-openamp-fw-examples_08101412.tar.gz"
-SRC_URI[sha256sum] = "7dcc90eb12aeb5c78605af1418fa5b4850066e08bc11b48125e7cb6802d8d346"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/08111410/external/packagegroup-openamp-fw-examples/versal-vrk160-multidomain_packagegroup-openamp-fw-examples_08111410.tar.gz"
+SRC_URI[sha256sum] = "b36b01bedcfd4f240197e147d8f3f4416052360dda7354fb5ae6b1949ed69c74"
 
 require conf/includes/openamp-fw-example.inc
 OPENAMPFW_BOARD = "vrk160"
