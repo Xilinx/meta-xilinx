@@ -9,8 +9,8 @@ SOM mounted on the X-PRC-01 carrier."
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://${UNPACKDIR}/versal-vm-p-m1369-00-reva-x-prc-01-reva-multidomain_packagegroup-openamp-fw-examples/LICENSE.md;md5=0b96a4c07d631aa5141bd3f058ba43b0"
 
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/08090727/external/packagegroup-openamp-fw-examples/versal-vm-p-m1369-00-reva-x-prc-01-reva-multidomain_packagegroup-openamp-fw-examples_08090727.tar.gz"
-SRC_URI[sha256sum] = "a6ade0aa38513b625855dd369a8fda851e3a0c3b9659593c3d1438f898077b1f"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/08101825/external/packagegroup-openamp-fw-examples/versal-vm-p-m1369-00-reva-x-prc-01-reva-multidomain_packagegroup-openamp-fw-examples_08101825.tar.gz"
+SRC_URI[sha256sum] = "436fd78643cf1c465ad8adebd5503c79e1fb1ddf83707ac36ad0c13adaee11d2"
 
 require conf/includes/openamp-fw-example.inc
 OPENAMPFW_BOARD = "versal-vm-p-m1369-00-reva-x-prc-01"
