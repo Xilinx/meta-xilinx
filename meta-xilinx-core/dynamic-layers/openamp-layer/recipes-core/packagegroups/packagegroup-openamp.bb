@@ -33,11 +33,6 @@ RDEPENDS:${PN}-zephyr-test = "zephyr-rpmsg-test"
 # Ensure that each of these kernel modules is present regardless of defconfig used
 RDEPENDS:${PN}:append = " kernel-module-uio-pdrv-genirq kernel-module-rpmsg-char kernel-module-rpmsg-ctrl "
 
-# ENABLE_OPENAMP_DTSI = 0 or empty: Build a dtbo
-# ENABLE_OPENAMP_DTSI = 1: Bundle into the device-tree the openamp items
-# ENABLE_OPENAMP_DTSI = 2 (!= 0, 1 or empty): Do nothing, assume openamp is already integrated into the device-tree
-RDEPENDS:${PN}:append = " ${@'open-amp-device-tree' if not d.getVar('ENABLE_OPENAMP_DTSI') or d.getVar('ENABLE_OPENAMP_DTSI') == '0' else ''}"
-
 RDEPENDS:${PN}:append = " \
 	libmetal \
 	libmetal-demos \
