@@ -25,6 +25,10 @@ jobs:
           # Handle new branch creation where 'before' is all zeros
           if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
             COMMITS=$(git rev-list ${{ github.event.after }} --not --remotes=origin 2>/dev/null || git rev-list ${{ github.event.after }})
+          elif ! git cat-file -e ${{ github.event.before }} 2>/dev/null; then
+            # Force push — old SHA no longer exists, validate all commits reachable from new HEAD
+            echo "Force push detected (old SHA not found). Scanning new commits only."
+            COMMITS=$(git rev-list ${{ github.event.after }} --not --remotes=origin 2>/dev/null || echo "")
           else
             COMMITS=$(git rev-list ${{ github.event.before }}..${{ github.event.after }})
           fi
@@ -90,7 +94,7 @@ jobs:
           echo "All commit authors are valid."
 
       - name: Send email notification on failure
-        if: failure()
+        if: failure() && steps.validate.outputs.failed > 0
         run: |
           SUBJECT="[meta-xilinx] Invalid commit author on ${{ github.ref_name }} (pushed by ${{ github.actor }})"
           TO="yocto_dev@amd.com,ssw_buildops@amd.com"
@@ -127,7 +131,7 @@ jobs:
           fi
 
       - name: Create issue on failure
-        if: failure()
+        if: failure() && steps.validate.outputs.failed > 0
         uses: actions/github-script@v7
         with:
           script: |
