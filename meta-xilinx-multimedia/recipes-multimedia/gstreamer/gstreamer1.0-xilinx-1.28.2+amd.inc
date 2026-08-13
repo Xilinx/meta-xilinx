@@ -1,5 +1,5 @@
 BRANCH ?= "xlnx-rebase-v1.28.2-dev"
-REPO ?= "git://github.com/AMD-AECG-SSW-PUBLIC/gstreamer.git;protocol=https"
+REPO ?= "git://github.com/Xilinx/gstreamer.git;protocol=https"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 
