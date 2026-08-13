@@ -12,7 +12,6 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 MULTIMEDIA_PACKAGES = " \
 	packagegroup-xilinx-gstreamer \
-	packagegroup-xilinx-matchbox \
 	packagegroup-core-x11 \
 	libdrm \
 	libdrm-tests \
