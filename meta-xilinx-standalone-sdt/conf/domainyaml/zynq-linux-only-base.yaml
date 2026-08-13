@@ -8,6 +8,3 @@ domains:
           secure: true
           el: 0x3
     os,type: linux
-    chosen:
-      bootargs: "earlycon"
-      stdout-path: "serial0:115200n8"

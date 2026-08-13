@@ -56,11 +56,6 @@ domains:
 
   RPU_Zephyr:
     compatible: openamp,domain-v1
-    chosen:
-      stdout-path: "serial1:115200n8"
-      bootargs: "earlycon=pl011,mmio32,0xf1930000 console=ttyAMA1,115200"
-      zephyr,console: "serial1"
-      zephyr,shell-uart: "serial1"
     xlnx,ddr-boot: true
     xlnx,zephyr,mems: [ ddrboot@9800100 ]
     domain-to-domain:
