@@ -29,6 +29,7 @@ PREFERRED_VERSION_xiltimer           ??= "${PREFERRED_VERSION_esw}%"
 
 # The following are the recipes-drivers used by the library items above
 # they should come from the same ESW version as the library.
+PREFERRED_VERSION_asu-ram-ecc         ??= "${PREFERRED_VERSION_esw}%"
 PREFERRED_VERSION_avbuf               ??= "${PREFERRED_VERSION_esw}%"
 PREFERRED_VERSION_axicdma             ??= "${PREFERRED_VERSION_esw}%"
 PREFERRED_VERSION_axicdma-example     ??= "${PREFERRED_VERSION_esw}%"
