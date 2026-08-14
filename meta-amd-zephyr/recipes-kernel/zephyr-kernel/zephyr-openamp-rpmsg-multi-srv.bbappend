@@ -7,12 +7,12 @@ require amd-zephyr-kernel-src_${PREFERRED_VERSION_zephyr-kernel}_${XILINX_RELEAS
 
 SRC_URI_ZEPHYR_OPEN_AMP_SYS_REF = "git://github.com/Xilinx/openamp-system-reference.git;protocol=https"
 BRANCH  = "2026"
-SRCREV_open-amp-sys-ref = "f71199f8ff873d5ba9f3af18fef28c2807dc88d5"
+SRCREV_open-amp-sys-ref = "7dbe56cc759971a6b0c6e43f812ba96228bde589"
 
 BOARD = "${ZEPHYR_BOARD}"
 ZEPHYR_SOC_FAMILY = "${ZEPHYR_BOARD}"
 
-EXTRA_OECMAKE += " \
+EXTRA_OECMAKE:append = " \
     -DOVERLAY_CONFIG="${S}/open-amp-sys-ref/examples/zephyr/rpmsg_multi_services/boards/${BOARD}.conf" \
     -DCONFIG_GIC_SAFE_CONFIG=y \
     "
@@ -20,6 +20,8 @@ EXTRA_OECMAKE += " \
 # The Versal Net and Versal Gen 2 machine overrides are also present when
 # building for Cortex-A.  Enable this RPU application only in the Zephyr
 # multiconfigs, where the generated RPU board is selected.
+COMPATIBLE_MACHINE:zynqmp = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') == 'zynqmp_rpu' else '^$'}"
+COMPATIBLE_MACHINE:versal = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') == 'versal_rpu' else '^$'}"
 COMPATIBLE_MACHINE:versal-net = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') == 'versalnet_rpu' else '^$'}"
 COMPATIBLE_MACHINE:versal-2ve-2vm = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') == 'versal2_rpu' else '^$'}"
 
