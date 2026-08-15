@@ -12,10 +12,13 @@ BIF_FSBL_ATTR       ??= "base-pdi plmfw"
 BIF_TFA_ATTR        ??= "trusted-firmware-a"
 BIF_OPTEE_ATTR      ??= "${@bb.utils.contains('MACHINE_FEATURES', 'optee', 'optee-os', '', d)}"
 BIF_ASU_ATTR        ??= ""
+BIF_IMAGESTORE_ATTR ??= ""
 BIF_DEVICETREE_ATTR ??= "device-tree"
 BIF_SSBL_ATTR       ??= "u-boot-xlnx"
 BIF_APPS_ATTR       ??= ""
-BIF_PARTITION_ATTR  ??= "${BIF_FSBL_ATTR} ${BIF_ASU_ATTR} ${BIF_DEVICETREE_ATTR} ${BIF_TFA_ATTR} ${BIF_OPTEE_ATTR} ${BIF_SSBL_ATTR} ${BIF_APPS_ATTR}"
+# Token order is partition order, and PLM loads partitions in order, so keep
+# the Image Store slot ahead of the device tree and handoff slots.
+BIF_PARTITION_ATTR  ??= "${BIF_FSBL_ATTR} ${BIF_ASU_ATTR} ${BIF_IMAGESTORE_ATTR} ${BIF_DEVICETREE_ATTR} ${BIF_TFA_ATTR} ${BIF_OPTEE_ATTR} ${BIF_SSBL_ATTR} ${BIF_APPS_ATTR}"
 
 # Specify BIF partition attributes for base-pdi
 BIF_PARTITION_ATTR[base-pdi] ?= "type=bootimage"
@@ -51,6 +54,14 @@ BIF_PARTITION_ID[optee-os] ?= "0x1c000000"
 # Specify BIF partition attributes for asufw
 BIF_PARTITION_ATTR[asufw] ?= "core=asu"
 BIF_PARTITION_IMAGE[asufw] ?= "${RECIPE_SYSROOT}/boot/asufw.elf"
+
+# Image Store, holding the FPD CDO so PLM can reload it on resume without
+# touching the boot device. Inert until BIF_IMAGESTORE_ATTR names it, and named
+# for the recipe because that name becomes a DEPENDS entry.
+BIF_PARTITION_ATTR[fpd-image-store] ?= "imagestore = 0xFFFF0000"
+BIF_PARTITION_IMAGE[fpd-image-store] ?= "${RECIPE_SYSROOT}/firmware/fpd-image-store.pdi"
+# In the APU image, so the subsystem keeps one ID and one ImageInfoTbl entry
+BIF_PARTITION_ID[fpd-image-store] ?= "0x1c000000"
 
 # Force the newly created CDO file to be made available in the deploy directory
 do_extract_cdo() {
