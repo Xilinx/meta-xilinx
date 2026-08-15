@@ -24,14 +24,11 @@ do_install[noexec] = '1'
 
 do_deploy() {
     install -d ${DEPLOYDIR}/CDO
-    pmc_data_cdo=$(find ${SYSTEM_DTFILE_DIR}/extracted/*/pdi_files/gen_files/ -name pmc_data.cdo | head -1)
-    if [ -e $pmc_data_cdo ]; then
-        install -m 0644 ${pmc_data_cdo} ${DEPLOYDIR}/CDO/pmc_data.cdo
-    fi
-
-    lpd_data_cdo=$(find ${SYSTEM_DTFILE_DIR}/extracted/*/pdi_files/gen_files/ -name lpd_data.cdo | head -1)
-    if [ -e $lpd_data_cdo ]; then
-        install -m 0644 $lpd_data_cdo ${DEPLOYDIR}/CDO/lpd_data.cdo
-    fi
+    for cdo in pmc_data lpd_data fpd_data; do
+        src=$(find ${SYSTEM_DTFILE_DIR}/extracted/*/pdi_files/gen_files/ -name "$cdo.cdo" | head -1)
+        if [ -n "$src" ]; then
+            install -m 0644 "$src" ${DEPLOYDIR}/CDO/$cdo.cdo
+        fi
+    done
 }
 addtask deploy before do_build after do_install
