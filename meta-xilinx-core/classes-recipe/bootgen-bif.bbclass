@@ -23,7 +23,14 @@
 #                                [puf_file]    = "= <puf data file>"
 #                            * Zynq/ZynqMP: value is a comma-separated flag list
 #                              emitted as "[name] flag1, flag2".
-#   BIF_OPTIONAL_DATA      - Semicolon-separated: "<filepath>, id=<id>;"
+#   BIF_OPTIONAL_DATA      - Semicolon-separated: "<filepath>, id=<id>;" (versal+)
+#                            This is for manually specified values, otherwise use below
+#   BIF_OPTIONAL_DATA_VAL[id] - Value associated with id, value is written to a file
+#                               optional-data-<id>.txt, id=<id>
+#   BIF_OPTIONAL_DATA_FILE[id] - Value associated with a file for an id:
+#                                <BIF_OPTIONAL_DATA_FILE[id]>, id=<id>
+#                            Setting both BIF_OPTIONAL_DATA_VAL and FILE for the same
+#                            ID is invalid
 #   BIF_PARTITION_ATTR     - Space-separated partition names (boot order)
 #   BIF_PARTITION_ATTR[p]  - Attribute flags for partition 'p'
 #   BIF_PARTITION_IMAGE[p] - File path for partition 'p'
@@ -205,6 +212,50 @@ def bootgen_bif_write_optional_data(biffd, optional_data, workdir, seen_basename
             shutil.copyfile(filepath, dest)
         biffd.write("\toptionaldata { %s, %s }\n" % (basename, id_part))
 
+def bootgen_bif_write_optional_data_val(biffd, workdir, seen_basenames, d):
+    """
+    Process BIF_OPTIONAL_DATA_VAL[id] entries, write to a file, and call
+    bootgen_bif_write_optional_data to add the entries to the bif.
+
+    Format: "<filepath>, id=<id>;" (semicolon-separated)
+    """
+
+    optional_data = ""
+
+    for id in d.getVarFlags('BIF_OPTIONAL_DATA_VAL') or '':
+        val = d.getVarFlag('BIF_OPTIONAL_DATA_VAL', id)
+        if not val:
+            continue
+
+        filepath = os.path.join(workdir, f'optional-data-{id}.txt')
+        with open(filepath, 'w') as fd:
+            fd.write(val)
+
+        optional_data = optional_data + f'{filepath}, id={id}; '
+
+    if optional_data:
+        bootgen_bif_write_optional_data(biffd, optional_data, workdir, seen_basenames, d)
+
+def bootgen_bif_write_optional_data_file(biffd, workdir, seen_basenames, d):
+    """
+    Process BIF_OPTIONAL_DATA_FILE[id] entries by calling
+    bootgen_bif_write_optional_data to add the entries to the bif.
+
+    Format: "<filepath>, id=<id>;" (semicolon-separated)
+    """
+
+    optional_data = ""
+
+    for id in d.getVarFlags('BIF_OPTIONAL_DATA_FILE') or '':
+        val = d.getVarFlag('BIF_OPTIONAL_DATA_FILE', id)
+        if not val:
+            continue
+
+        optional_data = optional_data + f'{val}, id={id}; '
+
+    if optional_data:
+        bootgen_bif_write_optional_data(biffd, optional_data, workdir, seen_basenames, d)
+
 def bootgen_bif_copy_partition_files(partitions, partition_attrimage, workdir, seen_basenames, d, skip_check=None):
     """
     Copy partition files to workdir for bootgen.
@@ -300,10 +351,12 @@ def bootgen_bif_generate(d, bif_path=None, workdir=None, partitions=None, option
 
         bootgen_bif_write_toplevel_attrs(biffd, d)
 
-        # Optional data (Versal version strings, user data) - use parameter or variable
-        opt_data = optional_data if optional_data is not None else (d.getVar("BIF_OPTIONAL_DATA") or "")
-        if opt_data:
+        if soc_family in ('versal', 'versal-net', 'versal-2ve-2vm', 'versal-2vp'):
+            # Optional data (Versal version strings, user data) - use parameter or variable
+            opt_data = optional_data if optional_data is not None else (d.getVar("BIF_OPTIONAL_DATA") or "")
             bootgen_bif_write_optional_data(biffd, opt_data, workdir, seen_basenames, d)
+            bootgen_bif_write_optional_data_val(biffd, workdir, seen_basenames, d)
+            bootgen_bif_write_optional_data_file(biffd, workdir, seen_basenames, d)
 
         common_attrs = (d.getVar("BIF_COMMON_ATTR") or "").split()
 
