@@ -129,6 +129,9 @@ do_generate_bif[vardeps] += "\
     IMGSEL_ID_CODE_DEFAULT \
     IMGSEL_BIF_ATTRS \
 "
+do_generate_bif[vardeps] += "${@' '.join('BIF_OPTIONAL_DATA_VAL[%s]' % n for n in (d.getVarFlags('BIF_OPTIONAL_DATA_VAL') or ''))}"
+do_generate_bif[vardeps] += "${@' '.join('BIF_OPTIONAL_DATA_FILE[%s]' % n for n in (d.getVarFlags('BIF_OPTIONAL_DATA_FILE') or ''))}"
+
 addtask do_generate_bif after do_compile do_extract_idcode before do_bootgen
 
 do_bootgen[dirs] = "${B}"
