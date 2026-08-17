@@ -42,36 +42,27 @@ BIF_PARTITION_ID[rootfs] ?= "0x1c000000"
 IMGRCVRY_BIFFILE ?= "${B}/imgrcvry.bif"
 BIF_FILE_PATH = "${IMGRCVRY_BIFFILE}"
 
+# Embed metadata into the image-recovery bin as BIF optional data via
+# bif-optional-data.
+#   id=0x21 description
+#   id=0x22 component version
+#   id=0x23 tool version
+
 IMGRCVRY_VERSION ?= "${DISTRO_VERSION}"
-IMGRCVRY_VERFILE ?= "${B}/imgrcvry-version.txt"
-IMGRCVRY_VERSION_STRING ?= "${DISTRO}-${MACHINE}-imgrcvry-v${IMGRCVRY_VERSION}"
+IMGRCVRY_DESCRIPTION ?= "Image Recovery (${MACHINE})"
+IMGRCVRY_TOOLS_VERSION ?= "${@(d.getVar('XILINX_RELEASE_VERSION') or '').replace('v', '')}"
 
-IMGRCVRY_OPTIONAL_DATA_DEFAULT = ""
-IMGRCVRY_OPTIONAL_DATA_DEFAULT:versal = "${IMGRCVRY_VERFILE}, id=0x21;"
-IMGRCVRY_OPTIONAL_DATA_DEFAULT:versal-2ve-2vm = "${IMGRCVRY_VERFILE}, id=0x21;"
-IMGRCVRY_OPTIONAL_DATA_DEFAULT:versal-2vp = "${IMGRCVRY_VERFILE}, id=0x21;"
-# FIXME: versal-net override missing (pre-existing)
-IMGRCVRY_OPTIONAL_DATA ?= "${IMGRCVRY_OPTIONAL_DATA_DEFAULT}"
-
-def write_imgrcvry_version(d):
-    version_string = d.getVar('IMGRCVRY_VERSION_STRING')
-    with open(d.expand(d.getVar('IMGRCVRY_VERFILE')), 'w') as f:
-        f.write(version_string)
+BIF_OPTIONAL_DATA_VAL[0x21] = "${IMGRCVRY_DESCRIPTION}"
+BIF_OPTIONAL_DATA_VAL[0x22] = "${IMGRCVRY_VERSION}"
+BIF_OPTIONAL_DATA_VAL[0x23] = "${IMGRCVRY_TOOLS_VERSION}"
 
 python do_imgrcvry_bif () {
     partitions = (d.getVar("IMGRCVRY_ATTR") or "").split()
     partitions += (d.getVar("IMGRCVRY_KERNEL_ATTR") or "").split()
 
-    soc_family = d.getVar('SOC_FAMILY')
-    if soc_family in ('versal', 'versal-2ve-2vm', 'versal-2vp'):
-        write_imgrcvry_version(d)
-
-    optional_data = d.getVar("IMGRCVRY_OPTIONAL_DATA") or ""
-
     # Generate BIF, skip file check for rootfs (built later by IMAGE_TYPEDEP)
     bootgen_bif_generate(d,
         partitions=partitions,
-        optional_data=optional_data,
         skip_check=['rootfs']
     )
 }
@@ -89,7 +80,6 @@ IMAGE_CMD:imagercvry () {
 addtask do_imgrcvry_bif after do_image before do_image_imagercvry
 
 do_imgrcvry_bif[vardeps] += "\
-    IMGRCVRY_OPTIONAL_DATA \
     IMGRCVRY_ATTR \
     IMGRCVRY_KERNEL_ATTR \
     BIF_FILE_PATH \
@@ -98,11 +88,14 @@ do_imgrcvry_bif[vardeps] += "\
     BIF_PARTITION_ID \
     BIF_PARTITION_NAME \
     BIF_COMMON_ATTR \
+    BIF_OPTIONAL_DATA \
     SOC_FAMILY \
 "
 # Track per-name BIF_COMMON_ATTR flag values so changing a value (without
 # changing the list) still invalidates the task signature.
 do_imgrcvry_bif[vardeps] += "${@' '.join('BIF_COMMON_ATTR[%s]' % n for n in (d.getVar('BIF_COMMON_ATTR') or '').split())}"
+do_imgrcvry_bif[vardeps] += "${@' '.join('BIF_OPTIONAL_DATA_VAL[%s]' % n for n in (d.getVarFlags('BIF_OPTIONAL_DATA_VAL') or ''))}"
+do_imgrcvry_bif[vardeps] += "${@' '.join('BIF_OPTIONAL_DATA_FILE[%s]' % n for n in (d.getVarFlags('BIF_OPTIONAL_DATA_FILE') or ''))}"
 
 IMGRCVRY_ATTR_DEP = "${@(d.getVar('IMGRCVRY_ATTR') or "").replace('bitstream', 'virtual/bitstream')}"
 do_imgrcvry_bif[depends] += "${@' '.join('%s:do_populate_sysroot' % r for r in d.getVar('IMGRCVRY_ATTR_DEP').split())}"
