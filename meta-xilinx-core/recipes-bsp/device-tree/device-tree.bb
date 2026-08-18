@@ -9,10 +9,13 @@ LIC_FILES_CHKSUM = " \
 		file://${COMMON_LICENSE_DIR}/GPL-2.0-or-later;md5=fed54355545ffd980b814dab4a3b312c \
 		"
 
-# Since we're not based on a kernel default to nothing.
-# This needs to be before the devicetree inherit, as it configured for use
-# with a linux kernel by default.
-KERNEL_INCLUDE ?= ""
+# Since we're not based on a kernel default, do not include ${KERNEL_INCLUDE}
+# in the path. If your devicetree does depend on the kernel includes, this can
+# be arranged in a bbappend.
+#
+# Default from devicetree.bbclass is:
+#   DT_INCLUDE ?= "${DT_FILES_PATH} ${KERNEL_INCLUDE}"
+DT_INCLUDE ?= "${DT_FILES_PATH}"
 
 inherit devicetree image-artifact-names shared-manifest
 
