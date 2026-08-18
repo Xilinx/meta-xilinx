@@ -10,10 +10,7 @@ QEMU_FLASH_TYPE ??= "undefined"
 # Base dependency on EXTRA_IMAGEDEPENDS
 DEPLOY_DEPENDS = "${EXTRA_IMAGEDEPENDS}"
 
-inherit packagegroup deploy
-
-# No packages will be generated
-PACKAGES = ""
+inherit packagegroup nopackages deploy
 
 do_deploy() {
     :
