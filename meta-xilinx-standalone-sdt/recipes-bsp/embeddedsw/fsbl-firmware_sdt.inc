@@ -65,6 +65,7 @@ do_install() {
     :
 }
 
+inherit nopackages
 PACKAGES = ""
 
 ESW_COMPONENT = "undefined"
@@ -76,4 +77,4 @@ do_deploy() {
     ln -sf ${FSBL_BASE_NAME}.elf ${DEPLOYDIR}/${FSBL_IMAGE_NAME}.elf
 }
 
-addtask deploy before do_build after do_package
+addtask deploy before do_build after do_install
