@@ -5,9 +5,9 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 inherit dfx_user_dts
 
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/08170744/external/fwapp/vpk180-pl-bram-gpio-fw_2026.2_0817_1_08170744.tar.gz"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/08180849/external/fwapp/vpk180-pl-bram-gpio-fw_2026.2_0818_1_08180849.tar.gz"
 
-SRC_URI[sha256sum] = "34188c48a48b784bbc7bdc5c43d7e3fe306266061c8ea6bd9fe4552897ab159c"
+SRC_URI[sha256sum] = "d3e661d3e9c9539134ecae900fac3f1b5e8dd060d79032897011bb2da153b382"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:amd-cortexa72-common = "${MACHINE}"
