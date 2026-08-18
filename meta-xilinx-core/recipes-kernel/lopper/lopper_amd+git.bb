@@ -8,7 +8,7 @@ SECTION = "bootloader"
 SRC_URI = "git://github.com/Xilinx/lopper.git;branch=xlnx_rel_v2026.1;protocol=https"
 SRCREV = "05dc7e4bf359b60f1e6f7ed7074740afd7955a63"
 
-BASEVERSION = "1.3.0"
+BASEVERSION = "1.3.2"
 PV = "v${BASEVERSION}+amd+git"
 
 PYPA_WHEEL = "${PIP_INSTALL_DIST_PATH}/${BPN}-${BASEVERSION}-*.whl"
