@@ -1,3 +1,11 @@
+axi:
+  r52_0a_atcm_global:
+    mpu-policy: [ readable, writable, executable, cacheable, static ]
+  r52_0a_btcm_global:
+    mpu-policy: [ readable, writable, cacheable, static ]
+  r52_0a_ctcm_global:
+    mpu-policy: [ readable, writable, cacheable, static ]
+
 reserved-memory:
   ranges: true
   "#size-cells": 2
@@ -7,7 +15,8 @@ reserved-memory:
     label: ddrboot
     no-map: 1
     start: 0x9800100
-    size: 0x5FF00
+    size: 0x5EF00
+    mpu-policy: [ readable, writable, executable, cacheable, static ]
   vdev0vring0@9860000:
     label: vdev0vring0
     start: 0x9860000
@@ -28,6 +37,7 @@ reserved-memory:
     start: 0x9800000
     size: 0x100
     no-map: 1
+    mpu-policy: [ readable, writable ]
 
 domains:
   APU_Linux:
@@ -56,6 +66,8 @@ domains:
 
   RPU_Zephyr:
     compatible: openamp,domain-v1
+    os,type: zephyr
+    zephyr-version: "4.3"
     xlnx,ddr-boot: true
     xlnx,zephyr,mems: [ ddrboot@9800100 ]
     domain-to-domain:
@@ -69,7 +81,7 @@ domains:
     sram:
       - dev: ddrboot@9800100
         start: 0x9800100
-        size: 0x5FF00
+        size: 0x5EF00
       - dev: r52_0a_atcm_global@eba00000
         label: r52_0a_atcm_global
         size: 64K
@@ -87,3 +99,18 @@ domains:
         start: '0xeba20000'
     reserved-memory:
         - ddrboot@9800100
+        - rsctbl@9800000
+    linker:
+      linker_file_output_name: openamp-zephyr.ld
+      linker_memories: [ r52_0a_atcm_global, r52_0a_btcm_global, r52_0a_ctcm_global, ddrboot, rsctbl ]
+      entry: _vector_table
+      sections:
+        vector_table: { region: r52_0a_atcm_global, offset: 0 }
+        text: { region: r52_0a_atcm_global }
+        rodata: { region: r52_0a_atcm_global }
+        data: { region: r52_0a_btcm_global }
+        bss: { region: r52_0a_btcm_global }
+        noinit: { region: r52_0a_btcm_global }
+        heap: { region: r52_0a_btcm_global }
+        stack: { region: r52_0a_btcm_global }
+        resource_table: { region: rsctbl, offset: 0 }
