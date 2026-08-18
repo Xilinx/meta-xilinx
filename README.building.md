@@ -61,7 +61,6 @@ $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-oe
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-python
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-networking
 $ bitbake-layers add-layer ./<path-to-layer>/meta-openembedded/meta-filesystems
-$ bitbake-layers add-layer ./<path-to-layer>/meta-virtualization
 $ bitbake-layers add-layer ./<path-to-layer>/meta-arm/meta-arm-toolchain
 $ bitbake-layers add-layer ./<path-to-layer>/meta-arm/meta-arm
 $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-microblaze
@@ -75,11 +74,13 @@ $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-standalone-
 >    demos or Virtualization then add these respective layers. For more details
 >    see layer README files.
 > ```
-> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-mali400
-> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-demos
-> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-multimedia
-> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-virtualization
-> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx-gpu-malig78ae
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-mali400
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-demos
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-multimedia
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-virtualization
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-virtualization
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-gpu-malig78ae
+> $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-imgrcvry
 > ```
 
 5. Create a new layer to for SDT machine files geneated using gen-machineconf
