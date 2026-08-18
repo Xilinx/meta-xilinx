@@ -10,17 +10,17 @@ Upstream-Status: Pending
 
 Signed-off-by: Anil Kumar Mamidala <anil.mamidala@xilinx.com>
 ---
- include/drm/drm_fourcc.h |   7 ++
+ include/drm/drm_fourcc.h |   8 ++
  tests/modetest/buffers.c |   5 +-
  tests/util/format.c      |   1 +
  tests/util/pattern.c     | 260 +++++++++++++++++++++++++++++++++++++++
- 4 files changed, 272 insertions(+), 1 deletion(-)
+ 4 files changed, 273 insertions(+), 1 deletion(-)
 
 diff --git a/include/drm/drm_fourcc.h b/include/drm/drm_fourcc.h
 index 1b1eabe..0644709 100644
 --- a/include/drm/drm_fourcc.h
 +++ b/include/drm/drm_fourcc.h
-@@ -459,6 +459,13 @@ extern "C" {
+@@ -459,6 +459,14 @@ extern "C" {
  #define DRM_FORMAT_YUV444	fourcc_code('Y', 'U', '2', '4') /* non-subsampled Cb (1) and Cr (2) planes */
  #define DRM_FORMAT_YVU444	fourcc_code('Y', 'V', '2', '4') /* non-subsampled Cr (1) and Cb (2) planes */
  
@@ -31,9 +31,10 @@ index 1b1eabe..0644709 100644
 + * index 2: Cr plane, [31:0] x:Cr2:Cr1:Cr0 [2:10:10:10] little endian
 + */
 +#define DRM_FORMAT_X403		fourcc_code('X', '4', '0', '3') /* non-subsampled Cb:Cr plane, 10 bit per channel */
- 
++
  /*
-  * Format Modifiers:
+  * Y-only (greyscale) formats
+  *
 diff --git a/tests/modetest/buffers.c b/tests/modetest/buffers.c
 index d1b7075..4181893 100644
 --- a/tests/modetest/buffers.c
@@ -377,4 +378,3 @@ index 7a3c2ab..cf488cf 100644
  			 planes[2], width, height, stride);
 -- 
 2.54.0
-

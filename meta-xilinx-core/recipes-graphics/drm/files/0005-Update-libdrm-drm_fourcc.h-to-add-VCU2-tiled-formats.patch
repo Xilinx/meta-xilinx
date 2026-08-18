@@ -93,7 +93,7 @@ index 0644709..b259947 100644
 +
  
  /*
-  * Format Modifiers:
+  * Y-only (greyscale) formats
 @@ -1039,7 +1066,7 @@ extern "C" {
   * which corresponds to the "generic" kind used for simple single-sample
   * uncompressed color formats on Fermi - Volta GPUs.
@@ -105,4 +105,3 @@ index 0644709..b259947 100644
  	if (!(modifier & 0x10) || (modifier & (0xff << 12)))
 -- 
 2.54.0
-

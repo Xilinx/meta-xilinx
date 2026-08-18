@@ -8,7 +8,7 @@ Linux version 6.17.
 
 Add support for some 10,12 bpc YUV 422, 420 and Y-only formats.
 
-Update libdrm core with new S410 and S412 formats.
+The core format definitions are already provided by libdrm 2.4.134.
 
 Add modetest support for corresponding framebuffers formats.
 
@@ -18,59 +18,11 @@ Signed-off-by: Anatoliy Klymenko <anatoliy.klymenko@amd.com>
 
 Upstream-Status: Pending
 ---
- include/drm/drm_fourcc.h |  36 ++++
  tests/modetest/buffers.c |  34 ++++
  tests/util/format.c      |  13 ++
  tests/util/pattern.c     | 371 ++++++++++++++++++++++++++++-----------
- 4 files changed, 349 insertions(+), 105 deletions(-)
+ 3 files changed, 313 insertions(+), 105 deletions(-)
 
-diff --git a/include/drm/drm_fourcc.h b/include/drm/drm_fourcc.h
-index b259947..6d31626 100644
---- a/include/drm/drm_fourcc.h
-+++ b/include/drm/drm_fourcc.h
-@@ -467,6 +467,42 @@ extern "C" {
- #define DRM_FORMAT_YUV444	fourcc_code('Y', 'U', '2', '4') /* non-subsampled Cb (1) and Cr (2) planes */
- #define DRM_FORMAT_YVU444	fourcc_code('Y', 'V', '2', '4') /* non-subsampled Cr (1) and Cb (2) planes */
- 
-+/*
-+ * 3 plane YCbCr LSB aligned
-+ * In order to use these formats in a similar fashion to MSB aligned ones
-+ * implementation can multiply the values by 2^6=64. For that reason the padding
-+ * must only contain zeros.
-+ * index 0 = Y plane, [15:0] z:Y [6:10] little endian
-+ * index 1 = Cr plane, [15:0] z:Cr [6:10] little endian
-+ * index 2 = Cb plane, [15:0] z:Cb [6:10] little endian
-+ */
-+#define DRM_FORMAT_S010	fourcc_code('S', '0', '1', '0') /* 2x2 subsampled Cb (1) and Cr (2) planes 10 bits per channel */
-+#define DRM_FORMAT_S210	fourcc_code('S', '2', '1', '0') /* 2x1 subsampled Cb (1) and Cr (2) planes 10 bits per channel */
-+#define DRM_FORMAT_S410	fourcc_code('S', '4', '1', '0') /* non-subsampled Cb (1) and Cr (2) planes 10 bits per channel */
-+
-+/*
-+ * 3 plane YCbCr LSB aligned
-+ * In order to use these formats in a similar fashion to MSB aligned ones
-+ * implementation can multiply the values by 2^4=16. For that reason the padding
-+ * must only contain zeros.
-+ * index 0 = Y plane, [15:0] z:Y [4:12] little endian
-+ * index 1 = Cr plane, [15:0] z:Cr [4:12] little endian
-+ * index 2 = Cb plane, [15:0] z:Cb [4:12] little endian
-+ */
-+#define DRM_FORMAT_S012	fourcc_code('S', '0', '1', '2') /* 2x2 subsampled Cb (1) and Cr (2) planes 12 bits per channel */
-+#define DRM_FORMAT_S212	fourcc_code('S', '2', '1', '2') /* 2x1 subsampled Cb (1) and Cr (2) planes 12 bits per channel */
-+#define DRM_FORMAT_S412	fourcc_code('S', '4', '1', '2') /* non-subsampled Cb (1) and Cr (2) planes 12 bits per channel */
-+
-+/*
-+ * 3 plane YCbCr
-+ * index 0 = Y plane, [15:0] Y little endian
-+ * index 1 = Cr plane, [15:0] Cr little endian
-+ * index 2 = Cb plane, [15:0] Cb little endian
-+ */
-+#define DRM_FORMAT_S016	fourcc_code('S', '0', '1', '6') /* 2x2 subsampled Cb (1) and Cr (2) planes 16 bits per channel */
-+#define DRM_FORMAT_S216	fourcc_code('S', '2', '1', '6') /* 2x1 subsampled Cb (1) and Cr (2) planes 16 bits per channel */
-+#define DRM_FORMAT_S416	fourcc_code('S', '4', '1', '6') /* non-subsampled Cb (1) and Cr (2) planes 16 bits per channel */
-+
- /* tile formats */
- #define DRM_FORMAT_T5M8  fourcc_code('T', '5', 'M', '8') /* Y/CbCr 4:0:0 8-bit 32x4 tiles */
- #define DRM_FORMAT_T5MA  fourcc_code('T', '5', 'M', 'A') /* Y/CbCr 4:0:0 10-bit 32x4 tiles */
 diff --git a/tests/modetest/buffers.c b/tests/modetest/buffers.c
 index 4181893..9c10cc2 100644
 --- a/tests/modetest/buffers.c
@@ -594,4 +546,3 @@ index cf488cf..608f256 100644
  	case DRM_FORMAT_XRGB4444:
 -- 
 2.54.0
-
