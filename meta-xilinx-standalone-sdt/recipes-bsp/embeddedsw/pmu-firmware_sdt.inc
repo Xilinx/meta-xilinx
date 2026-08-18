@@ -1,4 +1,4 @@
-inherit esw
+inherit esw nopackages
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/zynqmp_pmufw/src"
 

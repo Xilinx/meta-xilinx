@@ -49,6 +49,7 @@ do_install() {
     :
 }
 
+inherit nopackages
 PACKAGES = ""
 
 ESW_COMPONENT = "plm.elf"

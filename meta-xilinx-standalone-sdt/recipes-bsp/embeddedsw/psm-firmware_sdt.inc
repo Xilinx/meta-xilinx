@@ -1,4 +1,4 @@
-inherit esw
+inherit esw nopackages
 
 DEPENDS += "xilstandalone libxil xiltimer"
 
