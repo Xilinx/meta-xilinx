@@ -1,0 +1,54 @@
+reserved-memory:
+  ranges: true
+  "#size-cells": 2
+  "#address-cells": 2
+  vdev0vring0@9880000:
+    { label: vdev0vring0, start: 0x9880000, size: 0x4000, no-map: 1 }
+  vdev0vring1@9884000:
+    { label: vdev0vring1, start: 0x9884000, size: 0x4000, no-map: 1 }
+  vdev0buffer@9888000:
+    { label: vdev0buffer, start: 0x9888000, size: 0x78000, no-map: 1 }
+  trace@985f000:
+    label: trace_buffer
+    start: 0x0985f000
+    size: 0x1000
+    no-map: 1
+    mpu-policy: [ readable, writable ]
+  rproc0@9800000:
+    label: rproc0
+    start: 0x09800000
+    size: 0x20000
+    no-map: 1
+    mpu-policy: [ readable, writable, executable, cacheable, static ]
+  rsctbl@9820000:
+    label: rsctbl
+    start: 0x09820000
+    size: 0x100
+    no-map: 1
+    mpu-policy: [ readable, writable ]
+
+chosen:
+  zephyr,ram-console: /reserved-memory/trace@985f000
+
+domains:
+  APU_Linux: # host in channel from a72-0
+    compatible: openamp,domain-v1
+    reserved-memory: [ vdev0buffer@9888000, vdev0vring1@9884000,
+                       vdev0vring0@9880000, rproc0@9800000,
+                       trace@985f000, rsctbl@9820000 ]
+    domain-to-domain:
+      compatible: openamp,domain-to-domain-v1
+      remoteproc-relation:
+        compatible: openamp,remoteproc-v2
+        relation0:
+          remote: R5_0_ZEPHYR
+          elfload: [ psv_r5_0_atcm_global@ffe00000,
+                     psv_r5_0_btcm_global@ffe20000, rproc0@9800000,
+                     trace@985f000, rsctbl@9820000 ]
+      rpmsg-relation:
+        compatible: openamp,rpmsg-v1
+        relation0:
+          remote: R5_0_ZEPHYR
+          carveouts: [ vdev0vring0@9880000, vdev0vring1@9884000,
+                       vdev0buffer@9888000 ]
+          mbox: ipi_3_to_ipi_1

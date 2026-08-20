@@ -1,0 +1,47 @@
+axi:
+  ps_wizard_0_pmcps_0_psv_r5_0_atcm:
+    start: 0x0
+    size: 0x10000
+    reg: [ 0x0, 0x0, 0x0, 0x10000 ]
+    mpu-policy: [ readable, writable, executable, cacheable, static ]
+  ps_wizard_0_pmcps_0_psv_r5_0_btcm:
+    start: 0x20000
+    size: 0x10000
+    reg: [ 0x0, 0x20000, 0x0, 0x10000 ]
+    mpu-policy: [ readable, writable, cacheable ]
+
+domains:
+  R5_0_ZEPHYR:
+    compatible: openamp,domain-v1
+    zephyr-version: "4.3"
+    sram:
+      - { dev: rproc0@9800000, start: 0x9800000, size: 0x20000 }
+      - { dev: ps_wizard_0_pmcps_0_psv_r5_0_atcm@0, start: 0x0, size: 64K }
+      - { dev: ps_wizard_0_pmcps_0_psv_r5_0_btcm@20000, start: 0x20000, size: 64K }
+    reserved-memory: [ vdev0buffer@9888000, vdev0vring1@9884000,
+                       vdev0vring0@9880000, rproc0@9800000,
+                       trace@985f000, rsctbl@9820000 ]
+    domain-to-domain:
+      compatible: openamp,domain-to-domain-v1
+      rpmsg-relation:
+        compatible: openamp,rpmsg-v1
+        relation0:
+          host: APU_Linux
+          mbox: ipi_1_to_ipi_3
+          carveouts: [ vdev0vring0@9880000, vdev0vring1@9884000,
+                       vdev0buffer@9888000 ]
+    linker:
+      linker_file_output_name: openamp-zephyr.ld
+      linker_memories: [ ps_wizard_0_pmcps_0_psv_r5_0_atcm,
+                         ps_wizard_0_pmcps_0_psv_r5_0_btcm, rproc0, rsctbl ]
+      entry: _vector_table
+      sections:
+        vector_table: { region: ps_wizard_0_pmcps_0_psv_r5_0_atcm, offset: 0 }
+        text: { region: rproc0 }
+        rodata: { region: rproc0 }
+        data: { region: ps_wizard_0_pmcps_0_psv_r5_0_btcm }
+        bss: { region: ps_wizard_0_pmcps_0_psv_r5_0_btcm }
+        noinit: { region: ps_wizard_0_pmcps_0_psv_r5_0_btcm }
+        heap: { region: ps_wizard_0_pmcps_0_psv_r5_0_btcm }
+        stack: { region: ps_wizard_0_pmcps_0_psv_r5_0_btcm }
+        resource_table: { region: rsctbl, offset: 0 }
