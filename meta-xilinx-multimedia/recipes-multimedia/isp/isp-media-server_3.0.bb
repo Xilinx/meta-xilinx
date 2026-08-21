@@ -6,10 +6,10 @@ COMPATIBLE_HOST = ".*-linux"
 
 S = "${UNPACKDIR}"
 
-SRC_URI = "https://edf.amd.com/sswreleases/isp-media-server/2026.2/08052026/isp-media-server_08052026.tar.gz"
-SRC_URI[sha256sum] = "044c58c3b5676fae1425cefee582f67d980ca8466b39182108ba757259084a09"
+SRC_URI = "https://edf.amd.com/sswreleases/isp-media-server/2026.2/08202026/isp-media-server_08202026.tar.gz"
+SRC_URI[sha256sum] = "76ddd0fa222d51ba7060b2c5d886832fec2360b5eb10ac1a55373b3e2ccb0736"
 
-RDEPENDS:${PN} += "kernel-module-isp"
+RDEPENDS:${PN} += "kernel-module-isp libdrm"
 
 do_install() {
     install -d ${D}${libdir}
@@ -18,6 +18,15 @@ do_install() {
     install -d ${D}${datadir}
 
     cp -r ${UNPACKDIR}/Tuning_files ${D}${datadir}
+
+    # Fmcconfig.bin ships in the tarball's isp_bin/ dir; install it alongside
+    # the RPU firmware blobs from isp-firmware, since consumers look for it there.
+    if [ -e ${S}/isp_bin/Fmcconfig.bin ]; then
+        install -d ${D}${base_libdir}/firmware
+        install -Dm 0644 ${S}/isp_bin/Fmcconfig.bin ${D}${base_libdir}/firmware/Fmcconfig.bin
+    else
+        bbwarn "isp-media-server: isp_bin/Fmcconfig.bin is missing from this drop; it is optional, continuing build without it"
+    fi
 
     # Make sure necessary symlinks are created
     for fullso in *.so.*.* *.so.* *.so ; do
@@ -41,9 +50,20 @@ do_install() {
 
     # Install binary
     install -m 0755 *isp_media_server ${D}${bindir}/
+
+    if [ -e ${S}/isp_bin/video_test ]; then
+        install -m 0755 ${S}/isp_bin/video_test ${D}${bindir}/
+    else
+        bbwarn "isp-media-server: isp_bin/video_test is missing from this drop; it is optional, continuing build without it"
+    fi
+    if [ -e ${S}/isp_bin/vsi-ctl ]; then
+        install -m 0755 ${S}/isp_bin/vsi-ctl ${D}${bindir}/
+    else
+        bbwarn "isp-media-server: isp_bin/vsi-ctl is missing from this drop; it is optional, continuing build without it"
+    fi
 }
 
-FILES:${PN} += "${libdir}/*.so* ${bindir}/*isp_media_server ${datadir}/Tuning_files/*"
+FILES:${PN} += "${libdir}/*.so* ${bindir}/*isp_media_server ${bindir}/video_test ${bindir}/vsi-ctl ${datadir}/Tuning_files/* ${base_libdir}/firmware/Fmcconfig.bin"
 
 # Disable all QA checks and stripping
 INSANE_SKIP:${PN} += "already-stripped ldflags"
