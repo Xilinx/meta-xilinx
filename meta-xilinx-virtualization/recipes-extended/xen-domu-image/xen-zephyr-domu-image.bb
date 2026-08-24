@@ -16,6 +16,8 @@ COMPATIBLE_MACHINE:versal = "${MACHINE}"
 COMPATIBLE_MACHINE:versal-2ve-2vm = "${MACHINE}"
 COMPATIBLE_MACHINE:versal-2vp = "${MACHINE}"
 
+S = "${UNPACKDIR}"
+
 do_configure() {
 	:
 }
@@ -36,3 +38,5 @@ FILES:${PN} += " \
     /boot/* \
     ${sysconfdir}/xen/zephyr-synchronization-xenvmgicv3.cfg \
     "
+
+CONFFILES:${PN} += "${sysconfdir}/xen/zephyr-synchronization-xenvmgicv3.cfg"
