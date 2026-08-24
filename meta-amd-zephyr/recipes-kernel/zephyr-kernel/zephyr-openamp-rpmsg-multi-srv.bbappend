@@ -24,6 +24,7 @@ COMPATIBLE_MACHINE:zynqmp = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') 
 COMPATIBLE_MACHINE:versal = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') == 'versal_rpu' else '^$'}"
 COMPATIBLE_MACHINE:versal-net = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') == 'versalnet_rpu' else '^$'}"
 COMPATIBLE_MACHINE:versal-2ve-2vm = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') == 'versal2_rpu' else '^$'}"
+COMPATIBLE_MACHINE:versal-2vp = "${@d.getVar('MACHINE') if d.getVar('ZEPHYR_BOARD') == 'versal_rpu' else '^$'}"
 
 # ZEPHYR_MAKE_OUTPUT is "rpmsg_multi_services.elf", so replacing "zephyr"
 # leaves both output_img and output_img_link unchanged.  Avoid replacing the
