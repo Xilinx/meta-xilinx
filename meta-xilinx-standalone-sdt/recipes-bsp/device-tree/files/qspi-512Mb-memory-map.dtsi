@@ -83,3 +83,36 @@
 		};
 	};
 };
+
+/ {
+	/* System-ready metadata partitions for bank0 and bank1 with uuid info */
+	firmware {
+		fwu-mdata {
+			compatible = "u-boot,fwu-mdata-mtd";
+			fwu-mdata-store = <&qspi_flash>;
+			mdata-parts = "SystemReady-DT Update Metadata", "SystemReady-DT Update Metadata Backup";
+
+			fwu-bank0 {
+				id = <0>;
+				label = "Bank A Space";
+				fwu-image0 {
+					id = <0>;
+					offset = <0>;
+					size = <0x1000000>;
+					uuid = "0b931b7e-b2f6-11ef-8565-eb65d140066b";
+				};
+			};
+
+			fwu-bank1 {
+				id = <1>;
+				label = "Bank B Space";
+				fwu-image0 {
+					id = <0>;
+					offset = <0>;
+					size = <0x1000000>;
+					uuid = "1243d800-b2f6-11ef-8f4f-8bddc3aa326d";
+				};
+			};
+		};
+	};
+};
