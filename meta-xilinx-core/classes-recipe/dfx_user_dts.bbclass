@@ -369,7 +369,7 @@ do_install() {
 do_install:append() {
     # Versal-only: only these families carry image-header UUIDs.
     case "${SOC_FAMILY}" in
-        versal|versal-net|versal-2ve-2vm) ;;
+        versal|versal-net|versal-2ve-2vm|versal-2vp) ;;
         *) return ;;
     esac
 
