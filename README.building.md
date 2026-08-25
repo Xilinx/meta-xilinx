@@ -32,18 +32,11 @@ $ git clone -b <release-branch> https://git.openembedded.org/meta-openembedded
 $ git clone -b <release-branch> https://git.yoctoproject.org/meta-virtualization
 $ git clone -b <release-branch> https://git.yoctoproject.org/meta-arm
 $ git clone -b <release-branch> https://github.com/OpenAMP/meta-openamp
-$ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx --recurse-submodules
+$ git clone -b <rel-version> https://github.com/Xilinx/meta-xilinx
+$ git clone -b xlnx_rel_v2026.1-wrynose https://github.com/Xilinx/gen-machine-conf
 ```
-> **Note:**
-> * When meta-xilinx layer is cloned using git tool by default it will clone
-> [gen-machine-conf](https://github.com/Xilinx/gen-machine-conf.git) repo as
-> submodules, If you don't need to clone gen-machine-conf repo then remove
-> `--recurse-submodules` option.
-> * Skip this step if you are using yocto-manifests https://github.com/Xilinx/yocto-manifests
-> * If you are using pre-built target machines then clone these layers and add
->   these layers in step 4. For more details see meta layer README files.
->   * [meta-amd-adaptive-socs-bsp README](https://github.com/Xilinx/meta-amd-adaptive-socs/blob/master/meta-amd-adaptive-socs-bsp/README.asoc.bsp.md)
->   * [meta-kria README](https://github.com/Xilinx/meta-kria/blob/master/README.kria.bsp.md)
+> **Note:** gen-machine-conf above is a tool to generate machines, while
+> optional, it is recommended.
 
 3. Initialize a build environment using the `oe-init-build-env` script. 
 ```
