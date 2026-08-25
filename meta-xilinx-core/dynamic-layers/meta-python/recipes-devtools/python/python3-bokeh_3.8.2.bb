@@ -12,20 +12,21 @@ DEPENDS += " \
 	python3-setuptools-git-versioning-native \
 	"
 
-SRC_URI[sha256sum] = "21dbe86842b24d83c73a1aef2de346a1a7c11c437015d6e9d180a1637e6e8197"
+PYPI_PACKAGE = "bokeh"
 
 inherit pypi python_setuptools_build_meta
 
+SRC_URI[sha256sum] = "8e7dcacc21d53905581b54328ad2705954f72f2997f99fc332c1de8da53aa3cc"
+
 RDEPENDS:${PN} = " \
-	python3-colorama \
 	python3-contourpy \
 	python3-jinja2 \
+	python3-narwhals \
 	python3-numpy \
 	python3-packaging \
 	python3-pandas \
 	python3-pillow \
 	python3-pyyaml \
 	python3-tornado \
-	python3-typing-extensions \
 	python3-xyzservices \
 	"
