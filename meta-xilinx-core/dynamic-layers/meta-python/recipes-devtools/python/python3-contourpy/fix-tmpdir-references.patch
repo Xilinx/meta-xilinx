@@ -1,0 +1,40 @@
+Signed-off-by: Zoltán Böszörményi <zboszor@gmail.com>
+Upstream-Status: Inappropriate [Yocto specific]
+
+diff -durpN contourpy-1.3.2.old/lib/contourpy/util/_build_config.py.in contourpy-1.3.2/lib/contourpy/util/_build_config.py.in
+--- contourpy-1.3.2.old/lib/contourpy/util/_build_config.py.in	2025-04-15 17:59:49.000000000 +0200
++++ contourpy-1.3.2/lib/contourpy/util/_build_config.py.in	2025-05-16 15:04:06.715019752 +0200
+@@ -16,7 +16,7 @@ def build_config() -> dict[str, str]:
+         # Python settings
+         python_version="@python_version@",
+         python_install_dir=r"@python_install_dir@",
+-        python_path=r"@python_path@",
++        python_path=r"python3",
+ 
+         # Package versions
+         contourpy_version="@contourpy_version@",
+@@ -26,12 +26,12 @@ def build_config() -> dict[str, str]:
+ 
+         # Misc meson settings
+         meson_backend="@meson_backend@",
+-        build_dir=r"@build_dir@",
+-        source_dir=r"@source_dir@",
++        build_dir=r"",
++        source_dir=r"",
+         cross_build="@cross_build@",
+ 
+         # Build options
+-        build_options=r"@build_options@",
++        build_options=r"",
+         buildtype="@buildtype@",
+         cpp_std="@cpp_std@",
+         debug="@debug@",
+@@ -44,7 +44,7 @@ def build_config() -> dict[str, str]:
+         compiler_name="@compiler_name@",
+         compiler_version="@compiler_version@",
+         linker_id="@linker_id@",
+-        compile_command="@compile_command@",
++        compile_command="",
+ 
+         # Host machine
+         host_cpu="@host_cpu@",
