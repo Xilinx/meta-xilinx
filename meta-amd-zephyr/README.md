@@ -72,11 +72,6 @@ This layer depends on:
 	layers: meta-xilinx-core, meta-microblaze.
 	branch: wrynose
 
-	URI:
-        https://git.yoctoproject.org/meta-virtualization (official version)
-        https://github.com/Xilinx/meta-virtualization (development and AMD release)
-	branch: wrynose
-
 	URI: https://git.yoctoproject.org/meta-arm
 	layers: meta-arm, meta-arm-toolchain
 	branch: wrynose
