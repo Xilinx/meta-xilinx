@@ -1,5 +1,7 @@
-# This version extension should match CONFIG_LOCALVERSION in defconfig
-LINUX_VERSION_EXTENSION ?= "-xilinx"
+# CONFIG_LOCALVERSION is supplied from this value by kernel-yocto.bbclass,
+# not from defconfig.
+KERNEL_SRCREV_SUFFIX = "${@'-g%s' % (d.getVar('SRCREV_machine') or '')[:12] if (d.getVar('SRCREV_machine') or '').isalnum() else ''}"
+LINUX_VERSION_EXTENSION ?= "-xilinx${KERNEL_SRCREV_SUFFIX}"
 PV = "${LINUX_VERSION}+git"
 
 # Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
@@ -108,3 +110,5 @@ SRC_URI:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'fi
 KERNEL_FEATURES_KPROBES = " features/kprobes"
 
 KERNEL_FEATURES:append = "${KERNEL_FEATURES_KPROBES}"
+
+KERNEL_FEATURES:append = " features/base/xilinx-base.scc"
