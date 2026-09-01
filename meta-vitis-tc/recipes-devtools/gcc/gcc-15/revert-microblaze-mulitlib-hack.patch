@@ -1,0 +1,31 @@
+Revert Microblaze Mulitlib hack
+
+We do not want the original change applied when building the vitis-tc
+as we need proper multilib support.
+
+Upstream-Status: Inappropriate [AMD Microblaze specific]
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
+Index: gcc-15.3.0/gcc/config/microblaze/t-microblaze
+===================================================================
+--- gcc-15.3.0.orig/gcc/config/microblaze/t-microblaze
++++ gcc-15.3.0/gcc/config/microblaze/t-microblaze
+@@ -1,6 +1,5 @@
+ MULTILIB_OPTIONS = m64 mxl-barrel-shift mlittle-endian mno-xl-soft-mul mxl-multiply-high
+-#MULTILIB_DIRNAMES = m64 bs le m mh
+-MULTILIB_DIRNAMES = . . . . .
++MULTILIB_DIRNAMES = m64 bs le m mh
+ MULTILIB_EXCEPTIONS = *m64/mxl-multiply-high mxl-multiply-high
+ MULTILIB_EXCEPTIONS += *m64
+ MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift
+Index: gcc-15.3.0/gcc/config/microblaze/t-microblaze-linux
+===================================================================
+--- gcc-15.3.0.orig/gcc/config/microblaze/t-microblaze-linux
++++ gcc-15.3.0/gcc/config/microblaze/t-microblaze-linux
+@@ -1,4 +1,3 @@
+ MULTILIB_OPTIONS = mxl-barrel-shift mno-xl-soft-mul mxl-multiply-high
+-#MULTILIB_DIRNAMES = bs m mh
+-MULTILIB_DIRNAMES = . . .
++MULTILIB_DIRNAMES = bs m mh
+ MULTILIB_EXCEPTIONS = *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high

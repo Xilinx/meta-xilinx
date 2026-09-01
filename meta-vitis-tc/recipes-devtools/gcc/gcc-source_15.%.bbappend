@@ -1,4 +1,8 @@
 FILESEXTRAPATHS:append := ":${THISDIR}/gcc-15"
+
+#        file://additional-microblaze-multilibs.patch \
+#
+
 SRC_URI += " \
-        file://additional-microblaze-multilibs.patch \
+    file://revert-microblaze-mulitlib-hack.patch \
 "
