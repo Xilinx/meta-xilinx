@@ -20,7 +20,6 @@ SRC_URI_RISCV = "\
     ${@bb.utils.contains("TUNE_FEATURES", "zicbom", "file://u-boot-riscv-isa_zicbom.cfg", "", d)} \
     "
 
-SRC_URI:append:riscv32 = "${SRC_URI_RISCV}"
 SRC_URI:append:riscv64 = "${SRC_URI_RISCV}"
 
 # Include microblaze-v-generic.cfg file for 2026.01 and later versions of

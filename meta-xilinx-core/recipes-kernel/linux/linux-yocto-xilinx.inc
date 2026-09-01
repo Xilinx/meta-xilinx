@@ -9,9 +9,6 @@ COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 KMACHINE:zynqmp = "zynqmp"
 
 # MicroBlaze-v default generic KMACHINE
-COMPATIBLE_MACHINE:riscv32 = "${MACHINE}"
-KMACHINE:riscv32 = "${TUNE_RISCV_ARCH}"
-
 COMPATIBLE_MACHINE:riscv64 = "${MACHINE}"
 KMACHINE:riscv64 = "${TUNE_RISCV_ARCH}"
 
@@ -26,5 +23,4 @@ SRC_URI_RISCV = "\
     ${@bb.utils.contains(    "TUNE_FEATURES", "zicbom",      "file://risc-v-isa-zicbom.cfg",   "", d)} \
     "
 
-SRC_URI:append:riscv32 = "${SRC_URI_RISCV}"
 SRC_URI:append:riscv64 = "${SRC_URI_RISCV}"

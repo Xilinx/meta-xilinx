@@ -1,11 +1,10 @@
 # kernel-yocto.bbclass supports resolving KERNEL_FEATURES entries against
 # in-tree config fragments (arch/${ARCH}/configs and kernel/configs), see:
 # https://git.openembedded.org/openembedded-core/commit/meta/classes-recipe/kernel-yocto.bbclass?h=wrynose&id=e4e50a9a93d606ba5fef8f10f1ec20deaed7ab9c
-# This lets us reference linux-xlnx/arch/riscv/configs/{32,64}-bit.config
-# and amd.config directly, instead of keeping local riscv-32-bit.cfg,
-# riscv-64-bit.cfg and riscv-amd.cfg copies in sync with the kernel
-# source via a separate do_compare_config_files sanity check.
-KERNEL_FEATURES:append:riscv32 = " 32-bit.config"
+# This lets us reference linux-xlnx/arch/riscv/configs/64-bit.config
+# and amd.config directly, instead of keeping local riscv-64-bit.cfg
+# and riscv-amd.cfg copies in sync with the kernel source via a
+# separate do_compare_config_files sanity check.
 KERNEL_FEATURES:append:riscv64 = " 64-bit.config"
 KERNEL_FEATURES:append = " amd.config"
 

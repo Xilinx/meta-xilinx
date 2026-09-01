@@ -6,7 +6,6 @@ OVERRIDES .= ":qemuboot-xilinx"
 QB_RNG = ""
 
 DEFAULT_QB_SYSTEM_NAME = "qemu-system-amd-fpga-multiarch"
-DEFAULT_QB_SYSTEM_NAME:microblaze-v:riscv32 = "qemu-system-riscv32"
 DEFAULT_QB_SYSTEM_NAME:microblaze-v:riscv64 = "qemu-system-riscv64"
 QB_SYSTEM_NAME ?= "${DEFAULT_QB_SYSTEM_NAME}"
 

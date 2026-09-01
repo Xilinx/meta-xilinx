@@ -34,7 +34,6 @@ SRC_URI_RISCV = "\
     ${@bb.utils.contains(    "TUNE_FEATURES", "zicbom",      "file://risc-v-isa-zicbom.cfg",   "", d)} \
     "
 
-SRC_URI:append:riscv32 = "${SRC_URI_RISCV}"
 SRC_URI:append:riscv64 = "${SRC_URI_RISCV}"
 
 SRCREV_machine ?= "${SRCREV}"
@@ -69,7 +68,6 @@ inherit kernel-simpleimage
 
 # Default to be only compatible with specific machines or soc families
 COMPATIBLE_MACHINE ?= "^$"
-COMPATIBLE_MACHINE:riscv32 = ".*"
 COMPATIBLE_MACHINE:riscv64 = ".*"
 COMPATIBLE_MACHINE:zynq = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
@@ -81,7 +79,6 @@ COMPATIBLE_MACHINE:versal-2vp = ".*"
 # Use DEFCONFIGs for configuring linux-xlnx kernels
 KCONFIG_MODE ?= "alldefconfig"
 KBUILD_DEFCONFIG_DEFAULT ?= ""
-KBUILD_DEFCONFIG_DEFAULT:riscv32 ?= "defconfig"
 KBUILD_DEFCONFIG_DEFAULT:riscv64 ?= "defconfig"
 KBUILD_DEFCONFIG_DEFAULT:zynq ?= "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG_DEFAULT:zynqmp ?= "xilinx_defconfig"

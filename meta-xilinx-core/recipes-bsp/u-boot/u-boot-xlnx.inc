@@ -10,7 +10,6 @@ require recipes-bsp/u-boot/u-boot.inc
 DEPENDS += "bc-native dtc-native python3-setuptools-native bison-native xxd-native"
 
 # RISC-V U-boot depends on opensbi
-DEPENDS:append:riscv32 = " opensbi"
 DEPENDS:append:riscv64 = " opensbi"
 
 require u-boot-xlnx-common.inc
@@ -38,7 +37,6 @@ UBOOT_USER_SPECIFIED_TEXT_BASE ?= ""
 
 EXTRA_OEMAKE += "${@'EXT_DTB=${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_FILE_NAME}' if (d.getVar('DTB_FILE_NAME') != '' and d.getVar('UBOOT_USER_SPECIFIED_DTS') == '') else '' }"
 EXTRA_OEMAKE += "${@'DEVICE_TREE=${UBOOT_USER_SPECIFIED_DTS}' if (d.getVar('UBOOT_USER_SPECIFIED_DTS') != '') else '' }"
-EXTRA_OEMAKE:append:riscv32 = " ${@'OPENSBI=${RECIPE_SYSROOT}/share/opensbi/ilp32/generic/firmware/fw_dynamic.bin'}"
 EXTRA_OEMAKE:append:riscv64 = " ${@'OPENSBI=${RECIPE_SYSROOT}/share/opensbi/lp64/generic/firmware/fw_dynamic.bin'}"
 
 python __anonymous () {
@@ -54,7 +52,6 @@ DEFAULT_ARCH_DTS_DIR = ""
 DEFAULT_ARCH_DTS_DIR:arm = "arm"
 DEFAULT_ARCH_DTS_DIR:aarch64 = "arm"
 DEFAULT_ARCH_DTS_DIR:microblazeel = "microblaze"
-DEFAULT_ARCH_DTS_DIR:riscv32 = "riscv"
 DEFAULT_ARCH_DTS_DIR:riscv64 = "riscv"
 ARCH_DTS_DIR ?= "${DEFAULT_ARCH_DTS_DIR}"
 
