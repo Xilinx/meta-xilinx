@@ -78,6 +78,11 @@ reserved-memory:
     no-map: 1
     start: 0x1e4a8000
     size: 256K
+  isp_sensor_bin@1e4e8000:
+    label: isp_sensor_bin
+    no-map: 1
+    start: 0x1e4e8000
+    size: 64K
   vring@1fff7000:
     label: isp_vring
     no-map: 1
@@ -128,4 +133,5 @@ domains:
       - rpu9-hal-mem-pri@1d0a6000
       - isp_mbox_buffer@1e0a8000
       - rpu-shared-mem@1e4a8000
+      - isp_sensor_bin@1e4e8000
       - vring@1fff7000
