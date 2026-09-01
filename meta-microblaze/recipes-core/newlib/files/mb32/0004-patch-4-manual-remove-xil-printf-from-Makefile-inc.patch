@@ -1,0 +1,27 @@
+From 3e582d820e277b66651e34a9819eb7869e2b5761 Mon Sep 17 00:00:00 2001
+From: Aayush Misra <aayushm@amd.com>
+Date: Tue, 23 Jun 2026 04:10:24 +0530
+Subject: [PATCH 04/11] patch 4 manual: remove xil_printf from Makefile.inc
+
+Co-authored-by: Cursor <cursoragent@cursor.com>
+Upstream-Status: Inappropriate [Xilinx local]
+---
+ libgloss/microblaze/Makefile.inc | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/libgloss/microblaze/Makefile.inc b/libgloss/microblaze/Makefile.inc
+index ca1e8bf83..67f134016 100644
+--- a/libgloss/microblaze/Makefile.inc
++++ b/libgloss/microblaze/Makefile.inc
+@@ -81,7 +81,6 @@ multilibtool_LIBRARIES += %D%/libgloss.a
+ 	%D%/_program_init.S \
+ 	%D%/xil_malloc.c \
+ 	%D%/xil_sbrk.c \
+-	%D%/xil_printf.c
+ 
+ multilibtool_LIBRARIES += %D%/libgloss-linux.a
+ %C%_libgloss_linux_a_SOURCES = \
+-- 
+2.43.7
+
+
