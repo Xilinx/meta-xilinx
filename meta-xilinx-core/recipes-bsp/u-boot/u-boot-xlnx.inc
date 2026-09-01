@@ -30,6 +30,12 @@ DTB_FILE_NAME ?= ""
 # Example: UBOOT_USER_SPECIFIED_DTS = "versal-vck190-revA-x-ebm-01-revA"
 UBOOT_USER_SPECIFIED_DTS ?= ""
 
+# This variable can be used to override CONFIG_TEXT_BASE in the generated
+# ${B}/.config for all targets. Leave unset/empty to keep the value
+# already present in the .config as-is.
+# Example: UBOOT_USER_SPECIFIED_TEXT_BASE = "0x8000000"
+UBOOT_USER_SPECIFIED_TEXT_BASE ?= ""
+
 EXTRA_OEMAKE += "${@'EXT_DTB=${RECIPE_SYSROOT}/${DTB_PATH}/${DTB_FILE_NAME}' if (d.getVar('DTB_FILE_NAME') != '' and d.getVar('UBOOT_USER_SPECIFIED_DTS') == '') else '' }"
 EXTRA_OEMAKE += "${@'DEVICE_TREE=${UBOOT_USER_SPECIFIED_DTS}' if (d.getVar('UBOOT_USER_SPECIFIED_DTS') != '') else '' }"
 EXTRA_OEMAKE:append:riscv32 = " ${@'OPENSBI=${RECIPE_SYSROOT}/share/opensbi/ilp32/generic/firmware/fw_dynamic.bin'}"
@@ -57,6 +63,13 @@ do_configure:prepend () {
         bbfatal "Uboot user specified dts (${UBOOT_USER_SPECIFIED_DTS}.dts) is not found in \
 the${S}/arch/${ARCH_DTS_DIR}/dts directory, you need to patch dts file to u-boot source and use this configuration. \
 For more details refer https://u-boot.readthedocs.io/en/latest/develop/devicetree/control.html#configuration "
+    fi
+}
+
+do_configure:append () {
+    if [ -f "${B}/.config" ] && [ -n "${UBOOT_USER_SPECIFIED_TEXT_BASE}" ]; then
+        sed -i "s/^CONFIG_TEXT_BASE=.*/CONFIG_TEXT_BASE=${UBOOT_USER_SPECIFIED_TEXT_BASE}/" "${B}/.config"
+        bbnote "Found ${B}/.config file, updated CONFIG_TEXT_BASE to ${UBOOT_USER_SPECIFIED_TEXT_BASE}"
     fi
 }
 
