@@ -1,0 +1,58 @@
+From: MicroBlaze toolchain integration
+Subject: [PATCH] libstdc++: build fast_float without a 128-bit integer type
+
+fast_float infers a 64-bit platform from SIZE_MAX when it does not recognise the
+architecture, which is the case for MicroBlaze-64, and then full_multiplication
+requires __uint128_t with "#error Not implemented" as the only alternative.
+MB-64 has no TImode support, so libstdc++ cannot be built for the m64 multilibs.
+
+The file already carries a portable 64x64 -> 128 multiplication, used on 32-bit
+targets. Make it available whenever no 128-bit integer type exists (except under
+Visual Studio, which supplies _umul128 as an intrinsic) and select it in
+full_multiplication. scalar_mul already routes through full_multiplication when
+__SIZEOF_INT128__ is undefined, so nothing else needs changing.
+
+This is a portability fix rather than a MicroBlaze one: any 64-bit target without
+__int128 hits it.
+
+Apply to the GCC tree.
+
+Upstream-Status: Pending
+
+--- a/libstdc++-v3/src/c++17/fast_float/fast_float.h
++++ b/libstdc++-v3/src/c++17/fast_float/fast_float.h
+@@ -241,7 +241,9 @@
+ #endif
+ }
+ 
+-#ifdef FASTFLOAT_32BIT
++// A 64-bit target without a 128-bit integer type needs the emulation too.
++#if defined(FASTFLOAT_32BIT) \
++    || (!defined(__SIZEOF_INT128__) && !defined(FASTFLOAT_VISUAL_STUDIO))
+ 
+ // slow emulation routine for 32-bit
+ fastfloat_really_inline uint64_t emulu(uint32_t x, uint32_t y) {
+@@ -263,7 +265,7 @@
+ }
+ #endif // !__MINGW64__
+ 
+-#endif // FASTFLOAT_32BIT
++#endif // FASTFLOAT_32BIT || no 128-bit integer type
+ 
+ 
+ // compute 64-bit a*b
+@@ -278,10 +280,13 @@
+ #elif defined(FASTFLOAT_32BIT) ||                                              \
+     (defined(_WIN64) && !defined(__clang__) && !defined(_M_ARM64))
+   answer.low = _umul128(a, b, &answer.high); // _umul128 not available on ARM64
+-#elif defined(FASTFLOAT_64BIT)
++#elif defined(FASTFLOAT_64BIT) && defined(__SIZEOF_INT128__)
+   __uint128_t r = ((__uint128_t)a) * b;
+   answer.low = uint64_t(r);
+   answer.high = uint64_t(r >> 64);
++#elif !defined(FASTFLOAT_VISUAL_STUDIO)
++  // 64-bit target with no 128-bit integer type.
++  answer.low = _umul128(a, b, &answer.high);
+ #else
+   #error Not implemented
+ #endif

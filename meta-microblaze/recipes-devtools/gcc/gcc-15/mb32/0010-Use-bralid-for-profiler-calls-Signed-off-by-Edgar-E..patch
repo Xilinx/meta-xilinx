@@ -1,0 +1,27 @@
+From f9f1cb6d280bc768825e7a7acc05077bc0a17421 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Tue, 17 Jan 2017 10:57:19 +0530
+Subject: [PATCH 10/51] Use bralid for profiler calls Signed-off-by: Edgar E.
+ Iglesias <edgar.iglesias@gmail.com>
+
+Upstream-Status: Pending
+---
+ gcc/config/microblaze/microblaze.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
+index 2390542434b..749bf6b5087 100644
+--- a/gcc/config/microblaze/microblaze.h
++++ b/gcc/config/microblaze/microblaze.h
+@@ -482,7 +482,7 @@ typedef struct microblaze_args
+ 
+ #define FUNCTION_PROFILER(FILE, LABELNO) { \
+   {                                        \
+-    fprintf (FILE, "\tbrki\tr16,_mcount\n");           \
++    fprintf (FILE, "\tbralid\tr15,_mcount\nnop\n");         \
+   }                                                    \
+  }
+ 
+-- 
+2.43.7
+

@@ -1,0 +1,64 @@
+From: MicroBlaze toolchain integration
+Subject: [PATCH] microblaze: do not offer __int128 for MB-64
+
+The generic scalar_mode_supported_p hook accepts TImode once a word is 64 bits
+wide, so -m64 advertises __SIZEOF_INT128__ and the compiler happily emits calls
+to __multi3 and __udivti3.  Nothing builds those: microblaze.h pins
+
+  #define MIN_UNITS_PER_WORD      4
+
+(the correct (TARGET_MB_64 ? 8 : 4) sits commented out directly above it), so
+libgcc builds only the DImode helpers even for the m64 multilibs and the m64
+libgcc.a contains no TImode symbol at all.  Worse, the CLZ, CTZ and POPCOUNT
+internal functions have neither an insn nor a libcall for TImode and abort
+during expand:
+
+  charconv:172: internal compiler error: in expand_fn_using_insn,
+                                         at internal-fn.cc:268
+
+libstdc++ reaches that path from <charconv>, which instantiates its 128-bit
+conversions whenever __int128 exists, so libstdc++ cannot be built for m64.
+
+Withhold TImode for MB-64 so __int128 is rejected at the source level instead.
+Revisit once libgcc grows TImode support, at which point MIN_UNITS_PER_WORD
+needs sorting out first.
+
+Apply to the GCC tree, after the MB-64 patch set.
+
+Upstream-Status: Pending
+
+--- a/gcc/config/microblaze/microblaze.cc
++++ b/gcc/config/microblaze/microblaze.cc
+@@ -4321,6 +4321,22 @@
+ {
+   return (crtl->outgoing_args_size + FIRST_PARM_OFFSET(FNDECL));
+ }
++
++/* Implement TARGET_SCALAR_MODE_SUPPORTED_P.  The generic hook accepts TImode
++   once a word is 64 bits wide, which would offer __int128 under -m64.  libgcc
++   has no TImode support for this target, so uses of __int128 either call
++   helpers such as __multi3 that were never built, or reach the CLZ, CTZ and
++   POPCOUNT internal functions, which have neither an insn nor a libcall and so
++   abort during expand.  Withhold the mode until that support exists.  */
++
++static bool
++microblaze_scalar_mode_supported_p (scalar_mode mode)
++{
++  if (TARGET_MB_64 && mode == TImode)
++    return false;
++
++  return default_scalar_mode_supported_p (mode);
++}
+ 
+ #undef TARGET_ENCODE_SECTION_INFO
+ #define TARGET_ENCODE_SECTION_INFO      microblaze_encode_section_info
+@@ -4451,6 +4467,9 @@
+ #undef TARGET_STARTING_FRAME_OFFSET
+ #define TARGET_STARTING_FRAME_OFFSET microblaze_starting_frame_offset
+ 
++#undef TARGET_SCALAR_MODE_SUPPORTED_P
++#define TARGET_SCALAR_MODE_SUPPORTED_P microblaze_scalar_mode_supported_p
++
+ #undef TARGET_DOCUMENTATION_NAME
+ #define TARGET_DOCUMENTATION_NAME "MicroBlaze"
+ 
