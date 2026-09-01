@@ -1,7 +1,7 @@
-From 36e578efe3e94a6c13b21c364d818d0a8fd675ca Mon Sep 17 00:00:00 2001
+From 35570fd217c4f25ecdc4beff1f917ce8a1acc78b Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 24 Jan 2022 16:59:19 +0530
-Subject: [PATCH 37/56] Double free with ld --no-keep-memory. Proposed patches
+Subject: [PATCH 6/6] Double free with ld --no-keep-memory. Proposed patches
  from the community member (dednev@rambler.ru) for 2021.1. [CR-1115233]
 
 Conflicts:
@@ -9,15 +9,17 @@ Conflicts:
 	bfd/elf64-microblaze.c
 
 Signed-off-by: Aayush Misra <aayushm@amd.com>
+
+Upstream-Status: Pending
 ---
  bfd/elf32-microblaze.c | 40 ++++++++++++++++++++++------------------
  1 file changed, 22 insertions(+), 18 deletions(-)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 0ba7e36aa5f..1ff552a151b 100644
+index dcef21f7301..02f724af122 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
-@@ -1882,10 +1882,8 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1825,10 +1825,8 @@ microblaze_elf_relax_section (bfd *abfd,
  {
    Elf_Internal_Shdr *symtab_hdr;
    Elf_Internal_Rela *internal_relocs;
@@ -25,10 +27,10 @@ index 0ba7e36aa5f..1ff552a151b 100644
    Elf_Internal_Rela *irel, *irelend;
    bfd_byte *contents = NULL;
 -  bfd_byte *free_contents = NULL;
-   int rel_count;
    unsigned int shndx;
    size_t i, sym_index;
-@@ -1929,8 +1927,6 @@ microblaze_elf_relax_section (bfd *abfd,
+   asection *o;
+@@ -1871,8 +1869,6 @@ microblaze_elf_relax_section (bfd *abfd,
    internal_relocs = _bfd_elf_link_read_relocs (abfd, sec, NULL, NULL, link_info->keep_memory);
    if (internal_relocs == NULL)
      goto error_return;
@@ -37,7 +39,7 @@ index 0ba7e36aa5f..1ff552a151b 100644
  
    sdata->relax_count = 0;
    sdata->relax = (struct relax_table *) bfd_malloc ((sec->reloc_count + 1)
-@@ -1958,7 +1954,6 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1899,7 +1895,6 @@ microblaze_elf_relax_section (bfd *abfd,
  	      contents = (bfd_byte *) bfd_malloc (sec->size);
  	      if (contents == NULL)
  		goto error_return;
@@ -45,7 +47,7 @@ index 0ba7e36aa5f..1ff552a151b 100644
  
  	      if (!bfd_get_section_contents (abfd, sec, contents,
  					     (file_ptr) 0, sec->size))
-@@ -2475,25 +2470,26 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2342,25 +2337,26 @@ microblaze_elf_relax_section (bfd *abfd,
  	}
  
        elf_section_data (sec)->relocs = internal_relocs;
@@ -83,7 +85,7 @@ index 0ba7e36aa5f..1ff552a151b 100644
      }
  
    if (sdata->relax_count == 0)
-@@ -2507,8 +2503,16 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2374,8 +2370,16 @@ microblaze_elf_relax_section (bfd *abfd,
    return true;
  
   error_return:
@@ -103,5 +105,5 @@ index 0ba7e36aa5f..1ff552a151b 100644
    sdata->relax = NULL;
    sdata->relax_count = 0;
 -- 
-2.34.1
+2.47.3
 

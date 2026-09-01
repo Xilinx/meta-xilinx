@@ -1,19 +1,21 @@
-From 3056650d65b5bfa34bf16cd1ee7829a64dfb19ac Mon Sep 17 00:00:00 2001
+From b6bb7c8fd7caec7f92b3a8875227b528fff99df9 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Wed, 21 Feb 2018 12:32:02 +0530
-Subject: [PATCH 18/56] Compiler will give error messages in more detail for
+Subject: [PATCH 3/6] Compiler will give error messages in more detail for
  mxl-gp-opt flag..
 
 Signed-off-by: Aayush Misra <aayushm@amd.com>
+
+Upstream-Status: Pending
 ---
  ld/ldmain.c | 12 ++++++++++++
  1 file changed, 12 insertions(+)
 
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index e90c2021b33..e135939fade 100644
+index a2711d230ea..a3ea057f43b 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
-@@ -1575,6 +1575,18 @@ reloc_overflow (struct bfd_link_info *info,
+@@ -2067,6 +2067,18 @@ reloc_overflow (struct bfd_link_info *info,
  	  break;
  	case bfd_link_hash_defined:
  	case bfd_link_hash_defweak:
@@ -33,5 +35,6 @@ index e90c2021b33..e135939fade 100644
  		   "%s against symbol `%pT' defined in %pA section in %pB"),
  		 reloc_name, entry->root.string,
 -- 
-2.34.1
+2.47.3
+
 
