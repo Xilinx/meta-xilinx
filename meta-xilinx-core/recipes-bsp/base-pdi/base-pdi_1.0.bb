@@ -21,6 +21,30 @@ PACKAGE_ARCH ?= "${MACHINE_ARCH}"
 
 do_compile[noexec] = "1"
 
+BASE_PDI_DTFILE ??= "${@d.getVar('SYSTEM_DTFILE') or d.getVar('CONFIG_DTFILE') or ''}"
+
+def base_pdi_vivado_version(d):
+    import re
+    dtfile = d.getVar("BASE_PDI_DTFILE")
+    if not dtfile:
+        return ""
+    try:
+        with open(dtfile) as f:
+            for line in f:
+                m = re.search(r'vivado-version\s*=\s*"([^"]+)"', line)
+                if m:
+                    return m.group(1)
+    except OSError as e:
+        bb.warn("base-pdi: cannot read %s: %s" % (dtfile, e))
+    return ""
+
+inherit shared-manifest
+
+MANIFEST_COMPONENT_FIELDS = "vivado_version"
+MANIFEST_COMPONENT_FIELD_vivado_version = "${@base_pdi_vivado_version(d)}"
+
+do_install[file-checksums] += "${@'%s:%s' % (d.getVar('BASE_PDI_DTFILE'), str(os.path.exists(d.getVar('BASE_PDI_DTFILE')))) if d.getVar('BASE_PDI_DTFILE') else ''}"
+
 PDI_PATH ?= ""
 SRC_URI += "${@['file://'+d.getVar('PDI_PATH'),''][d.getVar('PDI_PATH') == '']}"
 
