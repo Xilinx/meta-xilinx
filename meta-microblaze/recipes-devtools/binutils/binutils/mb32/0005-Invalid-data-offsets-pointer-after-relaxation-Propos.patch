@@ -1,50 +1,32 @@
-From 9d691c146a484002e678babb0d40a9387272cb97 Mon Sep 17 00:00:00 2001
+From 29206ea305b18180328c93231ae8e4a050072807 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Mon, 24 Jan 2022 16:04:07 +0530
-Subject: [PATCH 36/56] Invalid data offsets (pointer) after relaxation.
- Proposed patch from community member (dednev@rambler.ru) against 2021.1
- [CR-1115232]
+Subject: [PATCH 5/6] Invalid data offsets (pointer) after relaxation. Proposed
+ patch from community member (dednev@rambler.ru) against 2021.1 [CR-1115232]
 
 Signed-off-by: Aayush Misra <aayushm@amd.com>
+
+Upstream-Status: Pending
 ---
- bfd/elf32-microblaze.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ bfd/elf32-microblaze.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 7e7c4bf471d..0ba7e36aa5f 100644
+index 5fd0732b160..dcef21f7301 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
-@@ -2176,6 +2176,9 @@ microblaze_elf_relax_section (bfd *abfd,
-                 {
-                   unsigned int val;
- 
-+	  	  if (ELF32_R_SYM (irelscan->r_info) >= symtab_hdr->sh_info)
-+		    continue;
-+
-                   isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
- 
-                   /* hax: We only do the following fixup for debug location lists.  */
-@@ -2215,6 +2218,9 @@ microblaze_elf_relax_section (bfd *abfd,
-               }
-               if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32)// || ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_IMML_64)
-                 {
-+		  if (ELF32_R_SYM (irelscan->r_info) >= symtab_hdr->sh_info)
-+		    continue;
-+
- 	          isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
- 
- 		  /* Look at the reloc only if the value has been resolved.  */
-@@ -2247,6 +2253,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2119,6 +2119,10 @@ microblaze_elf_relax_section (bfd *abfd,
  		    }
  		  else if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_SYM_OP_SYM)
  		    {
++
 +		      if (ELF32_R_SYM (irelscan->r_info) >= symtab_hdr->sh_info)
-+		        continue;
++			continue;
 +
  		      isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
  
  		      /* Look at the reloc only if the value has been resolved.  */
-@@ -2284,6 +2293,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2156,6 +2160,9 @@ microblaze_elf_relax_section (bfd *abfd,
  		       || (ELF32_R_TYPE (irelscan->r_info)
  			   == (int) R_MICROBLAZE_TEXTREL_32_LO))
  		{
@@ -54,7 +36,7 @@ index 7e7c4bf471d..0ba7e36aa5f 100644
  		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
  
  		  /* Look at the reloc only if the value has been resolved.  */
-@@ -2330,6 +2342,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2202,6 +2209,9 @@ microblaze_elf_relax_section (bfd *abfd,
  		  || (ELF32_R_TYPE (irelscan->r_info)
  			      == (int) R_MICROBLAZE_TEXTREL_64))
  		{
@@ -64,7 +46,7 @@ index 7e7c4bf471d..0ba7e36aa5f 100644
  		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
  
  		  /* Look at the reloc only if the value has been resolved.  */
-@@ -2364,6 +2379,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2236,6 +2246,9 @@ microblaze_elf_relax_section (bfd *abfd,
  		}
  	      else if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_64_PCREL)
  		{
@@ -75,5 +57,6 @@ index 7e7c4bf471d..0ba7e36aa5f 100644
  
  		  /* Look at the reloc only if the value has been resolved.  */
 -- 
-2.34.1
+2.47.3
+
 

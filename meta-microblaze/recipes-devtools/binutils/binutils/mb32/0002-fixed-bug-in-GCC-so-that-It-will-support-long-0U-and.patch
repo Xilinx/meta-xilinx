@@ -1,19 +1,21 @@
-From ea27bc6ec052b20f4c193054ecdef9bd4ecbcde7 Mon Sep 17 00:00:00 2001
+From 0ac93620b3c14a2cb109c24048dd562a0a456fd3 Mon Sep 17 00:00:00 2001
 From: Mahesh Bodapati <mbodapat@xilinx.com>
 Date: Fri, 29 Sep 2017 18:00:23 +0530
-Subject: [PATCH 17/56] fixed bug in GCC so that It will support .long 0U and
+Subject: [PATCH 2/6] fixed bug in GCC so that It will support .long 0U and
  .long 0u
 
 Signed-off-by: Aayush Misra <aayushm@amd.com>
+
+Upstream-Status: Pending
 ---
  gas/expr.c | 9 +++++++++
  1 file changed, 9 insertions(+)
 
 diff --git a/gas/expr.c b/gas/expr.c
-index 3a01b88e310..8214bdf3263 100644
+index 87824b0ca1a..15f1b452371 100644
 --- a/gas/expr.c
 +++ b/gas/expr.c
-@@ -833,6 +833,15 @@ operand (expressionS *expressionP, enum expr_mode mode)
+@@ -861,6 +861,15 @@ operand (expressionS *expressionP, enum expr_mode mode)
  	      break;
  	    }
  	}
@@ -30,5 +32,6 @@ index 3a01b88e310..8214bdf3263 100644
        switch (c)
  	{
 -- 
-2.34.1
+2.47.3
+
 
