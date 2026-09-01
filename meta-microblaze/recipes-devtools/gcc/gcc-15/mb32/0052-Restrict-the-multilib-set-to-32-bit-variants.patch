@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Aayush Misra <aayushm@amd.com>
+Date: Mon, 18 Aug 2026 11:30:00 +0530
+Subject: [PATCH] Restrict the multilib set to 32-bit variants
+
+"Support of multilibs with m64" and "-Added double arith instructions" add
+m64 to MULTILIB_OPTIONS and then prune the unwanted combinations with
+MULTILIB_EXCEPTIONS.  Those patterns are end-anchored, so combinations that
+do not end in an m64 component - m64/le and m64/bs/le, for example - survive
+and are requested by libgcc and newlib.
+
+Apply this patch for a 32-bit-only toolchain.  It excludes every multilib
+whose path starts with m64, leaving the twelve 32-bit variants, and it means
+the MB-64 patches present in the tree contribute no installed libraries.
+Leave it out to build all eighteen multilibs, which additionally needs the
+MB-64 binutils support and the MB-64 fixes under mb64/fixes/.
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+
+Upstream-Status: Pending
+---
+ gcc/config/microblaze/t-microblaze | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/gcc/config/microblaze/t-microblaze b/gcc/config/microblaze/t-microblaze
+--- a/gcc/config/microblaze/t-microblaze
++++ b/gcc/config/microblaze/t-microblaze
+@@ -12,6 +12,12 @@ MULTILIB_EXCEPTIONS += *mxl-barrel-shift/mxl-multiply-high mxl-multiply-high
+ MULTILIB_EXCEPTIONS += *mlittle-endian/mxl-multiply-high mxl-multiply-high
+ MULTILIB_EXCEPTIONS += *m64/mxl-barrel-shift/mlittle-endian/mxl-multiply-high
+ 
++# The patterns above are end-anchored, so m64 combinations ending in
++# mlittle-endian survive and get requested by libgcc/newlib.  This build
++# targets 32-bit MicroBlaze only, so drop every m64 variant and leave the
++# twelve 32-bit multilibs.
++MULTILIB_EXCEPTIONS += m64*
++
+ # Extra files
+ microblaze-c.o: $(srcdir)/config/microblaze/microblaze-c.cc \
+     $(srcdir)/config/microblaze/microblaze-protos.h \
+-- 
+2.43.7
+
