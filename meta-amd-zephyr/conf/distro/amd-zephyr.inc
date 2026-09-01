@@ -20,3 +20,8 @@ BB_HASHSERVE ??= "auto"
 # Use Zephyr SDK toolchain to build application for cortex-r and microblaze-v
 # processor.
 ZEPHYR_TOOLCHAIN_VARIANT = "zephyr"
+
+# Deploy SDT artifacts alongside Zephyr applications so the
+# generated system device tree and related boot artifacts are
+# available in the deploy directory.
+do_deploy[depends] += "${@'sdt-artifacts:do_deploy' if d.getVar('PN').startswith('zephyr-') else ''}"
