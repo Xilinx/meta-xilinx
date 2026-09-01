@@ -1,0 +1,62 @@
+From c14b2100ab3faf60dc4d7cc2e7ee1ccc45e75722 Mon Sep 17 00:00:00 2001
+From: Mahesh Bodapati <mbodapat@xilinx.com>
+Date: Mon, 24 Jan 2022 16:04:07 +0530
+Subject: [PATCH 2/4] Invalid data offsets (pointer) after relaxation. Proposed
+ patch from community member (dednev@rambler.ru) against 2021.1 [CR-1115232]
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+
+Upstream-Status: Pending
+---
+ bfd/elf32-microblaze.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
+index db7ed465779..251d7304dbf 100644
+--- a/bfd/elf32-microblaze.c
++++ b/bfd/elf32-microblaze.c
+@@ -2055,6 +2055,10 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		    }
+ 		  else if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_SYM_OP_SYM)
+ 		    {
++
++		      if (ELF32_R_SYM (irelscan->r_info) >= symtab_hdr->sh_info)
++			continue;
++
+ 		      isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
+ 
+ 		      /* Look at the reloc only if the value has been resolved.  */
+@@ -2092,6 +2096,9 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		       || (ELF32_R_TYPE (irelscan->r_info)
+ 			   == (int) R_MICROBLAZE_TEXTREL_32_LO))
+ 		{
++		  if (ELF32_R_SYM (irelscan->r_info) >= symtab_hdr->sh_info)
++		    continue;
++
+ 		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
+ 
+ 		  /* Look at the reloc only if the value has been resolved.  */
+@@ -2138,6 +2145,9 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		  || (ELF32_R_TYPE (irelscan->r_info)
+ 			      == (int) R_MICROBLAZE_TEXTREL_64))
+ 		{
++		  if (ELF32_R_SYM (irelscan->r_info) >= symtab_hdr->sh_info)
++		    continue;
++
+ 		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
+ 
+ 		  /* Look at the reloc only if the value has been resolved.  */
+@@ -2172,6 +2182,9 @@ microblaze_elf_relax_section (bfd *abfd,
+ 		}
+ 	      else if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_64_PCREL)
+ 		{
++		  if (ELF32_R_SYM (irelscan->r_info) >= symtab_hdr->sh_info)
++		    continue;
++
+ 		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
+ 
+ 		  /* Look at the reloc only if the value has been resolved.  */
+-- 
+2.47.3
+
+

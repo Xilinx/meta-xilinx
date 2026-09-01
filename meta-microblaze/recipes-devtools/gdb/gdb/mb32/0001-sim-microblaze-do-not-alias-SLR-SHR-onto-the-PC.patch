@@ -1,0 +1,83 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Aayush Misra <aayushm@amd.com>
+Date: Sun, 17 Aug 2026 19:06:00 +0530
+Subject: [PATCH] sim: microblaze: do not alias SLR/SHR onto the PC
+
+The simulator models only two special registers (PC and MSR) and selects
+between them with "CPU.spregs[IMM & 0x1]".  MicroBlaze's stack protection
+registers SLR (SPR 0x0800) and SHR (SPR 0x0802) both have bit 0 clear, so
+"mts rslr, rN" wrote straight into spregs[0] - the program counter.
+
+GCC's libgcc/config/microblaze/crti.S initialises SLR/SHR in __init, so
+every newlib program built with this toolchain reset its own PC to 0 and
+span forever in the startup code.  Reproducer:
+
+        addik   r11, r0, 0
+        mts     rslr, r11
+        addi    r3, r0, 9
+        bri     0
+
+Route any SPR other than PC/MSR to a catch-all slot instead.
+
+The interp.c hunk revives the existing but unreachable "tracing" code (the
+variable was never assigned) behind the MB_SIM_TRACE environment variable,
+which prints PC and opcode per instruction.
+
+Without this patch the toolchain still builds, but nothing can be run under
+the simulator, so the testsuite is meaningless.  Not submitted upstream.
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+
+Upstream-Status: Pending
+---
+ sim/microblaze/interp.c         | 3 +++
+ sim/microblaze/microblaze-sim.h | 2 +-
+ sim/microblaze/microblaze.h     | 7 ++++++-
+ 3 files changed, 10 insertions(+), 2 deletions(-)
+
+--- a/sim/microblaze/microblaze.h
++++ b/sim/microblaze/microblaze.h
+@@ -31,7 +31,12 @@
+ #define RB      CPU.regs[rb]
+ /* #define IMM     immword */
+ 
+-#define SA	CPU.spregs[IMM & 0x1]
++/* Only PC (SPR 0x0000) and MSR (SPR 0x0001) are modelled.  Every other
++   special register, notably SLR (0x0800) and SHR (0x0802) which crti.S
++   initialises, must land in the catch-all slot: masking the SPR number
++   with 0x1 would alias them onto spregs[0], i.e. the PC.  */
++#define SPRNUM	(IMM & 0x3FFF)
++#define SA	CPU.spregs[SPRNUM > 1 ? 2 : SPRNUM]
+ 
+ #define IMM_H	CPU.imm_high
+ #define IMM_L	((inst & IMM_MASK) >> IMM_LOW)
+--- a/sim/microblaze/microblaze-sim.h
++++ b/sim/microblaze/microblaze-sim.h
+@@ -34,7 +34,7 @@
+  struct microblaze_regset
+ {
+   signed_4	regs[32];		/* primary registers */
+-  signed_4	spregs[2];		/* pc + msr */
++  signed_4	spregs[3];		/* pc + msr + catch-all for unmodelled */
+   int		cycles;
+   int		insts;
+   unsigned_1	imm_enable;
+--- a/sim/microblaze/interp.c
++++ b/sim/microblaze/interp.c
+@@ -111,6 +111,7 @@
+ }
+ 
+ static int tracing = 0;
++#define TRACING_INIT() (tracing = (getenv ("MB_SIM_TRACE") != NULL))
+ 
+ void
+ sim_engine_run (SIM_DESC sd,
+@@ -137,6 +138,8 @@
+   bonus_cycles = 0;
+   insts = 0;
+ 
++  TRACING_INIT ();
++
+   while (1)
+     {
+       /* Fetch the initial instructions that we'll decode. */
