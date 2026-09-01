@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Aayush Misra <aayushm@amd.com>
+Date: Wed, 12 Aug 2026 00:00:00 +0000
+Subject: [PATCH 11/11] libgloss: remove xil_printf from Makefile.in
+
+Patch 04/11 only updated Makefile.inc; Makefile.in still references
+the deleted xil_printf.c source file.
+
+Upstream-Status: Inappropriate [Xilinx local]
+
+Signed-off-by: Aayush Misra <aayushm@amd.com>
+---
+ libgloss/Makefile.in | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/libgloss/Makefile.in b/libgloss/Makefile.in
+index 5146a7880..d05e934ea 100644
+--- a/libgloss/Makefile.in
++++ b/libgloss/Makefile.in
+@@ -1079,8 +1079,7 @@ microblaze_libgloss_a_LIBADD =
+ @CONFIG_MICROBLAZE_TRUE@	microblaze/_program_clean.$(OBJEXT) \
+ @CONFIG_MICROBLAZE_TRUE@	microblaze/_program_init.$(OBJEXT) \
+ @CONFIG_MICROBLAZE_TRUE@	microblaze/xil_malloc.$(OBJEXT) \
+-@CONFIG_MICROBLAZE_TRUE@	microblaze/xil_sbrk.$(OBJEXT) \
+-@CONFIG_MICROBLAZE_TRUE@	microblaze/xil_printf.$(OBJEXT)
++@CONFIG_MICROBLAZE_TRUE@	microblaze/xil_sbrk.$(OBJEXT)
+ microblaze_libgloss_a_OBJECTS = $(am_microblaze_libgloss_a_OBJECTS)
+ mn10200_libeval_a_AR = $(AR) $(ARFLAGS)
+ mn10200_libeval_a_LIBADD =
+@@ -2553,8 +2552,7 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
+ @CONFIG_MICROBLAZE_TRUE@	microblaze/_program_clean.S \
+ @CONFIG_MICROBLAZE_TRUE@	microblaze/_program_init.S \
+ @CONFIG_MICROBLAZE_TRUE@	microblaze/xil_malloc.c \
+-@CONFIG_MICROBLAZE_TRUE@	microblaze/xil_sbrk.c \
+-@CONFIG_MICROBLAZE_TRUE@	microblaze/xil_printf.c
++@CONFIG_MICROBLAZE_TRUE@	microblaze/xil_sbrk.c
+ 
+ @CONFIG_MICROBLAZE_TRUE@microblaze_libgloss_linux_a_SOURCES = \
+ @CONFIG_MICROBLAZE_TRUE@	microblaze/linux-syscalls.S \
+@@ -4376,8 +4374,6 @@ microblaze/xil_malloc.$(OBJEXT): microblaze/$(am__dirstamp) \
+ 	microblaze/$(DEPDIR)/$(am__dirstamp)
+ microblaze/xil_sbrk.$(OBJEXT): microblaze/$(am__dirstamp) \
+ 	microblaze/$(DEPDIR)/$(am__dirstamp)
+-microblaze/xil_printf.$(OBJEXT): microblaze/$(am__dirstamp) \
+-	microblaze/$(DEPDIR)/$(am__dirstamp)
+ 
+ microblaze/libgloss.a: $(microblaze_libgloss_a_OBJECTS) $(microblaze_libgloss_a_DEPENDENCIES) $(EXTRA_microblaze_libgloss_a_DEPENDENCIES) microblaze/$(am__dirstamp)
+ 	$(AM_V_at)-rm -f microblaze/libgloss.a
+@@ -6001,7 +5997,6 @@ distclean-compile:
+ @AMDEP_TRUE@@am__include@ @am__quote@microblaze/$(DEPDIR)/sim-pgcrtinit.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@microblaze/$(DEPDIR)/timer.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@microblaze/$(DEPDIR)/xil_malloc.Po@am__quote@
+-@AMDEP_TRUE@@am__include@ @am__quote@microblaze/$(DEPDIR)/xil_printf.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@microblaze/$(DEPDIR)/xil_sbrk.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@mn10200/$(DEPDIR)/_exit.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@mn10200/$(DEPDIR)/access.Po@am__quote@
