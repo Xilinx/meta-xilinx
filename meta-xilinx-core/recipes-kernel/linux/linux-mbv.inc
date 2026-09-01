@@ -1,3 +1,23 @@
+# MicroBlaze-V (MicroBlaze RISC-V) is only compatible with the riscv64
+# tune/arch (32-bit MB-V Linux support has been dropped).
+COMPATIBLE_MACHINE:riscv64 = ".*"
+
+# Use DEFCONFIGs for configuring linux-xlnx kernels
+KBUILD_DEFCONFIG_DEFAULT:riscv64 ?= "defconfig"
+
+SRC_URI_RISCV = "\
+    file://risc-v-isa-clear.cfg \
+    ${@bb.utils.contains(    "TUNE_FEATURES", "rv 32 i m a", "file://risc-v-isa-rv32i.cfg", "", d)} \
+    ${@bb.utils.contains(    "TUNE_FEATURES", "rv 64 i m a", "file://risc-v-isa-rv64i.cfg", "", d)} \
+    ${@bb.utils.contains(    "TUNE_FEATURES", "f d",         "file://risc-v-isa-fpu.cfg",   "", d)} \
+    ${@bb.utils.contains(    "TUNE_FEATURES", "c",           "file://risc-v-isa-c.cfg",     "", d)} \
+    ${@bb.utils.contains(    "TUNE_FEATURES", "v",           "file://risc-v-isa-v.cfg",     "", d)} \
+    ${@bb.utils.contains_any("TUNE_FEATURES", "b zbb",       "file://risc-v-isa-zbb.cfg",   "", d)} \
+    ${@bb.utils.contains(    "TUNE_FEATURES", "zicbom",      "file://risc-v-isa-zicbom.cfg",   "", d)} \
+    "
+
+SRC_URI:append:riscv64 = "${SRC_URI_RISCV}"
+
 # kernel-yocto.bbclass supports resolving KERNEL_FEATURES entries against
 # in-tree config fragments (arch/${ARCH}/configs and kernel/configs), see:
 # https://git.openembedded.org/openembedded-core/commit/meta/classes-recipe/kernel-yocto.bbclass?h=wrynose&id=e4e50a9a93d606ba5fef8f10f1ec20deaed7ab9c

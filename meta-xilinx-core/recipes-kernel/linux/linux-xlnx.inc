@@ -23,19 +23,6 @@ LINUX_MBV_INC = ""
 LINUX_MBV_INC:microblaze-v = "linux-mbv.inc"
 require ${LINUX_MBV_INC}
 
-SRC_URI_RISCV = "\
-    file://risc-v-isa-clear.cfg \
-    ${@bb.utils.contains(    "TUNE_FEATURES", "rv 32 i m a", "file://risc-v-isa-rv32i.cfg", "", d)} \
-    ${@bb.utils.contains(    "TUNE_FEATURES", "rv 64 i m a", "file://risc-v-isa-rv64i.cfg", "", d)} \
-    ${@bb.utils.contains(    "TUNE_FEATURES", "f d",         "file://risc-v-isa-fpu.cfg",   "", d)} \
-    ${@bb.utils.contains(    "TUNE_FEATURES", "c",           "file://risc-v-isa-c.cfg",     "", d)} \
-    ${@bb.utils.contains(    "TUNE_FEATURES", "v",           "file://risc-v-isa-v.cfg",     "", d)} \
-    ${@bb.utils.contains_any("TUNE_FEATURES", "b zbb",       "file://risc-v-isa-zbb.cfg",   "", d)} \
-    ${@bb.utils.contains(    "TUNE_FEATURES", "zicbom",      "file://risc-v-isa-zicbom.cfg",   "", d)} \
-    "
-
-SRC_URI:append:riscv64 = "${SRC_URI_RISCV}"
-
 SRCREV_machine ?= "${SRCREV}"
 SRCREV_meta ?= "eeb5d0c9dd5e2928835c633644426ee357fbce12"
 SRCREV_FORMAT = "machine"
@@ -68,7 +55,6 @@ inherit kernel-simpleimage
 
 # Default to be only compatible with specific machines or soc families
 COMPATIBLE_MACHINE ?= "^$"
-COMPATIBLE_MACHINE:riscv64 = ".*"
 COMPATIBLE_MACHINE:zynq = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
@@ -79,7 +65,6 @@ COMPATIBLE_MACHINE:versal-2vp = ".*"
 # Use DEFCONFIGs for configuring linux-xlnx kernels
 KCONFIG_MODE ?= "alldefconfig"
 KBUILD_DEFCONFIG_DEFAULT ?= ""
-KBUILD_DEFCONFIG_DEFAULT:riscv64 ?= "defconfig"
 KBUILD_DEFCONFIG_DEFAULT:zynq ?= "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG_DEFAULT:zynqmp ?= "xilinx_defconfig"
 KBUILD_DEFCONFIG_DEFAULT:versal ?= "xilinx_defconfig"
