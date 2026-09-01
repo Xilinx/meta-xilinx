@@ -4,8 +4,6 @@ KBRANCH = "xlnx_rebase_v6.18_LTS"
 SRCREV = "f383cb113baa454c4d49e574c4c3e56e76d33dbc"
 SRCREV_meta = "f202157d297182244bde71c8ed8b6d4946deec8f"
 
-KCONF_AUDIT_LEVEL = "0"
-
 include linux-xlnx.inc
 
 # CVE exclusions
