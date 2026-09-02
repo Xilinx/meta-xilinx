@@ -1,6 +1,6 @@
-SRCREV = "db83ebe9c76786d444d260c530cce874970d3b6f"
+SRCREV = "d310a7e4b13684844683be8ba697da9888db71b7"
 SRC_BRANCH = "master"
-SRCREV = "db83ebe9c76786d444d260c530cce874970d3b6f"
+SRCREV = "d310a7e4b13684844683be8ba697da9888db71b7"
 
 include kernel-module-isp.inc
 
