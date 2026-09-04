@@ -175,6 +175,10 @@ do_deploy() {
 FILES:${PN} += "/boot/BOOT.bin"
 SYSROOT_DIRS += "/boot"
 
+# Debug firmware payloads, such as TF-A built with TFA_DEBUG=1, may retain
+# absolute build paths. BOOT.bin packages these payloads without modifying them.
+INSANE_SKIP:${PN} += "buildpaths"
+
 addtask deploy before do_build after do_compile
 
 # We want to deploy this into the build directory and copy it later
