@@ -4,7 +4,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/dpdk:"
 # field; carried here so meta-dpdk stays a pristine upstream fork.
 SRC_URI += "file://0002-bus-platform-add-compatible-string-matching.patch"
 
-PACKAGECONFIG:append = " driver-sdk"
+PACKAGECONFIG:append = " driver-sdk shared"
 PACKAGECONFIG[driver-sdk] = "-Denable_driver_sdk=true,-Denable_driver_sdk=false,"
 
 # Core patch 0001 (libatomic link): it edits config/arm/arm64_armv8_linux_gcc,
