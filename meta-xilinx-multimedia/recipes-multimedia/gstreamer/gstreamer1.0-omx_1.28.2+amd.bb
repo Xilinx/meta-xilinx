@@ -12,8 +12,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c \
 # Source repository
 # ---------------------------------------------------------------------------
 REPO    ?= "git://github.com/Xilinx/gst-omx.git;protocol=https"
-BRANCH  ?= "xlnx-rebase-v1.28.2-dev"
-SRCREV  = "e44c9143904abb427a64f74fda8ef2051b50f2be"
+BRANCH  ?= "xlnx-rebase-v1.28.2"
+SRCREV  = "832b0d552075a06e8f3add80bd394ff23285e276"
 SRC_URI = "${REPO};branch=${BRANCH}"
 
 PV .= "+git"
