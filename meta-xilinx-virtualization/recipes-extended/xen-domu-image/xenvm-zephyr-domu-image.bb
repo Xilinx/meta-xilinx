@@ -6,8 +6,8 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 # kept in the standard EDF artifact shape for the automated updater
-SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/08281142/external/zephyr-synchronization/xenvm_zephyr-synchronization_08281142.tar.gz"
-SRC_URI[sha256sum] = "d31da891062dca25cc7b6175964c9ae82d8932bb46574c6022f714f722ad4793"
+SRC_URI = "https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/09040838/external/zephyr-synchronization/xenvm_zephyr-synchronization_09040838.tar.gz"
+SRC_URI[sha256sum] = "7d4cc0846c3d56fd71febcb34f1be6bc72465d0657a30fd6923c5d174d405f19"
 
 SRC_URI += "file://zephyr-synchronization-xenvm.cfg"
 
