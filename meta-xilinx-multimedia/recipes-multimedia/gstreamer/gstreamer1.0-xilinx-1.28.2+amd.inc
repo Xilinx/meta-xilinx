@@ -1,4 +1,4 @@
-BRANCH ?= "xlnx-rebase-v1.28.2-dev"
+BRANCH ?= "xlnx-rebase-v1.28.2"
 REPO ?= "git://github.com/Xilinx/gstreamer.git;protocol=https"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
@@ -24,5 +24,5 @@ SRC_URI = " \
     ${REPO};${BRANCHARG};name=gstreamer-xlnx \
 "
 
-SRCREV_gstreamer-xlnx = "4a4cd548529220b62be63d0b9a588bf78fef4bb4"
+SRCREV_gstreamer-xlnx = "d5b37410dfe2d7ff0dd520a29b8b65b587805e8a"
 SRCREV_FORMAT = "gstreamer-xlnx"
