@@ -52,8 +52,8 @@ https://docs.yoctoproject.org/dev/contributor-guide/submit-changes.html#
 
 This layer depends on:
 
-	URI: https://git.yoctoproject.org/poky
-	layers: meta, meta-poky
+	URI: https://git.openembedded.org/openembedded-core
+	layers: meta
 	branch: wrynose
 
 	URI: https://git.openembedded.org/meta-openembedded
@@ -69,7 +69,7 @@ This layer depends on:
 	URI:
         https://git.yoctoproject.org/meta-xilinx (official version)
         https://github.com/Xilinx/meta-xilinx (development and AMD release)
-	layers: meta-xilinx-core, meta-microblaze.
+	layers: meta-xilinx-core.
 	branch: wrynose
 
 	URI: https://git.yoctoproject.org/meta-arm
