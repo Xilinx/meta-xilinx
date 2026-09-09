@@ -23,6 +23,8 @@ DEPENDS += " \
         or d.getVar('ESW_MACHINE') == 'psx_pmc_0' \
         or d.getVar('ESW_MACHINE') == 'cortexa78_0' \
         or d.getVar('ESW_MACHINE') == 'cortexr52_0' \
-        or d.getVar('ESW_MACHINE') == 'pmc_0' else ''} \
+        or d.getVar('ESW_MACHINE') == 'pmc_0' \
+        or (d.getVar('SOC_FAMILY') == 'versal-2vp' \
+            and d.getVar('ESW_MACHINE') == 'psv_pmc_0') else ''} \
     cframe \
     "
