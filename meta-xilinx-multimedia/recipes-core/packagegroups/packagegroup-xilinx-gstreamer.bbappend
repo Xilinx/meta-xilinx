@@ -5,5 +5,6 @@ GSTREAMER_PACKAGES += " \
 	${@bb.utils.contains_any('LICENSE_FLAGS_ACCEPTED', 'commercial commercial_gstreamer1.0-omx', \
 		bb.utils.contains_any('MACHINE_FEATURES', 'vcu vdu vcu2', \
 			'gstreamer1.0-omx', '', d), '', d)} \
-	${@bb.utils.contains_any('MACHINE_FEATURES', 'vcu vcu2', 'gst-plugins-vcu', '', d)} \
+	${@bb.utils.contains('MACHINE_FEATURES', 'vcu', 'gst-plugins-vcu', '', d)} \
+	${@bb.utils.contains('MACHINE_FEATURES', 'vcu2', 'gst-plugins-vcu2', '', d)} \
 	"
