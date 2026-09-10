@@ -50,6 +50,12 @@ domains:
   APU_Linux:
     compatible: openamp,domain-v1
     lopper,activate: linux
+    access:
+      - dev: timer@f1e90000
+      - dev: mailbox@eb360000
+      - dev: libmetal_uio_desc0@99c8000
+      - dev: libmetal_uio_desc1@99cc000
+      - dev: libmetal_uio_data@99d0000
     domain-to-domain:
       compatible: openamp,domain-to-domain-v1
       libmetal-relation:
