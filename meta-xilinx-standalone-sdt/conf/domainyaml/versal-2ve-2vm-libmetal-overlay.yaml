@@ -98,3 +98,17 @@ domains:
         size: 32K
         spec_name: R52_0B_CTCM_GLOBAL
         start: '0xebaa0000'
+    memory:
+      - dev: NoC_C0_C1_ddr_memory
+        start: 0x09968000
+        size: 0x60000
+    access:
+      - dev: i2c@f1940000
+      - dev: timer@f1e90000
+      - dev: mailbox@eb350000
+      - dev: libmetal_uio_desc0@99c8000
+      - dev: libmetal_uio_desc1@99cc000
+      - dev: libmetal_uio_data@99d0000
+      - dev: libmetal_desc0@99c8000
+      - dev: libmetal_desc1@99cc000
+      - dev: libmetal_data@99d0000
