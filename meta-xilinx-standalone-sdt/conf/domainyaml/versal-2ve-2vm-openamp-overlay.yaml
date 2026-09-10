@@ -112,6 +112,13 @@ domains:
         - ddrboot@9800100
         - trace@985f000
         - rsctbl@9800000
+    access:
+      - dev: timer@f1e80000
+      - dev: mailbox@eb340000
+      - dev: mailbox@eb3b1000
+      - dev: r52_0a_atcm_global@eba00000
+      - dev: r52_0a_btcm_global@eba10000
+      - dev: r52_0a_ctcm_global@eba20000
     linker:
       linker_file_output_name: openamp-zephyr.ld
       linker_memories: [ r52_0a_atcm_global, r52_0a_btcm_global, r52_0a_ctcm_global, ddrboot, rsctbl ]
