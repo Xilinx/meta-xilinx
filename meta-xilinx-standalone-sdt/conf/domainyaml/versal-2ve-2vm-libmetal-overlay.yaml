@@ -38,16 +38,18 @@ axi:
     compatible: "uio"
 
   timer@f1e90000:
-    linux,uio-name: "libmetal-timer"
-    compatible: "uio"
+    linux,uio-name!linux: "libmetal-timer"
+    compatible!linux: "uio"         # linux overlay replaces it
+
   # linux -> rpu1 libmetal IPI
   mailbox@eb360000:
-    linux,uio-name: "libmetal-ipi"
-    compatible: "uio"
+    linux,uio-name!linux: "libmetal-ipi"
+    compatible!linux: "uio"         # linux overlay replaces it
 
 domains:
   APU_Linux:
     compatible: openamp,domain-v1
+    lopper,activate: linux
     domain-to-domain:
       compatible: openamp,domain-to-domain-v1
       libmetal-relation:
