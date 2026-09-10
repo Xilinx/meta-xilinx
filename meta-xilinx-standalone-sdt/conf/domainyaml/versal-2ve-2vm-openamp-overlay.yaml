@@ -46,7 +46,7 @@ reserved-memory:
     mpu-policy: [ readable, writable ]
 
 chosen:
-  zephyr,ram-console: /reserved-memory/trace@985f000
+  zephyr,ram-console!zephyr: /reserved-memory/trace@985f000
 
 domains:
   APU_Linux:
@@ -76,6 +76,7 @@ domains:
 
   RPU_Zephyr:
     compatible: openamp,domain-v1
+    lopper,activate: zephyr
     os,type: zephyr
     zephyr-version: "4.3"
     xlnx,ddr-boot: true
