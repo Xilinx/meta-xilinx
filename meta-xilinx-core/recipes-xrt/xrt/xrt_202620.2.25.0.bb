@@ -27,8 +27,8 @@ PACKAGECONFIG[opencl-icd-loader] = ",,opencl-icd-loader,opencl-icd-loader"
 
 # util-linux is for libuuid-dev.
 # coreutils-native is for base64, used by aiebu
-DEPENDS = "libdrm opencl-headers virtual/opencl-icd opencl-clhpp boost util-linux git-replacement-native protobuf-native coreutils-native protobuf elfutils libffi rapidjson systemtap libdfx"
-RDEPENDS:${PN} = "bash boost-system boost-filesystem zocl (= ${PV})"
+DEPENDS = "libdrm opencl-headers virtual/opencl-icd opencl-clhpp boost util-linux git-replacement-native protobuf-native coreutils-native protobuf elfutils libffi rapidjson systemtap libdfx python3 python3-pybind11"
+RDEPENDS:${PN} = "bash boost-system boost-filesystem zocl (= ${PV}) python3-core"
 
 EXTRA_OECMAKE += " \
 		-DCMAKE_BUILD_TYPE=Release \
@@ -53,7 +53,8 @@ FILES:${PN} += "\
     ${libdir}/lib*.so.* \
     ${libdir}/ps_kernels_lib \
     /lib/*.so* \
-    ${datadir}"
+    ${datadir} \
+    ${libdir}/python*/site-packages/pyxrt*"
 INSANE_SKIP:${PN} += "dev-so"
 
 pkg_postinst_ontarget:${PN}() {
