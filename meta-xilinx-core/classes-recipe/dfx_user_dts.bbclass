@@ -354,7 +354,24 @@ do_install() {
     fi
 
     # Install xclbin
-    if ls ${S}/${XCL_PATH}/*.xclbin >/dev/null 2>&1; then
+    # In case of dtbo as input (i.e. '.dtbo' exists directly in ${S} or
+    # ${S}/${DTBO_PATH}), .xclbin will be copied directly from ${S} to
+    # install directory. Otherwise (dtsi/dts as input) install as
+    # ${PN}.xclbin.
+    # if more than one .xclbin file is found then fatal the task.
+    if [ `ls ${S}/*.xclbin 2>/dev/null | wc -l` -gt 1 ]; then
+        bbfatal "Multiple .xclbin found, use the right .xclbin in SRC_URI from the following:\n$(basename -a ${S}/*.xclbin)"
+    elif [ `ls ${S}/${XCL_PATH}/*.xclbin 2>/dev/null | wc -l` -gt 1 ]; then
+        bbfatal "Multiple .xclbin found, use the right .xclbin in SRC_URI from the following:\n$(basename -a ${S}/${XCL_PATH}/*.xclbin)"
+    elif [ `ls ${S}/*.dtbo 2>/dev/null | wc -l` -eq 1 ] || [ `ls ${S}/${DTBO_PATH}/*.dtbo 2>/dev/null | wc -l` -eq 1 ]; then
+        if [ `ls ${S}/*.xclbin 2>/dev/null | wc -l` -eq 1 ]; then
+            install -Dm 0644 ${S}/*.xclbin ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/
+        elif [ `ls ${S}/${XCL_PATH}/*.xclbin 2>/dev/null | wc -l` -eq 1 ]; then
+            install -Dm 0644 ${S}/${XCL_PATH}/*.xclbin ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/
+        fi
+    elif [ `ls ${S}/*.xclbin 2>/dev/null | wc -l` -eq 1 ]; then
+        install -Dm 0644 ${S}/*.xclbin ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/${PN}.xclbin
+    elif [ `ls ${S}/${XCL_PATH}/*.xclbin 2>/dev/null | wc -l` -eq 1 ]; then
         install -Dm 0644 ${S}/${XCL_PATH}/*.xclbin ${D}/${nonarch_base_libdir}/firmware/xilinx/${FW_INSTALL_DIR}/${PN}.xclbin
     fi
 
