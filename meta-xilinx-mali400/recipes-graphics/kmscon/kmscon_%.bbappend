@@ -1,13 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/kmscon:"
 
-# zynqmp-specific DRM patches require machine arch packaging
-PACKAGE_ARCH:zynqmp = "${MACHINE_ARCH}"
-
-# DRM workarounds for zynqmp-dpsub driver only
-SRC_URI:append:zynqmp = " \
-    file://0002-drm2d-Use-ARGB8888-framebuffer-format.patch \
-"
-
 # Software DRM rendering, pango fonts, systemd
 # seat management. No OpenGL (avoids drm3d which conflicts with
 # render-only GPUs like mali400).
