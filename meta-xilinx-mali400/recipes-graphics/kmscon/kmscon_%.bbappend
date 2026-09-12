@@ -24,7 +24,7 @@ do_install:append() {
     install -m 0644 ${UNPACKDIR}/99-kmscon-hotplug.rules \
         ${D}${sysconfdir}/udev/rules.d/
 
-    # systemd drop-in: fail kmsconvt if no display is connected
+    # systemd drop-in: skip kmsconvt if no display is connected
     install -d ${D}${systemd_system_unitdir}/kmsconvt@tty1.service.d
     install -m 0644 ${UNPACKDIR}/10-check-display.conf \
         ${D}${systemd_system_unitdir}/kmsconvt@tty1.service.d/
