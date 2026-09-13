@@ -1,13 +1,13 @@
 SUMMARY = "Control Software for VCU2"
 DESCRIPTION = "Control software libraries, test applications and headers provider for VCU2 encoder/decoder software API"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=003bf8ee942bb6256905b58e9b1b19c2"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=624e7970a65c3e70b309116d8fb6c3d7"
 
 PV .= "+git"
 
 BRANCH ?= "master"
 REPO   ?= "git://github.com/Xilinx/vcu2-ctrl-sw.git;protocol=https"
-SRCREV = "e0aacc32e5dc8e15e88204f61fd53c2930f33f84"
+SRCREV = "3949f98b2ab8244a6435551737195e5efc588a4b"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
