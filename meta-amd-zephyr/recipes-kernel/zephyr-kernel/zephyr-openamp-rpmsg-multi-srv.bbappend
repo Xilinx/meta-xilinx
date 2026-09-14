@@ -17,6 +17,9 @@ EXTRA_OECMAKE:append = " \
     -DCONFIG_GIC_SAFE_CONFIG=y \
     "
 
+EXTRA_OECMAKE:append:versal-net = " -DCONFIG_CPU_CORTEX_R52_TCM_INIT=y"
+EXTRA_OECMAKE:append:versal-2ve-2vm = " -DCONFIG_CPU_CORTEX_R52_TCM_INIT=y"
+
 # The Versal Net and Versal Gen 2 machine overrides are also present when
 # building for Cortex-A.  Enable this RPU application only in the Zephyr
 # multiconfigs, where the generated RPU board is selected.
