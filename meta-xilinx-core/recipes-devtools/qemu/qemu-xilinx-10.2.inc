@@ -36,7 +36,7 @@ CVE_STATUS[CVE-2024-8354]  = "upstream-wontfix: Xilinx QEMU does not support the
 CVE_STATUS[CVE-2024-6519]  = "not-applicable-config: We do not enable the LSI53C895A SCSI Host Bus Adapter"
 
 # qemu-xilinx does not support virtualization using hyper-v
-CVE_STATUS[CVE-2026-3842]  = "upstream-wontfix: Xilinx QEMU does not support Hyper-V virtualizations"
+CVE_STATUS[CVE-2026-3842]  = "upstream-wontfix: Xilinx models in QEMU do not support Hyper-V virtualization"
 
 # Patch has already been backported
 CVE_STATUS[CVE-2026-48914] = "fixed-version: Fixed in Xilinx QEMU version 10.2.4"
