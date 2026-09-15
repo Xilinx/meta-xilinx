@@ -33,5 +33,3 @@ do_install:append() {
 }
 
 FILES:${PN} = "${sysconfdir}/udev/rules.d/*"
-
-SKIP_RECIPE[kernel-module-vcu2] = "${@'Only kernel 6.18 and before are supported.' if bb.utils.vercmp_string(d.getVarFlag('XILINX_LINUX_VERSION', d.getVar('XILINX_RELEASE_VERSION')) or 'undefined', "6.19") >= 0 else ''}"
