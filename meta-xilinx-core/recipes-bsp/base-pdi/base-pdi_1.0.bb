@@ -43,6 +43,10 @@ inherit shared-manifest
 MANIFEST_COMPONENT_FIELDS = "vivado_version"
 MANIFEST_COMPONENT_FIELD_vivado_version = "${@base_pdi_vivado_version(d)}"
 
+# PV says nothing about a Vivado-generated PDI; omit rather than state it.
+MANIFEST_VERSION = "${MANIFEST_COMPONENT_FIELD_vivado_version}"
+MANIFEST_VERSION_VARS = "MANIFEST_VERSION"
+
 do_install[file-checksums] += "${@'%s:%s' % (d.getVar('BASE_PDI_DTFILE'), str(os.path.exists(d.getVar('BASE_PDI_DTFILE')))) if d.getVar('BASE_PDI_DTFILE') else ''}"
 
 PDI_PATH ?= ""

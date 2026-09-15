@@ -71,6 +71,8 @@ DTB_BASE_NAME ?= "${MACHINE}-system${IMAGE_VERSION_SUFFIX}"
 MANIFEST_COMPONENT_NAME ?= "device-tree"
 MANIFEST_BRANCH_VARS = "DT_UBOOT_BRANCH BRANCH SRCBRANCH"
 MANIFEST_SRCREV_VARS = "DT_UBOOT_SRCREV SRCREV"
+# Generated from the hardware description; PV identifies nothing.
+MANIFEST_VERSION_VARS = ""
 
 # Copy the EXTRA_DT_FILES and EXTRA_DT_INCLUDE_FILES files in prepend operation so that
 # it can be preprocessed.
