@@ -2,5 +2,8 @@ GSTREAMER_PACKAGES += " \
 	gst-perf \
 	gst-shark \
 	gstd \
-	gstreamer1.0-omx \
 	"
+
+# Temporarily disable gstream1.0-omx
+#	gstreamer1.0-omx \
+#
