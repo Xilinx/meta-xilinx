@@ -5,7 +5,7 @@ inherit cmake ccmake
  
 COMPATIBLE_HOST = "aarch64-xilinx-elf"
 
-require ../../../meta-xilinx-core/recipes-bsp/ai-engine/aie-rt-2024.2.inc
+require ../../../meta-xilinx-core/recipes-bsp/ai-engine/aie-rt-2026.inc
 
 B = "${WORKDIR}/build"
  
