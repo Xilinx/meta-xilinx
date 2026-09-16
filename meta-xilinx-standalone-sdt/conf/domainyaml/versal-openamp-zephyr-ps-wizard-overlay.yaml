@@ -14,6 +14,12 @@ domains:
   R5_0_ZEPHYR:
     compatible: openamp,domain-v1
     zephyr-version: "4.3"
+    access:
+      # Match prefixed/unprefixed local TCM names, with optional unit addresses.
+      # Anchor the suffix to exclude lockstep and global TCM nodes.
+      # Use {0,1}: '?' would trigger YAML glob expansion before node lookup.
+      - dev: "psv_r5_0_atcm(@0){0,1}$"
+      - dev: "psv_r5_0_btcm(@20000){0,1}$"
     sram:
       - { dev: rproc0@9800000, start: 0x9800000, size: 0x20000 }
       - { dev: ps_wizard_0_pmcps_0_psv_r5_0_atcm@0, start: 0x0, size: 64K }
