@@ -6,7 +6,6 @@ require aie-rt-2026.inc
 SECTION	= "devel"
 
 XAIEFAL_DIR ?= "fal"
-S = "${UNPACKDIR}/git"
 
 IOBACKENDS ?= "Linux"
 
@@ -21,6 +20,7 @@ OECMAKE_SOURCEPATH = "${S}/${XAIEFAL_DIR}"
 
 EXTRA_OECMAKE = "-DWITH_TESTS=OFF  -DFAL_LINUX=ON "
 EXTRA_OECMAKE:append = "${@'-DWITH_EXAMPLES=ON' if d.getVar('WITH_EXAMPLES') == 'y' else '-DWITH_EXAMPLES=OFF'}"
+OECMAKE_ARGS += "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
 
 FILES:${PN}-demos = " \
     ${bindir}/* \

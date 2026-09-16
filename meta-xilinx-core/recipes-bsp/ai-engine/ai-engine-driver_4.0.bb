@@ -6,7 +6,6 @@ require aie-rt-2026.inc
 SECTION	= "libs"
 
 AIEDIR ?= "${S}/driver"
-S = "${UNPACKDIR}/git"
 I = "${AIEDIR}/include"
 
 IOBACKENDS ?= "Linux"
