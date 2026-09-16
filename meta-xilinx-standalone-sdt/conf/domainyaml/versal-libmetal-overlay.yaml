@@ -42,16 +42,23 @@ axi:
     compatible: "uio"
 
   timer@ff100000:
-    linux,uio-name: "libmetal-timer"
-    compatible: "uio"
-  # linux -> rpu1 libmetal IPI
+    linux,uio-name!linux: "libmetal-timer"
+    compatible!linux: "uio"           # linux overlay replaces it
+
   mailbox@ff380000:
-    linux,uio-name: "libmetal-ipi"
-    compatible: "uio"
+    linux,uio-name!linux: "libmetal-ipi"
+    compatible!linux: "uio"           # linux overlay replaces it
 
 domains:
   APU_Linux: # host in channel from a72-0
     compatible: openamp,domain-v1
+    lopper,activate: linux
+    access:
+      - dev: timer@ff100000
+      - dev: mailbox@ff380000
+      - dev: libmetal_uio_desc0@99c8000
+      - dev: libmetal_uio_desc1@99cc000
+      - dev: libmetal_uio_data@99d0000
     domain-to-domain:
       compatible: openamp,domain-to-domain-v1
       libmetal-relation:
@@ -64,6 +71,17 @@ domains:
 
   R5_1_BAREMETAL:
     compatible: openamp,domain-v1
+    access:
+      - dev: psv_rpu_0@ff9a0000     # Required by xilpm; matches both CIPS and PS Wizard RPU node names.
+      - dev: timer@ff100000
+      - dev: mailbox@ff350000
+      - dev: psv_r5_1_atcm_global@ffe90000
+      - dev: libmetal_uio_desc0@99c8000
+      - dev: libmetal_uio_desc1@99cc000
+      - dev: libmetal_uio_data@99d0000
+      - dev: libmetal_desc0@99c8000
+      - dev: libmetal_desc1@99cc000
+      - dev: libmetal_data@99d0000
     domain-to-domain:
       compatible: openamp,domain-to-domain-v1
       libmetal-relation:
@@ -74,7 +92,9 @@ domains:
           mbox: ipi_2_to_ipi_5 #IPI2 Libmetal example app (RPU)
           timer: ttc2
           elfload: [ libmetal_elf@9968000 ]
-
+    memory:   # Preserve the libmetal ELF DDR allocation during domain filtering.
+      - start: 0x9968000
+        size: 0x60000
     sram:
       - dev: libmetal_elf@9968000
         start: 0x9968000
