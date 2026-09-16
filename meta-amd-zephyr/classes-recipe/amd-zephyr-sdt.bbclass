@@ -84,7 +84,25 @@ def check_zephyr_variables(d):
     if not d.getVar('CONFIG_DTFILE'):
         raise bb.parse.SkipRecipe("CONFIG_DTFILE or ZEPHYR_BOARD_DTS is not defined.")
 
+# zephyr-toolchain-zephyr.inc sets INHIBIT_DEFAULT_DEPS, so no Yocto cross
+# toolchain is built for these recipes and the exported CC/LD/AR/... point at
+# binaries which do not exist. Zephyr itself ignores them and uses the SDK, but
+# external module build systems invoked by Zephyr (for example Trusted
+# Firmware-A, which is built with its own Makefile) honour them and fail
+# instead of using the SDK passed through CROSS_COMPILE. Keep them out of the
+# task environment.
+#
+# TEMPORARY WORKAROUND: this belongs in meta-zephyr's
+# zephyr-toolchain-zephyr.inc and a patch has been submitted upstream:
+# https://lists.yoctoproject.org/g/yocto-patches/topic/121279971
+# Drop this once that patch is accepted and merged into meta-zephyr.
+ZEPHYR_UNEXPORT_TOOLS ?= "AR AS CC CPP CXX LD NM OBJCOPY OBJDUMP RANLIB STRIP"
+
 python() {
     # Need to allow bbappends to change the check
     check_zephyr_variables(d)
+
+    if d.getVar('ZEPHYR_TOOLCHAIN_VARIANT') == 'zephyr':
+        for tool in (d.getVar('ZEPHYR_UNEXPORT_TOOLS') or '').split():
+            d.setVarFlag(tool, 'unexport', '1')
 }
