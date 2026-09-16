@@ -28,7 +28,7 @@ reserved-memory:
     mpu-policy: [ readable, writable ]
 
 chosen:
-  zephyr,ram-console: /reserved-memory/trace@985f000
+  zephyr,ram-console!zephyr: /reserved-memory/trace@985f000
 
 domains:
   APU_Linux: # host in channel from a72-0
@@ -52,3 +52,12 @@ domains:
           carveouts: [ vdev0vring0@9880000, vdev0vring1@9884000,
                        vdev0buffer@9888000 ]
           mbox: ipi_3_to_ipi_1
+
+  R5_0_ZEPHYR:
+    compatible: openamp,domain-v1
+    lopper,activate: zephyr
+    access:
+      - dev: timer@ff0e0000
+      - dev: mailbox@ff340000
+      - dev: psv_r5_0_atcm_global@ffe00000
+      - dev: psv_r5_0_btcm_global@ffe20000
