@@ -8,10 +8,12 @@ SRC_URI_RISCV = "\
     ${@bb.utils.contains("TUNE_FEATURES", "zicbom", "file://u-boot-riscv-isa_zicbom.cfg", "", d)} \
     "
 
-SRC_URI:append:riscv64 = "${SRC_URI_RISCV}"
+UBOOT_MBV_RISCV_SRC = ""
+UBOOT_MBV_RISCV_SRC:riscv64 = "${SRC_URI_RISCV}"
 
 # Include microblaze-v-generic.cfg file for 2026.01 and later versions of
 # u-boot-xlnx.
-SRC_URI:append:microblaze-v = "\
-    file://microblaze-v-generic.cfg \
-    "
+UBOOT_MBV_GENERIC_CFG = ""
+UBOOT_MBV_GENERIC_CFG:microblaze-v = "file://microblaze-v-generic.cfg"
+
+SRC_URI += "${UBOOT_MBV_RISCV_SRC} ${UBOOT_MBV_GENERIC_CFG}"
