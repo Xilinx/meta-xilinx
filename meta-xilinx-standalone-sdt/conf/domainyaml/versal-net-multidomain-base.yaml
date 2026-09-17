@@ -13,10 +13,6 @@ domains:
     compatible: openamp,domain-v1
     cpus:
       - cluster: cpus_r52_0
-        # cluster_cpu is required for RPU domains. Lopper uses it to auto-generate
-        # cpu_config_str, rpu_pd_val, core_num and cluster_cpu properties in the
-        # output DTS. Without it, remoteproc nodes will not be generated.
-        cluster_cpu: cortexr52_0
         cpumask: 0x1
         mode:
           secure: true
@@ -27,11 +23,7 @@ domains:
     compatible: openamp,domain-v1
     cpus:
       - cluster: cpus_r52_1
-        # cluster_cpu is required for RPU domains. Lopper uses it to auto-generate
-        # cpu_config_str, rpu_pd_val, core_num and cluster_cpu properties in the
-        # output DTS. Without it, remoteproc nodes will not be generated.
-        cluster_cpu: cortexr52_1
-        cpumask: 0x2
+        cpumask: 0x1
         mode:
           secure: true
           el: 0x3
