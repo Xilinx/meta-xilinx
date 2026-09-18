@@ -27,7 +27,6 @@ def bootjtag(args, config, basepath, workspace):
         rd = tinfoil.parse_recipe('u-boot-xlnx-scr')
         deploy_dir = rd.getVar('DEPLOY_DIR_IMAGE')
         machine = rd.getVar('MACHINE')
-        arch =  rd.getVar('TARGET_ARCH')
         soc = rd.getVar("SOC_FAMILY")
         ddr_base_addr = rd.getVar('DDR_BASEADDR')
         kernel_img_name = rd.getVar('KERNEL_IMAGE')
@@ -46,38 +45,29 @@ def bootjtag(args, config, basepath, workspace):
     print("INFO: HW_SERVER Connected to: " + str(args.hw_server))
     print("INFO: Using DISTRO IMAGE: " + str(args.image))
 
-    # Use arch for MB and SOC Family other devices.
-    if arch == 'microblazeel':
-        print("INFO: ARCH: " + arch)
-    else:
-        print("INFO: SOC FAMILY: " + soc)
+    print("INFO: SOC FAMILY: " + soc)
 
     # Load Address of boot.scr in DDR(Except for QSPI/OSPI/NAND boot)
-    # MB = (DDR base address + DDR Size) - 0xe00000
     # Zynq 7000 = DDR base address + 0x3000000
     # ZynqMP = DDR base address + 0x20000000
     # Versal, Versal-Net and Versal-2ve-2vm = DDR base address + 0x20000000
-    if arch == 'microblazeel':
-        # Assuming DDR size is 2GB
-        bootscr_addr = hex(int(ddr_base_addr, 16) + 0x80000000 - 0xe00000)
-    elif soc == 'zynq':
+    if soc == 'zynq':
         bootscr_addr = hex(int(ddr_base_addr, 16) + 0x3000000)
     else:
         bootscr_addr = hex(int(ddr_base_addr, 16) + 0x20000000)
 
     print("INFO: MACHINE: " + machine)
 
-    if arch != 'microblazeel':
-        if "fpga-overlay" in machine_features:
-            print("INFO: fpga-overlay MACHINE_FEATURES is enabled, Hence PL bitstream or PDI will not be loaded at initial boot, User can load from u-boot or linux.")
-        else:
-            print("INFO: fpga-overlay MACHINE_FEATURES is not enabled, Hence PL bitstream or PDI will be loaded at initial boot.")
+    if "fpga-overlay" in machine_features:
+        print("INFO: fpga-overlay MACHINE_FEATURES is enabled, Hence PL bitstream or PDI will not be loaded at initial boot, User can load from u-boot or linux.")
+    else:
+        print("INFO: fpga-overlay MACHINE_FEATURES is not enabled, Hence PL bitstream or PDI will be loaded at initial boot.")
 
     #dictionary with all required artifacts
     data = {}
 
-    # For MB, Zynq 7000 and ZynqMP.
-    if arch == 'microblazeel' or soc == 'zynq' or soc == 'zynqmp':
+    # For Zynq 7000 and ZynqMP.
+    if soc == 'zynq' or soc == 'zynqmp':
         if not "fpga-overlay" in machine_features:
             data['bit'] = glob.glob(os.path.join(deploy_dir, '*' + machine + '.bit'))[0]
         data['uboot'] = os.path.join(deploy_dir, 'u-boot.elf')
@@ -117,7 +107,7 @@ def bootjtag(args, config, basepath, workspace):
     lines.append('# Run \'xsdb ' + deploy_dir + '/boot-jtag.tcl\' to execute this script.')
     lines.append('connect -url ' + args.hw_server)
 
-    if arch == 'microblazeel' or soc == 'zynq' or soc == 'zynqmp':
+    if soc == 'zynq' or soc == 'zynqmp':
         lines.append('for {set i 0} {$i < 20} {incr i} {')
         lines.append('    if { [ta] != "" } break;')
         lines.append('    after 50')
@@ -181,11 +171,6 @@ def bootjtag(args, config, basepath, workspace):
         # Check if the target is already stopped or cannot be stopped.
         lines.append('catch {stop}; after 1000')
         lines.append('')
-    else:
-        lines.append('targets -set -nocase -filter {name =~ \"microblaze*#0\"}')
-        # Check if the target is already stopped or cannot be stopped.
-        lines.append('catch {stop}; after 1000')
-        lines.append('')
 
 
     if soc == 'zynq' or soc == 'zynqmp':
@@ -196,12 +181,12 @@ def bootjtag(args, config, basepath, workspace):
         lines.append('after 4000; stop')
         lines.append('')
 
-    # Download U-boot and DTB for MB, Zynq 7000 and ZynqMP
-    if arch == 'microblazeel' or soc == 'zynq' or soc == 'zynqmp':
+    # Download U-boot and DTB for Zynq 7000 and ZynqMP
+    if soc == 'zynq' or soc == 'zynqmp':
         lines.append('puts stderr "INFO: Downloading U-boot ELF file: ' + data['uboot'] + '"')
         lines.append('dow \"' + data['uboot'] + '\"')
         lines.append('')
-        # For MB and Zynq 7000 we need to connect and stop before loading
+        # For Zynq 7000 we need to connect and stop before loading
         # kernel images
         if soc != 'zynqmp':
             lines.append('con')

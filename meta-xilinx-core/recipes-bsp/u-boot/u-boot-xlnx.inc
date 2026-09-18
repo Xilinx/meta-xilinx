@@ -51,7 +51,6 @@ python __anonymous () {
 DEFAULT_ARCH_DTS_DIR = ""
 DEFAULT_ARCH_DTS_DIR:arm = "arm"
 DEFAULT_ARCH_DTS_DIR:aarch64 = "arm"
-DEFAULT_ARCH_DTS_DIR:microblazeel = "microblaze"
 DEFAULT_ARCH_DTS_DIR:riscv64 = "riscv"
 ARCH_DTS_DIR ?= "${DEFAULT_ARCH_DTS_DIR}"
 

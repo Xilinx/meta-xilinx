@@ -16,7 +16,6 @@ COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 COMPATIBLE_MACHINE:zynq = "zynq"
 COMPATIBLE_MACHINE:versal = "versal"
 COMPATIBLE_MACHINE:versal-net = "versal"
-COMPATIBLE_MACHINE:microblaze = "microblaze"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
 COMPATIBLE_MACHINE:versal-2vp = ".*"
 
@@ -32,7 +31,6 @@ KERNEL_BOOTCMD:zynqmp ?= "booti"
 KERNEL_BOOTCMD:zynq ?= "bootm"
 KERNEL_BOOTCMD:versal ?= "booti"
 KERNEL_BOOTCMD:versal-net ?= "booti"
-KERNEL_BOOTCMD:microblaze ?= "bootm"
 KERNEL_BOOTCMD:versal-2ve-2vm ?= "booti"
 KERNEL_BOOTCMD:versal-2vp ?= "booti"
 
@@ -43,7 +41,6 @@ BOOTFILE_EXT ?= ""
 SKIP_APPEND_BASEADDR ?= "0"
 
 DDR_BASEADDR ?= "0x0"
-DDR_BASEADDR:microblaze ?= "0x80000000"
 PRE_BOOTENV ?= ""
 
 # Set debfault SD boot device to mmc 0 interface
@@ -69,7 +66,6 @@ UENV_MMC_OFFSET:zynqmp ??= "0x200000"
 UENV_MMC_OFFSET:zynq ??= "0x2080000"
 UENV_MMC_OFFSET:versal ??= "0x200000"
 UENV_MMC_OFFSET:versal-net ??= "0x200000"
-UENV_MMC_OFFSET:microblaze ??= "0x0"
 UENV_MMC_OFFSET:versal-2ve-2vm ??= "0x200000"
 UENV_MMC_OFFSET:versal-2vp ??= "0x200000"
 
@@ -83,7 +79,6 @@ DEVICETREE_ADDRESS ?= "${@append_baseaddr(d,d.getVar('DEVICETREE_OFFSET'))}"
 DEVICETREE_ADDRESS_SD ?= "${DEVICETREE_ADDRESS}"
 
 DEVICETREE_OFFSET_DEFAULT ??= ""
-DEVICETREE_OFFSET_DEFAULT:microblaze ??= "0x1e00000"
 DEVICETREE_OFFSET_DEFAULT:zynqmp ??= "0x100000"
 DEVICETREE_OFFSET_DEFAULT:zynq ??= "0x100000"
 DEVICETREE_OFFSET_DEFAULT:versal ??= "0x1000"
@@ -93,7 +88,6 @@ DEVICETREE_OFFSET_DEFAULT:versal-2vp ??= "0x1000"
 DEVICETREE_OFFSET ??= "${DEVICETREE_OFFSET_DEFAULT}"
 
 DEVICETREE_OVERLAY_OFFSET_DEFAULT ??= ""
-DEVICETREE_OVERLAY_OFFSET_DEFAULT:microblaze ??= "0x1e00000"
 DEVICETREE_OVERLAY_OFFSET_DEFAULT:zynqmp ??= "0x100000"
 DEVICETREE_OVERLAY_OFFSET_DEFAULT:zynq ??= "0x100000"
 DEVICETREE_OVERLAY_OFFSET_DEFAULT:versal ??= "0x1000"
@@ -110,7 +104,6 @@ KERNEL_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('KERNEL_OFFSET'))}"
 
 
 KERNEL_OFFSET_DEFAULT ??= ""
-KERNEL_OFFSET_DEFAULT:microblaze ??= "0x0"
 KERNEL_OFFSET_DEFAULT:zynqmp ??= "0x200000"
 KERNEL_OFFSET_DEFAULT:zynq ??= "0x200000"
 KERNEL_OFFSET_DEFAULT:versal ??= "0x200000"
@@ -124,7 +117,6 @@ KERNEL_IMAGE ?= "${KERNEL_IMAGETYPE}"
 RAMDISK_IMAGE_ADDRESS ?= "${@append_baseaddr(d,d.getVar('RAMDISK_OFFSET'))}"
 
 RAMDISK_OFFSET_DEFAULT ??= ""
-RAMDISK_OFFSET_DEFAULT:microblaze ??= "0x2e00000"
 RAMDISK_OFFSET_DEFAULT:zynq ??= "0x4000000"
 RAMDISK_OFFSET_DEFAULT:zynqmp ??= "0x4000000"
 RAMDISK_OFFSET_DEFAULT:versal ??= "0x4000000"
@@ -138,13 +130,6 @@ FIT_IMAGE_OFFSET ??= "0x10000000"
 FIT_IMAGE ?= "image.ub"
 
 ## Below offsets and sizes are based on 32MB QSPI Memory for zynq
-## For MB
-## Load boot.scr at 0xFC0000 -> 15MB of QSPI/NAND Memory
-QSPI_KERNEL_OFFSET:microblaze ??= "0xBC0000"
-QSPI_KERNEL_SIZE:microblaze ??= "0x500000"
-QSPI_RAMDISK_SIZE:microblaze ??= "0xA00000"
-QSPI_RAMDISK_SIZE:microblaze ??= "0x4000000"
-
 ## For zynq
 ## Load boot.scr at 0xFC0000 -> 15MB of QSPI/NAND Memory
 QSPI_KERNEL_OFFSET:zynq ??= "0xA00000"
@@ -203,7 +188,6 @@ QSPI_RAMDISK_SIZE:versal-net ??= "0x4000000"
 QSPI_RAMDISK_SIZE:versal-2ve-2vm ??= "0x4000000"
 QSPI_RAMDISK_SIZE:versal-2vp ??= "0x4000000"
 
-QSPI_KERNEL_IMAGE:microblaze ?= "image.ub"
 QSPI_KERNEL_IMAGE:zynq ?= "image.ub"
 QSPI_KERNEL_IMAGE:zynqmp ?= "image.ub"
 QSPI_KERNEL_IMAGE:versal ?= "image.ub"
@@ -216,12 +200,10 @@ NAND_KERNEL_IMAGE ?= "image.ub"
 QSPI_FIT_IMAGE_OFFSET ??= "0xF40000"
 QSPI_FIT_IMAGE_OFFSET:zynqmpdr ??= "0x3F80000"
 QSPI_FIT_IMAGE_OFFSET:zynq ??= "0xA80000"
-QSPI_FIT_IMAGE_OFFSET:microblaze ??= "0xC00000"
 
 QSPI_FIT_IMAGE_SIZE ??= "0x6400000"
 QSPI_FIT_IMAGE_SIZE:zynqmpdr ??= "0x3F00000"
 QSPI_FIT_IMAGE_SIZE:zynq ??= "0x1500000"
-QSPI_FIT_IMAGE_SIZE:microblaze ??= "0xF00000"
 
 NAND_FIT_IMAGE_OFFSET ??= "0x4180000"
 NAND_FIT_IMAGE_OFFSET:zynq ??= "0x1080000"
