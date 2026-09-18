@@ -23,6 +23,7 @@ do_compile[noexec] = "1"
 
 BASE_PDI_DTFILE ??= "${@d.getVar('SYSTEM_DTFILE') or d.getVar('CONFIG_DTFILE') or ''}"
 
+# The DT reaches the sysroot after parse, so nothing in vardeps may reference this.
 def base_pdi_vivado_version(d):
     import re
     dtfile = d.getVar("BASE_PDI_DTFILE")
@@ -43,11 +44,8 @@ inherit shared-manifest
 MANIFEST_COMPONENT_FIELDS = "vivado_version"
 MANIFEST_COMPONENT_FIELD_vivado_version = "${@base_pdi_vivado_version(d)}"
 
-# PV says nothing about a Vivado-generated PDI; omit rather than state it.
-MANIFEST_VERSION = "${MANIFEST_COMPONENT_FIELD_vivado_version}"
-MANIFEST_VERSION_VARS = "MANIFEST_VERSION"
-
-do_install[file-checksums] += "${@'%s:%s' % (d.getVar('BASE_PDI_DTFILE'), str(os.path.exists(d.getVar('BASE_PDI_DTFILE')))) if d.getVar('BASE_PDI_DTFILE') else ''}"
+# PV says nothing about a Vivado-generated PDI; report the Vivado version.
+MANIFEST_VERSION_VARS = "MANIFEST_COMPONENT_FIELD_vivado_version"
 
 PDI_PATH ?= ""
 SRC_URI += "${@['file://'+d.getVar('PDI_PATH'),''][d.getVar('PDI_PATH') == '']}"
