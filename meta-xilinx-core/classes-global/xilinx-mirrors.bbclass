@@ -22,9 +22,19 @@ python xilinx_mirrors_prefetch() {
     for url in fetcher.urls:
         ud = fetcher.ud[url]
 
-        # Check if the fetch needs to be corrected.
-        if ud and ud.localpath and ud.method.need_update(ud, d):
-            #bb.warn(f'Possibly out of date clone: {ud.clonedir}')
+        if not (ud and ud.localpath):
+            continue
+
+        # DL_DIR/git2/<clonedir> is shared by every recipe that uses the
+        # same git url, and do_fetch postfuncs run outside of the fetcher
+        # lock.  Hold ud.lockfile so the rename below cannot land while
+        # another recipe is inside the git fetcher.
+        lf = bb.utils.lockfile(ud.lockfile) if ud.lockfile else None
+
+        try:
+            # Check if the fetch needs to be corrected.
+            if not ud.method.need_update(ud, d):
+                continue
 
             if not mirrors:
                 mirrors = bb.fetch2.mirror_from_string(d.getVar('PREMIRRORS') + d.getVar('MIRRORS'))
@@ -68,6 +78,9 @@ python xilinx_mirrors_prefetch() {
                     os.symlink(relative_src, dest)
 
                     break
+        finally:
+            if lf:
+                bb.utils.unlockfile(lf)
 }
 do_fetch[postfuncs] += "xilinx_mirrors_prefetch"
 # Exclude this function from do_fetch's task hash.  The function only
