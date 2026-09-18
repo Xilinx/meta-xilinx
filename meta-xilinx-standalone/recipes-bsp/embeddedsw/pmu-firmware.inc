@@ -25,3 +25,13 @@ ESW_COMPONENT ??= "executable.elf"
 
 # Disable buildpaths QA check warnings.
 INSANE_SKIP:${PN} += "buildpaths"
+
+# u-boot SPL requries just the pmu-firmware.bin file, make this available
+do_compile:append() {
+    ${OBJCOPY} -O binary ${B}/${ESW_COMPONENT} ${B}/${ESW_COMPONENT}.bin
+}
+
+do_deploy:append() {
+    install -Dm 0644 ${B}/${ESW_COMPONENT}.bin ${DEPLOYDIR}/${PMU_FIRMWARE_BASE_NAME}.bin
+    ln -sf ${PMU_FIRMWARE_BASE_NAME}.bin ${DEPLOYDIR}/${PMU_FIRMWARE_IMAGE_NAME}.bin
+}
