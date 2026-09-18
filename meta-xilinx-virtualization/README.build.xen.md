@@ -20,16 +20,8 @@ $ bitbake-layers add-layer ./<path-to-layer>/meta-xilinx/meta-xilinx-virtualizat
 ```
 
 4. The following variables needs to be added to the end of the conf/local.conf file.
+
 ```
-# Xen variables
-BOOTMODE = "xen"
-ENABLE_XEN_UBOOT_SCR = "1"
-ENABLE_XEN_DTSI = "1"
-ENABLE_XEN_QEMU_DTSI = "1"
-
-# Default Xen Serial Console is serial0, if you are using serial1 then set as show below.
-XEN_SERIAL_CONSOLES = "serial1"
-
 # Variables for Xen JTAG or SD INITRD boot modes but this is not required for SD WIC image.
 IMAGE_FSTYPES += "cpio.gz"
 RAMDISK_IMAGE = "rootfs.cpio.gz"
@@ -58,6 +50,9 @@ IMAGE_INSTALL:append = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'vmsep', 'qemu-aarch64 qemu-keymaps', 'qemu', d)} \
     "
 ```
+> **Note:**
+> * To generate a Xen u-boot boot script (xen_boot.scr), see
+>   [Xen Boot Script Instructions](./README.xen.boot.scr.md).
 
 5. Continue [Building Instructions](../README.building.md) from step 5.
 

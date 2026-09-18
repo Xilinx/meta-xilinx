@@ -5,7 +5,7 @@ tool and boot using QEMU or Hardware.
 
 1. The following variable needs to be added to the end of the conf/local.conf file.
    ```
-   UBOOT_BOOT_SCRIPT:append = " u-boot-xen-scr"
+   IMAGE_INSTALL:append = " u-boot-xen-scr"
    ```
 
 2. [u-boot-xen-scr recipe](./recipes-bsp/u-boot/u-boot-xen-scr.bb) provides xen
