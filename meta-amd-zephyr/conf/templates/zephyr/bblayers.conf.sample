@@ -11,10 +11,14 @@ BBLAYERS ?= " \
   ##OEROOT##/../meta-openembedded/meta-oe \
   ##OEROOT##/../meta-openembedded/meta-python \
   ##OEROOT##/../meta-xilinx/meta-xilinx-core \
+  ##OEROOT##/../meta-xilinx/meta-xilinx-standalone \
+  ##OEROOT##/../meta-xilinx/meta-xilinx-standalone-sdt \
+  ##OEROOT##/../meta-xilinx/meta-microblaze \
   ##OEROOT##/../meta-arm/meta-arm \
   ##OEROOT##/../meta-arm/meta-arm-toolchain \
   ##OEROOT##/../meta-zephyr/meta-zephyr-core \
   ##OEROOT##/../meta-zephyr/meta-zephyr-bsp \
   ##OEROOT##/../meta-xilinx/meta-amd-zephyr \
   ##OEROOT##/../meta-xilinx/meta-amd-zephyr-bsp \
+  ##OEROOT##/../meta-amd-adaptive-socs/meta-amd-adaptive-socs-zephyr-bsp \
 "
