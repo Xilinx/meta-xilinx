@@ -235,11 +235,15 @@ def append_baseaddr(d,offset):
     skip_append = d.getVar('SKIP_APPEND_BASEADDR') or ""
     if skip_append == "1":
         return offset
-    if offset.startswith('$'):
+    if offset and offset.startswith('$'):
         # If offset startswith '$' Assuming as uboot env variable.
         return offset
     import subprocess
     baseaddr = d.getVar('DDR_BASEADDR') or "0x0"
+
+    if not offset:
+        return baseaddr
+
     subcmd = "$((%s+%s));" % (baseaddr,offset)
     cmd = "printf '0x%08x' " + str(subcmd)
     output = subprocess.check_output(cmd, shell=True).decode("utf-8")
