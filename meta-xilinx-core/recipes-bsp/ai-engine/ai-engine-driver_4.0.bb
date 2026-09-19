@@ -1,5 +1,5 @@
-SUMMARY = "Xilinx AI Engine runtime"
-DESCRIPTION = "This library provides APIs for the runtime support of the Xilinx AI Engine IP"
+SUMMARY = "AMD AI Engine runtime driver"
+DESCRIPTION = "This library provides APIs for the runtime support of the AMD AI Engine IP"
 
 require aie-rt-2026.inc
 
