@@ -39,6 +39,7 @@ SRC_URI = " \
     file://pxeboot.pxe \
     file://xilinx-default-sd.cmd \
     file://jtag-boot.cmd \
+    file://spi-boot.cmd \
     "
 
 # Even thought we don't create a package, make sure this is unique to the machine
@@ -51,6 +52,7 @@ inherit image-artifact-names
 # xilinx-default-sd.cmd on arm/aarch64. Override UBOOT_XLNX_BOOT_SCR (or
 # DEFAULT_UBOOT_XLNX_BOOT_SCR) in a bbappend to select a different template.
 DEFAULT_UBOOT_XLNX_BOOT_SCR ??= "xilinx-default-sd.cmd"
+DEFAULT_UBOOT_XLNX_BOOT_SCR:microblaze-v ??= "spi-boot.cmd"
 UBOOT_XLNX_BOOT_SCR ?= "${DEFAULT_UBOOT_XLNX_BOOT_SCR}"
 
 UENV_TEXTFILE ?= "uEnv.txt"
@@ -90,6 +92,7 @@ KERNEL_OFFSET_DEFAULT:versal ??= "0x200000"
 KERNEL_OFFSET_DEFAULT:versal-net ??= "0x200000"
 KERNEL_OFFSET_DEFAULT:versal-2ve-2vm ??= "0x200000"
 KERNEL_OFFSET_DEFAULT:versal-2vp ??= "0x200000"
+KERNEL_OFFSET_DEFAULT:microblaze-v ??= "0x10000000"
 KERNEL_OFFSET ??= "${KERNEL_OFFSET_DEFAULT}"
 
 KERNEL_IMAGE ?= "${KERNEL_IMAGETYPE}"
@@ -103,6 +106,7 @@ RAMDISK_OFFSET_DEFAULT:versal ??= "0x4000000"
 RAMDISK_OFFSET_DEFAULT:versal-net ??= "0x4000000"
 RAMDISK_OFFSET_DEFAULT:versal-2ve-2vm ??= "0x4000000"
 RAMDISK_OFFSET_DEFAULT:versal-2vp ??= "0x4000000"
+RAMDISK_OFFSET_DEFAULT:microblaze-v ??= "0x12e00000"
 RAMDISK_OFFSET ??= "${RAMDISK_OFFSET_DEFAULT}"
 
 ## Below offsets and sizes are based on 32MB QSPI Memory for zynq
@@ -163,6 +167,12 @@ SPI_RAMDISK_SIZE:versal ??= "0x4000000"
 SPI_RAMDISK_SIZE:versal-net ??= "0x4000000"
 SPI_RAMDISK_SIZE:versal-2ve-2vm ??= "0x4000000"
 SPI_RAMDISK_SIZE:versal-2vp ??= "0x4000000"
+
+## For MicroBlaze-v
+SPI_KERNEL_OFFSET:microblaze-v ??= "0xF80000"
+SPI_KERNEL_SIZE:microblaze-v ??= "0x2200000"
+SPI_RAMDISK_OFFSET:microblaze-v ??= "0x3180000"
+SPI_RAMDISK_SIZE:microblaze-v ??= "0x4E80000"
 
 # Add variables as addendum.
 SCRIPT_SED_ADDENDUM = ""
