@@ -38,6 +38,7 @@ SDBOOTDEV ?= "0"
 SRC_URI = " \
     file://pxeboot.pxe \
     file://xilinx-default-sd.cmd \
+    file://jtag-boot.cmd \
     "
 
 # Even thought we don't create a package, make sure this is unique to the machine
