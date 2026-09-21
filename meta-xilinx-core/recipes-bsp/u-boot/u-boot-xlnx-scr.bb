@@ -41,6 +41,7 @@ SRC_URI = " \
     file://jtag-boot.cmd \
     file://spi-boot.cmd \
     file://nand-boot.cmd \
+    file://nor-boot.cmd \
     "
 
 # Even thought we don't create a package, make sure this is unique to the machine
