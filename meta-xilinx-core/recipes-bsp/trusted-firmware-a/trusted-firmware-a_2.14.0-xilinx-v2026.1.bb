@@ -21,7 +21,7 @@ TFA_SCMI_SERVER ?= "0"
 # SCMI Server repository details
 SRCBRANCH_scmi-server = "main"
 SRC_URI_SCMI_SERVER ?= "git://github.com/Xilinx/scmi-server.git;name=scmi-server;protocol=https;destsuffix=scmi-server;branch=${SRCBRANCH_scmi-server}"
-SRCREV_scmi-server = "2eab26b8d92381bff182abfb66c2805321842edb"
+SRCREV_scmi-server = "f80feb6ab027cca268083b90095dc8b8f0b6419c"
 
 # Conditionally add SCMI server to sources
 SRC_URI:append = " ${@bb.utils.contains('TFA_SCMI_SERVER', '1', '${SRC_URI_SCMI_SERVER}', '', d)}"
