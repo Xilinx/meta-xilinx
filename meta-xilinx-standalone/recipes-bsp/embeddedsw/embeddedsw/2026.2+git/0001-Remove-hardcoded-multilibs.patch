@@ -3,7 +3,15 @@ From: Mark Hatle <mark.hatle@amd.com>
 Date: Tue, 3 Dec 2024 18:27:32 -0700
 Subject: [PATCH] Remove hardcoded multilibs
 
+Upstream-Status: Inappropriate [YP integration specific]
+
 Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+
+Add Upstream-Status tag.
+
+AI-Generated: GitHub Copilot (Claude Opus 5)
+
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
 ---
  lib/sw_apps/asufw/src/Makefile | 7 ++++---
  1 file changed, 4 insertions(+), 3 deletions(-)

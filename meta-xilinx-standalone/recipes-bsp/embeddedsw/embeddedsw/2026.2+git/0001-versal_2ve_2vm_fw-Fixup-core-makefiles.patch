@@ -8,6 +8,12 @@ additional variables that may not be appropriate to do on the regular
 command line build version.  This Yocto Project specific will allow this
 behavior.
 
+Upstream-Status: Inappropriate [YP integration specific]
+
+Add Upstream-Status tag.
+
+AI-Generated: GitHub Copilot (Claude Opus 5)
+
 Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
 ---
  lib/sw_apps/asufw/misc/Makefile                    | 6 ++++--
