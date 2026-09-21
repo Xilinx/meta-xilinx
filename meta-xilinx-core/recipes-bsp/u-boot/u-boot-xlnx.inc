@@ -13,6 +13,18 @@ DEPENDS += "bc-native dtc-native python3-setuptools-native bison-native xxd-nati
 DEPENDS:append:riscv64 = " opensbi"
 
 require u-boot-xlnx-common.inc
+
+# Selects the one fragment allowed to set CONFIG_PREBOOT; Kconfig strings
+# do not merge. Layers set the DEFAULT_; a recipe or the user overrides it.
+DEFAULT_UBOOT_PREBOOT_CFG = ""
+UBOOT_PREBOOT_CFG ?= "${DEFAULT_UBOOT_PREBOOT_CFG}"
+SRC_URI:append = " ${UBOOT_PREBOOT_CFG}"
+
+# Same arbitration for CONFIG_BOOTCOMMAND.
+DEFAULT_UBOOT_BOOTCMD_CFG = ""
+UBOOT_BOOTCMD_CFG ?= "${DEFAULT_UBOOT_BOOTCMD_CFG}"
+SRC_URI:append = " ${UBOOT_BOOTCMD_CFG}"
+
 inherit shared-manifest
 
 MANIFEST_COMPONENT_NAME ?= "u-boot"
