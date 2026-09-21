@@ -12,30 +12,19 @@ inherit deploy image-wic-utils
 INHIBIT_DEFAULT_DEPS = "1"
 
 COMPATIBLE_MACHINE ?= "^$"
-COMPATIBLE_MACHINE:zynqmp = "zynqmp"
-COMPATIBLE_MACHINE:zynq = "zynq"
-COMPATIBLE_MACHINE:versal = "versal"
-COMPATIBLE_MACHINE:versal-net = "versal"
-COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
-COMPATIBLE_MACHINE:versal-2vp = ".*"
+COMPATIBLE_MACHINE:arm = ".*"
+COMPATIBLE_MACHINE:aarch64 = ".*"
+COMPATIBLE_MACHINE:microblaze-v = ".*"
 
 KERNELDT = "${@os.path.basename(d.getVar('KERNEL_DEVICETREE').split(' ')[0]) if d.getVar('KERNEL_DEVICETREE') else ''}"
 DEVICE_TREE_NAME ?= "${@bb.utils.contains('PREFERRED_PROVIDER_virtual/dtb', 'device-tree', 'system.dtb', d.getVar('KERNELDT'), d)}"
-#Need to copy a rootfs.cpio.gz.u-boot  into boot partition
-RAMDISK_IMAGE ?= "rootfs.cpio.gz.u-boot"
-RAMDISK_IMAGE1 ?= "ramdisk.cpio.gz.u-boot"
 
-PXERAMDISK_IMAGE ?= "${@'${RAMDISK_IMAGE1}' if d.getVar('INITRAMFS_IMAGE') and d.getVar('INITRAMFS_IMAGE').find('initramfs') > 0 else '${RAMDISK_IMAGE}'}"
+# This is required for pxeboot and default to core-image-cmdline.
+RAMDISK_IMAGE ?= "core-image-full-cmdline-${MACHINE}-rootfs.cpio.gz.u-boot"
 
-KERNEL_BOOTCMD:zynqmp ?= "booti"
-KERNEL_BOOTCMD:zynq ?= "bootm"
-KERNEL_BOOTCMD:versal ?= "booti"
-KERNEL_BOOTCMD:versal-net ?= "booti"
-KERNEL_BOOTCMD:versal-2ve-2vm ?= "booti"
-KERNEL_BOOTCMD:versal-2vp ?= "booti"
-
-BOOTMODE ??= "generic"
-BOOTFILE_EXT ?= ""
+DEFAULT_KERNEL_BOOTCMD ??= "booti"
+DEFAULT_KERNEL_BOOTCMD:arm ??= "bootm"
+KERNEL_BOOTCMD ?= "${DEFAULT_KERNEL_BOOTCMD}"
 
 #Make this value to "1" to skip appending base address to ddr offsets.
 SKIP_APPEND_BASEADDR ?= "0"
@@ -47,20 +36,22 @@ PRE_BOOTENV ?= ""
 SDBOOTDEV ?= "0"
 
 SRC_URI = " \
-    file://boot.cmd.sd.zynq \
-    file://boot.cmd.sd.zynqmp \
-    file://boot.cmd.sd.versal \
-    file://boot.cmd.qspi.versal \
-    file://boot.cmd.generic \
-    file://boot.cmd.generic.root \
-    file://boot.cmd.ubifs \
     file://pxeboot.pxe \
+    file://xilinx-default-sd.cmd \
     "
 
 # Even thought we don't create a package, make sure this is unique to the machine
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit image-artifact-names
+
+# Boot script template compiled by do_compile(): UBOOT_XLNX_BOOT_SCR names
+# the file (under this recipe's SRC_URI) used as input, defaulting to
+# xilinx-default-sd.cmd on arm/aarch64. Override UBOOT_XLNX_BOOT_SCR (or
+# DEFAULT_UBOOT_XLNX_BOOT_SCR) in a bbappend to select a different template.
+DEFAULT_UBOOT_XLNX_BOOT_SCR ??= "xilinx-default-sd.cmd"
+UBOOT_XLNX_BOOT_SCR ?= "${DEFAULT_UBOOT_XLNX_BOOT_SCR}"
+
 UENV_TEXTFILE ?= "uEnv.txt"
 UENV_MMC_OFFSET:zynqmp ??= "0x200000"
 UENV_MMC_OFFSET:zynq ??= "0x2080000"
@@ -68,6 +59,7 @@ UENV_MMC_OFFSET:versal ??= "0x200000"
 UENV_MMC_OFFSET:versal-net ??= "0x200000"
 UENV_MMC_OFFSET:versal-2ve-2vm ??= "0x200000"
 UENV_MMC_OFFSET:versal-2vp ??= "0x200000"
+UENV_MMC_OFFSET:microblaze-v ??= "0x0"
 
 UENV_MMC_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('UENV_MMC_OFFSET'))}"
 
@@ -76,7 +68,6 @@ UBOOTPXE_CONFIG ?= "pxelinux.cfg"
 UBOOTPXE_CONFIG_NAME = "${UBOOTPXE_CONFIG}${IMAGE_VERSION_SUFFIX}"
 
 DEVICETREE_ADDRESS ?= "${@append_baseaddr(d,d.getVar('DEVICETREE_OFFSET'))}"
-DEVICETREE_ADDRESS_SD ?= "${DEVICETREE_ADDRESS}"
 
 DEVICETREE_OFFSET_DEFAULT ??= ""
 DEVICETREE_OFFSET_DEFAULT:zynqmp ??= "0x100000"
@@ -85,20 +76,8 @@ DEVICETREE_OFFSET_DEFAULT:versal ??= "0x1000"
 DEVICETREE_OFFSET_DEFAULT:versal-net ??= "0x1000"
 DEVICETREE_OFFSET_DEFAULT:versal-2ve-2vm ??= "0x1000"
 DEVICETREE_OFFSET_DEFAULT:versal-2vp ??= "0x1000"
+DEVICETREE_OFFSET_DEFAULT:microblaze-v ??= "0x1e00000"
 DEVICETREE_OFFSET ??= "${DEVICETREE_OFFSET_DEFAULT}"
-
-DEVICETREE_OVERLAY_OFFSET_DEFAULT ??= ""
-DEVICETREE_OVERLAY_OFFSET_DEFAULT:zynqmp ??= "0x100000"
-DEVICETREE_OVERLAY_OFFSET_DEFAULT:zynq ??= "0x100000"
-DEVICETREE_OVERLAY_OFFSET_DEFAULT:versal ??= "0x1000"
-DEVICETREE_OVERLAY_OFFSET_DEFAULT:versal-net ??= "0x1000"
-DEVICETREE_OVERLAY_OFFSET_DEFAULT:versal-2ve-2vm ??= "0x1000"
-DEVICETREE_OVERLAY_OFFSET_DEFAULT:versal-2vp ??= "0x1000"
-DEVICETREE_OVERLAY_OFFSET ??= "${DEVICETREE_OVERLAY_OFFSET_DEFAULT}"
-DEVICETREE_OVERLAY_PADSIZE ??= "0x1f00000"
-
-DEVICETREE_OVERLAY_ADDRESS ?= "${@hex(int(append_baseaddr(d,d.getVar('DEVICETREE_OVERLAY_OFFSET')),16) \
-				+ int(d.getVar('DEVICETREE_OVERLAY_PADSIZE'),16))}"
 
 KERNEL_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('KERNEL_OFFSET'))}"
 
@@ -125,50 +104,46 @@ RAMDISK_OFFSET_DEFAULT:versal-2ve-2vm ??= "0x4000000"
 RAMDISK_OFFSET_DEFAULT:versal-2vp ??= "0x4000000"
 RAMDISK_OFFSET ??= "${RAMDISK_OFFSET_DEFAULT}"
 
-FIT_IMAGE_LOAD_ADDRESS ?= "${@append_baseaddr(d,d.getVar('FIT_IMAGE_OFFSET'))}"
-FIT_IMAGE_OFFSET ??= "0x10000000"
-FIT_IMAGE ?= "image.ub"
-
 ## Below offsets and sizes are based on 32MB QSPI Memory for zynq
 ## For zynq
 ## Load boot.scr at 0xFC0000 -> 15MB of QSPI/NAND Memory
-QSPI_KERNEL_OFFSET:zynq ??= "0xA00000"
-QSPI_RAMDISK_OFFSET:zynq ??= "0x1000000"
+SPI_KERNEL_OFFSET:zynq ??= "0xA00000"
+SPI_RAMDISK_OFFSET:zynq ??= "0x1000000"
 
 NAND_KERNEL_OFFSET:zynq ??= "0x1000000"
 NAND_RAMDISK_OFFSET:zynq ??= "0x4600000"
 
-QSPI_KERNEL_SIZE:zynq ??= "0x600000"
-QSPI_RAMDISK_SIZE:zynq ??= "0xF80000"
+SPI_KERNEL_SIZE:zynq ??= "0x600000"
+SPI_RAMDISK_SIZE:zynq ??= "0xF80000"
 
 NAND_KERNEL_SIZE ??= "0x3200000"
 NAND_RAMDISK_SIZE ??= "0x3200000"
 
-## Below offsets and sizes are based on 128MB QSPI Memory for zynqmp/versal
+## Below offsets and sizes are based on 128MB QSPI/OSPI Memory for zynqmp/versal
 ## For zynqMP
 ## Load boot.scr at 0x3E80000 -> 62MB of QSPI/NAND Memory
-QSPI_KERNEL_OFFSET ??= "0xF00000"
-QSPI_KERNEL_OFFSET:zynqmpdr ??= "0x3F00000"
-QSPI_RAMDISK_OFFSET ??= "0x4000000"
-QSPI_RAMDISK_OFFSET:zynqmpdr ??= "0x5D00000"
+SPI_KERNEL_OFFSET ??= "0xF00000"
+SPI_KERNEL_OFFSET:zynqmpdr ??= "0x3F00000"
+SPI_RAMDISK_OFFSET ??= "0x4000000"
+SPI_RAMDISK_OFFSET:zynqmpdr ??= "0x5D00000"
 
 NAND_KERNEL_OFFSET:zynqmp ??= "0x4100000"
 NAND_RAMDISK_OFFSET:zynqmp ??= "0x7800000"
 
-QSPI_KERNEL_SIZE:zynqmp ??= "0x1D00000"
-QSPI_RAMDISK_SIZE ??= "0x4000000"
-QSPI_RAMDISK_SIZE:zynqmpdr ??= "0x1D00000"
+SPI_KERNEL_SIZE:zynqmp ??= "0x1D00000"
+SPI_RAMDISK_SIZE ??= "0x4000000"
+SPI_RAMDISK_SIZE:zynqmpdr ??= "0x1D00000"
 
 ## For versal
-## Load boot.scr at 0x7F80000 -> 127MB of QSPI/NAND Memory
-QSPI_KERNEL_OFFSET:versal ??= "0xF00000"
-QSPI_KERNEL_OFFSET:versal-net ??= "0xF00000"
-QSPI_KERNEL_OFFSET:versal-2ve-2vm ??= "0xF00000"
-QSPI_KERNEL_OFFSET:versal-2vp ??= "0xF00000"
-QSPI_RAMDISK_OFFSET:versal ??= "0x2E00000"
-QSPI_RAMDISK_OFFSET:versal-net ??= "0x2E00000"
-QSPI_RAMDISK_OFFSET:versal-2ve-2vm ??= "0x2E00000"
-QSPI_RAMDISK_OFFSET:versal-2vp ??= "0x2E00000"
+## Load boot.scr at 0x7F80000 -> 127MB of QSPI/OSPI/NAND Memory
+SPI_KERNEL_OFFSET:versal ??= "0xF00000"
+SPI_KERNEL_OFFSET:versal-net ??= "0xF00000"
+SPI_KERNEL_OFFSET:versal-2ve-2vm ??= "0xF00000"
+SPI_KERNEL_OFFSET:versal-2vp ??= "0xF00000"
+SPI_RAMDISK_OFFSET:versal ??= "0x2E00000"
+SPI_RAMDISK_OFFSET:versal-net ??= "0x2E00000"
+SPI_RAMDISK_OFFSET:versal-2ve-2vm ??= "0x2E00000"
+SPI_RAMDISK_OFFSET:versal-2vp ??= "0x2E00000"
 
 NAND_KERNEL_OFFSET:versal ??= "0x4100000"
 NAND_KERNEL_OFFSET:versal-net ??= "0x4100000"
@@ -179,45 +154,25 @@ NAND_RAMDISK_OFFSET:versal-net ??= "0x8200000"
 NAND_RAMDISK_OFFSET:versal-2ve-2vm ??= "0x8200000"
 NAND_RAMDISK_OFFSET:versal-2vp ??= "0x8200000"
 
-QSPI_KERNEL_SIZE:versal ??= "0x1D00000"
-QSPI_KERNEL_SIZE:versal-net ??= "0x1D00000"
-QSPI_KERNEL_SIZE:versal-2ve-2vm ??= "0x1D00000"
-QSPI_KERNEL_SIZE:versal-2vp ??= "0x1D00000"
-QSPI_RAMDISK_SIZE:versal ??= "0x4000000"
-QSPI_RAMDISK_SIZE:versal-net ??= "0x4000000"
-QSPI_RAMDISK_SIZE:versal-2ve-2vm ??= "0x4000000"
-QSPI_RAMDISK_SIZE:versal-2vp ??= "0x4000000"
-
-QSPI_KERNEL_IMAGE:zynq ?= "image.ub"
-QSPI_KERNEL_IMAGE:zynqmp ?= "image.ub"
-QSPI_KERNEL_IMAGE:versal ?= "image.ub"
-QSPI_KERNEL_IMAGE:versal-net ?= "image.ub"
-QSPI_KERNEL_IMAGE:versal-2ve-2vm ?= "image.ub"
-QSPI_KERNEL_IMAGE:versal-2vp ?= "image.ub"
-
-NAND_KERNEL_IMAGE ?= "image.ub"
-
-QSPI_FIT_IMAGE_OFFSET ??= "0xF40000"
-QSPI_FIT_IMAGE_OFFSET:zynqmpdr ??= "0x3F80000"
-QSPI_FIT_IMAGE_OFFSET:zynq ??= "0xA80000"
-
-QSPI_FIT_IMAGE_SIZE ??= "0x6400000"
-QSPI_FIT_IMAGE_SIZE:zynqmpdr ??= "0x3F00000"
-QSPI_FIT_IMAGE_SIZE:zynq ??= "0x1500000"
-
-NAND_FIT_IMAGE_OFFSET ??= "0x4180000"
-NAND_FIT_IMAGE_OFFSET:zynq ??= "0x1080000"
-NAND_FIT_IMAGE_SIZE ??= "0x6400000"
+SPI_KERNEL_SIZE:versal ??= "0x1D00000"
+SPI_KERNEL_SIZE:versal-net ??= "0x1D00000"
+SPI_KERNEL_SIZE:versal-2ve-2vm ??= "0x1D00000"
+SPI_KERNEL_SIZE:versal-2vp ??= "0x1D00000"
+SPI_RAMDISK_SIZE:versal ??= "0x4000000"
+SPI_RAMDISK_SIZE:versal-net ??= "0x4000000"
+SPI_RAMDISK_SIZE:versal-2ve-2vm ??= "0x4000000"
+SPI_RAMDISK_SIZE:versal-2vp ??= "0x4000000"
 
 # Add variables as addendum.
 SCRIPT_SED_ADDENDUM = ""
 
-# Default to booting with the rootfs device being partition 2 for SD/eMMC
-PARTNUM ?= "2"
-
-# Set Kernel root filesystem parameter for SD/eMMC boot
-# Bootdev will automatically be set to 'sda' or 'mmcblkXp'
-KERNEL_ROOT_SD ?= "root=/dev/\${bootdev}${PARTNUM} ro rootwait"
+# Partition number of the root filesystem, used by SD/eMMC wic layouts
+# where the kernel and boot.scr live under /boot on the same ext4 partition
+# as the rootfs (as opposed to a separate FAT boot partition addressed
+# via distro_bootpart below). Also used to build the kernel root= parameter
+# for SD/eMMC boot, and substituted into the @@PARTNUM@@ token still used
+# by some downstream boot.cmd templates (e.g. meta-kria's boot.cmd.kria.prod).
+ROOT_PARTNUM ?= "2"
 
 # Set Kernel root filesystem parameter for JTAG/QSPI/OSPI/NAND(using RAMDISK) boot
 KERNEL_ROOT_RAMDISK ?= "root=/dev/ram0 rw"
@@ -260,8 +215,6 @@ do_compile() {
         -e 's/@@KERNEL_LOAD_ADDRESS@@/${KERNEL_LOAD_ADDRESS}/' \
         -e 's/@@DEVICE_TREE_NAME@@/${DEVICE_TREE_NAME}/' \
         -e 's/@@DEVICETREE_ADDRESS@@/${DEVICETREE_ADDRESS}/' \
-	-e 's/@@DEVICETREE_ADDRESS_SD@@/${DEVICETREE_ADDRESS_SD}/' \
-        -e 's/@@DEVICETREE_OVERLAY_ADDRESS@@/${DEVICETREE_OVERLAY_ADDRESS}/' \
         -e 's/@@RAMDISK_IMAGE@@/${RAMDISK_IMAGE}/' \
         -e 's/@@RAMDISK_IMAGE_ADDRESS@@/${RAMDISK_IMAGE_ADDRESS}/' \
         -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/' \
@@ -270,39 +223,29 @@ do_compile() {
         -e 's/@@BITSTREAM_LOAD_ADDRESS@@/${BITSTREAM_LOAD_ADDRESS}/g' \
         -e 's/@@BITSTREAM_IMAGE@@/${@boot_files_bitstream(d)[0]}/g' \
         -e 's/@@BITSTREAM_LOAD_TYPE@@/${@get_bitstream_load_type(d)}/g' \
-        -e 's/@@QSPI_KERNEL_OFFSET@@/${QSPI_KERNEL_OFFSET}/' \
+        -e 's/@@SPI_KERNEL_OFFSET@@/${SPI_KERNEL_OFFSET}/' \
         -e 's/@@NAND_KERNEL_OFFSET@@/${NAND_KERNEL_OFFSET}/' \
-        -e 's/@@QSPI_KERNEL_SIZE@@/${QSPI_KERNEL_SIZE}/' \
+        -e 's/@@SPI_KERNEL_SIZE@@/${SPI_KERNEL_SIZE}/' \
         -e 's/@@NAND_KERNEL_SIZE@@/${NAND_KERNEL_SIZE}/' \
-        -e 's/@@QSPI_RAMDISK_OFFSET@@/${QSPI_RAMDISK_OFFSET}/' \
+        -e 's/@@SPI_RAMDISK_OFFSET@@/${SPI_RAMDISK_OFFSET}/' \
         -e 's/@@NAND_RAMDISK_OFFSET@@/${NAND_RAMDISK_OFFSET}/' \
-        -e 's/@@QSPI_RAMDISK_SIZE@@/${QSPI_RAMDISK_SIZE}/' \
+        -e 's/@@SPI_RAMDISK_SIZE@@/${SPI_RAMDISK_SIZE}/' \
         -e 's/@@NAND_RAMDISK_SIZE@@/${NAND_RAMDISK_SIZE}/' \
         -e 's/@@KERNEL_IMAGE@@/${KERNEL_IMAGE}/' \
-        -e 's/@@QSPI_KERNEL_IMAGE@@/${QSPI_KERNEL_IMAGE}/' \
-        -e 's/@@NAND_KERNEL_IMAGE@@/${NAND_KERNEL_IMAGE}/' \
-        -e 's/@@FIT_IMAGE_LOAD_ADDRESS@@/${FIT_IMAGE_LOAD_ADDRESS}/' \
-        -e 's/@@QSPI_FIT_IMAGE_OFFSET@@/${QSPI_FIT_IMAGE_OFFSET}/' \
-        -e 's/@@QSPI_FIT_IMAGE_SIZE@@/${QSPI_FIT_IMAGE_SIZE}/' \
-        -e 's/@@NAND_FIT_IMAGE_OFFSET@@/${NAND_FIT_IMAGE_OFFSET}/' \
-        -e 's/@@NAND_FIT_IMAGE_SIZE@@/${NAND_FIT_IMAGE_SIZE}/' \
-        -e 's/@@FIT_IMAGE@@/${FIT_IMAGE}/' \
         -e 's/@@PRE_BOOTENV@@/${PRE_BOOTENV}/' \
         -e 's/@@UENV_MMC_LOAD_ADDRESS@@/${UENV_MMC_LOAD_ADDRESS}/' \
         -e 's/@@UENV_TEXTFILE@@/${UENV_TEXTFILE}/' \
-        -e 's/@@RAMDISK_IMAGE1@@/${RAMDISK_IMAGE1}/' \
-        -e 's/@@PARTNUM@@/${PARTNUM}/' \
-        -e 's:@@KERNEL_ROOT_SD@@:${KERNEL_ROOT_SD}:' \
+        -e 's/@@ROOT_PARTNUM@@/${ROOT_PARTNUM}/' \
         -e 's:@@KERNEL_ROOT_RAMDISK@@:${KERNEL_ROOT_RAMDISK}:' \
         -e 's:@@KERNEL_COMMAND_APPEND@@:${KERNEL_COMMAND_APPEND}:' \
         ${SCRIPT_SED_ADDENDUM} \
-        "${UNPACKDIR}/boot.cmd.${BOOTMODE}${BOOTFILE_EXT}" > "${UNPACKDIR}/boot.cmd"
+        "${UNPACKDIR}/${UBOOT_XLNX_BOOT_SCR}" > "${UNPACKDIR}/boot.cmd"
 
-    mkimage -A arm -T script -C none -n "Boot script" -d "${UNPACKDIR}/boot.cmd" boot.scr
+    mkimage -A arm -T script -C none -n "Default Boot script" -d "${UNPACKDIR}/boot.cmd" boot.scr
 
     sed -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
         -e 's/@@DEVICE_TREE_NAME@@/${DEVICE_TREE_NAME}/' \
-        -e 's/@@RAMDISK_IMAGE@@/${PXERAMDISK_IMAGE}/' \
+        -e 's/@@RAMDISK_IMAGE@@/${RAMDISK_IMAGE}/' \
         "${UNPACKDIR}/pxeboot.pxe" > "pxeboot.pxe"
 }
 
