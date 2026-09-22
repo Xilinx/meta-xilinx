@@ -8,7 +8,7 @@ ESW_COMPONENT_SRC = "/ThirdParty/sw_services/lwip220/src/"
 ESW_COMPONENT_NAME = "liblwip220.a"
 
 DEPENDS += "libxil"
-DEPENDS:append:xilinx-freertos = "freertos10-xilinx"
+DEPENDS:append:xilinx-freertos = " freertos10-xilinx"
 
 EXTRA_OECMAKE += "-Dlwip220_api_mode=RAW_API"
 EXTRA_OECMAKE += "-Dlwip220_dhcp_does_arp_check=ON"
