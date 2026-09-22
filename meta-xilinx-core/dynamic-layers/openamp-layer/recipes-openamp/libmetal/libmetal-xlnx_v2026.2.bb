@@ -5,7 +5,7 @@ providing the user-space and baremetal hardware abstraction layer \
 (memory, IRQ, I/O) used by open-amp on Zynq UltraScale+ MPSoC, Versal \
 and Versal NET inter-processor communication."
 SRCBRANCH ?= "main"
-SRCREV = "c5389ea380a2824a069f06df357d7dddfc0942a9"
+SRCREV = "f05a041762532320a5e8d8532b118c22fc3e8e1e"
 BRANCH = "main"
 LIC_FILES_CHKSUM ?= "file://LICENSE.md;md5=f4d5df0f12dcea1b1a0124219c0dbab4"
 PV .= "+git"
