@@ -17,7 +17,7 @@ SYSTEM_DTFILE_DEPENDS ??= ""
 LIBMETAL_DEPENDS ?= "${SYSTEM_DTFILE_DEPENDS}"
 LIBMETAL_DTFILE ?= "${CONFIG_DTFILE}"
 
-DEPENDS:append = "${LIBMETAL_DEPENDS}"
+DEPENDS += "${LIBMETAL_DEPENDS}"
 DEPENDS:append = " libmetal-xlnx device-tree python3-native python3-pyyaml-native  python3-dtc-native libmetal-xlnx-extension xiltimer ttcps libxil xilstandalone xiltimer ipipsu xilpm "
 
 B = "${WORKDIR}/build"
