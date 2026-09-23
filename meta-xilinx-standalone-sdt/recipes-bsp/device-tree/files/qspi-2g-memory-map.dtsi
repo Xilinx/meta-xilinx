@@ -1,7 +1,7 @@
 / {
 	/* Empty root node resets Lopper's label tracking to avoid false duplicate label errors */
 };
-/* QSPI partitions for basecamp Image-recovery (256MB / 2Gbit) */
+/* QSPI partitions for Image-recovery (256MB / 2Gbit) */
 &qspi {
 	#address-cells = <1>;
 	#size-cells = <0>;
