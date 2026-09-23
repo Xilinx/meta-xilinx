@@ -6,8 +6,8 @@ SECTION = "multimedia"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=624e7970a65c3e70b309116d8fb6c3d7"
 
-SRC_URI = "git://github.com/Xilinx/gst-plugins-vcu.git;protocol=https;branch=main"
-SRCREV = "40a54d0fdf3778361b780f797874527a9c60fa57"
+SRC_URI = "git://github.com/Xilinx/gst-plugins-vcu.git;protocol=https;branch=xlnx-rebase-v1.28.2"
+SRCREV = "bd8cb15959f5afcd47f571d87cf9aed2e5c50023"
 
 PV = "0.1.0+git"
 
