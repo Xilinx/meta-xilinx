@@ -18,12 +18,12 @@ require u-boot-xlnx-common.inc
 # do not merge. Layers set the DEFAULT_; a recipe or the user overrides it.
 DEFAULT_UBOOT_PREBOOT_CFG = ""
 UBOOT_PREBOOT_CFG ?= "${DEFAULT_UBOOT_PREBOOT_CFG}"
-SRC_URI:append = " ${UBOOT_PREBOOT_CFG}"
+SRC_URI += "${UBOOT_PREBOOT_CFG}"
 
 # Same arbitration for CONFIG_BOOTCOMMAND.
 DEFAULT_UBOOT_BOOTCMD_CFG = ""
 UBOOT_BOOTCMD_CFG ?= "${DEFAULT_UBOOT_BOOTCMD_CFG}"
-SRC_URI:append = " ${UBOOT_BOOTCMD_CFG}"
+SRC_URI += "${UBOOT_BOOTCMD_CFG}"
 
 inherit shared-manifest
 
