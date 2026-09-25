@@ -6,6 +6,7 @@ REQUIRED_MACHINE_FEATURES = "dp14rxss"
 inherit esw python3native
 
 DEPENDS += "xilstandalone video-common dp14 iic iicps"
+DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "clk-wiz", "clk-wiz", "",d)}"
 DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "hdcp1x", "hdcp1x", "",d)}"
 DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "hdcp22-rx-dp", "hdcp22-rx-dp", "",d)}"
 
