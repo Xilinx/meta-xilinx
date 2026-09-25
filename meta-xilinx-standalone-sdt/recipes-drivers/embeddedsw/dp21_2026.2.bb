@@ -5,7 +5,7 @@ REQUIRED_MACHINE_FEATURES = "dp21"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone "
+DEPENDS += "xilstandalone video-common"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dp21/src/"
 ESW_COMPONENT_NAME = "libdp21.a"

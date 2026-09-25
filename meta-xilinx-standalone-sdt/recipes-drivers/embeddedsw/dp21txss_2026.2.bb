@@ -5,7 +5,9 @@ REQUIRED_MACHINE_FEATURES = "dp21txss"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone "
+DEPENDS += "xilstandalone video-common dp21 vtc"
+DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "clk-wiz", "clk-wiz", "",d)}"
+DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "dual-splitter", "dual-splitter", "",d)}"
 
 ESW_COMPONENT_SRC = "/XilinxProcessorIPLib/drivers/dp21txss/src/"
 ESW_COMPONENT_NAME = "libdp21txss.a"
