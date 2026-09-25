@@ -4,9 +4,9 @@ ESW_VER ?= "${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or 'master'
 
 REPO ??= "git://github.com/Xilinx/embeddedsw.git;protocol=https;name=embeddedsw"
 
-ESW_BRANCH[git] = "master"
+ESW_BRANCH[git] = "xlnx_rel_v2026.2"
 ESW_BRANCH[2026.1] = "xlnx_rel_v2026.1"
-ESW_BRANCH[2026.2] = "master"
+ESW_BRANCH[2026.2] = "xlnx_rel_v2026.2"
 ESW_BRANCH = "${@d.getVarFlag('ESW_BRANCH', d.getVar('ESW_VER')) or '${ESW_VER}'}"
 ESW_BRANCH[vardeps] += "ESW_VER"
 BRANCH ??= "${ESW_BRANCH}"
@@ -24,6 +24,7 @@ EMBEDDEDSW_SRCURI ?= "${REPO};${EMBEDDEDSW_BRANCHARG}"
 LICENSE = "MIT"
 ESW_LIC_FILES_CHKSUM[master] = 'b29f4da21ad77af267cadb19543de2e5'
 ESW_LIC_FILES_CHKSUM[xlnx_rel_v2026.1] = '72a4c4e9c5bcb3f5ac72f1bb755dbdb5'
+ESW_LIC_FILES_CHKSUM[xlnx_rel_v2026.2] = 'b29f4da21ad77af267cadb19543de2e5'
 ESW_LIC_FILES_CHKSUM = "${@d.getVarFlag('ESW_LIC_FILES_CHKSUM', d.getVar('BRANCH')) or '0'}"
 ESW_LIC_FILES_CHKSUM[vardeps] += "BRANCH"
 LIC_FILES_CHKSUM ??= "file://license.txt;md5=${ESW_LIC_FILES_CHKSUM}"
