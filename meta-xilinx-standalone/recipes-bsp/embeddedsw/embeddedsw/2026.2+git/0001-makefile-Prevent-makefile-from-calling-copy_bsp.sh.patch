@@ -14,40 +14,25 @@ AI-Generated: GitHub Copilot (Claude Opus 5)
 
 Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
 ---
- lib/sw_apps/asufw/src/Makefile                    | 4 ++--
- lib/sw_apps/versal_plm/src/versal_aiepg2/Makefile | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ lib/sw_apps/asufw/src/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/lib/sw_apps/asufw/src/Makefile b/lib/sw_apps/asufw/src/Makefile
-index a5c32b60c1..ac7436d157 100644
+index 75b0215976..9e46802a48 100644
 --- a/lib/sw_apps/asufw/src/Makefile
 +++ b/lib/sw_apps/asufw/src/Makefile
-@@ -37,8 +37,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
+@@ -127,9 +127,9 @@ BSP_CONFIG := $(ASU_XPARAMETERS) \
+ 	$(filter-out ../misc/asufw_bsp ../misc/Readme.txt $(ASU_XPARAMETERS), $(wildcard ../misc/*))
  
- $(LIBS):
- 	echo "Copying BSP files"
+ $(LIBS): $(BSP_CONFIG)
+-	echo "Regenerating BSP for the current configuration"
+-	rm -rf ../misc/asufw_bsp
 -	../misc/copy_bsp.sh
--	echo "Compiling bsp"
++	#echo "Regenerating BSP for the current configuration"
++	#rm -rf ../misc/asufw_bsp
 +	#../misc/copy_bsp.sh
-+	#echo "Compiling bsp"
- 	$(MAKE) -C ../misc/asufw_bsp/
- 
- %.o:%.c
-diff --git a/lib/sw_apps/versal_plm/src/versal_aiepg2/Makefile b/lib/sw_apps/versal_plm/src/versal_aiepg2/Makefile
-index 9574465ad9..f53dbba671 100755
---- a/lib/sw_apps/versal_plm/src/versal_aiepg2/Makefile
-+++ b/lib/sw_apps/versal_plm/src/versal_aiepg2/Makefile
-@@ -35,8 +35,8 @@ $(EXEC): $(LIBS) $(OBJS) $(INCLUDES)
- $(OBJS): $(LIBS)
- 
- $(LIBS):
--	echo "Copying BSP files"
--	../../misc/versal_aiepg2/copy_bsp.sh
-+	#echo "Copying BSP files"
-+	#../../misc/versal_aiepg2/copy_bsp.sh
  	echo "Compiling bsp"
- 	$(MAKE) -C ../../misc/versal_aiepg2/versal_plm_bsp
+ 	$(MAKE) -C ../misc/asufw_bsp/
  
 -- 
 2.34.1
-
