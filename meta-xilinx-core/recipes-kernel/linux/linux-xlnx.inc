@@ -94,3 +94,11 @@ KERNEL_FEATURES_KPROBES = " features/kprobes"
 KERNEL_FEATURES:append = "${KERNEL_FEATURES_KPROBES}"
 
 KERNEL_FEATURES:append = " features/base/xilinx-base.scc"
+
+# The libmetal host demo uses named UIO devices with compatible = "uio".
+# Limit this module configuration to the full kernel; linux-xlnx-small
+# uses a recovery defconfig without module support.
+KERNEL_FEATURES:append:pn-linux-xlnx = " ${@bb.utils.contains('DISTRO_FEATURES', 'openamp', 'features/libmetal/libmetal-uio.scc', '', d)}"
+KERNEL_MODULE_AUTOLOAD:append:pn-linux-xlnx = " ${@bb.utils.contains('DISTRO_FEATURES', 'openamp', 'uio_pdrv_genirq', '', d)}"
+KERNEL_MODULE_PROBECONF:append:pn-linux-xlnx = " ${@bb.utils.contains('DISTRO_FEATURES', 'openamp', 'uio_pdrv_genirq', '', d)}"
+module_conf_uio_pdrv_genirq:pn-linux-xlnx = "${@bb.utils.contains('DISTRO_FEATURES', 'openamp', 'options uio_pdrv_genirq of_id=uio', '', d)}"
