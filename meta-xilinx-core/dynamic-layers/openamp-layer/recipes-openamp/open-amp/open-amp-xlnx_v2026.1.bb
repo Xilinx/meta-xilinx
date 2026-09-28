@@ -4,7 +4,7 @@ implementing VirtIO/RPMsg/Remoteproc on top of libmetal so Linux on \
 the APU can boot and message firmware running on the RPU/PMU \
 MicroBlaze cores of Zynq UltraScale+ MPSoC, Versal and Versal NET."
 SRCBRANCH ?= "2026"
-SRCREV = "effa32427f758d2ecacc770523e0f515576c1395"
+SRCREV = "6a50022d9edf4f22b0335298bae3dc5372e43631"
 BRANCH = "2026"
 LIC_FILES_CHKSUM ?= "file://LICENSE.md;md5=dfc0adf4d04cc738ba65b7d3f587dca5"
 PV .= "+git"
