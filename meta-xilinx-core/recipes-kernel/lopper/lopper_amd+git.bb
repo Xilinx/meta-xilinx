@@ -5,7 +5,7 @@ DESCRIPTION = "Tool for manipulation of system device tree files"
 LICENSE = "BSD-3-Clause"
 SECTION = "bootloader"
 
-SRC_URI = "git://github.com/Xilinx/lopper.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/Xilinx/lopper.git;branch=xlnx_rel_v2026.2;protocol=https"
 SRCREV = "ffbc06e249c085cccc1181a4a3ead37c77f3955b"
 
 BASEVERSION = "1.5.0"
