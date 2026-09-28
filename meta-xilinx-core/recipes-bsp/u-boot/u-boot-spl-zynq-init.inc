@@ -1,3 +1,5 @@
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+
 inherit xilinx-platform-init
 
 FORCE_PLATFORM_INIT[doc] = "This variable is used to force the overriding of all platform init files in u-boot source."
@@ -15,15 +17,18 @@ do_zynq_platform_init() {
 		fi
 		# Newer u-boot sources use the init files in a sub directory named
 		# based on the name of the device tree. This is not straight forward to
-		# detect. Instead of detecting just overwrite all the platform init
+		# detect. Instead of detecting just remove all the platform init
 		# files so that the correct one is always used. This shotgun approach
-		# only works due to this recipe being machine arch specific. Do this
-		# overwrite un-conditionally as there is no guarantees that the chosen
-		# board config does not have the device tree config set.
-		for i in ${S}/${PLATFORM_BOARD_DIR}/*/; do
-			[ -d $i ] && cp ${PLATFORM_INIT_STAGE_DIR}/$f $i
-		done
+		# only works due to this recipe being machine arch specific.
+		rm -f ${S}/${PLATFORM_BOARD_DIR}/*/$f
 	done
+}
+
+# The psu_init_gpl.c file as provided doesn't properly compile under u-boot, so apply
+# the script that cleans it up. The script calls clang-format so hence the dependency
+# on clang-native.
+do_zynq_platform_init:append:zynqmp() {
+    ${S}/tools/zynqmp_psu_init_minimize.sh ${S}/${PLATFORM_BOARD_DIR} ${S}/${PLATFORM_BOARD_DIR}
 }
 
 python () {
@@ -64,7 +69,23 @@ python () {
         d.setVar("SPL_BINARY", "")
 
     if providesbin and d.getVar("SOC_FAMILY") in ["zynqmp"]:
-        # setup PMU Firmware path via MAKEFLAGS
-        d.appendVar("EXTRA_OEMAKE", " CONFIG_PMUFW_INIT_FILE=\"{0}\"".format("${PMU_FIRMWARE_DEPLOY_DIR}/${PMU_FIRMWARE_IMAGE_NAME}.bin"))
+        # to create boot.bin, the zynqmp needs pmu-firmware and tf-a binaries
+        d.appendVar("DEPENDS", " pmufw trusted-firmware-a clang-native")
 }
 
+# ZynqMP needs to be told where to find the TF-A
+do_compile:prepend:zynqmp() {
+    export BL31="${DEPLOY_DIR_IMAGE}/bl31.bin"
+}
+
+# Default PMU configuration
+SRC_URI:append:zynqmp = " file://pm_cfg_obj_default.c"
+
+# ZynqMP needs to be told where to find the PMU firmware blobs
+do_configure:prepend:zynqmp() {
+    # Amend configuration file with config location. Cannot be done through MAKEFLAGS
+    # because these don't end up in "config.h".
+    echo 'CONFIG_PMUFW_INIT_FILE="${PMU_FIRMWARE_DEPLOY_DIR}/${PMU_FIRMWARE_IMAGE_NAME}.bin"' >> ${S}/configs/${UBOOT_MACHINE}
+    ${S}/tools/zynqmp_pm_cfg_obj_convert.py ${UNPACKDIR}/pm_cfg_obj_default.c ${B}/pmu-conf.bin
+    echo 'CONFIG_ZYNQMP_SPL_PM_CFG_OBJ_FILE="${B}/pmu-conf.bin"' >> ${S}/configs/${UBOOT_MACHINE}
+}
