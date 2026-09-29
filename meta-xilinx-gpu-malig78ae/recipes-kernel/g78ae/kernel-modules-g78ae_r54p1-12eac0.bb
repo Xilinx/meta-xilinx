@@ -4,8 +4,9 @@ GPU as found on AMD Versal Series Gen 2 devices."
 SECTION = "kernel/modules"
 
 LICENSE = "GPL-2.0-only"
+# Relative to ${S} so this also works with `devtool modify` / externalsrc.
 LIC_FILES_CHKSUM = " \
-	file://${UNPACKDIR}/${BP}/kbase/license.txt;md5=13e14ae1bd7ad5bff731bba4a31bb510 \
+	file://kbase/license.txt;md5=13e14ae1bd7ad5bff731bba4a31bb510 \
 	"
 # Arbiter license file
 # driver/product/kernel/drivers/gpu/arm/arbitration/license_gplv2.txt
@@ -13,7 +14,7 @@ LIC_FILES_CHKSUM = " \
 
 BRANCH = "r54p1-12eac0"
 SRCREV_kernel = "1bb2b38d39065aec2d9674f83294887c56c2c00b"
-SRCREV_arbitration = "8c5448552b84e5a7ecb13046ad02a31cb673aeeb"
+SRCREV_arbitration = "d3868a13838add453587552f45f6d477a386b2cb"
 SRCREV_FORMAT = "kernel_arbitration"
 
 SRC_URI = " \
@@ -38,7 +39,7 @@ REQUIRED_MACHINE_FEATURES = "malig78ae"
 INSANE_SKIP += "buildpaths"
 
 BUILD_SCRIPT = "${UNPACKDIR}/compiler.py"
-BUILD_CMD = "${STAGING_BINDIR_NATIVE}/python3-native/python3 ${BUILD_SCRIPT} --driver ${UNPACKDIR}/${BP}/kbase --debug"
+BUILD_CMD = "${STAGING_BINDIR_NATIVE}/python3-native/python3 ${BUILD_SCRIPT} --driver ${S}/kbase --debug"
 
 INSTALL_DIR = "${nonarch_base_libdir}/modules/${KERNEL_VERSION}"
 
