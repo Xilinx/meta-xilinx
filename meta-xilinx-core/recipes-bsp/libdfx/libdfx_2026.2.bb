@@ -8,7 +8,7 @@ BRANCH ?= "master"
 REPO ?= "git://github.com/Xilinx/libdfx.git;protocol=https"
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
-SRCREV = "8cdb13d4a227648f5e4a8beb823e9990280f2e24"
+SRCREV = "2935992c5d9716368bda81ccf5263f553e041ef9"
 
 # Don't allow building for Microblaze MACHINE unless it is supported.
 COMPATIBLE_MACHINE = "^$"
