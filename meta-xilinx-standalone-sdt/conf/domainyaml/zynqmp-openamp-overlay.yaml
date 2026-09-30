@@ -52,8 +52,8 @@ domains:
         compatible: openamp,remoteproc-v2
         relation0:
           remote: R5_0_ZEPHYR
-          elfload: [ psu_r5_0_atcm_global@ffe00000,
-                     psu_r5_0_btcm_global@ffe20000, rproc0@9800000,
+          elfload: [ psu_r5_0_atcm_global,
+                     psu_r5_0_btcm_global, rproc0@9800000,
                      trace@985f000, rsctbl@9820000 ]
       rpmsg-relation:
         compatible: openamp,rpmsg-v1
