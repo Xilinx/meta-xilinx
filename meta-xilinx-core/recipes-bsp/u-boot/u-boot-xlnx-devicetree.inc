@@ -14,12 +14,19 @@ EXTRA_OEMAKE += "${@'DEVICE_TREE=${UBOOT_USER_SPECIFIED_DTS}' if (d.getVar('UBOO
 EXTRA_OEMAKE:append:riscv64 = " ${@'OPENSBI=${RECIPE_SYSROOT}/share/opensbi/lp64/generic/firmware/fw_dynamic.bin'}"
 
 python __anonymous () {
-    #check if there are any dtb providers
-    providerdtb = d.getVar("PREFERRED_PROVIDER_virtual/dtb")
+    # Check if there are any external dtb providers. It's possible to have a separate
+    # provider for the U-Boot devicetree, through UBOOT_MACHINE_DTB
+    dts = d.getVar("UBOOT_MACHINE_DTB")
+    if dts:
+        d.setVar('DTB_FILE_NAME', d.getVar('UBOOT_MACHINE_DTB'))
+        providerdtb = d.getVar("UBOOT_MACHINE_DTB_PROVIDER")
+    else:
+        providerdtb = d.getVar("PREFERRED_PROVIDER_virtual/dtb")
+        if providerdtb and d.getVar("DTB_FILE_NAME") is not None:
+            d.setVar('DTB_FILE_NAME', d.getVar('BASE_DTS')+ '.dtb')
+
     if providerdtb:
-       d.appendVarFlag('do_configure', 'depends', ' virtual/dtb:do_populate_sysroot')
-       if d.getVar("DTB_FILE_NAME") is not None:
-           d.setVar('DTB_FILE_NAME', d.getVar('BASE_DTS')+ '.dtb')
+       d.appendVarFlag('do_configure', 'depends', ' %s:do_populate_sysroot' % providerdtb)
 }
 
 DEFAULT_ARCH_DTS_DIR = ""
