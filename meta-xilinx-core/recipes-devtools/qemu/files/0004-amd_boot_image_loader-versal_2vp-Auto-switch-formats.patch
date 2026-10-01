@@ -1,0 +1,134 @@
+From 87ae3a3472e1a7d28a266eebb9ff06fdf883d5d2 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Wed, 30 Sep 2026 18:48:03 -0500
+Subject: [PATCH 4/8] amd_boot_image_loader: versal_2vp: Auto switch formats
+
+Based on the bootgen code, automatically determine the correct file
+format and switch.
+
+AI-Generated: Github copilot (auto)
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ amd_boot_image_loader/versal_2vp.py | 92 ++++++++++++++++++++++++++++-
+ 1 file changed, 89 insertions(+), 3 deletions(-)
+
+diff --git a/amd_boot_image_loader/versal_2vp.py b/amd_boot_image_loader/versal_2vp.py
+index 165f4ff..2b097a5 100644
+--- a/amd_boot_image_loader/versal_2vp.py
++++ b/amd_boot_image_loader/versal_2vp.py
+@@ -17,6 +17,7 @@ so only that window is re-read after the inherited parse.
+ """
+ 
+ import struct
++from pathlib import Path
+ 
+ from .versal import (
+     VersalBootImageLoader,
+@@ -32,13 +33,98 @@ from .versal_2ve_2vm import (
+     Versal2VE2VMBootImageLoader
+ )
+ 
++# versal_2vp devices whose PDI uses the Versal format, mirroring bootgen's
++# IdCodeManager::IsVersalFmtIdCode().
++VERSAL_FMT_IDCODES = frozenset({
++    0x04C60093, 0x04C69093, 0x04C74093, 0x04C75093, 0x04C76093,
++})
++
++# The image header table idCode sits in the word versal.py still calls
++# reserved1.
++IHT_ID_CODE_OFFSET = 0x18
++
++# Full PDI identification string, accepted in either byte order because
++# bootgen stores the literal 'FPDI' word while the parser here reads it
++# little-endian.
++_PDI_FULL_WORDS = frozenset({
++    VersalImageHeaderTable.PDI_FULL,
++    int.from_bytes(VersalImageHeaderTable.PDI_FULL.to_bytes(4, 'little'), 'big'),
++})
++
++
++def is_versal_fmt_pdi(image_path, image_path_offset: int = 0) -> bool:
++    """Report whether a versal_2vp PDI uses the Versal boot image format.
++
++    This is the Python counterpart of bootgen's IsVersalFmtPdi(). The image
++    header table of a versal_2vp image carries the idcode that decides which
++    format the image uses. A Versal-format image always keeps the table
++    offset in the Versal boot header field, so that layout is read first; a
++    native image simply fails the check and takes the native path. The
++    remaining candidates cover an image with no usable boot header.
++
++    Any short or failed read leaves the image to the regular parser, which
++    reports the error with the context this probe does not have.
++    """
++    try:
++        with open(image_path, 'rb') as fd:
++            file_size = fd.seek(0, 2)
++
++            def read_word(offset):
++                if offset < 0 or offset + 4 > file_size:
++                    return None
++                fd.seek(offset)
++                data = fd.read(4)
++                if len(data) != 4:
++                    return None
++                return struct.unpack('<I', data)[0]
++
++            base = image_path_offset
++            iht_offsets = []
++            word = read_word(base + VersalBootHeader.BH_META_HEADER_OFFSET)
++            if word is not None:
++                iht_offsets.append(base + word)
++            iht_offsets.append(base + Versal2VPPBootHeader.BH_SMAP_BUS_WIDTH_SIZE)
++            iht_offsets.append(base)
++
++            for iht_offset in iht_offsets:
++                ident = read_word(
++                    iht_offset + VersalImageHeaderTable.IHT_IDENTIFICATION_STRING_OFFSET)
++                if ident is None or ident not in _PDI_FULL_WORDS:
++                    continue
++                idcode = read_word(iht_offset + IHT_ID_CODE_OFFSET)
++                return idcode in VERSAL_FMT_IDCODES
++    except OSError:
++        return False
++
++    return False
++
++
+ class Versal2VPBootImageLoader(VersalBootImageLoader):
+     """Boot image loader for Versal Premium Series Gen 2.
+ 
+-    Currently uses the same boot image format as Versal, but can
+-    alternatively used the new Versal2VPP format defined below.
++    2VP parts ship one of two incompatible PDI formats, so open() probes the
++    image the same way bootgen does and rebinds this instance to the loader
++    for the detected format: VersalBootImageLoader for Versal-format images,
++    Versal2VPPBootImageLoader otherwise.
+     """
+-    pass
++
++    def open(self, image_path=None, image_path_offset=None):
++        path = image_path or self.image_path
++        if path is None:
++            raise ValueError("No image path provided")
++        path = Path(path)
++        offset = (self.image_path_offset if image_path_offset is None
++                  else image_path_offset)
++
++        if is_versal_fmt_pdi(path, offset):
++            impl = VersalBootImageLoader
++        else:
++            impl = Versal2VPPBootImageLoader
++
++        self.__class__ = impl
++        impl.__init__(self, path, offset)
++        return impl.open(self)
++
+ 
+ class Versal2VPPBootHeader(Versal2VE2VMBootHeader):
+     BH_SMAP_BUS_WIDTH_SIZE = 0x10
+-- 
+2.50.1 (Apple Git-155)
+

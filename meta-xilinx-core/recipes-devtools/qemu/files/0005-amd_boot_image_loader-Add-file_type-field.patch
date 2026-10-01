@@ -1,0 +1,350 @@
+From e49ba2592dddf2826014deafdf922e74bde1851c Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Wed, 30 Sep 2026 19:21:10 -0500
+Subject: [PATCH 5/8] amd_boot_image_loader: Add file_type field
+
+Due to the versal 2vp having multiple formats for the file, we
+need a way to determine which file_type was processed so we can
+do further processing.  Add this information to the loader and
+test scripts.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ amd_boot_image_loader/loader.py         | 15 +++++++++++++++
+ amd_boot_image_loader/versal.py         |  3 +++
+ amd_boot_image_loader/versal_2ve_2vm.py |  3 +++
+ amd_boot_image_loader/versal_2vp.py     |  7 +++++++
+ amd_boot_image_loader/versalnet.py      |  3 +++
+ amd_boot_image_loader/zynq.py           |  3 +++
+ amd_boot_image_loader/zynqmp.py         |  3 +++
+ test_versal_2ve_2vm_loader.py           |  6 ++++++
+ test_versal_2vp_loader.py               |  7 +++++++
+ test_versal_loader.py                   |  6 ++++++
+ test_versalnet_loader.py                |  6 ++++++
+ test_zynq_loader.py                     |  6 ++++++
+ test_zynqmp_loader.py                   |  6 ++++++
+ 13 files changed, 74 insertions(+)
+
+diff --git a/amd_boot_image_loader/loader.py b/amd_boot_image_loader/loader.py
+index dc7d911..e4db844 100644
+--- a/amd_boot_image_loader/loader.py
++++ b/amd_boot_image_loader/loader.py
+@@ -12,9 +12,22 @@ Reference: https://docs.amd.com/r/en-US/ug1283-bootgen-user-guide
+ from typing import Optional, BinaryIO
+ from pathlib import Path
+ from abc import ABC, abstractmethod
++from enum import IntEnum
+ import struct
+ 
+ 
++class FileType(IntEnum):
++    """Boot image format handled by a loader."""
++
++    UNKNOWN = 0x0
++    ZYNQ = 0x1
++    ZYNQMP = 0x2
++    VERSAL = 0x3
++    VERSALNET = 0x4
++    VERSAL2VE2VM = 0x5
++    VERSAL2VPP = 0x6
++
++
+ class BootHeader(ABC):
+     """Abstract base class for boot image headers."""
+     
+@@ -75,6 +88,8 @@ class ImageHeaderWrapper:
+ class BootImageLoader(ABC):
+     """Abstract base class for loading and processing AMD boot images."""
+ 
++    file_type: FileType = FileType.UNKNOWN
++
+     def __init__(self, image_path: Optional[Path] = None, image_path_offset: int = 0) -> None:
+         """Initialize the boot image loader.
+         
+diff --git a/amd_boot_image_loader/versal.py b/amd_boot_image_loader/versal.py
+index d5b2a6e..57ebd62 100644
+--- a/amd_boot_image_loader/versal.py
++++ b/amd_boot_image_loader/versal.py
+@@ -13,6 +13,7 @@ import struct
+ from .loader import (
+     BootImageLoader,
+     BootHeader,
++    FileType,
+     ImageHeaderTable,
+     ImageHeader,
+     ImageHeaderWrapper,
+@@ -1253,6 +1254,8 @@ class VersalPartitionHeader(PartitionHeader):
+ class VersalBootImageLoader(BootImageLoader):
+     """Versal-specific boot image loader implementation."""
+ 
++    file_type = FileType.VERSAL
++
+     def __init__(self, image_path=None, image_path_offset=0):
+         """Initialize the Versal boot image loader.
+         
+diff --git a/amd_boot_image_loader/versal_2ve_2vm.py b/amd_boot_image_loader/versal_2ve_2vm.py
+index bca6598..0f58bcb 100644
+--- a/amd_boot_image_loader/versal_2ve_2vm.py
++++ b/amd_boot_image_loader/versal_2ve_2vm.py
+@@ -15,6 +15,7 @@ from enum import IntEnum
+ import struct
+ from .loader import (
+     BootHeader,
++    FileType,
+     ImageHeaderTable,
+     ImageHeader,
+     PartitionHeader,
+@@ -1449,6 +1450,8 @@ class Versal2VE2VMPartitionHeader(PartitionHeader):
+ class Versal2VE2VMBootImageLoader(VersalBootImageLoader):
+     """Versal Gen 2 (VE/VM)-specific boot image loader implementation."""
+ 
++    file_type = FileType.VERSAL2VE2VM
++
+     def __init__(self, image_path=None, image_path_offset=0):
+         """Initialize the Versal Gen 2 boot image loader.
+         
+diff --git a/amd_boot_image_loader/versal_2vp.py b/amd_boot_image_loader/versal_2vp.py
+index 2b097a5..fe5b773 100644
+--- a/amd_boot_image_loader/versal_2vp.py
++++ b/amd_boot_image_loader/versal_2vp.py
+@@ -19,6 +19,8 @@ so only that window is re-read after the inherited parse.
+ import struct
+ from pathlib import Path
+ 
++from .loader import FileType
++
+ from .versal import (
+     VersalBootImageLoader,
+     VersalBootHeader,
+@@ -108,6 +110,9 @@ class Versal2VPBootImageLoader(VersalBootImageLoader):
+     Versal2VPPBootImageLoader otherwise.
+     """
+ 
++    # Settled by open(), which rebinds the instance to the detected format.
++    file_type = FileType.UNKNOWN
++
+     def open(self, image_path=None, image_path_offset=None):
+         path = image_path or self.image_path
+         if path is None:
+@@ -151,6 +156,8 @@ class Versal2VPPBootHeader(Versal2VE2VMBootHeader):
+ 
+ 
+ class Versal2VPPBootImageLoader(Versal2VE2VMBootImageLoader):
++    file_type = FileType.VERSAL2VPP
++
+     def __init__(self, image_path=None, image_path_offset=0):
+         super().__init__(image_path, image_path_offset)
+         self.boot_header = Versal2VPPBootHeader()
+diff --git a/amd_boot_image_loader/versalnet.py b/amd_boot_image_loader/versalnet.py
+index 17b10b1..0c45b9d 100644
+--- a/amd_boot_image_loader/versalnet.py
++++ b/amd_boot_image_loader/versalnet.py
+@@ -12,6 +12,7 @@ from enum import IntEnum
+ import struct
+ from .loader import (
+     BootHeader,
++    FileType,
+     ImageHeaderTable,
+     ImageHeader,
+     PartitionHeader,
+@@ -1263,6 +1264,8 @@ class VersalNetPartitionHeader(PartitionHeader):
+ class VersalNetBootImageLoader(VersalBootImageLoader):
+     """VersalNet-specific boot image loader implementation."""
+ 
++    file_type = FileType.VERSALNET
++
+     def __init__(self, image_path=None, image_path_offset=0):
+         """Initialize the VersalNet boot image loader.
+         
+diff --git a/amd_boot_image_loader/zynq.py b/amd_boot_image_loader/zynq.py
+index 06d9bc3..fb2eb14 100644
+--- a/amd_boot_image_loader/zynq.py
++++ b/amd_boot_image_loader/zynq.py
+@@ -13,6 +13,7 @@ import struct
+ from .loader import (
+     BootImageLoader,
+     BootHeader,
++    FileType,
+     ImageHeaderTable,
+     ImageHeader,
+     PartitionHeader,
+@@ -404,6 +405,8 @@ class ZynqPartitionHeader(PartitionHeader):
+ class ZynqBootImageLoader(BootImageLoader):
+     """Zynq-specific boot image loader implementation."""
+ 
++    file_type = FileType.ZYNQ
++
+     def __init__(self, image_path=None, image_path_offset=0):
+         """Initialize the Zynq boot image loader.
+         
+diff --git a/amd_boot_image_loader/zynqmp.py b/amd_boot_image_loader/zynqmp.py
+index b1463da..0af1859 100644
+--- a/amd_boot_image_loader/zynqmp.py
++++ b/amd_boot_image_loader/zynqmp.py
+@@ -13,6 +13,7 @@ import struct
+ from .loader import (
+     BootImageLoader,
+     BootHeader,
++    FileType,
+     ImageHeaderTable,
+     ImageHeader,
+     PartitionHeader,
+@@ -714,6 +715,8 @@ class ZynqmpPartitionHeader(PartitionHeader):
+ class ZynqmpBootImageLoader(BootImageLoader):
+     """Zynqmp-specific boot image loader implementation."""
+ 
++    file_type = FileType.ZYNQMP
++
+     def __init__(self, image_path=None, image_path_offset=0):
+         """Initialize the Zynqmp boot image loader.
+         
+diff --git a/test_versal_2ve_2vm_loader.py b/test_versal_2ve_2vm_loader.py
+index 11b2c35..946d427 100755
+--- a/test_versal_2ve_2vm_loader.py
++++ b/test_versal_2ve_2vm_loader.py
+@@ -8,6 +8,7 @@
+ import sys
+ import argparse
+ from pathlib import Path
++from amd_boot_image_loader.loader import FileType
+ from amd_boot_image_loader.versal_2ve_2vm import Versal2VE2VMBootImageLoader
+ 
+ 
+@@ -70,6 +71,11 @@ Examples:
+     try:
+         # Create loader instance and use context manager
+         with Versal2VE2VMBootImageLoader(file_path, offset) as loader:
++            if loader.file_type != FileType.VERSAL2VE2VM:
++                print(f"Error: unexpected boot image type: {loader.file_type.name}",
++                      file=sys.stderr)
++                return 1
++
+             # Parse the image
+             loader.parse()
+             
+diff --git a/test_versal_2vp_loader.py b/test_versal_2vp_loader.py
+index 4849265..1128a76 100755
+--- a/test_versal_2vp_loader.py
++++ b/test_versal_2vp_loader.py
+@@ -8,6 +8,7 @@
+ import sys
+ import argparse
+ from pathlib import Path
++from amd_boot_image_loader.loader import FileType
+ from amd_boot_image_loader.versal_2vp import Versal2VPBootImageLoader
+ 
+ 
+@@ -70,6 +71,12 @@ Examples:
+     try:
+         # Create loader instance and use context manager
+         with Versal2VPBootImageLoader(file_path, offset) as loader:
++            if loader.file_type not in (FileType.VERSAL, FileType.VERSAL2VPP):
++                print(f"Error: unexpected boot image type: {loader.file_type.name}",
++                      file=sys.stderr)
++                return 1
++            print(f"Detected 2VP boot image format: {loader.file_type.name}")
++
+             # Parse the image
+             loader.parse()
+             
+diff --git a/test_versal_loader.py b/test_versal_loader.py
+index 8d10271..8d16789 100755
+--- a/test_versal_loader.py
++++ b/test_versal_loader.py
+@@ -8,6 +8,7 @@
+ import sys
+ import argparse
+ from pathlib import Path
++from amd_boot_image_loader.loader import FileType
+ from amd_boot_image_loader.versal import VersalBootImageLoader
+ 
+ 
+@@ -70,6 +71,11 @@ Examples:
+     try:
+         # Create loader instance and use context manager
+         with VersalBootImageLoader(file_path, offset) as loader:
++            if loader.file_type != FileType.VERSAL:
++                print(f"Error: unexpected boot image type: {loader.file_type.name}",
++                      file=sys.stderr)
++                return 1
++
+             # Parse the image
+             loader.parse()
+             
+diff --git a/test_versalnet_loader.py b/test_versalnet_loader.py
+index c63dd39..36bea22 100755
+--- a/test_versalnet_loader.py
++++ b/test_versalnet_loader.py
+@@ -8,6 +8,7 @@
+ import sys
+ import argparse
+ from pathlib import Path
++from amd_boot_image_loader.loader import FileType
+ from amd_boot_image_loader.versalnet import VersalNetBootImageLoader
+ 
+ 
+@@ -70,6 +71,11 @@ Examples:
+     try:
+         # Create loader instance and use context manager
+         with VersalNetBootImageLoader(file_path, offset) as loader:
++            if loader.file_type != FileType.VERSALNET:
++                print(f"Error: unexpected boot image type: {loader.file_type.name}",
++                      file=sys.stderr)
++                return 1
++
+             # Parse the image
+             loader.parse()
+             
+diff --git a/test_zynq_loader.py b/test_zynq_loader.py
+index 83d72b4..a30b4df 100755
+--- a/test_zynq_loader.py
++++ b/test_zynq_loader.py
+@@ -8,6 +8,7 @@
+ import sys
+ import argparse
+ from pathlib import Path
++from amd_boot_image_loader.loader import FileType
+ from amd_boot_image_loader.zynq import ZynqBootImageLoader
+ 
+ 
+@@ -70,6 +71,11 @@ Examples:
+     try:
+         # Create loader instance and use context manager
+         with ZynqBootImageLoader(file_path, offset) as loader:
++            if loader.file_type != FileType.ZYNQ:
++                print(f"Error: unexpected boot image type: {loader.file_type.name}",
++                      file=sys.stderr)
++                return 1
++
+             # Parse the image
+             loader.parse()
+             
+diff --git a/test_zynqmp_loader.py b/test_zynqmp_loader.py
+index 1343527..7cb9921 100755
+--- a/test_zynqmp_loader.py
++++ b/test_zynqmp_loader.py
+@@ -8,6 +8,7 @@
+ import sys
+ import argparse
+ from pathlib import Path
++from amd_boot_image_loader.loader import FileType
+ from amd_boot_image_loader.zynqmp import ZynqmpBootImageLoader
+ 
+ 
+@@ -70,6 +71,11 @@ Examples:
+     try:
+         # Create loader instance and use context manager
+         with ZynqmpBootImageLoader(file_path, offset) as loader:
++            if loader.file_type != FileType.ZYNQMP:
++                print(f"Error: unexpected boot image type: {loader.file_type.name}",
++                      file=sys.stderr)
++                return 1
++
+             # Parse the image
+             loader.parse()
+             
+-- 
+2.50.1 (Apple Git-155)
+

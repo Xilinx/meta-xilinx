@@ -1,0 +1,351 @@
+From 3a1286f7cd8bc7bc19675e5d97aef270126a4197 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Thu, 18 Jun 2026 16:18:00 -0500
+Subject: [PATCH 2/8] amd_boot_image_loader: versal2vp: Add versal 2vp support
+
+This is functionally equivalent, for our purposes, to the versal.
+
+AI-Generated: Github copilot (claude sonnet 4.6)
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ amd_boot_image_loader/__init__.py   |   2 +
+ amd_boot_image_loader/versal_2vp.py |  29 +++++
+ qemu-system-amd-fpga-multiarch      |  31 ++++--
+ test_versal_2vp_loader.py           | 167 ++++++++++++++++++++++++++++
+ 4 files changed, 222 insertions(+), 7 deletions(-)
+ create mode 100644 amd_boot_image_loader/versal_2vp.py
+ create mode 100755 test_versal_2vp_loader.py
+
+diff --git a/amd_boot_image_loader/__init__.py b/amd_boot_image_loader/__init__.py
+index 77f4053..590f37b 100644
+--- a/amd_boot_image_loader/__init__.py
++++ b/amd_boot_image_loader/__init__.py
+@@ -16,6 +16,7 @@ from .zynqmp import ZynqmpBootImageLoader
+ from .versal import VersalBootImageLoader
+ from .versalnet import VersalNetBootImageLoader
+ from .versal_2ve_2vm import Versal2VE2VMBootImageLoader
++from .versal_2vp import Versal2VPBootImageLoader
+ 
+ __all__ = [
+     "BootImageLoader",
+@@ -24,4 +25,5 @@ __all__ = [
+     "VersalBootImageLoader",
+     "VersalNetBootImageLoader",
+     "Versal2VE2VMBootImageLoader",
++    "Versal2VPBootImageLoader",
+ ]
+diff --git a/amd_boot_image_loader/versal_2vp.py b/amd_boot_image_loader/versal_2vp.py
+new file mode 100644
+index 0000000..93e7a13
+--- /dev/null
++++ b/amd_boot_image_loader/versal_2vp.py
+@@ -0,0 +1,29 @@
++# Copyright (C) 2026, Advanced Micro Devices, Inc.  All rights reserved.
++# Portions of this file consist of AI-generated content.
++# SPDX-License-Identifier: MIT
++
++"""Versal Premium Series Gen 2 (VP) boot image loader module.
++
++This module provides support for Versal Premium Series Gen 2 boot images
++(PDI files).
++
++The xc2vp3602 is similar to the Versal formation documented in the
++reference: https://docs.amd.com/r/en-US/ug1283-bootgen-user-guide/Versal-Adaptive-SoC-Boot-Image-Format
++"""
++
++from .versal import (
++    VersalBootImageLoader,
++    VersalBootHeader,
++    VersalOptionalData,
++    VersalImageHeaderTable,
++    VersalImageHeader,
++    VersalPartitionHeader,
++)
++
++
++class Versal2VPBootImageLoader(VersalBootImageLoader):
++    """Boot image loader for Versal Premium Series Gen 2.
++
++    Currently uses the same boot image format as Versal.
++    """
++    pass
+diff --git a/qemu-system-amd-fpga-multiarch b/qemu-system-amd-fpga-multiarch
+index 9625195..475312a 100755
+--- a/qemu-system-amd-fpga-multiarch
++++ b/qemu-system-amd-fpga-multiarch
+@@ -21,6 +21,7 @@ try:
+     from amd_boot_image_loader.zynqmp import ZynqmpBootImageLoader
+     from amd_boot_image_loader.versal import VersalBootImageLoader
+     from amd_boot_image_loader.versal_2ve_2vm import Versal2VE2VMBootImageLoader
++    from amd_boot_image_loader.versal_2vp import Versal2VPBootImageLoader
+ except ModuleNotFoundError:
+     # Relaunch the helper and look for nativepython3 in the same directory
+     nativepython3 = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'nativepython3')
+@@ -33,11 +34,12 @@ except ModuleNotFoundError:
+ binpath = os.path.dirname(os.path.abspath(__file__))
+ 
+ VERSION = "2026.1"
+-SUPPORTED_ARCHS = [ 'zynq' , 'zynqmp', 'versal', 'versal2ve2vm']
++SUPPORTED_ARCHS = [ 'zynq' , 'zynqmp', 'versal', 'versal2ve2vm', 'versal2vp']
+ SUPPORTED_MODES = { 'zynq' :        [ ( '1', 'QSPI' ), ( '5', 'SD0' ) ],
+                     'zynqmp':       [ ( '1', 'QSPI' ), ( '2', 'QSPI' ), ( '3', 'SD0' ), ( '5', 'SD1' ), ( '6', 'eMMC1' ), ( '14', 'SD1' )  ],
+                     'versal':       [ ( '1', 'QSPI' ), ( '2', 'QSPI' ), ( '3', 'SD0' ), ( '5', 'SD1' ), ( '6', 'eMMC1' ), ( '8', 'OSPI'), ( '14', 'SD1' )],
+                     'versal2ve2vm': [ ( '1', 'QSPI' ), ( '2', 'QSPI' ), ( '3', 'SD0' ), ( '5', 'SD1' ), ( '6', 'eMMC1' ), ( '8', 'OSPI'), ( '11', 'UFS' ), ( '14', 'SD1' )],
++                    'versal2vp':    [ ( '1', 'QSPI' ), ( '2', 'QSPI' ), ( '3', 'SD0' ), ( '5', 'SD1' ), ( '6', 'eMMC1' ), ( '8', 'OSPI'), ( '14', 'SD1' )],
+                     }
+ QEMU_APU_ARGS = []
+ QEMU_PMU_ARGS = []
+@@ -91,7 +93,7 @@ Required Options:
+   -boot mode=<num>         Specify boot mode number (mandatory){boot_modes_text}
+ 
+   -pmu-args <args>         Arguments passed to PMU emulation (zynqmp only)
+-  -plm-args <args>         Arguments passed to PLM emulation (versal, versal2ve2vm)
++  -plm-args <args>         Arguments passed to PLM emulation (versal, versal2ve2vm, versal2vp)
+   -asu-args <args>         Arguments passed to ASU emulation (versal2ve2vm only)
+                            Note: -pmu-args cannot be used with -plm-args or -asu-args
+ Optional Arguments:
+@@ -306,15 +308,15 @@ def parse_arguments(args: list[str]) -> tuple[dict[str, str | None], list[str]]:
+             print(f"Error: PMU arguments are only supported for zynqmp", file=sys.stderr)
+             sys.exit(1)
+     
+-    # Handle PLM arguments (only valid for versal and versal2ve2vm)
++    # Handle PLM arguments (only valid for versal, versal2ve2vm, and versal2vp)
+     if known_args.get('plm_args'):
+-        if known_args['boot_arch'] in ['versal', 'versal2ve2vm']:
++        if known_args['boot_arch'] in ['versal', 'versal2ve2vm', 'versal2vp']:
+             known_plm_args, unknown_plm_args = parse_plm_arguments(known_args['plm_args'])
+             # Store known PLM args back into known_args for later use
+             known_args['plm_hw_dtb'] = known_plm_args.get('hw_dtb')
+             known_args['plm_unknown'] = unknown_plm_args
+         else:
+-            print(f"Error: PLM arguments are only supported for versal and versal2ve2vm", file=sys.stderr)
++            print(f"Error: PLM arguments are only supported for versal, versal2ve2vm, and versal2vp", file=sys.stderr)
+             sys.exit(1)
+     
+     # Handle ASU arguments (only valid for versal2ve2vm)
+@@ -2271,6 +2273,19 @@ def configure_versal2ve2vm(known_args: dict[str, str | None], unknown_args: list
+         QEMU_ASU_ARGS = [ "-hw-dtb", known_args.get('asu_hw_dtb') ]
+         QEMU_ASU_ARGS += known_args.get('asu_unknown')
+ 
++def configure_versal2vp(known_args: dict[str, str | None], unknown_args: list[str], drives: dict[str, list[dict[str, str]]], machine_path: str) -> None:
++    """Configure Versal VP Series Gen 2 boot settings and extract boot files.
++
++    Currently uses the same boot image format and configuration as Versal.
++
++    Args:
++        known_args: Dictionary of known arguments (boot_arch, boot_mode, kernel, dtb, etc.)
++        unknown_args: List of unknown arguments to pass through to QEMU
++        drives: Dictionary of parsed drive configurations by interface type
++        machine_path: Path to machine working directory for extracted files
++    """
++    configure_versal(known_args, unknown_args, drives, machine_path)
++
+ def main() -> None:
+     """Main entry point for the AMD FPGA multiarch wrapper.
+     
+@@ -2354,7 +2369,7 @@ def main() -> None:
+             print(f"Error: {boot_arch} architecture, but no pmu_args defined", file=sys.stderr)
+             sys.exit(1)
+ 
+-    if boot_arch in ['versal', 'versal2ve2vm']:
++    if boot_arch in ['versal', 'versal2ve2vm', 'versal2vp']:
+         if known_args.get('plm_args'):
+             mb_cmd_path = 'qemu-system-microblazeel'
+             if os.path.exists(f'{binpath}/qemu-system-microblazeel'):
+@@ -2445,6 +2460,8 @@ def main() -> None:
+         configure_versal(known_args, unknown_args, drives, machine_path)
+     elif boot_arch == 'versal2ve2vm':
+         configure_versal2ve2vm(known_args, unknown_args, drives, machine_path)
++    elif boot_arch == 'versal2vp':
++        configure_versal2vp(known_args, unknown_args, drives, machine_path)
+     
+     if not QEMU_APU_ARGS:
+         print(f"ERROR: Nothing to do!", file=sys.stderr)
+@@ -2459,7 +2476,7 @@ def main() -> None:
+         mb_cmd_list = [mb_cmd_path] + QEMU_PMU_ARGS + ['-machine-path', machine_path]
+         mb_type = "PMU"
+ 
+-    elif QEMU_PLM_ARGS and boot_arch in ['versal', 'versal2ve2vm']:
++    elif QEMU_PLM_ARGS and boot_arch in ['versal', 'versal2ve2vm', 'versal2vp']:
+         mb_cmd_list = [mb_cmd_path] + QEMU_PLM_ARGS + ['-machine-path', machine_path]
+         mb_type = "PLM"
+ 
+diff --git a/test_versal_2vp_loader.py b/test_versal_2vp_loader.py
+new file mode 100755
+index 0000000..4849265
+--- /dev/null
++++ b/test_versal_2vp_loader.py
+@@ -0,0 +1,167 @@
++#!/usr/bin/env python3
++# Copyright (C) 2026, Advanced Micro Devices, Inc.  All rights reserved.
++# Portions of this file consist of AI-generated content.
++# SPDX-License-Identifier: MIT
++
++"""Test program for Versal2VPBootImageLoader."""
++
++import sys
++import argparse
++from pathlib import Path
++from amd_boot_image_loader.versal_2vp import Versal2VPBootImageLoader
++
++
++def main():
++    """Main test program entry point."""
++    parser = argparse.ArgumentParser(
++        description='Test program for Versal2VPBootImageLoader',
++        formatter_class=argparse.RawDescriptionHelpFormatter,
++        epilog="""
++Examples:
++  %(prog)s boot.pdi
++  %(prog)s boot.pdi 0x1000
++  %(prog)s boot.pdi --offset 4096
++        """
++    )
++    
++    parser.add_argument(
++        'filename',
++        type=str,
++        help='Path to the boot image file (PDI)'
++    )
++    
++    parser.add_argument(
++        'offset',
++        nargs='?',
++        default='0',
++        help='Optional offset within the file (decimal or hex with 0x prefix). Default: 0'
++    )
++    
++    parser.add_argument(
++        '-o', '--output-dir',
++        type=str,
++        default='.',
++        help='Output directory for extracted files. Default: current directory'
++    )
++    
++    args = parser.parse_args()
++    
++    # Parse offset (support both decimal and hex)
++    try:
++        offset = int(args.offset, 0)  # 0 base allows both decimal and hex
++    except ValueError:
++        print(f"Error: Invalid offset value '{args.offset}'", file=sys.stderr)
++        return 1
++    
++    # Check if file exists
++    file_path = Path(args.filename)
++    if not file_path.exists():
++        print(f"Error: File not found: {args.filename}", file=sys.stderr)
++        return 1
++    
++    # Create output directory if it doesn't exist
++    output_dir = Path(args.output_dir)
++    output_dir.mkdir(parents=True, exist_ok=True)
++    
++    print(f"Loading Versal 2VP boot image (PDI) from: {args.filename}")
++    if offset > 0:
++        print(f"Using offset: {hex(offset)} ({offset} bytes)")
++    
++    try:
++        # Create loader instance and use context manager
++        with Versal2VPBootImageLoader(file_path, offset) as loader:
++            # Parse the image
++            loader.parse()
++            
++            # Call debug function
++            loader.debug()
++
++            # Extract boot header
++            bh_filename = file_path.stem + "_bh.bin"
++            bh_output_path = output_dir / bh_filename
++            loader.dump_boot_header(str(bh_output_path))
++            print(f"\nExtracted boot header: {bh_output_path}")
++            print(f"qemu load argument: -device loader,file={bh_output_path},addr=0xf201e000,force-raw=on")
++
++            # Count total partitions across all images
++            total_partitions = sum(len(partition_headers) for _, partition_headers in loader.image)
++            print(f"\nExtracting {total_partitions} partition(s) from {len(loader.image)} image(s)...")
++            
++            for img_idx in range(len(loader.image)):
++                image_header, partition_headers = loader.image[img_idx]
++                for part_idx, partition_header in enumerate(partition_headers):
++                    # Generate filename for this partition
++                    if image_header.image_name == 'pmc_subsys' and part_idx == 0:
++                        # Use plm.bin for the PLM partition
++                        filename = "plm.bin"
++                    elif part_idx == 0:
++                        filename = image_header.image_name
++                    else:
++                        # Insert partition index before file extension if present
++                        if '.' in image_header.image_name:
++                            name, ext = image_header.image_name.rsplit('.', 1)
++                            filename = f"{name}.{part_idx}.{ext}"
++                        else:
++                            filename = f"{image_header.image_name}.{part_idx}"
++                    
++                    # Get partition type for informational purposes
++                    partition_type = partition_header.get_partition_type().name
++                    
++                    output_path = output_dir / filename
++                    print(f"  Extracting partition {img_idx}.{part_idx}: {output_path} (Type: {partition_type})")
++                    loader.extract(img_idx, part_idx, str(output_path))
++                    
++                    # If this is the pmc_subsys (PLM) partition, also extract the PMC CDO
++                    # The PMC CDO is embedded after the PLM data in the boot image
++                    if image_header.image_name == 'pmc_subsys' and part_idx == 0:
++                        try:
++                            pmc_cdo_output_path = output_dir / "pmc_cdo.bin"
++                            loader.dump_pmc_cdo(str(pmc_cdo_output_path))
++                            print(f"  Extracted PMC CDO: {pmc_cdo_output_path}")
++                            pmc_cdo_load_addr = loader.boot_header.pmc_data_load_address
++                            print(f"qemu load argument: -device loader,file={pmc_cdo_output_path},addr=0x{pmc_cdo_load_addr:08x},force-raw=on")
++                        except ValueError as e:
++                            print(f"  (No PMC CDO data available: {e})")
++                    
++                    # Combine 64-bit load address
++                    load_addr = partition_header.get_destination_load_address()
++                    
++                    # Only print QEMU load argument for partitions with valid load addresses
++                    # CFI and CDO partitions typically have 0xFFFFFFFF as load address
++                    if load_addr != 0xFFFFFFFFFFFFFFFF and load_addr != 0xFFFFFFFF:
++                        print(f"qemu load argument: -device loader,file={output_path},addr=0x{load_addr:016x},force-raw=on")
++                    else:
++                        print(f"  (Configuration data - no QEMU load address)")
++            
++            # Extract optional data if present
++            print(f"\nFound {len(loader.optional_data)} optional data entries")
++            if loader.optional_data:
++                print(f"Extracting optional data entries with non-empty data...")
++                count = 0
++                for idx, opt_data in enumerate(loader.optional_data):
++                    data_id = opt_data.data_id if opt_data.data_id is not None else 0
++                    data_id_name = opt_data.get_data_id_name()
++                    data_size = len(opt_data.data) if opt_data.data else 0
++                    print(f"  Optional data {idx}: ID={data_id:#06x} ({data_id_name}), Size={data_size} bytes")
++                    if opt_data.data:
++                        filename = f"optional_data_{data_id:02X}"
++                        output_path = output_dir / filename
++                        print(f"    Extracting to: {output_path}")
++                        loader.extract_optional_data(idx, str(output_path))
++                        count += 1
++                if count > 0:
++                    print(f"Extracted {count} optional data file(s)")
++                else:
++                    print("No optional data entries with data to extract")
++        
++        return 0
++        
++    except Exception as e:
++        print(f"\nError: {e}", file=sys.stderr)
++        import traceback
++        traceback.print_exc()
++        return 1
++
++
++if __name__ == '__main__':
++    sys.exit(main())
+-- 
+2.50.1 (Apple Git-155)
+

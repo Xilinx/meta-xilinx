@@ -13,8 +13,6 @@ DEPENDS += "wic-native"
 
 inherit setuptools3 native
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
-
 require qemu-xilinx-multiarch-helper.inc
 
 B = "${S}"
