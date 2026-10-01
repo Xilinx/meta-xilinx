@@ -51,6 +51,9 @@ chosen:
 domains:
   APU_Linux:
     compatible: openamp,domain-v1
+    # Linux claims every device; domain_access keeps them all.
+    access:
+      - dev: "*"
     reserved-memory:
       - vdev0vring0@9880000
       - vdev0vring1@9884000
@@ -80,6 +83,9 @@ domains:
     zephyr-version: "4.3"
     xlnx,ddr-boot: true
     xlnx,zephyr,mems: [ ddrboot@9800100 ]
+    # IPI_NOBUF2 controller of the RPMsg mailbox ipi_nobuf2_to_ipi_nobuf1.
+    access:
+      - dev: ipi_nobuf2
     domain-to-domain:
       compatible: openamp,domain-to-domain-v1
       rpmsg-relation:

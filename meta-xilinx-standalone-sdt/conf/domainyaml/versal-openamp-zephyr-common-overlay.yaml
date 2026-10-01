@@ -33,6 +33,9 @@ chosen:
 domains:
   APU_Linux: # host in channel from a72-0
     compatible: openamp,domain-v1
+    # Linux claims every device; domain_access keeps them all.
+    access:
+      - dev: "*"
     reserved-memory: [ vdev0buffer@9888000, vdev0vring1@9884000,
                        vdev0vring0@9880000, rproc0@9800000,
                        trace@985f000, rsctbl@9820000 ]

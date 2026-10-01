@@ -51,6 +51,9 @@ chosen:
 domains:
   APU_Linux:
     compatible: openamp,domain-v1
+    # Linux claims every device; domain_access keeps them all.
+    access:
+      - dev: "*"
     reserved-memory:
       - vdev0vring0@9880000
       - vdev0vring1@9884000
