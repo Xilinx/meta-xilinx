@@ -4,12 +4,6 @@ BOOTGEN_EXTRA_ARGS += "-dump bh"
 # specify BIF common attribute for FSBL
 BIF_COMMON_ATTR ?= ""
 
-# L40 / L80 machines require a specific id code as defined in bootgen
-BIF_TOPLEVEL_ATTR ?= "id_code"
-# L40 is 0x4c68093
-# L80 is 0x4c74093
-BIF_TOPLEVEL_ATTR[id_code] ?= "0x4c74093"
-
 # specify BIF optional attributes
 BIF_OPTIONAL_DATA ?= ""
 

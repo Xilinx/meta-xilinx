@@ -21,10 +21,6 @@ SRCREV = "47be98bc382187da5e40edb14c3555376e99c3c8"
 
 SRC_URI += "file://0001-xis_qspi_fix_missing_include.patch"
 
-# Workaround for bug in bootgen id_code extraction
-# versal-2vp support is not yet implemented
-BOOTGEN_ARCH:versal-2vp:task-extract-idcode = "versal"
-
 # BIF configuration
 BIF_FILE_PATH = "${B}/${PN}.bif"
 
