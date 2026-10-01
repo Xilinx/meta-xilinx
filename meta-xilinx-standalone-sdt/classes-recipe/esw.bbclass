@@ -87,6 +87,7 @@ XLNX_CMAKE_MACHINE:versal-net = "VersalNet"
 XLNX_CMAKE_MACHINE:versal-2ve-2vm = "VersalNet"
 XLNX_CMAKE_MACHINE:versal-2vp = "Versal"
 
+# Fallback values in case it can't be read from the device-tree
 XLNX_CMAKE_SUBMACHINE:versal-2ve-2vm = "Versal_2VE_2VM"
 XLNX_CMAKE_SUBMACHINE:versal-2vp = "Versal_2vp"
 
@@ -96,14 +97,28 @@ XLNX_CMAKE_PROCESSOR = "${@get_xlnx_cmake_processor(d.getVar('DEFAULTTUNE'), d.g
 XLNX_CMAKE_SYSTEM_NAME ?= "Generic"
 XLNX_CMAKE_BSP_VARS ?= ""
 
+# We need fdtget from the recipe-sysroot-native, normally this runs in
+# parallel with do_prepare_recipe_sysroot, instead we need to wait for
+# it to be completed.
+addtask generate_toolchain_file after do_prepare_recipe_sysroot
 cmake_do_generate_toolchain_file:append() {
+    # Use the family to determine the next step
+    family=$(fdtget ${DTS_FILE} / family || :)
+    if [ "$family" = "Versal" ]; then
+        submachine=$(fdtget ${DTS_FILE} / variant || :)
+    fi
+    # Fallback to the default submachine if empty
+    if [ -z "$submachine" ]; then
+        submachine="${XLNX_CMAKE_SUBMACHINE}"
+    fi
+
     cat >> ${WORKDIR}/toolchain.cmake <<EOF
     include(CMakeForceCompiler)
     CMAKE_FORCE_C_COMPILER("${OECMAKE_C_COMPILER}" GNU)
     CMAKE_FORCE_CXX_COMPILER("${OECMAKE_CXX_COMPILER}" GNU)
     set( CMAKE_SYSTEM_PROCESSOR "${XLNX_CMAKE_PROCESSOR}" )
     set( CMAKE_MACHINE "${XLNX_CMAKE_MACHINE}" )
-    set( CMAKE_SUBMACHINE "${XLNX_CMAKE_SUBMACHINE}" )
+    set( CMAKE_SUBMACHINE "$submachine" )
     # Will need this in the future to make cmake understand esw variables
     # set( CMAKE_SYSTEM_NAME `echo elf | sed -e 's/^./\u&/' -e 's/^\(Linux\).*/\1/'` )
     set( CMAKE_SYSTEM_NAME "${XLNX_CMAKE_SYSTEM_NAME}" )
