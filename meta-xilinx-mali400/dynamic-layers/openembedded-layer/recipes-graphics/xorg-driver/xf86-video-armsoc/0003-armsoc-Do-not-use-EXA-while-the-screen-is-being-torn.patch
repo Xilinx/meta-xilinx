@@ -1,0 +1,475 @@
+From 0396a70f904bc8946aa5678b3b3a6b2949ea2735 Mon Sep 17 00:00:00 2001
+From: Parth Gajjar <parth.gajjar@amd.com>
+Date: Fri, 4 Sep 2026 03:03:08 -0700
+Subject: [PATCH 2/2] armsoc: Do not use EXA while the screen is being torn
+ down
+
+Running "glmark2-es2 --fullscreen" under a bare Xorg (no window manager) and
+interrupting it with Ctrl+C killed the server intermittently, either on
+
+    dixGetPrivateAddr: Assertion `key->initialized' failed
+
+or, once that was worked around, on
+
+    armsoc_bo_del: Assertion `bo->dmabuf < 0' failed
+
+dix calls dixFreeScreenSpecificPrivates() on the line immediately before
+CloseScreen() (dix/main.c), and that clears key->initialized on every
+screen-specific private key. exaDriverInit() registers the EXA pixmap
+private with dixRegisterScreenSpecificPrivateKey(), so from the moment
+CloseScreen() is entered every EXA pixmap-private access - and that includes
+exaGetPixmapDriverPrivate(), exaGetPixmapPitch() and the EXA-wrapped
+pScreen->DestroyPixmap() - aborts the server in dixGetPrivateAddr(), even
+though the pixmap itself is still perfectly valid.
+
+Whether we got there depended on whether a page flip was still in flight
+when the client went away, which is what made the crash intermittent: with
+no pending flip nothing is destroyed during teardown and the server
+survives, while a pending flip is drained, completes its swap and releases
+its DRI2 buffers right inside that window.
+
+Mark the screen as closing and route the affected teardown paths around EXA:
+
+  - Drain in-flight flips before the CloseScreen chain runs, since a swap's
+    FrontLeft buffer can still hold an X ref on the root pixmap.
+
+  - Release the swap's pixmaps with fbDestroyPixmap() rather than the
+    EXA-wrapped hook, and take the buffer stride from pPixmap->devKind
+    instead of exaGetPixmapPitch().
+
+  - Cache armsoc's own pixmap private in the DRI2 buffer at creation time so
+    the dmabuf fd release from ARMSOCDeregisterExternalAccess() and the bo
+    unreference from ARMSOCDestroyPixmap() can still be done without EXA.
+    Leaving the dmabuf fd attached is what tripped armsoc_bo_del(): for the
+    FrontLeft buffer that bo is pARMSOC->scanout, whose last two refs are
+    dropped a few lines later. ARMSOCPixmapExchange() swaps the bo between
+    two privs rather than moving privs between pixmaps, so a cached priv
+    stays valid for the lifetime of its pixmap. The screen pixmap is excluded
+    from the unreference because ARMSOCCloseScreen() already accounts for
+    both of the scanout bo's refs.
+
+  - Reset pending_flips and swap_chain_count in ARMSOCDRI2CloseScreen().
+    pARMSOC is the ScrnInfoRec driverPrivate and survives server
+    regeneration, so a stale pending_flips would leave the drain loop
+    waiting for an event that will never arrive.
+
+Also verify that a swap's DRI2 buffers still describe live pixmaps before
+destroying them when the drawable is already gone, and leak them with a
+warning if not, and guard the pixmap-private accessors in armsoc_exa.c
+against a NULL pixmap or private instead of asserting.
+
+Upstream-Status: Inappropriate [AMD Mali-400 specific]
+
+AI-Assisted: Claude Opus 5
+Signed-off-by: Parth Gajjar <parth.gajjar@amd.com>
+---
+ src/armsoc_dri2.c   | 198 ++++++++++++++++++++++++++++++++++++--------
+ src/armsoc_driver.c |  32 +++----
+ src/armsoc_driver.h |  15 ++++
+ 3 files changed, 197 insertions(+), 48 deletions(-)
+
+diff --git a/src/armsoc_dri2.c b/src/armsoc_dri2.c
+index 897628c..20c37f8 100644
+--- a/src/armsoc_dri2.c
++++ b/src/armsoc_dri2.c
+@@ -53,6 +53,18 @@ struct ARMSOCDRI2BufferRec {
+ 	 */
+ 	PixmapPtr *pPixmaps;
+ 
++	/**
++	 * armsoc's EXA driver private for each pixmap in pPixmaps.
++	 *
++	 * Cached at creation because screen teardown has to release these
++	 * pixmaps after EXA's pixmap private key has been invalidated and
++	 * exaGetPixmapDriverPrivate() can no longer be called (see
++	 * ARMSOCRec.closing). ARMSOCPixmapExchange() swaps the bo between two
++	 * privs rather than moving privs between pixmaps, so a priv pointer
++	 * stays valid for the lifetime of its pixmap.
++	 */
++	struct ARMSOCPixmapPrivRec **privs;
++
+ 	/**
+ 	 * Pixmap that corresponds to the DRI2BufferRec.name, so wraps
+ 	 * the buffer that will be used for DRI2GetBuffers calls and the
+@@ -197,21 +209,21 @@ static Bool create_buffer(DrawablePtr pDraw, struct ARMSOCDRI2BufferRec *buf)
+ 		goto fail;
+ 	}
+ 
+-	if (buffer->attachment == DRI2BufferBackLeft && pARMSOC->driNumBufs > 2) {
+-		buf->pPixmaps = calloc(pARMSOC->driNumBufs-1,
+-				sizeof(PixmapPtr));
++	if (buffer->attachment == DRI2BufferBackLeft && pARMSOC->driNumBufs > 2)
+ 		buf->numPixmaps = pARMSOC->driNumBufs-1;
+-	} else {
+-		buf->pPixmaps = malloc(sizeof(PixmapPtr));
++	else
+ 		buf->numPixmaps = 1;
+-	}
+ 
+-	if (!buf->pPixmaps) {
++	buf->pPixmaps = calloc(buf->numPixmaps, sizeof(*buf->pPixmaps));
++	buf->privs = calloc(buf->numPixmaps, sizeof(*buf->privs));
++
++	if (!buf->pPixmaps || !buf->privs) {
+ 		ERROR_MSG("Failed to allocate PixmapPtr array for DRI2Buffer");
+ 		goto fail;
+ 	}
+ 
+ 	buf->pPixmaps[0] = pPixmap;
++	buf->privs[0] = exaGetPixmapDriverPrivate(pPixmap);
+ 	assert(buf->currentPixmap == 0);
+ 
+ 	bo = ARMSOCPixmapBo(pPixmap);
+@@ -221,12 +233,8 @@ static Bool create_buffer(DrawablePtr pDraw, struct ARMSOCDRI2BufferRec *buf)
+ 		goto fail;
+ 	}
+ 
+-	/*
+-	 * Use the pixmap stride directly. exaGetPixmapPitch() reads the EXA
+-	 * pixmap private, which asserts (key->initialized) if the pixmap was
+-	 * not created through EXA - e.g. the fbScreenInit root pixmap that
+-	 * DRI2 wraps as the FrontLeft buffer for a fullscreen unredirected
+-	 * window (CR-1279766). devKind carries the same stride.
++	/* devKind carries the same stride as exaGetPixmapPitch() without
++	 * needing the EXA pixmap private.
+ 	 */
+ 	DRIBUF(buf)->pitch = pPixmap->devKind;
+ 	DRIBUF(buf)->cpp = pPixmap->drawable.bitsPerPixel / 8;
+@@ -298,23 +306,68 @@ static Bool destroy_buffer(DrawablePtr pDraw, struct ARMSOCDRI2BufferRec *buf)
+ 
+ 	for (i = 0; i < numBuffers && buf->pPixmaps[i] != NULL; i++) {
+ 		PixmapPtr pPixmap = buf->pPixmaps[i];
+-		PixmapPtr pScreenPix = pScreen->GetScreenPixmap(pScreen);
++
++		/*
++		 * Screen teardown: EXA's pixmap private key has already been
++		 * marked uninitialized (see ARMSOCRec.closing), so neither
++		 * ARMSOCDeregisterExternalAccess() nor the EXA-wrapped
++		 * pScreen->DestroyPixmap() may be called - both would abort the
++		 * server in dixGetPrivateAddr() even though this pixmap is
++		 * perfectly valid. This is the path taken when a page flip is
++		 * still in flight as the client goes away, which is why bare
++		 * Xorg died intermittently on Ctrl+C (CR-1279766).
++		 *
++		 * Both are driven off the priv cached at create_buffer() time
++		 * instead, and the pixmap is released with the fb helper exactly
++		 * as ARMSOCCloseScreen() does for the root pixmap.
++		 */
++		if (pARMSOC->closing) {
++			struct ARMSOCPixmapPrivRec *priv = buf->privs[i];
++
++			/*
++			 * ARMSOCDeregisterExternalAccess() inlined. Skipping the
++			 * dmabuf release leaves the fd attached to the bo and
++			 * trips "armsoc_bo_del: Assertion `bo->dmabuf < 0'
++			 * failed" when the screen drops its last ref on the
++			 * scanout bo at the end of ARMSOCCloseScreen().
++			 */
++			if (priv) {
++				if (priv->ext_access_cnt > 0)
++					priv->ext_access_cnt--;
++
++				if (priv->ext_access_cnt == 0 && priv->bo &&
++				    armsoc_bo_has_dmabuf(priv->bo))
++					armsoc_bo_clear_dmabuf(priv->bo);
++			}
++
++			/*
++			 * Stand in for armsoc's EXA DestroyPixmap hook, which
++			 * EXA can no longer call for us, so that a back buffer
++			 * we allocated does not leak its bo. The screen pixmap
++			 * is excluded: ARMSOCCloseScreen() owns the accounting
++			 * for the scanout bo.
++			 */
++			if (priv && pPixmap->refcnt == 1 &&
++			    pPixmap != pScreen->GetScreenPixmap(pScreen)) {
++				armsoc_bo_unreference(priv->bo);
++				free(priv);
++				buf->privs[i] = NULL;
++			}
++
++			fbDestroyPixmap(pPixmap);
++			continue;
++		}
+ 
+ 		ARMSOCDeregisterExternalAccess(pPixmap);
+ 
+ 		/*
+ 		 * create_buffer() wraps the drawable's existing pixmap for the
+ 		 * FrontLeft buffer and only takes an extra X ref on it
+-		 * (pPixmap->refcnt++). For a fullscreen unredirected window
+-		 * that pixmap is the fbScreenInit root/screen pixmap, which EXA
+-		 * is not aware of. Routing it through the EXA-wrapped
+-		 * pScreen->DestroyPixmap() calls dixGetPrivateAddr() on the EXA
+-		 * pixmap key and aborts bare Xorg on teardown (CR-1279766:
+-		 * dixGetPrivateAddr: Assertion `key->initialized' failed).
+-		 * Drop the extra ref we took in create_buffer() directly.
++		 * (pPixmap->refcnt++), so drop that ref rather than destroying
++		 * a pixmap the screen still owns.
+ 		 */
+ 		if (buffer->attachment == DRI2BufferFrontLeft &&
+-		    pPixmap == pScreenPix) {
++		    pPixmap == pScreen->GetScreenPixmap(pScreen)) {
+ 			if (pPixmap->refcnt > 1)
+ 				pPixmap->refcnt--;
+ 			continue;
+@@ -357,6 +410,8 @@ ARMSOCDRI2CreateBuffer(DrawablePtr pDraw, unsigned int attachment,
+ 	DRIBUF(buf)->format = format;
+ 
+ 	if (!create_buffer(pDraw, buf)) {
++		free(buf->privs);
++		free(buf->pPixmaps);
+ 		free(buf);
+ 		return NULL;
+ 	}
+@@ -377,8 +432,11 @@ ARMSOCDRI2DestroyBuffer(DrawablePtr pDraw, DRI2BufferPtr buffer)
+ 	 * instead (since it is at least refcntd)
+ 	 */
+ 	if (NULL == buf->pPixmaps || NULL == buf->pPixmaps[0]) {
+-		if (--buf->refcnt == 0)
++		if (--buf->refcnt == 0) {
++			free(buf->privs);
++			free(buf->pPixmaps);
+ 			free(buf);
++		}
+ 		return;
+ 	}
+ 
+@@ -388,6 +446,7 @@ ARMSOCDRI2DestroyBuffer(DrawablePtr pDraw, DRI2BufferPtr buffer)
+ 	DEBUG_MSG("pDraw=%p, DRIbuffer=%p", pDraw, buffer);
+ 
+ 	if (destroy_buffer(pDraw, buf)) {
++		free(buf->privs);
+ 		free(buf->pPixmaps);
+ 		free(buf);
+ 	}
+@@ -622,7 +681,10 @@ static void nextBuffer(DrawablePtr pDraw, struct ARMSOCDRI2BufferRec *backBuf)
+ 			&backBuf->pPixmaps[backBuf->currentPixmap];
+ 		ret = allocNextBuffer(pDraw, curBackPix,
+ 			&DRIBUF(backBuf)->name);
+-		if (!ret) {
++		if (ret) {
++			backBuf->privs[backBuf->currentPixmap] =
++					exaGetPixmapDriverPrivate(*curBackPix);
++		} else {
+ 			/* can't have failed on the first buffer */
+ 			assert(backBuf->currentPixmap > 0);
+ 			/* Fall back to last buffer */
+@@ -701,6 +763,41 @@ ARMSOCDRI2ResizeSwapChain(ScrnInfoPtr pScrn, struct armsoc_bo *old_bo,
+ }
+ 
+ 
++/*
++ * Report whether a swap's DRI2 buffer still describes a live pixmap. Used when
++ * the drawable has already gone away, so that a buffer whose pixmap was freed
++ * underneath us is leaked rather than dereferenced.
++ */
++static Bool
++check_swap_buffer(ScrnInfoPtr pScrn, const char *what, DRI2BufferPtr buffer)
++{
++	struct ARMSOCDRI2BufferRec *buf;
++	PixmapPtr pPixmap;
++
++	if (!buffer)
++		return FALSE;
++
++	buf = ARMSOCBUF(buffer);
++
++	/* ARMSOCDRI2DestroyBuffer() handles a buffer with no pixmap itself */
++	if (!buf->pPixmaps || !buf->pPixmaps[0])
++		return TRUE;
++
++	pPixmap = buf->pPixmaps[0];
++	if ((pPixmap->drawable.pScreen == pScrn->pScreen) &&
++			(pPixmap->drawable.type == DRAWABLE_PIXMAP) &&
++			(pPixmap->refcnt > 0) &&
++			(buf->refcnt > 0))
++		return TRUE;
++
++	ERROR_MSG("%s DRI2 buffer no longer describes a live pixmap: att=%d bufrefcnt=%d pix=%p pixrefcnt=%d drawtype=%d pixScreen=%p (pScreen=%p)",
++			what, buffer->attachment, buf->refcnt, pPixmap,
++			pPixmap->refcnt, pPixmap->drawable.type,
++			pPixmap->drawable.pScreen, pScrn->pScreen);
++
++	return FALSE;
++}
++
+ void
+ ARMSOCDRI2SwapComplete(struct ARMSOCDRISwapCmd *cmd)
+ {
+@@ -726,7 +823,8 @@ ARMSOCDRI2SwapComplete(struct ARMSOCDRISwapCmd *cmd)
+ 			DRI2SwapComplete(cmd->client, pDraw, 0, 0, 0, cmd->type,
+ 					cmd->func, cmd->data);
+ 		else
+-			ERROR_MSG("dixLookupDrawable fail on swap complete");
++			DEBUG_MSG("swap %d completed after its drawable went away",
++					cmd->swap_id);
+ 
+ 		/*
+ 		 * Move the Screen's scanout ref onto the buffer now on the CRTC
+@@ -736,11 +834,10 @@ ARMSOCDRI2SwapComplete(struct ARMSOCDRISwapCmd *cmd)
+ 		 * flip still happened and this buffer is what the CRTC (and the
+ 		 * root pixmap) now reference. If we skip this, the unreferences
+ 		 * below free a GEM BO that is still being scanned out and
+-		 * teardown then dies in EXA (CR-1279766: intermittent
+-		 * "dixLookupDrawable fail on swap complete" followed by
+-		 * !key->initialized). set_scanout_bo() only touches pScrn and
+-		 * the bo, so it is safe with pDraw == NULL, and cmd->new_scanout
+-		 * is still held alive by the swap chain's old_src_bo ref here.
++		 * teardown then dies in EXA (CR-1279766). set_scanout_bo() only
++		 * touches pScrn and the bo, so it is safe with pDraw == NULL, and
++		 * cmd->new_scanout is still held alive by the swap chain's
++		 * old_src_bo ref here.
+ 		 */
+ 		if (cmd->type != DRI2_BLIT_COMPLETE &&
+ 		    cmd->type != DRI2_EXCHANGE_COMPLETE &&
+@@ -753,9 +850,28 @@ ARMSOCDRI2SwapComplete(struct ARMSOCDRISwapCmd *cmd)
+ 	}
+ 
+ 	/* drop extra refcnt we obtained prior to swap:
++	 *
++	 * If the drawable is already gone (client exited / Ctrl+C while this
++	 * flip was in flight) the swap's DRI2 buffers may already have been
++	 * torn down. Destroying them then walks into freed pixmap memory and
++	 * kills the server during teardown, so verify they still look live
++	 * first and leak them if not - this generation is being torn down
++	 * anyway (CR-1279766).
+ 	 */
+-	ARMSOCDRI2DestroyBuffer(pDraw, cmd->pSrcBuffer);
+-	ARMSOCDRI2DestroyBuffer(pDraw, cmd->pDstBuffer);
++	if (pDraw) {
++		ARMSOCDRI2DestroyBuffer(pDraw, cmd->pSrcBuffer);
++		ARMSOCDRI2DestroyBuffer(pDraw, cmd->pDstBuffer);
++	} else {
++		if (check_swap_buffer(pScrn, "src", cmd->pSrcBuffer))
++			ARMSOCDRI2DestroyBuffer(pDraw, cmd->pSrcBuffer);
++		else
++			WARNING_MSG("Leaking swap %d src buffer", cmd->swap_id);
++
++		if (check_swap_buffer(pScrn, "dst", cmd->pDstBuffer))
++			ARMSOCDRI2DestroyBuffer(pDraw, cmd->pDstBuffer);
++		else
++			WARNING_MSG("Leaking swap %d dst buffer", cmd->swap_id);
++	}
+ 
+ 	/* swap chain drops ref on original src bo */
+ 	armsoc_bo_unreference(cmd->old_src_bo);
+@@ -1250,16 +1366,32 @@ ARMSOCDRI2CloseScreen(ScreenPtr pScreen)
+ {
+ 	ScrnInfoPtr pScrn = xf86ScreenToScrn(pScreen);
+ 	struct ARMSOCRec *pARMSOC = ARMSOCPTR(pScrn);
++
++	DEBUG_MSG("closing with %d flip(s) still pending after %u swap(s)",
++			pARMSOC->pending_flips, pARMSOC->swap_chain_count);
++
+ 	while (pARMSOC->pending_flips > 0) {
+ 		DEBUG_MSG("waiting..");
+ 		drmmode_wait_for_event(pScrn);
+ 	}
++
+ 	DRI2CloseScreen(pScreen);
+ 
+ 	if (pARMSOC->swap_chain) {
+ 		unsigned int idx = pARMSOC->swap_chain_count % pARMSOC->swap_chain_size;
+-		assert(!pARMSOC->swap_chain[idx]);
++
++		if (pARMSOC->swap_chain[idx])
++			WARNING_MSG("Swap chain slot %u still occupied at close", idx);
+ 		free(pARMSOC->swap_chain);
+ 		pARMSOC->swap_chain = NULL;
+ 	}
++
++	/*
++	 * pARMSOC is the ScrnInfoRec driverPrivate and survives server
++	 * regeneration, so these must be reset here or a stale count leaks
++	 * into the next generation (a stale pending_flips would make the
++	 * drain loop above wait for an event that will never arrive).
++	 */
++	pARMSOC->pending_flips = 0;
++	pARMSOC->swap_chain_count = 0;
+ }
+diff --git a/src/armsoc_driver.c b/src/armsoc_driver.c
+index f12f927..a94581a 100644
+--- a/src/armsoc_driver.c
++++ b/src/armsoc_driver.c
+@@ -1132,6 +1132,11 @@ ARMSOCScreenInit(SCREEN_INIT_ARGS_DECL)
+ 
+ 	TRACE_ENTER();
+ 
++	/* pARMSOC survives server regeneration, so clear the previous
++	 * generation's teardown state before EXA is re-initialised.
++	 */
++	pARMSOC->closing = FALSE;
++
+ 	/* set drm master before allocating scanout buffer */
+ 	if (ARMSOCSetDRMMaster()) {
+ 		ERROR_MSG("Cannot get DRM master: %s", strerror(errno));
+@@ -1401,27 +1406,24 @@ ARMSOCCloseScreen(CLOSE_SCREEN_ARGS_DECL)
+ 
+ 	TRACE_ENTER();
+ 
++	/*
++	 * EXA is already unusable by the time we get here: dix calls
++	 * dixFreeScreenSpecificPrivates() on the line before CloseScreen()
++	 * (dix/main.c), which marks EXA's screen-specific pixmap private key
++	 * uninitialized. Every teardown path below must therefore avoid EXA,
++	 * which is what this flag signals (CR-1279766).
++	 */
++	pARMSOC->closing = TRUE;
++
+ 	armsoc_repulsion_release(pARMSOC->repulsion);
+ 
+ 	drmmode_screen_fini(pScrn);
+ 	drmmode_cursor_fini(pScreen);
+ 
+ 	/*
+-	 * Tear DRI2 down before the CloseScreen chain runs.
+-	 *
+-	 * The chain calls exaCloseScreen(), which free()s the EXA screen
+-	 * private - and the EXA *pixmap* private key lives inside that struct
+-	 * (ExaScreenPrivRec.pixmapPrivateKeyRec, see ExaGetPixmapPriv()).
+-	 * ARMSOCDRI2CloseScreen() drains any in-flight page flip, and
+-	 * completing that swap destroys its DRI2 buffers, which touches the
+-	 * EXA pixmap private. Doing that after exaCloseScreen() reads a freed
+-	 * key and kills bare Xorg (no WM) on client exit / Ctrl+C
+-	 * (CR-1279766: dixGetPrivateAddr: Assertion `key->initialized'
+-	 * failed). It is intermittent because it needs a flip in flight when
+-	 * the client goes away.
+-	 *
+-	 * DRI2 buffers can also still hold a ref on the root pixmap, so this
+-	 * has to happen before that pixmap is destroyed below too.
++	 * Tear DRI2 down first: draining an in-flight page flip completes its
++	 * swap, and a swap's FrontLeft buffer can still hold an X ref on the
++	 * root pixmap that is destroyed just below.
+ 	 */
+ 	if (pARMSOC->dri)
+ 		ARMSOCDRI2CloseScreen(pScreen);
+diff --git a/src/armsoc_driver.h b/src/armsoc_driver.h
+index 27e978e..ec8f859 100644
+--- a/src/armsoc_driver.h
++++ b/src/armsoc_driver.h
+@@ -132,6 +132,21 @@ struct ARMSOCRec {
+ 	/** record if ARMSOCDRI2ScreenInit() was successful */
+ 	Bool				dri;
+ 
++	/**
++	 * Set for the duration of ARMSOCCloseScreen().
++	 *
++	 * dix calls dixFreeScreenSpecificPrivates() on the line immediately
++	 * before CloseScreen() (dix/main.c), and that clears key->initialized
++	 * on every screen-specific private key. exaDriverInit() registers the
++	 * EXA pixmap private with dixRegisterScreenSpecificPrivateKey(), so
++	 * from the moment CloseScreen() is entered any EXA pixmap-private
++	 * access - exaGetPixmapDriverPrivate(), exaGetPixmapPitch(), or the
++	 * EXA-wrapped pScreen->DestroyPixmap() - aborts the server in
++	 * dixGetPrivateAddr() even though the pixmap itself is still valid.
++	 * Teardown paths must check this and avoid EXA (CR-1279766).
++	 */
++	Bool				closing;
++
+ 	/** user-configurable option: */
+ 	Bool				NoFlip;
+ 	unsigned			driNumBufs;
+-- 
+2.54.0
+
