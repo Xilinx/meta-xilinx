@@ -9,12 +9,10 @@ RDEPENDS:${PN} += "openssl"
 
 REPO ?= "git://github.com/Xilinx/bootgen.git;protocol=https"
 BRANCH = "master"
-SRCREV = "9ca2c1ddeaf21ae18642a0204c57452cdaee3fa9"
+SRCREV = "ad22c924bdc9ce444c33ee49c0942972f112cb0b"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
-SRC_URI = "${REPO};${BRANCHARG} \
-    file://0001-utils-src-cdo-load-Fix-incompatible-pointer-type-in-.patch \
-    "
+SRC_URI = "${REPO};${BRANCHARG}"
 
 do_install() {
     install -d ${D}${bindir}
