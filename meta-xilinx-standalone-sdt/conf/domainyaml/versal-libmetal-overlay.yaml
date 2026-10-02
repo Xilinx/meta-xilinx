@@ -72,7 +72,7 @@ domains:
   R5_1_BAREMETAL:
     compatible: openamp,domain-v1
     access:
-      - dev: psv_rpu_0@ff9a0000     # Required by xilpm; matches both CIPS and PS Wizard RPU node names.
+      - dev: "psv(_|-)rpu(_|-)0@ff9a0000$"     # Required by xilpm; matches both CIPS and PS Wizard RPU node names.
       - dev: timer@ff100000
       - dev: mailbox@ff350000
       - dev: psv_r5_1_atcm_global@ffe90000
