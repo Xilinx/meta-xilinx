@@ -1,4 +1,4 @@
 require optee-os-amd.inc
 
 BRANCH = "xlnx_rebase_v4.9.0"
-SRCREV = "bc2769acfe8a37441f9453cdb89356b9acdb9fe1"
+SRCREV = "6fb7c729432a148118767f37defa0573159783a2"
