@@ -46,12 +46,12 @@ https://docs.yoctoproject.org/dev/contributor-guide/submit-changes.html#
 
 This layer depends on:
 
-	URI: https://git.yoctoproject.org/poky
+	URI: https://git.openembedded.org/openembedded-core
 	layers: meta
 	branch: wrynose
 
 	URI:
-        https://git.yoctoproject.org/meta-dpdk (official version)
-        https://github.com/AMD-AECG-SSW-PUBLIC/meta-dpdk (development and AMD release)
+	 https://git.yoctoproject.org/meta-dpdk (official version)
+	 https://github.com/Xilinx/meta-dpdk (development and AMD release)
 	layers: meta-dpdk
 	branch: AMD release version (e.g. rel-v2026.2)

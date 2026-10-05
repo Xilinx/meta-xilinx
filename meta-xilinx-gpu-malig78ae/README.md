@@ -30,8 +30,8 @@ mesa does not currently support the mali g78ae.
 
 This layer depends on:
 
-	URI: https://git.yoctoproject.org/poky
-	layers: meta, meta-poky
+	URI: https://git.openembedded.org/openembedded-core
+	layers: meta
 	branch: wrynose
 
 	URI: https://git.openembedded.org/meta-openembedded
@@ -43,7 +43,7 @@ This layer depends on:
 	branch: wrynose
 
 	URI:
-        https://git.yoctoproject.org/meta-xilinx (official version)
-        https://github.com/Xilinx/meta-xilinx (development and AMD release)
-	layers: meta-xilinx-microblaze, meta-xilinx-core, meta-xilinx-standalone, meta-xilinx-mali400
-	branch: wrynose
+	 https://git.yoctoproject.org/meta-xilinx (official version)
+	 https://github.com/Xilinx/meta-xilinx (development and AMD release)
+	layers: meta-xilinx-core, meta-xilinx-mali400
+	branch: wrynose or AMD release version (e.g. rel-v2026.2)

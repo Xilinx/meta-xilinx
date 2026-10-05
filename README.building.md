@@ -20,7 +20,7 @@ $ cd sources
 > * *rel-version:* refers to AMD release version.
 > * *README:* By default README file link will be pointing to master branch so make
 > sure to checkout the release_branch or rel-version branch.
-> * *Upstream Pending Patches:* It is intended to resync Scarthgap (upstream) for
+> * *Upstream Pending Patches:* It is intended to resync Wrynose (upstream) for
 > both meta-virtualization and meta-openamp, but currently there are some patches
 > in there that have not yet been accepted by upstream. So using the fork from
 > https://github.com/Xilinx is recommended.

@@ -25,24 +25,7 @@ them.
 
 This layer depends on:
 
-	URI: https://git.yoctoproject.org/poky
-	layers: meta, meta-poky
-	branch: wrynose
-
-	URI: https://git.openembedded.org/meta-openembedded
-	layers: meta-oe
-	branch: wrynose
-
-	URI: https://git.yoctoproject.org/meta-arm
-	layers: meta-arm, meta-arm-toolchain
-	branch: wrynose
-
-	URI:
-        https://git.yoctoproject.org/meta-xilinx (official version)
-        https://github.com/Xilinx/meta-xilinx (development and AMD release)
-	layers: meta-xilinx-core
-
-	URI: https://git.yoctoproject.org/openembedded-core
+	URI: https://git.openembedded.org/openembedded-core
 	layers: meta
 	branch: wrynose
 

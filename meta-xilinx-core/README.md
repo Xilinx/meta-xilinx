@@ -8,16 +8,18 @@ multimedia, graphics, xrt etc.
 
 This layer depends on:
 
-	URI: https://git.yoctoproject.org/poky
-	layers: meta, meta-poky
-	branch: wrynose
-
-	URI: https://git.openembedded.org/meta-openembedded
-	layers: meta-oe
+	URI: https://git.openembedded.org/openembedded-core
+	layers: meta
 	branch: wrynose
 
 	URI: https://git.yoctoproject.org/meta-arm
 	layers: meta-arm, meta-arm-toolchain
+	branch: wrynose
+
+Recommended (optional) layers:
+
+	URI: https://git.openembedded.org/meta-openembedded
+	layers: meta-oe, meta-python, meta-networking, meta-multimedia.
 	branch: wrynose
 ---
 
