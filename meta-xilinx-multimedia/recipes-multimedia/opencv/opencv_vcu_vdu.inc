@@ -5,7 +5,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 SRC_URI += " git://github.com/Xilinx/opencv_modules_xlnx.git;protocol=https;branch=main;name=xlnx-modules;destsuffix=${BP}/contrib_xlnx"
 
 # Update this hash when you make changes to the opencv_modules_xlnx repository
-SRCREV_xlnx-modules = "2c860038153fe6c21a7772222126b8ae3de3e906"
+SRCREV_xlnx-modules = "9098b46ba1b76484f4fe2eebf20565bce7503ffc"
 
 # This extends the existing OPENCV_EXTRA_MODULES_PATH to include both official contrib and contrib_xlnx modules
 EXTRA_OECMAKE += "-DOPENCV_EXTRA_MODULES_PATH='${S}/contrib/modules;${S}/contrib_xlnx/modules'"
