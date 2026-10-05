@@ -10,10 +10,7 @@ COMPATIBLE_MACHINE:zynqmp = "${MACHINE}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 BOOTBIN_VER_MAIN ??= "${PV}"
-BOOTBIN_VERSION_MACHINE ??= "${MACHINE}"
-# Build id of the automation build; empty for a local build.
-BOOTBIN_VER_BUILD ??= ""
-BOOTBIN_VERSION_STRING ??= "${BOOTBIN_VERSION_MACHINE}-v${BOOTBIN_VER_MAIN}${@('-' + d.getVar('BOOTBIN_VER_BUILD')) if d.getVar('BOOTBIN_VER_BUILD') else ''}"
+BOOTBIN_VERSION_STRING ??= "${MACHINE}-v${BOOTBIN_VER_MAIN}"
 
 BOOTBIN_VER_FILE = "bootbin-version-header.txt"
 BOOTBIN_VER_MAX_LEN = "40"
@@ -27,20 +24,11 @@ MANIFEST_VERSION = "${BOOTBIN_VERSION_STRING}"
 
 python do_configure() {
     version = d.getVar('BOOTBIN_VERSION_STRING')
-    maxlen = int(d.getVar("BOOTBIN_VER_MAX_LEN"))
-    encoded = version.encode("utf-8")
-    if len(encoded) > maxlen:
-        machine = d.getVar('BOOTBIN_VERSION_MACHINE') or ''
-        main = d.getVar('BOOTBIN_VER_MAIN') or ''
-        bb.fatal("BOOTBIN_VERSION_STRING does not fit the udf_bh field: '%s' is %d bytes, "
-                 "limit is %d. Machine name '%s' contributes %d, version '%s' %d, "
-                 "build id is '%s'. The limit is the size of the field, so shorten "
-                 "one of the inputs."
-                 % (version, len(encoded), maxlen, machine, len(machine), main, len(main),
-                    d.getVar('BOOTBIN_VER_BUILD') or ''))
+    if len(version) > int(d.getVar("BOOTBIN_VER_MAX_LEN")):
+        bb.fatal("version string too long (%s) [%d > %d]" % (version, len(version), int(d.getVar("BOOTBIN_VER_MAX_LEN"))))
 
     with open(d.expand("${B}/${BOOTBIN_VER_FILE}"), 'w') as f:
-        f.write(encoded.hex())
+        f.write(version.encode("utf-8").hex())
 }
 
 do_install() {
