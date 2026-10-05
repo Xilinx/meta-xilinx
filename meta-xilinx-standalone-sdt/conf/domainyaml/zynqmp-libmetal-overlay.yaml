@@ -1,3 +1,14 @@
+# Workaround for a Lopper bug: the libmetal relations below use a phandle
+# property named "timer", and the ZynqMP architected timer node is also
+# labelled "timer". When Lopper regenerates __symbols__ for a domain it
+# types the "timer" symbol as a phandle ("/timer" becomes <0x2f74696d>),
+# and the OpenAMP assist then fails in get_label(). Relabel the timer so
+# its symbol does not match the relation property name. The long-term fix
+# belongs in Lopper (__symbols__ entries are always path strings); drop
+# this relabel once that fix is available.
+timer:
+  label: arm_generic_timer
+
 reserved-memory:
   ranges: true
   "#size-cells": 2
