@@ -83,9 +83,16 @@ domains:
     zephyr-version: "4.3"
     xlnx,ddr-boot: true
     xlnx,zephyr,mems: [ ddrboot@9800100 ]
-    # IPI_NOBUF2 controller of the RPMsg mailbox ipi_nobuf2_to_ipi_nobuf1.
+    # IPI_NOBUF2 controller of the RPMsg mailbox ipi_nobuf2_to_ipi_nobuf1,
+    # the system timer and the TCMs the linker places code and data in.
+    # sram entries are address ranges and do not keep these nodes through
+    # domain_access.
     access:
       - dev: ipi_nobuf2
+      - dev: ttc0
+      - dev: psx_wizard_0_psxl_0_psx_r52_0a_atcm_global
+      - dev: psx_wizard_0_psxl_0_psx_r52_0a_btcm_global
+      - dev: psx_wizard_0_psxl_0_psx_r52_0a_ctcm_global
     domain-to-domain:
       compatible: openamp,domain-to-domain-v1
       rpmsg-relation:
