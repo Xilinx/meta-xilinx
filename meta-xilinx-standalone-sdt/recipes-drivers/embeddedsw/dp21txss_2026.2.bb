@@ -5,7 +5,7 @@ REQUIRED_MACHINE_FEATURES = "dp21txss"
 
 inherit esw python3native
 
-DEPENDS += "xilstandalone video-common dp21 vtc"
+DEPENDS += "xilstandalone video-common dp21 vtc iic iicps tmrctr"
 DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "clk-wiz", "clk-wiz", "",d)}"
 DEPENDS += " ${@bb.utils.contains("MACHINE_FEATURES", "dual-splitter", "dual-splitter", "",d)}"
 
