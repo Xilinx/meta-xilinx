@@ -11,11 +11,12 @@ SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 # Enable kmsconvt on tty1
 SYSTEMD_SERVICE:${PN} += "kmsconvt@tty1.service"
 
-# udev rule for display hotplug and service drop-in for display
-# presence check
+# udev rule for display hotplug, service drop-in for display presence
+# check and a preset that keeps agetty off the VTs kmscon owns
 SRC_URI += " \
     file://99-kmscon-hotplug.rules \
     file://10-check-display.conf \
+    file://80-kmscon-no-vt-getty.preset \
 "
 
 do_install:append() {
@@ -33,10 +34,16 @@ do_install:append() {
     install -d ${D}${sysconfdir}/systemd/system/getty.target.wants
     ln -sf ${systemd_system_unitdir}/kmsconvt@.service \
         ${D}${sysconfdir}/systemd/system/getty.target.wants/kmsconvt@tty1.service
+
+    # kmscon owns tty1, so keep systemd's preset from enabling agetty there
+    install -d ${D}${systemd_unitdir}/system-preset
+    install -m 0644 ${UNPACKDIR}/80-kmscon-no-vt-getty.preset \
+        ${D}${systemd_unitdir}/system-preset/
 }
 
 FILES:${PN} += " \
     ${sysconfdir}/udev/rules.d \
     ${sysconfdir}/systemd/system/getty.target.wants \
+    ${systemd_unitdir}/system-preset/80-kmscon-no-vt-getty.preset \
     ${systemd_system_unitdir}/kmsconvt@tty1.service.d \
 "

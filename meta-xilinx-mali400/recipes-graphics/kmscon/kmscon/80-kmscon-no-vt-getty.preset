@@ -1,0 +1,10 @@
+# kmscon owns the virtual terminals: autovt@.service points at kmsconvt@.service
+# and kmsconvt@tty1.service is enabled explicitly. systemd's own
+# 90-systemd.preset enables getty@.service, whose DefaultInstance is tty1, so
+# without this file both agetty and kmscon end up owning /dev/tty1. Both units
+# set TTYVHangup=yes with Restart=always, so they hang up each other's terminal
+# and respawn forever.
+#
+# This preset must sort before 90-systemd.preset for the rule to win.
+disable getty@.service
+disable getty@tty1.service
