@@ -6,6 +6,7 @@ inherit esw python3native
 
 ESW_COMPONENT_SRC = "/lib/sw_services/xilpm/src/"
 ESW_COMPONENT_NAME = "libxilpm.a"
+EXTRA_OECMAKE:append:zynqmp = " -Dstandalone_zynqmp_fsbl_bsp=ON"
 
 DEPENDS += " \
     libxil \
