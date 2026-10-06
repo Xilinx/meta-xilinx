@@ -5,8 +5,6 @@ driver for AI Engine IP."
 
 require aie-rt-2026.inc
 
-SRC_URI += "file://0001-CMakeLists.txt-Add-cmake_minimum_required.patch"
-
 SECTION	= "devel"
 
 XAIEFAL_DIR ?= "fal"
