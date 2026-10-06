@@ -83,21 +83,21 @@ domains:
       - dev: libmetal_elf@9968000
         start: 0x9968000
         size: 0x60000
-      - dev: r52_0b_atcm_global@eba80000
-        label: r52_0b_atcm_global
+      - dev: r52_1a_atcm_global@eba40000
+        label: r52_1a_atcm_global
         size: 64K
-        spec_name: R52_0B_ATCM_GLOBAL
-        start: '0xeba80000'
-      - dev: r52_0b_btcm_global@eba90000
-        label: r52_0b_btcm_global
+        spec_name: R52_1A_ATCM_GLOBAL
+        start: '0xeba40000'
+      - dev: r52_1a_btcm_global@eba50000
+        label: r52_1a_btcm_global
         size: 32K
-        spec_name: R52_0B_BTCM_GLOBAL
-        start: '0xeba90000'
-      - dev: r52_0b_ctcm_global@ebaa0000
-        label: r52_0b_ctcm_global
+        spec_name: R52_1A_BTCM_GLOBAL
+        start: '0xeba50000'
+      - dev: r52_1a_ctcm_global@eba60000
+        label: r52_1a_ctcm_global
         size: 32K
-        spec_name: R52_0B_CTCM_GLOBAL
-        start: '0xebaa0000'
+        spec_name: R52_1A_CTCM_GLOBAL
+        start: '0xeba60000'
     memory:
       - dev: NoC_C0_C1_ddr_memory
         start: 0x09968000
