@@ -1,4 +1,5 @@
 # Assign specific ownership and tag for session management
 
-SUBSYSTEM=="dma_heap", KERNEL=="*reserved*", GROUP="video", MODE="0660", TAG+="uaccess", SYMLINK+="dma_heap/reserved"
+SUBSYSTEM=="dma_heap", KERNEL=="cma_reserved*|reserved", GROUP="video", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="dma_heap", KERNEL=="default_cma_region", GROUP="video", MODE="0660", TAG+="uaccess", SYMLINK+="dma_heap/reserved"
 
