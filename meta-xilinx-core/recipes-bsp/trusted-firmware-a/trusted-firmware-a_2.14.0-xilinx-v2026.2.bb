@@ -51,6 +51,10 @@ TFA_PLATFORM:versal-net = "versal_net"
 TFA_PLATFORM:versal-2ve-2vm = "versal2"
 TFA_PLATFORM:versal-2vp     = "versal"
 
+TFA_PLATFORM_VARIANT = ""
+# Versal Premium Gen 2 uses the Versal port with platform-specific overrides.
+TFA_PLATFORM_VARIANT:versal-2vp = "PREMIUM_GEN2"
+
 ### Console settings
 TFA_CONSOLE_DEFAULT = ""
 TFA_CONSOLE_DEFAULT:zynqmp = "cadence"
@@ -88,6 +92,7 @@ TFA_MEM_OEMAKE:append:versal-2vp = "${@' VERSAL_ATF_MEM_SIZE=${TFA_MEM_SIZE}'   
 
 EXTRA_OEMAKE += "${TFA_MEM_OEMAKE}"
 
+EXTRA_OEMAKE += "${@'PLAT_VARIANT=${TFA_PLATFORM_VARIANT}' if d.getVar('TFA_PLATFORM_VARIANT') else ''}"
 
 ### Preloaded Base
 TFA_BL33_LOAD ?= ""
