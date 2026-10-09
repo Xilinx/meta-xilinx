@@ -10,6 +10,8 @@ inherit features_check update-alternatives
 REQUIRED_DISTRO_FEATURES = "wayland"
 REQUIRED_MACHINE_FEATURES = "malig78ae"
 
+PV .= "+git"
+
 REPO ?= "git://github.com/Xilinx/g78ae-userspace-binaries.git;protocol=https"
 BRANCH ?= "r54p1-12eac0"
 SRCREV ?= "e351fab9da02397c710f58f20ab5d1c8a844f241"

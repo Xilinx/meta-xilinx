@@ -8,9 +8,7 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = " \
 	file://kbase/license.txt;md5=13e14ae1bd7ad5bff731bba4a31bb510 \
 	"
-# Arbiter license file
-# driver/product/kernel/drivers/gpu/arm/arbitration/license_gplv2.txt
-# md5sum: 13e14ae1bd7ad5bff731bba4a31bb510
+PV .= "+1+git"
 
 BRANCH = "r54p1-12eac0"
 SRCREV_kernel = "1bb2b38d39065aec2d9674f83294887c56c2c00b"
