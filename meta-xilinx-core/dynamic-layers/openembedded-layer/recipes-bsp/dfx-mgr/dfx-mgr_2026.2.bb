@@ -9,7 +9,7 @@ BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = "${REPO};${BRANCHARG}"
 
 BRANCH = "master"
-SRCREV = "063cd6f18ef26ff6b8ec9b6024f6594c620d5938"
+SRCREV = "4e63d78f01413ec7dfc851caa3970267529b4327"
 SOMAJOR = "2"
 SOMINOR = "0"
 SOVERSION = "${SOMAJOR}.${SOMINOR}"
@@ -26,7 +26,7 @@ COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 inherit cmake update-rc.d systemd
 
-DEPENDS += " libwebsockets inotify-tools libdfx libdrm systemd"
+DEPENDS += " libwebsockets inotify-tools libdfx libdrm"
 RDEPENDS:${PN} += " freeipmi ${PN}-client"
 EXTRA_OECMAKE += " \
                -DCMAKE_SYSROOT:PATH=${RECIPE_SYSROOT} \
@@ -36,7 +36,7 @@ INITSCRIPT_NAME = "dfx-mgr.sh"
 INITSCRIPT_PARAMS = "start 99 S ."
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE:${PN} = "dfx-mgr.service dfx-mgr-fw-load.service"
+SYSTEMD_SERVICE:${PN} = "dfx-mgr.socket dfx-mgr.service dfx-mgr-fw-load.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 
@@ -66,6 +66,7 @@ do_install(){
 	install -m 0755 ${S}/src/scripts/xlnx-firmware-load ${D}${bindir}
 
 	install -d ${D}${systemd_system_unitdir}
+	install -m 0644 ${S}/src/dfx-mgr.socket ${D}${systemd_system_unitdir}
 	install -m 0644 ${S}/src/dfx-mgr.service ${D}${systemd_system_unitdir}
 	install -m 0644 ${S}/src/dfx-mgr-fw-load.service ${D}${systemd_system_unitdir}
 }
