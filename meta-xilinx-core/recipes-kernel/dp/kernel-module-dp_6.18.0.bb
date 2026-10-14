@@ -9,7 +9,7 @@ PV = "6.18.0+git"
 
 REPO   = "git://github.com/Xilinx/dp-modules.git;protocol=https"
 BRANCH = "master"
-SRCREV = "deda821e2b0794e9cebd594f0e3826a5141d0767"
+SRCREV = "eacbd15553ca2ba2f55b2caa2c3ec213b61046f5"
 
 SRC_URI = "${REPO};branch=${BRANCH}"
 
