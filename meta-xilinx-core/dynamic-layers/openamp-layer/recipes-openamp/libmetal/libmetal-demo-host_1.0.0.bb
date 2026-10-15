@@ -15,6 +15,9 @@ inherit pkgconfig cmake
 
 DEPENDS:append = " libmetal "
 
+# libmetal is a machine_arch recipe, so we are too
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 FILES:${PN} = " /usr/bin/irq_shmem_demo "
 
 do_install () {
