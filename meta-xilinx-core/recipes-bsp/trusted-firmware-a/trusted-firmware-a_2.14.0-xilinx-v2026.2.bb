@@ -8,7 +8,7 @@ DEPENDS:remove:versal-2vp:qemuall = " optee-os"
 
 # Xilinx TF-A v2.14
 SRC_URI_TRUSTED_FIRMWARE_A = "git://github.com/Xilinx/arm-trusted-firmware.git;protocol=https"
-SRCREV_tfa = "fc32e8dbccd575c4e1879090bf7e759c8f9ca608"
+SRCREV_tfa = "a4da0a92ddf183bed7bb6977e60fa2cc51273bdf"
 SRCBRANCH = "xlnx_rebase_v2.14"
 
 LIC_FILES_CHKSUM = "file://docs/license.rst;md5=6ed7bace7b0bc63021c6eba7b524039e"
@@ -30,7 +30,7 @@ SRC_URI:append = " ${@bb.utils.contains('TFA_SCMI_SERVER', '1', '${SRC_URI_SCMI_
 LICENSE:append = "${@bb.utils.contains('TFA_SCMI_SERVER', '1', ' & BSD-3-Clause', '', d)}"
 LIC_FILES_CHKSUM += "${@bb.utils.contains('TFA_SCMI_SERVER', '1', 'file://../scmi-server/LICENSE;md5=8a98de6f98ae5501d035c335a47a2bae', '', d)}"
 
-SRCREV = "fc32e8dbccd575c4e1879090bf7e759c8f9ca608"
+SRCREV = "a4da0a92ddf183bed7bb6977e60fa2cc51273bdf"
 SRCREV_FORMAT:append = "${@bb.utils.contains('TFA_SCMI_SERVER', '1', '_scmi-server', '', d)}"
 
 # Pass SCMI server path to TF-A build
