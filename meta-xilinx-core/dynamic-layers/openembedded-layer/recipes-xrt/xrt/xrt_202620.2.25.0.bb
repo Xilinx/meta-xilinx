@@ -1,6 +1,9 @@
 SUMMARY  = "Xilinx Runtime(XRT) libraries"
 DESCRIPTION = "Xilinx Runtime User Space Libraries and headers"
 
+# May depend on opencl, which may depend on libmali-xlnx
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 require xrt-${PV}.inc
 
 LICENSE = "GPL-2.0-or-later & Apache-2.0 & MIT"
