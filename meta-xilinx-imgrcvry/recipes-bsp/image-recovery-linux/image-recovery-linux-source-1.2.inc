@@ -5,7 +5,7 @@ REPO ??= "git://github.com/Xilinx/image-recovery-linux.git;protocol=https"
 
 BRANCH ??= "main"
 
-SRCREV ?= "ef99e7b14390586ca80799fc5cf30c7e0f5fe710"
+SRCREV ?= "5092f4beaa1a82c6137827a9c92782e3c9c27c05"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 
