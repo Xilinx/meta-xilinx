@@ -5,5 +5,7 @@
 # xserver-xorg_xen.inc file.
 XEN_REMOVED_OPENGL_PKGCONFIGS:zynqmp ?= ""
 XEN_REMOVED_OPENGL_PKGCONFIGS:versal ?= ""
+XEN_REMOVED_OPENGL_PKGCONFIGS:versal-net ?= ""
+XEN_REMOVED_OPENGL_PKGCONFIGS:versal-2ve-2vm ?= ""
 XEN_REMOVED_OPENGL_PKGCONFIGS:versal-2vp ?= ""
 
