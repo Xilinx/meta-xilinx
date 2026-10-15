@@ -9,6 +9,5 @@ DEPENDS:append = "${@' libmali-xlnx' if d.getVar('PREFERRED_PROVIDER_virtual/lib
 
 SRC_URI:append = "${@bb.utils.contains('DEPENDS', 'libmali-xlnx', '${EXTRA_MALI400_SRC}', '', d)}"
 
-# Links to libmali-xlnx, so it becomes MACHINE_ARCH specific
-DEFAULT_PACKAGE_ARCH := "${PACKAGE_ARCH}"
-PACKAGE_ARCH = "${@bb.utils.contains('DEPENDS', 'libmali-xlnx', '${MACHINE_ARCH}', '${DEFAULT_PACKAGE_ARCH}', d)}"
+# Links to mesa / libmali-xlnx, so it becomes MACHINE_ARCH specific
+PACKAGE_ARCH = "${MACHINE_ARCH}"
