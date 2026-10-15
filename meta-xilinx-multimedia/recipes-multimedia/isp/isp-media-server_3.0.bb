@@ -19,15 +19,6 @@ do_install() {
 
     cp -r ${UNPACKDIR}/Tuning_files ${D}${datadir}
 
-    # Fmcconfig.bin ships in the tarball's isp_bin/ dir; install it alongside
-    # the RPU firmware blobs from isp-firmware, since consumers look for it there.
-    if [ -e ${S}/isp_bin/Fmcconfig.bin ]; then
-        install -d ${D}${base_libdir}/firmware
-        install -Dm 0644 ${S}/isp_bin/Fmcconfig.bin ${D}${base_libdir}/firmware/Fmcconfig.bin
-    else
-        bbwarn "isp-media-server: isp_bin/Fmcconfig.bin is missing from this drop; it is optional, continuing build without it"
-    fi
-
     # Make sure necessary symlinks are created
     for fullso in *.so.*.* *.so.* *.so ; do
         soname=$(objdump -p $fullso | grep SONAME | xargs echo | cut -d ' ' -f 2)
@@ -63,7 +54,7 @@ do_install() {
     fi
 }
 
-FILES:${PN} += "${libdir}/*.so* ${bindir}/*isp_media_server ${bindir}/video_test ${bindir}/vsi-ctl ${datadir}/Tuning_files/* ${base_libdir}/firmware/Fmcconfig.bin"
+FILES:${PN} += "${libdir}/*.so* ${bindir}/*isp_media_server ${bindir}/video_test ${bindir}/vsi-ctl ${datadir}/Tuning_files/*"
 
 # Disable all QA checks and stripping
 INSANE_SKIP:${PN} += "already-stripped ldflags"

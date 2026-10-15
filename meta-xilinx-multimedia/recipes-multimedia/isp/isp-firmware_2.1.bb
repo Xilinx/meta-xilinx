@@ -6,8 +6,8 @@ COMPATIBLE_HOST = ".*-linux"
 
 S = "${UNPACKDIR}"
 
-SRC_URI = "https://edf.amd.com/sswreleases/isp-fw/2026.2/09262026/isp_fw_09262026.tar.gz"
-SRC_URI[sha256sum] = "4d8470980cc504ed9a3551cb7389c1777cc4e78e171e9fc0b04ca4a603db5d43"
+SRC_URI = "https://edf.amd.com/sswreleases/isp-fw/2026.2/10132026/isp_fw_10132026.tar.gz"
+SRC_URI[sha256sum] = "ff865fa34febaa469d24b88ab47869b9fe6c5e0b37f39d6787f4a9fdaf52cad0"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 do_compile[noexec] = "1"
@@ -18,6 +18,7 @@ do_install() {
     install -Dm 0644 ${S}/isp-r52-7-firmware.elf ${D}${base_libdir}/firmware/isp-r52-7-firmware.elf
     install -Dm 0644 ${S}/isp-r52-8-firmware.elf ${D}${base_libdir}/firmware/isp-r52-8-firmware.elf
     install -Dm 0644 ${S}/isp-r52-9-firmware.elf ${D}${base_libdir}/firmware/isp-r52-9-firmware.elf
+    install -Dm 0644 ${S}/Fmcconfig.bin ${D}${base_libdir}/firmware/Fmcconfig.bin
 }
 
 COMPATIBLE_MACHINE = "^$"
@@ -31,4 +32,5 @@ FILES:${PN} += "\
     ${base_libdir}/firmware/isp-r52-7-firmware.elf \
     ${base_libdir}/firmware/isp-r52-8-firmware.elf \
     ${base_libdir}/firmware/isp-r52-9-firmware.elf \
+    ${base_libdir}/firmware/Fmcconfig.bin \
 "
