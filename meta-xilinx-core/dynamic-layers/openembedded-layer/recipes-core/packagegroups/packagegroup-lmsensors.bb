@@ -2,7 +2,8 @@ SUMMARY = "lm_sensors hardware-monitoring tools and drivers."
 DESCRIPTION = "PetaLinux packages that provides tools and drivers for \
 monitoring temperatures, voltage"
 
-PACKAGE_ARCH = "${TUNE_PKGARCH}"
+# Due to lmsensor bbappend switch it to MACHINE_ARCH
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit packagegroup
 
