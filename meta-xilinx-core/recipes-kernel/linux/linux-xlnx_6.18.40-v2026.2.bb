@@ -1,7 +1,7 @@
 LINUX_VERSION = "6.18.40"
 YOCTO_META ?= "git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-6.18;destsuffix=yocto-kmeta"
 KBRANCH = "xlnx_rebase_v6.18_LTS"
-SRCREV = "1cc2355840949182d0049bdf3fe7f7fc56ac8a2c"
+SRCREV = "59d213656d69e7768dbcb00c505c89e90a9e04e9"
 SRCREV_meta = "f202157d297182244bde71c8ed8b6d4946deec8f"
 
 include linux-xlnx.inc
