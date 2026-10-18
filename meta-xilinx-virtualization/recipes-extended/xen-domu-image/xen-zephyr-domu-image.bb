@@ -6,10 +6,10 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 SRC_URI = "\
-    https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/10170604/external/zephyr-synchronization/xenvmgicv3_zephyr-synchronization_10170604.tar.gz;name=tarball \
+    https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/10180550/external/zephyr-synchronization/xenvmgicv3_zephyr-synchronization_10180550.tar.gz;name=tarball \
     file://zephyr-synchronization-xenvmgicv3.cfg \
     "
-SRC_URI[tarball.sha256sum] = "95800f28da7199aa02851caf486c585431f9263599bf6b0cda33e07e3036c488"
+SRC_URI[tarball.sha256sum] = "7604b38fe0be9bf6c6c4f450a7d227171f494387e5a1dc01a06b005f22fad5ee"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:versal = "${MACHINE}"
