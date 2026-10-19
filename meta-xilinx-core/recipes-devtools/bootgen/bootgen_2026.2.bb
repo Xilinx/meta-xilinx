@@ -8,7 +8,7 @@ DEPENDS += "openssl"
 RDEPENDS:${PN} += "openssl"
 
 REPO ?= "git://github.com/Xilinx/bootgen.git;protocol=https"
-BRANCH = "master"
+BRANCH = "xlnx_rel_v2026.2"
 SRCREV = "b0f60761ffce44d589229a70f1ad4c125fce2afe"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
