@@ -18,9 +18,7 @@ SRC_URI = "${REPO};branch=${BRANCH}"
 
 PV .= "+git"
 
-# Force a common PRSERV_PV_AUTOINC across all gstreamer package variants
 PE = "1"
-PACKAGE_ARCH:task-packagedata = "all"
 
 # ---------------------------------------------------------------------------
 # Build only for AMD SoCs carrying an Allegro OMX-IL core (VCU / VDU / VCU2)
@@ -54,14 +52,6 @@ EXTRA_OEMESON += "-Dtarget=${GSTREAMER_1_0_OMX_TARGET} -Dheader_path=${STAGING_I
 # Allegro cores share one library name and are machine-specific
 GSTREAMER_1_0_OMX_CORE_NAME = "${libdir}/libOMX.allegro.core.so.1"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-
-python () {
-    # PACKAGE_ARCH:task-packagedata overrides the value used by Bitbake for
-    # PRSERV_PV_AUTOINC but would also change MULTIMACH_TARGET_SYS (and
-    # therefore WORKDIR).  Freeze MULTIMACH_TARGET_SYS to the pre-override
-    # value so the WORKDIR path is stable.
-    d.setVar("MULTIMACH_TARGET_SYS", d.getVar("MULTIMACH_TARGET_SYS"))
-}
 
 # ---------------------------------------------------------------------------
 # Post-install: patch the installed gstomx.conf with the resolved core name
