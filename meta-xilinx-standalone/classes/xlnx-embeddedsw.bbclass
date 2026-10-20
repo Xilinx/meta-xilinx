@@ -13,7 +13,7 @@ BRANCH ??= "${ESW_BRANCH}"
 
 ESW_REV[git] = "${AUTOREV}"
 ESW_REV[2026.1] = "2fb454742f9d42e23a46a13c0eb09e29dc52c6d1"
-ESW_REV[2026.2] = "59eeef4e9ba30846a29acdf6a93ce69928fa5b70"
+ESW_REV[2026.2] = "a04aa07553cadc32c4820f3ea7ed463584c7cf74"
 ESW_REV = "${@d.getVarFlag('ESW_REV', d.getVar('ESW_VER')) or 'INVALID'}"
 ESW_REV[vardeps] += "ESW_VER"
 SRCREV_embeddedsw ??= "${ESW_REV}"
@@ -24,7 +24,7 @@ EMBEDDEDSW_SRCURI ?= "${REPO};${EMBEDDEDSW_BRANCHARG}"
 LICENSE = "MIT"
 ESW_LIC_FILES_CHKSUM[master] = 'b29f4da21ad77af267cadb19543de2e5'
 ESW_LIC_FILES_CHKSUM[xlnx_rel_v2026.1] = '72a4c4e9c5bcb3f5ac72f1bb755dbdb5'
-ESW_LIC_FILES_CHKSUM[xlnx_rel_v2026.2] = 'b29f4da21ad77af267cadb19543de2e5'
+ESW_LIC_FILES_CHKSUM[xlnx_rel_v2026.2] = 'b6a7578a6bef7b2de42f6935f3026f61'
 ESW_LIC_FILES_CHKSUM = "${@d.getVarFlag('ESW_LIC_FILES_CHKSUM', d.getVar('BRANCH')) or '0'}"
 ESW_LIC_FILES_CHKSUM[vardeps] += "BRANCH"
 LIC_FILES_CHKSUM ??= "file://license.txt;md5=${ESW_LIC_FILES_CHKSUM}"
