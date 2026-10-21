@@ -10,26 +10,30 @@
 MEMORY_START="0x20000000"
 MEMORY_END="0x70000000"
 
-XEN="xen"
+XEN="target:/boot/xen"
 
 # Xen Dom0 load configurations
-DOM0_KERNEL="Image"
+DOM0_KERNEL="target:/boot/Image"
 
 # User configurable bootparams
+# Default boot medium is set to SD boot mode.
 DOM0_CMD="console=hvc0 clk_ignore_unused root=/dev/mmcblk0p3 ro rootwait"
 XEN_CMD="console=dtuart dom0_mem=1500M dom0_max_vcpus=2 bootscrub=0 vwfi=native sched=null"
 
 # Xen Dom0-less load configurations
 NUM_DOMUS=1
 
-DOMU_KERNEL[0]="Image"
-DOMU_RAMDISK[0]="root/core-image-minimal-amd-cortexa53-common.rootfs.cpio.gz"
+DOMU_KERNEL[0]="target:/boot/Image"
+DOMU_RAMDISK[0]="target:/root/core-image-minimal-amd-cortexa53-common.rootfs.cpio.gz"
 DOMU_MEM[0]="800"
 DOMU_VCPUS[0]=1
 DOMU_CMD[0]="console=hvc0 init=/bin/sh root=/dev/ram0"
 
 # User configurable image load boot medium.
-LOAD_CMD="ext4load mmc 0:1"
+# The interface defaults to mmc, matching the SD boot mode. To boot from a USB
+# disk or a UFS/SATA device instead, change the interface to usb or scsi
+# respectively, and update DOM0_CMD root= to match the new boot medium.
+LOAD_CMD="ext4load mmc 0:3"
 
 # Image builder output name, For recipe this is fixed to a static name.
 # If user changes this output file name then it needs to be update in recipe as
