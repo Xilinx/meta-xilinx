@@ -7,7 +7,7 @@ require amd-zephyr-kernel-src_${PREFERRED_VERSION_zephyr-kernel}_${XILINX_RELEAS
 
 SRC_URI_ZEPHYR_OPEN_AMP_SYS_REF = "git://github.com/Xilinx/openamp-system-reference.git;protocol=https"
 BRANCH  = "2026"
-SRCREV_open-amp-sys-ref = "7dbe56cc759971a6b0c6e43f812ba96228bde589"
+SRCREV_open-amp-sys-ref = "bea9c274aead225013afb8d35af1ea77d0aa1d91"
 
 BOARD = "${ZEPHYR_BOARD}"
 ZEPHYR_SOC_FAMILY = "${ZEPHYR_BOARD}"
