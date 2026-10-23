@@ -19,7 +19,7 @@ python () {
             return
         else:
             d.setVar('BB_DONT_CACHE', '1')
-            bb.parse.SkipRecipe("LIBXIL_CONFIG (%s) was not found." % libxil_cfg)
+            raise bb.parse.SkipRecipe("LIBXIL_CONFIG (%s) was not found." % libxil_cfg)
     else:
         d.setVar('BB_DONT_CACHE', '1')
         raise bb.parse.SkipRecipe("No LIBXIL_CONFIG set.")
