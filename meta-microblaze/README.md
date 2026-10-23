@@ -28,3 +28,13 @@ This layer depends on:
 	URI: https://git.openembedded.org/openembedded-core
 	layers: meta
 	branch: wrynose
+
+## Scripts
+
+scripts/microblaze_dtb.py is a debugging helper; no recipe or class uses
+it. It reads a device tree blob and prints AVAILTUNES and TUNE_FEATURES
+settings for each MicroBlaze CPU described in it, for example:
+
+	python3 scripts/microblaze_dtb.py -d system.dtb
+
+It needs the Python libfdt module (pylibfdt).
