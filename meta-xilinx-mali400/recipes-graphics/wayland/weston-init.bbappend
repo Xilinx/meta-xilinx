@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 PACKAGECONFIG:append = " no-idle-timeout"
 
-# Disable weston system service — kmscon + agetty handles display
+# Disable weston system service - kmscon + agetty handles display
 # login and launches weston via the user's profile.
 SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 

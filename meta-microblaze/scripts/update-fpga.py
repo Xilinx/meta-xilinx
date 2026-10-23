@@ -102,10 +102,10 @@ def preprocess_argv(argv):
     Pre-process argv to convert the --offset companion syntax into nargs=2 pairs.
 
     Converts:
-      --u-boot <path> --offset <val>        →  --u-boot <path> <val>
-      --boot-script <path> --offset <val>   →  --boot-script <path> <val>
-      --kernel <path> --offset <val>        →  --kernel <path> <val>
-      --rootfs <path> --offset <val>        →  --rootfs <path> <val>
+      --u-boot <path> --offset <val>        ->  --u-boot <path> <val>
+      --boot-script <path> --offset <val>   ->  --boot-script <path> <val>
+      --kernel <path> --offset <val>        ->  --kernel <path> <val>
+      --rootfs <path> --offset <val>        ->  --rootfs <path> <val>
 
     This lets argparse nargs=2 pick up (path, offset) as a pair while the
     command-line syntax uses a shared --offset flag after each file argument.
@@ -304,7 +304,7 @@ def parse_arguments():
         metavar='<hex-offset>',
         help='Flash offset for the preceding --u-boot / --boot-script / --kernel / --rootfs argument. '
              'Specify once after each file argument '
-             '(e.g., --u-boot u-boot.bin --offset 0xa00000 --boot-script boot.scr --offset 0x1F80000)'
+             '(e.g., --u-boot u-boot.bin --offset 0xa00000 --boot-script boot.scr --offset 0xc00000)'
     )
 
     return parser.parse_args(preprocess_argv(sys.argv[1:]))

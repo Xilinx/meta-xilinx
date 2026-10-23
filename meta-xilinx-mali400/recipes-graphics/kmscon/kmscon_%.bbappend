@@ -5,7 +5,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/kmscon:"
 # render-only GPUs like mali400).
 PACKAGECONFIG = "video_drm2d font_pango multi_seat"
 
-# Disable kmscon.service auto-start — kmsconvt@tty1 is used instead
+# Disable kmscon.service auto-start - kmsconvt@tty1 is used instead
 SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
 # Enable kmsconvt on tty1

@@ -168,7 +168,7 @@ python(){
             if not esw.startswith(esw_preferred_version.rstrip('%')):
                 raise bb.parse.SkipRecipe('Skip non-preferred version %s, looking for %s' % (esw, esw_preferred_version))
 
-    # We need to find the license file, which vaires depending on the component
+    # We need to find the license file, which varies depending on the component
     # recurse a maximum of x times, could be fancier but it gets complicated since
     # we dont know for certain we are running devtool or just externalsrc
     import os.path

@@ -66,7 +66,7 @@ domains:
         relation0:
           remote: R5_1_BAREMETAL
           carveouts: [ libmetal_uio_desc0@99c8000, libmetal_uio_desc1@99cc000, libmetal_uio_data@99d0000 ]
-          mbox: ipi_5_to_ipi_2 # IPI3 OpenAMP example app (APU)
+          mbox: ipi_5_to_ipi_2 # IPI5 Libmetal example app (APU)
           timer: ttc2
 
   R5_1_BAREMETAL:

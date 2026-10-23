@@ -20,7 +20,7 @@ COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
 COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 # Default XEN_TEMPLATE_CONFIG is set to <soc>-xen-scr-dom0-template-cfg file
-# User can change to <soc>-xen-scr-dom0-template-cfg or a custom config.
+# User can change to <soc>-xen-scr-dom0less-template-cfg or a custom config.
 
 XEN_TEMPLATE_CONFIG_DEFAULT = ""
 XEN_TEMPLATE_CONFIG_DEFAULT:zynqmp = "zynqmp-xen-scr-dom0-template-cfg"

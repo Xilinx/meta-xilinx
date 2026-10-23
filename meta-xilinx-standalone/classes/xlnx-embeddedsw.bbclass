@@ -1,5 +1,5 @@
 
-# Automatically determnine the version from the bb file
+# Automatically determine the version from the bb file
 ESW_VER ?= "${@bb.parse.vars_from_file(d.getVar('FILE', False),d)[1] or 'master'}"
 
 REPO ??= "git://github.com/Xilinx/embeddedsw.git;protocol=https;name=embeddedsw"

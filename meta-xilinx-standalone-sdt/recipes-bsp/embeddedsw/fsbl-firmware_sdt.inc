@@ -1,6 +1,6 @@
 inherit esw
 
-# Not compatible with Zynq
+# Not compatible with MicroBlaze
 COMPATIBLE_MACHINE:microblaze = "none"
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/undefined/src"
