@@ -3,6 +3,8 @@ DESCRIPTION = "ISP Media Server application and required shared libraries."
 LICENSE = "CLOSED"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=fb857fc9e8eed46509f2cce8648a05c1"
 COMPATIBLE_HOST = ".*-linux"
+COMPATIBLE_MACHINE = "^$"
+COMPATIBLE_MACHINE:versal-2ve-2vm = "versal-2ve-2vm"
 
 S = "${UNPACKDIR}"
 
