@@ -43,8 +43,8 @@ do_compile() {
        echo addlib lib$each.a >> libxil.mri
      fi
    done
-   echo “save” >> libxil.mri
-   echo “end” >> libxil.mri
+   echo save >> libxil.mri
+   echo end >> libxil.mri
    ${AR} -M <libxil.mri
    cp libxil.a ${B}
 }
