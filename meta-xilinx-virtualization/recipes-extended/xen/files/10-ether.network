@@ -1,5 +1,0 @@
-[Match]
-Type=ether
-
-[Network]
-Bridge=xenbr0
