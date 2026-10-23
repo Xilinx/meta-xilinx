@@ -23,9 +23,7 @@ RDEPENDS:${PN} += " \
 
 do_install () {
     install -d ${D}${bindir}
-    chmod -R 777 ${S}/scripts/*
     install -m 0755 ${S}/scripts/* ${D}${bindir}
-    ln -sf ${D}${bindir}/uboot-script-gen uboot-script-gen
 }
 
 do_deploy() {

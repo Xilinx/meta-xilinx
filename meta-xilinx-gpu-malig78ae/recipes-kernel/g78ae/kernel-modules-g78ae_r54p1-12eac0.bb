@@ -55,16 +55,16 @@ do_install() {
 		--install "${D}${INSTALL_DIR}"
 
         # Install the script to load modules and configure settings
-        install -d ${D}/usr/bin
-        install -m 0755 ${UNPACKDIR}/load-mali-modules.sh ${D}/usr/bin
+        install -d ${D}${bindir}
+        install -m 0755 ${UNPACKDIR}/load-mali-modules.sh ${D}${bindir}
 
         # Install the udev rules file to /etc/udev/rules.d/
-        install -d ${D}/etc/udev/rules.d
-        install -m 0644 ${UNPACKDIR}/99-mali-modules.rules ${D}/etc/udev/rules.d
+        install -d ${D}${sysconfdir}/udev/rules.d
+        install -m 0644 ${UNPACKDIR}/99-mali-modules.rules ${D}${sysconfdir}/udev/rules.d
 
         # Install the mali_kbase conf
-        install -d ${D}/etc/modprobe.d/
-        install -m 0644 ${UNPACKDIR}/mali_kbase.conf ${D}/etc/modprobe.d/
+        install -d ${D}${sysconfdir}/modprobe.d/
+        install -m 0644 ${UNPACKDIR}/mali_kbase.conf ${D}${sysconfdir}/modprobe.d/
 }
 
 
@@ -86,9 +86,9 @@ FILES:${PN} = "\
 	${INSTALL_DIR}/kernel-module-mali-kutf-mgm-integration-test.ko \
 	${INSTALL_DIR}/kernel-module-memory-group-manager.ko \
 	${INSTALL_DIR}/kernel-module-mali-gpu-pm.ko \
-        /etc/udev/rules.d/99-mali-modules.rules \
-        /usr/bin/load-mali-modules.sh \
-        /etc/modprobe.d/mali_kbase.conf \
+        ${sysconfdir}/udev/rules.d/99-mali-modules.rules \
+        ${bindir}/load-mali-modules.sh \
+        ${sysconfdir}/modprobe.d/mali_kbase.conf \
 "
 RPROVIDES:${PN} = "\
 	kernel-module-dma-buf-test-exporter \

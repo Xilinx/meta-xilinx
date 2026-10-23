@@ -13,10 +13,16 @@ OECMAKE_ARGS:remove = "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON"
 # Set a default CMAKE version which resolves most cases.
 OECMAKE_ARGS += "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
 
-# ESW upstream CMakeLists.txt files lack this directive.
+# Generate the BSP cmake metadata with lopper. Some ESW upstream
+# CMakeLists.txt files lack the cmake_minimum_required directive.
 # Inject it at the top of the file before cmake reads it, since -D variables
 # are processed too late for some checks.
 do_configure:prepend() {
+    (
+    cd ${S}
+    lopper ${DTS_FILE} -- bmcmake_metadata_xlnx ${ESW_MACHINE} ${S}/lib/bsp/standalone/src/ hwcmake_metadata ${S}
+    install -m 0755 StandaloneExample.cmake ${S}/cmake/Findcommonmeta.cmake
+    )
     local cmake_file="${OECMAKE_SOURCEPATH}/CMakeLists.txt"
     if [ -f "$cmake_file" ] && ! grep -q "cmake_minimum_required" "$cmake_file"; then
         sed -i '1s/^/cmake_minimum_required(VERSION 3.5)\n/' "$cmake_file"
@@ -140,14 +146,6 @@ do_install() {
 
 CFLAGS:append = " ${ESW_CFLAGS}"
 EXTRA_OECMAKE:append = " -DYOCTO=ON"
-
-do_configure:prepend() {
-    (
-    cd ${S}
-    lopper ${DTS_FILE} -- bmcmake_metadata_xlnx ${ESW_MACHINE} ${S}/lib/bsp/standalone/src/ hwcmake_metadata ${S}
-    install -m 0755 StandaloneExample.cmake ${S}/cmake/Findcommonmeta.cmake
-    )
-}
 
 python(){
     # Even though we have preferred versions, we found instances where the
