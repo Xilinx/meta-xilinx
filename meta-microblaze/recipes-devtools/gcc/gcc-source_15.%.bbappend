@@ -2,7 +2,6 @@
 FILESEXTRAPATHS:append := ":${THISDIR}/gcc-15"
 
 # MicroBlaze patches use mixed tab/space indentation; ignore whitespace differences
-QUILT_PATCHES_FUZZ = "2"
 export QUILT_PATCH_OPTS = "--ignore-whitespace"
 
 

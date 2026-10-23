@@ -16,16 +16,6 @@ do_configure:prepend() {
     )
 }
 
-CLOCKPS_EX_IMAGE_NAME ??= "${BPN}"
-
-inherit image-artifact-names
-
-CLOCKPS_EX_NAME ?= "${CLOCKPS_EX_IMAGE_NAME}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
-
-ESW_COMPONENT ??= "*.elf"
-
-addtask deploy before do_build after do_install
-
 do_install() {
     install -d ${D}/${base_libdir}/firmware
     install -m 0755  ${B}/*.elf ${D}/${base_libdir}/firmware
