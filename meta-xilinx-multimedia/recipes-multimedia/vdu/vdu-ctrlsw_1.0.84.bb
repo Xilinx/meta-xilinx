@@ -1,5 +1,5 @@
 SUMMARY = "Control Software for VDU"
-DESCRIPTION = "Control software libraries, test applications and headers provider for VDU deconder software API"
+DESCRIPTION = "Control software libraries, test applications and headers provider for VDU decoder software API"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ac7c6b649ce8caa4f4c517aaa77c8b17"
 

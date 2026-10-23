@@ -1,4 +1,4 @@
-SUMMARY = "Linux kernel module for Video Code Unit"
+SUMMARY = "Linux kernel module for Video Codec Unit"
 DESCRIPTION = "Out-of-tree VCU decoder, encoder and common kernel modules provider for MPSoC EV devices"
 SECTION = "kernel/modules"
 LICENSE = "GPL-2.0-or-later"

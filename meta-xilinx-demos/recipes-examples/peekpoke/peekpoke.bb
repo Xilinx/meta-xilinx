@@ -4,7 +4,7 @@
 #
 
 SUMMARY = "peekpoke application"
-DESCRIPTION = "Tiny user-space utility for peek/poke (32-bit MMIO \
+DESCRIPTION = "Tiny user-space utility for peek/poke (64-bit MMIO \
 read/write) via /dev/mem on AMD Xilinx target boards."
 SECTION = "apps"
 LICENSE = "MIT"

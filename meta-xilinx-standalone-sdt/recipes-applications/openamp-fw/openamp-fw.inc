@@ -1,4 +1,3 @@
-SUMMARY = "Sample recipe to package and deploy baremetal or freertos elf or bin to linux rootfs"
 LICENSE = "CLOSED"
 
 inherit check_sdt_enabled fw-package
