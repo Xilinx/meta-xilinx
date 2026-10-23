@@ -13,8 +13,9 @@ Be sure to read everything below.
 > * To use the SDT version of the embedded software (firmware) as well as system
 >   configuration, you must build through gen-machineconf tool. This tool is passed
 >   a output of system device tree directory.
-> * meta-xilinx-standalone-sdt layer depends on meta-openamp layer make sure
->   meta-openamp is cloned and add using `bitbake-layers` command.
+> * meta-xilinx-standalone-sdt layer recommends the meta-openamp layer; to
+>   build the OpenAMP recipes, clone meta-openamp and add it using
+>   `bitbake-layers` command.
 
 > **Note:** SDT builds for following devices are not supported in 2026.1 release.
 >  * MicroBlaze
@@ -66,7 +67,7 @@ $ export PATH=$PATH:<ABSOLUTE_PATH>/gen-machine-conf
       `-g {full|dfx}` option. Once SDT pl overlay command is executed successfully
       pl.dtsi will be generated under <conf-directory>/dts/${MACHINE}/pl-overlay-{full|dfx}
       directory. User can use this pl.dtsi as input to full or dfx static firmware
-      recipes. See https://github.com/Xilinx/meta-xilinx/blob/master/docs/README.dfx.user.dts.md
+      recipes. See [README.dfx.user.dts.md](../docs/README.dfx.user.dts.md)
 	  for more details.
 
    > **Note:**
@@ -150,7 +151,7 @@ A minimum configuration is included with the generated configuration.
    See the Yocto Project documentation if you have questions on how to work with
    the multiconfig recipes. The following is a simple build for testing.
 
-5. Continue [Building Instructions](https://github.com/Xilinx/meta-xilinx/blob/master/README.building.md)
+5. Continue [Building Instructions](../README.building.md)
    from step 8.
 
 >**Note:** Only AMD eval boards have the dtsi in System Device Tree repo, for

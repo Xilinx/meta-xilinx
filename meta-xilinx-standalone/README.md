@@ -72,28 +72,29 @@ $ bitbake-layers add-layer /<path-to-layer>/sources/meta-custom
 ```
 
 $ mkdir -p /<path-to-layer>/sources/meta-custom/recipes-bsp/embeddedsw-source/files
-$ touch /<path-to-layer>/sources/meta-custom/recipes-bsp/embeddedsw-source/embeddedsw-source_2025.2.bbappend
+$ touch /<path-to-layer>/sources/meta-custom/recipes-bsp/embeddedsw-source/embeddedsw-source_<ESW_VER>.bbappend
 ```
 3. Create the patch for embeddedsw repo and copy the patch to files directory.
 ```
-$ cp -r <path-to-embeddedsw-repo-patch>/0001-PLM.ptach /<path-to-layer>/sources/meta-custom/recipes-bsp/embeddedsw-source/files
+$ cp -r <path-to-embeddedsw-repo-patch>/0001-PLM.patch /<path-to-layer>/sources/meta-custom/recipes-bsp/embeddedsw-source/files
 ```
 4. Include the patch to embeddedsw-source_${ESW_VER}.bbappend.
 ```
 SRC_URI:append = " \
-    file://0001-PLM.ptach \
+    file://0001-PLM.patch \
 	"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 ```
 5. Now rebuild the embeddedsw firmware recipes.
 ```
-$ bitbake embeddedsw-source -c clean; bitbake plm-firmware
+$ bitbake mc:<machine>-microblaze-pmc:embeddedsw-source-<ESW_VER> -c clean
+$ bitbake mc:<machine>-microblaze-pmc:plm-firmware
 ```
 
 ### How to build embeddedsw firmware recipes using EXTERNALSRC method.
 
-1. Inherit externalsrc bbclass and set the EXTERNALSRC:pn-emebddedsw-source variable
+1. Inherit externalsrc bbclass and set the EXTERNALSRC:pn-embeddedsw-source-${ESW_VER} variable
    to point the external embeddedsw source code in local.conf as shown below.
 ```
 INHERIT += "externalsrc"
@@ -101,7 +102,8 @@ EXTERNALSRC:pn-embeddedsw-source-${ESW_VER} = "<path-to-ext-embeddedsw-source-tr
 ```
 2. Now rebuild the embeddedsw firmware recipes.
 ```
-$ bitbake embeddedsw-source plm-firmware -c clean; bitbake plm-firmware
+$ bitbake mc:<machine>-microblaze-pmc:embeddedsw-source-<ESW_VER> mc:<machine>-microblaze-pmc:plm-firmware -c clean
+$ bitbake mc:<machine>-microblaze-pmc:plm-firmware
 ```
 
 ## Dependencies

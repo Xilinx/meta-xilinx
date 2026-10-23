@@ -61,6 +61,10 @@ This layer depends on:
 	layers: meta-arm, meta-arm-toolchain
 	branch: wrynose
 
+	URI: https://github.com/Xilinx/meta-amd-edf
+	layers: meta-amd-edf-core (required by the distro)
+	branch: AMD release version (e.g. rel-v2027.1)
+
 Recommended (optional) layers:
 
 	URI:

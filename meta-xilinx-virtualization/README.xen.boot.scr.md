@@ -11,7 +11,8 @@ tool and boot using QEMU or Hardware.
 2. [u-boot-xen-scr recipe](./recipes-bsp/u-boot/u-boot-xen-scr.bb) provides xen
    dom0 and dom0less template configs. User can use these template configs to
    generate the xen_boot.scr file or create your own config. Default config is
-   <soc>-xen-scr-dom0-template-cfg.
+   `<soc>-xen-scr-dom0-template-cfg`, where `<soc>` is zynqmp, versal or
+   versal-2ve-2vm (versal-2vp uses the versal templates).
    See [Image Builder README](https://gitlab.com/xen-project/imagebuilder/-/blob/master/README.md?ref_type=heads)
    for variable usage.
 
@@ -25,8 +26,8 @@ tool and boot using QEMU or Hardware.
     $ cp -r ./<path-to-layer>/meta-xilinx/meta-xilinx-virtualization/recipes-bsp/u-boot/u-boot-xen-scr/custom-cfg ./<path-to-layer>/meta-xilinx/meta-xilinx-virtualization/recipes-bsp/u-boot/u-boot-xen-scr/versal-2ve-2vm-xen-scr-dom0-template-cfg
     ```
     > **Note:** If you are using xen dom0less boot then copy your custom-cfg to
-    > <soc>-xen-scr-dom0less-template-cfg and update XEN_TEMPLATE_CONFIG_DEFAULT variable
-    > in ./<path-to-layer>/meta-xilinx/meta-xilinx-virtualization/recipes-bsp/u-boot/u-boot-xen-scr.bb
+    > `<soc>-xen-scr-dom0less-template-cfg` and update XEN_TEMPLATE_CONFIG_DEFAULT variable
+    > in `./<path-to-layer>/meta-xilinx/meta-xilinx-virtualization/recipes-bsp/u-boot/u-boot-xen-scr.bb`
     > file as shown below.
 
     ```
