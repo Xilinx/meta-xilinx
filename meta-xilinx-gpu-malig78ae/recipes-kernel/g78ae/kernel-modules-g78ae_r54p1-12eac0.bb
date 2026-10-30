@@ -11,7 +11,7 @@ LIC_FILES_CHKSUM = " \
 PV .= "+1+git"
 
 BRANCH = "r54p1-12eac0"
-SRCREV_kernel = "b310d9654874e9fd47dd118b79312a77194e29dc"
+SRCREV_kernel = "7496b83bd5edc5b29d0e966337a18901669bde76"
 SRCREV_arbitration = "d3868a13838add453587552f45f6d477a386b2cb"
 SRCREV_FORMAT = "kernel_arbitration"
 
