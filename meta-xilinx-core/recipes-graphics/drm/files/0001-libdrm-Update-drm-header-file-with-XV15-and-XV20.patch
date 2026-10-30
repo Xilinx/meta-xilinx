@@ -1,7 +1,7 @@
-From e880a6f71080e4d8c3ef31900a2921109d7e9e6b Mon Sep 17 00:00:00 2001
+From cb4937a355ecd115ab8387f82b12b298600c6079 Mon Sep 17 00:00:00 2001
 From: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
 Date: Mon, 1 Nov 2021 12:59:36 -0700
-Subject: [PATCH 1/7] libdrm: Update drm header file with XV15 and XV20
+Subject: [PATCH 1/8] libdrm: Update drm header file with XV15 and XV20
 
 This patch updates drm header file with YUV 420 and
 YUV422 10 bit formats.
@@ -14,7 +14,7 @@ Signed-off-by: Sai Hari Chandana Kalluri <chandana.kalluri@xilinx.com>
  1 file changed, 8 insertions(+)
 
 diff --git a/include/drm/drm_fourcc.h b/include/drm/drm_fourcc.h
-index 4a138b5..1b1eabe 100644
+index 4a138b5f..1b1eabef 100644
 --- a/include/drm/drm_fourcc.h
 +++ b/include/drm/drm_fourcc.h
 @@ -365,6 +365,14 @@ extern "C" {
@@ -33,5 +33,5 @@ index 4a138b5..1b1eabe 100644
   * 2 plane YCbCr MSB aligned
   * index 0 = Y plane, [15:0] Y little endian
 -- 
-2.54.0
+2.43.0
 

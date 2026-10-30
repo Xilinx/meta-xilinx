@@ -1,7 +1,7 @@
-From b8a9ff454a1b71b30c013e402576fef41034fca7 Mon Sep 17 00:00:00 2001
+From 18d69d1df47f47716ffb894992d1a118bd7de8c4 Mon Sep 17 00:00:00 2001
 From: Arno Glim <arno.glim@amd.com>
 Date: Wed, 9 Apr 2025 10:48:47 -0700
-Subject: [PATCH 5/7] Update libdrm drm_fourcc.h to add VCU2 tiled formats
+Subject: [PATCH 5/8] Update libdrm drm_fourcc.h to add VCU2 tiled formats
  needed to compile kmssink for gstreamer. Actual support will be added in
  future. Aligned somewhat with uapi version of this file.
 
@@ -16,7 +16,7 @@ Signed-off-by: Arno Glim <arno.glim@amd.com>
  1 file changed, 41 insertions(+), 14 deletions(-)
 
 diff --git a/include/drm/drm_fourcc.h b/include/drm/drm_fourcc.h
-index 0644709..b259947 100644
+index 0644709f..b259947a 100644
 --- a/include/drm/drm_fourcc.h
 +++ b/include/drm/drm_fourcc.h
 @@ -344,6 +344,14 @@ extern "C" {
@@ -104,5 +104,5 @@ index 0644709..b259947 100644
  {
  	if (!(modifier & 0x10) || (modifier & (0xff << 12)))
 -- 
-2.54.0
+2.43.0
 
