@@ -1,26 +1,26 @@
 # Booting OS Images onto AMD Xilinx target devices
 
-AMD Xilinx Devices support different boot modes such as JTAG, SD, eMMC, QSPI etc.
+AMD Xilinx devices support different boot modes such as JTAG, SD, eMMC, QSPI etc.
 
 ## Booting Images with QEMU
 
 Once images are built, you can simulate the image using QEMU emulator.
 
 > **Note:** Use `slirp` option if you don't have sudo permissions and tap devices
-  are enabled on your build host.
+> are not enabled on your build host.
 
 * Without slirp
 ```
-$ MACHINE=<target_mahcine_name> runqemu nographic
+$ MACHINE=<target_machine_name> runqemu nographic
 ```
 
 * With slirp
 ```
-$ MACHINE=<target_mahcine_name> runqemu nographic slirp
+$ MACHINE=<target_machine_name> runqemu nographic slirp
 ```
 
-> **Note:** To terminate qemu, usually the command is ctrl-a x
+> **Note:** To terminate QEMU, usually the command is ctrl-a x
 
 ## Booting Images with Hardware
 
-Follow booting instructions [README](docs) for more details.
+Follow the booting instructions in [docs](docs) for more details.

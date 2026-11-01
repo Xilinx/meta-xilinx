@@ -121,9 +121,9 @@ ppu1_mdm_uart@0xf0310000 {
 ```
 
 The above identifies five serial ports, serial0, serial1, serial2,
-serial3, serial4 and serial5.  This correlates on the qemu command
+serial3 and serial4.  This correlates on the qemu command
 line to the `-serial <value>` entries.  In this configuration, we
-must defined five `-serial` entries for the qemu command line.  See
+must define five `-serial` entries for the qemu command line.  See
 QEMU documentation for more information:
 <https://www.qemu.org/docs/master/>
 
