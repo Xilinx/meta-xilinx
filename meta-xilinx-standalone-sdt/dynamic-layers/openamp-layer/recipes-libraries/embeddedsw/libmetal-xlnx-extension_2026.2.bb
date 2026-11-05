@@ -19,3 +19,16 @@ do_install() {
 EXTRA_OECMAKE:append = " -DCMAKE_INCLUDE_PATH:PATH=${STAGING_INCDIR}"
 EXTRA_OECMAKE:append:armv7r = " -DMACHINE=zynqmp_r5"
 EXTRA_OECMAKE:append:armv8r = " -DMACHINE=zynqmp_r5"
+
+# ESW validates the selected interrupt driver using a monolithic BSP layout
+# relative to CMAKE_LIBRARY_PATH (${B}). Yocto stages drivers separately.
+# Expose the driver source at that expected location only when its header
+# is present in the recipe sysroot, retaining the upstream validation.
+do_configure:prepend() {
+    for driver in ipipsu mbox; do
+        if [ -f "${STAGING_INCDIR}/x${driver}.h" ]; then
+            install -d "${B}/../libsrc/${driver}"
+            ln -sfn "${S}/XilinxProcessorIPLib/drivers/${driver}/src" "${B}/../libsrc/${driver}/src"
+        fi
+    done
+}
