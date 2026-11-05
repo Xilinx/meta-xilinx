@@ -18,11 +18,11 @@ DEPENDS:append = " libmetal "
 # libmetal is a machine_arch recipe, so we are too
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-FILES:${PN} = " /usr/bin/irq_shmem_demo "
+FILES:${PN} = " ${bindir}/irq_shmem_demo "
 
 do_install () {
-	install -d ${D}/usr/bin
-	install -m 0755 ${B}/machine/host/amd_linux_userspace/irq_shmem_demo ${D}/usr/bin/irq_shmem_demo
+	install -d ${D}${bindir}
+	install -m 0755 ${B}/machine/host/amd_linux_userspace/irq_shmem_demo ${D}${bindir}/irq_shmem_demo
 }
 
 EXTRA_OECMAKE:append = " \ 
