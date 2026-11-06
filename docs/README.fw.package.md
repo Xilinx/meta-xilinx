@@ -15,7 +15,7 @@ filesystem.
 
 ## How to create and install firmware package recipe
 
-1. Follow [SDT Mulitconfig Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.mc.build.md)
+1. Follow [SDT Multiconfig Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.mc.build.md)
    upto step 3.
 
 2. Create recipes-firmware directory in distribution meta layer.
@@ -39,7 +39,7 @@ $ recipetool create -o <path-to-meta-layer>/recipes-firmware/<firmware-package-n
 >                recipe name.
 > * **TARGET_MC:** Variable to define one of the multiconfig target name
 >                  (ex: <soc-family>-<board-name>-sdt-<design-name>-cortexr5-0-baremetal)
->                  from the BBMULTICONFIG list generated at [SDT Mulitconfig Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.mc.build.md)
+>                  from the BBMULTICONFIG list generated at [SDT Multiconfig Building Instructions](../meta-xilinx-standalone-sdt/README.sdt.mc.build.md)
 >                  step 2.
 
 ```

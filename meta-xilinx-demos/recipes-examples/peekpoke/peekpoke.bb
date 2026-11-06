@@ -1,5 +1,5 @@
 #
-# This is the peekpoke apllication recipe
+# This is the peekpoke application recipe
 #
 #
 

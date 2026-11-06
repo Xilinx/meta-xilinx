@@ -94,7 +94,7 @@ xsdb% targets
 ##### Loading boot components using XSDB
 
 1. Download the boot images for the target using XSDB with the `fpga` and `dow`
-   command. ZyqnMP boot images will be located in the `${DEPLOY_DIR_IMAGE}`
+   command. ZynqMP boot images will be located in the `${DEPLOY_DIR_IMAGE}`
    directory. 
 
 > **Note:** In yocto by default, ${DEPLOY_DIR_IMAGE}/system.dtb is used for both

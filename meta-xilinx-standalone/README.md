@@ -67,7 +67,7 @@ $ bitbake-layers add-layer /<path-to-layer>/sources/meta-custom
 
 2. Create a recipes-bsp/embeddedsw-source directory and embeddedsw-source_${ESW_VER}.bbappend.
    file in newly created layer.
-> **Note:** ${ESW_VER} variable referes to version to which you need to apply
+> **Note:** ${ESW_VER} variable refers to version to which you need to apply
 > the patch.
 ```
 
