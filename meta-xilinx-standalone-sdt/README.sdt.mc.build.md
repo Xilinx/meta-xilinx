@@ -27,7 +27,7 @@ directory.
 
 * Usage:
 ```
-$ bitbake mc:<soc-family>-<board-name>-sdt-<design-name>-<apu-or-rpu>-<cpu-core-number>-<baremetal-or-freertos>:<application-recipe-name>
+$ bitbake mc:<soc-family>-<board-name>-sdt-<design-name>-<cpu>-<cpu-core-number>-<baremetal-or-freertos>:<application-recipe-name>
 ```
 * Example:
 ```
