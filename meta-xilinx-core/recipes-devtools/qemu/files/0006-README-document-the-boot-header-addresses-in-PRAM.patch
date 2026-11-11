@@ -1,0 +1,56 @@
+From 06681a933543984aef93fbe4f5085bb8f72c56df Mon Sep 17 00:00:00 2001
+From: Christian Kohn <chris.kohn@amd.com>
+Date: Tue, 29 Sep 2026 18:13:49 -0600
+Subject: [PATCH 6/8] README: document the boot header addresses in PRAM
+
+The PLM reads the boot header, and on newer parts a hash block, from
+fixed PMC RAM addresses that differ per part. Nothing recorded them, so
+adding an architecture meant rediscovering them from embeddedsw.
+
+Record the addresses per arch, where they come from, and that the header
+in PRAM excludes the SMAP bus width table.
+
+Upstream-Status: Pending
+
+Signed-off-by: Christian Kohn <chris.kohn@amd.com>
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ README.md | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/README.md b/README.md
+index 993b9a7..f5be037 100644
+--- a/README.md
++++ b/README.md
+@@ -7,6 +7,28 @@ the boot.bin, constructs appropriate qemu command line arguments and
+ orchestrates the system level emulation for Zynq, ZynqMP and Versal
+ families of FPGAs.
+ 
++## Boot header addresses in PRAM
++
++On Versal-family parts the ROM copies the boot header, and on the newer
++parts a hash block, into PMC RAM before the PLM runs. The PLM reads them
++from fixed addresses that differ per part, so a new architecture must use
++its own values or the PLM reads the wrong words and fails validating the
++image header table.
++
++The addresses are `XIH_BH_PRAM_ADDR` and `XIH_HASH_BLOCK_1_HASH_OFFSET` in
++embeddedsw, `lib/sw_services/xilpdi/src/<plat>/xilpdi_plat.h`. The hash
++block is loaded at its base, 0xa0 below the documented hash offset.
++
++| arch            | boot header | hash block |
++| --------------- | ----------- | ---------- |
++| `versal`        | 0xf201e000  | n/a        |
++| `versalnet`     | 0xf201e000  | n/a        |
++| `versal2ve2vm`  | 0xf201eec0  | 0xf201ecc0 |
++| `versal2vp`     | 0xf201ee00  | 0xf201ecc0 |
++
++The boot header written to PRAM excludes the 16-byte SMAP bus width
++table, matching `bootgen -dump <pdi> boot_files`.
++
+ ## Copyright/License
+ 
+ Copyright (C) 2026, Advanced Micro Devices, Inc.  All rights reserved.
+-- 
+2.50.1 (Apple Git-155)
+

@@ -13,7 +13,7 @@ SRC_URI = "file://gpio-demo.c \
            file://Makefile \
         "
 S = "${UNPACKDIR}"
-CFLAGS:prepend = "-I ${S}/include"
+CFLAGS:prepend = "-I ${S}/include "
 do_compile() {
         oe_runmake
 }
@@ -22,4 +22,3 @@ do_install() {
         install -m 0755 ${S}/gpio-demo ${D}${bindir}
 
 }
-

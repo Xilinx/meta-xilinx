@@ -11,6 +11,7 @@ COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
+COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 # Since we're just copying, we can run any config
 COMPATIBLE_HOST = ".*"

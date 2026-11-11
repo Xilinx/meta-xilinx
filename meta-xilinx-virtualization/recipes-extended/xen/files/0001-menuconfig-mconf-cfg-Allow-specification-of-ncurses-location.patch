@@ -3,8 +3,8 @@ From: Bruce Ashfield <bruce.ashfield@windriver.com>
 Date: Mon, 2 Jul 2018 23:10:28 -0400
 Subject: [PATCH] xen: Fix menuconfig and add support for config fragments and
 
-Upstream-Status: Xen: Inappropriate [oe specific, cross compile issue]
-Upstream-Status: Kernel: Pending
+Upstream-Status: Inappropriate [oe specific, cross compile issue]
+
 Signed-off-by: Diego Sueiro <diego.sueiro@arm.com>
 commit e6972e689a980ab28637e94e48c77eeace6abde5
 

@@ -1,7 +1,7 @@
 # meta-xilinx-demos
 
 This layer contains demos recipes and packagegroup for PL firmware, openamp,
-jupyter notebook, ros, qt5, multimedia, sdfec etc for AMD Adaptive SoC's and
+jupyter notebook, qt6, multimedia, sdfec etc for AMD Adaptive SoC's and
 FPGA's target images.
 
 > **Note:** Some of the demos recipes and packagegroup are moved from meta-petalinux
@@ -29,37 +29,36 @@ IMAGE_INSTALL:append = " gpio-demo"
 
 This layer depends on:
 
-	URI: https://git.yoctoproject.org/poky
-	layers: meta, meta-poky
+	URI: https://git.openembedded.org/openembedded-core
+	layers: meta
 	branch: wrynose
 
 	URI: https://git.openembedded.org/meta-openembedded
-	layers: meta-oe, meta-perl, meta-python, meta-filesystems, meta-gnome,
-            meta-multimedia, meta-networking, meta-webserver, meta-xfce,
-            meta-initramfs.
+	layers: meta-oe
 	branch: wrynose
 
 	URI:
-        https://git.yoctoproject.org/meta-xilinx (official version)
-        https://github.com/Xilinx/meta-xilinx (development and AMD release)
-	layers: meta-xilinx-core, meta-xilinx-microblaze, meta-xilinx-standalone.
-	branch: wrynose
-
-	URI: https://github.com/Xilinx/meta-jupyter
-	branch: wrynose
-
-	URI: https://github.com/OpenAMP/meta-openamp
-	branch: wrynose
-
-	URI: https://github.com/meta-qt5/meta-qt5
-	branch: wrynose
-
-	URI: https://github.com/Xilinx/meta-ros
-	layers: meta-ros-common, meta-ros2, meta-ros2-jazzy
-	branch: wrynose
+	 https://git.yoctoproject.org/meta-xilinx (official version)
+	 https://github.com/Xilinx/meta-xilinx (development and AMD release)
+	layers: meta-xilinx-core
+	branch: wrynose or AMD release version (e.g. rel-v2026.2)
 
 	URI: https://git.yoctoproject.org/meta-arm
 	layers: meta-arm, meta-arm-toolchain
+	branch: wrynose
+
+Recommended (optional) layers:
+
+	URI: https://github.com/Xilinx/meta-jupyter
+	branch: AMD release version (e.g. rel-v2026.2)
+
+	URI:
+	 https://github.com/OpenAMP/meta-openamp (official version)
+	 https://github.com/Xilinx/meta-openamp (development and AMD release)
+	branch: wrynose or AMD release version (e.g. rel-v2026.2)
+
+	URI: https://code.qt.io/yocto/meta-qt6.git
+	layers: meta-qt6
 	branch: wrynose
 
 ## Note: 

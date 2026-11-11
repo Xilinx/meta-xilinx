@@ -5,10 +5,13 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 SRC_URI += " git://github.com/Xilinx/opencv_modules_xlnx.git;protocol=https;branch=main;name=xlnx-modules;destsuffix=${BP}/contrib_xlnx"
 
 # Update this hash when you make changes to the opencv_modules_xlnx repository
-SRCREV_xlnx-modules = "6eb9d4a23c0401f20a0f6802c9805af898d7b6c4"
+SRCREV_xlnx-modules = "cbdd539795a8233c03757518a2600c8d2fccc67b"
 
 # This extends the existing OPENCV_EXTRA_MODULES_PATH to include both official contrib and contrib_xlnx modules
 EXTRA_OECMAKE += "-DOPENCV_EXTRA_MODULES_PATH='${S}/contrib/modules;${S}/contrib_xlnx/modules'"
+
+# Set C++17 standard required for vcucodec public headers (uses std::string_view)
+EXTRA_OECMAKE += "-DCMAKE_CXX_STANDARD=17"
 
 # Set C++17 standard required for vcucodec public headers (uses std::string_view)
 EXTRA_OECMAKE += "-DCMAKE_CXX_STANDARD=17"

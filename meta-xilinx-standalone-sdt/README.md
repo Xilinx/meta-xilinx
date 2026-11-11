@@ -10,12 +10,8 @@ See [SDT Build Instructions](README.sdt.bsp.md) for SDT build workflows.
 
 This layer depends on:
 
-	URI: https://git.yoctoproject.org/poky
-	layers: meta, meta-poky
-	branch: wrynose
-
-	URI: https://git.openembedded.org/meta-openembedded
-	layers: meta-oe
+	URI: https://git.openembedded.org/openembedded-core
+	layers: meta
 	branch: wrynose
 
 	URI: https://git.yoctoproject.org/meta-arm
@@ -23,20 +19,17 @@ This layer depends on:
 	branch: wrynose
 
 	URI:
-        https://git.yoctoproject.org/meta-xilinx (official version)
-        https://github.com/Xilinx/meta-xilinx (development and AMD release)
-	layers: meta-xilinx-core, meta-xilinx-standalone
-	branch: wrynose
+	 https://git.yoctoproject.org/meta-xilinx (official version)
+	 https://github.com/Xilinx/meta-xilinx (development and AMD release)
+	layers: meta-xilinx-core, meta-xilinx-standalone, meta-microblaze
+	branch: wrynose or AMD release version (e.g. rel-v2026.2)
+
+Recommended (optional) layers:
 
 	URI:
-        https://git.yoctoproject.org/meta-virtualization (official version)
-        https://github.com/Xilinx/meta-virtualization (development and AMD release)
-	branch: wrynose
-
-	URI:
-        https://github.com/OpenAMP/meta-openamp (official version)
-        https://github.com/Xilinx/meta-openamp (development and AMD release)
-	branch: wrynose
+	 https://github.com/OpenAMP/meta-openamp (official version)
+	 https://github.com/Xilinx/meta-openamp (development and AMD release)
+	branch: wrynose or AMD release version (e.g. rel-v2026.2)
 
 ## Note: 
 

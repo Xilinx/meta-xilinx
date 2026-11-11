@@ -10,6 +10,7 @@ FW_OS ?= "${MCNAME}"
 TARGET_MC:zynqmp = "cortexr5-0-${FW_OS}"
 TARGET_MC:versal = "cortexr5-0-${FW_OS}"
 TARGET_MC:versal-net = "cortexr52-0-${FW_OS}"
+TARGET_MC:versal-2vp = "cortexr5-0-${FW_OS}"
 FW_MCDEPENDS = "mc::${MACHINE}-${TARGET_MC}:${OPENAMP_XLNX_RECIPE}-${FW_OS}:do_deploy"
 FW_DEPLOY_DIR ?= "${TMPDIR}-${MACHINE}-${TARGET_MC}/deploy/images/${MACHINE}"
 

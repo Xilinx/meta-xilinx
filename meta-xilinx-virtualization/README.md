@@ -10,25 +10,23 @@ images.
 
 This layer depends on:
 
-	URI: https://git.yoctoproject.org/poky
-	layers: meta, meta-poky
-	branch: wrynose
-
-	URI: https://git.openembedded.org/meta-openembedded
-	layers: meta-oe, meta-python, meta-filesystems, meta-networking.
+	URI: https://git.openembedded.org/openembedded-core
+	layers: meta
 	branch: wrynose
 
 	URI:
-        https://git.yoctoproject.org/meta-xilinx (official version)
-        https://github.com/Xilinx/meta-xilinx (development and AMD release)
-	layers: meta-xilinx-core, meta-xilinx-standalone
-	branch: wrynose
+	 https://git.yoctoproject.org/meta-xilinx (official version)
+	 https://github.com/Xilinx/meta-xilinx (development and AMD release)
+	layers: meta-xilinx-core
+	branch: wrynose or AMD release version (e.g. rel-v2026.2)
 
-	URI: https://git.yoctoproject.org/meta-virtualization
-	branch: wrynose
+	URI:
+	 https://git.yoctoproject.org/meta-virtualization (official version)
+	 https://github.com/Xilinx/meta-virtualization (development and AMD release)
+	branch: wrynose or AMD release version (e.g. rel-v2026.2)
 
 	URI: https://git.yoctoproject.org/meta-security
-	layers: meta-tpm
+	layers: meta-security, meta-tpm
 	branch: wrynose
 
 	URI: https://git.yoctoproject.org/meta-arm

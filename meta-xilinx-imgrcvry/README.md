@@ -43,21 +43,27 @@ binary into the default multiconfig.
 
 This layer depends on:
 
-	URI: https://git.yoctoproject.org/poky
-	layers: meta, meta-poky
+	URI: https://git.openembedded.org/openembedded-core
+	layers: meta
 	branch: wrynose
 
 	URI: https://git.openembedded.org/meta-openembedded
-	layers: meta-oe, meta-python, meta-filesystems, meta-networking.
+	layers: meta-oe, meta-filesystems.
 	branch: wrynose
 
 	URI:
-        https://git.yoctoproject.org/meta-xilinx (official version)
-        https://github.com/Xilinx/meta-xilinx (development and AMD release)
+	 https://git.yoctoproject.org/meta-xilinx (official version)
+	 https://github.com/Xilinx/meta-xilinx (development and AMD release)
 	layers: meta-xilinx-core, meta-xilinx-standalone, meta-xilinx-standalone-sdt.
+	branch: wrynose or AMD release version (e.g. rel-v2026.2)
+
+	URI: https://git.yoctoproject.org/meta-arm
+	layers: meta-arm, meta-arm-toolchain
 	branch: wrynose
 
+Recommended (optional) layers:
+
 	URI:
-        https://github.com/Xilinx/meta-amd-adaptive-socs (development and AMD release)
+	 https://github.com/Xilinx/meta-amd-adaptive-socs (development and AMD release)
 	layers: meta-amd-adaptive-socs-core, meta-amd-adaptive-socs-bsp
-	branch: wrynose
+	branch: AMD release version (e.g. rel-v2026.2)

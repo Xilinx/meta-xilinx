@@ -35,6 +35,15 @@ Vivado and Vitis tools.
 * **meta-xilinx-virtualization**: layer containing metadata to build Xen target
 images.
 
+* **meta-amd-dpdk**: layer containing AMD additions to DPDK, the core patches
+and build options required by the AMD poll mode drivers.
+
+* **meta-amd-zephyr**: layer containing the amd-zephyr distro configuration
+and supporting recipes for AMD Zephyr RTOS targets.
+
+* **meta-amd-zephyr-bsp**: layer containing AMD Zephyr RTOS board machine
+configurations.
+
 > **See:** AMD Xilinx devices:
 	https://www.xilinx.com/products/silicon-devices.html
 

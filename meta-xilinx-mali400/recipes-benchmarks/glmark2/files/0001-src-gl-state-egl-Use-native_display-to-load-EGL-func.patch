@@ -10,7 +10,7 @@ EGL_DEFAULT_DISPLAY if the display is uninitialized (which is already
 been taken care).
 
 Signed-off-by: Madhurkiran Harikrishnan <madhurkiran.harikrishnan@xilinx.com>
-Upstream-status: Pending
+Upstream-Status: Pending
 ---
  src/gl-state-egl.cpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

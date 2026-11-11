@@ -9,6 +9,7 @@ COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "none"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
+COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

@@ -75,10 +75,10 @@ you need to make sure you have QSPI interface on board or a QSPI daughter card.
 3. Set the U-boot boot script variables to match the flash partition offsets in
    local.conf
 ```
-QSPI_KERNEL_OFFSET = "0x1E40000"
-QSPI_KERNEL_SIZE = "0x2040000"
-QSPI_RAMDISK_OFFSET = "0x4000000"
-QSPI_RAMDISK_SIZE = "0x4000000"
+SPI_KERNEL_OFFSET = "0x1E40000"
+SPI_KERNEL_SIZE = "0x2040000"
+SPI_RAMDISK_OFFSET = "0x4000000"
+SPI_RAMDISK_SIZE = "0x4000000"
 ```
 4. Build the images and make sure images are copied to tftp directory.
 5. Once the images are built, ensure the target is booted using JTAG or SD boot modes.

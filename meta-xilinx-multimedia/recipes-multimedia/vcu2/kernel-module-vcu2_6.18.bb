@@ -11,7 +11,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 BRANCH = "master"
 REPO = "git://github.com/Xilinx/vcu2-modules.git;protocol=https"
-SRCREV = "056476b8a37d2ad2d4a3eb10ae5a1e3a24ef4e95"
+SRCREV = "b28174361170395745183a5cd945874d2475d098"
 
 BRANCHARG = "${@['nobranch=1', 'branch=${BRANCH}'][d.getVar('BRANCH') != '']}"
 SRC_URI = " \
@@ -33,5 +33,3 @@ do_install:append() {
 }
 
 FILES:${PN} = "${sysconfdir}/udev/rules.d/*"
-
-SKIP_RECIPE[kernel-module-vcu2] = "${@'Only kernel 6.18 and before are supported.' if bb.utils.vercmp_string(d.getVarFlag('XILINX_LINUX_VERSION', d.getVar('XILINX_RELEASE_VERSION')) or 'undefined', "6.19") >= 0 else ''}"

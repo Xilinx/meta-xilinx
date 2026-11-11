@@ -1,7 +1,7 @@
-From a06ad193aea7bdae6be1669c8f8a8834579afd61 Mon Sep 17 00:00:00 2001
+From 4ec990d3f866f4b8e28bd62266f78b511cc0c387 Mon Sep 17 00:00:00 2001
 From: Anil Kumar M <amamidal@xilinx.com>
 Date: Fri, 10 Apr 2020 21:35:47 +0530
-Subject: [PATCH 2/7] modetest: Add semiplanar 10bit pattern support for
+Subject: [PATCH 2/8] modetest: Add semiplanar 10bit pattern support for
  modetest
 
 Add XV15 and XV20 10 bit semiplanar formats support for
@@ -21,7 +21,7 @@ Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
  3 files changed, 465 insertions(+), 9 deletions(-)
 
 diff --git a/tests/modetest/buffers.c b/tests/modetest/buffers.c
-index 81ca77f..d1b7075 100644
+index 81ca77ff..d1b70755 100644
 --- a/tests/modetest/buffers.c
 +++ b/tests/modetest/buffers.c
 @@ -117,7 +117,7 @@ bo_create(int fd, unsigned int format,
@@ -84,7 +84,7 @@ index 81ca77f..d1b7075 100644
  	case DRM_FORMAT_NV42:
  	case DRM_FORMAT_NV20:
 diff --git a/tests/util/format.c b/tests/util/format.c
-index c623544..f6a55e0 100644
+index c6235441..f6a55e07 100644
 --- a/tests/util/format.c
 +++ b/tests/util/format.c
 @@ -59,6 +59,8 @@ static const struct util_format_info format_info[] = {
@@ -97,7 +97,7 @@ index c623544..f6a55e0 100644
  	{ DRM_FORMAT_YUV420, "YU12", MAKE_YUV_INFO(YUV_YCbCr, 2, 2, 1) },
  	{ DRM_FORMAT_YVU420, "YV12", MAKE_YUV_INFO(YUV_YCrCb, 2, 2, 1) },
 diff --git a/tests/util/pattern.c b/tests/util/pattern.c
-index 358699a..32f28a3 100644
+index 358699a4..32f28a34 100644
 --- a/tests/util/pattern.c
 +++ b/tests/util/pattern.c
 @@ -449,6 +449,432 @@ static void fill_smpte_yuv_planar_10bpp(const struct util_yuv_info *yuv,
@@ -591,5 +591,5 @@ index 358699a..32f28a3 100644
  	case DRM_FORMAT_XRGB4444:
  	case DRM_FORMAT_ABGR4444:
 -- 
-2.54.0
+2.43.0
 

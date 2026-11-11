@@ -12,6 +12,7 @@ COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 COMPATIBLE_MACHINE:versal = "versal"
 COMPATIBLE_MACHINE:versal-2ve-2vm = "versal-2ve-2vm"
+COMPATIBLE_MACHINE:versal-2vp = "versal-2vp"
 
 # Since we're just copying, we can run any config
 COMPATIBLE_HOST = ".*"

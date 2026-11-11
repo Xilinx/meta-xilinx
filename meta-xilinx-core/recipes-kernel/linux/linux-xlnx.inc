@@ -1,5 +1,7 @@
-# This version extension should match CONFIG_LOCALVERSION in defconfig
-LINUX_VERSION_EXTENSION ?= "-xilinx"
+# CONFIG_LOCALVERSION is supplied from this value by kernel-yocto.bbclass,
+# not from defconfig.
+KERNEL_SRCREV_SUFFIX = "${@'-g%s' % (d.getVar('SRCREV_machine') or '')[:12] if (d.getVar('SRCREV_machine') or '').isalnum() else ''}"
+LINUX_VERSION_EXTENSION ?= "-xilinx${KERNEL_SRCREV_SUFFIX}"
 PV = "${LINUX_VERSION}+git"
 
 # Sources, by default allow for the use of SRCREV pointing to orphaned tags/commits
@@ -20,20 +22,6 @@ SRC_URI:append:versal-2ve-2vm = "\
 LINUX_MBV_INC = ""
 LINUX_MBV_INC:microblaze-v = "linux-mbv.inc"
 require ${LINUX_MBV_INC}
-
-SRC_URI_RISCV = "\
-    file://risc-v-isa-clear.cfg \
-    ${@bb.utils.contains(    "TUNE_FEATURES", "rv 32 i m a", "file://risc-v-isa-rv32i.cfg", "", d)} \
-    ${@bb.utils.contains(    "TUNE_FEATURES", "rv 64 i m a", "file://risc-v-isa-rv64i.cfg", "", d)} \
-    ${@bb.utils.contains(    "TUNE_FEATURES", "f d",         "file://risc-v-isa-fpu.cfg",   "", d)} \
-    ${@bb.utils.contains(    "TUNE_FEATURES", "c",           "file://risc-v-isa-c.cfg",     "", d)} \
-    ${@bb.utils.contains(    "TUNE_FEATURES", "v",           "file://risc-v-isa-v.cfg",     "", d)} \
-    ${@bb.utils.contains_any("TUNE_FEATURES", "b zbb",       "file://risc-v-isa-zbb.cfg",   "", d)} \
-    ${@bb.utils.contains(    "TUNE_FEATURES", "zicbom",      "file://risc-v-isa-zicbom.cfg",   "", d)} \
-    "
-
-SRC_URI:append:riscv32 = "${SRC_URI_RISCV}"
-SRC_URI:append:riscv64 = "${SRC_URI_RISCV}"
 
 SRCREV_machine ?= "${SRCREV}"
 SRCREV_meta ?= "eeb5d0c9dd5e2928835c633644426ee357fbce12"
@@ -67,24 +55,22 @@ inherit kernel-simpleimage
 
 # Default to be only compatible with specific machines or soc families
 COMPATIBLE_MACHINE ?= "^$"
-COMPATIBLE_MACHINE:riscv32 = ".*"
-COMPATIBLE_MACHINE:riscv64 = ".*"
 COMPATIBLE_MACHINE:zynq = ".*"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
+COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 # Use DEFCONFIGs for configuring linux-xlnx kernels
 KCONFIG_MODE ?= "alldefconfig"
 KBUILD_DEFCONFIG_DEFAULT ?= ""
-KBUILD_DEFCONFIG_DEFAULT:riscv32 ?= "defconfig"
-KBUILD_DEFCONFIG_DEFAULT:riscv64 ?= "defconfig"
 KBUILD_DEFCONFIG_DEFAULT:zynq ?= "xilinx_zynq_defconfig"
 KBUILD_DEFCONFIG_DEFAULT:zynqmp ?= "xilinx_defconfig"
 KBUILD_DEFCONFIG_DEFAULT:versal ?= "xilinx_defconfig"
 KBUILD_DEFCONFIG_DEFAULT:versal-net ?= "xilinx_defconfig"
 KBUILD_DEFCONFIG_DEFAULT:versal-2ve-2vm ?= "xilinx_defconfig"
+KBUILD_DEFCONFIG_DEFAULT:versal-2vp ?= "xilinx_defconfig"
 
 KBUILD_DEFCONFIG ?= "${KBUILD_DEFCONFIG_DEFAULT}"
 
@@ -106,3 +92,13 @@ SRC_URI:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'fi
 KERNEL_FEATURES_KPROBES = " features/kprobes"
 
 KERNEL_FEATURES:append = "${KERNEL_FEATURES_KPROBES}"
+
+KERNEL_FEATURES:append = " features/base/xilinx-base.scc"
+
+# The libmetal host demo uses named UIO devices with compatible = "uio".
+# Limit this module configuration to the full kernel; linux-xlnx-small
+# uses a recovery defconfig without module support.
+KERNEL_FEATURES:append:pn-linux-xlnx = " ${@bb.utils.contains('DISTRO_FEATURES', 'openamp', 'features/libmetal/libmetal-uio.scc', '', d)}"
+KERNEL_MODULE_AUTOLOAD:append:pn-linux-xlnx = " ${@bb.utils.contains('DISTRO_FEATURES', 'openamp', 'uio_pdrv_genirq', '', d)}"
+KERNEL_MODULE_PROBECONF:append:pn-linux-xlnx = " ${@bb.utils.contains('DISTRO_FEATURES', 'openamp', 'uio_pdrv_genirq', '', d)}"
+module_conf_uio_pdrv_genirq:pn-linux-xlnx = "${@bb.utils.contains('DISTRO_FEATURES', 'openamp', 'options uio_pdrv_genirq of_id=uio', '', d)}"

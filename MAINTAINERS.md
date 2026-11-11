@@ -35,7 +35,7 @@ https://docs.yoctoproject.org/dev/contributor-guide/submit-changes.html#
 
 **Reviewers:**
 
-	Mark Hatle <mark.hatle@xilinx.com>
-	Sandeep Gundlupet Raju <sandeep.gundlupet-raju@xilinx.com>
-	John Toomey <john.toomey@xilinx.com>
+	Mark Hatle <mark.hatle@amd.com>
+	Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+	John Toomey <john.toomey@amd.com>
 	Trevor Woerner <trevor.woerner@amd.com>

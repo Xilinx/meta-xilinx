@@ -6,14 +6,17 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 SRC_URI = "\
-    https://edf.amd.com/sswreleases/rel-v2026.1/edf_files/2026.1/06092108/external/zephyr-synchronization/xenvmgicv3_zephyr-synchronization_06092108.tar.gz;name=tarball \
+    https://edf.amd.com/sswreleases/rel-v2026.2/edf_files/2026.2/11071152/external/zephyr-synchronization/xenvmgicv3_zephyr-synchronization_11071152.tar.gz;name=tarball \
     file://zephyr-synchronization-xenvmgicv3.cfg \
     "
-SRC_URI[tarball.sha256sum] = "eb783b170b8e583a01c3858ee2165ba85090a7d81feed435798f9f80bddd2d63"
+SRC_URI[tarball.sha256sum] = "ead10f685478b863554aaaec5e23d954c55e0aea0987c4267c0f702a93ddd7f7"
 
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:versal = "${MACHINE}"
 COMPATIBLE_MACHINE:versal-2ve-2vm = "${MACHINE}"
+COMPATIBLE_MACHINE:versal-2vp = "${MACHINE}"
+
+S = "${UNPACKDIR}"
 
 do_configure() {
 	:
@@ -35,3 +38,5 @@ FILES:${PN} += " \
     /boot/* \
     ${sysconfdir}/xen/zephyr-synchronization-xenvmgicv3.cfg \
     "
+
+CONFFILES:${PN} += "${sysconfdir}/xen/zephyr-synchronization-xenvmgicv3.cfg"

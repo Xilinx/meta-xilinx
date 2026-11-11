@@ -400,7 +400,7 @@ SRC_URI = " \
    > 1. COMPATIBLE_MACHINE should match machine fw files or EDF common machine.
    > 2. In 2025.2 and later release dfx_user_dts bbclass supports FW_INSTALL_DIR
    >    where user can install the fw files to a specific directory structure. By
-   >    default bbclass will install fw files into `/lib/firmaware/xilinx/${PN}`
+   >    default bbclass will install fw files into `/lib/firmware/xilinx/${PN}`
 
     ```
     SUMMARY = "<board-name> {full|dfx|segmented|segmented-dfx} loading app firmware using dfx_user_dts bbclass"
@@ -427,7 +427,7 @@ SRC_URI = " \
 
     > **Note:** User can use fpgautil or dfx-mgr tool to load .bin/pdi and dtbo
     > at runtime linux. For more details refer.
-    > 1. [fpgautil](https://github.com/Xilinx/meta-xilinx/blob/master/meta-xilinx-core/recipes-bsp/fpga-manager-script/files/fpgautil.c#L96)
+    > 1. [fpgautil](../meta-xilinx-core/recipes-bsp/fpga-manager-script/files/fpgautil.c)
     > 2. [dfx-mgr-client](https://github.com/Xilinx/dfx-mgr/blob/master/README.md)
     > **Note:** dfx-mgr requires the meta-oe layer
 
@@ -843,7 +843,7 @@ yocto-vck190-versal:/# fpgautil -R -n PR0
 ```
 * Versal (DFx Static)
 ```
-yocto-vck190-versal:/# fpgautil -R -n Full
+yocto-vck190-versal:/# fpgautil -R -n full
 ```
 * Versal or Versal-2ve-2vm (Segmented)
 ```
@@ -855,7 +855,7 @@ amd-edf:/lib/firmware/xilinx# fpgautil -R -n PR0
 ```
 * Versal-2ve-2vm (Segmented DFx Static)
 ```
-amd-edf:/lib/firmware/xilinx# fpgautil -R -n Full
+amd-edf:/lib/firmware/xilinx# fpgautil -R -n full
 ```
 ---
 

@@ -13,7 +13,7 @@ do_configure() {
 RISCV_OBJCOPY ??= "${OBJCOPY}"
 
 # Only add a dependency if we need to use OUR binutils
-DEPENDS .= "${@' virtual/${TARGET_PREFIX}binutils' if d.getVar('RISCV_OBJCOPY') == d.getVar('OBJCOPY') else ''}"
+DEPENDS .= "${@' virtual/cross-binutils' if d.getVar('RISCV_OBJCOPY') == d.getVar('OBJCOPY') else ''}"
 
 COMPILER = "${CC}"
 COMPILER_FLAGS = "-O2 -c"

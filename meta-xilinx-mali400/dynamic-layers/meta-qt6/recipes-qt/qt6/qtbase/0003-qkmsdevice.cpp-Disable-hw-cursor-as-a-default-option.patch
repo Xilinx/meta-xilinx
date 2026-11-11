@@ -16,7 +16,7 @@ Upstream-Status: Inappropriate [Xilinx specific]
 diff --git a/src/platformsupport/kmsconvenience/qkmsdevice.cpp b/src/platformsupport/kmsconvenience/qkmsdevice.cpp
 --- a/src/platformsupport/kmsconvenience/qkmsdevice.cpp
 +++ b/src/platformsupport/kmsconvenience/qkmsdevice.cpp
-@@ -995,9 +995,9 @@ QKmsScreenConfig *QKmsDevice::screenConfig() const
+@@ -1367,9 +1367,9 @@ QKmsScreenConfig *QKmsDevice::screenConfig() const
  
  QKmsScreenConfig::QKmsScreenConfig()
      : m_headless(false)

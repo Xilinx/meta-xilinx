@@ -17,6 +17,7 @@ COMPATIBLE_MACHINE ?= "^$"
 COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
+COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 # Default XEN_TEMPLATE_CONFIG is set to <soc>-xen-scr-dom0-template-cfg file
 # User can change to <soc>-xen-scr-dom0-template-cfg or a custom config.
@@ -25,29 +26,34 @@ XEN_TEMPLATE_CONFIG_DEFAULT = ""
 XEN_TEMPLATE_CONFIG_DEFAULT:zynqmp = "zynqmp-xen-scr-dom0-template-cfg"
 XEN_TEMPLATE_CONFIG_DEFAULT:versal = "versal-xen-scr-dom0-template-cfg"
 XEN_TEMPLATE_CONFIG_DEFAULT:versal-2ve-2vm = "versal-2ve-2vm-xen-scr-dom0-template-cfg"
+XEN_TEMPLATE_CONFIG_DEFAULT:versal-2vp = "versal-xen-scr-dom0-template-cfg"
 XEN_TEMPLATE_CONFIG ?= "${XEN_TEMPLATE_CONFIG_DEFAULT}"
 
 SRC_URI = " \
     ${@'file://${XEN_TEMPLATE_CONFIG}' if d.getVar('XEN_TEMPLATE_CONFIG') else ''} \
     "
 
+S = "${UNPACKDIR}"
+
 do_configure[noexec] = "1"
 do_compile[depends] += " image-builder-native:do_populate_sysroot"
 
 do_compile(){
-    ${RECIPE_SYSROOT_NATIVE}/usr/bin/uboot-script-gen -c ${WORKDIR}/${XEN_TEMPLATE_CONFIG} -s -d ${WORKDIR} -o ${WORKDIR}/xen_boot
+    ${RECIPE_SYSROOT_NATIVE}/usr/bin/uboot-script-gen -c ${UNPACKDIR}/${XEN_TEMPLATE_CONFIG} -s -d ${UNPACKDIR} -o ${UNPACKDIR}/xen_boot
 }
 
 do_install() {
 	install -d ${D}/boot
-	install -m 0644 ${WORKDIR}/xen_boot.scr ${D}/boot
+	install -m 0644 ${UNPACKDIR}/xen_boot.scr ${D}/boot
 }
 
 do_deploy() {
 	install -d ${DEPLOYDIR}
-	install -m 0644 ${WORKDIR}/xen_boot.scr ${DEPLOYDIR}
+	install -m 0644 ${UNPACKDIR}/xen_boot.scr ${DEPLOYDIR}
 }
 
-FILES:${PN} = "/boot/*"
+FILES:${PN} += " \
+    /boot/* \
+    "
 
 addtask do_deploy after do_compile before do_build

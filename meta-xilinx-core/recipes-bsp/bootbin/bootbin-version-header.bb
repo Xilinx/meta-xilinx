@@ -20,8 +20,7 @@ inherit deploy image-artifact-names shared-manifest
 
 IMAGE_NAME_SUFFIX = ""
 MANIFEST_COMPONENT_NAME = "bootbin-version-header"
-MANIFEST_COMPONENT_FIELDS = "version"
-MANIFEST_COMPONENT_FIELD_version = "${BOOTBIN_VERSION_STRING}"
+MANIFEST_VERSION = "${BOOTBIN_VERSION_STRING}"
 
 python do_configure() {
     version = d.getVar('BOOTBIN_VERSION_STRING')

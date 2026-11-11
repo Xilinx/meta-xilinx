@@ -38,6 +38,7 @@ MANIFEST_AGGREGATE_DEPENDS:zynqmp = "device-tree virtual/bootloader fsbl pmufw t
 MANIFEST_AGGREGATE_DEPENDS:versal = "device-tree virtual/bootloader plmfw psmfw trusted-firmware-a virtual/base-pdi"
 MANIFEST_AGGREGATE_DEPENDS:versal-net = "device-tree virtual/bootloader plmfw psmfw trusted-firmware-a virtual/base-pdi"
 MANIFEST_AGGREGATE_DEPENDS:versal-2ve-2vm = "device-tree virtual/bootloader plmfw trusted-firmware-a virtual/base-pdi"
+MANIFEST_AGGREGATE_DEPENDS:versal-2vp = "device-tree virtual/bootloader plmfw psmfw trusted-firmware-a virtual/base-pdi"
 
 # Don't allow building for microblaze MACHINE
 COMPATIBLE_MACHINE ?= "^$"
@@ -46,6 +47,7 @@ COMPATIBLE_MACHINE:zynqmp = ".*"
 COMPATIBLE_MACHINE:versal = ".*"
 COMPATIBLE_MACHINE:versal-net = ".*"
 COMPATIBLE_MACHINE:versal-2ve-2vm = ".*"
+COMPATIBLE_MACHINE:versal-2vp = ".*"
 
 PROVIDES = "virtual/boot-bin"
 
@@ -133,7 +135,7 @@ do_configure[vardeps] += "BIF_PARTITION_ATTR BIF_PARTITION_IMAGE BIF_COMMON_ATTR
 # Track per-name BIF_COMMON_ATTR flag values so changing a value (without
 # changing the list) still invalidates the configure signature.
 do_configure[vardeps] += "${@' '.join('BIF_COMMON_ATTR[%s]' % n for n in (d.getVar('BIF_COMMON_ATTR') or '').split())}"
-do_configure[vardeps] += "BIF_FSBL_ATTR BIF_BITSTREAM_ATTR BIF_TFA_ATTR BIF_DEVICETREE_ATTR BIF_SSBL_ATTR BIF_OPTIONAL_DATA"
+do_configure[vardeps] += "BIF_FSBL_ATTR BIF_BITSTREAM_ATTR BIF_TFA_ATTR BIF_DEVICETREE_ATTR BIF_SSBL_ATTR BIF_OPTIONAL_DATA BIF_IMAGESTORE_ATTR"
 do_configure[vardeps] += "BIF_PARTITION_ID BIF_PARTITION_NAME"
 do_configure[vardeps] += "${@' '.join('BIF_OPTIONAL_DATA_VAL[%s]' % n for n in (d.getVarFlags('BIF_OPTIONAL_DATA_VAL') or ''))}"
 do_configure[vardeps] += "${@' '.join('BIF_OPTIONAL_DATA_FILE[%s]' % n for n in (d.getVarFlags('BIF_OPTIONAL_DATA_FILE') or ''))}"
@@ -172,6 +174,10 @@ do_deploy() {
 
 FILES:${PN} += "/boot/BOOT.bin"
 SYSROOT_DIRS += "/boot"
+
+# Debug firmware payloads, such as TF-A built with TFA_DEBUG=1, may retain
+# absolute build paths. BOOT.bin packages these payloads without modifying them.
+INSANE_SKIP:${PN} += "buildpaths"
 
 addtask deploy before do_build after do_compile
 

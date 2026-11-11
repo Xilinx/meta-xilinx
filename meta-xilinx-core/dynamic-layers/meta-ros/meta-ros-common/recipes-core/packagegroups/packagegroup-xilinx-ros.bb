@@ -3,7 +3,8 @@ publisher/subscriber nodes for the AMD Xilinx ROS demos."
 DESCRIPTION = "Packages for ROS2 Base and Demos including some basic \
 pub/sub examples"
 
-PACKAGE_ARCH = "${TUNE_PKGARCH}"
+# A implicit dependency on linux-xlnx means this needs to be MACHINE_ARCH
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit packagegroup
 inherit ros_distro_${ROS_DISTRO}

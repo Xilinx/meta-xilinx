@@ -1,0 +1,77 @@
+From 4613fb25ac71a989999373512fe6bd686ad99130 Mon Sep 17 00:00:00 2001
+From: Christian Kohn <chris.kohn@amd.com>
+Date: Tue, 29 Sep 2026 18:13:49 -0600
+Subject: [PATCH 8/8] qemu-system-amd-fpga-multiarch: add versal2vp support,
+ for 2vpp format
+
+Route versal2vpp through the Versal setup path, which matches the
+hardware: 2VP has a PLM and no ASU.
+
+The ROM copies the boot header, and on newer parts a hash block, into
+PMC RAM at addresses that differ per part. Versal uses 0xf201e000 and
+has no hash block; 2VP uses 0xf201ee00 with the hash block at
+0xf201ecc0. Pass both as parameters so the arches share the flow.
+
+Upstream-Status: Pending
+
+Signed-off-by: Christian Kohn <chris.kohn@amd.com>
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ qemu-system-amd-fpga-multiarch | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/qemu-system-amd-fpga-multiarch b/qemu-system-amd-fpga-multiarch
+index 862e4a2..1785e06 100755
+--- a/qemu-system-amd-fpga-multiarch
++++ b/qemu-system-amd-fpga-multiarch
+@@ -1825,7 +1825,7 @@ def detect_versal_boot_image(known_args: dict[str, str | None], drives: dict[str
+     return multiboot_val
+ 
+ 
+-def setup_versal(loader, known_args: dict[str, str | None], unknown_args: list[str], machine_path: str, multiboot_val: int) -> None:
++def setup_versal(loader, known_args: dict[str, str | None], unknown_args: list[str], machine_path: str, multiboot_val: int, bh_addr: int = 0xf201e000, hb_addr: int | None = None) -> None:
+     """Set up QEMU arguments for a Versal-format boot image.
+ 
+     Emits QEMU loader arguments for the boot header, PMC CDO and PLM held in
+@@ -1842,6 +1842,9 @@ def setup_versal(loader, known_args: dict[str, str | None], unknown_args: list[s
+         unknown_args: List of unknown arguments to pass through to QEMU
+         machine_path: Path to machine working directory for extracted files
+         multiboot_val: Multiboot index the boot image was found at
++        bh_addr: PMC RAM address the ROM copies the boot header to
++        hb_addr: PMC RAM address the ROM copies hash block 0 to, or None on
++                 parts without a hash block
+     """
+ 
+     apu_args = ""
+@@ -1896,7 +1899,14 @@ def setup_versal(loader, known_args: dict[str, str | None], unknown_args: list[s
+     bh_filename = os.path.join(machine_path, 'boot_bh.bin')
+     loader.dump_boot_header(bh_filename)
+     print(f"Extracted boot header: {bh_filename}")
+-    plm_args += f" -device loader,file={bh_filename},addr=0xf201e000,force-raw=on"
++    plm_args += f" -device loader,file={bh_filename},addr={bh_addr:#x},force-raw=on"
++
++    if hb_addr is not None:
++        # Extract Hash Block 0
++        hb0_filename = os.path.join(machine_path, 'HashBlock0.bin')
++        loader.dump_hash_block_0(hb0_filename)
++        print(f"Extracted hash block 0: {hb0_filename}")
++        plm_args += f" -device loader,file={hb0_filename},addr={hb_addr:#x},force-raw=on"
+ 
+     # Extract PMC CDO
+     pmc_cdo_filename = os.path.join(machine_path, 'pmc_cdo.bin')
+@@ -2344,8 +2354,10 @@ def configure_versal2vp(known_args: dict[str, str | None], unknown_args: list[st
+             if loader.file_type == FileType.VERSAL:
+                 setup_versal(loader, known_args, unknown_args, machine_path, multiboot_val)
+             elif loader.file_type == FileType.VERSAL2VPP:
+-                print("Error: the native versal_2vp boot image format is not supported yet", file=sys.stderr)
+-                sys.exit(1)
++                # The 2VP ROM copies the boot header and hash block 0 to PMC
++                # RAM at addresses that differ from Versal.
++                setup_versal(loader, known_args, unknown_args, machine_path, multiboot_val,
++                             bh_addr=0xf201ee00, hb_addr=0xf201ecc0)
+             else:
+                 print(f"Error: unexpected versal_2vp boot image type: {loader.file_type.name}", file=sys.stderr)
+                 sys.exit(1)
+-- 
+2.50.1 (Apple Git-155)
+

@@ -5,15 +5,25 @@ DESCRIPTION = "Tool for manipulation of system device tree files"
 LICENSE = "BSD-3-Clause"
 SECTION = "bootloader"
 
-SRC_URI = "git://github.com/Xilinx/lopper.git;branch=xlnx_rel_v2026.1;protocol=https"
-SRCREV = "05dc7e4bf359b60f1e6f7ed7074740afd7955a63"
+SRC_URI = "git://github.com/Xilinx/lopper.git;branch=xlnx_rel_v2026.2;protocol=https"
+SRCREV = "424a0f169e04e3321f795cf72471275e461d070e"
 
-BASEVERSION = "1.3.2"
+BASEVERSION = "1.5.0"
 PV = "v${BASEVERSION}+amd+git"
 
 PYPA_WHEEL = "${PIP_INSTALL_DIST_PATH}/${BPN}-${BASEVERSION}-*.whl"
 
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=8e5f5f691f01c9fdfa7a7f2d535be619"
+
+DEPENDS += " \
+    python3-dtc \
+    python3-humanfriendly \
+    python3-ruamel-yaml \
+    python3-anytree \
+    python3-six \
+    python3-pyyaml \
+    python3-packaging \
+"
 
 RDEPENDS:${PN} = " \
     python3-core \

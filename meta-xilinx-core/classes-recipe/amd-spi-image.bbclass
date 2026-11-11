@@ -359,7 +359,7 @@ python do_compile() {
 }
 
 do_compile[vardeps] += "SPI_COMPONENTS SPI_IMAGE_SIZE SPI_OUTPUT_SIZE SPI_VERSION SPI_DEPLOY_DEPENDS \
-    SPI_FLASH_TYPE SPI_ERASE_BLOCK_SIZE"
+    SPI_FLASH_TYPE SPI_ERASE_BLOCK_SIZE SPI_OFFSET SPI_SOURCE"
 do_compile[vardepsexclude] += "DATETIME"
 
 # Required by the image deployment

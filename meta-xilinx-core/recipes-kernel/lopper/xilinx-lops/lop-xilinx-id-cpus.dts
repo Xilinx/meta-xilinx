@@ -104,24 +104,31 @@
                               inherit = "lopper_lib";
                               code = "
                                      cpu_output = {}
+                                     cpu_ids = {}
                                      symbol_node = node.tree['/__symbols__']
                                      prop_dict = symbol_node.__props__
                                      for c in __selected__:
-                                         num_cpu = 0
                                          for c_node in c.subnodes( children_only = True ):
                                              try:
                                                  cpu_node = c_node['device_type'].value[0]
-                                                 num_cpu = c_node['reg'].value[0]
-                                                 num_cpu = num_cpu + 1
+                                                 core_id = c_node['reg'].value[0]
                                              except:
-                                                 cpu_node = None
-                                             if cpu_node:
-                                                 match = [label for label,node_abs in prop_dict.items() if re.match(node_abs[0], c_node.abs_path) and len(node_abs[0]) == len(c_node.abs_path)]
-                                                 cpu_name = match[0]
-                                                 if num_cpu != 0:
-                                                     cpu_type = c_node['compatible'].value[0]
-                                                     dict_key = cpu_name + str(num_cpu)
-                                                     cpu_output[dict_key] = '{} {} {} {} {}'.format(cpu_type, num_cpu-1, 'None', cpu_name, 'None')
+                                                 continue
+                                             if cpu_node != 'cpu':
+                                                 continue
+                                             match = [label for label,node_abs in prop_dict.items() if node_abs[0] == c_node.abs_path]
+                                             if not match:
+                                                 raise ValueError('CPU node has no symbol: %s' % c_node.abs_path)
+                                             cpu_name = match[0]
+                                             cpu_type = c_node['compatible'].value[0]
+                                             match = re.search(r'_([0-9]+)$', cpu_name)
+                                             if match:
+                                                 core_id = int(match.group(1))
+                                             cpu_id = (cpu_type, core_id)
+                                             if cpu_id in cpu_ids and cpu_ids[cpu_id] != c_node.abs_path:
+                                                 raise ValueError('Duplicate CPU ID %s for %s and %s' % (cpu_id, cpu_ids[cpu_id], c_node.abs_path))
+                                             cpu_ids[cpu_id] = c_node.abs_path
+                                             cpu_output[cpu_name] = '{} {} {} {} {}'.format(cpu_type, core_id, 'None', cpu_name, 'None')
 
                                      if cpu_output:
                                          print( '# global core_number no-domain cpu_name' )

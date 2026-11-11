@@ -57,3 +57,14 @@
 &sdhci1 {
     iommus = <&smmu 0x243>;
 };
+
+/*
+ * Xen EEMI authorizes RPU core PM calls through the RPU control page.
+ * Remoteproc TCM resources alone do not grant access to this page.
+ */
+/ {
+    xen-rpu-control@ff9a0000 {
+        compatible = "xen,mmio";
+        reg = <0x0 0xff9a0000 0x0 0x1000>;
+    };
+};

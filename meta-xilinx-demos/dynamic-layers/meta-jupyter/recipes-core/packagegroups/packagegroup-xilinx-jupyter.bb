@@ -10,6 +10,7 @@ JUPYTER_NOTEBOOK_PACKAGES = " \
 	python3-core \
 	python3-ipywidgets \
 	python3-pydot \
+	python3-qtconsole \
 	liberation-fonts \
 	ttf-bitstream-vera \
 	start-jupyter \

@@ -8,7 +8,3 @@ SRC_URI = "${UBOOTURI};${UBRANCHARG}"
 
 B = "${WORKDIR}/build"
 
-UBOOT_MB_INC = ""
-UBOOT_MB_INC:microblaze = "u-boot-xlnx-microblaze.inc"
-require ${UBOOT_MB_INC}
-

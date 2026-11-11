@@ -16,6 +16,7 @@ COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:zynqmp = "zynqmp"
 COMPATIBLE_MACHINE:versal = "versal"
 COMPATIBLE_MACHINE:versal-net = "versal-net"
+COMPATIBLE_MACHINE:versal-2vp = "versal-2vp"
 
 PACKAGE_ARCH:zynqmp = "${MACHINE_ARCH}"
 

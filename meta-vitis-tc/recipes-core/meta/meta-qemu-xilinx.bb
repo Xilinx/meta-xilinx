@@ -20,7 +20,7 @@ QEMU_HOST_TASK += "nativesdk-bootgen"
 QEMU_HOST_TASK += "nativesdk-qemu-devicetrees"
 
 # Tool to work on qemuboot.conf files
-QEMU_HOST_TASK += "nativesdk-qemuboot-tool"
+QEMU_HOST_TASK += "nativesdk-qemuboot-tool nativesdk-qemu-serial-port-tool"
 
 # Add wic to allow for image manipulation
 QEMU_HOST_TASK += "nativesdk-wic"

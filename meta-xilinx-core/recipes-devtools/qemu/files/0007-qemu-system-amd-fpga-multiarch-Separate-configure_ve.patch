@@ -1,0 +1,335 @@
+From 0f790d77c0757f2f443e34090a388aef919e7237 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Wed, 30 Sep 2026 19:42:33 -0500
+Subject: [PATCH 7/8] qemu-system-amd-fpga-multiarch: Separate configure_versal
+ into parts
+
+detect_versal_boot_image now handles the boot mode processing for
+versal and versal like machines.  This does require that the loader type
+to be passed in.
+
+setup_versal now handles the parsing and qemu configuration work.
+
+The functions are called in a pattern similar to:
+
+  multiboot_val = detect_versal_boot_image(known_args, drives, machine_path, VersalBootImageLoader)
+  with VersalBootImageLoader(boot_pdi_path, 0) as loader:
+      loader.parse()
+      setup_versal(loader, known_args, unknown_args, machine_path, multiboot_val)
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ qemu-system-amd-fpga-multiarch | 241 +++++++++++++++++++++------------
+ 1 file changed, 154 insertions(+), 87 deletions(-)
+
+diff --git a/qemu-system-amd-fpga-multiarch b/qemu-system-amd-fpga-multiarch
+index 475312a..862e4a2 100755
+--- a/qemu-system-amd-fpga-multiarch
++++ b/qemu-system-amd-fpga-multiarch
+@@ -17,6 +17,7 @@ import sys
+ import subprocess
+ 
+ try:
++    from amd_boot_image_loader.loader import FileType
+     from amd_boot_image_loader.zynq import ZynqBootImageLoader
+     from amd_boot_image_loader.zynqmp import ZynqmpBootImageLoader
+     from amd_boot_image_loader.versal import VersalBootImageLoader
+@@ -1646,27 +1647,23 @@ def configure_zynqmp(known_args: dict[str, str | None], unknown_args: list[str],
+         # PMU partitions were extracted from boot.bin but no -pmu-args provided
+         QEMU_PMU_ARGS = clock_args + pmu_args.split()
+ 
+-def configure_versal(known_args: dict[str, str | None], unknown_args: list[str], drives: dict[str, list[dict[str, str]]], machine_path: str) -> None:
+-    """Configure Versal boot settings and extract boot files.
+-    
+-    Configures the Versal boot process by:
+-    1. Selecting the appropriate boot file based on boot mode (QSPI, SD0, SD1, or eMMC1)
+-    2. Extracting and verifying boot.bin (pdi) from the boot device
+-    3. Parsing boot.bin (pdi) to extract individual partition files
+-    4. Generating QEMU loader arguments for each partition
+-    5. Configuring Versal-specific registers
+-    
+-    Sets the global APU_ARGS variable with QEMU command arguments.
+-    Sets the global PLM_ARGS variable with QEMU microblaze command arguments.
+-    Exits on error if boot file cannot be found or processed.
+-    
++def detect_versal_boot_image(known_args: dict[str, str | None], drives: dict[str, list[dict[str, str]]], machine_path: str, loader: type) -> int:
++    """Locate the Versal boot device, then extract and verify boot.bin from it.
++
++    Selects the boot file for the configured boot mode (QSPI, OSPI, SD0, SD1
++    or eMMC1), extracts boot.bin into machine_path and verifies it with the
++    supplied boot image loader class. Exits on error.
++
+     Args:
+-        known_args: Dictionary of known arguments (boot_arch, boot_mode, kernel, dtb, etc.)
+-        unknown_args: List of unknown arguments to pass through to QEMU
++        known_args: Dictionary of known arguments (boot_arch, boot_mode, kernel, etc.)
+         drives: Dictionary of parsed drive configurations by interface type
+         machine_path: Path to machine working directory for extracted files
++        loader: Boot image loader class used to verify the extracted image
++
++    Returns:
++        The multiboot index the boot image was actually found at.
+     """
+-    
++
+     # Get boot mode description
+     boot_mode_name = get_boot_mode_name(known_args['boot_arch'], known_args.get('boot_mode'))
+     
+@@ -1809,7 +1806,7 @@ def configure_versal(known_args: dict[str, str | None], unknown_args: list[str],
+         
+         if boot_mode_name in ['QSPI', 'OSPI']:
+             # Pass boot architecture for magic verification
+-            actual_multiboot = get_mtd_contents(boot_file, kernel_file, known_args['boot_arch'], machine_path, multiboot=multiboot_val, loader=VersalBootImageLoader, mtd_file2=boot_file2)
++            actual_multiboot = get_mtd_contents(boot_file, kernel_file, known_args['boot_arch'], machine_path, multiboot=multiboot_val, loader=loader, mtd_file2=boot_file2)
+             if actual_multiboot == -1:
+                 sys.exit(1)
+             if actual_multiboot != multiboot_val:
+@@ -1825,6 +1822,28 @@ def configure_versal(known_args: dict[str, str | None], unknown_args: list[str],
+             if actual_multiboot != multiboot_val:
+                 multiboot_val = actual_multiboot
+ 
++    return multiboot_val
++
++
++def setup_versal(loader, known_args: dict[str, str | None], unknown_args: list[str], machine_path: str, multiboot_val: int) -> None:
++    """Set up QEMU arguments for a Versal-format boot image.
++
++    Emits QEMU loader arguments for the boot header, PMC CDO and PLM held in
++    the already parsed boot image, and configures the Versal-specific
++    registers.
++
++    Sets the global APU_ARGS variable with QEMU command arguments.
++    Sets the global PLM_ARGS variable with QEMU microblaze command arguments.
++    Exits on error if the boot image cannot be processed.
++
++    Args:
++        loader: Parsed Versal-format boot image loader
++        known_args: Dictionary of known arguments (boot_arch, boot_mode, kernel, dtb, etc.)
++        unknown_args: List of unknown arguments to pass through to QEMU
++        machine_path: Path to machine working directory for extracted files
++        multiboot_val: Multiboot index the boot image was found at
++    """
++
+     apu_args = ""
+     plm_args = ""
+     
+@@ -1839,74 +1858,64 @@ def configure_versal(known_args: dict[str, str | None], unknown_args: list[str],
+         apu_args += " -device loader,addr=0xf1110060,data=0x1d000000,data-len=4"
+ 
+     # Extract boot.pdi into individual partition files
+-    boot_pdi_path = os.path.join(machine_path, 'boot.bin')
+-    if os.path.exists(boot_pdi_path):
+-        try:
+-            # Track which CPU numbers have been enabled (0-5)
+-            enabled_cpu_nums = set()
+-            
+-            # Map destination CPU to QEMU cpu-num value
+-            from amd_boot_image_loader.versal import VersalPartitionHeader
+-            cpu_num_map = {
+-                VersalPartitionHeader.DestinationCpu.A72_0: 0,
+-                VersalPartitionHeader.DestinationCpu.A72_1: 1,
+-                VersalPartitionHeader.DestinationCpu.R5_0: 2,
+-                VersalPartitionHeader.DestinationCpu.R5_1: 3,
+-                VersalPartitionHeader.DestinationCpu.R5_LOCKSTEP: 2,  # Lockstep uses R5_0's cpu-num
+-            }
+-            
+-            with VersalBootImageLoader(boot_pdi_path, 0) as loader:
+-                loader.parse()
+-                
+-                # Check for optional data 0x21, this might have boot.bin version info
+-                if loader.optional_data:
+-                    for idx, opt_data in enumerate(loader.optional_data):
+-                        if opt_data.data_id == 0x21:
+-                            if opt_data.data:
+-                                # Extract and print ASCII characters from the data
+-                                ascii_chars = []
+-                                for byte in opt_data.data:
+-                                    # Check if byte is printable ASCII (space to tilde: 32-126)
+-                                    if 32 <= byte <= 126:
+-                                        ascii_chars.append(chr(byte))
+-                                    elif byte == 0:
+-                                        # Null terminator - stop here
+-                                        break
+-                                    else:
+-                                        # Non-printable, non-null character - stop
+-                                        break
+-                                
+-                                if ascii_chars:
+-                                    print(f"boot.bin od 0x21: {''.join(ascii_chars)}")
+-
+-                # Extract boot header
+-                bh_filename = os.path.join(machine_path, 'boot_bh.bin')
+-                loader.dump_boot_header(bh_filename)
+-                print(f"Extracted boot header: {bh_filename}")
+-                plm_args += f" -device loader,file={bh_filename},addr=0xf201e000,force-raw=on"
+-                
+-                # Extract PMC CDO
+-                pmc_cdo_filename = os.path.join(machine_path, 'pmc_cdo.bin')
+-                loader.dump_pmc_cdo(pmc_cdo_filename)
+-                print(f"Extracted PMC CDO: {pmc_cdo_filename}")
+-                pmc_cdo_load_addr = loader.boot_header.pmc_data_load_address
+-                plm_args += f" -device loader,file={pmc_cdo_filename},addr=0x{pmc_cdo_load_addr:08x},force-raw=on"
++    # Track which CPU numbers have been enabled (0-5)
++    enabled_cpu_nums = set()
++    
++    # Map destination CPU to QEMU cpu-num value
++    from amd_boot_image_loader.versal import VersalPartitionHeader
++    cpu_num_map = {
++        VersalPartitionHeader.DestinationCpu.A72_0: 0,
++        VersalPartitionHeader.DestinationCpu.A72_1: 1,
++        VersalPartitionHeader.DestinationCpu.R5_0: 2,
++        VersalPartitionHeader.DestinationCpu.R5_1: 3,
++        VersalPartitionHeader.DestinationCpu.R5_LOCKSTEP: 2,  # Lockstep uses R5_0's cpu-num
++    }
+ 
+-                # Extract PLM (image 0, partition 0 from pmc_subsys)
+-                image_header, partition_headers = loader.image[0]
+-                # Extract the PLM partition
+-                plm_filename = os.path.join(machine_path, 'plm.bin')
+-                loader.extract(0, 0, plm_filename)
+-                print(f"Extracted PLM: {plm_filename}")
+-                        
+-                # Get PLM load address
+-                partition_header = partition_headers[0]
+-                load_addr = (partition_header.destination_load_address_hi << 32) | partition_header.destination_load_address_lo
+-                plm_args += f" -device loader,file={plm_filename},addr=0x{load_addr:016x},force-raw=on,cpu-num=1"
+-        
+-        except Exception as e:
+-            print(f"Error: Could not extract PLM files from boot.pdi: {e}", file=sys.stderr)
+-            sys.exit(1)
++    # Check for optional data 0x21, this might have boot.bin version info
++    if loader.optional_data:
++        for idx, opt_data in enumerate(loader.optional_data):
++            if opt_data.data_id == 0x21:
++                if opt_data.data:
++                    # Extract and print ASCII characters from the data
++                    ascii_chars = []
++                    for byte in opt_data.data:
++                        # Check if byte is printable ASCII (space to tilde: 32-126)
++                        if 32 <= byte <= 126:
++                            ascii_chars.append(chr(byte))
++                        elif byte == 0:
++                            # Null terminator - stop here
++                            break
++                        else:
++                            # Non-printable, non-null character - stop
++                            break
++                    
++                    if ascii_chars:
++                        print(f"boot.bin od 0x21: {''.join(ascii_chars)}")
++
++    # Extract boot header
++    bh_filename = os.path.join(machine_path, 'boot_bh.bin')
++    loader.dump_boot_header(bh_filename)
++    print(f"Extracted boot header: {bh_filename}")
++    plm_args += f" -device loader,file={bh_filename},addr=0xf201e000,force-raw=on"
++
++    # Extract PMC CDO
++    pmc_cdo_filename = os.path.join(machine_path, 'pmc_cdo.bin')
++    loader.dump_pmc_cdo(pmc_cdo_filename)
++    print(f"Extracted PMC CDO: {pmc_cdo_filename}")
++    pmc_cdo_load_addr = loader.boot_header.pmc_data_load_address
++    plm_args += f" -device loader,file={pmc_cdo_filename},addr=0x{pmc_cdo_load_addr:08x},force-raw=on"
++
++    # Extract PLM (image 0, partition 0 from pmc_subsys)
++    image_header, partition_headers = loader.image[0]
++    # Extract the PLM partition
++    plm_filename = os.path.join(machine_path, 'plm.bin')
++    loader.extract(0, 0, plm_filename)
++    print(f"Extracted PLM: {plm_filename}")
++            
++    # Get PLM load address
++    partition_header = partition_headers[0]
++    load_addr = (partition_header.destination_load_address_hi << 32) | partition_header.destination_load_address_lo
++    plm_args += f" -device loader,file={plm_filename},addr=0x{load_addr:016x},force-raw=on,cpu-num=1"
+ 
+     # Magic PMC ROM values
+     plm_args += " -device loader,addr=0xf0000000,data=0xba020004,data-len=4"
+@@ -1931,6 +1940,42 @@ def configure_versal(known_args: dict[str, str | None], unknown_args: list[str],
+         # Create QEMU_PMU_ARGS with just the extracted PSM partitions
+         QEMU_PLM_ARGS = plm_args.split()
+ 
++def configure_versal(known_args: dict[str, str | None], unknown_args: list[str], drives: dict[str, list[dict[str, str]]], machine_path: str) -> None:
++    """Configure Versal boot settings and extract boot files.
++    
++    Configures the Versal boot process by:
++    1. Selecting the appropriate boot file based on boot mode (QSPI, SD0, SD1, or eMMC1)
++    2. Extracting and verifying boot.bin (pdi) from the boot device
++    3. Parsing boot.bin (pdi) to extract individual partition files
++    4. Generating QEMU loader arguments for each partition
++    5. Configuring Versal-specific registers
++    
++    Sets the global APU_ARGS variable with QEMU command arguments.
++    Sets the global PLM_ARGS variable with QEMU microblaze command arguments.
++    Exits on error if boot file cannot be found or processed.
++    
++    Args:
++        known_args: Dictionary of known arguments (boot_arch, boot_mode, kernel, dtb, etc.)
++        unknown_args: List of unknown arguments to pass through to QEMU
++        drives: Dictionary of parsed drive configurations by interface type
++        machine_path: Path to machine working directory for extracted files
++    """
++    multiboot_val = detect_versal_boot_image(known_args, drives, machine_path, VersalBootImageLoader)
++
++    boot_pdi_path = os.path.join(machine_path, 'boot.bin')
++    if not os.path.exists(boot_pdi_path):
++        print(f"Error: no boot image found at {boot_pdi_path}", file=sys.stderr)
++        sys.exit(1)
++
++    try:
++        with VersalBootImageLoader(boot_pdi_path, 0) as loader:
++            loader.parse()
++
++            setup_versal(loader, known_args, unknown_args, machine_path, multiboot_val)
++    except Exception as e:
++        print(f"Error: Could not parse boot.pdi: {e}", file=sys.stderr)
++        sys.exit(1)
++
+ def configure_versal2ve2vm(known_args: dict[str, str | None], unknown_args: list[str], drives: dict[str, list[dict[str, str]]], machine_path: str) -> None:
+     """Configure Versal Gen 2 (VE/VM) boot settings and extract boot files.
+     
+@@ -2276,7 +2321,8 @@ def configure_versal2ve2vm(known_args: dict[str, str | None], unknown_args: list
+ def configure_versal2vp(known_args: dict[str, str | None], unknown_args: list[str], drives: dict[str, list[dict[str, str]]], machine_path: str) -> None:
+     """Configure Versal VP Series Gen 2 boot settings and extract boot files.
+ 
+-    Currently uses the same boot image format and configuration as Versal.
++    2VP parts ship one of two incompatible PDI formats, so the extracted
++    boot.bin is probed to pick the matching setup path.
+ 
+     Args:
+         known_args: Dictionary of known arguments (boot_arch, boot_mode, kernel, dtb, etc.)
+@@ -2284,7 +2330,28 @@ def configure_versal2vp(known_args: dict[str, str | None], unknown_args: list[st
+         drives: Dictionary of parsed drive configurations by interface type
+         machine_path: Path to machine working directory for extracted files
+     """
+-    configure_versal(known_args, unknown_args, drives, machine_path)
++    multiboot_val = detect_versal_boot_image(known_args, drives, machine_path, Versal2VPBootImageLoader)
++
++    boot_pdi_path = os.path.join(machine_path, 'boot.bin')
++    if not os.path.exists(boot_pdi_path):
++        print(f"Error: no boot image found at {boot_pdi_path}", file=sys.stderr)
++        sys.exit(1)
++
++    try:
++        with Versal2VPBootImageLoader(boot_pdi_path, 0) as loader:
++            loader.parse()
++
++            if loader.file_type == FileType.VERSAL:
++                setup_versal(loader, known_args, unknown_args, machine_path, multiboot_val)
++            elif loader.file_type == FileType.VERSAL2VPP:
++                print("Error: the native versal_2vp boot image format is not supported yet", file=sys.stderr)
++                sys.exit(1)
++            else:
++                print(f"Error: unexpected versal_2vp boot image type: {loader.file_type.name}", file=sys.stderr)
++                sys.exit(1)
++    except Exception as e:
++        print(f"Error: Could not parse boot.pdi: {e}", file=sys.stderr)
++        sys.exit(1)
+ 
+ def main() -> None:
+     """Main entry point for the AMD FPGA multiarch wrapper.
+-- 
+2.50.1 (Apple Git-155)
+

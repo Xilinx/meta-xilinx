@@ -1,7 +1,7 @@
-From f0cf0a2a5f04c26287b084ccd6fe1a1a9f45404f Mon Sep 17 00:00:00 2001
+From 1c6163054acc02ec639bf77aaaa81b75638b5cf4 Mon Sep 17 00:00:00 2001
 From: Anil Kumar Mamidala <anil.mamidala@xilinx.com>
 Date: Wed, 27 Oct 2021 16:04:47 +0530
-Subject: [PATCH 4/7] modetest: Add X403 format support for modetest
+Subject: [PATCH 4/8] modetest: Add X403 format support for modetest
 
 Add X403 10-bit format support to modetest
 for generating color bar pattern.
@@ -17,7 +17,7 @@ Signed-off-by: Anil Kumar Mamidala <anil.mamidala@xilinx.com>
  4 files changed, 272 insertions(+), 1 deletion(-)
 
 diff --git a/include/drm/drm_fourcc.h b/include/drm/drm_fourcc.h
-index 1b1eabe..0644709 100644
+index 1b1eabef..0644709f 100644
 --- a/include/drm/drm_fourcc.h
 +++ b/include/drm/drm_fourcc.h
 @@ -459,6 +459,13 @@ extern "C" {
@@ -35,7 +35,7 @@ index 1b1eabe..0644709 100644
  /*
   * Format Modifiers:
 diff --git a/tests/modetest/buffers.c b/tests/modetest/buffers.c
-index d1b7075..4181893 100644
+index d1b70755..540fb3c1 100644
 --- a/tests/modetest/buffers.c
 +++ b/tests/modetest/buffers.c
 @@ -162,6 +162,7 @@ bo_create(int fd, unsigned int format,
@@ -72,7 +72,7 @@ index d1b7075..4181893 100644
  		handles[0] = bo->handle;
  		pitches[0] = bo->pitch;
 diff --git a/tests/util/format.c b/tests/util/format.c
-index f6a55e0..0017f9e 100644
+index f6a55e07..0017f9e2 100644
 --- a/tests/util/format.c
 +++ b/tests/util/format.c
 @@ -68,6 +68,7 @@ static const struct util_format_info format_info[] = {
@@ -84,7 +84,7 @@ index f6a55e0..0017f9e 100644
  	{ DRM_FORMAT_ARGB4444, "AR12", MAKE_RGB_INFO(4, 8, 4, 4, 4, 0, 4, 12) },
  	{ DRM_FORMAT_XRGB4444, "XR12", MAKE_RGB_INFO(4, 8, 4, 4, 4, 0, 0, 0) },
 diff --git a/tests/util/pattern.c b/tests/util/pattern.c
-index 7a3c2ab..cf488cf 100644
+index 7a3c2ab7..cf488cfd 100644
 --- a/tests/util/pattern.c
 +++ b/tests/util/pattern.c
 @@ -615,6 +615,175 @@ static void fill_smpte_yuv_semiplanar_10b(
@@ -376,5 +376,5 @@ index 7a3c2ab..cf488cf 100644
  		return fill_tiles_xv15(info, planes[0], planes[1],
  			 planes[2], width, height, stride);
 -- 
-2.54.0
+2.43.0
 

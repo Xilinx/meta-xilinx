@@ -9,6 +9,7 @@ TARGET_MC:zynqmp = "cortexr5-1-${FW_OS}"
 TARGET_MC:versal = "cortexr5-1-${FW_OS}"
 TARGET_MC:versal-net = "cortexr52-1-${FW_OS}"
 TARGET_MC:versal-2ve-2vm = "cortexr52-1-${FW_OS}"
+TARGET_MC:versal-2vp = "cortexr5-1-${FW_OS}"
 
 FW_MCDEPENDS = "mc::${MACHINE}-${TARGET_MC}:libmetal-demo-remote:do_deploy"
 

@@ -1,4 +1,4 @@
-# Generates per-component JSON manifest with branch/srcrev metadata.
+# Generates per-component JSON manifest with branch/srcrev/version metadata.
 # Stages to sysroot for aggregation. Only deploys to DEPLOYDIR for
 # baremetal builds (multiconfig producers) where sysroot is not shared.
 #
@@ -6,6 +6,8 @@
 #   MANIFEST_COMPONENT_NAME - Component identifier (default: ${PN})
 #   MANIFEST_BRANCH_VARS - Space-separated list of vars to check for branch
 #   MANIFEST_SRCREV_VARS - Space-separated list of vars to check for srcrev
+#   MANIFEST_VERSION_VARS - Vars to check for version; empty omits the field
+#   MANIFEST_VERSION - Explicit version, recorded verbatim
 #   MANIFEST_COMPONENT_FIELDS - Space-separated list of custom field names
 #   MANIFEST_COMPONENT_FIELD_<name> - Value for custom field <name>
 
@@ -14,6 +16,7 @@ SYSROOT_DIRS += "/sysroot-only"
 MANIFEST_COMPONENT_NAME ??= "${PN}"
 MANIFEST_BRANCH_VARS ?= "BRANCH SRCBRANCH UBRANCH MANIFEST_BRANCH"
 MANIFEST_SRCREV_VARS ?= "SRCREV MANIFEST_SRCREV"
+MANIFEST_VERSION_VARS ?= "MANIFEST_VERSION PV"
 MANIFEST_COMPONENT_FIELDS ?= ""
 
 def _shared_manifest_entry(d):
@@ -21,6 +24,7 @@ def _shared_manifest_entry(d):
     for key, varlist, skip in [
         ("branch", (d.getVar("MANIFEST_BRANCH_VARS") or "").split(), set()),
         ("srcrev", (d.getVar("MANIFEST_SRCREV_VARS") or "").split(), {"INVALID"}),
+        ("version", (d.getVar("MANIFEST_VERSION_VARS") or "").split(), set()),
     ]:
         for v in varlist:
             val = d.getVar(v)
@@ -31,6 +35,9 @@ def _shared_manifest_entry(d):
                 continue
             e[key] = val
             break
+    # A +git version names a source revision but does not carry one.
+    if e.get("version", "").endswith("+git") and e.get("srcrev"):
+        e["version"] += "+" + e["srcrev"][:10]
     for field in (d.getVar("MANIFEST_COMPONENT_FIELDS") or "").split():
         val = d.getVar("MANIFEST_COMPONENT_FIELD_%s" % field)
         if val:
@@ -64,8 +71,8 @@ python do_shared_manifest_deploy() {
 }
 
 # Static vardeps - dynamic computation removed to avoid AUTOREV parse-time conflicts
-do_shared_manifest_sysroot[vardeps] = "MANIFEST_COMPONENT_NAME MANIFEST_BRANCH_VARS MANIFEST_SRCREV_VARS MANIFEST_COMPONENT_FIELDS"
-do_shared_manifest_deploy[vardeps] = "MANIFEST_COMPONENT_NAME MANIFEST_BRANCH_VARS MANIFEST_SRCREV_VARS MANIFEST_COMPONENT_FIELDS"
+do_shared_manifest_sysroot[vardeps] = "MANIFEST_COMPONENT_NAME MANIFEST_BRANCH_VARS MANIFEST_SRCREV_VARS MANIFEST_VERSION_VARS MANIFEST_VERSION MANIFEST_COMPONENT_FIELDS PV"
+do_shared_manifest_deploy[vardeps] = "MANIFEST_COMPONENT_NAME MANIFEST_BRANCH_VARS MANIFEST_SRCREV_VARS MANIFEST_VERSION_VARS MANIFEST_VERSION MANIFEST_COMPONENT_FIELDS PV"
 
 
 do_install[postfuncs] += "do_shared_manifest_sysroot"

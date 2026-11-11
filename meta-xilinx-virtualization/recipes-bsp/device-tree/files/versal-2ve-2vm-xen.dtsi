@@ -1,0 +1,74 @@
+&smmu {
+    status = "okay";
+};
+
+&adma0 {
+    iommus = <&smmu 0x210>;
+};
+
+&adma1 {
+    iommus = <&smmu 0x212>;
+};
+
+&adma2 {
+    iommus = <&smmu 0x214>;
+};
+
+&adma3 {
+    iommus = <&smmu 0x216>;
+};
+
+&adma4 {
+    iommus = <&smmu 0x218>;
+};
+
+&adma5 {
+    iommus = <&smmu 0x21a>;
+};
+
+&adma6 {
+    iommus = <&smmu 0x21c>;
+};
+
+&adma7 {
+    iommus = <&smmu 0x21e>;
+};
+
+&dwc3_0 {
+    iommus = <&smmu 0x230>;
+};
+
+&dwc3_1 {
+    iommus = <&smmu 0x231>;
+};
+
+&mmi_dwc3 {
+    iommus = <&smmu 0x20e>;
+};
+
+&gem0 {
+    iommus = <&smmu 0x234>;
+};
+
+&gem1 {
+    iommus = <&smmu 0x235>;
+};
+
+&mmi_10gbe {
+    iommus = <&smmu 0x25e>;
+};
+
+&qspi {
+    iommus = <&smmu 0x244>;
+};
+
+&ospi {
+    iommus = <&smmu 0x245>;
+};
+
+&ufshc {
+    iommus = <&smmu 0x246>;
+};
+&mdb_pcie0 {
+    iommus = <&smmu 0x250>;
+};

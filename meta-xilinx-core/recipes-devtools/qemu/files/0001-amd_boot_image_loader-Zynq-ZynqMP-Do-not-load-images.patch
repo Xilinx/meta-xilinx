@@ -1,0 +1,66 @@
+From 302b751368955113c910d99aab11fa1e9db9dac4 Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@amd.com>
+Date: Wed, 30 Sep 2026 16:38:56 -0600
+Subject: [PATCH 1/8] amd_boot_image_loader: Zynq/ZynqMP: Do not load images if
+ empty
+
+If there is no image table, the offset will be 0x00.  Do not attempt
+to load the table if the offset is 0x00 or it will attempt to load
+invalid data.  In this case, the FSBL and PMU (ZynqMP) can be found
+from the fields in the main boot header.
+
+Upstream-Status: Pending
+
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ amd_boot_image_loader/zynq.py   | 4 ++--
+ amd_boot_image_loader/zynqmp.py | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/amd_boot_image_loader/zynq.py b/amd_boot_image_loader/zynq.py
+index c097a99..06d9bc3 100644
+--- a/amd_boot_image_loader/zynq.py
++++ b/amd_boot_image_loader/zynq.py
+@@ -545,7 +545,7 @@ class ZynqBootImageLoader(BootImageLoader):
+         self.boot_header.partition_header_table_offset = struct.unpack('<I', self.image_fd.read(4))[0]
+ 
+         # Load Image Header Table
+-        if self.boot_header.image_header_table_offset is not None:
++        if self.boot_header.image_header_table_offset is not None and self.boot_header.image_header_table_offset != 0x00:
+             # Seek to Image Header Table offset
+             self._safe_seek(self.image_path_offset + self.boot_header.image_header_table_offset, 20)
+             
+@@ -572,7 +572,7 @@ class ZynqBootImageLoader(BootImageLoader):
+                 self.image_header_table.header_authentication_certificate_offset = None
+ 
+         # Load Image Headers and corresponding Partition Headers
+-        if self.image_header_table.first_image_header_offset is not None:
++        if self.image_header_table.first_image_header_offset is not None and self.image_header_table.first_image_header_offset != 0x00:
+             current_offset = self.image_header_table.first_image_header_offset * 4 # Word to byte offset
+             
+             while current_offset != 0 and current_offset != 0xffffffff:
+diff --git a/amd_boot_image_loader/zynqmp.py b/amd_boot_image_loader/zynqmp.py
+index 01bb099..b1463da 100644
+--- a/amd_boot_image_loader/zynqmp.py
++++ b/amd_boot_image_loader/zynqmp.py
+@@ -871,7 +871,7 @@ class ZynqmpBootImageLoader(BootImageLoader):
+         self.boot_header.black_key_iv = self.image_fd.read(12)
+ 
+         # Load Image Header Table
+-        if self.boot_header.image_header_table_offset is not None:
++        if self.boot_header.image_header_table_offset is not None and self.boot_header.image_header_table_offset != 0x00:
+             # Seek to Image Header Table offset
+             self._safe_seek(self.image_path_offset + self.boot_header.image_header_table_offset, ZynqmpImageHeaderTable.IMAGE_HEADER_TABLE_SIZE)
+             
+@@ -909,7 +909,7 @@ class ZynqmpBootImageLoader(BootImageLoader):
+             self.image_header_table.checksum = struct.unpack('<I', self.image_fd.read(4))[0]
+ 
+         # Load Image Headers and corresponding Partition Headers
+-        if self.image_header_table.first_image_header_offset is not None:
++        if self.image_header_table.first_image_header_offset is not None and self.image_header_table.first_image_header_offset != 0x00:
+             current_offset = self.image_header_table.first_image_header_offset * 4 # Word to byte offset
+             
+             while current_offset != 0 and current_offset != 0xffffffff:
+-- 
+2.50.1 (Apple Git-155)
+

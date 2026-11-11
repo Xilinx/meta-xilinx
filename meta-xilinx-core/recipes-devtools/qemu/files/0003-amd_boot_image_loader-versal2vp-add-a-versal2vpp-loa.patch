@@ -1,0 +1,153 @@
+From 3f7e0d5f7e3bd1810bac1a85815441d815c85c35 Mon Sep 17 00:00:00 2001
+From: Christian Kohn <chris.kohn@amd.com>
+Date: Tue, 29 Sep 2026 14:55:29 -0600
+Subject: [PATCH 3/8] amd_boot_image_loader: versal2vp: add a versal2vpp loader
+
+For parts using a Versal Gen2 style file format, add custom loader
+code that is different from the default Versal.  This new loader
+style is called 2VPP inside this code.
+
+The 2VPP boot header matches Gen2 except between 0x27C and 0x334,
+where the PPK and signature block give way to a single hashAlgo
+word; that moves hashBlockLength1 to 0x280 and imageHeaderByteOffset
+to 0x2D4.
+
+Subclass the Gen2 loader and re-read only that window. Dump the boot
+header by copying the image bytes rather than rebuilding it from parsed
+fields, which would emit those two fields at the Gen2 offsets.
+
+The boot header, PLM, PMC CDO and hash block this produces are
+byte-identical to 'bootgen -arch versal_2vp -dump'.
+
+Upstream-Status: Pending
+
+Signed-off-by: Christian Kohn <chris.kohn@amd.com>
+Signed-off-by: Mark Hatle <mark.hatle@amd.com>
+---
+ amd_boot_image_loader/versal_2vp.py | 98 ++++++++++++++++++++++++++++-
+ 1 file changed, 95 insertions(+), 3 deletions(-)
+
+diff --git a/amd_boot_image_loader/versal_2vp.py b/amd_boot_image_loader/versal_2vp.py
+index 93e7a13..165f4ff 100644
+--- a/amd_boot_image_loader/versal_2vp.py
++++ b/amd_boot_image_loader/versal_2vp.py
+@@ -7,10 +7,17 @@
+ This module provides support for Versal Premium Series Gen 2 boot images
+ (PDI files).
+ 
+-The xc2vp3602 is similar to the Versal formation documented in the
+-reference: https://docs.amd.com/r/en-US/ug1283-bootgen-user-guide/Versal-Adaptive-SoC-Boot-Image-Format
++There are two variants of the PDI file which differ per part.  One is
++similar to the Versal, while the other is similar to the Versal 2ve 2vm
++which we call '2VPP'.
++
++The 2VPP boot header matches Gen2 below 0x27C and from 0x334 up. Between
++those it replaces the PPK and signature block with a single hashAlgo word,
++so only that window is re-read after the inherited parse.
+ """
+ 
++import struct
++
+ from .versal import (
+     VersalBootImageLoader,
+     VersalBootHeader,
+@@ -20,10 +27,95 @@ from .versal import (
+     VersalPartitionHeader,
+ )
+ 
++from .versal_2ve_2vm import (
++    Versal2VE2VMBootHeader,
++    Versal2VE2VMBootImageLoader
++)
+ 
+ class Versal2VPBootImageLoader(VersalBootImageLoader):
+     """Boot image loader for Versal Premium Series Gen 2.
+ 
+-    Currently uses the same boot image format as Versal.
++    Currently uses the same boot image format as Versal, but can
++    alternatively used the new Versal2VPP format defined below.
+     """
+     pass
++
++class Versal2VPPBootHeader(Versal2VE2VMBootHeader):
++    BH_SMAP_BUS_WIDTH_SIZE = 0x10
++    BH_HASH_ALGO_OFFSET = 0x27C
++    BH_HASH_BLOCK_SIZE_1_OFFSET = 0x280
++    BH_PUF_PDI_IDENTIFICATION_OFFSET = 0x284
++    BH_PUF_HD_LENGTH_OFFSET = 0x288
++    BH_ROM_RESERVED_OFFSET = 0x28C
++    BH_ROM_RESERVED_SIZE = 72
++    BH_IMAGE_HEADER_BYTE_OFFSET = 0x2D4
++    BH_PLM_RESERVED_OFFSET = 0x2D8
++    BH_PLM_RESERVED_SIZE = 92
++
++    def __init__(self):
++        super().__init__()
++        self.hash_algo = None
++        self.image_header_byte_offset = None
++        # Not present in the 2VP header.
++        self.auth_header_1 = None
++        self.total_ppk_size_1 = None
++        self.actual_ppk_size_1 = None
++        self.total_pdi_signature_size_1 = None
++        self.actual_pdi_signature_size_1 = None
++
++
++class Versal2VPPBootImageLoader(Versal2VE2VMBootImageLoader):
++    def __init__(self, image_path=None, image_path_offset=0):
++        super().__init__(image_path, image_path_offset)
++        self.boot_header = Versal2VPPBootHeader()
++
++    def parse(self):
++        super().parse()
++
++        bh = self.boot_header
++        cls = Versal2VPPBootHeader
++
++        def word(offset):
++            self._safe_seek(self.image_path_offset + offset, 4)
++            return struct.unpack('<I', self.image_fd.read(4))[0]
++
++        def blob(offset, length):
++            self._safe_seek(self.image_path_offset + offset, length)
++            return self.image_fd.read(length)
++
++        bh.hash_algo = word(cls.BH_HASH_ALGO_OFFSET)
++        bh.hash_block_size_1 = word(cls.BH_HASH_BLOCK_SIZE_1_OFFSET)
++        bh.puf_pdi_identification_word = word(cls.BH_PUF_PDI_IDENTIFICATION_OFFSET)
++        bh.puf_hd_length = word(cls.BH_PUF_HD_LENGTH_OFFSET)
++        bh.rom_reserved = blob(cls.BH_ROM_RESERVED_OFFSET, cls.BH_ROM_RESERVED_SIZE)
++        bh.image_header_byte_offset = word(cls.BH_IMAGE_HEADER_BYTE_OFFSET)
++        bh.plm_reserved = blob(cls.BH_PLM_RESERVED_OFFSET, cls.BH_PLM_RESERVED_SIZE)
++
++        bh.total_ppk_size_1 = None
++        bh.actual_ppk_size_1 = None
++        bh.total_pdi_signature_size_1 = None
++        bh.actual_pdi_signature_size_1 = None
++
++        # 2VP holds the hash type bare where Gen2 keeps it in bits 4-7, so
++        # shift it for the inherited hash-size lookup.
++        bh.auth_header_1 = (bh.hash_algo & 0xF) << 4
++
++        if bh.image_header_byte_offset:
++            bh.meta_header_offset = bh.image_header_byte_offset
++
++        return True
++
++    def dump_boot_header(self, filename=None):
++        """Write the boot header as it appears in the image, minus SMAP."""
++        if filename is None:
++            filename = self.image_path + '_bh.bin'
++
++        smap = Versal2VPPBootHeader.BH_SMAP_BUS_WIDTH_SIZE
++        start = self.image_path_offset + smap
++        length = Versal2VPPBootHeader.BOOT_HEADER_SIZE - smap
++        self._safe_seek(start, length)
++        data = self.image_fd.read(length)
++
++        with open(filename, 'wb') as fd:
++            fd.write(data)
++        return True
+-- 
+2.50.1 (Apple Git-155)
+

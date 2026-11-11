@@ -3,7 +3,7 @@ xen-tools and supporting components used by the AMD Xilinx Xen-based \
 virtualization stack."
 DESCRIPTION = "Xen supported packages"
 
-PACKAGE_ARCH = "${TUNE_PKGARCH}"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit packagegroup features_check
 

@@ -1,0 +1,38 @@
+From 22c866271143fdec14bdcfac04342ed340bb01fe Mon Sep 17 00:00:00 2001
+From: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+Date: Tue, 28 May 2024 14:50:03 -0600
+Subject: [PATCH] makefile: Prevent makefile from calling copy_bsp.sh
+
+If we call copy_bsp.sh we will undo any manual compliation steps we
+have already done. Avoid this.
+
+Upstream-Status: Inappropriate [YP integration specific]
+
+Add Upstream-Status tag.
+
+AI-Generated: GitHub Copilot (Claude Opus 5)
+
+Signed-off-by: Sandeep Gundlupet Raju <sandeep.gundlupet-raju@amd.com>
+---
+ lib/sw_apps/asufw/src/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/sw_apps/asufw/src/Makefile b/lib/sw_apps/asufw/src/Makefile
+index 75b0215976..9e46802a48 100644
+--- a/lib/sw_apps/asufw/src/Makefile
++++ b/lib/sw_apps/asufw/src/Makefile
+@@ -127,9 +127,9 @@ BSP_CONFIG := $(ASU_XPARAMETERS) \
+ 	$(filter-out ../misc/asufw_bsp ../misc/Readme.txt $(ASU_XPARAMETERS), $(wildcard ../misc/*))
+ 
+ $(LIBS): $(BSP_CONFIG)
+-	echo "Regenerating BSP for the current configuration"
+-	rm -rf ../misc/asufw_bsp
+-	../misc/copy_bsp.sh
++	#echo "Regenerating BSP for the current configuration"
++	#rm -rf ../misc/asufw_bsp
++	#../misc/copy_bsp.sh
+ 	echo "Compiling bsp"
+ 	$(MAKE) -C ../misc/asufw_bsp/
+ 
+-- 
+2.34.1

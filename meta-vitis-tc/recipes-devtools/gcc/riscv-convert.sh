@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Call using:
-#../riscv/sysroots/x86_64-oesdk-linux/usr/bin/riscv-xilinx-elf/riscv-xilinx-elf-gcc -print-multi-lib | riscv-convert.sh
+#../riscv/sysroots/x86_64-oesdk-linux/usr/bin/riscv-xilinx-elf/riscv-xilinx-elf-gcc -print-multi-lib | sort -t/ -k1,1 -k2,2 | riscv-convert.sh
 
 # Then copy the output into the special riscv-tc BSP
 
@@ -25,7 +25,30 @@ sed -e 's,;, ,' |
 
     cflags=$(echo $args | sed -e 's,@, -,g')
     tune=$(echo $cflags | sed -e 's,-march=\([a-z0-9_]*\).*,\1,')
-    multilib="lib$tune"
+
+    # Drop extensions already implied by single-letter ISA bits before the
+    # first '_' ('a' implies zaamo/zalrsc, 'b' implies zba/zbb/zbs).
+    ml_base=$(echo $tune | sed -e 's,_.*,,')
+    ml_exts=$(echo $tune | sed -e 's,^[^_]*,,')
+    baseletters=$(echo $ml_base | sed -e 's,^rv[0-9]*,,')
+    has_a=""
+    has_b=""
+    case "$baseletters" in *a*) has_a=1 ;; esac
+    case "$baseletters" in *b*) has_b=1 ;; esac
+    multilib="lib$ml_base"
+    oldIFS=$IFS
+    IFS=_
+    for ext in $ml_exts; do
+      [ -z "$ext" ] && continue
+      if [ -n "$has_a" ] && { [ "$ext" = "zaamo" ] || [ "$ext" = "zalrsc" ]; }; then
+        continue
+      fi
+      if [ -n "$has_b" ] && { [ "$ext" = "zba" ] || [ "$ext" = "zbb" ] || [ "$ext" = "zbs" ]; }; then
+        continue
+      fi
+      multilib="${multilib}_${ext}"
+    done
+    IFS=$oldIFS
     echo "MULTILIBS += \"multilib:${multilib}\""
     echo >> $tempfile
     echo >> $tempfile

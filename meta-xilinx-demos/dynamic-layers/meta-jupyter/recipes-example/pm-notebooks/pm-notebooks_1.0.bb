@@ -18,6 +18,7 @@ S = "${UNPACKDIR}/${BP}/pm-notebooks"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:versal = "versal"
 COMPATIBLE_MACHINE:versal-net = "versal-net"
+COMPATIBLE_MACHINE:versal-2vp = "versal-2vp"
 
 RDEPENDS:${PN} = " \
     packagegroup-xilinx-jupyter \

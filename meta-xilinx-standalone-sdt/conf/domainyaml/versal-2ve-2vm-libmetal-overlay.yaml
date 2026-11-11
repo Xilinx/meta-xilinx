@@ -22,27 +22,40 @@ reserved-memory:
 
 axi:
   libmetal_uio_desc0@99c8000:
+    linux,uio-name: "libmetal-desc0"
     start: 0x99c8000
     size: 0x4000
     compatible: "uio"
   libmetal_uio_desc1@99cc000:
+    linux,uio-name: "libmetal-desc1"
     start: 0x99cc000
     size: 0x4000
     compatible: "uio"
   libmetal_uio_data@99d0000:
+    linux,uio-name: "libmetal-data"
     start: 0x99d0000
     size: 0x40000
     compatible: "uio"
 
   timer@f1e90000:
-    compatible: "uio"
+    linux,uio-name!linux: "libmetal-timer"
+    compatible!linux: "uio"         # linux overlay replaces it
+
   # linux -> rpu1 libmetal IPI
   mailbox@eb360000:
-    compatible: "uio"
+    linux,uio-name!linux: "libmetal-ipi"
+    compatible!linux: "uio"         # linux overlay replaces it
 
 domains:
   APU_Linux:
     compatible: openamp,domain-v1
+    lopper,activate: linux
+    access:
+      - dev: timer@f1e90000
+      - dev: mailbox@eb360000
+      - dev: libmetal_uio_desc0@99c8000
+      - dev: libmetal_uio_desc1@99cc000
+      - dev: libmetal_uio_data@99d0000
     domain-to-domain:
       compatible: openamp,domain-to-domain-v1
       libmetal-relation:
@@ -63,25 +76,39 @@ domains:
           host: APU_Linux
           carveouts: [ libmetal_uio_desc0@99c8000, libmetal_uio_desc1@99cc000, libmetal_uio_data@99d0000 ]
           mbox: ipi_2_to_ipi_3 #IPI2 Libmetal example app (RPU)
-          timer: [ ttc2, ttc3 ]
+          timer: ttc3
           elfload: [ libmetal_elf@9968000 ]
 
     sram:
       - dev: libmetal_elf@9968000
         start: 0x9968000
         size: 0x60000
-      - dev: r52_0b_atcm_global@eba80000
-        label: r52_0b_atcm_global
+      - dev: r52_1a_atcm_global@eba40000
+        label: r52_1a_atcm_global
         size: 64K
-        spec_name: R52_0B_ATCM_GLOBAL
-        start: '0xeba80000'
-      - dev: r52_0b_btcm_global@eba90000
-        label: r52_0b_btcm_global
+        spec_name: R52_1A_ATCM_GLOBAL
+        start: '0xeba40000'
+      - dev: r52_1a_btcm_global@eba50000
+        label: r52_1a_btcm_global
         size: 32K
-        spec_name: R52_0B_BTCM_GLOBAL
-        start: '0xeba90000'
-      - dev: r52_0b_ctcm_global@ebaa0000
-        label: r52_0b_ctcm_global
+        spec_name: R52_1A_BTCM_GLOBAL
+        start: '0xeba50000'
+      - dev: r52_1a_ctcm_global@eba60000
+        label: r52_1a_ctcm_global
         size: 32K
-        spec_name: R52_0B_CTCM_GLOBAL
-        start: '0xebaa0000'
+        spec_name: R52_1A_CTCM_GLOBAL
+        start: '0xeba60000'
+    memory:
+      - dev: NoC_C0_C1_ddr_memory
+        start: 0x09968000
+        size: 0x60000
+    access:
+      - dev: i2c@f1940000
+      - dev: timer@f1e90000
+      - dev: mailbox@eb350000
+      - dev: libmetal_uio_desc0@99c8000
+      - dev: libmetal_uio_desc1@99cc000
+      - dev: libmetal_uio_data@99d0000
+      - dev: libmetal_desc0@99c8000
+      - dev: libmetal_desc1@99cc000
+      - dev: libmetal_data@99d0000
