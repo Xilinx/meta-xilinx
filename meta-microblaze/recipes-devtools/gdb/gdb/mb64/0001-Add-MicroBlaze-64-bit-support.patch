@@ -14,28 +14,28 @@ Upstream-Status: Pending
  bfd/Makefile.am           |    2 +
  bfd/Makefile.in           |    3 +
  bfd/archures.c            |    2 +
- bfd/bfd-in2.h             |   38 +-
+ bfd/bfd-in2.h             |   42 +-
  bfd/config.bfd            |   12 +
  bfd/configure             |    2 +
- bfd/cpu-microblaze.c      |   55 +-
+ bfd/cpu-microblaze.c      |   59 +-
  bfd/elf32-microblaze.c    |  130 +-
  bfd/elf64-microblaze.c    | 3808 +++++++++++++++++++++++++++++++++++++
- bfd/libbfd.h              |    4 +
- bfd/reloc.c               |   34 +-
+ bfd/libbfd.h              |    5 +
+ bfd/reloc.c               |   39 +-
  bfd/targets.c             |    6 +
  include/elf/common.h      |    1 +
  include/elf/microblaze.h  |    2 +
  opcodes/microblaze-dis.c  |   84 +-
  opcodes/microblaze-opc.h  |  205 +-
  opcodes/microblaze-opcm.h |   27 +-
- 17 files changed, 4350 insertions(+), 65 deletions(-)
+ 17 files changed, 4363 insertions(+), 66 deletions(-)
  create mode 100644 bfd/elf64-microblaze.c
 
 diff --git a/bfd/Makefile.am b/bfd/Makefile.am
-index 3c3243269f1..2cf4e41d854 100644
+index e4df05441eb..7a61c2ad98b 100644
 --- a/bfd/Makefile.am
 +++ b/bfd/Makefile.am
-@@ -562,6 +562,7 @@ BFD64_BACKENDS = \
+@@ -566,6 +566,7 @@ BFD64_BACKENDS = \
  	elf64-ppc.lo \
  	elf64-riscv.lo \
  	elf64-s390.lo \
@@ -43,7 +43,7 @@ index 3c3243269f1..2cf4e41d854 100644
  	elf64-sparc.lo \
  	elf64-tilegx.lo \
  	elf64-x86-64.lo \
-@@ -611,6 +612,7 @@ BFD64_BACKENDS_CFILES = \
+@@ -615,6 +616,7 @@ BFD64_BACKENDS_CFILES = \
  	elf64-nfp.c \
  	elf64-ppc.c \
  	elf64-s390.c \
@@ -52,10 +52,10 @@ index 3c3243269f1..2cf4e41d854 100644
  	elf64-tilegx.c \
  	elf64-x86-64.c \
 diff --git a/bfd/Makefile.in b/bfd/Makefile.in
-index 4c259682fd0..f56cd192144 100644
+index 14512cf61fb..f5116bdb24b 100644
 --- a/bfd/Makefile.in
 +++ b/bfd/Makefile.in
-@@ -1029,6 +1029,7 @@ BFD64_BACKENDS = \
+@@ -1036,6 +1036,7 @@ BFD64_BACKENDS = \
  	elf64-ppc.lo \
  	elf64-riscv.lo \
  	elf64-s390.lo \
@@ -63,7 +63,7 @@ index 4c259682fd0..f56cd192144 100644
  	elf64-sparc.lo \
  	elf64-tilegx.lo \
  	elf64-x86-64.lo \
-@@ -1078,6 +1079,7 @@ BFD64_BACKENDS_CFILES = \
+@@ -1085,6 +1086,7 @@ BFD64_BACKENDS_CFILES = \
  	elf64-nfp.c \
  	elf64-ppc.c \
  	elf64-s390.c \
@@ -71,7 +71,7 @@ index 4c259682fd0..f56cd192144 100644
  	elf64-sparc.c \
  	elf64-tilegx.c \
  	elf64-x86-64.c \
-@@ -1647,6 +1649,7 @@ distclean-compile:
+@@ -1655,6 +1657,7 @@ distclean-compile:
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-ppc.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-riscv.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-s390.Plo@am__quote@
@@ -80,7 +80,7 @@ index 4c259682fd0..f56cd192144 100644
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-tilegx.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-x86-64.Plo@am__quote@
 diff --git a/bfd/archures.c b/bfd/archures.c
-index fd22c94d6d6..f4b574689d0 100644
+index 0e919246673..d1ec07a525d 100644
 --- a/bfd/archures.c
 +++ b/bfd/archures.c
 @@ -515,6 +515,8 @@ DESCRIPTION
@@ -93,10 +93,10 @@ index fd22c94d6d6..f4b574689d0 100644
  .#define bfd_mach_kv3_unknown       0
  .#define bfd_mach_kv3_1             1
 diff --git a/bfd/bfd-in2.h b/bfd/bfd-in2.h
-index 5e7c6ddf1ee..e9fdead6b17 100644
+index e55bde7b129..a124acd9f25 100644
 --- a/bfd/bfd-in2.h
 +++ b/bfd/bfd-in2.h
-@@ -1744,6 +1744,8 @@ enum bfd_architecture
+@@ -1772,6 +1772,8 @@ enum bfd_architecture
    bfd_arch_lm32,      /* Lattice Mico32.  */
  #define bfd_mach_lm32          1
    bfd_arch_microblaze,/* Xilinx MicroBlaze.  */
@@ -105,7 +105,7 @@ index 5e7c6ddf1ee..e9fdead6b17 100644
    bfd_arch_kvx,        /* Kalray VLIW core of the MPPA processor family */
  #define bfd_mach_kv3_unknown       0
  #define bfd_mach_kv3_1             1
-@@ -6393,7 +6395,10 @@ enum bfd_reloc_code_real
+@@ -6254,7 +6256,10 @@ enum bfd_reloc_code_real
    /* Relative offset within page of GOT slot.  */
    BFD_RELOC_MACH_O_ARM64_GOT_LOAD_PAGEOFF12,
  
@@ -117,7 +117,7 @@ index 5e7c6ddf1ee..e9fdead6b17 100644
    BFD_RELOC_MACH_O_ARM64_POINTER_TO_GOT,
  
    /* This is a 32 bit reloc for the microblaze that stores the low 16
-@@ -6426,11 +6431,31 @@ enum bfd_reloc_code_real
+@@ -6287,11 +6292,31 @@ enum bfd_reloc_code_real
       only used for relaxing.  */
    BFD_RELOC_MICROBLAZE_64_NONE,
  
@@ -152,7 +152,18 @@ index 5e7c6ddf1ee..e9fdead6b17 100644
    /* This is a 64 bit reloc that stores the 32 bit pc relative value in
       two words (with an imm instruction).  The relocation is GOT offset.  */
    BFD_RELOC_MICROBLAZE_64_GOT,
-@@ -7231,7 +7256,10 @@ enum bfd_reloc_code_real
+@@ -6311,6 +6336,10 @@ enum bfd_reloc_code_real
+      _GLOBAL_OFFSET_TABLE_.  */
+   BFD_RELOC_MICROBLAZE_32_GOTOFF,
+ 
++  /* This is used to tell the dynamic linker to copy the value out of
++     the dynamic object into the runtime process image.  */
++  BFD_RELOC_MICROBLAZE_COPY,
++
+   /* Unused Reloc.  */
+   BFD_RELOC_MICROBLAZE_64_TLS,
+ 
+@@ -7080,7 +7109,10 @@ enum bfd_reloc_code_real
    BFD_RELOC_TILEGX_IMM8_Y0_TLS_ADD,
    BFD_RELOC_TILEGX_IMM8_Y1_TLS_ADD,
  
@@ -165,10 +176,10 @@ index 5e7c6ddf1ee..e9fdead6b17 100644
    BFD_RELOC_BPF_DISP32,
    BFD_RELOC_BPF_DISPCALL32,
 diff --git a/bfd/config.bfd b/bfd/config.bfd
-index a5c3953a18a..4922220d01a 100644
+index 8eb2131128d..9b6bd33859f 100644
 --- a/bfd/config.bfd
 +++ b/bfd/config.bfd
-@@ -865,15 +865,27 @@ case "${targ}" in
+@@ -755,15 +755,27 @@ case "${targ}" in
      targ_defvec=metag_elf32_vec
      targ_underscore=yes
      ;;
@@ -197,23 +208,23 @@ index a5c3953a18a..4922220d01a 100644
  
  #ifdef BFD64
 diff --git a/bfd/configure b/bfd/configure
-index ee588238500..8a799003eeb 100755
+index 12d43a5aeae..761294c3e6f 100755
 --- a/bfd/configure
 +++ b/bfd/configure
-@@ -15664,6 +15664,8 @@ do
+@@ -16051,6 +16051,8 @@ do
      rx_elf32_linux_le_vec)	 tb="$tb elf32-rx.lo elf32.lo $elf" ;;
-     s390_elf32_vec)		 tb="$tb elf32-s390.lo elf32.lo $elf" ;;
-     s390_elf64_vec)		 tb="$tb elf64-s390.lo elf64.lo $elf"; target_size=64 ;;
+     s390_elf32_vec)		 tb="$tb elf32-s390.lo elf32.lo elf-attrs.lo $elf" ;;
+     s390_elf64_vec)		 tb="$tb elf64-s390.lo elf64.lo elf-attrs.lo elf-sframe.lo $elf"; target_size=64 ;;
 +    microblaze_elf64_vec)	 tb="$tb elf64-microblaze.lo elf64.lo $elf"; target_size=64 ;;
 +    microblaze_elf64_le_vec)	 tb="$tb elf64-microblaze.lo elf64.lo $elf"; target_size=64 ;;
      score_elf32_be_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo elf64.lo $elf"; want64=true; target_size=64 ;;
      score_elf32_le_vec)		 tb="$tb elf32-score.lo elf32-score7.lo elf32.lo elf64.lo $elf"; want64=true; target_size=64 ;;
      sh_coff_vec)		 tb="$tb coff-sh.lo $coff" ;;
 diff --git a/bfd/cpu-microblaze.c b/bfd/cpu-microblaze.c
-index 1e82c007d0d..42308413fa0 100644
+index 0864d7bbaab..127068cc882 100644
 --- a/bfd/cpu-microblaze.c
 +++ b/bfd/cpu-microblaze.c
-@@ -23,13 +23,30 @@
+@@ -23,13 +23,31 @@
  #include "bfd.h"
  #include "libbfd.h"
  
@@ -234,7 +245,8 @@ index 1e82c007d0d..42308413fa0 100644
 +  bfd_default_compatible,	/* Architecture comparison function.  */
 +  bfd_default_scan,	   	/* String to architecture conversion.  */
 +  bfd_arch_default_fill,	/* Default fill.  */
-+  &bfd_microblaze_arch[1]  	/* Next in list.  */
++  &bfd_microblaze_arch[1],  	/* Next in list.  */
++  0				/* Maximum offset of a reloc from insn start */
 +},
  {
    32,				/* Bits in a word.  */
@@ -246,10 +258,12 @@ index 1e82c007d0d..42308413fa0 100644
    "microblaze",			/* Architecture name.  */
    "MicroBlaze",			/* Printable name.  */
    3,				/* Section align power.  */
-@@ -39,4 +56,38 @@ const bfd_arch_info_type bfd_microblaze_arch =
+@@ -38,5 +56,40 @@ const bfd_arch_info_type bfd_microblaze_arch =
+   bfd_default_scan,		/* String to architecture conversion.  */
    bfd_arch_default_fill,	/* Default fill.  */
    NULL,				/* Next in list.  */
-   0 /* Maximum offset of a reloc from the start of an insn.  */
+-  0 /* Maximum offset of a reloc from the start of an insn.  */
++  0				/* Maximum offset of a reloc from insn start */
 +}
 +#else
 +{
@@ -265,7 +279,8 @@ index 1e82c007d0d..42308413fa0 100644
 +  bfd_default_compatible,	/* Architecture comparison function.  */
 +  bfd_default_scan,	   	/* String to architecture conversion.  */
 +  bfd_arch_default_fill,	/* Default fill.  */
-+  &bfd_microblaze_arch[1]   	/* Next in list.  */
++  &bfd_microblaze_arch[1],   	/* Next in list.  */
++  0				/* Maximum offset of a reloc from insn start */
 +},
 +{
 +  64,		  		/* 32 bits in a word.  */
@@ -281,12 +296,12 @@ index 1e82c007d0d..42308413fa0 100644
 +  bfd_default_scan,	   	/* String to architecture conversion.  */
 +  bfd_arch_default_fill,	/* Default fill.  */
 +  NULL,			  	/* Next in list.  */
-+  0
++  0				/* Maximum offset of a reloc from insn start */
 +}
 +#endif
  };
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index 95fb99a4f36..b4b04723ccb 100644
+index 4f9a36869f8..617b038e677 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
 @@ -114,6 +114,20 @@ static reloc_howto_type microblaze_elf_howto_raw[] =
@@ -348,7 +363,7 @@ index 95fb99a4f36..b4b04723ccb 100644
      case BFD_RELOC_MICROBLAZE_64_GOT:
        microblaze_reloc = R_MICROBLAZE_GOT_64;
        break;
-@@ -1496,7 +1531,7 @@ microblaze_elf_relocate_section (bfd *output_bfd,
+@@ -1560,7 +1595,7 @@ microblaze_elf_relocate_section (struct bfd_link_info *info,
  		if (r_symndx == STN_UNDEF || (input_section->flags & SEC_ALLOC) == 0)
  		  {
  		    relocation += addend;
@@ -357,7 +372,7 @@ index 95fb99a4f36..b4b04723ccb 100644
  		      bfd_put_32 (input_bfd, relocation, contents + offset);
  		    else
  		      {
-@@ -1894,8 +1929,7 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -1958,8 +1993,7 @@ microblaze_elf_relax_section (bfd *abfd,
        else
  	symval += irel->r_addend;
  
@@ -367,7 +382,7 @@ index 95fb99a4f36..b4b04723ccb 100644
  	{
  	  /* We can delete this instruction.  */
  	  sdata->relax[sdata->relax_count].addr = irel->r_offset;
-@@ -1958,16 +1992,45 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2022,16 +2056,45 @@ microblaze_elf_relax_section (bfd *abfd,
  		    irel->r_addend -= calc_fixup (irel->r_addend, 0, sec);
  		}
  	      break;
@@ -413,7 +428,7 @@ index 95fb99a4f36..b4b04723ccb 100644
  		irel->r_addend -= (efix - sfix);
  		/* Should use HOWTO.  */
  		microblaze_bfd_write_imm_value_32 (abfd, contents + irel->r_offset,
-@@ -1984,8 +2047,8 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2048,8 +2111,8 @@ microblaze_elf_relax_section (bfd *abfd,
  		sfix = calc_fixup (irel->r_offset + INST_WORD_SIZE, 0, sec);
  		efix = calc_fixup (target_address, 0, sec);
  		irel->r_addend -= (efix - sfix);
@@ -424,7 +439,7 @@ index 95fb99a4f36..b4b04723ccb 100644
  	      }
  	      break;
  	    }
-@@ -2015,10 +2078,50 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2079,10 +2142,50 @@ microblaze_elf_relax_section (bfd *abfd,
  	  irelscanend = irelocs + o->reloc_count;
  	  for (irelscan = irelocs; irelscan < irelscanend; irelscan++)
  	    {
@@ -479,7 +494,7 @@ index 95fb99a4f36..b4b04723ccb 100644
  
  		  /* Look at the reloc only if the value has been resolved.  */
  		  if (isym->st_shndx == shndx
-@@ -3435,6 +3538,13 @@ microblaze_elf_finish_dynamic_sections (bfd *output_bfd,
+@@ -3497,6 +3600,13 @@ microblaze_elf_finish_dynamic_sections (struct bfd_link_info *info,
    return true;
  }
  
@@ -493,16 +508,16 @@ index 95fb99a4f36..b4b04723ccb 100644
  /* Hook called by the linker routine which adds symbols from an object
     file.  We use it to put .comm items in .sbss, and not .bss.  */
  
-@@ -3506,4 +3616,6 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
- #define elf_backend_late_size_sections		microblaze_elf_late_size_sections
- #define elf_backend_add_symbol_hook		microblaze_elf_add_symbol_hook
+@@ -3571,4 +3681,6 @@ microblaze_elf_add_symbol_hook (bfd *abfd,
+ #define elf_backend_grok_prstatus               microblaze_elf_grok_prstatus
+ #define elf_backend_grok_psinfo                 microblaze_elf_grok_psinfo
  
 +#define elf_backend_object_p                    microblaze_elf_object_p
 +
  #include "elf32-target.h"
 diff --git a/bfd/elf64-microblaze.c b/bfd/elf64-microblaze.c
 new file mode 100644
-index 00000000000..88dfed77a74
+index 00000000000..8b80649ab18
 --- /dev/null
 +++ b/bfd/elf64-microblaze.c
 @@ -0,0 +1,3808 @@
@@ -1543,8 +1558,7 @@ index 00000000000..88dfed77a74
 +   accordingly.  */
 +
 +static int
-+microblaze_elf_relocate_section (bfd *output_bfd,
-+			         struct bfd_link_info *info,
++microblaze_elf_relocate_section (struct bfd_link_info *info,
 +			         bfd *input_bfd,
 +			         asection *input_section,
 +			         bfd_byte *contents,
@@ -1552,6 +1566,7 @@ index 00000000000..88dfed77a74
 +			         Elf_Internal_Sym *local_syms,
 +			         asection **local_sections)
 +{
++  bfd *output_bfd = info->output_bfd;
 +  struct elf64_mb_link_hash_table *htab;
 +  Elf_Internal_Shdr *symtab_hdr = &elf_tdata (input_bfd)->symtab_hdr;
 +  struct elf_link_hash_entry **sym_hashes = elf_sym_hashes (input_bfd);
@@ -3052,20 +3067,20 @@ index 00000000000..88dfed77a74
 +
 +static asection *
 +microblaze_elf_gc_mark_hook (asection *sec,
-+			     struct bfd_link_info * info,
-+			     Elf_Internal_Rela * rel,
-+			     struct elf_link_hash_entry * h,
-+			     Elf_Internal_Sym * sym)
++			     struct bfd_link_info *info,
++			     struct elf_reloc_cookie *cookie,
++			     struct elf_link_hash_entry *h,
++			     unsigned int symndx)
 +{
 +  if (h != NULL)
-+    switch (ELF64_R_TYPE (rel->r_info))
++    switch (ELF64_R_TYPE (cookie->rel->r_info))
 +      {
 +      case R_MICROBLAZE_GNU_VTINHERIT:
 +      case R_MICROBLAZE_GNU_VTENTRY:
 +	return NULL;
 +      }
 +
-+  return _bfd_elf_gc_mark_hook (sec, info, rel, h, sym);
++  return _bfd_elf_gc_mark_hook (sec, info, cookie, h, symndx);
 +}
 +
 +/* PIC support.  */
@@ -3778,8 +3793,7 @@ index 00000000000..88dfed77a74
 +/* Set the sizes of the dynamic sections.  */
 +
 +static bool
-+microblaze_elf_late_size_sections (bfd *output_bfd ATTRIBUTE_UNUSED,
-+				   struct bfd_link_info *info)
++microblaze_elf_late_size_sections (struct bfd_link_info *info)
 +{
 +  struct elf64_mb_link_hash_table *htab;
 +  bfd *dynobj;
@@ -3965,18 +3979,18 @@ index 00000000000..88dfed77a74
 +
 +  /* ??? Force DF_BIND_NOW?  */
 +  info->flags |= DF_BIND_NOW;
-+  return _bfd_elf_add_dynamic_tags (output_bfd, info, true);
++  return _bfd_elf_add_dynamic_tags (info, true);
 +}
 +
 +/* Finish up dynamic symbol handling.  We set the contents of various
 +   dynamic sections here.  */
 +
 +static bool
-+microblaze_elf_finish_dynamic_symbol (bfd *output_bfd,
-+				      struct bfd_link_info *info,
++microblaze_elf_finish_dynamic_symbol (struct bfd_link_info *info,
 +				      struct elf_link_hash_entry *h,
 +				      Elf_Internal_Sym *sym)
 +{
++  bfd *output_bfd = info->output_bfd;
 +  struct elf64_mb_link_hash_table *htab;
 +  struct elf64_mb_link_hash_entry *eh = elf64_mb_hash_entry(h);
 +
@@ -4143,9 +4157,10 @@ index 00000000000..88dfed77a74
 +/* Finish up the dynamic sections.  */
 +
 +static bool
-+microblaze_elf_finish_dynamic_sections (bfd *output_bfd,
-+					struct bfd_link_info *info)
++microblaze_elf_finish_dynamic_sections (struct bfd_link_info *info,
++					bfd_byte *buf ATTRIBUTE_UNUSED)
 +{
++  bfd *output_bfd = info->output_bfd;
 +  bfd *dynobj;
 +  asection *sdyn, *sgot;
 +  struct elf64_mb_link_hash_table *htab;
@@ -4315,10 +4330,10 @@ index 00000000000..88dfed77a74
 +
 +#include "elf64-target.h"
 diff --git a/bfd/libbfd.h b/bfd/libbfd.h
-index f2485d99078..baf23a5af2b 100644
+index 6e737e468df..9a9d86bfce8 100644
 --- a/bfd/libbfd.h
 +++ b/bfd/libbfd.h
-@@ -3001,7 +3001,11 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
+@@ -2835,11 +2835,16 @@ static const char *const bfd_reloc_code_real_names[] = { "@@uninitialized@@",
    "BFD_RELOC_MICROBLAZE_32_SYM_OP_SYM",
    "BFD_RELOC_MICROBLAZE_32_NONE",
    "BFD_RELOC_MICROBLAZE_64_NONE",
@@ -4330,11 +4345,16 @@ index f2485d99078..baf23a5af2b 100644
    "BFD_RELOC_MICROBLAZE_64_GOT",
    "BFD_RELOC_MICROBLAZE_64_PLT",
    "BFD_RELOC_MICROBLAZE_64_GOTOFF",
+   "BFD_RELOC_MICROBLAZE_32_GOTOFF",
++  "BFD_RELOC_MICROBLAZE_COPY",
+   "BFD_RELOC_MICROBLAZE_64_TLS",
+   "BFD_RELOC_MICROBLAZE_64_TLSGD",
+   "BFD_RELOC_MICROBLAZE_64_TLSLD",
 diff --git a/bfd/reloc.c b/bfd/reloc.c
-index c9d53bb9e11..e499c286c8a 100644
+index 29288f8099d..5d5046374c3 100644
 --- a/bfd/reloc.c
 +++ b/bfd/reloc.c
-@@ -6547,6 +6547,8 @@ ENUM
+@@ -6159,6 +6159,8 @@ ENUM
  ENUMDOC
    Address of a GOT entry.
  
@@ -4343,7 +4363,7 @@ index c9d53bb9e11..e499c286c8a 100644
  ENUM
    BFD_RELOC_MICROBLAZE_32_LO
  ENUMDOC
-@@ -6584,12 +6586,36 @@ ENUMDOC
+@@ -6196,12 +6198,36 @@ ENUMDOC
    This is a 64 bit reloc that stores the 32 bit pc relative value in
    two words (with an imm instruction).  No relocation is done here -
    only used for relaxing.
@@ -4383,7 +4403,19 @@ index c9d53bb9e11..e499c286c8a 100644
  ENUM
    BFD_RELOC_MICROBLAZE_64_GOT
  ENUMDOC
-@@ -7816,6 +7842,8 @@ ENUMX
+@@ -6225,6 +6251,11 @@ ENUMDOC
+   This is a 32 bit reloc that stores the 32 bit GOT relative value in
+   a word.  The relocation is relative offset from
+   _GLOBAL_OFFSET_TABLE_.
++ENUM
++  BFD_RELOC_MICROBLAZE_COPY
++ENUMDOC
++  This is used to tell the dynamic linker to copy the value out of
++  the dynamic object into the runtime process image.
+ ENUM
+   BFD_RELOC_MICROBLAZE_64_TLS
+ ENUMDOC
+@@ -7407,6 +7438,8 @@ ENUMX
  ENUMDOC
    Linux eBPF relocations.
  
@@ -4393,10 +4425,10 @@ index c9d53bb9e11..e499c286c8a 100644
    BFD_RELOC_EPIPHANY_SIMM8
  ENUMDOC
 diff --git a/bfd/targets.c b/bfd/targets.c
-index ee629bbe9df..ca619416558 100644
+index fcf650410dc..acf7b9a0923 100644
 --- a/bfd/targets.c
 +++ b/bfd/targets.c
-@@ -792,6 +792,8 @@ extern const bfd_target mep_elf32_le_vec;
+@@ -798,6 +798,8 @@ extern const bfd_target mep_elf32_le_vec;
  extern const bfd_target metag_elf32_vec;
  extern const bfd_target microblaze_elf32_vec;
  extern const bfd_target microblaze_elf32_le_vec;
@@ -4405,7 +4437,7 @@ index ee629bbe9df..ca619416558 100644
  extern const bfd_target mips_ecoff_be_vec;
  extern const bfd_target mips_ecoff_le_vec;
  extern const bfd_target mips_ecoff_bele_vec;
-@@ -1155,6 +1157,10 @@ static const bfd_target * const _bfd_target_vector[] =
+@@ -1162,6 +1164,10 @@ static const bfd_target * const _bfd_target_vector[] =
  
  	&metag_elf32_vec,
  
@@ -4417,7 +4449,7 @@ index ee629bbe9df..ca619416558 100644
  
  	&mips_ecoff_be_vec,
 diff --git a/include/elf/common.h b/include/elf/common.h
-index 0d9a7b7a8a9..0f05c9a1c96 100644
+index f811b8daeb5..d1e97b79d85 100644
 --- a/include/elf/common.h
 +++ b/include/elf/common.h
 @@ -360,6 +360,7 @@
@@ -4429,7 +4461,7 @@ index 0d9a7b7a8a9..0f05c9a1c96 100644
  /* If it is necessary to assign new unofficial EM_* values, please pick large
     random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
 diff --git a/include/elf/microblaze.h b/include/elf/microblaze.h
-index 443be9be822..1b1735f98d3 100644
+index 3a7fb20b9b0..0da23cb24db 100644
 --- a/include/elf/microblaze.h
 +++ b/include/elf/microblaze.h
 @@ -62,6 +62,8 @@ START_RELOC_NUMBERS (elf_microblaze_reloc_type)
@@ -4442,7 +4474,7 @@ index 443be9be822..1b1735f98d3 100644
  
  /* Global base address names.  */
 diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
-index 6153f4b2e4b..639bdfaf876 100644
+index 89770a7abe5..8a005473fa0 100644
 --- a/opcodes/microblaze-dis.c
 +++ b/opcodes/microblaze-dis.c
 @@ -33,6 +33,7 @@
@@ -4624,7 +4656,7 @@ index 6153f4b2e4b..639bdfaf876 100644
  
    *unconditionalbranch = false;
 diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index 26fe731d0b5..0db226f3e58 100644
+index 849769dbadc..849b39b0df8 100644
 --- a/opcodes/microblaze-opc.h
 +++ b/opcodes/microblaze-opc.h
 @@ -40,7 +40,7 @@
@@ -4912,7 +4944,7 @@ index 26fe731d0b5..0db226f3e58 100644
  #endif /* MICROBLAZE_OPC */
  
 diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
-index 8622da78cd7..61e8203e27b 100644
+index faa520ff269..c30ec4cacd8 100644
 --- a/opcodes/microblaze-opcm.h
 +++ b/opcodes/microblaze-opcm.h
 @@ -25,6 +25,7 @@

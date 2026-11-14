@@ -10,20 +10,21 @@ Signed-off-by :Mahesh Bodapati <mbodapat@xilinx.com>
 
 Upstream-Status: Pending
 ---
- gdb/features/Makefile                         |   2 +
- gdb/features/microblaze-core.xml              |   6 +-
- gdb/features/microblaze-stack-protect.xml     |   4 +-
- gdb/features/microblaze-with-stack-protect.c  |   8 +-
- gdb/features/microblaze.c                     |   6 +-
- gdb/features/microblaze64-core.xml            |  69 ++++++
- gdb/features/microblaze64-stack-protect.xml   |  12 +
- .../microblaze64-with-stack-protect.c         |  79 +++++++
- .../microblaze64-with-stack-protect.xml       |  12 +
- gdb/features/microblaze64.c                   |  77 +++++++
- gdb/features/microblaze64.xml                 |  12 +
- gdb/microblaze-tdep.c                         | 208 +++++++++++++++---
- gdb/microblaze-tdep.h                         |  15 +-
- 13 files changed, 472 insertions(+), 38 deletions(-)
+ gdb/features/Makefile                            |   2 +
+ gdb/features/microblaze-core.xml                 |   6 +-
+ gdb/features/microblaze-stack-protect.xml        |   4 +-
+ gdb/features/microblaze-with-stack-protect.c     |   8 +-
+ gdb/features/microblaze.c                        |   6 +-
+ gdb/features/microblaze64-core.xml               |  69 ++++++++
+ gdb/features/microblaze64-stack-protect.xml      |  12 ++
+ gdb/features/microblaze64-with-stack-protect.c   |  78 +++++++++
+ gdb/features/microblaze64-with-stack-protect.xml |  12 ++
+ gdb/features/microblaze64.c                      |  76 ++++++++
+ gdb/features/microblaze64.xml                    |  12 ++
+ gdb/microblaze-linux-tdep.c                      |   5 +-
+ gdb/microblaze-tdep.c                            | 213 ++++++++++++++++++++---
+ gdb/microblaze-tdep.h                            |  17 +-
+ 14 files changed, 478 insertions(+), 42 deletions(-)
  create mode 100644 gdb/features/microblaze64-core.xml
  create mode 100644 gdb/features/microblaze64-stack-protect.xml
  create mode 100644 gdb/features/microblaze64-with-stack-protect.c
@@ -32,21 +33,22 @@ Upstream-Status: Pending
  create mode 100644 gdb/features/microblaze64.xml
 
 diff --git a/gdb/features/Makefile b/gdb/features/Makefile
-index d17c349b6cf..031b063bcba 100644
+index 161a7453d66..5d996011d1e 100644
 --- a/gdb/features/Makefile
 +++ b/gdb/features/Makefile
-@@ -102,7 +102,9 @@ OUTPUTS = $(patsubst %,$(outdir)/%.dat,$(WHICH))
+@@ -102,8 +102,10 @@ OUTPUTS = $(patsubst %,$(outdir)/%.dat,$(WHICH))
  XMLTOC = \
  	alpha.xml \
- 	microblaze-with-stack-protect.xml \
-+	microblaze64-with-stack-protect.xml \
  	microblaze.xml \
 +	microblaze64.xml \
+ 	microblaze-linux.xml \
+ 	microblaze-with-stack-protect.xml \
++	microblaze64-with-stack-protect.xml \
  	mips-dsp-linux.xml \
  	mips-linux.xml \
  	mips64-dsp-linux.xml \
 diff --git a/gdb/features/microblaze-core.xml b/gdb/features/microblaze-core.xml
-index 4182d4b1314..3dcda3db387 100644
+index 3219d6c9a20..0d9803222d2 100644
 --- a/gdb/features/microblaze-core.xml
 +++ b/gdb/features/microblaze-core.xml
 @@ -8,7 +8,7 @@
@@ -75,7 +77,7 @@ index 4182d4b1314..3dcda3db387 100644
 +  <reg name="shr" bitsize="32"/>
  </feature>
 diff --git a/gdb/features/microblaze-stack-protect.xml b/gdb/features/microblaze-stack-protect.xml
-index 4ecae94dc40..0bb03a1c7aa 100644
+index 4b18caa7c36..ef0503bab2e 100644
 --- a/gdb/features/microblaze-stack-protect.xml
 +++ b/gdb/features/microblaze-stack-protect.xml
 @@ -7,6 +7,6 @@
@@ -88,7 +90,7 @@ index 4ecae94dc40..0bb03a1c7aa 100644
 +  <reg name="shr" bitsize="32"/>
  </feature>
 diff --git a/gdb/features/microblaze-with-stack-protect.c b/gdb/features/microblaze-with-stack-protect.c
-index e5c0956610a..c47bed54d03 100644
+index a3e75d123a2..40408186f7c 100644
 --- a/gdb/features/microblaze-with-stack-protect.c
 +++ b/gdb/features/microblaze-with-stack-protect.c
 @@ -13,7 +13,7 @@ initialize_tdesc_microblaze_with_stack_protect (void)
@@ -118,10 +120,10 @@ index e5c0956610a..c47bed54d03 100644
 +  tdesc_create_reg (feature, "slr", 57, 1, NULL, 32, "int");
 +  tdesc_create_reg (feature, "shr", 58, 1, NULL, 32, "int");
  
-   tdesc_microblaze_with_stack_protect = result.release ();
+   tdesc_microblaze_with_stack_protect = std::move (result);
  }
 diff --git a/gdb/features/microblaze.c b/gdb/features/microblaze.c
-index 32ae3b02ad7..d67fc7477f3 100644
+index fe367f3b82f..51f8f7fdf93 100644
 --- a/gdb/features/microblaze.c
 +++ b/gdb/features/microblaze.c
 @@ -13,7 +13,7 @@ initialize_tdesc_microblaze (void)
@@ -149,7 +151,7 @@ index 32ae3b02ad7..d67fc7477f3 100644
 +  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
 +  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
  
-   tdesc_microblaze = result.release ();
+   tdesc_microblaze = std::move (result);
  }
 diff --git a/gdb/features/microblaze64-core.xml b/gdb/features/microblaze64-core.xml
 new file mode 100644
@@ -246,18 +248,17 @@ index 00000000000..1bbf5fc3cea
 +</feature>
 diff --git a/gdb/features/microblaze64-with-stack-protect.c b/gdb/features/microblaze64-with-stack-protect.c
 new file mode 100644
-index 00000000000..a4de4666c76
+index 00000000000..c360affdc1f
 --- /dev/null
 +++ b/gdb/features/microblaze64-with-stack-protect.c
-@@ -0,0 +1,79 @@
+@@ -0,0 +1,78 @@
 +/* THIS FILE IS GENERATED.  -*- buffer-read-only: t -*- vi:set ro:
 +  Original: microblaze-with-stack-protect.xml */
 +
-+#include "defs.h"
 +#include "osabi.h"
 +#include "target-descriptions.h"
 +
-+struct target_desc *tdesc_microblaze64_with_stack_protect;
++const_target_desc_up tdesc_microblaze64_with_stack_protect;
 +static void
 +initialize_tdesc_microblaze64_with_stack_protect (void)
 +{
@@ -327,7 +328,7 @@ index 00000000000..a4de4666c76
 +  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
 +  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
 +
-+  tdesc_microblaze64_with_stack_protect = result.release();
++  tdesc_microblaze64_with_stack_protect = std::move (result);
 +}
 diff --git a/gdb/features/microblaze64-with-stack-protect.xml b/gdb/features/microblaze64-with-stack-protect.xml
 new file mode 100644
@@ -349,18 +350,17 @@ index 00000000000..0e9f01611f3
 +</target>
 diff --git a/gdb/features/microblaze64.c b/gdb/features/microblaze64.c
 new file mode 100644
-index 00000000000..8ab7a90dd95
+index 00000000000..8e60c38c8ac
 --- /dev/null
 +++ b/gdb/features/microblaze64.c
-@@ -0,0 +1,77 @@
+@@ -0,0 +1,76 @@
 +/* THIS FILE IS GENERATED.  -*- buffer-read-only: t -*- vi:set ro:
 +  Original: microblaze.xml */
 +
-+#include "defs.h"
 +#include "osabi.h"
 +#include "target-descriptions.h"
 +
-+struct target_desc *tdesc_microblaze64;
++const_target_desc_up tdesc_microblaze64;
 +static void
 +initialize_tdesc_microblaze64 (void)
 +{
@@ -428,7 +428,7 @@ index 00000000000..8ab7a90dd95
 +  tdesc_create_reg (feature, "slr", 57, 1, NULL, 64, "uint64");
 +  tdesc_create_reg (feature, "shr", 58, 1, NULL, 64, "uint64");
 +
-+  tdesc_microblaze64 = result.release();
++  tdesc_microblaze64 = std::move (result);
 +}
 diff --git a/gdb/features/microblaze64.xml b/gdb/features/microblaze64.xml
 new file mode 100644
@@ -448,8 +448,31 @@ index 00000000000..9c1b7d22003
 +  <architecture>microblaze64</architecture>
 +  <xi:include href="microblaze64-core.xml"/>
 +</target>
+diff --git a/gdb/microblaze-linux-tdep.c b/gdb/microblaze-linux-tdep.c
+index 3c83faab7d4..7566eff7bc9 100644
+--- a/gdb/microblaze-linux-tdep.c
++++ b/gdb/microblaze-linux-tdep.c
+@@ -88,7 +88,8 @@ microblaze_linux_sigtramp_cache (const frame_info_ptr &next_frame,
+   /* Registers saved on stack.  */
+   for (regnum = 0; regnum < MICROBLAZE_BTR_REGNUM; regnum++)
+     trad_frame_set_reg_addr (this_cache, regnum,
+-			     gpregs + regnum * MICROBLAZE_REGISTER_SIZE);
++			     gpregs + regnum
++			     * microblaze_abi_regsize (get_frame_arch (next_frame)));
+   trad_frame_set_id (this_cache, frame_id_build (base, func));
+ }
+ 
+@@ -131,7 +132,7 @@ microblaze_linux_init_abi (struct gdbarch_info info,
+ 	  gdbarch_tdep<microblaze_gdbarch_tdep> (gdbarch);
+ 
+   tdep->gregset = &microblaze_linux_gregset;
+-  tdep->sizeof_gregset = MICROBLAZE_REGISTER_SIZE * MICROBLAZE_REDR_REGNUM;
++  tdep->sizeof_gregset = microblaze_abi_regsize (gdbarch) * MICROBLAZE_REDR_REGNUM;
+ 
+   linux_init_abi (info, gdbarch, 0);
+ 
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index aaf6873822e..3e6b466581d 100644
+index 61db3cf07b3..78d1149f844 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
 @@ -40,7 +40,9 @@
@@ -558,7 +581,7 @@ index aaf6873822e..3e6b466581d 100644
  static unsigned int microblaze_debug_flag = 0;
 +int reg_size = 4;
 +
-+static unsigned int
++unsigned int
 +microblaze_abi_regsize (struct gdbarch *gdbarch)
 +{
 +  switch (microblaze_abi (gdbarch))
@@ -586,7 +609,7 @@ index aaf6873822e..3e6b466581d 100644
    if (regnum == MICROBLAZE_SP_REGNUM)
      return builtin_type (gdbarch)->builtin_data_ptr;
  
-@@ -520,11 +616,11 @@ microblaze_extract_return_value (struct type *type, struct regcache *regcache,
+@@ -535,11 +631,11 @@ microblaze_extract_return_value (struct type *type, struct regcache *regcache,
      {
        case 1:	/* return last byte in the register.  */
  	regcache->cooked_read (MICROBLAZE_RETVAL_REGNUM, buf);
@@ -600,7 +623,7 @@ index aaf6873822e..3e6b466581d 100644
  	return;
        case 4:	/* for sizes 4 or 8, copy the required length.  */
        case 8:
-@@ -622,30 +718,47 @@ microblaze_dwarf2_reg_to_regnum (struct gdbarch *gdbarch, int reg)
+@@ -723,34 +819,23 @@ microblaze_dwarf2_reg_to_regnum (struct gdbarch *gdbarch, int reg)
    return -1;
  }
  
@@ -609,14 +632,36 @@ index aaf6873822e..3e6b466581d 100644
 -{
 -  register_remote_g_packet_guess (gdbarch,
 -				  4 * MICROBLAZE_NUM_CORE_REGS,
--				  tdesc_microblaze);
+-				  tdesc_microblaze.get ());
 -
 -  register_remote_g_packet_guess (gdbarch,
 -				  4 * MICROBLAZE_NUM_REGS,
--				  tdesc_microblaze_with_stack_protect);
+-				  tdesc_microblaze_with_stack_protect.get ());
 -}
 -
- static struct gdbarch *
+ void
+ microblaze_supply_gregset (const struct regset *regset,
+ 			   struct regcache *regcache,
+ 			   int regnum, const void *gregs, size_t size)
+ {
+   const gdb_byte *regs = (const gdb_byte *) gregs;
++  unsigned int rsize = microblaze_abi_regsize (regcache->arch ());
+ 
+   if (regnum >= 0)
+-    regcache->raw_supply (regnum, regs + regnum * MICROBLAZE_REGISTER_SIZE);
++    regcache->raw_supply (regnum, regs + regnum * rsize);
+ 
+   if (regnum == -1) {
+     int i;
+ 
+     for (i = 0; i < MICROBLAZE_REDR_REGNUM; i++)
+       {
+-	regcache->raw_supply (i, regs + i * MICROBLAZE_REGISTER_SIZE);
++	regcache->raw_supply (i, regs + i * rsize);
+       }
+   }
+ }
+@@ -776,14 +861,43 @@ static struct gdbarch *
  microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  {
    tdesc_arch_data_up tdesc_data;
@@ -646,23 +691,23 @@ index aaf6873822e..3e6b466581d 100644
 +    microblaze_abi = found_abi;
 +
    if (tdesc == NULL)
--    tdesc = tdesc_microblaze;
+-    tdesc = tdesc_microblaze.get ();
 +    {
 +       if (microblaze_abi == MICROBLAZE_ABI_M64)
 +	 {
-+	   tdesc = tdesc_microblaze64;
++	   tdesc = tdesc_microblaze64.get ();
 +	   reg_size = 8;
 +	 }
 +       else
 +	 {
-+	   tdesc = tdesc_microblaze;
++	   tdesc = tdesc_microblaze.get ();
 +	   reg_size = 4;
 +	 }
 +    }
  
    /* Check any target description for validity.  */
    if (tdesc_has_registers (tdesc))
-@@ -654,31 +767,42 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -792,7 +906,11 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
        int valid_p;
        int i;
  
@@ -675,6 +720,7 @@ index aaf6873822e..3e6b466581d 100644
  				    "org.gnu.gdb.microblaze.core");
        if (feature == NULL)
  	return NULL;
+@@ -800,24 +918,31 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
        tdesc_data = tdesc_data_alloc ();
  
        valid_p = 1;
@@ -714,9 +760,9 @@ index aaf6873822e..3e6b466581d 100644
      }
  
    /* Allocate space for the new architecture.  */
-@@ -695,6 +819,11 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
-   set_gdbarch_sp_regnum (gdbarch, MICROBLAZE_SP_REGNUM); 
-   set_gdbarch_pc_regnum (gdbarch, MICROBLAZE_PC_REGNUM); 
+@@ -837,6 +962,11 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+   set_gdbarch_sp_regnum (gdbarch, MICROBLAZE_SP_REGNUM);
+   set_gdbarch_pc_regnum (gdbarch, MICROBLAZE_PC_REGNUM);
  
 +  if(microblaze_abi == MICROBLAZE_ABI_M64)
 +    set_gdbarch_ptr_bit (gdbarch, 64);
@@ -726,7 +772,7 @@ index aaf6873822e..3e6b466581d 100644
    /* Map Dwarf2 registers to GDB registers.  */
    set_gdbarch_dwarf2_reg_to_regnum (gdbarch, microblaze_dwarf2_reg_to_regnum);
  
-@@ -719,7 +848,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -861,7 +991,7 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  
    set_gdbarch_unwind_pc (gdbarch, microblaze_unwind_pc);
  
@@ -735,7 +781,7 @@ index aaf6873822e..3e6b466581d 100644
  
    frame_base_set_default (gdbarch, &microblaze_frame_base);
  
-@@ -738,10 +867,35 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+@@ -887,10 +1017,35 @@ microblaze_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
  
  INIT_GDB_FILE (microblaze_tdep)
  {
@@ -772,10 +818,10 @@ index aaf6873822e..3e6b466581d 100644
    add_setshow_zuinteger_cmd ("microblaze", class_maintenance,
  			     &microblaze_debug_flag, _("\
 diff --git a/gdb/microblaze-tdep.h b/gdb/microblaze-tdep.h
-index b2fb5e7fcb9..3a9879cf117 100644
+index d7bf5d2262f..f4673c55436 100644
 --- a/gdb/microblaze-tdep.h
 +++ b/gdb/microblaze-tdep.h
-@@ -20,11 +20,24 @@
+@@ -20,12 +20,27 @@
  #ifndef GDB_MICROBLAZE_TDEP_H
  #define GDB_MICROBLAZE_TDEP_H
  
@@ -790,17 +836,20 @@ index b2fb5e7fcb9..3a9879cf117 100644
 + };
 +
 +enum microblaze_abi microblaze_abi (struct gdbarch *gdbarch);
++unsigned int microblaze_abi_regsize (struct gdbarch *gdbarch);
 +
  /* Microblaze architecture-specific information.  */
+ 
  struct microblaze_gdbarch_tdep : gdbarch_tdep_base
  {
 +  enum microblaze_abi microblaze_abi {};
 +  enum microblaze_abi found_abi {};
 +  int register_size;
- };
- 
- /* Register numbers.  */
-@@ -114,7 +127,7 @@ struct microblaze_frame_cache
++
+   /* Register sets.  */
+   struct regset *gregset = nullptr;
+   size_t sizeof_gregset = 0;
+@@ -121,7 +136,7 @@ struct microblaze_frame_cache
    struct trad_frame_saved_reg *saved_regs;
  };
  /* All registers are 32 bits.  */

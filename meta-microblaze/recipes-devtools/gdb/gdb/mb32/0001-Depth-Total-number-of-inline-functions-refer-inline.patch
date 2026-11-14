@@ -20,10 +20,10 @@ Upstream-Status: Pending
  1 file changed, 3 insertions(+), 9 deletions(-)
 
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index 7b58220871c..a40edf10259 100644
+index fd0200853fc..35ac3d685ae 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
-@@ -370,16 +370,9 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
+@@ -369,16 +369,9 @@ microblaze_analyze_prologue (struct gdbarch *gdbarch, CORE_ADDR pc,
  static CORE_ADDR
  microblaze_unwind_pc (struct gdbarch *gdbarch, const frame_info_ptr &next_frame)
  {
@@ -41,7 +41,7 @@ index 7b58220871c..a40edf10259 100644
    return pc;
  }
  
-@@ -486,7 +479,8 @@ static const struct frame_unwind_legacy microblaze_frame_unwind (
+@@ -501,7 +494,8 @@ static const struct frame_unwind_legacy microblaze_frame_unwind (
    microblaze_frame_this_id,
    microblaze_frame_prev_register,
    NULL,

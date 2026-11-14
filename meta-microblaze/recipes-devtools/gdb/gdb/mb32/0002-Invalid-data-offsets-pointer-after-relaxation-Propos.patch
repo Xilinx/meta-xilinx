@@ -12,10 +12,10 @@ Upstream-Status: Pending
  1 file changed, 13 insertions(+)
 
 diff --git a/bfd/elf32-microblaze.c b/bfd/elf32-microblaze.c
-index db7ed465779..251d7304dbf 100644
+index a52358a9a12..73bfd1f7ad3 100644
 --- a/bfd/elf32-microblaze.c
 +++ b/bfd/elf32-microblaze.c
-@@ -2055,6 +2055,10 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2119,6 +2119,10 @@ microblaze_elf_relax_section (bfd *abfd,
  		    }
  		  else if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_32_SYM_OP_SYM)
  		    {
@@ -26,7 +26,7 @@ index db7ed465779..251d7304dbf 100644
  		      isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
  
  		      /* Look at the reloc only if the value has been resolved.  */
-@@ -2092,6 +2096,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2156,6 +2160,9 @@ microblaze_elf_relax_section (bfd *abfd,
  		       || (ELF32_R_TYPE (irelscan->r_info)
  			   == (int) R_MICROBLAZE_TEXTREL_32_LO))
  		{
@@ -36,7 +36,7 @@ index db7ed465779..251d7304dbf 100644
  		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
  
  		  /* Look at the reloc only if the value has been resolved.  */
-@@ -2138,6 +2145,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2202,6 +2209,9 @@ microblaze_elf_relax_section (bfd *abfd,
  		  || (ELF32_R_TYPE (irelscan->r_info)
  			      == (int) R_MICROBLAZE_TEXTREL_64))
  		{
@@ -46,7 +46,7 @@ index db7ed465779..251d7304dbf 100644
  		  isym = isymbuf + ELF32_R_SYM (irelscan->r_info);
  
  		  /* Look at the reloc only if the value has been resolved.  */
-@@ -2172,6 +2182,9 @@ microblaze_elf_relax_section (bfd *abfd,
+@@ -2236,6 +2246,9 @@ microblaze_elf_relax_section (bfd *abfd,
  		}
  	      else if (ELF32_R_TYPE (irelscan->r_info) == (int) R_MICROBLAZE_64_PCREL)
  		{

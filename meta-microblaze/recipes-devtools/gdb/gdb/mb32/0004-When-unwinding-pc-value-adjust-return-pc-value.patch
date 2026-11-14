@@ -28,10 +28,10 @@ Upstream-Status: Pending
  1 file changed, 6 insertions(+)
 
 diff --git a/gdb/microblaze-tdep.c b/gdb/microblaze-tdep.c
-index a40edf10259..aaf6873822e 100644
+index 35ac3d685ae..61db3cf07b3 100644
 --- a/gdb/microblaze-tdep.c
 +++ b/gdb/microblaze-tdep.c
-@@ -373,6 +373,12 @@ microblaze_unwind_pc (struct gdbarch *gdbarch, const frame_info_ptr &next_frame)
+@@ -372,6 +372,12 @@ microblaze_unwind_pc (struct gdbarch *gdbarch, const frame_info_ptr &next_frame)
    CORE_ADDR pc;
  
    pc=frame_unwind_register_unsigned (next_frame, MICROBLAZE_PC_REGNUM);
