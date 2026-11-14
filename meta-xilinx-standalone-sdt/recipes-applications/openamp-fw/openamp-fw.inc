@@ -1,4 +1,16 @@
-LICENSE = "CLOSED"
+# License follows the recipe producing the firmware (meta-openamp
+# rpmsg-example.inc / libmetal.inc), or is LicenseRef-Proprietary for
+# any other producer or a user supplied binary
+inherit firmware-license
+FW_LICENSE_VARS = "FW_DEPENDS FW_MCDEPENDS"
+FW_LICENSE_PRODUCER[open-amp-xlnx-echo-baremetal] = "BSD-3-Clause"
+FW_LICENSE_PRODUCER[open-amp-xlnx-echo-freertos] = "BSD-3-Clause"
+FW_LICENSE_PRODUCER[open-amp-xlnx-matrix-baremetal] = "BSD-3-Clause"
+FW_LICENSE_PRODUCER[open-amp-xlnx-matrix-freertos] = "BSD-3-Clause"
+FW_LICENSE_PRODUCER[open-amp-xlnx-proxy-baremetal] = "BSD-3-Clause"
+FW_LICENSE_PRODUCER[open-amp-xlnx-proxy-freertos] = "BSD-3-Clause"
+FW_LICENSE_PRODUCER[libmetal-xlnx] = "BSD-3-Clause"
+FW_LICENSE_PRODUCER[libmetal-demo-remote] = "BSD-3-Clause"
 
 inherit check_sdt_enabled fw-package
 

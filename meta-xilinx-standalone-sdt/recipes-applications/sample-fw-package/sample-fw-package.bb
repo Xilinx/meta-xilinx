@@ -1,7 +1,11 @@
 SUMMARY = "Sample baremetal firmware package recipe (template)."
 DESCRIPTION = "Template recipe demonstrating how to package a custom \
 baremetal firmware ELF as part of a multiconfig BSP build."
-LICENSE = "CLOSED"
+# License follows the recipe producing the firmware, or is
+# LicenseRef-Proprietary for a user supplied binary
+inherit firmware-license
+FW_LICENSE_VARS = "FW_DEPENDS FW_MCDEPENDS"
+FW_LICENSE_PRODUCER[hello-world] = "MIT"
 
 inherit fw-package
 
