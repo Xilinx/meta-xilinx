@@ -13,10 +13,10 @@ Upstream-Status: Pending
  1 file changed, 5 insertions(+), 8 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index 2f8df07414a..a975e2b0113 100644
+index 8c16061958e..fd17057e8f2 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -2057,7 +2057,7 @@ microblaze_save_volatiles (tree func)
+@@ -2056,7 +2056,7 @@ microblaze_save_volatiles (tree func)
  int
  microblaze_is_interrupt_variant (void)
  {
@@ -25,7 +25,7 @@ index 2f8df07414a..a975e2b0113 100644
  }
  int
  microblaze_is_break_handler (void)
-@@ -2096,7 +2096,7 @@ microblaze_must_save_register (int regno)
+@@ -2095,7 +2095,7 @@ microblaze_must_save_register (int regno)
      {
        if (df_regs_ever_live_p (regno)
  	  || regno == MB_ABI_MSR_SAVE_REG
@@ -34,7 +34,7 @@ index 2f8df07414a..a975e2b0113 100644
                && (regno == MB_ABI_ASM_TEMP_REGNUM
  	          || regno == MB_ABI_EXCEPTION_RETURN_ADDR_REGNUM)))
  	return 1;
-@@ -2312,9 +2312,6 @@ compute_frame_size (HOST_WIDE_INT size)
+@@ -2311,9 +2311,6 @@ compute_frame_size (HOST_WIDE_INT size)
    fast_interrupt =
      microblaze_fast_interrupt_function_p (current_function_decl);
    save_volatiles = microblaze_save_volatiles (current_function_decl);
@@ -44,7 +44,7 @@ index 2f8df07414a..a975e2b0113 100644
    gp_reg_size = 0;
    mask = 0;
    var_size = size;
-@@ -3273,7 +3270,7 @@ microblaze_expand_prologue (void)
+@@ -3272,7 +3269,7 @@ microblaze_expand_prologue (void)
  				 gen_rtx_PLUS (Pmode, stack_pointer_rtx,
  					       const0_rtx));
  
@@ -53,7 +53,7 @@ index 2f8df07414a..a975e2b0113 100644
  	    /* Do not optimize in flow analysis.  */
  	    MEM_VOLATILE_P (mem_rtx) = 1;
  
-@@ -3384,12 +3381,12 @@ microblaze_expand_epilogue (void)
+@@ -3383,12 +3380,12 @@ microblaze_expand_epilogue (void)
           a load-use stall cycle  :)   This is also important to handle alloca.
           (See comments for if (frame_pointer_needed) below.  */
  

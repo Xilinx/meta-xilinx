@@ -19,10 +19,10 @@ Upstream-Status: Pending
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index 78b9428ef3b..456e2d82bf4 100644
+index 84f40f9eedf..afd41e6e9b4 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -3750,8 +3750,7 @@ microblaze_expand_divide (rtx operands[])
+@@ -3749,8 +3749,7 @@ microblaze_expand_divide (rtx operands[])
    mem_rtx = gen_rtx_MEM (QImode,
                              gen_rtx_PLUS (Pmode, regt1, div_table_rtx));
  

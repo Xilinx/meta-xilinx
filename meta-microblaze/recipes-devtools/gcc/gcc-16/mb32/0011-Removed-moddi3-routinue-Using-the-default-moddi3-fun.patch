@@ -18,13 +18,13 @@ Upstream-Status: Pending
 
 diff --git a/libgcc/config/microblaze/moddi3.S b/libgcc/config/microblaze/moddi3.S
 deleted file mode 100644
-index 3af3659ab55..00000000000
+index 71a67c11ccb..00000000000
 --- a/libgcc/config/microblaze/moddi3.S
 +++ /dev/null
 @@ -1,121 +0,0 @@
 -###################################
 -# 
--#  Copyright (C) 2009-2025 Free Software Foundation, Inc.
+-#  Copyright (C) 2009-2026 Free Software Foundation, Inc.
 -#
 -#  Contributed by Michael Eager <eager@eagercon.com>.
 -#

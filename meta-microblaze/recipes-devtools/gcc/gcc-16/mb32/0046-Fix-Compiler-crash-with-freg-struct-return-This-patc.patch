@@ -15,10 +15,10 @@ Upstream-Status: Pending
  2 files changed, 10 insertions(+), 20 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index 1d9c455a092..d72aeb40199 100644
+index 2f0aa6fbde1..7b66a88e62c 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -3949,7 +3949,16 @@ microblaze_function_value (const_tree valtype,
+@@ -3948,7 +3948,16 @@ microblaze_function_value (const_tree valtype,
  			   const_tree func ATTRIBUTE_UNUSED,
  			   bool outgoing ATTRIBUTE_UNUSED)
  {
@@ -37,7 +37,7 @@ index 1d9c455a092..d72aeb40199 100644
  
  /* Implement TARGET_SCHED_ADJUST_COST.  */
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index ca5eb809d02..9d7bfca62e3 100644
+index 3a2a1f30903..5c2804a9adc 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -263,13 +263,6 @@ extern enum pipeline_type microblaze_pipe;

@@ -16,10 +16,10 @@ Upstream-Status: Pending
  4 files changed, 94 insertions(+), 3 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index b61643e6f11..9fce12e9031 100644
+index 05470066269..60c95b045f3 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -1878,6 +1878,17 @@ microblaze_option_override (void)
+@@ -1877,6 +1877,17 @@ microblaze_option_override (void)
  		   "%<-mcpu=v8.30.a%>");
          TARGET_REORDER = 0;
      }
@@ -38,7 +38,7 @@ index b61643e6f11..9fce12e9031 100644
    if (TARGET_MULTIPLY_HIGH && TARGET_SOFT_MUL)
      error ("%<-mxl-multiply-high%> requires %<-mno-xl-soft-mul%>");
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index 749bf6b5087..526a2dc43f1 100644
+index aa3a8504a35..7645737072b 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -27,7 +27,8 @@
@@ -52,7 +52,7 @@ index 749bf6b5087..526a2dc43f1 100644
  
  #define MICROBLAZE_MASK_NO_UNSAFE_DELAY         0x00000001
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 3d25f3e6076..371ce193da5 100644
+index eab7898054a..1958b37dd33 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -36,6 +36,7 @@
@@ -163,13 +163,13 @@ index 3d25f3e6076..371ce193da5 100644
    (set_attr "length"    "4")])
  
 diff --git a/gcc/config/microblaze/microblaze.opt b/gcc/config/microblaze/microblaze.opt
-index 639557721fb..4308aa29f0c 100644
+index 0c2c4bc669e..19532ab4207 100644
 --- a/gcc/config/microblaze/microblaze.opt
 +++ b/gcc/config/microblaze/microblaze.opt
 @@ -133,3 +133,7 @@ Data referenced by offset from start of text instead of GOT (with -fPIC/-fPIE).
  
  mxl-mode-xilkernel
- Target
+ Target Undocumented
 +
 +mxl-frequency
 +Target Mask(AREA_OPTIMIZED_2)

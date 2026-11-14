@@ -30,7 +30,7 @@ Upstream-Status: Pending
  create mode 100644 libgcc/config/microblaze/umoddi3.S
 
 diff --git a/gcc/config/microblaze/constraints.md b/gcc/config/microblaze/constraints.md
-index 0d229c28132..bbcba058f10 100644
+index 0ebcc6c1326..d5a39c71d76 100644
 --- a/gcc/config/microblaze/constraints.md
 +++ b/gcc/config/microblaze/constraints.md
 @@ -55,7 +55,7 @@
@@ -43,7 +43,7 @@ index 0d229c28132..bbcba058f10 100644
  
  ;; Define floating point constraints
 diff --git a/gcc/config/microblaze/microblaze-c.cc b/gcc/config/microblaze/microblaze-c.cc
-index c57271dbb02..d4d83b31e98 100644
+index 185c506d2ca..70e46edfecf 100644
 --- a/gcc/config/microblaze/microblaze-c.cc
 +++ b/gcc/config/microblaze/microblaze-c.cc
 @@ -100,4 +100,10 @@ microblaze_cpp_define (cpp_reader *pfile)
@@ -58,7 +58,7 @@ index c57271dbb02..d4d83b31e98 100644
 +    }
  }
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index e359226d1ce..14b61792f18 100644
+index af93dfab5a1..73df726c751 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
 @@ -387,10 +387,10 @@ simple_memory_operand (rtx op, machine_mode mode ATTRIBUTE_UNUSED)
@@ -83,7 +83,7 @@ index e359226d1ce..14b61792f18 100644
  			   plus_constant (Pmode, addr, 4));
  }
  
-@@ -685,7 +685,7 @@ microblaze_legitimize_tls_address(rtx x, rtx reg)
+@@ -684,7 +684,7 @@ microblaze_legitimize_tls_address(rtx x, rtx reg)
           /* Load the addend.  */
           addend = gen_rtx_UNSPEC (Pmode, gen_rtvec (2, x, GEN_INT (TLS_DTPREL)),
  				  UNSPEC_TLS);
@@ -92,7 +92,7 @@ index e359226d1ce..14b61792f18 100644
           dest = gen_rtx_PLUS (Pmode, dest, addend);
           break;
  
-@@ -703,7 +703,7 @@ microblaze_classify_unspec (struct microblaze_address_info *info, rtx x)
+@@ -702,7 +702,7 @@ microblaze_classify_unspec (struct microblaze_address_info *info, rtx x)
  
    if (XINT (x, 1) == UNSPEC_GOTOFF)
      {
@@ -101,7 +101,7 @@ index e359226d1ce..14b61792f18 100644
        info->type = ADDRESS_GOTOFF;
      }
    else if (XINT (x, 1) == UNSPEC_PLT)
-@@ -1312,8 +1312,16 @@ microblaze_block_move_loop (rtx dest, rtx src, HOST_WIDE_INT length)
+@@ -1311,8 +1311,16 @@ microblaze_block_move_loop (rtx dest, rtx src, HOST_WIDE_INT length)
    emit_move_insn (dest_reg, plus_constant (Pmode, dest_reg, MAX_MOVE_BYTES));
  
    /* Emit the test & branch.  */
@@ -119,7 +119,7 @@ index e359226d1ce..14b61792f18 100644
  
    /* Mop up any left-over bytes.  */
    if (leftover)
-@@ -1671,14 +1679,20 @@ microblaze_function_arg_advance (cumulative_args_t cum_v,
+@@ -1670,14 +1678,20 @@ microblaze_function_arg_advance (cumulative_args_t cum_v,
        break;
  
      case E_DFmode:
@@ -142,7 +142,7 @@ index e359226d1ce..14b61792f18 100644
        break;
  
      case E_QImode:
-@@ -2193,7 +2207,7 @@ compute_frame_size (HOST_WIDE_INT size)
+@@ -2192,7 +2206,7 @@ compute_frame_size (HOST_WIDE_INT size)
  
  	  if (regno != MB_ABI_SUB_RETURN_ADDR_REGNUM)
  	    /* Don't account for link register. It is accounted specially below.  */
@@ -151,7 +151,7 @@ index e359226d1ce..14b61792f18 100644
  
  	  mask |= (1L << (regno - GP_REG_FIRST));
  	}
-@@ -2462,7 +2476,7 @@ print_operand (FILE * file, rtx op, int letter)
+@@ -2461,7 +2475,7 @@ print_operand (FILE * file, rtx op, int letter)
  
        if ((letter == 'M' && !WORDS_BIG_ENDIAN)
  	  || (letter == 'L' && WORDS_BIG_ENDIAN) || letter == 'D')
@@ -160,7 +160,7 @@ index e359226d1ce..14b61792f18 100644
  
        fprintf (file, "%s", reg_names[regnum]);
      }
-@@ -2488,6 +2502,7 @@ print_operand (FILE * file, rtx op, int letter)
+@@ -2487,6 +2501,7 @@ print_operand (FILE * file, rtx op, int letter)
    else if (letter == 'h' || letter == 'j')
      {
        long val[2];
@@ -168,7 +168,7 @@ index e359226d1ce..14b61792f18 100644
        long l[2];
        if (code == CONST_DOUBLE)
  	{
-@@ -2500,12 +2515,12 @@ print_operand (FILE * file, rtx op, int letter)
+@@ -2499,12 +2514,12 @@ print_operand (FILE * file, rtx op, int letter)
  	      val[0] = l[WORDS_BIG_ENDIAN != 0];
  	    }
  	}
@@ -185,7 +185,7 @@ index e359226d1ce..14b61792f18 100644
      }
    else if (code == CONST_DOUBLE)
      {
-@@ -2699,7 +2714,10 @@ microblaze_asm_constructor (rtx symbol ATTRIBUTE_UNUSED, int priority)
+@@ -2698,7 +2713,10 @@ microblaze_asm_constructor (rtx symbol ATTRIBUTE_UNUSED, int priority)
  
      switch_to_section (get_section (section, 0, NULL));
      assemble_align (POINTER_SIZE);
@@ -197,7 +197,7 @@ index e359226d1ce..14b61792f18 100644
      output_addr_const (asm_out_file, symbol);
      fputs ("\n", asm_out_file);
  }
-@@ -2722,7 +2740,10 @@ microblaze_asm_destructor (rtx symbol, int priority)
+@@ -2721,7 +2739,10 @@ microblaze_asm_destructor (rtx symbol, int priority)
  
      switch_to_section (get_section (section, 0, NULL));
      assemble_align (POINTER_SIZE);
@@ -209,7 +209,7 @@ index e359226d1ce..14b61792f18 100644
      output_addr_const (asm_out_file, symbol);
      fputs ("\n", asm_out_file);
  }
-@@ -2788,7 +2809,7 @@ save_restore_insns (int prologue)
+@@ -2787,7 +2808,7 @@ save_restore_insns (int prologue)
    /* For interrupt_handlers, need to save/restore the MSR.  */
    if (microblaze_is_interrupt_variant ())
      {
@@ -218,7 +218,7 @@ index e359226d1ce..14b61792f18 100644
  				 gen_rtx_PLUS (Pmode, base_reg_rtx,
  					       GEN_INT (current_frame_info.
  							gp_offset -
-@@ -2796,8 +2817,8 @@ save_restore_insns (int prologue)
+@@ -2795,8 +2816,8 @@ save_restore_insns (int prologue)
  
        /* Do not optimize in flow analysis.  */
        MEM_VOLATILE_P (isr_mem_rtx) = 1;
@@ -229,7 +229,7 @@ index e359226d1ce..14b61792f18 100644
      }
  
    if (microblaze_is_interrupt_variant () && !prologue)
-@@ -2805,8 +2826,8 @@ save_restore_insns (int prologue)
+@@ -2804,8 +2825,8 @@ save_restore_insns (int prologue)
        emit_move_insn (isr_reg_rtx, isr_mem_rtx);
        emit_move_insn (isr_msr_rtx, isr_reg_rtx);
        /* Do not optimize in flow analysis.  */
@@ -240,7 +240,7 @@ index e359226d1ce..14b61792f18 100644
      }
  
    for (regno = GP_REG_FIRST; regno <= GP_REG_LAST; regno++)
-@@ -2817,9 +2838,9 @@ save_restore_insns (int prologue)
+@@ -2816,9 +2837,9 @@ save_restore_insns (int prologue)
  	    /* Don't handle here. Already handled as the first register.  */
  	    continue;
  
@@ -252,7 +252,7 @@ index e359226d1ce..14b61792f18 100644
  	  if (microblaze_is_interrupt_variant () || save_volatiles)
  	    /* Do not optimize in flow analysis.  */
  	    MEM_VOLATILE_P (mem_rtx) = 1;
-@@ -2834,7 +2855,7 @@ save_restore_insns (int prologue)
+@@ -2833,7 +2854,7 @@ save_restore_insns (int prologue)
  	      insn = emit_move_insn (reg_rtx, mem_rtx);
  	    }
  
@@ -261,7 +261,7 @@ index e359226d1ce..14b61792f18 100644
  	}
      }
  
-@@ -2844,8 +2865,8 @@ save_restore_insns (int prologue)
+@@ -2843,8 +2864,8 @@ save_restore_insns (int prologue)
        emit_move_insn (isr_mem_rtx, isr_reg_rtx);
  
        /* Do not optimize in flow analysis.  */
@@ -272,7 +272,7 @@ index e359226d1ce..14b61792f18 100644
      }
  
    /* Done saving and restoring */
-@@ -2934,7 +2955,10 @@ microblaze_elf_asm_cdtor (rtx symbol, int priority, bool is_ctor)
+@@ -2933,7 +2954,10 @@ microblaze_elf_asm_cdtor (rtx symbol, int priority, bool is_ctor)
  
    switch_to_section (s);
    assemble_align (POINTER_SIZE);
@@ -284,7 +284,7 @@ index e359226d1ce..14b61792f18 100644
    output_addr_const (asm_out_file, symbol);
    fputs ("\n", asm_out_file);
  }
-@@ -3078,10 +3102,10 @@ microblaze_expand_prologue (void)
+@@ -3077,10 +3101,10 @@ microblaze_expand_prologue (void)
  	{
  	  if (offset != 0)
  	    ptr = gen_rtx_PLUS (Pmode, stack_pointer_rtx, GEN_INT (offset));
@@ -298,7 +298,7 @@ index e359226d1ce..14b61792f18 100644
  	}
      }
  
-@@ -3090,15 +3114,23 @@ microblaze_expand_prologue (void)
+@@ -3089,15 +3113,23 @@ microblaze_expand_prologue (void)
        rtx fsiz_rtx = GEN_INT (fsiz);
  
        rtx_insn *insn = NULL;
@@ -324,7 +324,7 @@ index e359226d1ce..14b61792f18 100644
  				 gen_rtx_PLUS (Pmode, stack_pointer_rtx,
  					       const0_rtx));
  
-@@ -3106,7 +3138,7 @@ microblaze_expand_prologue (void)
+@@ -3105,7 +3137,7 @@ microblaze_expand_prologue (void)
  	    /* Do not optimize in flow analysis.  */
  	    MEM_VOLATILE_P (mem_rtx) = 1;
  
@@ -333,7 +333,7 @@ index e359226d1ce..14b61792f18 100644
  	  insn = emit_move_insn (mem_rtx, reg_rtx);
  	  RTX_FRAME_RELATED_P (insn) = 1;
  	}
-@@ -3216,12 +3248,12 @@ microblaze_expand_epilogue (void)
+@@ -3215,12 +3247,12 @@ microblaze_expand_epilogue (void)
        if (!crtl->is_leaf || interrupt_handler)
  	{
  	  mem_rtx =
@@ -348,7 +348,7 @@ index e359226d1ce..14b61792f18 100644
  	  emit_move_insn (reg_rtx, mem_rtx);
  	}
  
-@@ -3237,15 +3269,25 @@ microblaze_expand_epilogue (void)
+@@ -3236,15 +3268,25 @@ microblaze_expand_epilogue (void)
        /* _restore_ registers for epilogue.  */
        save_restore_insns (0);
        emit_insn (gen_blockage ());
@@ -378,7 +378,7 @@ index e359226d1ce..14b61792f18 100644
    emit_jump_insn (gen_return_internal (gen_rtx_REG (Pmode, GP_REG_FIRST +
  						    MB_ABI_SUB_RETURN_ADDR_REGNUM)));
  }
-@@ -3412,9 +3454,14 @@ microblaze_asm_output_mi_thunk (FILE *file, tree thunk_fndecl ATTRIBUTE_UNUSED,
+@@ -3411,9 +3453,14 @@ microblaze_asm_output_mi_thunk (FILE *file, tree thunk_fndecl ATTRIBUTE_UNUSED,
    else
      this_rtx = gen_rtx_REG (Pmode, MB_ABI_FIRST_ARG_REGNUM);
  
@@ -395,7 +395,7 @@ index e359226d1ce..14b61792f18 100644
  
    /* Apply the offset from the vtable, if required.  */
    if (vcall_offset)
-@@ -3427,7 +3474,10 @@ microblaze_asm_output_mi_thunk (FILE *file, tree thunk_fndecl ATTRIBUTE_UNUSED,
+@@ -3426,7 +3473,10 @@ microblaze_asm_output_mi_thunk (FILE *file, tree thunk_fndecl ATTRIBUTE_UNUSED,
      rtx loc = gen_rtx_PLUS (Pmode, temp1, vcall_offset_rtx);
      emit_move_insn (temp1, gen_rtx_MEM (Pmode, loc));
  
@@ -407,7 +407,7 @@ index e359226d1ce..14b61792f18 100644
    }
  
    /* Generate a tail call to the target function.  */
-@@ -3662,9 +3712,9 @@ microblaze_trampoline_init (rtx m_tramp, tree fndecl, rtx chain_value)
+@@ -3661,9 +3711,9 @@ microblaze_trampoline_init (rtx m_tramp, tree fndecl, rtx chain_value)
    emit_block_move (m_tramp, assemble_trampoline_template (),
  		   GEN_INT (6*UNITS_PER_WORD), BLOCK_OP_NORMAL);
  
@@ -419,7 +419,7 @@ index e359226d1ce..14b61792f18 100644
    emit_move_insn (mem, fnaddr);
  }
  
-@@ -3688,7 +3738,7 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
+@@ -3687,7 +3737,7 @@ microblaze_expand_conditional_branch (machine_mode mode, rtx operands[])
      {
        comp_reg = cmp_op0;
        condition = gen_rtx_fmt_ee (signed_condition (code), mode, comp_reg, const0_rtx);
@@ -428,7 +428,7 @@ index e359226d1ce..14b61792f18 100644
          emit_jump_insn (gen_condjump (condition, label1));
        else
          emit_jump_insn (gen_long_condjump (condition, label1));
-@@ -3807,7 +3857,7 @@ microblaze_expand_conditional_branch_sf (rtx operands[])
+@@ -3806,7 +3856,7 @@ microblaze_expand_conditional_branch_sf (rtx operands[])
    rtx comp_reg = gen_reg_rtx (SImode);
  
    emit_insn (gen_cstoresf4 (comp_reg, operands[0], cmp_op0, cmp_op1));
@@ -437,7 +437,7 @@ index e359226d1ce..14b61792f18 100644
    emit_jump_insn (gen_condjump (condition, operands[3]));
  }
  
-@@ -3817,10 +3867,10 @@ microblaze_expand_conditional_branch_df (rtx operands[])
+@@ -3816,10 +3866,10 @@ microblaze_expand_conditional_branch_df (rtx operands[])
    rtx condition;
    rtx cmp_op0 = XEXP (operands[0], 0);
    rtx cmp_op1 = XEXP (operands[0], 1);
@@ -450,7 +450,7 @@ index e359226d1ce..14b61792f18 100644
    emit_jump_insn (gen_long_condjump (condition, operands[3]));
  }
  
-@@ -3841,8 +3891,8 @@ microblaze_expand_divide (rtx operands[])
+@@ -3840,8 +3890,8 @@ microblaze_expand_divide (rtx operands[])
  {
    /* Table lookup software divides. Works for all (nr/dr) where (0 <= nr,dr <= 15).  */
  
@@ -461,7 +461,7 @@ index e359226d1ce..14b61792f18 100644
    rtx regqi = gen_reg_rtx (QImode);
    rtx_code_label *div_label = gen_label_rtx ();
    rtx_code_label *div_end_label = gen_label_rtx ();
-@@ -3851,16 +3901,30 @@ microblaze_expand_divide (rtx operands[])
+@@ -3850,16 +3900,30 @@ microblaze_expand_divide (rtx operands[])
    rtx ret;
    rtx_insn *jump, *cjump, *insn;
  
@@ -498,7 +498,7 @@ index e359226d1ce..14b61792f18 100644
    mem_rtx = gen_rtx_MEM (QImode,
                              gen_rtx_PLUS (QImode, regt1, div_table_rtx));
  
-@@ -4007,7 +4071,7 @@ insert_wic_for_ilb_runout (rtx_insn *first)
+@@ -4006,7 +4070,7 @@ insert_wic_for_ilb_runout (rtx_insn *first)
                {
                  insn =
                    emit_insn_before (gen_iprefetch
@@ -507,7 +507,7 @@ index e359226d1ce..14b61792f18 100644
                                      before_4);
                  recog_memoized (insn);
                  INSN_LOCATION (insn) = INSN_LOCATION (before_4);
-@@ -4017,7 +4081,27 @@ insert_wic_for_ilb_runout (rtx_insn *first)
+@@ -4016,7 +4080,27 @@ insert_wic_for_ilb_runout (rtx_insn *first)
             }
         }
  }
@@ -536,7 +536,7 @@ index e359226d1ce..14b61792f18 100644
  /* Insert instruction prefetch instruction at the fall
     through path of the function call.  */
  
-@@ -4167,6 +4251,17 @@ microblaze_starting_frame_offset (void)
+@@ -4166,6 +4250,17 @@ microblaze_starting_frame_offset (void)
  #undef TARGET_LEGITIMATE_ADDRESS_P
  #define TARGET_LEGITIMATE_ADDRESS_P 	microblaze_legitimate_address_p
  
@@ -554,7 +554,7 @@ index e359226d1ce..14b61792f18 100644
  #undef TARGET_FRAME_POINTER_REQUIRED
  #define TARGET_FRAME_POINTER_REQUIRED	microblaze_frame_pointer_required
  
-@@ -4176,6 +4271,9 @@ microblaze_starting_frame_offset (void)
+@@ -4175,6 +4270,9 @@ microblaze_starting_frame_offset (void)
  #undef  TARGET_TRAMPOLINE_INIT
  #define TARGET_TRAMPOLINE_INIT		microblaze_trampoline_init
  
@@ -565,7 +565,7 @@ index e359226d1ce..14b61792f18 100644
  #define TARGET_PROMOTE_FUNCTION_MODE 	default_promote_function_mode_always_promote
  
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index 021c222c9e9..d3cd5e42116 100644
+index 101802be2f4..961b105c698 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -173,7 +173,6 @@ extern enum pipeline_type microblaze_pipe;
@@ -731,7 +731,7 @@ index 021c222c9e9..d3cd5e42116 100644
  /* Default to -G 8 */
  #ifndef MICROBLAZE_DEFAULT_GVALUE
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 4b599610b1e..bce1645ce76 100644
+index 7a628eb74f0..9ba7e622f87 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -27,6 +27,7 @@
@@ -1780,7 +1780,7 @@ index 4c25cfe15e7..965132b3513 100644
  MULTILIB_EXCEPTIONS += mxl-multiply-high/m64
  MULTILIB_EXCEPTIONS += *mxl-multiply-high/mlittle-endian/m64
 diff --git a/libgcc/config/microblaze/crti.S b/libgcc/config/microblaze/crti.S
-index db64f7a0c7a..198fd6e39c0 100644
+index 461a5582f85..73e341397b4 100644
 --- a/libgcc/config/microblaze/crti.S
 +++ b/libgcc/config/microblaze/crti.S
 @@ -40,7 +40,7 @@
@@ -1800,7 +1800,7 @@ index db64f7a0c7a..198fd6e39c0 100644
 +    addik   r1, r1, -16
      sw      r15, r0, r1
 diff --git a/libgcc/config/microblaze/crtn.S b/libgcc/config/microblaze/crtn.S
-index ab06f755af7..229037bcb61 100644
+index 5d706f61530..b2fd15cb0a7 100644
 --- a/libgcc/config/microblaze/crtn.S
 +++ b/libgcc/config/microblaze/crtn.S
 @@ -33,9 +33,9 @@

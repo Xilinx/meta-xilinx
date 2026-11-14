@@ -17,10 +17,10 @@ Upstream-Status: Pending
  5 files changed, 125 insertions(+), 17 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index 78239badcc8..2f1b5dd9345 100644
+index fa1833ab884..94a26eb879d 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -2511,7 +2511,12 @@ print_operand (FILE * file, rtx op, int letter)
+@@ -2510,7 +2510,12 @@ print_operand (FILE * file, rtx op, int letter)
        if (code == CONST_DOUBLE)
  	{
  	  if (GET_MODE (op) == DFmode)
@@ -34,7 +34,7 @@ index 78239badcc8..2f1b5dd9345 100644
  	  else
  	    {
  	      REAL_VALUE_TO_TARGET_DOUBLE (*CONST_DOUBLE_REAL_VALUE (op), l);
-@@ -3917,7 +3922,10 @@ microblaze_expand_divide (rtx operands[])
+@@ -3916,7 +3921,10 @@ microblaze_expand_divide (rtx operands[])
                              gen_rtx_PLUS (QImode, regt1, div_table_rtx));
  
    insn = emit_insn (gen_zero_extendqisi2 (operands[0], mem_rtx));
@@ -47,7 +47,7 @@ index 78239badcc8..2f1b5dd9345 100644
    LABEL_NUSES (div_end_label) = 1;
    emit_barrier ();
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index d3cd5e42116..69fd5a7dfb9 100644
+index 961b105c698..694bb18e0cc 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -884,10 +884,17 @@ do {									 \
@@ -69,7 +69,7 @@ index d3cd5e42116..69fd5a7dfb9 100644
  /* We need to group -lm as well, since some Newlib math functions
     reference __errno!  */
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index bc2d9b8ed3a..5caad51970d 100644
+index 833538b7b02..5f3603fdb83 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -535,6 +535,15 @@
@@ -230,7 +230,7 @@ index bc2d9b8ed3a..5caad51970d 100644
    ""
    "mfs\t%0,rpc\n\taddik\t%0,%0,_GLOBAL_OFFSET_TABLE_+8"
 diff --git a/libgcc/config/microblaze/crti.S b/libgcc/config/microblaze/crti.S
-index 198fd6e39c0..26f496172b8 100644
+index 73e341397b4..f4f37d92246 100644
 --- a/libgcc/config/microblaze/crti.S
 +++ b/libgcc/config/microblaze/crti.S
 @@ -33,11 +33,32 @@
@@ -273,7 +273,7 @@ index 198fd6e39c0..26f496172b8 100644
      sw      r15, r0, r1
 +#endif
 diff --git a/libgcc/config/microblaze/crtn.S b/libgcc/config/microblaze/crtn.S
-index 229037bcb61..b90f062ae37 100644
+index b2fd15cb0a7..9709775193e 100644
 --- a/libgcc/config/microblaze/crtn.S
 +++ b/libgcc/config/microblaze/crtn.S
 @@ -29,7 +29,19 @@

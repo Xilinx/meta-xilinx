@@ -11,10 +11,10 @@ Upstream-Status: Pending
  2 files changed, 11 insertions(+), 7 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index 63f79dd3efa..78239badcc8 100644
+index 8c5fedc47f5..fa1833ab884 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -2215,9 +2215,14 @@ compute_frame_size (HOST_WIDE_INT size)
+@@ -2214,9 +2214,14 @@ compute_frame_size (HOST_WIDE_INT size)
  
    total_size += gp_reg_size;
  
@@ -31,7 +31,7 @@ index 63f79dd3efa..78239badcc8 100644
  
    /* No space to be allocated for link register in leaf functions with no other
       stack requirements.  */
-@@ -2502,7 +2507,6 @@ print_operand (FILE * file, rtx op, int letter)
+@@ -2501,7 +2506,6 @@ print_operand (FILE * file, rtx op, int letter)
    else if (letter == 'h' || letter == 'j')
      {
        long val[2];
@@ -39,7 +39,7 @@ index 63f79dd3efa..78239badcc8 100644
        long l[2];
        if (code == CONST_DOUBLE)
  	{
-@@ -2517,10 +2521,10 @@ print_operand (FILE * file, rtx op, int letter)
+@@ -2516,10 +2520,10 @@ print_operand (FILE * file, rtx op, int letter)
  	}
        else if (code == CONST_INT || code == CONST)// || code == SYMBOL_REF ||code == LABEL_REF)
          {
@@ -54,7 +54,7 @@ index 63f79dd3efa..78239badcc8 100644
    else if (code == CONST_DOUBLE)
      {
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 95994ed209d..bc2d9b8ed3a 100644
+index 0272f1c3cb8..833538b7b02 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -1104,7 +1104,7 @@

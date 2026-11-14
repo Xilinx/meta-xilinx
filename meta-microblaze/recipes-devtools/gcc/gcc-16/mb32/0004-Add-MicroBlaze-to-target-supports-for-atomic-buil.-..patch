@@ -21,10 +21,10 @@ Upstream-Status: Pending
  1 file changed, 1 insertion(+)
 
 diff --git a/gcc/testsuite/lib/target-supports.exp b/gcc/testsuite/lib/target-supports.exp
-index 5e0edcd60a8..61e6e3e7f94 100644
+index 0371d7bc42c..9c6beb10d49 100644
 --- a/gcc/testsuite/lib/target-supports.exp
 +++ b/gcc/testsuite/lib/target-supports.exp
-@@ -10206,6 +10206,7 @@ proc check_effective_target_sync_int_long { } {
+@@ -10558,6 +10558,7 @@ proc check_effective_target_sync_int_long { } {
  		 && [check_effective_target_arm_acq_rel])
  	     || [istarget bfin*-*linux*]
  	     || [istarget hppa*-*linux*]

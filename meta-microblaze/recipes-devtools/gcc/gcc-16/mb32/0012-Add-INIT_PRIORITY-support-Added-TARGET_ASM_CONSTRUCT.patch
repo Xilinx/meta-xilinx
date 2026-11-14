@@ -17,10 +17,10 @@ Upstream-Status: Pending
  1 file changed, 53 insertions(+)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index 456e2d82bf4..25600427db2 100644
+index afd41e6e9b4..b0f2d8d1e5f 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -2672,6 +2672,53 @@ print_operand_address (FILE * file, rtx addr)
+@@ -2671,6 +2671,53 @@ print_operand_address (FILE * file, rtx addr)
      }
  }
  
@@ -74,7 +74,7 @@ index 456e2d82bf4..25600427db2 100644
  /* Emit either a label, .comm, or .lcomm directive, and mark that the symbol
     is used, so that we don't emit an .extern for it in
     microblaze_asm_file_end.  */
-@@ -4016,6 +4063,12 @@ microblaze_starting_frame_offset (void)
+@@ -4015,6 +4062,12 @@ microblaze_starting_frame_offset (void)
  #undef TARGET_ATTRIBUTE_TABLE
  #define TARGET_ATTRIBUTE_TABLE          microblaze_attribute_table
  

@@ -32,10 +32,10 @@ Upstream-Status: Pending
  2 files changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index 25600427db2..b61643e6f11 100644
+index b0f2d8d1e5f..05470066269 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -2506,7 +2506,7 @@ print_operand (FILE * file, rtx op, int letter)
+@@ -2505,7 +2505,7 @@ print_operand (FILE * file, rtx op, int letter)
  	  unsigned long value_long;
  	  REAL_VALUE_TO_TARGET_SINGLE (*CONST_DOUBLE_REAL_VALUE (op),
  				       value_long);
@@ -45,7 +45,7 @@ index 25600427db2..b61643e6f11 100644
        else
  	{
 diff --git a/gcc/config/microblaze/microblaze.md b/gcc/config/microblaze/microblaze.md
-index 9385f528c35..3d25f3e6076 100644
+index 1d26cfc190b..eab7898054a 100644
 --- a/gcc/config/microblaze/microblaze.md
 +++ b/gcc/config/microblaze/microblaze.md
 @@ -1376,7 +1376,10 @@

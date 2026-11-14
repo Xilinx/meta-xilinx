@@ -18,7 +18,7 @@ Upstream-Status: Pending
  3 files changed, 133 insertions(+), 2 deletions(-)
 
 diff --git a/gcc/config/microblaze/microblaze-protos.h b/gcc/config/microblaze/microblaze-protos.h
-index 09315652a6d..986e54eb253 100644
+index 15f35aaeb20..d9960286469 100644
 --- a/gcc/config/microblaze/microblaze-protos.h
 +++ b/gcc/config/microblaze/microblaze-protos.h
 @@ -64,6 +64,7 @@ extern int label_mentioned_p (rtx);
@@ -30,10 +30,10 @@ index 09315652a6d..986e54eb253 100644
  
  /* Declare functions in microblaze-c.cc.  */
 diff --git a/gcc/config/microblaze/microblaze.cc b/gcc/config/microblaze/microblaze.cc
-index d72aeb40199..2f8df07414a 100644
+index 7b66a88e62c..8c16061958e 100644
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -2118,6 +2118,136 @@ microblaze_must_save_register (int regno)
+@@ -2117,6 +2117,136 @@ microblaze_must_save_register (int regno)
    return 0;
  }
  
@@ -171,7 +171,7 @@ index d72aeb40199..2f8df07414a 100644
     stack pointer.
  
 diff --git a/gcc/config/microblaze/microblaze.h b/gcc/config/microblaze/microblaze.h
-index 9d7bfca62e3..979b2975da9 100644
+index 5c2804a9adc..63e1f2acfdb 100644
 --- a/gcc/config/microblaze/microblaze.h
 +++ b/gcc/config/microblaze/microblaze.h
 @@ -443,9 +443,9 @@ extern struct microblaze_frame_info current_frame_info;

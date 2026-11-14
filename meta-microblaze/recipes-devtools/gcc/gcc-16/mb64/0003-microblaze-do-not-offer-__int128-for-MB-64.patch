@@ -29,7 +29,7 @@ Upstream-Status: Pending
 
 --- a/gcc/config/microblaze/microblaze.cc
 +++ b/gcc/config/microblaze/microblaze.cc
-@@ -4321,6 +4321,22 @@
+@@ -4320,6 +4320,22 @@ microblaze_starting_frame_offset (void)
  {
    return (crtl->outgoing_args_size + FIRST_PARM_OFFSET(FNDECL));
  }
@@ -52,7 +52,7 @@ Upstream-Status: Pending
  
  #undef TARGET_ENCODE_SECTION_INFO
  #define TARGET_ENCODE_SECTION_INFO      microblaze_encode_section_info
-@@ -4451,6 +4467,9 @@
+@@ -4450,6 +4466,9 @@ microblaze_starting_frame_offset (void)
  #undef TARGET_STARTING_FRAME_OFFSET
  #define TARGET_STARTING_FRAME_OFFSET microblaze_starting_frame_offset
  
