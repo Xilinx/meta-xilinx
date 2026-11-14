@@ -1,4 +1,4 @@
-FILESEXTRAPATHS:append := ":${THISDIR}/gcc-15"
+FILESEXTRAPATHS:append := ":${THISDIR}/gcc-16"
 
 SRC_URI += " \
     file://revert-microblaze-mulitlib-hack.patch \
