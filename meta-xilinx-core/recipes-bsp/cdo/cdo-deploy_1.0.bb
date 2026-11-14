@@ -3,7 +3,9 @@ from the System Device Tree directory for AMD Versal targets."
 DESCRIPTION = "Recipe to deploy cdo files from System Device Tree \
 Directory"
 
-LICENSE = "CLOSED"
+# Deploys data generated from the user's design, which can't be interpreted
+LICENSE = "LicenseRef-Proprietary"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Proprietary;md5=0557f9d92cf58f2ccdd50f62f8ac0b28"
 
 inherit deploy
 

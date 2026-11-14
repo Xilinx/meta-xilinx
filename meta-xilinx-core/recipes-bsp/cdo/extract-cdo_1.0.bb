@@ -2,7 +2,9 @@ SUMMARY = "Extracts CDO (Configuration Data Object) files from a \
 Versal boot.bin so they can be supplied to QEMU."
 DESCRIPTION = "Recipe to extract boot_files for qemu usage"
 
-LICENSE = "CLOSED"
+# Deploys data generated from the user's design, which can't be interpreted
+LICENSE = "LicenseRef-Proprietary"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Proprietary;md5=0557f9d92cf58f2ccdd50f62f8ac0b28"
 
 inherit deploy bootgen-bif
 # bootgen-bif provides BOOTGEN_ARCH definitions

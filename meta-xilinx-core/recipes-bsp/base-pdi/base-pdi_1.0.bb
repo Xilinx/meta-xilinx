@@ -2,7 +2,9 @@ SUMMARY = "Deploys a pre-built AMD Versal Programmable Device Image \
 (base PDI)."
 DESCRIPTION = "Recipe to deploy base pdi"
 
-LICENSE = "CLOSED"
+# Deploys data generated from the user's design, which can't be interpreted
+LICENSE = "LicenseRef-Proprietary"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Proprietary;md5=0557f9d92cf58f2ccdd50f62f8ac0b28"
 
 PROVIDES = "virtual/base-pdi"
 
