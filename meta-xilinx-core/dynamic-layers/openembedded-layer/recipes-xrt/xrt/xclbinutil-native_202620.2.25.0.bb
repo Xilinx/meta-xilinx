@@ -5,7 +5,7 @@ require xrt-${PV}.inc
 
 FILESEXTRAPATHS:append := ":${THISDIR}/xrt"
 
-LICENSE = "GPL-2.0-or-later & Apache-2.0 & MIT"
+LICENSE = "GPL-2.0-or-later AND Apache-2.0 AND MIT"
 LIC_FILES_CHKSUM = " \
     file://../LICENSE;md5=de2c993ac479f02575bcbfb14ef9b485 \
     file://runtime_src/core/edge/drm/zocl/LICENSE;md5=7d040f51aae6ac6208de74e88a3795f8 \

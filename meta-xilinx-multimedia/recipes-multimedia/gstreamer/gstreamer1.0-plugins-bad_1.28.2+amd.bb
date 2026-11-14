@@ -14,7 +14,7 @@ SRC_URI += "\
            "
 S = "${UNPACKDIR}/${BP}/subprojects/gst-plugins-bad"
 
-LICENSE = "LGPL-2.1-or-later & GPL-2.0-or-later"
+LICENSE = "LGPL-2.1-or-later AND GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 DEPENDS += "gstreamer1.0-plugins-base"

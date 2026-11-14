@@ -8,7 +8,7 @@ UltraScale+ MPSoC reference boards; the file is fetched from the TI \
 service-pack git tree because it is not carried in linux-firmware."
 SECTION = "kernel"
 
-LICENSE = "Firmware-ti-bt"
+LICENSE = "LicenseRef-Firmware-ti-bt"
 
 LIC_FILES_CHKSUM = "file://LICENSE.ti-bt;md5=f39eac9f4573be5b012e8313831e72a9"
 
@@ -73,6 +73,6 @@ RDEPENDS:${PN}-wl180x = "\
     ${PN}-license linux-firmware-wl18xx \
     "
 
-LICENSE:${PN}-wl180x = "Firmware-ti-bt"
+LICENSE:${PN}-wl180x = "LicenseRef-Firmware-ti-bt"
 
 INSANE_SKIP = "arch"

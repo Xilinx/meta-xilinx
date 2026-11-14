@@ -27,7 +27,7 @@ SRCREV_scmi-server = "f80feb6ab027cca268083b90095dc8b8f0b6419c"
 SRC_URI:append = " ${@bb.utils.contains('TFA_SCMI_SERVER', '1', '${SRC_URI_SCMI_SERVER}', '', d)}"
 
 # Update license information (adjust license type as needed)
-LICENSE:append = "${@bb.utils.contains('TFA_SCMI_SERVER', '1', ' & BSD-3-Clause', '', d)}"
+LICENSE:append = "${@bb.utils.contains('TFA_SCMI_SERVER', '1', ' AND BSD-3-Clause', '', d)}"
 LIC_FILES_CHKSUM += "${@bb.utils.contains('TFA_SCMI_SERVER', '1', 'file://../scmi-server/LICENSE;md5=8a98de6f98ae5501d035c335a47a2bae', '', d)}"
 
 SRCREV = "a4da0a92ddf183bed7bb6977e60fa2cc51273bdf"
