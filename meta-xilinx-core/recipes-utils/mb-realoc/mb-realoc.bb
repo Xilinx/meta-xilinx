@@ -2,13 +2,18 @@ SUMMARY = "AMD MicroBlaze ELF relocator helper used to retarget u-boot \
 to a new load address before deploy."
 DESCRIPTION = "mb-realoc"
 
-LICENSE = "CLOSED"
+LICENSE = "LicenseRef-Xilinx-mb-realoc"
+# mb-realoc only carries a copyright notice with no license grant;
+# LICENSE.mb-realoc reproduces that notice
+LIC_FILES_CHKSUM = "file://LICENSE.mb-realoc;md5=ab4b1d392e81f464a182412db967c84c \
+                    file://mb-realoc;beginline=14;endline=15;md5=98529269b4dd365895052183a820d2fb"
+NO_GENERIC_LICENSE[Xilinx-mb-realoc] = "LICENSE.mb-realoc"
 
 PROVIDES = "virtual/elfrealloc"
 
 inherit deploy
 
-SRC_URI:append = " file://mb-realoc"
+SRC_URI:append = " file://mb-realoc file://LICENSE.mb-realoc"
 
 PV = "0.1"
 
