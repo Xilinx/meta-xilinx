@@ -1,7 +1,9 @@
 SUMMARY = "Firmware for VCU"
 DESCRIPTION = "Firmware binaries provider for VCU"
-LICENSE = "Proprietary"
+LICENSE = "LicenseRef-Allegro-DVT-VCU-Firmware"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=983705b3009f0554d24a9410c0efea65"
+# Allegro DVT binary-only firmware license (MIT-like, not MIT)
+NO_GENERIC_LICENSE[Allegro-DVT-VCU-Firmware] = "LICENSE.md"
 
 PE = "1"
 
