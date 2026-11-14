@@ -2,8 +2,10 @@ SUMMARY = "Arm Mali-G78AE user-space GLES/Vulkan driver libraries for \
 AMD Versal Series Gen 2 devices."
 DESCRIPTION = "libraries for Versal with Mali G78AE"
 
-LICENSE = "Proprietary"
+LICENSE = "LicenseRef-Arm-Mali-G78AE-Userspace-EULA"
 LIC_FILES_CHKSUM = "file://EULA;md5=646a0c3fd8ffd4c63169926fbc5f62a8"
+# Arm end user licence for the AMD Mali-G78AE userspace driver
+NO_GENERIC_LICENSE[Arm-Mali-G78AE-Userspace-EULA] = "EULA"
 
 inherit features_check update-alternatives
 

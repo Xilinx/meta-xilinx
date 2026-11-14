@@ -2,8 +2,10 @@ SUMMARY = "Arm Mali-400 user-space GLES driver libraries for Zynq \
 UltraScale+ MPSoC (EG/EV variants)."
 DESCRIPTION = "libGLES for ZynqMP with Mali 400"
 
-LICENSE = "Proprietary"
+LICENSE = "LicenseRef-Arm-Mali-Userspace-EULA"
 LIC_FILES_CHKSUM = "file://EULA;md5=82e466d0ed92c5a15f568dbe6b31089c"
+# Arm end user licence for the Mali userspace driver and firmware
+NO_GENERIC_LICENSE[Arm-Mali-Userspace-EULA] = "EULA"
 
 inherit features_check update-alternatives
 
