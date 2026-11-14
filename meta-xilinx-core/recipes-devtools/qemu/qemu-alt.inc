@@ -48,13 +48,5 @@ python split_qemu_packages () {
         if (d.getVar('BPN') != 'qemu'):
             for pkg in userpackages:
                 d.appendVar('RPROVIDES:%s' % pkg, ' ' + pkg.replace(d.getVar('PN'), 'qemu'))
-
-    mipspackage = d.getVar('PN') + "-user-mips"
-    if mipspackage in ' '.join(userpackages):
-        d.appendVar('RDEPENDS:' + mipspackage, ' ' + d.getVar("MLPREFIX") + 'bash')
-
-        if (d.getVar('BPN') != 'qemu'):
-            for pkg in mipspackage:
-                d.appendVar('RPROVIDES:%s' % pkg, ' ' + pkg.replace(d.getVar('PN'), 'qemu'))
 }
 
