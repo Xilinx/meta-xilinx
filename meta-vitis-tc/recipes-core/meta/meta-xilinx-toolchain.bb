@@ -31,7 +31,7 @@ HOST_DEPENDS = " \
 PLNX_ADD_VAI_SDK = ""
 
 TOOLCHAIN_HOST_TASK = "${HOST_DEPENDS} packagegroup-cross-canadian-${MACHINE}"
-TOOLCHAIN_TARGET_TASK:xilinx-standalone:baremetal-multilib-tc = "${@multilib_pkg_extend(d, 'packagegroup-newlib-standalone-sdk-target')}"
+TOOLCHAIN_TARGET_TASK:xilinx-standalone:baremetal-multilib-tc = "${@oe.utils.multilib_pkg_extend(d, 'packagegroup-newlib-standalone-sdk-target')}"
 
 TOOLCHAIN_SHAR_EXT_TMPL = "${VITIS_TC_PATH}/files/toolchain-shar-extract.sh"
 TOOLCHAIN_SHAR_REL_TMPL = "${VITIS_TC_PATH}/files/toolchain-shar-relocate.sh"
