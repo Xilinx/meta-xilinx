@@ -1,7 +1,11 @@
 DESCRIPTION = "PSM Firmware"
 SUMMARY = "PSM firmware for versal devices"
 
-LICENSE = "CLOSED"
+# License follows the recipe producing the binary, or is
+# LicenseRef-Proprietary for a user supplied binary
+inherit firmware-license
+FW_LICENSE_VARS = "PSM_DEPENDS PSM_MCDEPENDS"
+FW_LICENSE_PRODUCER[psm-firmware] = "MIT"
 
 PROVIDES = "virtual/psm-firmware"
 

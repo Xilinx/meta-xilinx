@@ -2,7 +2,11 @@ SUMMARY = "Deploys a pre-built AMD Zynq / Zynq UltraScale+ MPSoC First \
 Stage Boot Loader (FSBL) ELF as virtual/fsbl."
 DESCRIPTION = "Xilinx First Stage Boot Loader"
 
-LICENSE = "CLOSED"
+# License follows the recipe producing the binary, or is
+# LicenseRef-Proprietary for a user supplied binary
+inherit firmware-license
+FW_LICENSE_VARS = "FSBL_DEPENDS FSBL_MCDEPENDS"
+FW_LICENSE_PRODUCER[fsbl-firmware] = "MIT"
 
 PROVIDES = "virtual/fsbl"
 

@@ -2,7 +2,12 @@ SUMMARY = "Deploys a pre-built AMD Zynq UltraScale+ MPSoC Image \
 Recovery binary as virtual/imgrcry."
 DESCRIPTION = "Image Recovery"
 
-LICENSE = "CLOSED"
+# License follows the recipe producing the binary, or is
+# LicenseRef-Proprietary for a user supplied binary
+inherit firmware-license
+FW_LICENSE_VARS = "IMGRCRY_DEPENDS IMGRCRY_MCDEPENDS"
+FW_LICENSE_PRODUCER[image-recovery-bootbin] = "MIT"
+FW_LICENSE_PRODUCER[image-recovery-tiny-initramfs] = "MIT"
 
 PROVIDES = "virtual/imgrcry"
 

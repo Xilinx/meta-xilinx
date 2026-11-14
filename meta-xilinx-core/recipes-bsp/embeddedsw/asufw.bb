@@ -1,7 +1,11 @@
 DESCRIPTION = "Application Security Unit"
 SUMMARY = "Application Security Unit for Versal_2ve_2vm devices"
 
-LICENSE = "CLOSED"
+# License follows the recipe producing the binary, or is
+# LicenseRef-Proprietary for a user supplied binary
+inherit firmware-license
+FW_LICENSE_VARS = "ASU_DEPENDS ASU_MCDEPENDS"
+FW_LICENSE_PRODUCER[asu-firmware] = "MIT"
 
 PROVIDES = "virtual/asu"
 

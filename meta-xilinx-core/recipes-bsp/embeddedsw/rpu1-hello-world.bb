@@ -1,7 +1,11 @@
 DESCRIPTION = "RPU Core 1 Hello World Application"
 SUMMARY = "Proxy recipe to fetch RPU1 hello-world firmware from baremetal multiconfig"
 
-LICENSE = "CLOSED"
+# License follows the recipe producing the binary, or is
+# LicenseRef-Proprietary for a user supplied binary
+inherit firmware-license
+FW_LICENSE_VARS = "RPU1_DEPENDS RPU1_MCDEPENDS"
+FW_LICENSE_PRODUCER[hello-world] = "MIT"
 
 INHIBIT_DEFAULT_DEPS = "1"
 

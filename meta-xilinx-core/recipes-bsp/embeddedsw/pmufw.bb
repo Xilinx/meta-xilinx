@@ -2,7 +2,11 @@ SUMMARY = "Deploys a pre-built AMD Zynq UltraScale+ MPSoC Platform \
 Management Unit (PMU) firmware ELF as virtual/pmu-firmware."
 DESCRIPTION = "PMU Firmware"
 
-LICENSE = "CLOSED"
+# License follows the recipe producing the binary, or is
+# LicenseRef-Proprietary for a user supplied binary
+inherit firmware-license
+FW_LICENSE_VARS = "PMU_DEPENDS PMU_MCDEPENDS"
+FW_LICENSE_PRODUCER[pmu-firmware] = "MIT"
 
 PROVIDES = "virtual/pmu-firmware"
 

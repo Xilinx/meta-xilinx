@@ -1,7 +1,11 @@
 DESCRIPTION = "Platform Loader and Manager"
 SUMMARY = "Platform Loader and Manager for Versal devices"
 
-LICENSE = "CLOSED"
+# License follows the recipe producing the binary, or is
+# LicenseRef-Proprietary for a user supplied binary
+inherit firmware-license
+FW_LICENSE_VARS = "PLM_DEPENDS PLM_MCDEPENDS"
+FW_LICENSE_PRODUCER[plm-firmware] = "MIT"
 
 PROVIDES = "virtual/plm"
 

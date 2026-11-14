@@ -2,7 +2,11 @@ SUMMARY = "Deploys a pre-built AMD Image Selector (imgsel) binary for \
 Zynq UltraScale+ MPSoC and Versal targets as virtual/imgsel."
 DESCRIPTION = "Image Selector"
 
-LICENSE = "CLOSED"
+# License follows the recipe producing the binary, or is
+# LicenseRef-Proprietary for a user supplied binary
+inherit firmware-license
+FW_LICENSE_VARS = "IMGSEL_DEPENDS IMGSEL_MCDEPENDS"
+FW_LICENSE_PRODUCER[image-selector] = "MIT"
 
 PROVIDES = "virtual/imgsel"
 
