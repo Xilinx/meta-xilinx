@@ -12,10 +12,10 @@ Upstream-Status: Pending
  1 file changed, 12 insertions(+)
 
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index a2711d230ea..a3ea057f43b 100644
+index 4626cd58a53..efd5b5bbb75 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
-@@ -2067,6 +2067,18 @@ reloc_overflow (struct bfd_link_info *info,
+@@ -2082,6 +2082,18 @@ reloc_overflow (struct bfd_link_info *info,
  	  break;
  	case bfd_link_hash_defined:
  	case bfd_link_hash_defweak:

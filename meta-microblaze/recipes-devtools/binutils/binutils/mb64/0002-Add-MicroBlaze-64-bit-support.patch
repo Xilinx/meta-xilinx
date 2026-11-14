@@ -51,7 +51,7 @@ Upstream-Status: Pending
  create mode 100644 ld/testsuite/ld-microblaze/simple.ld
 
 diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index a7d410f879b..df1a8bf5c45 100644
+index a7d410f879b..850fac3baee 100644
 --- a/gas/config/tc-microblaze.c
 +++ b/gas/config/tc-microblaze.c
 @@ -35,10 +35,13 @@
@@ -1165,7 +1165,7 @@ index a7d410f879b..df1a8bf5c45 100644
        break;
 +    case DEFINED_64_PC_OFFSET:
 +      fix_new (fragP, fragP->fr_fix, INST_WORD_SIZE, fragP->fr_symbol,
-+		 fragP->fr_offset, TRUE, BFD_RELOC_MICROBLAZE_64_PCREL);
++		 fragP->fr_offset, true, BFD_RELOC_MICROBLAZE_64_PCREL);
 +      fragP->fr_fix += INST_WORD_SIZE * 2;
 +      fragP->fr_var = 0;
 +      break;
@@ -2528,7 +2528,7 @@ index 00000000000..264ef5930fc
 +$Lfe1:
 +	.size	i_am_right_here,$Lfe1-i_am_right_here
 diff --git a/ld/Makefile.am b/ld/Makefile.am
-index c219662d2e3..6a44e1bee76 100644
+index d48fd7340ec..cb4721503fa 100644
 --- a/ld/Makefile.am
 +++ b/ld/Makefile.am
 @@ -418,6 +418,8 @@ ALL_64_EMULATION_SOURCES = \
@@ -2541,10 +2541,10 @@ index c219662d2e3..6a44e1bee76 100644
  	eelf64_ia64.c \
  	eelf64_ia64_fbsd.c \
 diff --git a/ld/configure.tgt b/ld/configure.tgt
-index 3e158913b89..2c587842a2f 100644
+index 60efa496910..0775679417b 100644
 --- a/ld/configure.tgt
 +++ b/ld/configure.tgt
-@@ -506,7 +506,10 @@ microblaze*-linux*)	targ_emul="elf32mb_linux"
+@@ -500,7 +500,10 @@ microblaze*-linux*)	targ_emul="elf32mb_linux"
  			targ_extra_emuls="elf32mbel_linux"
  			;;
  microblazeel*)		targ_emul=elf32microblazeel
