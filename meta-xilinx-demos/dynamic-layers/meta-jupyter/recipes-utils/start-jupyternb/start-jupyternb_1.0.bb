@@ -9,7 +9,7 @@ SRC_URI = " file://start-jupyter.sh \
 	    file://jupyter-setup.service \
 	"
 
-LICENSE = "Proprietary"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://start-jupyter.sh;beginline=2;endline=24;md5=f29b6e59838b939312f578e77087ada3"
 
 JUPYTER_STARTUP_PACKAGES += " \
