@@ -1,7 +1,9 @@
 SUMMARY = "Firmware for ISP"
 DESCRIPTION = "Firmware binaries provider for ISP"
-LICENSE = "CLOSED"
+LICENSE = "LicenseRef-AMD-ISP-Firmware-Binary"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=cd33347a71202f7531fd3f82892a4a74"
+# Binary-only limited use license shipped with the ISP firmware
+NO_GENERIC_LICENSE[AMD-ISP-Firmware-Binary] = "LICENSE.md"
 COMPATIBLE_HOST = ".*-linux"
 
 S = "${UNPACKDIR}"

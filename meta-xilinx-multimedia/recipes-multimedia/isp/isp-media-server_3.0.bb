@@ -1,7 +1,9 @@
 SUMMARY = "ISP Media Server and Libraries"
 DESCRIPTION = "ISP Media Server application and required shared libraries."
-LICENSE = "CLOSED"
+LICENSE = "LicenseRef-AMD-ISP-Media-Server-Binary"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=fb857fc9e8eed46509f2cce8648a05c1"
+# Binary-only limited use license shipped with the ISP media server
+NO_GENERIC_LICENSE[AMD-ISP-Media-Server-Binary] = "LICENSE.md"
 COMPATIBLE_HOST = ".*-linux"
 COMPATIBLE_MACHINE = "^$"
 COMPATIBLE_MACHINE:versal-2ve-2vm = "versal-2ve-2vm"
