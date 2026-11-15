@@ -16,4 +16,6 @@ DEPENDS += "bc-native dtc-native python3-setuptools-native gnutls-native"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/u-boot-v2026.01:"
 
-SRC_URI += "file://0001-Add-support-for-OpenSSL-Provider-API.patch"
+SRC_URI += "file://0001-Add-support-for-OpenSSL-Provider-API.patch \
+            file://0001-pylibfdt-Replace-removed-SWIG-Python-2-compatibility.patch \
+"
