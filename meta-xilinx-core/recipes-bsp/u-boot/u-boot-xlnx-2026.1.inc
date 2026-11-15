@@ -15,3 +15,5 @@ HAS_PLATFORM_INIT ?= " \
 DEPENDS += "bc-native dtc-native python3-setuptools-native gnutls-native"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/u-boot-v2026.01:"
+
+SRC_URI += "file://0001-Add-support-for-OpenSSL-Provider-API.patch"
