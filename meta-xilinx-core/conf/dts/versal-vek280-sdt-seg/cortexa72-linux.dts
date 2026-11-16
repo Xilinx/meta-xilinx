@@ -1,0 +1,2763 @@
+/dts-v1/;
+/ {
+        compatible = "xlnx,versal-vek280-revB", "xlnx,versal-vek280", "xlnx,versal";
+        #address-cells = <0x2>;
+        #size-cells = <0x2>;
+        model = "Xilinx Versal vek280 Eval board revB";
+        board = "vek280";
+        vivado-version = "2026.2";
+        device_id = "xcve2802";
+        slrcount = <0x1>;
+        family = "Versal";
+        speed_grade = "2MP";
+
+        options {
+
+                u-boot {
+                        compatible = "u-boot,config";
+                        bootscr-address = /bits/ 64 <0x20000000>;
+                };
+        };
+
+        cpus_a72: cpus {
+                phandle = <0xcc>;
+                #address-cells = <0x1>;
+                #size-cells = <0x0>;
+                compatible = "cpus,cluster";
+                #ranges-address-cells = <0x2>;
+                #ranges-size-cells = <0x2>;
+
+                psv_cortexa72_0: cpu@0 {
+                        phandle = <0xc4>;
+                        compatible = "arm,cortex-a72", "arm,armv8";
+                        device_type = "cpu";
+                        enable-method = "psci";
+                        operating-points-v2 = <&cpu_opp_table>;
+                        reg = <0x0>;
+                        cpu-idle-states = <&CPU_SLEEP_0>;
+                        power-domains = <&versal_firmware 0x18110003>;
+                        d-cache-size = <0x8000>;
+                        d-cache-line-size = <0x40>;
+                        d-cache-sets = <0x100>;
+                        i-cache-size = <0xc000>;
+                        i-cache-line-size = <0x40>;
+                        i-cache-sets = <0x100>;
+                        next-level-cache = <&l2>;
+                        clocks = <&versal_clk 0x4d>;
+                        xlnx,timestamp-clk-freq = <0x5f5e0a4>;
+                        xlnx,pss-ref-clk-freq = <0x1fca034>;
+                        stamp-frequency = <0x5f5e0a4>;
+                        xlnx,ip-name = "psv_cortexa72";
+                        xlnx,cpu-clk-freq-hz = <0x537248c1>;
+                        cpu-frequency = <0x537248c1>;
+                        bus-handle = <0x1>;
+                };
+
+                psv_cortexa72_1: cpu@1 {
+                        phandle = <0xc6>;
+                        compatible = "arm,cortex-a72", "arm,armv8";
+                        device_type = "cpu";
+                        enable-method = "psci";
+                        operating-points-v2 = <&cpu_opp_table>;
+                        reg = <0x1>;
+                        cpu-idle-states = <&CPU_SLEEP_0>;
+                        power-domains = <&versal_firmware 0x18110004>;
+                        d-cache-size = <0x8000>;
+                        d-cache-line-size = <0x40>;
+                        d-cache-sets = <0x100>;
+                        i-cache-size = <0xc000>;
+                        i-cache-line-size = <0x40>;
+                        i-cache-sets = <0x100>;
+                        next-level-cache = <&l2>;
+                        xlnx,timestamp-clk-freq = <0x5f5e0a4>;
+                        xlnx,pss-ref-clk-freq = <0x1fca034>;
+                        stamp-frequency = <0x5f5e0a4>;
+                        xlnx,ip-name = "psv_cortexa72";
+                        xlnx,cpu-clk-freq-hz = <0x537248c1>;
+                        cpu-frequency = <0x537248c1>;
+                        bus-handle = <0x1>;
+                };
+
+                idle-states {
+                        entry-method = "psci";
+
+                        CPU_SLEEP_0: cpu-sleep-0 {
+                                phandle = <0x92>;
+                                compatible = "arm,idle-state";
+                                arm,psci-suspend-param = <0x40000000>;
+                                local-timer-stop;
+                                entry-latency-us = <0x12c>;
+                                exit-latency-us = <0x258>;
+                                min-residency-us = <0x2710>;
+                        };
+                };
+        };
+
+        l2: l2-cache {
+                phandle = <0x94>;
+                compatible = "cache";
+                cache-level = <0x2>;
+                cache-size = <0x100000>;
+                cache-line-size = <0x40>;
+                cache-sets = <0x1000>;
+                cache-unified;
+        };
+
+        cpu_opp_table: opp-table-cpu {
+                phandle = <0x91>;
+                compatible = "operating-points-v2";
+                opp-shared;
+
+                opp-1400000000 {
+                        opp-hz = /bits/ 64 <0x53724e00>;
+                        clock-latency-ns = <0x7a120>;
+                        opp-microvolt = <0xf4240>;
+                };
+
+                opp-700000000 {
+                        opp-hz = /bits/ 64 <0x29b92700>;
+                        clock-latency-ns = <0x7a120>;
+                        opp-microvolt = <0xf4240>;
+                };
+
+                opp-466666667 {
+                        opp-hz = /bits/ 64 <0x1bd0c4ab>;
+                        clock-latency-ns = <0x7a120>;
+                        opp-microvolt = <0xf4240>;
+                };
+
+                opp-350000000 {
+                        opp-hz = /bits/ 64 <0x14dc9380>;
+                        clock-latency-ns = <0x7a120>;
+                        opp-microvolt = <0xf4240>;
+                };
+        };
+
+        dcc: dcc {
+                phandle = <0xd3>;
+                compatible = "arm,dcc";
+                status = "disabled";
+                bootph-all;
+        };
+
+        fpga: fpga-region {
+                phandle = <0xd4>;
+                compatible = "fpga-region";
+                fpga-mgr = <&versal_fpga>;
+                #address-cells = <0x2>;
+                #size-cells = <0x2>;
+        };
+
+        psci: psci {
+                phandle = <0xd5>;
+                compatible = "arm,psci-0.2";
+                method = "smc";
+        };
+
+        pmu {
+                compatible = "arm,armv8-pmuv3";
+                interrupt-parent = <&gic>;
+                interrupts = <0x1 0x7 0x304>;
+        };
+
+        timer: timer {
+                phandle = <0xd6>;
+                compatible = "arm,armv8-timer";
+                interrupt-parent = <&gic>;
+                interrupts = <0x1 0xd 0x4 0x1 0xe 0x4 0x1 0xb 0x4 0x1 0xa 0x4>;
+        };
+
+        versal_fpga: versal-fpga {
+                phandle = <0xae>;
+                compatible = "xlnx,versal-fpga";
+        };
+
+        sensor0: versal-thermal-sensor {
+                phandle = <0xb0>;
+                compatible = "xlnx,versal-thermal";
+                #thermal-sensor-cells = <0x1>;
+                io-channels = <&sysmon0 0x9>;
+                io-channel-names = "sysmon-temp-channel";
+        };
+
+        thermal-zones {
+
+                versal_thermal: versal-thermal {
+                        phandle = <0xd7>;
+                        polling-delay-passive = <0xfa>;
+                        polling-delay = <0x3e8>;
+                        thermal-sensors = <&sensor0 0x0>;
+
+                        trips {
+
+                                temp_alert: temp-alert {
+                                        phandle = <0xd8>;
+                                        temperature = <0x11170>;
+                                        hysteresis = <0x0>;
+                                        type = "passive";
+                                };
+
+                                ot_crit: ot-crit {
+                                        phandle = <0xd9>;
+                                        temperature = <0x1e848>;
+                                        hysteresis = <0x0>;
+                                        type = "critical";
+                                };
+                        };
+
+                        cooling-maps {
+                        };
+                };
+
+                versal_thermal_aie: versal-aie-thermal {
+                        phandle = <0xda>;
+                        polling-delay-passive = <0xfa>;
+                        polling-delay = <0x3e8>;
+                        thermal-sensors = <&sensor0 0x1>;
+
+                        trips {
+
+                                temp_alert_aie: temp-alert-aie {
+                                        phandle = <0xdb>;
+                                        temperature = <0x11170>;
+                                        hysteresis = <0x0>;
+                                        type = "passive";
+                                };
+
+                                ot_crit_aie: ot-crit-aie {
+                                        phandle = <0xdc>;
+                                        temperature = <0x1e848>;
+                                        hysteresis = <0x0>;
+                                        type = "critical";
+                                };
+                        };
+
+                        cooling-maps {
+                        };
+                };
+        };
+
+        amba: axi {
+                phandle = <0x1>;
+                compatible = "simple-bus";
+                #address-cells = <0x2>;
+                #size-cells = <0x2>;
+                ranges;
+                interrupt-parent = <&gic>;
+                bootph-all;
+
+                can0: can@ff060000 {
+                        phandle = <0x70>;
+                        compatible = "xlnx,canfd-2.0";
+                        status = "okay";
+                        reg = <0x0 0xff060000 0x0 0x6000>;
+                        interrupts = <0x0 0x14 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "can_clk", "s_axi_aclk";
+                        rx-fifo-depth = <0x40>;
+                        tx-mailbox-count = <0x20>;
+                        clocks = <&can0_clk>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x1822401f>;
+                        xlnx,can-rx-dpth = <0x40>;
+                        xlnx,num-of-rx-mb-buf = <0x30>;
+                        xlnx,can-clk-freq-hz = <0x9896767>;
+                        xlnx,ip-name = "psv_canfd";
+                        xlnx,rx-mode = <0x0>;
+                        xlnx,can-tx-dpth = <0x20>;
+                        xlnx,num-of-tx-buf = <0x20>;
+                        xlnx,can-board-interface = "custom";
+                };
+
+                can1: can@ff070000 {
+                        phandle = <0x71>;
+                        compatible = "xlnx,canfd-2.0";
+                        status = "okay";
+                        reg = <0x0 0xff070000 0x0 0x6000>;
+                        interrupts = <0x0 0x15 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "can_clk", "s_axi_aclk";
+                        rx-fifo-depth = <0x40>;
+                        tx-mailbox-count = <0x20>;
+                        clocks = <&can1_clk>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x18224020>;
+                        xlnx,can-rx-dpth = <0x40>;
+                        xlnx,num-of-rx-mb-buf = <0x30>;
+                        xlnx,can-clk-freq-hz = <0x9896767>;
+                        xlnx,ip-name = "psv_canfd";
+                        xlnx,rx-mode = <0x0>;
+                        xlnx,can-tx-dpth = <0x20>;
+                        xlnx,num-of-tx-buf = <0x20>;
+                        xlnx,can-board-interface = "custom";
+                };
+
+                cci: cci@fd000000 {
+                        phandle = <0x60>;
+                        compatible = "arm,cci-500";
+                        status = "okay";
+                        reg = <0x0 0xfd000000 0x0 0x10000>;
+                        ranges = <0x0 0x0 0xfd000000 0xa0000>;
+                        #address-cells = <0x1>;
+                        #size-cells = <0x1>;
+                        xlnx,ip-name = "psv_fpd_maincci";
+
+                        cci_pmu: pmu@10000 {
+                                phandle = <0xdd>;
+                                compatible = "arm,cci-500-pmu,r0";
+                                reg = <0x10000 0x90000>;
+                                interrupt-parent = <&gic>;
+                                interrupts = <0x0 0x6a 0x4 0x0 0x6a 0x4 0x0 0x6a 0x4 0x0 0x6a 0x4 0x0 0x6a 0x4 0x0 0x6a 0x4 0x0 0x6a 0x4 0x0 0x6a 0x4>;
+                        };
+                };
+
+                lpd_dma_chan0: dma-controller@ffa80000 {
+                        phandle = <0x84>;
+                        compatible = "xlnx,zynqmp-dma-1.0";
+                        status = "okay";
+                        reg = <0x0 0xffa80000 0x0 0x1000>;
+                        interrupts = <0x0 0x3c 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "clk_main", "clk_apb";
+                        xlnx,dma-type = <0x1>;
+                        #dma-cells = <0x1>;
+                        xlnx,bus-width = <0x40>;
+                        clocks = <&versal_clk 0x51>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x18224035>;
+                        xlnx,is-cache-coherent = <0x0>;
+                        xlnx,ip-name = "psv_adma";
+                        xlnx,dma-mode = <0x1>;
+                };
+
+                lpd_dma_chan1: dma-controller@ffa90000 {
+                        phandle = <0x85>;
+                        compatible = "xlnx,zynqmp-dma-1.0";
+                        status = "okay";
+                        reg = <0x0 0xffa90000 0x0 0x1000>;
+                        interrupts = <0x0 0x3d 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "clk_main", "clk_apb";
+                        xlnx,dma-type = <0x1>;
+                        #dma-cells = <0x1>;
+                        xlnx,bus-width = <0x40>;
+                        clocks = <&versal_clk 0x51>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x18224036>;
+                        xlnx,is-cache-coherent = <0x0>;
+                        xlnx,ip-name = "psv_adma";
+                        xlnx,dma-mode = <0x1>;
+                };
+
+                lpd_dma_chan2: dma-controller@ffaa0000 {
+                        phandle = <0x86>;
+                        compatible = "xlnx,zynqmp-dma-1.0";
+                        status = "okay";
+                        reg = <0x0 0xffaa0000 0x0 0x1000>;
+                        interrupts = <0x0 0x3e 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "clk_main", "clk_apb";
+                        xlnx,dma-type = <0x1>;
+                        #dma-cells = <0x1>;
+                        xlnx,bus-width = <0x40>;
+                        clocks = <&versal_clk 0x51>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x18224037>;
+                        xlnx,is-cache-coherent = <0x0>;
+                        xlnx,ip-name = "psv_adma";
+                        xlnx,dma-mode = <0x1>;
+                };
+
+                lpd_dma_chan3: dma-controller@ffab0000 {
+                        phandle = <0x87>;
+                        compatible = "xlnx,zynqmp-dma-1.0";
+                        status = "okay";
+                        reg = <0x0 0xffab0000 0x0 0x1000>;
+                        interrupts = <0x0 0x3f 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "clk_main", "clk_apb";
+                        xlnx,dma-type = <0x1>;
+                        #dma-cells = <0x1>;
+                        xlnx,bus-width = <0x40>;
+                        clocks = <&versal_clk 0x51>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x18224038>;
+                        xlnx,is-cache-coherent = <0x0>;
+                        xlnx,ip-name = "psv_adma";
+                        xlnx,dma-mode = <0x1>;
+                };
+
+                lpd_dma_chan4: dma-controller@ffac0000 {
+                        phandle = <0x88>;
+                        compatible = "xlnx,zynqmp-dma-1.0";
+                        status = "okay";
+                        reg = <0x0 0xffac0000 0x0 0x1000>;
+                        interrupts = <0x0 0x40 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "clk_main", "clk_apb";
+                        xlnx,dma-type = <0x1>;
+                        #dma-cells = <0x1>;
+                        xlnx,bus-width = <0x40>;
+                        clocks = <&versal_clk 0x51>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x18224039>;
+                        xlnx,is-cache-coherent = <0x0>;
+                        xlnx,ip-name = "psv_adma";
+                        xlnx,dma-mode = <0x1>;
+                };
+
+                lpd_dma_chan5: dma-controller@ffad0000 {
+                        phandle = <0x89>;
+                        compatible = "xlnx,zynqmp-dma-1.0";
+                        status = "okay";
+                        reg = <0x0 0xffad0000 0x0 0x1000>;
+                        interrupts = <0x0 0x41 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "clk_main", "clk_apb";
+                        xlnx,dma-type = <0x1>;
+                        #dma-cells = <0x1>;
+                        xlnx,bus-width = <0x40>;
+                        clocks = <&versal_clk 0x51>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x1822403a>;
+                        xlnx,is-cache-coherent = <0x0>;
+                        xlnx,ip-name = "psv_adma";
+                        xlnx,dma-mode = <0x1>;
+                };
+
+                lpd_dma_chan6: dma-controller@ffae0000 {
+                        phandle = <0x8a>;
+                        compatible = "xlnx,zynqmp-dma-1.0";
+                        status = "okay";
+                        reg = <0x0 0xffae0000 0x0 0x1000>;
+                        interrupts = <0x0 0x42 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "clk_main", "clk_apb";
+                        xlnx,dma-type = <0x1>;
+                        #dma-cells = <0x1>;
+                        xlnx,bus-width = <0x40>;
+                        clocks = <&versal_clk 0x51>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x1822403b>;
+                        xlnx,is-cache-coherent = <0x0>;
+                        xlnx,ip-name = "psv_adma";
+                        xlnx,dma-mode = <0x1>;
+                };
+
+                lpd_dma_chan7: dma-controller@ffaf0000 {
+                        phandle = <0x8b>;
+                        compatible = "xlnx,zynqmp-dma-1.0";
+                        status = "okay";
+                        reg = <0x0 0xffaf0000 0x0 0x1000>;
+                        interrupts = <0x0 0x43 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "clk_main", "clk_apb";
+                        xlnx,dma-type = <0x1>;
+                        #dma-cells = <0x1>;
+                        xlnx,bus-width = <0x40>;
+                        clocks = <&versal_clk 0x51>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x1822403c>;
+                        xlnx,is-cache-coherent = <0x0>;
+                        xlnx,ip-name = "psv_adma";
+                        xlnx,dma-mode = <0x1>;
+                };
+
+                gem0: ethernet@ff0c0000 {
+                        phandle = <0x74>;
+                        compatible = "xlnx,versal-gem", "cdns,gem";
+                        status = "okay";
+                        reg = <0x0 0xff0c0000 0x0 0x1000>;
+                        interrupts = <0x0 0x38 0x4 0x0 0x38 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "pclk", "hclk", "tx_clk", "rx_clk", "tsu_clk";
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+                        clocks = <&versal_clk 0x52>,
+                         <&versal_clk 0x58>,
+                         <&versal_clk 0x31>,
+                         <&versal_clk 0x30>,
+                         <&versal_clk 0x2b>;
+                        power-domains = <&versal_firmware 0x18224019>;
+                        xlnx,has-mdio = <0x1>;
+                        xlnx,is-cache-coherent = <0x0>;
+                        xlnx,gem-board-interface = "custom";
+                        phy-mode = "rgmii-id";
+                        xlnx,enet-slcr-1000mbps-div0 = <0x2>;
+                        xlnx,enet-slcr-10mbps-div0 = <0x64>;
+                        xlnx,enet-tsu-clk-freq-hz = <0xee6b18c>;
+                        xlnx,ip-name = "psv_ethernet";
+                        xlnx,eth-mode = <0x1>;
+                        xlnx,enet-clk-freq-hz = <0x77358c6>;
+                        xlnx,enet-slcr-100mbps-div0 = <0xa>;
+                        phy-handle = <0xb3>;
+
+                        mdio: mdio {
+                                phandle = <0xde>;
+                                #address-cells = <0x1>;
+                                #size-cells = <0x0>;
+
+                                phy0: ethernet-phy@1 {
+                                        phandle = <0xb3>;
+                                        compatible = "ethernet-phy-id0283.bc30";
+                                        reg = <0x1>;
+                                        adi,rx-internal-delay-ps = <0x7d0>;
+                                        adi,tx-internal-delay-ps = <0x7d0>;
+                                        adi,fifo-depth-bits = <0x8>;
+                                        reset-gpios = <&gpio1 0x30 0x1>;
+                                        reset-assert-us = <0xa>;
+                                        reset-deassert-us = <0x1388>;
+                                };
+                        };
+                };
+
+                gem1: ethernet@ff0d0000 {
+                        phandle = <0xdf>;
+                        compatible = "xlnx,versal-gem", "cdns,gem";
+                        status = "disabled";
+                        reg = <0x0 0xff0d0000 0x0 0x1000>;
+                        interrupts = <0x0 0x3a 0x4 0x0 0x3a 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "pclk", "hclk", "tx_clk", "rx_clk", "tsu_clk";
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+                        clocks = <&versal_clk 0x52>,
+                         <&versal_clk 0x59>,
+                         <&versal_clk 0x33>,
+                         <&versal_clk 0x32>,
+                         <&versal_clk 0x2b>;
+                        power-domains = <&versal_firmware 0x1822401a>;
+                };
+
+                gpio0: gpio@ff0b0000 {
+                        phandle = <0xe0>;
+                        compatible = "xlnx,versal-gpio-1.0";
+                        status = "disabled";
+                        reg = <0x0 0xff0b0000 0x0 0x1000>;
+                        interrupts = <0x0 0xd 0x4>;
+                        interrupt-parent = <&gic>;
+                        #gpio-cells = <0x2>;
+                        gpio-controller;
+                        #interrupt-cells = <0x2>;
+                        interrupt-controller;
+                        clocks = <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x18224023>;
+                };
+
+                gpio1: gpio@f1020000 {
+                        phandle = <0x35>;
+                        compatible = "xlnx,pmc-gpio-1.0";
+                        status = "okay";
+                        reg = <0x0 0xf1020000 0x0 0x1000>;
+                        interrupts = <0x0 0x7a 0x4>;
+                        interrupt-parent = <&gic>;
+                        #gpio-cells = <0x2>;
+                        gpio-controller;
+                        #interrupt-cells = <0x2>;
+                        interrupt-controller;
+                        clocks = <&versal_clk 0x3d>;
+                        power-domains = <&versal_firmware 0x1822402c>;
+                        xlnx,ip-name = "psv_pmc_gpio";
+                        xlnx,pmc-gpio-emio-peripheral-enable = <0x0>;
+                };
+
+                i2c0: i2c@ff020000 {
+                        phandle = <0x6e>;
+                        compatible = "cdns,i2c-r1p14";
+                        status = "okay";
+                        reg = <0x0 0xff020000 0x0 0x1000>;
+                        interrupts = <0x0 0xe 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-frequency = <0x186a0>;
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+                        clocks = <&versal_clk 0x62>;
+                        power-domains = <&versal_firmware 0x1822401d>;
+                        xlnx,clock-freq = <0x5f5e0a4>;
+                        xlnx,i2c-clk-freq-hz = <0x5f5e0a4>;
+                        xlnx,ip-name = "psv_i2c";
+                        xlnx,iic-board-interface = "custom";
+                };
+
+                i2c1: i2c@ff030000 {
+                        phandle = <0x6f>;
+                        compatible = "cdns,i2c-r1p14";
+                        status = "okay";
+                        reg = <0x0 0xff030000 0x0 0x1000>;
+                        interrupts = <0x0 0xf 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-frequency = <0x186a0>;
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+                        clocks = <&versal_clk 0x63>;
+                        power-domains = <&versal_firmware 0x1822401e>;
+                        xlnx,clock-freq = <0x5f5e0a4>;
+                        xlnx,i2c-clk-freq-hz = <0x5f5e0a4>;
+                        xlnx,ip-name = "psv_i2c";
+                        xlnx,iic-board-interface = "custom";
+                        bootph-all;
+
+                        eeprom: eeprom@54 {
+                                phandle = <0xe1>;
+                                compatible = "st,24c128", "atmel,24c128";
+                                reg = <0x54>;
+                                bootph-all;
+                        };
+                };
+
+                i2c2: i2c@f1000000 {
+                        phandle = <0xe2>;
+                        compatible = "cdns,i2c-r1p14";
+                        status = "disabled";
+                        reg = <0x0 0xf1000000 0x0 0x1000>;
+                        interrupts = <0x0 0x7b 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-frequency = <0x186a0>;
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+                        clocks = <&versal_clk 0x3e>;
+                        power-domains = <&versal_firmware 0x1822402d>;
+                };
+
+                mc0: memory-controller@f6150000 {
+                        phandle = <0xe3>;
+                        compatible = "xlnx,versal-ddrmc";
+                        status = "disabled";
+                        reg = <0x0 0xf6150000 0x0 0x2000 0x0 0xf6070000 0x0 0x20000>;
+                        reg-names = "base", "noc";
+                        interrupts = <0x0 0x93 0x4>;
+                        interrupt-parent = <&gic>;
+                };
+
+                mc1: memory-controller@f62c0000 {
+                        phandle = <0xe4>;
+                        compatible = "xlnx,versal-ddrmc";
+                        status = "disabled";
+                        reg = <0x0 0xf62c0000 0x0 0x2000 0x0 0xf6210000 0x0 0x20000>;
+                        reg-names = "base", "noc";
+                        interrupts = <0x0 0x93 0x4>;
+                        interrupt-parent = <&gic>;
+                };
+
+                mc2: memory-controller@f6430000 {
+                        phandle = <0xe5>;
+                        compatible = "xlnx,versal-ddrmc";
+                        status = "disabled";
+                        reg = <0x0 0xf6430000 0x0 0x2000 0x0 0xf6380000 0x0 0x20000>;
+                        reg-names = "base", "noc";
+                        interrupts = <0x0 0x93 0x4>;
+                        interrupt-parent = <&gic>;
+                };
+
+                mc3: memory-controller@f65a0000 {
+                        phandle = <0xe6>;
+                        compatible = "xlnx,versal-ddrmc";
+                        status = "disabled";
+                        reg = <0x0 0xf65a0000 0x0 0x2000 0x0 0xf64f0000 0x0 0x20000>;
+                        reg-names = "base", "noc";
+                        interrupts = <0x0 0x93 0x4>;
+                        interrupt-parent = <&gic>;
+                };
+
+                ocm: memory-controller@ff960000 {
+                        phandle = <0xe7>;
+                        compatible = "xlnx,zynqmp-ocmc-1.0";
+                        reg = <0x0 0xff960000 0x0 0x1000>;
+                        interrupts = <0x0 0xa 0x4>;
+                        interrupt-parent = <&gic>;
+                };
+
+                rtc: rtc@f12a0000 {
+                        phandle = <0x47>;
+                        compatible = "xlnx,zynqmp-rtc";
+                        status = "okay";
+                        reg = <0x0 0xf12a0000 0x0 0x100>;
+                        interrupt-names = "alarm", "sec";
+                        interrupts = <0x0 0x8e 0x4 0x0 0x8f 0x4>;
+                        interrupt-parent = <&gic>;
+                        clocks = <&rtc_clk>;
+                        clock-names = "rtc";
+                        power-domains = <&versal_firmware 0x18224034>;
+                        xlnx,ip-name = "psv_pmc_rtc";
+                };
+
+                sdhci0: mmc@f1040000 {
+                        phandle = <0xe8>;
+                        compatible = "xlnx,versal-8.9a", "arasan,sdhci-8.9a";
+                        status = "disabled";
+                        reg = <0x0 0xf1040000 0x0 0x10000>;
+                        interrupts = <0x0 0x7e 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "clk_xin", "clk_ahb", "gate";
+                        #clock-cells = <0x1>;
+                        clock-output-names = "clk_out_sd0", "clk_in_sd0";
+                        clocks = <&versal_clk 0x3b>,
+                         <&versal_clk 0x52>,
+                         <&versal_clk 0x4a>;
+                        power-domains = <&versal_firmware 0x1822402e>;
+                };
+
+                sdhci1: mmc@f1050000 {
+                        phandle = <0x36>;
+                        compatible = "xlnx,versal-8.9a", "arasan,sdhci-8.9a";
+                        status = "okay";
+                        reg = <0x0 0xf1050000 0x0 0x10000>;
+                        interrupts = <0x0 0x80 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "clk_xin", "clk_ahb", "gate";
+                        #clock-cells = <0x1>;
+                        clock-output-names = "clk_out_sd1", "clk_in_sd1";
+                        clocks = <&versal_clk 0x3c>,
+                         <&versal_clk 0x52>,
+                         <&versal_clk 0x4a>;
+                        power-domains = <&versal_firmware 0x1822402f>;
+                        xlnx,sd-board-interface = "custom";
+                        xlnx,is-cache-coherent = <0x0>;
+                        xlnx,clk-50-ddr-otap-dly = <0x3>;
+                        xlnx,clk-50-sdr-itap-dly = <0x2c>;
+                        xlnx,has-emio = <0x0>;
+                        clock-frequency = <0xbebc149>;
+                        xlnx,clk-100-sdr-otap-dly = <0x3>;
+                        xlnx,mio-bank = <0x1>;
+                        xlnx,ip-name = "psv_pmc_sd";
+                        xlnx,bus-width = <0x8>;
+                        xlnx,card-detect = <0x1>;
+                        xlnx,has-wp = <0x0>;
+                        xlnx,has-cd = <0x1>;
+                        xlnx,slot-type = <0x3>;
+                        xlnx,clk-50-sdr-otap-dly = <0x4>;
+                        xlnx,clk-50-ddr-itap-dly = <0x36>;
+                        xlnx,has-power = <0x1>;
+                        xlnx,clk-200-sdr-otap-dly = <0x2>;
+                        xlnx,sdio-clk-freq-hz = <0xbebc149>;
+                        xlnx,write-protect = <0x0>;
+                        no-1-8-v;
+                };
+
+                serial0: serial@ff000000 {
+                        phandle = <0x6d>;
+                        compatible = "arm,pl011", "arm,primecell";
+                        status = "okay";
+                        reg = <0x0 0xff000000 0x0 0x1000>;
+                        interrupts = <0x0 0x12 0x4>;
+                        interrupt-parent = <&gic>;
+                        reg-io-width = <0x4>;
+                        clock-names = "uartclk", "apb_pclk";
+                        bootph-all;
+                        clocks = <&versal_clk 0x5c>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x18224021>;
+                        xlnx,has-modem = <0x0>;
+                        xlnx,uart-clk-freq-hz = <0x5f5e0a4>;
+                        port-number = <0x0>;
+                        xlnx,ip-name = "psv_sbsauart";
+                        xlnx,uart-board-interface = "custom";
+                        xlnx,baudrate = <0x1c200>;
+                        cts-override;
+                        u-boot,dm-pre-reloc;
+                        device_type = "serial";
+                        xlnx,clock-freq = <0x5f5e0a4>;
+                };
+
+                serial1: serial@ff010000 {
+                        phandle = <0xe9>;
+                        compatible = "arm,pl011", "arm,primecell";
+                        status = "disabled";
+                        reg = <0x0 0xff010000 0x0 0x1000>;
+                        interrupts = <0x0 0x13 0x4>;
+                        interrupt-parent = <&gic>;
+                        reg-io-width = <0x4>;
+                        clock-names = "uartclk", "apb_pclk";
+                        bootph-all;
+                        clocks = <&versal_clk 0x5d>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x18224022>;
+                };
+
+                smmu: iommu@fd800000 {
+                        phandle = <0x6b>;
+                        compatible = "arm,mmu-500";
+                        status = "okay";
+                        reg = <0x0 0xfd800000 0x0 0x40000>;
+                        stream-match-mask = <0x7c00>;
+                        #iommu-cells = <0x1>;
+                        #global-interrupts = <0x1>;
+                        interrupts = <0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4 0x0 0x6b 0x4>;
+                        interrupt-parent = <&gic>;
+                        xlnx,ip-name = "psv_fpd_smmutcu";
+                };
+
+                ospi: spi@f1010000 {
+                        phandle = <0x34>;
+                        compatible = "xlnx,versal-ospi-1.0", "cdns,qspi-nor";
+                        status = "okay";
+                        reg = <0x0 0xf1010000 0x0 0x10000 0x0 0xc0000000 0x0 0x20000000>;
+                        interrupts = <0x0 0x7c 0x4>;
+                        interrupt-parent = <&gic>;
+                        cdns,fifo-depth = <0x100>;
+                        cdns,fifo-width = <0x4>;
+                        cdns,is-dma = <0x1>;
+                        cdns,trigger-address = <0xc0000000>;
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+                        clocks = <&versal_clk 0x3a>;
+                        power-domains = <&versal_firmware 0x1822402a>;
+                        reset-names = "qspi";
+                        resets = <&versal_reset 0xc10402e>;
+                        is-stacked = <0x0>;
+                        xlnx,is-cache-coherent = <0x0>;
+                        xlnx,clock-freq = <0xbebc149>;
+                        xlnx,ip-name = "psv_pmc_ospi";
+                        xlnx,ospi-clk-freq-hz = <0xbebc149>;
+                        is-dual = <0x0>;
+                        xlnx,ospi-mode = <0x0>;
+                        bus-num = <0x2>;
+                        num-cs = <0x1>;
+                        #stream-id-cells = <0x1>;
+
+                        spi_flash: flash@0 {
+                                phandle = <0xea>;
+                                compatible = "mt35xu02g", "micron,m25p80", "jedec,spi-nor";
+                                reg = <0x0>;
+                                cdns,read-delay = <0x0>;
+                                cdns,tshsl-ns = <0x0>;
+                                cdns,tsd2d-ns = <0x0>;
+                                cdns,tchsh-ns = <0x1>;
+                                cdns,tslch-ns = <0x1>;
+                                spi-tx-bus-width = <0x8>;
+                                spi-rx-bus-width = <0x8>;
+                                spi-max-frequency = <0x1312d00>;
+                                no-wp;
+                                reset-gpios = <&gpio1 0xc 0x1>;
+
+                                partition@0 {
+                                        compatible = "fixed-partitions";
+                                        #address-cells = <0x1>;
+                                        #size-cells = <0x1>;
+
+                                        partition@0 {
+                                                label = "spi0-flash0";
+                                                reg = <0x0 0x10000000>;
+                                        };
+                                };
+                        };
+                };
+
+                qspi: spi@f1030000 {
+                        phandle = <0xeb>;
+                        compatible = "xlnx,versal-qspi-1.0";
+                        status = "disabled";
+                        reg = <0x0 0xf1030000 0x0 0x1000>;
+                        interrupts = <0x0 0x7d 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "ref_clk", "pclk";
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+                        clocks = <&versal_clk 0x39>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x1822402b>;
+                };
+
+                spi0: spi@ff040000 {
+                        phandle = <0xec>;
+                        compatible = "cdns,spi-r1p6";
+                        status = "disabled";
+                        reg = <0x0 0xff040000 0x0 0x1000>;
+                        interrupts = <0x0 0x10 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "ref_clk", "pclk";
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+                        clocks = <&versal_clk 0x5e>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x1822401b>;
+                };
+
+                spi1: spi@ff050000 {
+                        phandle = <0xed>;
+                        compatible = "cdns,spi-r1p6";
+                        status = "disabled";
+                        reg = <0x0 0xff050000 0x0 0x1000>;
+                        interrupts = <0x0 0x11 0x4>;
+                        interrupt-parent = <&gic>;
+                        clock-names = "ref_clk", "pclk";
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+                        clocks = <&versal_clk 0x5f>,
+                         <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x1822401c>;
+                };
+
+                sysmon0: sysmon@f1270000 {
+                        phandle = <0x46>;
+                        compatible = "xlnx,versal-sysmon";
+                        #io-channel-cells = <0x1>;
+                        reg = <0x0 0xf1270000 0x0 0x4000>;
+                        interrupts = <0x0 0x90 0x4>;
+                        xlnx,numchannels = [09];
+                        #address-cells = <0x2>;
+                        #size-cells = <0x2>;
+                        xlnx,nodeid = <0x18224055>;
+                        xlnx,sat-63-desc = "PS , FPD , satellite";
+                        xlnx,sat-1-desc = "PMC , system , ADC";
+                        xlnx,sat-17-x = <0x40b7>;
+                        xlnx,sat-9-x = <0x315e>;
+                        xlnx,sat-20-desc = "VNOC , satellite";
+                        xlnx,sat-19-desc = "Clocking , column , satellite";
+                        xlnx,sat-17-y = <0x1795>;
+                        xlnx,sat-9-y = <0x34f8>;
+                        xlnx,sat-22-x = <0x2624>;
+                        xlnx,meas-0-root-id = <0x0>;
+                        xlnx,meas-7-slr-number = <0x0>;
+                        xlnx,sat-22-y = <0x25ed>;
+                        xlnx,meas-1-root-id = <0x2>;
+                        xlnx,ip-name = "psv_pmc_sysmon";
+                        xlnx,sat-16-desc = "Clocking , column , satellite";
+                        xlnx,meas-2-root-id = <0x6>;
+                        xlnx,meas-2-slr-number = <0x0>;
+                        xlnx,meas-3-root-id = <0x7>;
+                        xlnx,sat-9-desc = "ME , satellite";
+                        xlnx,sat-26-x = <0x18d1>;
+                        xlnx,meas-4-root-id = <0x1>;
+                        xlnx,sat-28-desc = "ME , satellite";
+                        xlnx,sat-26-y = <0x19f9>;
+                        xlnx,meas-5-root-id = <0x3>;
+                        xlnx,sat-10-x = <0x2995>;
+                        xlnx,sat-64-x = <0x23>;
+                        xlnx,sat-2-x = <0x23>;
+                        xlnx,meas-6-root-id = <0x4>;
+                        xlnx,sat-10-y = <0x34f8>;
+                        xlnx,sat-64-y = <0xb34>;
+                        xlnx,sat-2-y = <0xb34>;
+                        xlnx,meas-7-root-id = <0x5>;
+                        xlnx,sat-13-desc = "Clocking , column , satellite";
+                        xlnx,sat-31-x = <0xa0e>;
+                        xlnx,meas-8-root-id = <0x8>;
+                        xlnx,sat-6-desc = "VNOC , satellite";
+                        xlnx,sat-31-y = <0x2ff0>;
+                        xlnx,sat-14-x = <0x40b7>;
+                        xlnx,sat-6-x = <0x3377>;
+                        xlnx,sat-25-desc = "VNOC , satellite";
+                        xlnx,sat-14-y = <0x29b7>;
+                        xlnx,sat-6-y = <0xe06>;
+                        xlnx,sat-10-desc = "ME , satellite";
+                        xlnx,sat-18-x = <0x40b7>;
+                        xlnx,sat-3-desc = "XPIO , satellite";
+                        xlnx,sat-18-y = <0x11d0>;
+                        xlnx,meas-5-slr-number = <0x0>;
+                        xlnx,sat-22-desc = "VNOC , satellite";
+                        xlnx,sat-23-x = <0x21cc>;
+                        xlnx,meas-0-slr-number = <0x0>;
+                        xlnx,sat-23-y = <0x34f8>;
+                        xlnx,sat-18-desc = "Clocking , column , satellite";
+                        xlnx,sat-27-x = <0x18d1>;
+                        xlnx,sat-27-y = <0x25ed>;
+                        xlnx,sat-11-x = <0x3926>;
+                        xlnx,sat-3-x = <0x116a>;
+                        xlnx,sat-31-desc = "Clocking , column , satellite";
+                        xlnx,sat-11-y = <0x34f8>;
+                        xlnx,sat-3-y = <0x5ff>;
+                        status = "okay";
+                        xlnx,meas-8-slr-number = <0x0>;
+                        xlnx,sat-15-desc = "Clocking , column , satellite";
+                        xlnx,sat-15-x = <0x40b7>;
+                        xlnx,sat-8-desc = "VNOC , satellite";
+                        xlnx,sat-7-x = <0x3377>;
+                        xlnx,sat-15-y = <0x2389>;
+                        xlnx,sat-7-y = <0x19f9>;
+                        xlnx,sat-27-desc = "VNOC , satellite";
+                        xlnx,meas-3-slr-number = <0x0>;
+                        xlnx,sat-20-x = <0x2624>;
+                        xlnx,sat-19-x = <0x40b7>;
+                        xlnx,sat-12-desc = "ME , satellite";
+                        xlnx,sat-20-y = <0xe06>;
+                        xlnx,sat-19-y = <0xba1>;
+                        xlnx,sat-5-desc = "XPIO , satellite";
+                        xlnx,sat-24-desc = "ME , satellite";
+                        xlnx,sat-24-x = <0x1a03>;
+                        xlnx,sat-24-y = <0x34f8>;
+                        xlnx,sat-64-desc = "PS , LPD , satellite";
+                        xlnx,sat-2-desc = "PMC , user , ADC";
+                        xlnx,sat-28-x = <0x123a>;
+                        xlnx,sat-21-desc = "VNOC , satellite";
+                        xlnx,sat-28-y = <0x34f8>;
+                        xlnx,meas-6-slr-number = <0x0>;
+                        xlnx,sat-12-x = <0x40ef>;
+                        xlnx,sat-4-x = <0x290a>;
+                        xlnx,sat-12-y = <0x34f8>;
+                        xlnx,sat-4-y = <0x5ff>;
+                        xlnx,meas-1-slr-number = <0x0>;
+                        xlnx,sat-17-desc = "Clocking , column , satellite";
+                        xlnx,sat-16-x = <0x40b7>;
+                        xlnx,sat-8-x = <0x3377>;
+                        xlnx,sat-16-y = <0x1dc4>;
+                        xlnx,sat-8-y = <0x25ed>;
+                        xlnx,meas-0 = "VCCAUX";
+                        xlnx,sat-30-desc = "ME , satellite";
+                        xlnx,sat-29-desc = "ME , satellite";
+                        xlnx,meas-1 = "VCCINT";
+                        xlnx,sat-21-x = <0x2624>;
+                        xlnx,meas-2 = "VCC_RAM";
+                        xlnx,sat-21-y = <0x19f9>;
+                        xlnx,meas-3 = "VCC_SOC";
+                        xlnx,sat-14-desc = "Clocking , column , satellite";
+                        xlnx,meas-4 = "VCCAUX_PMC";
+                        xlnx,sat-7-desc = "VNOC , satellite";
+                        xlnx,meas-5 = "VCC_PMC";
+                        xlnx,sat-26-desc = "VNOC , satellite";
+                        xlnx,sat-25-x = <0x18d1>;
+                        xlnx,meas-6 = "VCC_PSFP";
+                        xlnx,sat-25-y = <0xe06>;
+                        xlnx,meas-7 = "VCC_PSLP";
+                        xlnx,sat-63-x = <0x23>;
+                        xlnx,sat-1-x = <0x23>;
+                        xlnx,meas-4-slr-number = <0x0>;
+                        xlnx,meas-8 = "VP_VN";
+                        xlnx,sat-11-desc = "ME , satellite";
+                        xlnx,sat-63-y = <0xb34>;
+                        xlnx,sat-1-y = <0xb34>;
+                        xlnx,sat-4-desc = "XPIO , satellite";
+                        xlnx,sat-30-x = <0x2a8>;
+                        xlnx,sat-29-x = <0xa71>;
+                        xlnx,sat-30-y = <0x34f8>;
+                        xlnx,sat-29-y = <0x34f8>;
+                        xlnx,sat-23-desc = "ME , satellite";
+                        xlnx,sat-13-x = <0x40b7>;
+                        xlnx,sat-5-x = <0x40aa>;
+                        xlnx,sat-13-y = <0x2ff0>;
+                        xlnx,sat-5-y = <0x5ff>;
+
+                        supply@0 {
+                                reg = <0x0>;
+                                xlnx,name = "vccaux";
+                        };
+
+                        supply@2 {
+                                reg = <0x2>;
+                                xlnx,name = "vccint";
+                        };
+
+                        supply@6 {
+                                reg = <0x6>;
+                                xlnx,name = "vcc_ram";
+                        };
+
+                        supply@7 {
+                                reg = <0x7>;
+                                xlnx,name = "vcc_soc";
+                        };
+
+                        supply@1 {
+                                reg = <0x1>;
+                                xlnx,name = "vccaux_pmc";
+                        };
+
+                        supply@3 {
+                                reg = <0x3>;
+                                xlnx,name = "vcc_pmc";
+                        };
+
+                        supply@4 {
+                                reg = <0x4>;
+                                xlnx,name = "vcc_psfp";
+                        };
+
+                        supply@5 {
+                                reg = <0x5>;
+                                xlnx,name = "vcc_pslp";
+                        };
+
+                        supply@8 {
+                                reg = <0x8>;
+                                xlnx,name = "vp_vn";
+                        };
+                };
+
+                sysmon1: sysmon@109270000 {
+                        phandle = <0xee>;
+                        compatible = "xlnx,versal-sysmon";
+                        status = "disabled";
+                        #io-channel-cells = <0x1>;
+                        reg = <0x1 0x9270000 0x0 0x4000>;
+                        xlnx,numchannels = [00];
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+                        xlnx,nodeid = <0x18225055>;
+                };
+
+                sysmon2: sysmon@111270000 {
+                        phandle = <0xef>;
+                        compatible = "xlnx,versal-sysmon";
+                        status = "disabled";
+                        #io-channel-cells = <0x1>;
+                        reg = <0x1 0x11270000 0x0 0x4000>;
+                        xlnx,numchannels = [00];
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+                        xlnx,nodeid = <0x18226055>;
+                };
+
+                sysmon3: sysmon@119270000 {
+                        phandle = <0xf0>;
+                        compatible = "xlnx,versal-sysmon";
+                        status = "disabled";
+                        #io-channel-cells = <0x1>;
+                        reg = <0x1 0x19270000 0x0 0x4000>;
+                        xlnx,numchannels = [00];
+                        #address-cells = <0x1>;
+                        #size-cells = <0x0>;
+                        xlnx,nodeid = <0x18227055>;
+                };
+
+                ttc0: timer@ff0e0000 {
+                        phandle = <0x75>;
+                        compatible = "cdns,ttc";
+                        status = "okay";
+                        interrupts = <0x0 0x25 0x4 0x0 0x26 0x4 0x0 0x27 0x4>;
+                        interrupt-parent = <&gic>;
+                        reg = <0x0 0xff0e0000 0x0 0x1000>;
+                        timer-width = <0x20>;
+                        clocks = <&versal_clk 0x27>;
+                        power-domains = <&versal_firmware 0x18224024>;
+                        xlnx,ttc-board-interface = "custom";
+                        xlnx,ttc-clk2-freq-hz = <0x8f0d0f7>;
+                        xlnx,ttc-clk1-clksrc = <0x0>;
+                        xlnx,clock-freq = <0x8f0d0f7>;
+                        xlnx,ttc-clk2-clksrc = <0x0>;
+                        xlnx,ip-name = "psv_ttc";
+                        xlnx,ttc-clk0-freq-hz = <0x8f0d0f7>;
+                        xlnx,ttc-clk1-freq-hz = <0x8f0d0f7>;
+                        xlnx,ttc-clk0-clksrc = <0x0>;
+                };
+
+                ttc1: timer@ff0f0000 {
+                        phandle = <0x76>;
+                        compatible = "cdns,ttc";
+                        status = "okay";
+                        interrupts = <0x0 0x28 0x4 0x0 0x29 0x4 0x0 0x2a 0x4>;
+                        interrupt-parent = <&gic>;
+                        reg = <0x0 0xff0f0000 0x0 0x1000>;
+                        timer-width = <0x20>;
+                        clocks = <&versal_clk 0x28>;
+                        power-domains = <&versal_firmware 0x18224025>;
+                        xlnx,ttc-board-interface = "custom";
+                        xlnx,ttc-clk2-freq-hz = <0x8f0d0f7>;
+                        xlnx,ttc-clk1-clksrc = <0x0>;
+                        xlnx,clock-freq = <0x8f0d0f7>;
+                        xlnx,ttc-clk2-clksrc = <0x0>;
+                        xlnx,ip-name = "psv_ttc";
+                        xlnx,ttc-clk0-freq-hz = <0x8f0d0f7>;
+                        xlnx,ttc-clk1-freq-hz = <0x8f0d0f7>;
+                        xlnx,ttc-clk0-clksrc = <0x0>;
+                };
+
+                ttc2: timer@ff100000 {
+                        phandle = <0x77>;
+                        compatible = "cdns,ttc";
+                        status = "okay";
+                        interrupts = <0x0 0x2b 0x4 0x0 0x2c 0x4 0x0 0x2d 0x4>;
+                        interrupt-parent = <&gic>;
+                        reg = <0x0 0xff100000 0x0 0x1000>;
+                        timer-width = <0x20>;
+                        clocks = <&versal_clk 0x29>;
+                        power-domains = <&versal_firmware 0x18224026>;
+                        xlnx,ttc-board-interface = "custom";
+                        xlnx,ttc-clk2-freq-hz = <0x8f0d0f7>;
+                        xlnx,ttc-clk1-clksrc = <0x0>;
+                        xlnx,clock-freq = <0x8f0d0f7>;
+                        xlnx,ttc-clk2-clksrc = <0x0>;
+                        xlnx,ip-name = "psv_ttc";
+                        xlnx,ttc-clk0-freq-hz = <0x8f0d0f7>;
+                        xlnx,ttc-clk1-freq-hz = <0x8f0d0f7>;
+                        xlnx,ttc-clk0-clksrc = <0x0>;
+                };
+
+                ttc3: timer@ff110000 {
+                        phandle = <0x78>;
+                        compatible = "cdns,ttc";
+                        status = "okay";
+                        interrupts = <0x0 0x2e 0x4 0x0 0x2f 0x4 0x0 0x30 0x4>;
+                        interrupt-parent = <&gic>;
+                        reg = <0x0 0xff110000 0x0 0x1000>;
+                        timer-width = <0x20>;
+                        clocks = <&versal_clk 0x2a>;
+                        power-domains = <&versal_firmware 0x18224027>;
+                        xlnx,ttc-board-interface = "custom";
+                        xlnx,ttc-clk2-freq-hz = <0x8f0d0f7>;
+                        xlnx,ttc-clk1-clksrc = <0x0>;
+                        xlnx,clock-freq = <0x8f0d0f7>;
+                        xlnx,ttc-clk2-clksrc = <0x0>;
+                        xlnx,ip-name = "psv_ttc";
+                        xlnx,ttc-clk0-freq-hz = <0x8f0d0f7>;
+                        xlnx,ttc-clk1-freq-hz = <0x8f0d0f7>;
+                        xlnx,ttc-clk0-clksrc = <0x0>;
+                };
+
+                usb0: usb@ff9d0000 {
+                        phandle = <0x83>;
+                        compatible = "xlnx,versal-dwc3";
+                        status = "okay";
+                        reg = <0x0 0xff9d0000 0x0 0x100>;
+                        clock-names = "bus_clk", "ref_clk";
+                        ranges;
+                        #address-cells = <0x2>;
+                        #size-cells = <0x2>;
+                        clocks = <&versal_clk 0x5b>,
+                         <&versal_clk 0x68>;
+                        power-domains = <&versal_firmware 0x18224018>;
+                        resets = <&versal_reset 0xc104036>;
+                        xlnx,ip-name = "psv_usb";
+
+                        dwc3_0: usb@fe200000 {
+                                phandle = <0x6c>;
+                                compatible = "snps,dwc3";
+                                status = "okay";
+                                reg = <0x0 0xfe200000 0x0 0x10000>;
+                                interrupt-names = "host", "peripheral", "otg", "wakeup";
+                                interrupts = <0x0 0x16 0x4 0x0 0x16 0x4 0x0 0x1a 0x4 0x0 0x4a 0x4>;
+                                interrupt-parent = <&gic>;
+                                snps,dis_u2_susphy_quirk;
+                                snps,dis_u3_susphy_quirk;
+                                snps,quirk-frame-length-adjustment = <0x20>;
+                                clock-names = "ref";
+                                clocks = <&versal_clk 0x5b>;
+                                xlnx,is-cache-coherent = <0x0>;
+                                xlnx,ip-name = "psv_usb_xhci";
+                                xlnx,enable-superspeed = <0x0>;
+                                dr_mode = "host";
+                                maximum-speed = "high-speed";
+                                snps,usb3_lpm_capable;
+                        };
+                };
+
+                cpm_pciea: pci@fca10000 {
+                        phandle = <0xf1>;
+                        device_type = "pci";
+                        #address-cells = <0x3>;
+                        #interrupt-cells = <0x1>;
+                        #size-cells = <0x2>;
+                        compatible = "xlnx,versal-cpm-host-1.00";
+                        status = "disabled";
+                        interrupt-map = <0x0 0x0 0x0 0x1 &pcie_intc_0 0x0>,
+                         <0x0 0x0 0x0 0x2 &pcie_intc_0 0x1>,
+                         <0x0 0x0 0x0 0x3 &pcie_intc_0 0x2>,
+                         <0x0 0x0 0x0 0x4 &pcie_intc_0 0x3>;
+                        interrupt-map-mask = <0x0 0x0 0x0 0x7>;
+                        interrupt-names = "misc";
+                        interrupts = <0x0 0x48 0x4>;
+                        xlnx,csr-slcr = <0x6 0x0>;
+                        xlnx,num-of-bars = <0x2>;
+                        xlnx,port-type = <0x1>;
+                        interrupt-parent = <&gic>;
+                        bus-range = <0x0 0xff>;
+                        ranges = <0x2000000 0x0 0xe0010000 0x0 0xe0010000 0x0 0x10000000 0x43000000 0x80 0x0 0x80 0x0 0x0 0x80000000>;
+                        msi-map = <0x0 &gic_its 0x0 0x10000>;
+                        reg = <0x6 0x0 0x0 0x10000000 0x0 0xfca10000 0x0 0x1000>;
+                        reg-names = "cfg", "cpm_slcr";
+                        resets = <&versal_reset 0xc410054>;
+
+                        pcie_intc_0: interrupt-controller {
+                                phandle = <0xb6>;
+                                #address-cells = <0x0>;
+                                #interrupt-cells = <0x1>;
+                                interrupt-controller;
+                        };
+                };
+
+                cpm5_pcie: pcie@fcdd0000 {
+                        phandle = <0xf2>;
+                        device_type = "pci";
+                        #address-cells = <0x3>;
+                        #interrupt-cells = <0x1>;
+                        #size-cells = <0x2>;
+                        compatible = "xlnx,versal-cpm5-host";
+                        status = "disabled";
+                        interrupt-map = <0x0 0x0 0x0 0x1 &pcie_intc_2 0x0>,
+                         <0x0 0x0 0x0 0x2 &pcie_intc_2 0x1>,
+                         <0x0 0x0 0x0 0x3 &pcie_intc_2 0x2>,
+                         <0x0 0x0 0x0 0x4 &pcie_intc_2 0x3>;
+                        interrupt-map-mask = <0x0 0x0 0x0 0x7>;
+                        interrupt-names = "misc";
+                        interrupts = <0x0 0x48 0x4>;
+                        xlnx,csr-slcr = <0xfce20000>;
+                        xlnx,num-of-bars = <0x2>;
+                        xlnx,port-type = <0x1>;
+                        interrupt-parent = <&gic>;
+                        bus-range = <0x0 0xff>;
+                        ranges = <0x2000000 0x0 0xe0000000 0x0 0xe0000000 0x0 0x10000000 0x43000000 0x80 0x0 0x80 0x0 0x0 0x80000000>;
+                        msi-map = <0x0 &gic_its 0x0 0x10000>;
+                        reg = <0x6 0x0 0x0 0x10000000 0x0 0xfcdd0000 0x0 0x1000 0x0 0xfce20000 0x0 0x10000>;
+                        reg-names = "cfg", "cpm_slcr", "cpm_csr";
+
+                        pcie_intc_2: interrupt-controller {
+                                phandle = <0xb7>;
+                                #address-cells = <0x0>;
+                                #interrupt-cells = <0x1>;
+                                interrupt-controller;
+                        };
+                };
+
+                watchdog: watchdog@fd4d0000 {
+                        phandle = <0xf3>;
+                        compatible = "xlnx,versal-wwdt";
+                        status = "disabled";
+                        reg = <0x0 0xfd4d0000 0x0 0x10000>;
+                        interrupt-names = "wdt", "wwdt_reset_pending", "gwdt", "gwdt_reset_pending";
+                        interrupts = <0x0 0x64 0x1 0x0 0x6d 0x1 0x0 0x6c 0x4 0x0 0x6e 0x4>;
+                        interrupt-parent = <&gic>;
+                        timeout-sec = <0x1e>;
+                        clocks = <&versal_clk 0x4c>;
+                        power-domains = <&versal_firmware 0x18224029>;
+                };
+
+                watchdog1: watchdog@ff120000 {
+                        phandle = <0xf4>;
+                        compatible = "xlnx,versal-wwdt";
+                        status = "disabled";
+                        reg = <0x0 0xff120000 0x0 0x10000>;
+                        interrupt-parent = <&gic>;
+                        interrupt-names = "wdt", "wwdt_reset_pending", "gwdt", "gwdt_reset_pending";
+                        interrupts = <0x0 0x31 0x1 0x0 0x45 0x1 0x0 0x46 0x4 0x0 0x47 0x4>;
+                        timeout-sec = <0x1e>;
+                        clocks = <&versal_clk 0x52>;
+                        power-domains = <&versal_firmware 0x18224028>;
+                };
+
+                xilsem_edac: edac@f2014050 {
+                        phandle = <0xf5>;
+                        compatible = "xlnx,versal-xilsem-edac";
+                        status = "disabled";
+                        reg = <0x0 0xf2014050 0x0 0xc4>;
+                };
+
+                dma0: pmcdma@f11c0000 {
+                        phandle = <0x3b>;
+                        status = "okay";
+                        compatible = "xlnx,zynqmp-csudma-1.0";
+                        interrupt-parent = <&gic>;
+                        interrupts = <0x0 0x83 0x4>;
+                        reg = <0x0 0xf11c0000 0x0 0x10000>;
+                        xlnx,dma-type = <0x1>;
+                        xlnx,ip-name = "psv_pmc_dma";
+                };
+
+                dma1: pmcdma@f11d0000 {
+                        phandle = <0x3c>;
+                        status = "okay";
+                        compatible = "xlnx,zynqmp-csudma-1.0";
+                        interrupt-parent = <&gic>;
+                        interrupts = <0x0 0x84 0x4>;
+                        reg = <0x0 0xf11d0000 0x0 0x10000>;
+                        xlnx,dma-type = <0x2>;
+                        xlnx,ip-name = "psv_pmc_dma";
+                };
+
+                ipi0: mailbox@ff330000 {
+                        phandle = <0x9>;
+                        compatible = "xlnx,versal-ipi-mailbox";
+                        interrupt-parent = <&gic>;
+                        interrupts = <0x0 0x1e 0x4>;
+                        reg = <0x0 0xff330000 0x0 0x10000 0x0 0xff3f0400 0x0 0x200>;
+                        xlnx,ipi-id = <0x2>;
+                        #address-cells = <0x2>;
+                        #size-cells = <0x2>;
+                        ranges;
+                        reg-names = "ctrl", "msg";
+
+                        ipi_0_to_ipi_0: child@ff330000 {
+                                phandle = <0x114>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x2>;
+                                reg = <0x0 0xff330000 0x0 0x10000 0x0 0xff3f0400 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_0_to_ipi_1: child@ff340000 {
+                                phandle = <0x115>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x3>;
+                                reg = <0x0 0xff340000 0x0 0x10000 0x0 0xff3f0600 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_0_to_ipi_2: child@ff350000 {
+                                phandle = <0x116>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x4>;
+                                reg = <0x0 0xff350000 0x0 0x10000 0x0 0xff3f0800 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_0_to_ipi_3: child@ff360000 {
+                                phandle = <0x117>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x5>;
+                                reg = <0x0 0xff360000 0x0 0x10000 0x0 0xff3f0a00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_0_to_ipi_4: child@ff370000 {
+                                phandle = <0x118>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x6>;
+                                reg = <0x0 0xff370000 0x0 0x10000 0x0 0xff3f0c00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_0_to_ipi_5: child@ff380000 {
+                                phandle = <0x119>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x7>;
+                                reg = <0x0 0xff380000 0x0 0x10000 0x0 0xff3f0e00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_0_to_ipi_6: child@ff3a0000 {
+                                phandle = <0x11a>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x9>;
+                                reg = <0x0 0xff3a0000 0x0 0x10000>;
+                                reg-names = "ctrl";
+                        };
+
+                        ipi_0_to_ipi_pmc: child@ff320000 {
+                                phandle = <0x11b>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x1>;
+                                reg = <0x0 0xff320000 0x0 0x10000 0x0 0xff3f0200 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_0_to_ipi_pmc_nobuf: child@ff390000 {
+                                phandle = <0x11c>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x8>;
+                                reg = <0x0 0xff390000 0x0 0x10000>;
+                                reg-names = "ctrl";
+                        };
+
+                        ipi_0_to_ipi_psm: child@ff310000 {
+                                phandle = <0x11d>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x0>;
+                                reg = <0x0 0xff310000 0x0 0x10000 0x0 0xff3f0000 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+                };
+
+                ipi3: mailbox@ff360000 {
+                        phandle = <0xa>;
+                        compatible = "xlnx,versal-ipi-mailbox";
+                        interrupt-parent = <&gic>;
+                        interrupts = <0x0 0x21 0x4>;
+                        reg = <0x0 0xff360000 0x0 0x10000 0x0 0xff3f0a00 0x0 0x200>;
+                        xlnx,ipi-id = <0x5>;
+                        #address-cells = <0x2>;
+                        #size-cells = <0x2>;
+                        ranges;
+                        reg-names = "ctrl", "msg";
+
+                        ipi_3_to_ipi_0: child@ff330000 {
+                                phandle = <0x132>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x2>;
+                                reg = <0x0 0xff330000 0x0 0x10000 0x0 0xff3f0400 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_3_to_ipi_1: child@ff340000 {
+                                phandle = <0x133>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x3>;
+                                reg = <0x0 0xff340000 0x0 0x10000 0x0 0xff3f0600 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_3_to_ipi_2: child@ff350000 {
+                                phandle = <0x134>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x4>;
+                                reg = <0x0 0xff350000 0x0 0x10000 0x0 0xff3f0800 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_3_to_ipi_3: child@ff360000 {
+                                phandle = <0x135>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x5>;
+                                reg = <0x0 0xff360000 0x0 0x10000 0x0 0xff3f0a00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_3_to_ipi_4: child@ff370000 {
+                                phandle = <0x136>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x6>;
+                                reg = <0x0 0xff370000 0x0 0x10000 0x0 0xff3f0c00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_3_to_ipi_5: child@ff380000 {
+                                phandle = <0x137>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x7>;
+                                reg = <0x0 0xff380000 0x0 0x10000 0x0 0xff3f0e00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_3_to_ipi_6: child@ff3a0000 {
+                                phandle = <0x138>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x9>;
+                                reg = <0x0 0xff3a0000 0x0 0x10000>;
+                                reg-names = "ctrl";
+                        };
+
+                        ipi_3_to_ipi_pmc: child@ff320000 {
+                                phandle = <0x139>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x1>;
+                                reg = <0x0 0xff320000 0x0 0x10000 0x0 0xff3f0200 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_3_to_ipi_pmc_nobuf: child@ff390000 {
+                                phandle = <0x13a>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x8>;
+                                reg = <0x0 0xff390000 0x0 0x10000>;
+                                reg-names = "ctrl";
+                        };
+
+                        ipi_3_to_ipi_psm: child@ff310000 {
+                                phandle = <0x13b>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x0>;
+                                reg = <0x0 0xff310000 0x0 0x10000 0x0 0xff3f0000 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+                };
+
+                ipi4: mailbox@ff370000 {
+                        phandle = <0xb>;
+                        compatible = "xlnx,versal-ipi-mailbox";
+                        interrupt-parent = <&gic>;
+                        interrupts = <0x0 0x22 0x4>;
+                        reg = <0x0 0xff370000 0x0 0x10000 0x0 0xff3f0c00 0x0 0x200>;
+                        xlnx,ipi-id = <0x6>;
+                        #address-cells = <0x2>;
+                        #size-cells = <0x2>;
+                        ranges;
+                        reg-names = "ctrl", "msg";
+
+                        ipi_4_to_ipi_0: child@ff330000 {
+                                phandle = <0x13c>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x2>;
+                                reg = <0x0 0xff330000 0x0 0x10000 0x0 0xff3f0400 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_4_to_ipi_1: child@ff340000 {
+                                phandle = <0x13d>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x3>;
+                                reg = <0x0 0xff340000 0x0 0x10000 0x0 0xff3f0600 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_4_to_ipi_2: child@ff350000 {
+                                phandle = <0x13e>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x4>;
+                                reg = <0x0 0xff350000 0x0 0x10000 0x0 0xff3f0800 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_4_to_ipi_3: child@ff360000 {
+                                phandle = <0x13f>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x5>;
+                                reg = <0x0 0xff360000 0x0 0x10000 0x0 0xff3f0a00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_4_to_ipi_4: child@ff370000 {
+                                phandle = <0x140>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x6>;
+                                reg = <0x0 0xff370000 0x0 0x10000 0x0 0xff3f0c00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_4_to_ipi_5: child@ff380000 {
+                                phandle = <0x141>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x7>;
+                                reg = <0x0 0xff380000 0x0 0x10000 0x0 0xff3f0e00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_4_to_ipi_6: child@ff3a0000 {
+                                phandle = <0x142>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x9>;
+                                reg = <0x0 0xff3a0000 0x0 0x10000>;
+                                reg-names = "ctrl";
+                        };
+
+                        ipi_4_to_ipi_pmc: child@ff320000 {
+                                phandle = <0x143>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x1>;
+                                reg = <0x0 0xff320000 0x0 0x10000 0x0 0xff3f0200 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_4_to_ipi_pmc_nobuf: child@ff390000 {
+                                phandle = <0x144>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x8>;
+                                reg = <0x0 0xff390000 0x0 0x10000>;
+                                reg-names = "ctrl";
+                        };
+
+                        ipi_4_to_ipi_psm: child@ff310000 {
+                                phandle = <0x145>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x0>;
+                                reg = <0x0 0xff310000 0x0 0x10000 0x0 0xff3f0000 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+                };
+
+                ipi5: mailbox@ff380000 {
+                        phandle = <0xc>;
+                        compatible = "xlnx,versal-ipi-mailbox";
+                        interrupt-parent = <&gic>;
+                        interrupts = <0x0 0x23 0x4>;
+                        reg = <0x0 0xff380000 0x0 0x10000 0x0 0xff3f0e00 0x0 0x200>;
+                        xlnx,ipi-id = <0x7>;
+                        #address-cells = <0x2>;
+                        #size-cells = <0x2>;
+                        ranges;
+                        reg-names = "ctrl", "msg";
+
+                        ipi_5_to_ipi_0: child@ff330000 {
+                                phandle = <0x146>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x2>;
+                                reg = <0x0 0xff330000 0x0 0x10000 0x0 0xff3f0400 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_5_to_ipi_1: child@ff340000 {
+                                phandle = <0x147>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x3>;
+                                reg = <0x0 0xff340000 0x0 0x10000 0x0 0xff3f0600 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_5_to_ipi_2: child@ff350000 {
+                                phandle = <0x148>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x4>;
+                                reg = <0x0 0xff350000 0x0 0x10000 0x0 0xff3f0800 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_5_to_ipi_3: child@ff360000 {
+                                phandle = <0x149>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x5>;
+                                reg = <0x0 0xff360000 0x0 0x10000 0x0 0xff3f0a00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_5_to_ipi_4: child@ff370000 {
+                                phandle = <0x14a>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x6>;
+                                reg = <0x0 0xff370000 0x0 0x10000 0x0 0xff3f0c00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_5_to_ipi_5: child@ff380000 {
+                                phandle = <0x14b>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x7>;
+                                reg = <0x0 0xff380000 0x0 0x10000 0x0 0xff3f0e00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_5_to_ipi_6: child@ff3a0000 {
+                                phandle = <0x14c>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x9>;
+                                reg = <0x0 0xff3a0000 0x0 0x10000>;
+                                reg-names = "ctrl";
+                        };
+
+                        ipi_5_to_ipi_pmc: child@ff320000 {
+                                phandle = <0x14d>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x1>;
+                                reg = <0x0 0xff320000 0x0 0x10000 0x0 0xff3f0200 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_5_to_ipi_pmc_nobuf: child@ff390000 {
+                                phandle = <0x14e>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x8>;
+                                reg = <0x0 0xff390000 0x0 0x10000>;
+                                reg-names = "ctrl";
+                        };
+
+                        ipi_5_to_ipi_psm: child@ff310000 {
+                                phandle = <0x14f>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x0>;
+                                reg = <0x0 0xff310000 0x0 0x10000 0x0 0xff3f0000 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+                };
+
+                ipi6: mailbox@ff3a0000 {
+                        phandle = <0xd>;
+                        compatible = "xlnx,versal-ipi-mailbox";
+                        interrupt-parent = <&gic>;
+                        interrupts = <0x0 0x24 0x4>;
+                        reg = <0x0 0xff3a0000 0x0 0x10000>;
+                        xlnx,ipi-id = <0x9>;
+                        #address-cells = <0x2>;
+                        #size-cells = <0x2>;
+                        ranges;
+                        reg-names = "ctrl";
+
+                        ipi_6_to_ipi_0: child@ff330000 {
+                                phandle = <0x150>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x2>;
+                                reg = <0x0 0xff330000 0x0 0x10000 0x0 0xff3f0400 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_6_to_ipi_1: child@ff340000 {
+                                phandle = <0x151>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x3>;
+                                reg = <0x0 0xff340000 0x0 0x10000 0x0 0xff3f0600 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_6_to_ipi_2: child@ff350000 {
+                                phandle = <0x152>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x4>;
+                                reg = <0x0 0xff350000 0x0 0x10000 0x0 0xff3f0800 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_6_to_ipi_3: child@ff360000 {
+                                phandle = <0x153>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x5>;
+                                reg = <0x0 0xff360000 0x0 0x10000 0x0 0xff3f0a00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_6_to_ipi_4: child@ff370000 {
+                                phandle = <0x154>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x6>;
+                                reg = <0x0 0xff370000 0x0 0x10000 0x0 0xff3f0c00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_6_to_ipi_5: child@ff380000 {
+                                phandle = <0x155>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x7>;
+                                reg = <0x0 0xff380000 0x0 0x10000 0x0 0xff3f0e00 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_6_to_ipi_6: child@ff3a0000 {
+                                phandle = <0x156>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x9>;
+                                reg = <0x0 0xff3a0000 0x0 0x10000>;
+                                reg-names = "ctrl";
+                        };
+
+                        ipi_6_to_ipi_pmc: child@ff320000 {
+                                phandle = <0x157>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x1>;
+                                reg = <0x0 0xff320000 0x0 0x10000 0x0 0xff3f0200 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+
+                        ipi_6_to_ipi_pmc_nobuf: child@ff390000 {
+                                phandle = <0x158>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x8>;
+                                reg = <0x0 0xff390000 0x0 0x10000>;
+                                reg-names = "ctrl";
+                        };
+
+                        ipi_6_to_ipi_psm: child@ff310000 {
+                                phandle = <0x159>;
+                                compatible = "xlnx,versal-ipi-dest-mailbox";
+                                #mbox-cells = <0x1>;
+                                xlnx,ipi-id = <0x0>;
+                                reg = <0x0 0xff310000 0x0 0x10000 0x0 0xff3f0000 0x0 0x200>;
+                                reg-names = "ctrl", "msg";
+                        };
+                };
+
+                coresight: coresight@f0800000 {
+                        phandle = <0x14>;
+                        compatible = "xlnx,coresight-1.0";
+                        status = "okay";
+                        reg = <0x0 0xf0800000 0x0 0x10000>;
+                        xlnx,ip-name = "psv_coresight";
+                };
+
+                CIPS_0_pspmc_0_psv_coresight_fpd_cti1b: CIPS-0-pspmc-0-psv-coresight-fpd-cti1b@f0bb0000 {
+                        phandle = <0x1c>;
+                        compatible = "xlnx,psv-coresight-fpd-cti1b-1.0";
+                        status = "okay";
+                        xlnx,ip-name = "psv_coresight_fpd_cti1b";
+                        reg = <0x0 0xf0bb0000 0x0 0x10000>;
+                };
+
+                CIPS_0_pspmc_0_psv_coresight_fpd_cti1c: CIPS-0-pspmc-0-psv-coresight-fpd-cti1c@f0bc0000 {
+                        phandle = <0x1d>;
+                        compatible = "xlnx,psv-coresight-fpd-cti1c-1.0";
+                        status = "okay";
+                        xlnx,ip-name = "psv_coresight_fpd_cti1c";
+                        reg = <0x0 0xf0bc0000 0x0 0x10000>;
+                };
+
+                CIPS_0_pspmc_0_psv_coresight_fpd_cti1d: CIPS-0-pspmc-0-psv-coresight-fpd-cti1d@f0bd0000 {
+                        phandle = <0x1e>;
+                        compatible = "xlnx,psv-coresight-fpd-cti1d-1.0";
+                        status = "okay";
+                        xlnx,ip-name = "psv_coresight_fpd_cti1d";
+                        reg = <0x0 0xf0bd0000 0x0 0x10000>;
+                };
+
+                CIPS_0_pspmc_0_psv_coresight_lpd_cti: CIPS-0-pspmc-0-psv-coresight-lpd-cti@f09d0000 {
+                        phandle = <0x17>;
+                        compatible = "xlnx,psv-coresight-lpd-cti-1.0";
+                        status = "okay";
+                        xlnx,ip-name = "psv_coresight_lpd_cti";
+                        reg = <0x0 0xf09d0000 0x0 0x10000>;
+                };
+
+                CIPS_0_pspmc_0_psv_coresight_pmc_cti: CIPS-0-pspmc-0-psv-coresight-pmc-cti@f08d0000 {
+                        phandle = <0x15>;
+                        compatible = "xlnx,psv-coresight-pmc-cti-1.0";
+                        status = "okay";
+                        xlnx,ip-name = "psv_coresight_pmc_cti";
+                        reg = <0x0 0xf08d0000 0x0 0x10000>;
+                };
+
+                CIPS_0_pspmc_0_psv_coresight_r50_cti: CIPS-0-pspmc-0-psv-coresight-r50-cti@f0a10000 {
+                        phandle = <0x18>;
+                        compatible = "xlnx,psv-coresight-r50-cti-1.0";
+                        status = "okay";
+                        xlnx,ip-name = "psv_coresight_r50_cti";
+                        reg = <0x0 0xf0a10000 0x0 0x10000>;
+                };
+
+                CIPS_0_pspmc_0_psv_coresight_r51_cti: CIPS-0-pspmc-0-psv-coresight-r51-cti@f0a50000 {
+                        phandle = <0x19>;
+                        compatible = "xlnx,psv-coresight-r51-cti-1.0";
+                        status = "okay";
+                        xlnx,ip-name = "psv_coresight_r51_cti";
+                        reg = <0x0 0xf0a50000 0x0 0x10000>;
+                };
+
+                CIPS_0_pspmc_0_psv_cpm: CIPS-0-pspmc-0-psv-cpm@0 {
+                        phandle = <0x5f>;
+                        xlnx,cpm5-slcr-addr = <0xfcdd0000>;
+                        compatible = "xlnx,psv-cpm-1.0";
+                        status = "okay";
+                        xlnx,ip-name = "psv_cpm";
+                        reg = <0x0 0xfc000000 0x0 0x1000000>;
+                        xlnx,cpm-slcr = <0xfca10000>;
+                        xlnx,cpm5-dma0-csr-addr = <0xfce20000>;
+                };
+
+                CIPS_0_pspmc_0_psv_pmc_analog_0: CIPS-0-pspmc-0-psv-pmc-analog-0@f1160000 {
+                        phandle = <0x39>;
+                        compatible = "xlnx,psv-pmc-analog-1.0";
+                        status = "okay";
+                        xlnx,ip-name = "psv_pmc_analog";
+                        reg = <0x0 0xf1160000 0x0 0x30000>;
+                        xlnx,npi-scan = <0x0>;
+                        xlnx,event-log = <0x0>;
+                        xlnx,cram-scan = <0x0>;
+                };
+
+                CIPS_0_pspmc_0_psv_pmc_iou_slcr_0: CIPS-0-pspmc-0-psv-pmc-iou-slcr-0@f1060000 {
+                        phandle = <0x37>;
+                        compatible = "xlnx,psv-pmc-iou-slcr-1.0";
+                        status = "okay";
+                        xlnx,ip-name = "psv_pmc_iou_slcr";
+                        reg = <0x0 0xf1060000 0x0 0x10000>;
+                };
+
+                CIPS_0_pspmc_0_psv_pmc_tap: CIPS-0-pspmc-0-psv-pmc-tap@f11a0000 {
+                        phandle = <0x3a>;
+                        compatible = "xlnx,psv-pmc-tap-1.0";
+                        status = "okay";
+                        xlnx,ip-name = "psv_pmc_tap";
+                        reg = <0x0 0xf11a0000 0x0 0x20000>;
+                };
+
+                gic: interrupt-controller@f9000000 {
+                        phandle = <0x5e>;
+                        xlnx,ip-name = "psv_acpu_gic";
+                        xlnx,apu-gic-its-ctl = <0xf9020000>;
+                        status = "okay";
+                        interrupts = <0x1 0x9 0x4>;
+                        interrupt-parent = <&gic>;
+                        interrupt-controller;
+                        reg = <0x0 0xf9000000 0x0 0x80000 0x0 0xf9080000 0x0 0x80000>;
+                        ranges;
+                        #size-cells = <0x2>;
+                        #address-cells = <0x2>;
+                        #interrupt-cells = <0x3>;
+                        compatible = "arm,gic-v3";
+
+                        gic_its: msi-controller@f9020000 {
+                                phandle = <0x8>;
+                                reg = <0x0 0xf9020000 0x0 0x20000>;
+                                #msi-cells = <0x1>;
+                                msi-controller;
+                                status = "okay";
+                                compatible = "arm,gic-v3-its";
+                        };
+                };
+        };
+
+        amba_xppu: indirect-bus@1 {
+                phandle = <0x166>;
+                compatible = "indirect-bus";
+                #address-cells = <0x2>;
+                #size-cells = <0x2>;
+
+                lpd_xppu: xppu@ff990000 {
+                        phandle = <0x80>;
+                        compatible = "xlnx,xppu";
+                        #firewall-cells = <0x0>;
+                        reg = <0x0 0xff990000 0x0 0x2000>;
+                        status = "okay";
+                        xlnx,ip-name = "psv_lpd_xppu";
+                };
+
+                pmc_xppu: xppu@f1310000 {
+                        phandle = <0x5b>;
+                        compatible = "xlnx,xppu";
+                        #firewall-cells = <0x0>;
+                        reg = <0x0 0xf1310000 0x0 0x2000>;
+                        status = "okay";
+                        xlnx,ip-name = "psv_pmc_xppu";
+                };
+
+                pmc_xppu_npi: xppu@f1300000 {
+                        phandle = <0x5a>;
+                        compatible = "xlnx,xppu";
+                        #firewall-cells = <0x0>;
+                        reg = <0x0 0xf1300000 0x0 0x2000>;
+                        status = "okay";
+                        xlnx,ip-name = "psv_pmc_xppu_npi";
+                };
+        };
+
+        amba_xmpu: indirect-bus@2 {
+                phandle = <0x167>;
+                compatible = "indirect-bus";
+                #address-cells = <0x2>;
+                #size-cells = <0x2>;
+
+                fpd_xmpu: xmpu@fd390000 {
+                        phandle = <0x64>;
+                        compatible = "xlnx,xmpu";
+                        #firewall-cells = <0x0>;
+                        reg = <0x0 0xfd390000 0x0 0x1000>;
+                        status = "okay";
+                        xlnx,ip-name = "psv_fpd_slave_xmpu";
+                };
+
+                pmc_xmpu: xmpu@f12f0000 {
+                        phandle = <0x59>;
+                        compatible = "xlnx,xmpu";
+                        #firewall-cells = <0x0>;
+                        reg = <0x0 0xf12f0000 0x0 0x1000>;
+                        status = "okay";
+                        xlnx,ip-name = "psv_pmc_xmpu";
+                };
+
+                ocm_xmpu: xmpu@ff980000 {
+                        phandle = <0x7f>;
+                        compatible = "xlnx,xmpu";
+                        #firewall-cells = <0x0>;
+                        reg = <0x0 0xff980000 0x0 0x1000>;
+                        status = "okay";
+                        xlnx,ip-name = "psv_ocm_xmpu";
+                };
+
+                ddrmc_xmpu_0: xmpu@f6080000 {
+                        phandle = <0x168>;
+                        compatible = "xlnx,xmpu";
+                        #firewall-cells = <0x0>;
+                        reg = <0x0 0xf6080000 0x0 0x1000>;
+                        status = "disabled";
+                };
+
+                ddrmc_xmpu_1: xmpu@f6220000 {
+                        phandle = <0x169>;
+                        compatible = "xlnx,xmpu";
+                        #firewall-cells = <0x0>;
+                        reg = <0x0 0xf6220000 0x0 0x1000>;
+                        status = "disabled";
+                };
+
+                ddrmc_xmpu_2: xmpu@f6390000 {
+                        phandle = <0x16a>;
+                        compatible = "xlnx,xmpu";
+                        #firewall-cells = <0x0>;
+                        reg = <0x0 0xf6390000 0x0 0x1000>;
+                        status = "disabled";
+                };
+
+                ddrmc_xmpu_3: xmpu@f6500000 {
+                        phandle = <0x16b>;
+                        compatible = "xlnx,xmpu";
+                        #firewall-cells = <0x0>;
+                        reg = <0x0 0xf6500000 0x0 0x1000>;
+                        status = "disabled";
+                };
+
+                fpd_funnel: fpd-funnel@f0b20000 {
+                        phandle = <0x16c>;
+                        compatible = "arm,coresight-dynamic-funnel", "arm,primecell";
+                        reg = <0x0 0xf0b20000 0x0 0x1000>;
+                        clock-names = "apb_pclk";
+                        status = "disabled";
+                        clocks = <&versal_clk 0x52>;
+
+                        in-ports {
+                                #address-cells = <0x1>;
+                                #size-cells = <0x0>;
+
+                                port@1 {
+                                        reg = <0x1>;
+
+                                        fpd_funnel_in_port1: endpoint {
+                                                phandle = <0xc3>;
+                                                remote-endpoint = <&apu_etf_out_port>;
+                                        };
+                                };
+                        };
+
+                        out-ports {
+
+                                port {
+
+                                        fpd_funnel_out_port: endpoint {
+                                                phandle = <0xba>;
+                                                remote-endpoint = <&fpd_etf_in_port>;
+                                        };
+                                };
+                        };
+                };
+
+                fpd_etf: fpd-etf@f0b30000 {
+                        phandle = <0x16d>;
+                        compatible = "arm,coresight-tmc", "arm,primecell";
+                        reg = <0x0 0xf0b30000 0x0 0x1000>;
+                        clock-names = "apb_pclk";
+                        status = "disabled";
+                        clocks = <&versal_clk 0x52>;
+
+                        in-ports {
+
+                                port {
+
+                                        fpd_etf_in_port: endpoint {
+                                                phandle = <0xb9>;
+                                                remote-endpoint = <&fpd_funnel_out_port>;
+                                        };
+                                };
+                        };
+
+                        out-ports {
+
+                                port {
+
+                                        fpd_etf_out_port: endpoint {
+                                                phandle = <0xbc>;
+                                                remote-endpoint = <&replicator_in_port>;
+                                        };
+                                };
+                        };
+                };
+
+                replicator: replicator@f0b40000 {
+                        phandle = <0x16e>;
+                        compatible = "arm,coresight-dynamic-replicator", "arm,primecell";
+                        reg = <0x0 0xf0b40000 0x0 0x1000>;
+                        clock-names = "apb_pclk";
+                        status = "disabled";
+                        clocks = <&versal_clk 0x52>;
+
+                        in-ports {
+
+                                port {
+
+                                        replicator_in_port: endpoint {
+                                                phandle = <0xbb>;
+                                                remote-endpoint = <&fpd_etf_out_port>;
+                                        };
+                                };
+                        };
+
+                        out-ports {
+                                #address-cells = <0x1>;
+                                #size-cells = <0x0>;
+
+                                port@0 {
+                                        reg = <0x0>;
+
+                                        replicator_out_port0: endpoint {
+                                                phandle = <0xbe>;
+                                                remote-endpoint = <&etr_in_port>;
+                                        };
+                                };
+                        };
+                };
+
+                etr: etr@f0b50000 {
+                        phandle = <0x16f>;
+                        compatible = "arm,coresight-tmc", "arm,primecell";
+                        reg = <0x0 0xf0b50000 0x0 0x1000>;
+                        clock-names = "apb_pclk";
+                        status = "disabled";
+                        clocks = <&versal_clk 0x52>;
+
+                        in-ports {
+
+                                port {
+
+                                        etr_in_port: endpoint {
+                                                phandle = <0xbd>;
+                                                remote-endpoint = <&replicator_out_port0>;
+                                        };
+                                };
+                        };
+                };
+
+                apu_funnel: funnel@f0c20000 {
+                        phandle = <0x170>;
+                        compatible = "arm,coresight-dynamic-funnel", "arm,primecell";
+                        reg = <0x0 0xf0c20000 0x0 0x1000>;
+                        clock-names = "apb_pclk";
+                        status = "disabled";
+                        clocks = <&versal_clk 0x52>;
+
+                        in-ports {
+                                #address-cells = <0x1>;
+                                #size-cells = <0x0>;
+
+                                port@0 {
+                                        reg = <0x0>;
+
+                                        funnel_in_port0: endpoint {
+                                                phandle = <0xc5>;
+                                                remote-endpoint = <&etm0_out_port>;
+                                        };
+                                };
+
+                                port@1 {
+                                        reg = <0x1>;
+
+                                        funnel_in_port1: endpoint {
+                                                phandle = <0xc7>;
+                                                remote-endpoint = <&etm1_out_port>;
+                                        };
+                                };
+                        };
+
+                        out-ports {
+
+                                port {
+
+                                        funnel_out_port: endpoint {
+                                                phandle = <0xc2>;
+                                                remote-endpoint = <&etf_in_port>;
+                                        };
+                                };
+                        };
+                };
+
+                apu_etf: etf@f0c30000 {
+                        phandle = <0x171>;
+                        compatible = "arm,coresight-tmc", "arm,primecell";
+                        reg = <0x0 0xf0c30000 0x0 0x1000>;
+                        clock-names = "apb_pclk";
+                        status = "disabled";
+                        clocks = <&versal_clk 0x52>;
+
+                        in-ports {
+
+                                port {
+
+                                        etf_in_port: endpoint {
+                                                phandle = <0xc1>;
+                                                remote-endpoint = <&funnel_out_port>;
+                                        };
+                                };
+                        };
+
+                        out-ports {
+
+                                port {
+
+                                        apu_etf_out_port: endpoint {
+                                                phandle = <0xb8>;
+                                                remote-endpoint = <&fpd_funnel_in_port1>;
+                                        };
+                                };
+                        };
+                };
+
+                cpu0_debug: cpu0-debug@f0d00000 {
+                        phandle = <0x172>;
+                        compatible = "arm,coresight-cpu-debug", "arm,primecell";
+                        reg = <0x0 0xf0d00000 0x0 0x1000>;
+                        clock-names = "apb_pclk";
+                        cpu = <&psv_cortexa72_0>;
+                        status = "disabled";
+                        clocks = <&versal_clk 0x52>;
+                };
+
+                etm0: etm@f0d30000 {
+                        phandle = <0x173>;
+                        compatible = "arm,coresight-etm4x", "arm,primecell";
+                        reg = <0x0 0xf0d30000 0x0 0x1000>;
+                        clock-names = "apb_pclk";
+                        cpu = <&psv_cortexa72_0>;
+                        status = "disabled";
+                        clocks = <&versal_clk 0x52>;
+
+                        out-ports {
+
+                                port {
+
+                                        etm0_out_port: endpoint {
+                                                phandle = <0xbf>;
+                                                remote-endpoint = <&funnel_in_port0>;
+                                        };
+                                };
+                        };
+                };
+
+                cpu1_debug: cpu1-debug@f0d40000 {
+                        phandle = <0x174>;
+                        compatible = "arm,coresight-cpu-debug", "arm,primecell";
+                        reg = <0x0 0xf0d40000 0x0 0x1000>;
+                        clock-names = "apb_pclk";
+                        cpu = <&psv_cortexa72_1>;
+                        status = "disabled";
+                        clocks = <&versal_clk 0x52>;
+                };
+
+                etm1: etm@f0d70000 {
+                        phandle = <0x175>;
+                        compatible = "arm,coresight-etm4x", "arm,primecell";
+                        reg = <0x0 0xf0d70000 0x0 0x1000>;
+                        clock-names = "apb_pclk";
+                        cpu = <&psv_cortexa72_1>;
+                        status = "disabled";
+                        clocks = <&versal_clk 0x52>;
+
+                        out-ports {
+
+                                port {
+
+                                        etm1_out_port: endpoint {
+                                                phandle = <0xc0>;
+                                                remote-endpoint = <&funnel_in_port1>;
+                                        };
+                                };
+                        };
+                };
+        };
+
+        pl_alt_ref: pl-alt-ref {
+                phandle = <0xc9>;
+                bootph-all;
+                compatible = "fixed-clock";
+                #clock-cells = <0x0>;
+                clock-frequency = <0x1fca055>;
+                clock-output-names = "pl_alt_ref_clk";
+        };
+
+        ref: ref {
+                phandle = <0xc8>;
+                bootph-all;
+                compatible = "fixed-clock";
+                #clock-cells = <0x0>;
+                clock-frequency = <0x1fca034>;
+                clock-output-names = "ref_clk";
+        };
+
+        rtc_clk: rtc-clk {
+                phandle = <0xb4>;
+                bootph-all;
+                compatible = "fixed-clock";
+                #clock-cells = <0x0>;
+                clock-frequency = <0x8000>;
+                clock-output-names = "rtc_clk";
+        };
+
+        can0_clk: can0-clk {
+                phandle = <0xb1>;
+                #clock-cells = <0x0>;
+                compatible = "fixed-factor-clock";
+                clocks = <&versal_clk 0x60>;
+                clock-div = <0x2>;
+                clock-mult = <0x1>;
+                clock-output-names = "can0_clk";
+        };
+
+        can1_clk: can1-clk {
+                phandle = <0xb2>;
+                #clock-cells = <0x0>;
+                compatible = "fixed-factor-clock";
+                clocks = <&versal_clk 0x61>;
+                clock-div = <0x2>;
+                clock-mult = <0x1>;
+                clock-output-names = "can1_clk";
+        };
+
+        firmware {
+
+                versal_firmware: versal-firmware {
+                        phandle = <0x93>;
+                        compatible = "xlnx,versal-firmware";
+                        interrupt-parent = <&gic>;
+                        bootph-all;
+                        method = "smc";
+                        #power-domain-cells = <0x1>;
+
+                        versal_clk: clock-controller {
+                                phandle = <0x95>;
+                                bootph-all;
+                                #clock-cells = <0x1>;
+                                compatible = "xlnx,versal-clk";
+                                clocks = <&ref>,
+                                 <&pl_alt_ref>;
+                                clock-names = "ref", "pl_alt_ref";
+                        };
+
+                        zynqmp_power: power-management {
+                                phandle = <0x176>;
+                                compatible = "xlnx,zynqmp-power";
+                        };
+
+                        versal_reset: reset-controller {
+                                phandle = <0xb5>;
+                                compatible = "xlnx,versal-reset";
+                                #reset-cells = <0x1>;
+                        };
+
+                        pinctrl0: pinctrl {
+                                phandle = <0x177>;
+                                compatible = "xlnx,versal-pinctrl";
+                        };
+
+                        versal_sec_cfg: versal-sec-cfg {
+                                phandle = <0x178>;
+                                compatible = "xlnx,versal-sec-cfg";
+
+                                nvmem-layout {
+                                        compatible = "fixed-layout";
+                                        #address-cells = <0x1>;
+                                        #size-cells = <0x1>;
+
+                                        bbram_zeroize: bbram-zeroize@4 {
+                                                phandle = <0x179>;
+                                                reg = <0x4 0x4>;
+                                        };
+
+                                        bbram_key: bbram-key@10 {
+                                                phandle = <0x17a>;
+                                                reg = <0x10 0x20>;
+                                        };
+
+                                        bbram_usr: bbram-usr@30 {
+                                                phandle = <0x17b>;
+                                                reg = <0x30 0x4>;
+                                        };
+
+                                        bbram_lock: bbram-lock@48 {
+                                                phandle = <0x17c>;
+                                                reg = <0x48 0x4>;
+                                        };
+
+                                        user_key0: user-key@110 {
+                                                phandle = <0x17d>;
+                                                reg = <0x110 0x20>;
+                                        };
+
+                                        user_key1: user-key@130 {
+                                                phandle = <0x17e>;
+                                                reg = <0x130 0x20>;
+                                        };
+
+                                        user_key2: user-key@150 {
+                                                phandle = <0x17f>;
+                                                reg = <0x150 0x20>;
+                                        };
+
+                                        user_key3: user-key@170 {
+                                                phandle = <0x180>;
+                                                reg = <0x170 0x20>;
+                                        };
+
+                                        user_key4: user-key@190 {
+                                                phandle = <0x181>;
+                                                reg = <0x190 0x20>;
+                                        };
+
+                                        user_key5: user-key@1b0 {
+                                                phandle = <0x182>;
+                                                reg = <0x1b0 0x20>;
+                                        };
+
+                                        user_key6: user-key@1d0 {
+                                                phandle = <0x183>;
+                                                reg = <0x1d0 0x20>;
+                                        };
+
+                                        user_key7: user-key@1f0 {
+                                                phandle = <0x184>;
+                                                reg = <0x1f0 0x20>;
+                                        };
+                                };
+                        };
+                };
+        };
+
+        noc_lpddr0_ddr_memory: memory@00000000 {
+                phandle = <0x5>;
+                compatible = "xlnx,axi-noc-1.1";
+                xlnx,ip-name = "axi_noc";
+                device_type = "memory";
+                reg = <0x0 0x0 0x0 0x80000000 0x8 0x0 0x0 0x80000000>;
+                memory_type = "memory";
+        };
+
+        noc_lpddr1_ddr_memory: memory@50000000000 {
+                phandle = <0x6>;
+                compatible = "xlnx,axi-noc-1.1";
+                xlnx,ip-name = "axi_noc";
+                device_type = "memory";
+                reg = <0x500 0x0 0x1 0x0>;
+                memory_type = "memory";
+        };
+
+        noc_lpddr2_ddr_memory: memory@60000000000 {
+                phandle = <0x7>;
+                compatible = "xlnx,axi-noc-1.1";
+                xlnx,ip-name = "axi_noc";
+                device_type = "memory";
+                reg = <0x600 0x0 0x1 0x0>;
+                memory_type = "memory";
+        };
+
+        chosen {
+                stdout-path = "serial0:115200";
+                bootargs = "console=ttyAMA0 earlycon=pl011,mmio32,0xFF000000,115200n8";
+        };
+
+        aliases {
+                serial0 = "/axi/serial@ff000000";
+                spi0 = "/axi/spi@f1010000";
+                serial2 = "/dcc";
+                i2c0 = "/axi/i2c@ff020000";
+                i2c1 = "/axi/i2c@ff030000";
+                ethernet0 = "/axi/ethernet@ff0c0000";
+                mmc0 = "/axi/mmc@f1050000";
+                usb0 = "/axi/usb@ff9d0000";
+                rtc0 = "/axi/rtc@f12a0000";
+                nvmem0 = "/axi/i2c@ff030000/eeprom@54";
+        };
+
+        __symbols__ {
+                psv_cortexa72_0 = "/cpus/cpu@0";
+                psv_cortexa72_1 = "/cpus/cpu@1";
+                CPU_SLEEP_0 = "/cpus/idle-states/cpu-sleep-0";
+                cpus_a72 = "/cpus";
+                l2 = "/l2-cache";
+                cpu_opp_table = "/opp-table-cpu";
+                dcc = "/dcc";
+                fpga = "/fpga-region";
+                psci = "/psci";
+                timer = "/timer";
+                versal_fpga = "/versal-fpga";
+                sensor0 = "/versal-thermal-sensor";
+                temp_alert = "/thermal-zones/versal-thermal/trips/temp-alert";
+                ot_crit = "/thermal-zones/versal-thermal/trips/ot-crit";
+                versal_thermal = "/thermal-zones/versal-thermal";
+                temp_alert_aie = "/thermal-zones/versal-aie-thermal/trips/temp-alert-aie";
+                ot_crit_aie = "/thermal-zones/versal-aie-thermal/trips/ot-crit-aie";
+                versal_thermal_aie = "/thermal-zones/versal-aie-thermal";
+                can0 = "/axi/can@ff060000";
+                can1 = "/axi/can@ff070000";
+                cci_pmu = "/axi/cci@fd000000/pmu@10000";
+                cci = "/axi/cci@fd000000";
+                lpd_dma_chan0 = "/axi/dma-controller@ffa80000";
+                lpd_dma_chan1 = "/axi/dma-controller@ffa90000";
+                lpd_dma_chan2 = "/axi/dma-controller@ffaa0000";
+                lpd_dma_chan3 = "/axi/dma-controller@ffab0000";
+                lpd_dma_chan4 = "/axi/dma-controller@ffac0000";
+                lpd_dma_chan5 = "/axi/dma-controller@ffad0000";
+                lpd_dma_chan6 = "/axi/dma-controller@ffae0000";
+                lpd_dma_chan7 = "/axi/dma-controller@ffaf0000";
+                phy0 = "/axi/ethernet@ff0c0000/mdio/ethernet-phy@1";
+                mdio = "/axi/ethernet@ff0c0000/mdio";
+                gem0 = "/axi/ethernet@ff0c0000";
+                gem1 = "/axi/ethernet@ff0d0000";
+                gpio0 = "/axi/gpio@ff0b0000";
+                gpio1 = "/axi/gpio@f1020000";
+                i2c0 = "/axi/i2c@ff020000";
+                eeprom = "/axi/i2c@ff030000/eeprom@54";
+                i2c1 = "/axi/i2c@ff030000";
+                i2c2 = "/axi/i2c@f1000000";
+                mc0 = "/axi/memory-controller@f6150000";
+                mc1 = "/axi/memory-controller@f62c0000";
+                mc2 = "/axi/memory-controller@f6430000";
+                mc3 = "/axi/memory-controller@f65a0000";
+                ocm = "/axi/memory-controller@ff960000";
+                rtc = "/axi/rtc@f12a0000";
+                sdhci0 = "/axi/mmc@f1040000";
+                sdhci1 = "/axi/mmc@f1050000";
+                serial0 = "/axi/serial@ff000000";
+                serial1 = "/axi/serial@ff010000";
+                smmu = "/axi/iommu@fd800000";
+                spi_flash = "/axi/spi@f1010000/flash@0";
+                ospi = "/axi/spi@f1010000";
+                qspi = "/axi/spi@f1030000";
+                spi0 = "/axi/spi@ff040000";
+                spi1 = "/axi/spi@ff050000";
+                sysmon0 = "/axi/sysmon@f1270000";
+                sysmon1 = "/axi/sysmon@109270000";
+                sysmon2 = "/axi/sysmon@111270000";
+                sysmon3 = "/axi/sysmon@119270000";
+                ttc0 = "/axi/timer@ff0e0000";
+                ttc1 = "/axi/timer@ff0f0000";
+                ttc2 = "/axi/timer@ff100000";
+                ttc3 = "/axi/timer@ff110000";
+                dwc3_0 = "/axi/usb@ff9d0000/usb@fe200000";
+                usb0 = "/axi/usb@ff9d0000";
+                pcie_intc_0 = "/axi/pci@fca10000/interrupt-controller";
+                cpm_pciea = "/axi/pci@fca10000";
+                pcie_intc_2 = "/axi/pcie@fcdd0000/interrupt-controller";
+                cpm5_pcie = "/axi/pcie@fcdd0000";
+                watchdog = "/axi/watchdog@fd4d0000";
+                watchdog1 = "/axi/watchdog@ff120000";
+                xilsem_edac = "/axi/edac@f2014050";
+                dma0 = "/axi/pmcdma@f11c0000";
+                dma1 = "/axi/pmcdma@f11d0000";
+                ipi_0_to_ipi_0 = "/axi/mailbox@ff330000/child@ff330000";
+                ipi_0_to_ipi_1 = "/axi/mailbox@ff330000/child@ff340000";
+                ipi_0_to_ipi_2 = "/axi/mailbox@ff330000/child@ff350000";
+                ipi_0_to_ipi_3 = "/axi/mailbox@ff330000/child@ff360000";
+                ipi_0_to_ipi_4 = "/axi/mailbox@ff330000/child@ff370000";
+                ipi_0_to_ipi_5 = "/axi/mailbox@ff330000/child@ff380000";
+                ipi_0_to_ipi_6 = "/axi/mailbox@ff330000/child@ff3a0000";
+                ipi_0_to_ipi_pmc = "/axi/mailbox@ff330000/child@ff320000";
+                ipi_0_to_ipi_pmc_nobuf = "/axi/mailbox@ff330000/child@ff390000";
+                ipi_0_to_ipi_psm = "/axi/mailbox@ff330000/child@ff310000";
+                ipi0 = "/axi/mailbox@ff330000";
+                ipi_3_to_ipi_0 = "/axi/mailbox@ff360000/child@ff330000";
+                ipi_3_to_ipi_1 = "/axi/mailbox@ff360000/child@ff340000";
+                ipi_3_to_ipi_2 = "/axi/mailbox@ff360000/child@ff350000";
+                ipi_3_to_ipi_3 = "/axi/mailbox@ff360000/child@ff360000";
+                ipi_3_to_ipi_4 = "/axi/mailbox@ff360000/child@ff370000";
+                ipi_3_to_ipi_5 = "/axi/mailbox@ff360000/child@ff380000";
+                ipi_3_to_ipi_6 = "/axi/mailbox@ff360000/child@ff3a0000";
+                ipi_3_to_ipi_pmc = "/axi/mailbox@ff360000/child@ff320000";
+                ipi_3_to_ipi_pmc_nobuf = "/axi/mailbox@ff360000/child@ff390000";
+                ipi_3_to_ipi_psm = "/axi/mailbox@ff360000/child@ff310000";
+                ipi3 = "/axi/mailbox@ff360000";
+                ipi_4_to_ipi_0 = "/axi/mailbox@ff370000/child@ff330000";
+                ipi_4_to_ipi_1 = "/axi/mailbox@ff370000/child@ff340000";
+                ipi_4_to_ipi_2 = "/axi/mailbox@ff370000/child@ff350000";
+                ipi_4_to_ipi_3 = "/axi/mailbox@ff370000/child@ff360000";
+                ipi_4_to_ipi_4 = "/axi/mailbox@ff370000/child@ff370000";
+                ipi_4_to_ipi_5 = "/axi/mailbox@ff370000/child@ff380000";
+                ipi_4_to_ipi_6 = "/axi/mailbox@ff370000/child@ff3a0000";
+                ipi_4_to_ipi_pmc = "/axi/mailbox@ff370000/child@ff320000";
+                ipi_4_to_ipi_pmc_nobuf = "/axi/mailbox@ff370000/child@ff390000";
+                ipi_4_to_ipi_psm = "/axi/mailbox@ff370000/child@ff310000";
+                ipi4 = "/axi/mailbox@ff370000";
+                ipi_5_to_ipi_0 = "/axi/mailbox@ff380000/child@ff330000";
+                ipi_5_to_ipi_1 = "/axi/mailbox@ff380000/child@ff340000";
+                ipi_5_to_ipi_2 = "/axi/mailbox@ff380000/child@ff350000";
+                ipi_5_to_ipi_3 = "/axi/mailbox@ff380000/child@ff360000";
+                ipi_5_to_ipi_4 = "/axi/mailbox@ff380000/child@ff370000";
+                ipi_5_to_ipi_5 = "/axi/mailbox@ff380000/child@ff380000";
+                ipi_5_to_ipi_6 = "/axi/mailbox@ff380000/child@ff3a0000";
+                ipi_5_to_ipi_pmc = "/axi/mailbox@ff380000/child@ff320000";
+                ipi_5_to_ipi_pmc_nobuf = "/axi/mailbox@ff380000/child@ff390000";
+                ipi_5_to_ipi_psm = "/axi/mailbox@ff380000/child@ff310000";
+                ipi5 = "/axi/mailbox@ff380000";
+                ipi_6_to_ipi_0 = "/axi/mailbox@ff3a0000/child@ff330000";
+                ipi_6_to_ipi_1 = "/axi/mailbox@ff3a0000/child@ff340000";
+                ipi_6_to_ipi_2 = "/axi/mailbox@ff3a0000/child@ff350000";
+                ipi_6_to_ipi_3 = "/axi/mailbox@ff3a0000/child@ff360000";
+                ipi_6_to_ipi_4 = "/axi/mailbox@ff3a0000/child@ff370000";
+                ipi_6_to_ipi_5 = "/axi/mailbox@ff3a0000/child@ff380000";
+                ipi_6_to_ipi_6 = "/axi/mailbox@ff3a0000/child@ff3a0000";
+                ipi_6_to_ipi_pmc = "/axi/mailbox@ff3a0000/child@ff320000";
+                ipi_6_to_ipi_pmc_nobuf = "/axi/mailbox@ff3a0000/child@ff390000";
+                ipi_6_to_ipi_psm = "/axi/mailbox@ff3a0000/child@ff310000";
+                ipi6 = "/axi/mailbox@ff3a0000";
+                coresight = "/axi/coresight@f0800000";
+                CIPS_0_pspmc_0_psv_coresight_fpd_cti1b = "/axi/CIPS-0-pspmc-0-psv-coresight-fpd-cti1b@f0bb0000";
+                CIPS_0_pspmc_0_psv_coresight_fpd_cti1c = "/axi/CIPS-0-pspmc-0-psv-coresight-fpd-cti1c@f0bc0000";
+                CIPS_0_pspmc_0_psv_coresight_fpd_cti1d = "/axi/CIPS-0-pspmc-0-psv-coresight-fpd-cti1d@f0bd0000";
+                CIPS_0_pspmc_0_psv_coresight_lpd_cti = "/axi/CIPS-0-pspmc-0-psv-coresight-lpd-cti@f09d0000";
+                CIPS_0_pspmc_0_psv_coresight_pmc_cti = "/axi/CIPS-0-pspmc-0-psv-coresight-pmc-cti@f08d0000";
+                CIPS_0_pspmc_0_psv_coresight_r50_cti = "/axi/CIPS-0-pspmc-0-psv-coresight-r50-cti@f0a10000";
+                CIPS_0_pspmc_0_psv_coresight_r51_cti = "/axi/CIPS-0-pspmc-0-psv-coresight-r51-cti@f0a50000";
+                CIPS_0_pspmc_0_psv_cpm = "/axi/CIPS-0-pspmc-0-psv-cpm@0";
+                CIPS_0_pspmc_0_psv_pmc_analog_0 = "/axi/CIPS-0-pspmc-0-psv-pmc-analog-0@f1160000";
+                CIPS_0_pspmc_0_psv_pmc_iou_slcr_0 = "/axi/CIPS-0-pspmc-0-psv-pmc-iou-slcr-0@f1060000";
+                CIPS_0_pspmc_0_psv_pmc_tap = "/axi/CIPS-0-pspmc-0-psv-pmc-tap@f11a0000";
+                gic_its = "/axi/interrupt-controller@f9000000/msi-controller@f9020000";
+                gic = "/axi/interrupt-controller@f9000000";
+                amba = "/axi";
+                lpd_xppu = "/indirect-bus@1/xppu@ff990000";
+                pmc_xppu = "/indirect-bus@1/xppu@f1310000";
+                pmc_xppu_npi = "/indirect-bus@1/xppu@f1300000";
+                amba_xppu = "/indirect-bus@1";
+                fpd_xmpu = "/indirect-bus@2/xmpu@fd390000";
+                pmc_xmpu = "/indirect-bus@2/xmpu@f12f0000";
+                ocm_xmpu = "/indirect-bus@2/xmpu@ff980000";
+                ddrmc_xmpu_0 = "/indirect-bus@2/xmpu@f6080000";
+                ddrmc_xmpu_1 = "/indirect-bus@2/xmpu@f6220000";
+                ddrmc_xmpu_2 = "/indirect-bus@2/xmpu@f6390000";
+                ddrmc_xmpu_3 = "/indirect-bus@2/xmpu@f6500000";
+                fpd_funnel_in_port1 = "/indirect-bus@2/fpd-funnel@f0b20000/in-ports/port@1/endpoint";
+                fpd_funnel_out_port = "/indirect-bus@2/fpd-funnel@f0b20000/out-ports/port/endpoint";
+                fpd_funnel = "/indirect-bus@2/fpd-funnel@f0b20000";
+                fpd_etf_in_port = "/indirect-bus@2/fpd-etf@f0b30000/in-ports/port/endpoint";
+                fpd_etf_out_port = "/indirect-bus@2/fpd-etf@f0b30000/out-ports/port/endpoint";
+                fpd_etf = "/indirect-bus@2/fpd-etf@f0b30000";
+                replicator_in_port = "/indirect-bus@2/replicator@f0b40000/in-ports/port/endpoint";
+                replicator_out_port0 = "/indirect-bus@2/replicator@f0b40000/out-ports/port@0/endpoint";
+                replicator = "/indirect-bus@2/replicator@f0b40000";
+                etr_in_port = "/indirect-bus@2/etr@f0b50000/in-ports/port/endpoint";
+                etr = "/indirect-bus@2/etr@f0b50000";
+                funnel_in_port0 = "/indirect-bus@2/funnel@f0c20000/in-ports/port@0/endpoint";
+                funnel_in_port1 = "/indirect-bus@2/funnel@f0c20000/in-ports/port@1/endpoint";
+                funnel_out_port = "/indirect-bus@2/funnel@f0c20000/out-ports/port/endpoint";
+                apu_funnel = "/indirect-bus@2/funnel@f0c20000";
+                etf_in_port = "/indirect-bus@2/etf@f0c30000/in-ports/port/endpoint";
+                apu_etf_out_port = "/indirect-bus@2/etf@f0c30000/out-ports/port/endpoint";
+                apu_etf = "/indirect-bus@2/etf@f0c30000";
+                cpu0_debug = "/indirect-bus@2/cpu0-debug@f0d00000";
+                etm0_out_port = "/indirect-bus@2/etm@f0d30000/out-ports/port/endpoint";
+                etm0 = "/indirect-bus@2/etm@f0d30000";
+                cpu1_debug = "/indirect-bus@2/cpu1-debug@f0d40000";
+                etm1_out_port = "/indirect-bus@2/etm@f0d70000/out-ports/port/endpoint";
+                etm1 = "/indirect-bus@2/etm@f0d70000";
+                amba_xmpu = "/indirect-bus@2";
+                pl_alt_ref = "/pl-alt-ref";
+                ref = "/ref";
+                rtc_clk = "/rtc-clk";
+                can0_clk = "/can0-clk";
+                can1_clk = "/can1-clk";
+                versal_clk = "/firmware/versal-firmware/clock-controller";
+                zynqmp_power = "/firmware/versal-firmware/power-management";
+                versal_reset = "/firmware/versal-firmware/reset-controller";
+                pinctrl0 = "/firmware/versal-firmware/pinctrl";
+                bbram_zeroize = "/firmware/versal-firmware/versal-sec-cfg/nvmem-layout/bbram-zeroize@4";
+                bbram_key = "/firmware/versal-firmware/versal-sec-cfg/nvmem-layout/bbram-key@10";
+                bbram_usr = "/firmware/versal-firmware/versal-sec-cfg/nvmem-layout/bbram-usr@30";
+                bbram_lock = "/firmware/versal-firmware/versal-sec-cfg/nvmem-layout/bbram-lock@48";
+                user_key0 = "/firmware/versal-firmware/versal-sec-cfg/nvmem-layout/user-key@110";
+                user_key1 = "/firmware/versal-firmware/versal-sec-cfg/nvmem-layout/user-key@130";
+                user_key2 = "/firmware/versal-firmware/versal-sec-cfg/nvmem-layout/user-key@150";
+                user_key3 = "/firmware/versal-firmware/versal-sec-cfg/nvmem-layout/user-key@170";
+                user_key4 = "/firmware/versal-firmware/versal-sec-cfg/nvmem-layout/user-key@190";
+                user_key5 = "/firmware/versal-firmware/versal-sec-cfg/nvmem-layout/user-key@1b0";
+                user_key6 = "/firmware/versal-firmware/versal-sec-cfg/nvmem-layout/user-key@1d0";
+                user_key7 = "/firmware/versal-firmware/versal-sec-cfg/nvmem-layout/user-key@1f0";
+                versal_sec_cfg = "/firmware/versal-firmware/versal-sec-cfg";
+                versal_firmware = "/firmware/versal-firmware";
+                noc_lpddr0_ddr_memory = "/memory@00000000";
+                noc_lpddr1_ddr_memory = "/memory@50000000000";
+                noc_lpddr2_ddr_memory = "/memory@60000000000";
+        };
+};

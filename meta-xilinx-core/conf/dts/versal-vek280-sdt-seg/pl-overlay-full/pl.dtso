@@ -1,0 +1,227 @@
+/dts-v1/;
+/plugin/;
+
+&fpga {
+        firmware-name = "vek280_base_pld.pdi";
+
+        misc_clk_0: misc_clk_0 {
+                #clock-cells = <0x0>;
+                clock-frequency = <0x5f5e100>;
+                compatible = "fixed-clock";
+        };
+};
+
+&amba {
+
+        ai_engine_0: ai-engine@20000000000 {
+                xlnx,aie-site = "AIE_ML";
+                xlnx,name = "ai_engine_0";
+                xlnx,start-column = <0x0>;
+                xlnx,name-si-axi = "S00_AXI";
+                xlnx,shim-rows = /bits/ 8 <0x00 0x01>;
+                xlnx,core-rows = /bits/ 8 <0x03 0x08>;
+                xlnx,num-trig-out = <0x0>;
+                resets = <&versal_reset 0xc10405e>;
+                xlnx,en-ext-rst = <0x0>;
+                xlnx,nsu-dict = "NOC_NSU128_X1Y6 0x20000000000 NOC_NSU128_X2Y6 0x20002000000 NOC_NSU128_X3Y6 0x20008000000 NOC_NSU128_X4Y6 0x2000A000000 NOC_NSU128_X5Y6 0x20018000000 NOC_NSU128_X6Y6 0x20020000000 NOC_NSU128_X7Y6 0x2002C000000 NOC_NSU128_X8Y6 0x20032000000 NOC_NSU128_X9Y6 0x2003E000000 NOC_NSU128_X10Y6 0x20042000000 NOC_NSU128_X11Y6 0x20046000000 NOC_NSU128_X12Y6 0x2004A000000";
+                xlnx,num-trig-in = <0x0>;
+                clock-names = "aclk0";
+                xlnx,available-nsu = "NOC_NSU128_X1Y6 0x20000000000 NOC_NSU128_X2Y6 0x20002000000 NOC_NSU128_X3Y6 0x20008000000 NOC_NSU128_X4Y6 0x2000A000000 NOC_NSU128_X5Y6 0x20018000000 NOC_NSU128_X6Y6 0x20020000000 NOC_NSU128_X7Y6 0x2002C000000 NOC_NSU128_X8Y6 0x20032000000 NOC_NSU128_X9Y6 0x2003E000000 NOC_NSU128_X10Y6 0x20042000000 NOC_NSU128_X11Y6 0x20046000000 NOC_NSU128_X12Y6 0x2004A000000";
+                xlnx,selected-nsu = <0x0>;
+                xlnx,edk-iptype = "PERIPHERAL";
+                xlnx,fast-dm-write;
+                xlnx,name-si-axis = "S00_AXIS";
+                xlnx,clk-names = "aclk0";
+                xlnx,aie-core-ref-ctrl-freqmhz = <0x4e2>;
+                xlnx,num-column = <0x1>;
+                xlnx,name-mi-axi = "M00_AXI";
+                xlnx,num-si-axis = <0x0>;
+                #address-cells = <0x2>;
+                xlnx,partition-enabled = <0x0>;
+                xlnx,num-clks = <0x0>;
+                ranges;
+                xlnx,num-noc-axis-clks = <0x0>;
+                clocks = <&aie_core_ref_clk_0>;
+                reg = <0x200 0x0 0x1 0x0>;
+                xlnx,fast-pm-write;
+                xlnx,num-si-axi = <0x1>;
+                #size-cells = <0x2>;
+                xlnx,ip-name = "ai_engine";
+                xlnx,mi-destid-pins;
+                xlnx,mem-rows = /bits/ 8 <0x01 0x02>;
+                xlnx,name-mi-axis = "M00_AXIS";
+                xlnx,aie-gen = [02];
+                xlnx,aie-max-freq = <0x4e2>;
+                xlnx,en-addr-virtualization = <0x0>;
+                xlnx,num-mi-axis = <0x0>;
+                xlnx,aie-col-dict = "col00 0x20000000000 col01 0x20002000000 col02 0x20004000000 col03 0x20006000000 col04 0x20008000000 col05 0x2000A000000 col06 0x2000C000000 col07 0x2000E000000 col08 0x20010000000 col09 0x20012000000 col10 0x20014000000 col11 0x20016000000 col12 0x20018000000 col13 0x2001A000000 col14 0x2001C000000 col15 0x2001E000000 col16 0x20020000000 col17 0x20022000000 col18 0x20024000000 col19 0x20026000000 col20 0x20028000000 col21 0x2002A000000 col22 0x2002C000000 col23 0x2002E000000 col24 0x20030000000 col25 0x20032000000 col26 0x20034000000 col27 0x20036000000 col28 0x20038000000 col29 0x2003A000000 col30 0x2003C000000 col31 0x2003E000000 col32 0x20040000000 col33 0x20042000000 col34 0x20044000000 col35 0x20046000000 col36 0x20048000000 col37 0x2004A000000";
+                xlnx,aie-ref-clk-freqmhz = <0x1fc9f08>;
+                compatible = "xlnx,ai-engine-2.0", "xlnx,ai-engine-v2.0";
+                xlnx,num-mi-axi = <0x0>;
+
+                aie_aperture_0: aie_aperture@20000000000 {
+                        xlnx,columns = <0x0 0x26>;
+                        reg = <0x200 0x0 0x1 0x0>;
+                        interrupt-names = "interrupt1", "interrupt2", "interrupt3";
+                        #size-cells = <0x2>;
+                        xlnx,node-id = <0x18800000>;
+                        #address-cells = <0x2>;
+                        interrupts = <0x0 0x94 0x4 0x0 0x95 0x4 0x0 0x96 0x4>;
+                        interrupt-parent = <&gic>;
+                        xlnx,device-name = <0x0>;
+                };
+        };
+
+        axi_bram_ctrl_0: axi-bram-ctrl-0@a4000000 {
+                xlnx,name = "axi_bram_ctrl_0";
+                xlnx,s-axi-id-width = <0x1>;
+                xlnx,mem-depth = <0x800>;
+                xlnx,s-axi-ctrl-data-width = <0x20>;
+                xlnx,bram-inst-mode = "EXTERNAL";
+                xlnx,bram-addr-width = <0xb>;
+                xlnx,data-width = <0x20>;
+                clock-names = "s_axi_aclk";
+                xlnx,edk-iptype = "PERIPHERAL";
+                xlnx,ecc = <0x0>;
+                xlnx,single-port-bram = <0x0>;
+                xlnx,supports-narrow-burst = <0x0>;
+                xlnx,s-axi-supports-narrow-burst = <0x0>;
+                xlnx,id-width = <0x0>;
+                xlnx,read-latency = <0x1>;
+                xlnx,s-axi-ctrl-addr-width = <0x20>;
+                clocks = <&misc_clk_0>;
+                xlnx,bmg-instance = "EXTERNAL";
+                reg = <0x0 0xa4000000 0x0 0x2000>;
+                xlnx,ip-name = "axi_bram_ctrl";
+                xlnx,fault-inject = <0x0>;
+                xlnx,use-ecc = <0x0>;
+                xlnx,memory-depth = <0x800>;
+                xlnx,rd-cmd-optimization = <0x0>;
+                xlnx,ecc-type = <0x0>;
+                xlnx,ecc-onoff-reset-value = <0x0>;
+                compatible = "xlnx,axi-bram-ctrl-4.1", "xlnx,axi-bram-ctrl";
+                xlnx,edk-special = "BRAM_CTRL";
+                xlnx,protocol = "AXI4";
+        };
+
+        axi_gpio_0: gpio@a6010000 {
+                xlnx,all-inputs = <0x0>;
+                xlnx,name = "axi_gpio_0";
+                xlnx,tri-default = <0xffffffff>;
+                xlnx,use-board-flow;
+                clock-names = "s_axi_aclk";
+                xlnx,gpio2-width = <0x20>;
+                xlnx,dout-default-2 = <0x0>;
+                xlnx,edk-iptype = "PERIPHERAL";
+                xlnx,gpio2-board-interface = "Custom";
+                xlnx,interrupt-present = <0x0>;
+                device_type = "gpio";
+                gpio-controller;
+                xlnx,all-outputs-2 = <0x0>;
+                clocks = <&misc_clk_0>;
+                xlnx,all-inputs-2 = <0x0>;
+                reg = <0x0 0xa6010000 0x0 0x10000>;
+                xlnx,tri-default-2 = <0xffffffff>;
+                xlnx,ip-name = "axi_gpio";
+                xlnx,is-dual = <0x0>;
+                xlnx,dout-default = <0x0>;
+                xlnx,gpio-width = <0x4>;
+                #gpio-cells = <0x2>;
+                xlnx,all-outputs = <0x1>;
+                compatible = "xlnx,axi-gpio-2.0", "xlnx,xps-gpio-1.00.a";
+                xlnx,gpio-board-interface = "gpio_led";
+        };
+
+        axi_gpio_1: gpio@a6020000 {
+                xlnx,all-inputs = <0x1>;
+                xlnx,name = "axi_gpio_1";
+                xlnx,tri-default = <0xffffffff>;
+                xlnx,use-board-flow;
+                clock-names = "s_axi_aclk";
+                xlnx,gpio2-width = <0x20>;
+                xlnx,dout-default-2 = <0x0>;
+                xlnx,edk-iptype = "PERIPHERAL";
+                xlnx,gpio2-board-interface = "Custom";
+                xlnx,interrupt-present = <0x0>;
+                device_type = "gpio";
+                gpio-controller;
+                xlnx,all-outputs-2 = <0x0>;
+                clocks = <&misc_clk_0>;
+                xlnx,all-inputs-2 = <0x0>;
+                reg = <0x0 0xa6020000 0x0 0x10000>;
+                xlnx,tri-default-2 = <0xffffffff>;
+                xlnx,ip-name = "axi_gpio";
+                xlnx,is-dual = <0x0>;
+                xlnx,dout-default = <0x0>;
+                xlnx,gpio-width = <0x2>;
+                #gpio-cells = <0x2>;
+                xlnx,all-outputs = <0x0>;
+                compatible = "xlnx,axi-gpio-2.0", "xlnx,xps-gpio-1.00.a";
+                xlnx,gpio-board-interface = "gpio_pb";
+        };
+
+        axi_gpio_2: gpio@a6030000 {
+                xlnx,all-inputs = <0x1>;
+                xlnx,name = "axi_gpio_2";
+                xlnx,tri-default = <0xffffffff>;
+                xlnx,use-board-flow;
+                clock-names = "s_axi_aclk";
+                xlnx,gpio2-width = <0x20>;
+                xlnx,dout-default-2 = <0x0>;
+                xlnx,edk-iptype = "PERIPHERAL";
+                xlnx,gpio2-board-interface = "Custom";
+                xlnx,interrupt-present = <0x0>;
+                device_type = "gpio";
+                gpio-controller;
+                xlnx,all-outputs-2 = <0x0>;
+                clocks = <&misc_clk_0>;
+                xlnx,all-inputs-2 = <0x0>;
+                reg = <0x0 0xa6030000 0x0 0x10000>;
+                xlnx,tri-default-2 = <0xffffffff>;
+                xlnx,ip-name = "axi_gpio";
+                xlnx,is-dual = <0x0>;
+                xlnx,dout-default = <0x0>;
+                xlnx,gpio-width = <0x4>;
+                #gpio-cells = <0x2>;
+                xlnx,all-outputs = <0x0>;
+                compatible = "xlnx,axi-gpio-2.0", "xlnx,xps-gpio-1.00.a";
+                xlnx,gpio-board-interface = "gpio_dp";
+        };
+
+        axi_uart16550_0: serial@a6000000 {
+                xlnx,name = "axi_uart16550_0";
+                xlnx,is-a-16550 = <0x1>;
+                xlnx,base-user = <0x1>;
+                xlnx,use-board-flow;
+                clock-names = "s_axi_aclk";
+                xlnx,clock-freq = <0x5f5e100>;
+                xlnx,external-xin-clk-hz-d = <0x19>;
+                xlnx,edk-iptype = "PERIPHERAL";
+                device_type = "serial";
+                xlnx,use-modem-ports = <0x1>;
+                clocks = <&misc_clk_0>;
+                xlnx,has-external-xin = <0x0>;
+                reg = <0x0 0xa6000000 0x0 0x10000>;
+                xlnx,ip-name = "axi_uart16550";
+                xlnx,uart-board-interface = "sysctrl_uart";
+                xlnx,sim-device = "VERSAL_AI_EDGE";
+                xlnx,use-user-ports = <0x1>;
+                xlnx,s-axi-aclk-freq-hz-d = <0x64>;
+                xlnx,has-external-rclk = <0x0>;
+                xlnx,external-xin-clk-hz = <0x17d7840>;
+                compatible = "xlnx,axi-uart16550-2.0", "xlnx,axi-uart16550";
+        };
+
+        aie_core_ref_clk_0: aie_core_ref_clk_0 {
+                #clock-cells = <0x0>;
+                clock-frequency = <0x4a817c80>;
+                compatible = "fixed-clock";
+        };
+
+        zyxclmm_drm {
+                compatible = "xlnx,zocl-versal";
+                interrupt-parent = <&gic>;
+                interrupts = <0x0 0x89 0x4 0x0 0x90 0x4 0x0 0x91 0x4 0x0 0x92 0x4 0x0 0x93 0x4 0x0 0x94 0x4 0x0 0x95 0x4 0x0 0x96 0x4>;
+        };
+};
+

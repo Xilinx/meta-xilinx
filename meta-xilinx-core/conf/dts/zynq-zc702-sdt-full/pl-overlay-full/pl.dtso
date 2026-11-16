@@ -1,0 +1,79 @@
+/dts-v1/;
+/plugin/;
+
+&fpga_full {
+        firmware-name = "zc702_base.bit.bin";
+
+        clocking0: clocking0 {
+                clocks = <&clkc 0xf>;
+                clock-output-names = "fabric_clk";
+                #clock-cells = <0x0>;
+                assigned-clock-rates = <0x2faf080>;
+                assigned-clocks = <&clkc 0xf>;
+                compatible = "xlnx,fclk";
+        };
+};
+
+&amba {
+
+        axi_bram_ctrl_0: axi-bram-ctrl-0@40000000 {
+                xlnx,name = "axi_bram_ctrl_0";
+                xlnx,s-axi-id-width = <0x1>;
+                xlnx,mem-depth = <0x800>;
+                xlnx,s-axi-ctrl-data-width = <0x20>;
+                xlnx,bram-inst-mode = "EXTERNAL";
+                xlnx,bram-addr-width = <0xb>;
+                xlnx,data-width = <0x20>;
+                clock-names = "s_axi_aclk";
+                xlnx,edk-iptype = "PERIPHERAL";
+                xlnx,ecc = <0x0>;
+                xlnx,single-port-bram = <0x0>;
+                xlnx,supports-narrow-burst = <0x0>;
+                xlnx,s-axi-supports-narrow-burst = <0x0>;
+                xlnx,id-width = <0x0>;
+                xlnx,read-latency = <0x1>;
+                xlnx,s-axi-ctrl-addr-width = <0x20>;
+                clocks = <&clkc 0xf>;
+                xlnx,bmg-instance = "EXTERNAL";
+                reg = <0x40000000 0x2000>;
+                xlnx,ip-name = "axi_bram_ctrl";
+                xlnx,fault-inject = <0x0>;
+                xlnx,use-ecc = <0x0>;
+                xlnx,memory-depth = <0x800>;
+                xlnx,rd-cmd-optimization = <0x0>;
+                xlnx,ecc-type = <0x0>;
+                xlnx,ecc-onoff-reset-value = <0x0>;
+                compatible = "xlnx,axi-bram-ctrl-4.1", "xlnx,axi-bram-ctrl";
+                xlnx,edk-special = "BRAM_CTRL";
+                xlnx,protocol = "AXI4";
+        };
+
+        axi_gpio_0: gpio@41200000 {
+                xlnx,all-inputs = <0x0>;
+                xlnx,name = "axi_gpio_0";
+                xlnx,tri-default = <0xffffffff>;
+                xlnx,use-board-flow;
+                clock-names = "s_axi_aclk";
+                xlnx,gpio2-width = <0x20>;
+                xlnx,dout-default-2 = <0x0>;
+                xlnx,edk-iptype = "PERIPHERAL";
+                xlnx,gpio2-board-interface = "Custom";
+                xlnx,interrupt-present = <0x0>;
+                device_type = "gpio";
+                gpio-controller;
+                xlnx,all-outputs-2 = <0x0>;
+                clocks = <&clkc 0xf>;
+                xlnx,all-inputs-2 = <0x0>;
+                reg = <0x41200000 0x10000>;
+                xlnx,tri-default-2 = <0xffffffff>;
+                xlnx,ip-name = "axi_gpio";
+                xlnx,is-dual = <0x0>;
+                xlnx,dout-default = <0x0>;
+                xlnx,gpio-width = <0x4>;
+                #gpio-cells = <0x2>;
+                xlnx,all-outputs = <0x1>;
+                compatible = "xlnx,axi-gpio-2.0", "xlnx,xps-gpio-1.00.a";
+                xlnx,gpio-board-interface = "leds_4bits";
+        };
+};
+
