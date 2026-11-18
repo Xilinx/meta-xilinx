@@ -2,11 +2,11 @@ SUMMARY = "Recipe to download SDT artifacts and extract to directory"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-PROVIDES = "virtual/sdt"
+PROVIDES = "virtual/sdt ${@'virtual/xilinx-platform-init' if d.getVar('PLATFORM_INIT_FILES') else ''}"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-inherit deploy image-artifact-names
+inherit deploy image-artifact-names xilinx-platform-init
 
 # The user is expected to define SDT_URI, and SDT_URI[sha256sum].  Optionally
 # they may also define SDT_URI[S] to define the unpacking path.
@@ -49,6 +49,12 @@ do_install() {
     else
         cp --preserve=mode,timestamps -R ${S}/* ${D}${datadir}/sdt/${MACHINE}/.
     fi
+    if [ -n "${PLATFORM_INIT_FILES}" ]; then
+        install -d ${D}${PLATFORM_INIT_DIR}
+        for i in ${PLATFORM_INIT_FILES}; do
+            install -m 0644 ${S}/$i ${D}${PLATFORM_INIT_DIR}/
+        done
+    fi
 }
 
 # Artifacts has plm.elf, psm.elf or other aie elf hence we need to strip and skip
@@ -58,7 +64,8 @@ INHIBIT_SYSROOT_STRIP = "1"
 INHIBIT_PACKAGE_STRIP = "1"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 
-FILES:${PN} = "${datadir}/sdt/${MACHINE}"
+SYSROOT_DIRS += "${PLATFORM_INIT_DIR}"
+FILES:${PN} = "${datadir}/sdt/${MACHINE} ${PLATFORM_INIT_DIR}"
 
 do_deploy() {
     install -d ${DEPLOYDIR}/system-dt${IMAGE_VERSION_SUFFIX}
